@@ -159,3 +159,17 @@ export type DataComparison = {
   rival: number;
   unit: string;
 };
+
+export type PrimerEquipoGender = "masculino" | "femenino";
+
+export type MatchArticle = {
+  id: string;
+  matchId: string;
+  gender: PrimerEquipoGender;
+  type: "cronica" | "previa";
+  title: string;
+  date: string;
+  source: string;
+  excerpt: string;
+  body: string[];
+};

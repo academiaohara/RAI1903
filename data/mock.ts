@@ -1,7 +1,9 @@
-import type { AcademyTeam, DataComparison, Match, Matchday, NewsItem, Player, PressLink, Team, TransferRumor, UserPredictionSummary } from "@/types";
+import type { AcademyTeam, DataComparison, Match, MatchArticle, Matchday, NewsItem, Player, PressLink, Team, TransferRumor, UserPredictionSummary } from "@/types";
 
 export const RAI_TEAM_ID = "real-aviles-industrial";
+export const RAI_FEM_TEAM_ID = "real-aviles-industrial-femenino";
 export const COMPETITION_NAME = "Liga RAI1903 Norte";
+export const COMPETITION_NAME_FEM = "Liga Femenina RAI1903";
 
 export const teams: Team[] = [
   { id: RAI_TEAM_ID, name: "Real Aviles Industrial", shortName: "Aviles", city: "Aviles", stadium: "Roman Suarez Puerta", coach: "Miguel Alonso", founded: 1903, crestInitials: "RAI", colors: ["#214C9B", "#FFFFFF"], position: 3, form: ["W", "W", "D", "L", "W"], stats: { played: 9, won: 5, drawn: 2, lost: 2, goalsFor: 16, goalsAgainst: 9, points: 17 } },
@@ -25,6 +27,21 @@ export const teams: Team[] = [
   { id: "rayo-cantabria", name: "Rayo Cantabria", shortName: "Rayo Cantabria", city: "Santander", stadium: "La Albericia", coach: "Ezequiel Loza", founded: 1993, crestInitials: "RAC", colors: ["#22C55E", "#FFFFFF"], position: 19, form: ["L", "L", "D", "L", "L"], stats: { played: 9, won: 1, drawn: 2, lost: 6, goalsFor: 5, goalsAgainst: 15, points: 5 } },
   { id: "cristo-atletico", name: "CD Cristo Atletico", shortName: "Cristo", city: "Palencia", stadium: "Nueva Balastera", coach: "Ruben Gala", founded: 1985, crestInitials: "CTA", colors: ["#6D28D9", "#F8FAFC"], position: 20, form: ["L", "L", "D", "L", "D"], stats: { played: 9, won: 0, drawn: 4, lost: 5, goalsFor: 4, goalsAgainst: 15, points: 4 } },
 ];
+
+export const teamsFemenino: Team[] = teams.map((team) =>
+  team.id === RAI_TEAM_ID
+    ? {
+        ...team,
+        id: RAI_FEM_TEAM_ID,
+        name: "Real Aviles Industrial Femenino",
+        shortName: "Aviles Fem.",
+        coach: "Laura Menendez",
+        position: 2,
+        form: ["W", "D", "W", "W", "D"],
+        stats: { played: 9, won: 6, drawn: 2, lost: 1, goalsFor: 18, goalsAgainst: 7, points: 20 },
+      }
+    : { ...team, position: team.position === 1 ? 3 : team.position === 3 ? 1 : team.position },
+);
 
 const teamById = new Map(teams.map((team) => [team.id, team]));
 
@@ -100,6 +117,126 @@ export const players: Player[] = [
   { id: "enol-ferreiro", firstName: "Enol", lastName: "Ferreiro", displayName: "E. Ferreiro", number: 19, position: "Centrocampista", nationality: "Espana", age: 19, birthDate: "2007-01-21", height: "1,73 m", preferredFoot: "Derecha", seasonsAtClub: 8, status: "cantera", rating: 6.89, bio: "Interior con energia, buen golpeo desde media distancia y caracter competitivo.", clubHistory: ["Real Aviles Infantil", "Real Aviles Juvenil", "Real Aviles Industrial"], stats: { appearances: 5, goals: 1, assists: 1, minutes: 249, yellowCards: 1, redCards: 0 } },
   { id: "samuel-rodriguez", firstName: "Samuel", lastName: "Rodriguez", displayName: "S. Rodriguez", number: 21, position: "Delantero", nationality: "Espana", age: 25, birthDate: "2001-03-30", height: "1,85 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "nuevo fichaje", rating: 6.96, bio: "Segundo punta de apoyos, buen juego de espaldas y lectura para descargar de cara.", clubHistory: ["Bergantinos FC", "Real Aviles Industrial"], stats: { appearances: 8, goals: 3, assists: 2, minutes: 511, yellowCards: 2, redCards: 0 } },
 ];
+
+export const playersFemenino: Player[] = [
+  { id: "fem-lucia-ramos", firstName: "Lucia", lastName: "Ramos", displayName: "L. Ramos", number: 1, position: "Portero", nationality: "Espana", age: 27, birthDate: "1999-04-12", height: "1,74 m", preferredFoot: "Derecha", seasonsAtClub: 4, status: "titular", rating: 7.32, bio: "Portera referente del bloque femenino, fuerte en uno contra uno y salida de balon.", clubHistory: ["Sporting de Gijon Femenino", "Real Aviles Industrial Femenino"], stats: { appearances: 9, goals: 0, assists: 0, minutes: 810, yellowCards: 0, redCards: 0 } },
+  { id: "fem-sara-perez", firstName: "Sara", lastName: "Perez", displayName: "S. Perez", number: 3, position: "Defensa", nationality: "Espana", age: 24, birthDate: "2002-08-03", height: "1,69 m", preferredFoot: "Izquierda", seasonsAtClub: 2, status: "titular", rating: 7.08, bio: "Central rapida y agresiva en marca, lider del eje defensivo.", clubHistory: ["Oviedo Moderno", "Real Aviles Industrial Femenino"], stats: { appearances: 9, goals: 1, assists: 0, minutes: 801, yellowCards: 2, redCards: 0 } },
+  { id: "fem-claudia-nunez", firstName: "Claudia", lastName: "Nunez", displayName: "C. Nunez", number: 6, position: "Centrocampista", nationality: "Espana", age: 26, birthDate: "2000-11-19", height: "1,66 m", preferredFoot: "Derecha", seasonsAtClub: 3, status: "titular", rating: 7.44, bio: "Mediocentro con gran volumen de juego y capacidad para romper presion.", clubHistory: ["Real Aviles Industrial Femenino"], stats: { appearances: 9, goals: 2, assists: 4, minutes: 790, yellowCards: 3, redCards: 0 } },
+  { id: "fem-irene-costa", firstName: "Irene", lastName: "Costa", displayName: "I. Costa", number: 9, position: "Delantero", nationality: "Espana", age: 23, birthDate: "2003-01-27", height: "1,71 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "titular", rating: 7.61, bio: "Delantera goleadora, fuerte en el juego aereo y en la finalizacion rapida.", clubHistory: ["CD Orientacion Maritima", "Real Aviles Industrial Femenino"], stats: { appearances: 9, goals: 8, assists: 2, minutes: 742, yellowCards: 1, redCards: 0 } },
+  { id: "fem-noa-garcia", firstName: "Noa", lastName: "Garcia", displayName: "N. Garcia", number: 11, position: "Delantero", nationality: "Espana", age: 21, birthDate: "2005-06-15", height: "1,68 m", preferredFoot: "Izquierda", seasonsAtClub: 5, status: "cantera", rating: 7.02, bio: "Extrema zurda con desborde y llegada constante al segundo palo.", clubHistory: ["Real Aviles Cadete Femenino", "Real Aviles Industrial Femenino"], stats: { appearances: 8, goals: 3, assists: 5, minutes: 655, yellowCards: 1, redCards: 0 } },
+  { id: "fem-marta-diaz", firstName: "Marta", lastName: "Diaz", displayName: "M. Diaz", number: 14, position: "Defensa", nationality: "Espana", age: 29, birthDate: "1997-09-08", height: "1,72 m", preferredFoot: "Derecha", seasonsAtClub: 2, status: "titular", rating: 6.98, bio: "Lateral derecha con proyeccion y centros al area rival.", clubHistory: ["UD Santa Teresa", "Real Aviles Industrial Femenino"], stats: { appearances: 8, goals: 0, assists: 3, minutes: 710, yellowCards: 2, redCards: 0 } },
+  { id: "fem-alba-torre", firstName: "Alba", lastName: "Torre", displayName: "A. Torre", number: 17, position: "Centrocampista", nationality: "Espana", age: 20, birthDate: "2006-03-22", height: "1,65 m", preferredFoot: "Ambidiestro", seasonsAtClub: 6, status: "cantera", rating: 6.88, bio: "Interior joven con buen golpeo desde media distancia.", clubHistory: ["Real Aviles Juvenil Femenino", "Real Aviles Industrial Femenino"], stats: { appearances: 7, goals: 1, assists: 2, minutes: 402, yellowCards: 0, redCards: 0 } },
+  { id: "fem-elena-rios", firstName: "Elena", lastName: "Rios", displayName: "E. Rios", number: 19, position: "Centrocampista", nationality: "Espana", age: 25, birthDate: "2001-12-30", height: "1,67 m", preferredFoot: "Izquierda", seasonsAtClub: 1, status: "nuevo fichaje", rating: 7.15, bio: "Media punta con vision y ultimo pase para activar a las delanteras.", clubHistory: ["Zaragoza CFF B", "Real Aviles Industrial Femenino"], stats: { appearances: 9, goals: 4, assists: 3, minutes: 688, yellowCards: 2, redCards: 0 } },
+];
+
+const buildMatchArticles = (matches: Match[]): MatchArticle[] => {
+  const avilesMatches = matches.filter((match) => match.homeTeamId === RAI_TEAM_ID || match.awayTeamId === RAI_TEAM_ID);
+  const finished = avilesMatches.filter((match) => match.status === "finished");
+  const scheduled = avilesMatches.filter((match) => match.status === "scheduled").slice(0, 6);
+
+  const cronicas: MatchArticle[] = finished.map((match) => ({
+    id: `cronica-${match.id}`,
+    matchId: match.id,
+    gender: "masculino",
+    type: "cronica",
+    title: `Cronica: ${match.homeTeam} ${match.homeScore}-${match.awayScore} ${match.awayTeam}`,
+    date: match.date,
+    source: "RAI1903",
+    excerpt: `Resumen de la jornada ${match.matchday} con lectura tactica, protagonistas y sensaciones del vestuario blanquiazul.`,
+    body: [
+      `El encuentro de la jornada ${match.matchday} dejo un marcador de ${match.homeScore}-${match.awayScore} en ${match.venue}.`,
+      "El Real Aviles Industrial controló los primeros compases con presion alta y transiciones rapidas por banda.",
+      "La segunda parte confirmo el guion del equipo, que supo administrar ventaja y cerrar espacios sin perder verticalidad.",
+      "Miguel Alonso valoró la intensidad defensiva y la capacidad del grupo para competir partido a partido.",
+    ],
+  }));
+
+  const previas: MatchArticle[] = scheduled.map((match) => ({
+    id: `previa-${match.id}`,
+    matchId: match.id,
+    gender: "masculino",
+    type: "previa",
+    title: `Previa: ${match.homeTeam} vs ${match.awayTeam}`,
+    date: match.date,
+    source: "AsturFutbol",
+    excerpt: `Analisis del duelo de la jornada ${match.matchday}: forma reciente, claves tacticas y estado de la plantilla.`,
+    body: [
+      `El Real Aviles Industrial afronta la jornada ${match.matchday} ante ${match.awayTeamId === RAI_TEAM_ID ? match.homeTeam : match.awayTeam}.`,
+      "El cuerpo tecnico llega con la plantilla casi completa y rotaciones pensadas para sostener el ritmo competitivo.",
+      "La clave pasara por dominar los duelos en campo abierto y aprovechar las acciones a balon parado.",
+      "El Roman Suarez Puerta busca otro ambiente exigente para empujar al equipo en un tramo decisivo de la liga.",
+    ],
+  }));
+
+  const femeninoExtras: MatchArticle[] = [
+    {
+      id: "cronica-fem-j8",
+      matchId: "fem-j8-llanera",
+      gender: "femenino",
+      type: "cronica",
+      title: "Cronica: Aviles Femenino 3-1 Llanera",
+      date: "2026-10-12T11:00:00.000Z",
+      source: "RAI1903",
+      excerpt: "Victoria contundente con hat-trick parcial de Irene Costa y gran actitud colectiva.",
+      body: [
+        "El bloque femenino firmó un partido completo desde el inicio, con Claudia Nunez mandando en el centro del campo.",
+        "Irene Costa resolvió con frialdad tres ocasiones claras y el equipo mantuvo la porteria segura en los tramos finales.",
+        "Laura Menendez destacó la madurez del grupo y la proyeccion de las jugadoras de cantera.",
+      ],
+    },
+    {
+      id: "previa-fem-j10",
+      matchId: "fem-j10-covadonga",
+      gender: "femenino",
+      type: "previa",
+      title: "Previa: Covadonga vs Aviles Femenino",
+      date: "2026-10-26T11:30:00.000Z",
+      source: "Futbol Femenino Norte",
+      excerpt: "Duelo directo por el liderato con dos estilos de presión alta y transición rápida.",
+      body: [
+        "El Aviles Femenino viaja con la segunda posicion asegurada y la ambición de recuperar el liderato.",
+        "Se espera rotación mínima en defensa y mayor protagonismo de Noa Garcia por la banda izquierda.",
+        "El partido puede decidirse en los primeros quince minutos de cada parte.",
+      ],
+    },
+  ];
+
+  const cronicasFemenino: MatchArticle[] = finished.map((match) => ({
+    id: `cronica-fem-${match.id}`,
+    matchId: match.id,
+    gender: "femenino",
+    type: "cronica",
+    title: `Cronica femenina: ${match.homeTeam} ${match.homeScore}-${match.awayScore} ${match.awayTeam}`,
+    date: match.date,
+    source: "RAI1903",
+    excerpt: "Resumen del bloque femenino con protagonismo de Irene Costa y Claudia Nunez.",
+    body: [
+      `La jornada ${match.matchday} dejo un ${match.homeScore}-${match.awayScore} para el primer equipo femenino.`,
+      "El equipo mostro intensidad sin balon y solvencia en los ultimos metros.",
+      "Laura Menendez destaco la madurez del grupo y la aportacion de la cantera.",
+    ],
+  }));
+
+  const previasFemenino: MatchArticle[] = scheduled.map((match) => ({
+    id: `previa-fem-${match.id}`,
+    matchId: match.id,
+    gender: "femenino",
+    type: "previa",
+    title: `Previa femenina: ${match.homeTeam} vs ${match.awayTeam}`,
+    date: match.date,
+    source: "Futbol Femenino Norte",
+    excerpt: `Analisis femenino de la jornada ${match.matchday} con estado de forma y convocatoria.`,
+    body: [
+      `El Aviles Femenino afronta la jornada ${match.matchday} con ambicion de sumar en la parte alta de la tabla.`,
+      "Laura Menendez cuenta con la base titular y rotaciones para mantener la intensidad.",
+      "La clave sera el duelo en bandas y la capacidad de cerrar el partido desde balon parado.",
+    ],
+  }));
+
+  return [...cronicas, ...previas, ...cronicasFemenino, ...previasFemenino, ...femeninoExtras];
+};
+
+export const matchArticles: MatchArticle[] = buildMatchArticles(matchdays.flatMap((matchday) => matchday.matches));
 
 export const newsItems: NewsItem[] = [
   { id: "n1", source: "RAI1903", date: "2026-10-20", title: "El Aviles encuentra una marcha mas antes del tramo clave", excerpt: "El equipo suma siete puntos de nueve y gana solidez en las areas, con Llera y Navia liderando la produccion ofensiva.", url: "https://example.com/rai1903/aviles-tramo-clave", tags: ["club", "partido"], featured: true },

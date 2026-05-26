@@ -15,9 +15,9 @@ export function PageHero({ eyebrow, title, description, children, className }: P
     <section className={cn(className)}>
       <Badge tone="blue">{eyebrow}</Badge>
       <div className="mt-4 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
-        <div>
+        <div className="w-fit max-w-full">
           <h1 className="text-5xl font-extrabold uppercase leading-none text-[#214C9B] sm:text-6xl">{title}</h1>
-          <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">{description}</p>
+          <p className="mt-3 text-base leading-7 text-slate-600">{description}</p>
         </div>
         {children}
       </div>
