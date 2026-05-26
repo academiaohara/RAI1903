@@ -4,9 +4,12 @@ const nextConfig: NextConfig = {
   typedRoutes: true,
   async redirects() {
     return [
+      { source: "/primer-equipo", destination: "/primer-equipo/masculino/plantilla", permanent: false },
       { source: "/primer-equipo/plantilla", destination: "/primer-equipo/masculino/plantilla", permanent: false },
       { source: "/primer-equipo/noticias", destination: "/primer-equipo/masculino/noticias", permanent: false },
       { source: "/primer-equipo/competicion", destination: "/primer-equipo/masculino/competicion", permanent: false },
+      { source: "/primer-equipo/cronicas", destination: "/primer-equipo/masculino/cronicas", permanent: false },
+      { source: "/primer-equipo/previas", destination: "/primer-equipo/masculino/previas", permanent: false },
     ];
   },
 };

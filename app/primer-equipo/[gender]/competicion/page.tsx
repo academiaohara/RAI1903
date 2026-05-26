@@ -3,10 +3,10 @@ import { LeagueTableCard } from "@/components/LeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
 import { PageHero } from "@/components/PageHero";
 import { RivalCard } from "@/components/RivalCard";
-import { SectionTabs } from "@/components/SectionTabs";
+import { PrimerEquipoSubnav } from "@/components/PrimerEquipoSubnav";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import { getTeamsByGender, getUpcomingAvilesMatchesByGender } from "@/lib/fixtures";
-import { genderLabels, getPrimerEquipoTabs, type PrimerEquipoGender } from "@/lib/primer-equipo";
+import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
 
 export default async function PrimerEquipoCompeticionPage({ params }: { params: Promise<{ gender: PrimerEquipoGender }> }) {
   const { gender } = await params;
@@ -21,7 +21,7 @@ export default async function PrimerEquipoCompeticionPage({ params }: { params: 
         title="Competicion"
         description="Clasificacion, proximos partidos y rivales directos en una pagina independiente."
       />
-      <SectionTabs tabs={getPrimerEquipoTabs(gender)} />
+      <PrimerEquipoSubnav gender={gender} />
 
       <section className="grid gap-6 xl:grid-cols-[1fr_0.85fr]">
         <LeagueTableCard eyebrow="Competicion" title="Clasificacion" teams={teams} highlightTeamId={highlightTeamId} />

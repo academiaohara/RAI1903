@@ -6,8 +6,8 @@ import { Card } from "@/components/Card";
 import { Modal } from "@/components/Modal";
 import { PageHero } from "@/components/PageHero";
 import { PlayerCard } from "@/components/PlayerCard";
-import { SectionTabs } from "@/components/SectionTabs";
-import { genderLabels, getPrimerEquipoTabs, type PrimerEquipoGender } from "@/lib/primer-equipo";
+import { PrimerEquipoSubnav } from "@/components/PrimerEquipoSubnav";
+import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getPlayersByGender } from "@/lib/primer-equipo-data";
 import type { Player, PlayerPosition } from "@/types";
 import { use } from "react";
@@ -30,7 +30,7 @@ export default function PlantillaPage({ params }: { params: Promise<{ gender: st
         title="Plantilla"
         description={`Jugadores, parte semanal y fichas individuales de ${genderLabels[gender].club}.`}
       />
-      <SectionTabs tabs={getPrimerEquipoTabs(gender)} />
+      <PrimerEquipoSubnav gender={gender} />
 
       <Card eyebrow="Plantilla" title="Lista de jugadores">
         <div className="mb-5 flex flex-wrap gap-2">

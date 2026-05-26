@@ -15,6 +15,10 @@ export function primerEquipoBase(gender: PrimerEquipoGender) {
   return `/primer-equipo/${gender}`;
 }
 
+export const PRIMER_EQUIPO_SECTIONS = ["plantilla", "noticias", "competicion", "cronicas", "previas"] as const;
+
+export type PrimerEquipoSection = (typeof PRIMER_EQUIPO_SECTIONS)[number];
+
 export function getPrimerEquipoTabs(gender: PrimerEquipoGender) {
   const base = primerEquipoBase(gender);
   return [
@@ -24,4 +28,18 @@ export function getPrimerEquipoTabs(gender: PrimerEquipoGender) {
     { href: `${base}/cronicas`, label: "Cronicas" },
     { href: `${base}/previas`, label: "Previas" },
   ];
+}
+
+/** Keeps the current subsection when switching between masculino and femenino. */
+export function primerEquipoPathForGender(pathname: string, gender: PrimerEquipoGender) {
+  const match = pathname.match(/^\/primer-equipo\/(?:masculino|femenino)(\/.*)?$/);
+  const rest = match?.[1] ?? "/plantilla";
+  const segments = rest.split("/").filter(Boolean);
+  const section = segments[0];
+
+  if (section && PRIMER_EQUIPO_SECTIONS.includes(section as PrimerEquipoSection)) {
+    return `${primerEquipoBase(gender)}/${section}`;
+  }
+
+  return `${primerEquipoBase(gender)}/plantilla`;
 }

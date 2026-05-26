@@ -4,9 +4,9 @@ import { use, useState } from "react";
 import { Card } from "@/components/Card";
 import { NewsCard } from "@/components/NewsCard";
 import { PageHero } from "@/components/PageHero";
-import { SectionTabs } from "@/components/SectionTabs";
+import { PrimerEquipoSubnav } from "@/components/PrimerEquipoSubnav";
 import { newsItems } from "@/data/mock";
-import { genderLabels, getPrimerEquipoTabs, type PrimerEquipoGender } from "@/lib/primer-equipo";
+import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { NewsCategory, NewsTag } from "@/types";
 
 const newsCategoryTags: Record<NewsCategory, NewsTag> = {
@@ -30,7 +30,7 @@ export default function PrimerEquipoNoticiasPage({ params }: { params: Promise<{
         title="Noticias"
         description="Actualidad del primer equipo filtrada por categorias mock."
       />
-      <SectionTabs tabs={getPrimerEquipoTabs(gender)} />
+      <PrimerEquipoSubnav gender={gender} />
 
       <Card eyebrow="Noticias" title="Categorias del primer equipo">
         <div className="mb-5 flex flex-wrap gap-2">

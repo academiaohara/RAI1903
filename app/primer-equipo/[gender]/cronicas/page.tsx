@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Card } from "@/components/Card";
 import { PageHero } from "@/components/PageHero";
-import { SectionTabs } from "@/components/SectionTabs";
+import { PrimerEquipoSubnav } from "@/components/PrimerEquipoSubnav";
 import { getMatchArticles } from "@/lib/match-articles";
-import { genderLabels, getPrimerEquipoTabs, primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
+import { genderLabels, primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { formatDate } from "@/lib/utils";
 import type { Route } from "next";
 
@@ -14,7 +14,7 @@ export default async function CronicasPage({ params }: { params: Promise<{ gende
   return (
     <div className="space-y-6">
       <PageHero eyebrow={`Primer Equipo · ${genderLabels[gender].title}`} title="Cronicas" description="Resumenes de partidos disputados con lectura tactica y sensaciones del vestuario." />
-      <SectionTabs tabs={getPrimerEquipoTabs(gender)} />
+      <PrimerEquipoSubnav gender={gender} />
 
       <Card eyebrow="Partidos disputados" title="Archivo de cronicas">
         <div className="space-y-3">
