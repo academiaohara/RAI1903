@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Card } from "@/components/Card";
 import { PageHero } from "@/components/PageHero";
-import { SectionTabs } from "@/components/SectionTabs";
+import { PrimerEquipoSubnav } from "@/components/PrimerEquipoSubnav";
 import { getMatchArticles } from "@/lib/match-articles";
-import { genderLabels, getPrimerEquipoTabs, primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
+import { genderLabels, primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { formatDate } from "@/lib/utils";
 import type { Route } from "next";
 
@@ -14,7 +14,7 @@ export default async function PreviasPage({ params }: { params: Promise<{ gender
   return (
     <div className="space-y-6">
       <PageHero eyebrow={`Primer Equipo · ${genderLabels[gender].title}`} title="Previas" description="Analisis previos a cada jornada con forma reciente, claves tacticas y estado de la plantilla." />
-      <SectionTabs tabs={getPrimerEquipoTabs(gender)} />
+      <PrimerEquipoSubnav gender={gender} />
 
       <Card eyebrow="Proximos duelos" title="Archivo de previas">
         <div className="space-y-3">
