@@ -4,12 +4,12 @@ import { cn } from "@/lib/utils";
 type BadgeTone = "blue" | "red" | "green" | "amber" | "slate" | "white";
 
 const toneClasses: Record<BadgeTone, string> = {
-  blue: "border-blue-200 bg-blue-50 text-[#1c4f9c]",
-  red: "border-red-200 bg-red-50 text-[#c4121a]",
+  blue: "border-blue-200 bg-blue-50 text-[#214C9B]",
+  red: "border-red-200 bg-red-50 text-[#981915]",
   green: "border-emerald-200 bg-emerald-50 text-emerald-700",
   amber: "border-amber-200 bg-amber-50 text-amber-700",
   slate: "border-slate-200 bg-slate-100 text-slate-700",
-  white: "border-white bg-white text-[#c4121a]",
+  white: "border-white bg-white text-[#981915]",
 };
 
 export function Badge({ children, tone = "blue", className }: { children: ReactNode; tone?: BadgeTone; className?: string }) {

@@ -1,4 +1,4 @@
-import type { AcademyTeam, Match, Matchday, NewsItem, Player, Team, TransferRumor } from "@/types";
+import type { AcademyTeam, DataComparison, Match, Matchday, NewsItem, Player, PressLink, Team, TransferRumor, UserPredictionSummary } from "@/types";
 
 export const RAI_TEAM_ID = "real-aviles-industrial";
 export const COMPETITION_NAME = "Liga RAI1903 Norte";
@@ -96,21 +96,22 @@ export const players: Player[] = [
   { id: "oscar-cabanas", firstName: "Oscar", lastName: "Cabanas", displayName: "O. Cabanas", number: 14, position: "Defensa", nationality: "Espana", age: 24, birthDate: "2002-10-12", height: "1,81 m", preferredFoot: "Izquierda", seasonsAtClub: 2, status: "suplente", rating: 6.68, bio: "Lateral izquierdo competitivo, util para cerrar partidos con defensa de cinco.", clubHistory: ["CD Colunga", "Real Aviles Industrial"], stats: { appearances: 5, goals: 0, assists: 1, minutes: 271, yellowCards: 1, redCards: 0 } },
   { id: "jorge-villa", firstName: "Jorge", lastName: "Villa", displayName: "J. Villa", number: 15, position: "Centrocampista", nationality: "Espana", age: 20, birthDate: "2006-05-04", height: "1,76 m", preferredFoot: "Derecha", seasonsAtClub: 7, status: "cantera", rating: 6.95, bio: "Mediocentro de cantera, ordenado sin balon y valiente para recibir entre lineas.", clubHistory: ["Real Aviles Cadete", "Real Aviles Juvenil", "Real Aviles Industrial"], stats: { appearances: 6, goals: 0, assists: 2, minutes: 356, yellowCards: 2, redCards: 0 } },
   { id: "adrian-castro", firstName: "Adrian", lastName: "Castro", displayName: "A. Castro", number: 17, position: "Delantero", nationality: "Espana", age: 28, birthDate: "1998-09-28", height: "1,72 m", preferredFoot: "Izquierda", seasonsAtClub: 2, status: "lesionado", rating: 6.52, bio: "Extremo zurdo en recuperacion, aporta desborde y centros tensos desde banda derecha.", clubHistory: ["CD Mosconia", "Real Aviles Industrial"], stats: { appearances: 4, goals: 1, assists: 0, minutes: 214, yellowCards: 1, redCards: 0 } },
-  { id: "luis-bayon", firstName: "Luis", lastName: "Bayon", displayName: "L. Bayon", number: 18, position: "Defensa", nationality: "Espana", age: 32, birthDate: "1994-02-15", height: "1,83 m", preferredFoot: "Derecha", seasonsAtClub: 4, status: "suplente", rating: 6.74, bio: "Defensa polivalente, capaz de actuar como central o lateral segun el contexto.", clubHistory: ["Caudal Deportivo", "Real Aviles Industrial"], stats: { appearances: 6, goals: 0, assists: 0, minutes: 401, yellowCards: 3, redCards: 1 } },
+  { id: "luis-bayon", firstName: "Luis", lastName: "Bayon", displayName: "L. Bayon", number: 18, position: "Defensa", nationality: "Espana", age: 32, birthDate: "1994-02-15", height: "1,83 m", preferredFoot: "Derecha", seasonsAtClub: 4, status: "sancionado", rating: 6.74, bio: "Defensa polivalente, capaz de actuar como central o lateral segun el contexto.", clubHistory: ["Caudal Deportivo", "Real Aviles Industrial"], stats: { appearances: 6, goals: 0, assists: 0, minutes: 401, yellowCards: 3, redCards: 1 } },
   { id: "enol-ferreiro", firstName: "Enol", lastName: "Ferreiro", displayName: "E. Ferreiro", number: 19, position: "Centrocampista", nationality: "Espana", age: 19, birthDate: "2007-01-21", height: "1,73 m", preferredFoot: "Derecha", seasonsAtClub: 8, status: "cantera", rating: 6.89, bio: "Interior con energia, buen golpeo desde media distancia y caracter competitivo.", clubHistory: ["Real Aviles Infantil", "Real Aviles Juvenil", "Real Aviles Industrial"], stats: { appearances: 5, goals: 1, assists: 1, minutes: 249, yellowCards: 1, redCards: 0 } },
   { id: "samuel-rodriguez", firstName: "Samuel", lastName: "Rodriguez", displayName: "S. Rodriguez", number: 21, position: "Delantero", nationality: "Espana", age: 25, birthDate: "2001-03-30", height: "1,85 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "nuevo fichaje", rating: 6.96, bio: "Segundo punta de apoyos, buen juego de espaldas y lectura para descargar de cara.", clubHistory: ["Bergantinos FC", "Real Aviles Industrial"], stats: { appearances: 8, goals: 3, assists: 2, minutes: 511, yellowCards: 2, redCards: 0 } },
 ];
 
 export const newsItems: NewsItem[] = [
   { id: "n1", source: "RAI1903", date: "2026-10-20", title: "El Aviles encuentra una marcha mas antes del tramo clave", excerpt: "El equipo suma siete puntos de nueve y gana solidez en las areas, con Llera y Navia liderando la produccion ofensiva.", url: "https://example.com/rai1903/aviles-tramo-clave", tags: ["club", "partido"], featured: true },
-  { id: "n2", source: "La Voz de Aviles", date: "2026-10-19", title: "Sierra: 'El Roman tiene que ser un campo incomodo para todos'", excerpt: "El central blanquiazul analiza la mejora defensiva y pide continuidad tras el ultimo triunfo en casa.", url: "https://example.com/prensa/sierra-roman", tags: ["club"] },
+  { id: "n2", source: "La Voz de Aviles", date: "2026-10-19", title: "Sierra: 'El Roman tiene que ser un campo incomodo para todos'", excerpt: "El central blanquiazul analiza la mejora defensiva y pide continuidad tras el ultimo triunfo en casa.", url: "https://example.com/prensa/sierra-roman", tags: ["entrevistas", "club"] },
   { id: "n3", source: "AsturFutbol", date: "2026-10-18", title: "Previa: duelo de estilos entre Aviles y Numancia", excerpt: "La jornada enfrenta al tercer clasificado con uno de los bloques mas fiables de la categoria.", url: "https://example.com/asturfutbol/previa-numancia", tags: ["previa", "partido"] },
   { id: "n4", source: "El Comercio", date: "2026-10-16", title: "La cantera gana peso en los planes del cuerpo tecnico", excerpt: "Villa y Ferreiro acumulan minutos y el Juvenil A mantiene la primera posicion de su grupo.", url: "https://example.com/elcomercio/cantera-aviles", tags: ["cantera", "club"] },
-  { id: "n5", source: "Mercado Norte", date: "2026-10-14", title: "Un lateral sub-23 entra en la agenda blanquiazul", excerpt: "El club rastrea perfiles jovenes para reforzar la banda izquierda en el mercado de invierno.", url: "https://example.com/mercado/lateral-sub23", tags: ["fichajes"] },
+  { id: "n5", source: "Mercado Norte", date: "2026-10-14", title: "Un lateral sub-23 entra en la agenda blanquiazul", excerpt: "El club rastrea perfiles jovenes para reforzar la banda izquierda en el mercado de invierno.", url: "https://example.com/mercado/lateral-sub23", tags: ["fichajes", "rumores"] },
   { id: "n6", source: "Radio Marca Asturias", date: "2026-10-13", title: "Cronica: oficio y pegada para volver al playoff", excerpt: "El Aviles firmo un partido maduro, con dominio de areas y gestion de ritmos tras adelantarse.", url: "https://example.com/radio/cronicarai", tags: ["cronica", "partido"] },
-  { id: "n7", source: "Futbol Modesto", date: "2026-10-11", title: "Cinco nombres propios de la jornada en el grupo norte", excerpt: "Sergio Navia aparece entre los destacados por su asistencia y su volumen de acciones ofensivas.", url: "https://example.com/modesto/nombres-jornada", tags: ["partido"] },
-  { id: "n8", source: "La Voz de Aviles", date: "2026-10-09", title: "El club prepara iniciativas para llenar el Roman", excerpt: "La entidad trabaja en promociones para abonados jovenes y colegios del concejo.", url: "https://example.com/voz/roman-promos", tags: ["club"] },
+  { id: "n7", source: "Futbol Modesto", date: "2026-10-11", title: "Parte medico: Castro apunta a volver al grupo", excerpt: "El extremo completa trabajo individual y podria entrar en la convocatoria si supera la ultima prueba.", url: "https://example.com/modesto/parte-medico-castro", tags: ["lesionados", "club"] },
+  { id: "n8", source: "La Voz de Aviles", date: "2026-10-09", title: "Fidalgo y Cuesta, renovaciones prioritarias", excerpt: "La direccion deportiva quiere cerrar antes de enero dos piezas clave del centro del campo.", url: "https://example.com/voz/renovaciones-aviles", tags: ["renovaciones", "club"] },
   { id: "n9", source: "Cantera Norte", date: "2026-10-08", title: "El Cadete confirma su progresion con otra porteria a cero", excerpt: "El bloque de Marcos Roldan encadena cuatro jornadas sin perder y sube al podio.", url: "https://example.com/cantera/cadete", tags: ["cantera", "cronica"] },
+  { id: "n10", source: "RAI1903", date: "2026-10-07", title: "El club prepara iniciativas para llenar el Roman", excerpt: "Promociones para abonados jovenes, colegios y penas locales antes del duelo grande del mes.", url: "https://example.com/rai1903/roman-promos", tags: ["otros", "club"] },
 ];
 
 export const transfers: TransferRumor[] = [
@@ -124,11 +125,56 @@ export const transfers: TransferRumor[] = [
   { id: "t8", playerName: "Pablo Cuesta", position: "Centrocampista", age: 27, category: "Renovaciones", status: "Negociacion", probability: 69, source: "Radio Marca Asturias", date: "2026-10-15", originClub: "Real Aviles Industrial", destinationClub: "Real Aviles Industrial", rating: 5, analysis: "El equilibrio del equipo pasa por su continuidad; prioridad alta en la direccion deportiva." },
 ];
 
+const academyTable = (teamName: string): Team[] => [
+  { id: `${teamName}-aviles`, name: `Real Aviles ${teamName}`, shortName: "Aviles", city: "Aviles", stadium: "Santo Domingo", coach: "Casa", founded: 1903, crestInitials: "RAI", colors: ["#214C9B", "#FFFFFF"], position: 2, form: ["W", "W", "D", "W", "L"], stats: { played: 9, won: 6, drawn: 1, lost: 2, goalsFor: 19, goalsAgainst: 9, points: 19 } },
+  { id: `${teamName}-oviedo`, name: "Real Oviedo Vetusta", shortName: "Oviedo B", city: "Oviedo", stadium: "El Requexon", coach: "Pablo Lago", founded: 1926, crestInitials: "OVI", colors: ["#214C9B", "#FFFFFF"], position: 1, form: ["W", "D", "W", "W", "W"], stats: { played: 9, won: 6, drawn: 2, lost: 1, goalsFor: 21, goalsAgainst: 8, points: 20 } },
+  { id: `${teamName}-llanera`, name: "UD Llanera", shortName: "Llanera", city: "Llanera", stadium: "Pepe Quimaran", coach: "Adrian Torre", founded: 1981, crestInitials: "LLA", colors: ["#111827", "#F59E0B"], position: 3, form: ["W", "L", "W", "D", "W"], stats: { played: 9, won: 5, drawn: 2, lost: 2, goalsFor: 16, goalsAgainst: 10, points: 17 } },
+  { id: `${teamName}-roces`, name: "TSK Roces", shortName: "Roces", city: "Gijon", stadium: "Covadonga", coach: "Ivan Valdes", founded: 1952, crestInitials: "ROC", colors: ["#DC2626", "#FFFFFF"], position: 4, form: ["D", "W", "L", "W", "D"], stats: { played: 9, won: 4, drawn: 3, lost: 2, goalsFor: 13, goalsAgainst: 11, points: 15 } },
+  { id: `${teamName}-covadonga`, name: "CD Covadonga", shortName: "Covadonga", city: "Oviedo", stadium: "Juan Antonio Alvarez", coach: "Hugo Perez", founded: 1979, crestInitials: "COV", colors: ["#0F172A", "#60A5FA"], position: 5, form: ["L", "W", "D", "W", "L"], stats: { played: 9, won: 4, drawn: 1, lost: 4, goalsFor: 12, goalsAgainst: 14, points: 13 } },
+];
+
+const academyCalendar = (teamId: string, teamName: string, competition: string): Match[] => [
+  { id: `${teamId}-j10`, matchday: 10, homeTeamId: `${teamId}-aviles`, awayTeamId: `${teamId}-roces`, homeTeam: `Real Aviles ${teamName}`, awayTeam: "TSK Roces", date: "2026-10-24T10:30:00.000Z", competition, venue: "Santo Domingo", status: "scheduled" },
+  { id: `${teamId}-j11`, matchday: 11, homeTeamId: `${teamId}-covadonga`, awayTeamId: `${teamId}-aviles`, homeTeam: "CD Covadonga", awayTeam: `Real Aviles ${teamName}`, date: "2026-10-31T11:00:00.000Z", competition, venue: "Juan Antonio Alvarez", status: "scheduled" },
+  { id: `${teamId}-j12`, matchday: 12, homeTeamId: `${teamId}-aviles`, awayTeamId: `${teamId}-llanera`, homeTeam: `Real Aviles ${teamName}`, awayTeam: "UD Llanera", date: "2026-11-07T12:00:00.000Z", competition, venue: "Santo Domingo", status: "scheduled" },
+];
+
 export const academyTeams: AcademyTeam[] = [
-  { id: "juvenil-a", name: "Juvenil A", coach: "Borja Fernandez", category: "Liga Nacional Juvenil", position: "1º - 22 pts", lastResult: "Real Aviles 3-1 Veriña", nextMatch: "Covadonga - Real Aviles", standoutPlayers: ["Enol Ferreiro", "Mario Noval", "Leo Paredes"], news: ["Cuarta victoria consecutiva", "Debut de dos juveniles con el filial"] },
-  { id: "juvenil-b", name: "Juvenil B", coach: "Andres Solis", category: "Primera Juvenil", position: "4º - 17 pts", lastResult: "Real Aviles 2-2 Llano 2000", nextMatch: "Real Aviles - Roces", standoutPlayers: ["Izan Arias", "Dani Riestra"], news: ["El equipo remonta dos goles en contra"] },
-  { id: "cadete", name: "Cadete", coach: "Marcos Roldan", category: "Primera Cadete", position: "3º - 19 pts", lastResult: "Manuel Rubio 0-2 Real Aviles", nextMatch: "Real Aviles - Quirinal", standoutPlayers: ["Hugo Menendez", "Pablo Villa", "Yago Cortina"], news: ["Cuarta porteria a cero del curso"] },
-  { id: "infantil", name: "Infantil", coach: "Santi Blanco", category: "Primera Infantil", position: "6º - 13 pts", lastResult: "Real Aviles 4-0 Navarro", nextMatch: "Sporting - Real Aviles", standoutPlayers: ["Bruno Montes", "Mateo Vega"], news: ["Gran actuacion colectiva en Santo Domingo"] },
-  { id: "alevin", name: "Alevin", coach: "Laura Suarez", category: "Segunda Alevin", position: "2º - 21 pts", lastResult: "Real Aviles 6-2 Raices", nextMatch: "Los Campos - Real Aviles", standoutPlayers: ["Noa Alonso", "Nico Cuervo"], news: ["Festival ofensivo y liderato al alcance"] },
-  { id: "benjamin", name: "Benjamin", coach: "Pablo Menendez", category: "Benjamin Federado", position: "5º - 12 pts", lastResult: "Quirinal 3-3 Real Aviles", nextMatch: "Real Aviles - Aviles Stadium", standoutPlayers: ["Iria Pelaez", "Lucas Junquera"], news: ["Partido vibrante en el derbi comarcal"] },
+  { id: "filial", name: "Filial", coach: "Dani Borrego", category: "Primera Asturfutbol", position: "2º - 19 pts", lastResult: "Real Aviles B 2-0 Llanera B", nextMatch: "Real Aviles B - Roces", standoutPlayers: ["Raul Prendes", "Jorge Villa", "Enol Ferreiro"], news: ["Tercera porteria a cero seguida", "Dos juveniles entrenan con el primer equipo"], roster: players.filter((player) => ["raul-prendes", "jorge-villa", "enol-ferreiro", "diego-moran", "oscar-cabanas"].includes(player.id)).map(({ id, displayName, number, position, age }) => ({ id, displayName, number, position, age })), table: academyTable("filial"), calendar: academyCalendar("filial", "B", "Primera Asturfutbol") },
+  { id: "juvenil-a", name: "Juvenil A", coach: "Borja Fernandez", category: "Liga Nacional Juvenil", position: "1º - 22 pts", lastResult: "Real Aviles 3-1 Verina", nextMatch: "Covadonga - Real Aviles", standoutPlayers: ["Mario Noval", "Leo Paredes", "Enol Ferreiro"], news: ["Cuarta victoria consecutiva", "Debut de dos juveniles con el filial"], roster: [{ id: "mario-noval", displayName: "M. Noval", number: 7, position: "Delantero", age: 17 }, { id: "leo-paredes", displayName: "L. Paredes", number: 10, position: "Centrocampista", age: 18 }, { id: "izan-arias", displayName: "I. Arias", number: 4, position: "Defensa", age: 17 }, { id: "dani-riestra", displayName: "D. Riestra", number: 1, position: "Portero", age: 18 }, { id: "hugo-menendez", displayName: "H. Menendez", number: 9, position: "Delantero", age: 17 }], table: academyTable("juvenil-a"), calendar: academyCalendar("juvenil-a", "Juvenil A", "Liga Nacional Juvenil") },
+];
+
+export const pressLinks: PressLink[] = [
+  { id: "la-voz", name: "La Voz de Aviles", outlet: "Prensa local", url: "https://example.com/la-voz-aviles", description: "Seguimiento diario del club, entrevistas y piezas de ciudad." },
+  { id: "el-comercio", name: "El Comercio", outlet: "Prensa regional", url: "https://example.com/el-comercio-aviles", description: "Cronicas, previas y contexto del futbol asturiano." },
+  { id: "radio-marca", name: "Radio Marca Asturias", outlet: "Radio", url: "https://example.com/radio-marca-asturias", description: "Audios, tertulias y actualidad de la categoria." },
+  { id: "asturfutbol", name: "AsturFutbol", outlet: "Digital", url: "https://example.com/asturfutbol", description: "Calendarios, rivales y mercado de futbol modesto." },
+];
+
+export const quinielaRanking: UserPredictionSummary[] = [
+  { user: "Roman1903", points: 41, hits: 29, exactScores: 5 },
+  { user: "LaGradaDeRivero", points: 38, hits: 27, exactScores: 4 },
+  { user: "BlanquiazulData", points: 34, hits: 24, exactScores: 3 },
+  { user: "VillaDelAdelantado", points: 31, hits: 22, exactScores: 2 },
+];
+
+export const matchdayResult = {
+  round: 9,
+  pointsAvailable: 20,
+  averagePoints: 9.6,
+  bestUser: quinielaRanking[0],
+  highlightedMatch: matchdays[8].matches.find((match) => match.homeTeamId === RAI_TEAM_ID || match.awayTeamId === RAI_TEAM_ID),
+};
+
+export const dataComparisons: DataComparison[] = [
+  { label: "Goles a favor", aviles: 16, rival: 14, unit: "goles" },
+  { label: "Goles encajados", aviles: 9, rival: 6, unit: "goles" },
+  { label: "Puntos por partido", aviles: 1.89, rival: 2, unit: "ppp" },
+  { label: "Porterias a cero", aviles: 4, rival: 5, unit: "partidos" },
+];
+
+export const historicalMilestones = [
+  { season: "1903", title: "Nacimiento del club", detail: "Origen industrial y obrero del futbol avilesino." },
+  { season: "1952-53", title: "Primera etapa nacional", detail: "El Roman Suarez Puerta se convierte en punto de encuentro blanquiazul." },
+  { season: "2026-27", title: "RAI1903 como archivo fan", detail: "Mocks editables hoy, preparados para tablas Supabase manana." },
 ];

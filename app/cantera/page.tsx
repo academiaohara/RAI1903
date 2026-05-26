@@ -1,43 +1,58 @@
 import { Badge } from "@/components/Badge";
 import { Card } from "@/components/Card";
+import { LeagueTable } from "@/components/LeagueTable";
+import { MatchCard } from "@/components/MatchCard";
+import { PageHero } from "@/components/PageHero";
+import { SectionTabs } from "@/components/SectionTabs";
 import { academyTeams } from "@/data/mock";
 
 export default function CanteraPage() {
-  const promises = academyTeams.flatMap((team) => team.standoutPlayers.map((player) => ({ player, team: team.name }))).slice(0, 8);
+  const tabs = academyTeams.map((team) => ({ href: `#${team.id}`, label: team.name }));
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[2rem] border border-[#c4121a]/25 bg-white p-6 shadow-[0_18px_45px_rgba(17,24,39,0.08)]">
-        <Badge tone="green">Futuro blanquiazul</Badge>
-        <h1 className="mt-4 text-5xl font-black uppercase text-[#c4121a]">Cantera RAI1903</h1>
-        <p className="mt-3 max-w-3xl text-slate-600">Seguimiento de equipos inferiores, resultados, entrenadores, jugadores destacados y promesas a seguir.</p>
-      </section>
+      <PageHero eyebrow="Cantera" title="Filial y Juvenil A" description="Seguimiento simple de los dos bloques principales: plantilla, clasificacion y calendario basico editables desde mocks." />
+      <SectionTabs tabs={tabs} />
 
-      <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-6">
         {academyTeams.map((team) => (
-          <Card key={team.id} eyebrow={team.category} title={team.name}>
-            <div className="space-y-3 text-sm text-slate-600">
-              <p><strong className="text-slate-900">Entrenador:</strong> {team.coach}</p>
-              <p><strong className="text-slate-900">Clasificacion:</strong> {team.position}</p>
-              <p><strong className="text-slate-900">Ultimo resultado:</strong> {team.lastResult}</p>
-              <p><strong className="text-slate-900">Proximo partido:</strong> {team.nextMatch}</p>
-              <div className="flex flex-wrap gap-2 pt-2">{team.standoutPlayers.map((player) => <Badge key={player} tone="blue">{player}</Badge>)}</div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3"><p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Noticias</p>{team.news.map((item) => <p key={item} className="mt-2">{item}</p>)}</div>
-            </div>
-          </Card>
+          <section key={team.id} id={team.id} className="scroll-mt-28">
+            <Card eyebrow={team.category} title={team.name}>
+              <div className="grid gap-5 xl:grid-cols-[0.8fr_1fr_0.8fr]">
+                <div className="space-y-3 text-sm text-slate-600">
+                  <p><strong className="text-slate-900">Entrenador:</strong> {team.coach}</p>
+                  <p><strong className="text-slate-900">Clasificacion:</strong> {team.position}</p>
+                  <p><strong className="text-slate-900">Ultimo resultado:</strong> {team.lastResult}</p>
+                  <p><strong className="text-slate-900">Proximo partido:</strong> {team.nextMatch}</p>
+                  <div className="flex flex-wrap gap-2 pt-2">{team.standoutPlayers.map((player) => <Badge key={player} tone="blue">{player}</Badge>)}</div>
+                </div>
+                <div>
+                  <h3 className="mb-3 text-xs font-black uppercase tracking-[0.18em] text-[#214C9B]">Plantilla</h3>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {team.roster.map((player) => (
+                      <div key={player.id} className="rounded-2xl border border-[#981915]/15 bg-red-50 p-3">
+                        <p className="font-black uppercase text-[#981915]">#{player.number} {player.displayName}</p>
+                        <p className="text-sm font-bold text-slate-500">{player.position} · {player.age} anos</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="mb-3 text-xs font-black uppercase tracking-[0.18em] text-[#214C9B]">Calendario basico</h3>
+                  <div className="space-y-3">{team.calendar.map((match) => <MatchCard key={match.id} match={match} compact />)}</div>
+                </div>
+              </div>
+              <div className="mt-5 grid gap-5 xl:grid-cols-[1fr_0.45fr]">
+                <LeagueTable teams={team.table} compact />
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Notas</p>
+                  {team.news.map((item) => <p key={item} className="mt-2 text-sm font-bold text-slate-700">{item}</p>)}
+                </div>
+              </div>
+            </Card>
+          </section>
         ))}
       </div>
-
-      <Card eyebrow="Scouting interno" title="Promesas a seguir">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {promises.map((item) => (
-            <div key={`${item.player}-${item.team}`} className="rounded-3xl border border-[#c4121a]/20 bg-gradient-to-br from-white to-red-50 p-4">
-              <p className="text-xl font-black uppercase text-[#c4121a]">{item.player}</p>
-              <p className="mt-1 text-sm font-bold text-[#1c4f9c]">{item.team}</p>
-            </div>
-          ))}
-        </div>
-      </Card>
     </div>
   );
 }

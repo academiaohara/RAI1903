@@ -4,10 +4,19 @@ import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/Badge";
 import { Card } from "@/components/Card";
 import { JornadaSelector } from "@/components/JornadaSelector";
+import { MatchCard } from "@/components/MatchCard";
+import { PageHero } from "@/components/PageHero";
 import { PredictionForm } from "@/components/PredictionForm";
-import { matchdays } from "@/data/mock";
+import { SectionTabs } from "@/components/SectionTabs";
+import { matchdayResult, matchdays, quinielaRanking } from "@/data/mock";
 import { loadPredictions, savePredictions } from "@/lib/storage";
 import type { Prediction } from "@/types";
+
+const tabs = [
+  { href: "#pronosticos", label: "Pronosticos" },
+  { href: "#resultado", label: "Resultado" },
+  { href: "#ranking", label: "Ranking" },
+];
 
 export default function QuinielaPage() {
   const [round, setRound] = useState(10);
@@ -31,51 +40,82 @@ export default function QuinielaPage() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[2rem] border border-[#c4121a]/25 bg-white p-6 shadow-[0_18px_45px_rgba(17,24,39,0.08)]">
-        <Badge tone="red">38 jornadas · 10 partidos</Badge>
-        <h1 className="mt-4 text-5xl font-black uppercase text-[#c4121a]">Quiniela RAI1903</h1>
-        <p className="mt-3 max-w-3xl text-slate-600">Predice cada jornada con 1/X/2 y anade marcador exacto y goleadores cuando juega el Real Aviles. La estructura queda lista para persistir en backend mas adelante.</p>
+      <PageHero eyebrow="Quiniela" title="Pronosticos de la grada" description="Predicciones de usuarios, resultado de jornada y ranking mock. Hoy guarda en localStorage; manana puede persistir en Supabase." />
+      <SectionTabs tabs={tabs} />
+
+      <section id="pronosticos" className="space-y-6 scroll-mt-28">
+        <JornadaSelector value={round} total={matchdays.length} onChange={setRound} />
+
+        <div className="grid gap-6 xl:grid-cols-[1fr_0.38fr]">
+          <Card eyebrow={`Jornada ${selectedMatchday.round}`} title="Pronosticos de usuarios">
+            <div className="space-y-4">
+              {selectedMatchday.matches.map((match) => (
+                <PredictionForm key={match.id} match={match} prediction={predictions[match.id]} onChange={updatePrediction} />
+              ))}
+            </div>
+          </Card>
+
+          <Card eyebrow="Estado local" title="Resumen de tu quiniela">
+            <div className="space-y-3">
+              <div className="rounded-2xl border border-red-100 bg-red-50 p-4">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Pronosticos en jornada</p>
+                <p className="mt-2 text-4xl font-black text-[#981915]">{currentRoundPredictions.length}/10</p>
+              </div>
+              <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Total guardado</p>
+                <p className="mt-2 text-4xl font-black text-[#214C9B]">{Object.keys(predictions).length}</p>
+              </div>
+              {currentRoundPredictions.length > 0 ? (
+                <div className="space-y-2">
+                  {currentRoundPredictions.map((prediction) => {
+                    const match = selectedMatchday.matches.find((item) => item.id === prediction.matchId);
+                    return (
+                      <div key={prediction.matchId} className="rounded-2xl border border-[#981915]/20 bg-white p-3 text-sm text-slate-600">
+                        <strong className="text-slate-900">{match?.homeTeam} - {match?.awayTeam}</strong>
+                        <span className="mt-1 block">Signo: {prediction.outcome ?? "sin seleccionar"}</span>
+                        {prediction.exactScore && <span className="block">Marcador: {prediction.exactScore.home}-{prediction.exactScore.away}</span>}
+                        {prediction.scorers.length > 0 && <span className="block">Goleadores: {prediction.scorers.join(", ")}</span>}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : <p className="text-sm leading-6 text-slate-400">Aun no hay pronosticos en esta jornada.</p>}
+            </div>
+          </Card>
+        </div>
       </section>
 
-      <JornadaSelector value={round} total={matchdays.length} onChange={setRound} />
+      <section id="resultado" className="scroll-mt-28">
+        <Card eyebrow={`Jornada ${matchdayResult.round}`} title="Resultado de la jornada">
+          <div className="grid gap-5 lg:grid-cols-[1fr_0.7fr]">
+            {matchdayResult.highlightedMatch && <MatchCard match={matchdayResult.highlightedMatch} />}
+            <div className="grid grid-cols-3 gap-3">
+              {[["Puntos", matchdayResult.pointsAvailable], ["Media", matchdayResult.averagePoints], ["Ganador", matchdayResult.bestUser.user]].map(([label, value]) => (
+                <div key={label} className="rounded-2xl border border-[#214C9B]/20 bg-blue-50 p-4 text-center">
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{label}</p>
+                  <p className="mt-2 text-2xl font-black text-[#214C9B]">{value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
+      </section>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_0.38fr]">
-        <Card eyebrow={`Jornada ${selectedMatchday.round}`} title="Partidos">
-          <div className="space-y-4">
-            {selectedMatchday.matches.map((match) => (
-              <PredictionForm key={match.id} match={match} prediction={predictions[match.id]} onChange={updatePrediction} />
+      <section id="ranking" className="scroll-mt-28">
+        <Card eyebrow="Ranking" title="Clasificacion de usuarios">
+          <div className="space-y-3">
+            {quinielaRanking.map((row, index) => (
+              <div key={row.user} className="grid items-center gap-3 rounded-2xl border border-[#981915]/20 bg-white p-4 text-sm sm:grid-cols-[auto_1fr_auto_auto_auto]">
+                <Badge tone={index === 0 ? "red" : "blue"}>{index + 1}</Badge>
+                <p className="font-black uppercase text-[#981915]">{row.user}</p>
+                <span>{row.points} pts</span>
+                <span>{row.hits} aciertos</span>
+                <span>{row.exactScores} exactos</span>
+              </div>
             ))}
           </div>
         </Card>
-
-        <Card eyebrow="Estado local" title="Resumen de tu quiniela">
-          <div className="space-y-3">
-            <div className="rounded-2xl border border-red-100 bg-red-50 p-4">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Pronosticos en jornada</p>
-              <p className="mt-2 text-4xl font-black text-[#c4121a]">{currentRoundPredictions.length}/10</p>
-            </div>
-            <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Total guardado</p>
-              <p className="mt-2 text-4xl font-black text-[#1c4f9c]">{Object.keys(predictions).length}</p>
-            </div>
-            {currentRoundPredictions.length > 0 ? (
-              <div className="space-y-2">
-                {currentRoundPredictions.map((prediction) => {
-                  const match = selectedMatchday.matches.find((item) => item.id === prediction.matchId);
-                  return (
-                    <div key={prediction.matchId} className="rounded-2xl border border-[#c4121a]/20 bg-white p-3 text-sm text-slate-600">
-                      <strong className="text-slate-900">{match?.homeTeam} - {match?.awayTeam}</strong>
-                      <span className="mt-1 block">Signo: {prediction.outcome ?? "sin seleccionar"}</span>
-                      {prediction.exactScore && <span className="block">Marcador: {prediction.exactScore.home}-{prediction.exactScore.away}</span>}
-                      {prediction.scorers.length > 0 && <span className="block">Goleadores: {prediction.scorers.join(", ")}</span>}
-                    </div>
-                  );
-                })}
-              </div>
-            ) : <p className="text-sm leading-6 text-slate-400">Aun no hay pronosticos en esta jornada.</p>}
-          </div>
-        </Card>
-      </div>
+      </section>
     </div>
   );
 }
