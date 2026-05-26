@@ -7,6 +7,7 @@ import { PageHero } from "@/components/PageHero";
 import { newsItems, players, RAI_TEAM_ID, teams } from "@/data/mock";
 import { getLatestAvilesMatches, getNextAvilesMatch, getUpcomingAvilesMatches } from "@/lib/fixtures";
 import { formatDate, formatMatchDate, resultTone } from "@/lib/utils";
+import type { Route } from "next";
 import type { Match } from "@/types";
 
 const quickLinks = [
@@ -118,7 +119,7 @@ export default function HomePage() {
   );
 }
 
-function MatchBanner({ match, label, href, action }: { match: Match; label: string; href: string; action: string }) {
+function MatchBanner({ match, label, href, action }: { match: Match; label: string; href: Route; action: string }) {
   return (
     <Link href={href} className="group overflow-hidden rounded-[2rem] border border-[#214C9B]/25 bg-white shadow-[0_18px_45px_rgba(17,24,39,0.08)] transition hover:-translate-y-1 hover:border-[#214C9B]">
       <div className="grid items-stretch md:grid-cols-[1fr_auto_1fr]">
