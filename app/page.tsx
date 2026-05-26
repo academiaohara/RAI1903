@@ -53,6 +53,10 @@ export default function HomePage() {
         )}
       </section>
 
+      <Card eyebrow="Noticiero" title="Actualidad en movimiento">
+        <NewsTicker items={newsItems} />
+      </Card>
+
       <section className="grid gap-6 xl:grid-cols-[1fr_0.42fr]">
         <LeagueTableCard eyebrow="Estado competitivo" title="Clasificacion" teams={teams} highlightTeamId={RAI_TEAM_ID} compact />
         <Card eyebrow="Jugadores destacados" title="Stats de plantilla">
@@ -83,10 +87,6 @@ export default function HomePage() {
           <div className="space-y-3">{upcomingMatches.map((match) => <MatchCard key={match.id} match={match} />)}</div>
         </Card>
       </section>
-
-      <Card eyebrow="Noticiero" title="Actualidad en movimiento">
-        <NewsTicker items={newsItems} />
-      </Card>
     </div>
   );
 }
