@@ -80,3 +80,20 @@ a {
   opacity: 1;
   transform: translateX(80%);
 }
+
+.news-ticker-track {
+  animation: news-ticker-right 40s linear infinite;
+}
+
+.news-ticker:hover .news-ticker-track {
+  animation-play-state: paused;
+}
+
+@keyframes news-ticker-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
