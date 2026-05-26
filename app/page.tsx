@@ -13,7 +13,7 @@ const quickLinks = [
   { href: "/primer-equipo", label: "Primer Equipo", description: "Plantilla, noticias y competicion", icon: Shield },
   { href: "/cantera", label: "Cantera", description: "Filial y Juvenil A", icon: Trophy },
   { href: "/prensa", label: "Prensa", description: "Medios, enlaces y archivo", icon: Newspaper },
-];
+] as const;
 
 export default function HomePage() {
   const nextMatch = getNextAvilesMatch();
