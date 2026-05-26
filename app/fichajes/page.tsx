@@ -14,15 +14,15 @@ export default function FichajesPage() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#981915]/35 via-slate-950 to-[#214C9B]/35 p-6">
+      <section className="rounded-[2rem] border border-[#c4121a]/25 bg-white p-6 shadow-[0_18px_45px_rgba(17,24,39,0.08)]">
         <Badge tone="red">Mercado</Badge>
-        <h1 className="mt-4 text-4xl font-black text-white">Fichajes y rumores</h1>
-        <p className="mt-3 max-w-3xl text-slate-300">Radar de altas, bajas, renovaciones y rumores con estado, probabilidad visual, fuente y analisis corto de encaje.</p>
+        <h1 className="mt-4 text-5xl font-black uppercase text-[#c4121a]">Fichajes y rumores</h1>
+        <p className="mt-3 max-w-3xl text-slate-600">Radar de altas, bajas, renovaciones y rumores con estado, probabilidad visual, fuente y analisis corto de encaje.</p>
       </section>
 
-      <div className="flex flex-wrap gap-2 rounded-3xl border border-white/10 bg-slate-950/70 p-3">
+      <div className="flex flex-wrap gap-2 rounded-3xl border border-[#c4121a]/20 bg-white p-3 shadow-[0_12px_30px_rgba(17,24,39,0.06)]">
         {tabs.map((item) => (
-          <button key={item} onClick={() => setTab(item)} className={`rounded-2xl px-5 py-3 text-sm font-black uppercase tracking-[0.16em] transition ${tab === item ? "bg-white text-slate-950" : "bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"}`}>{item}</button>
+          <button key={item} onClick={() => setTab(item)} className={`rounded-2xl px-5 py-3 text-sm font-black uppercase tracking-[0.16em] transition ${tab === item ? "bg-[#c4121a] text-white" : "bg-white text-slate-700 hover:bg-red-50 hover:text-[#c4121a]"}`}>{item}</button>
         ))}
       </div>
 
