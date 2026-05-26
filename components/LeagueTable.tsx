@@ -2,7 +2,7 @@ import { RAI_TEAM_ID } from "@/data/mock";
 import { resultTone } from "@/lib/utils";
 import type { Team } from "@/types";
 
-export function LeagueTable({ teams, compact = false }: { teams: Team[]; compact?: boolean }) {
+export function LeagueTable({ teams, compact = false, highlightTeamId = RAI_TEAM_ID }: { teams: Team[]; compact?: boolean; highlightTeamId?: string }) {
   const rows = [...teams].sort((a, b) => a.position - b.position);
 
   return (
@@ -22,7 +22,7 @@ export function LeagueTable({ teams, compact = false }: { teams: Team[]; compact
           {rows.slice(0, compact ? 10 : rows.length).map((team) => {
             const diff = team.stats.goalsFor - team.stats.goalsAgainst;
             return (
-              <tr key={team.id} className={team.id === RAI_TEAM_ID ? "bg-blue-50 text-[#214C9B]" : "text-slate-700"}>
+              <tr key={team.id} className={team.id === highlightTeamId ? "bg-blue-50 text-[#214C9B]" : "text-slate-700"}>
                 <td className="px-3 py-3 font-extrabold">{team.position}</td>
                 <td className="px-3 py-3">
                   <div className="flex items-center gap-2">

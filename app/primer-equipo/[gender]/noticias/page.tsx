@@ -1,18 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { Card } from "@/components/Card";
 import { NewsCard } from "@/components/NewsCard";
 import { PageHero } from "@/components/PageHero";
 import { SectionTabs } from "@/components/SectionTabs";
 import { newsItems } from "@/data/mock";
+import { genderLabels, getPrimerEquipoTabs, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { NewsCategory, NewsTag } from "@/types";
-
-const tabs = [
-  { href: "/primer-equipo/plantilla", label: "Plantilla" },
-  { href: "/primer-equipo/noticias", label: "Noticias" },
-  { href: "/primer-equipo/competicion", label: "Competicion" },
-];
 
 const newsCategoryTags: Record<NewsCategory, NewsTag> = {
   Fichajes: "fichajes",
@@ -23,14 +18,19 @@ const newsCategoryTags: Record<NewsCategory, NewsTag> = {
   Otros: "otros",
 };
 
-export default function PrimerEquipoNoticiasPage() {
+export default function PrimerEquipoNoticiasPage({ params }: { params: Promise<{ gender: string }> }) {
+  const { gender } = use(params) as { gender: PrimerEquipoGender };
   const [category, setCategory] = useState<NewsCategory>("Fichajes");
   const categoryNews = newsItems.filter((item) => item.tags.includes(newsCategoryTags[category]));
 
   return (
     <div className="space-y-6">
-      <PageHero eyebrow="Primer Equipo" title="Noticias" description="Actualidad del primer equipo filtrada por categorias mock." />
-      <SectionTabs tabs={tabs} />
+      <PageHero
+        eyebrow={`Primer Equipo · ${genderLabels[gender].title}`}
+        title="Noticias"
+        description="Actualidad del primer equipo filtrada por categorias mock."
+      />
+      <SectionTabs tabs={getPrimerEquipoTabs(gender)} />
 
       <Card eyebrow="Noticias" title="Categorias del primer equipo">
         <div className="mb-5 flex flex-wrap gap-2">

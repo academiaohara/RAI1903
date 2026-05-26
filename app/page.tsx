@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { Card } from "@/components/Card";
-import { LeagueTable } from "@/components/LeagueTable";
+import { LeagueTableCard } from "@/components/LeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
 import { NewsTicker } from "@/components/NewsTicker";
 import { PageHero } from "@/components/PageHero";
-import { newsItems, players, teams } from "@/data/mock";
+import { RecentMatchCard } from "@/components/RecentMatchCard";
+import { RAI_TEAM_ID, newsItems, players, teams } from "@/data/mock";
 import { getLatestAvilesMatches, getNextAvilesMatch, getUpcomingAvilesMatches } from "@/lib/fixtures";
+import { getCronicaForMatch, getPreviaForMatch } from "@/lib/match-articles";
+import { primerEquipoBase } from "@/lib/primer-equipo";
 import { formatMatchDate } from "@/lib/utils";
 import type { Route } from "next";
 import type { Match } from "@/types";
@@ -16,6 +19,8 @@ export default function HomePage() {
   const latestMatches = getLatestAvilesMatches();
   const latestMatch = latestMatches[0];
   const upcomingMatches = getUpcomingAvilesMatches();
+  const latestCronica = latestMatch ? getCronicaForMatch(latestMatch.id) : undefined;
+  const nextPrevia = nextMatch ? getPreviaForMatch(nextMatch.id) : undefined;
   const statHighlights = [
     { label: "Mas goles", player: [...players].sort((a, b) => b.stats.goals - a.stats.goals)[0], valueKey: "goals", suffix: "goles" },
     { label: "Mas asistencias", player: [...players].sort((a, b) => b.stats.assists - a.stats.assists)[0], valueKey: "assists", suffix: "asist." },
@@ -30,14 +35,26 @@ export default function HomePage() {
       <PageHero eyebrow="Web fan no oficial" title="Real Aviles Industrial" description="Inicio blanquiazul para seguir ultimo partido, proxima previa, clasificacion, forma, calendario, stats y noticiero." />
 
       <section className="grid gap-4">
-        {latestMatch && <MatchBanner match={latestMatch} label="Ultimo partido" href="/prensa/noticias-externas" action="Entrar en la cronica" />}
-        {nextMatch && <MatchBanner match={nextMatch} label="Siguiente partido" href="/prensa/noticias-externas" action="Entrar en la previa" />}
+        {latestMatch && (
+          <MatchBanner
+            match={latestMatch}
+            label="Ultimo partido"
+            href={(latestCronica ? `${primerEquipoBase("masculino")}/cronicas/${latestCronica.id}` : `${primerEquipoBase("masculino")}/cronicas`) as Route}
+            action="Entrar en la cronica"
+          />
+        )}
+        {nextMatch && (
+          <MatchBanner
+            match={nextMatch}
+            label="Siguiente partido"
+            href={(nextPrevia ? `${primerEquipoBase("masculino")}/previas/${nextPrevia.id}` : `${primerEquipoBase("masculino")}/previas`) as Route}
+            action="Entrar en la previa"
+          />
+        )}
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1fr_0.42fr]">
-        <Card eyebrow="Estado competitivo" title="Clasificacion">
-          <LeagueTable teams={teams} compact />
-        </Card>
+        <LeagueTableCard eyebrow="Estado competitivo" title="Clasificacion" teams={teams} highlightTeamId={RAI_TEAM_ID} compact />
         <Card eyebrow="Jugadores destacados" title="Stats de plantilla">
           <ul className="space-y-3">
             {statHighlights.map((item) => {
@@ -60,7 +77,7 @@ export default function HomePage() {
 
       <section className="grid gap-6 xl:grid-cols-2">
         <Card eyebrow="Resultados" title="Ultimos 5 partidos">
-          <div className="space-y-3">{latestMatches.map((match) => <MatchCard key={match.id} match={match} />)}</div>
+          <div className="space-y-3">{latestMatches.map((match) => <RecentMatchCard key={match.id} match={match} />)}</div>
         </Card>
         <Card eyebrow="Calendario" title="Proximos 5 partidos">
           <div className="space-y-3">{upcomingMatches.map((match) => <MatchCard key={match.id} match={match} />)}</div>

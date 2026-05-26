@@ -25,4 +25,10 @@ export const resultTone = (result: ResultCode) => {
   return "bg-rose-500 text-white";
 };
 
+export const matchResultCardTone = (result: ResultCode) => {
+  if (result === "W") return "border-emerald-300 bg-emerald-100 hover:border-emerald-500";
+  if (result === "D") return "border-amber-300 bg-amber-100 hover:border-amber-500";
+  return "border-rose-300 bg-rose-100 hover:border-rose-500";
+};
+
 export const pluralize = (count: number, singular: string, plural = `${singular}s`) => `${count} ${count === 1 ? singular : plural}`;

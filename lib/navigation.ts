@@ -7,9 +7,12 @@ export const navItems = [
     label: "Primer Equipo",
     icon: Shield,
     children: [
-      { href: "/primer-equipo/plantilla", label: "Plantilla" },
-      { href: "/primer-equipo/noticias", label: "Noticias" },
-      { href: "/primer-equipo/competicion", label: "Competicion" },
+      { href: "/primer-equipo", label: "Elegir equipo" },
+      { href: "/primer-equipo/masculino/plantilla", label: "Plantilla" },
+      { href: "/primer-equipo/masculino/competicion", label: "Competicion" },
+      { href: "/primer-equipo/masculino/cronicas", label: "Cronicas" },
+      { href: "/primer-equipo/masculino/previas", label: "Previas" },
+      { href: "/primer-equipo/masculino/noticias", label: "Noticias" },
     ],
   },
   {
