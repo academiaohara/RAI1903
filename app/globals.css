@@ -1,11 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --rai-red: #981915;
-  --rai-blue: #214c9b;
+  --rai-red: #c4121a;
+  --rai-red-dark: #8f0f14;
+  --rai-blue: #1c4f9c;
+  --rai-gold: #f7c948;
   --rai-white: #ffffff;
-  --rai-ink: #08111f;
-  --rai-panel: #101b2d;
+  --rai-ink: #171717;
+  --rai-muted: #f5f6f8;
 }
 
 * {
@@ -19,12 +21,18 @@ html {
 body {
   min-height: 100vh;
   margin: 0;
-  color: #eef5ff;
+  color: var(--rai-ink);
   background:
-    radial-gradient(circle at top left, rgba(33, 76, 155, 0.38), transparent 34rem),
-    radial-gradient(circle at top right, rgba(152, 25, 21, 0.24), transparent 28rem),
-    linear-gradient(135deg, #07101d 0%, #0b1424 44%, #111827 100%);
-  font-family: Arial, Helvetica, sans-serif;
+    radial-gradient(circle at top left, rgba(196, 18, 26, 0.08), transparent 30rem),
+    linear-gradient(180deg, #ffffff 0%, #f7f7f8 58%, #f1f3f6 100%);
+  font-family: "Arial", "Helvetica", sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  font-family: Impact, "Arial Black", Arial, sans-serif;
+  letter-spacing: 0.01em;
 }
 
 a {
@@ -33,7 +41,7 @@ a {
 }
 
 ::selection {
-  background: rgba(33, 76, 155, 0.65);
+  background: rgba(196, 18, 26, 0.85);
   color: white;
 }
 
@@ -46,11 +54,11 @@ a {
   scrollbar-width: none;
 }
 
-.industrial-grid {
+.athletic-shell {
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 32px 32px;
+    linear-gradient(rgba(196, 18, 26, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(196, 18, 26, 0.035) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
 .card-shine {
@@ -59,7 +67,7 @@ a {
 }
 
 .card-shine::before {
-  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  background: linear-gradient(120deg, transparent, rgba(196, 18, 26, 0.08), transparent);
   content: "";
   inset: 0;
   opacity: 0;

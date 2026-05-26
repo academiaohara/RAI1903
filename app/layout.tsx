@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/Header";
-import { NavRail } from "@/components/NavRail";
 
 export const metadata: Metadata = {
   title: "RAI1903 | Real Aviles Industrial",
@@ -12,10 +11,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="es">
       <body>
-        <div className="min-h-screen industrial-grid">
+        <div className="min-h-screen athletic-shell">
           <Header />
-          <NavRail />
-          <main className="px-4 pb-10 pt-24 sm:px-6 lg:pl-72 lg:pr-8">{children}</main>
+          <main className="mx-auto max-w-[1480px] px-4 pb-12 pt-28 sm:px-6 lg:px-8">{children}</main>
         </div>
       </body>
     </html>
