@@ -30,7 +30,7 @@ export function Header() {
             const hasChildren = "children" in item && item.children;
             return (
               <div key={item.href} className="group relative">
-                <Link href={item.href} className={cn("inline-flex items-center gap-1 rounded-full px-4 py-2 text-sm font-bold uppercase tracking-normal text-white transition hover:bg-white hover:text-[#214C9B]", active && "bg-white text-[#214C9B] shadow-lg shadow-blue-950/20")}>
+                <Link href={item.href} className={cn("inline-flex items-center gap-1 rounded-full px-4 py-2 text-sm font-bold uppercase tracking-normal transition hover:bg-white hover:text-[#214C9B]", active ? "bg-white text-[#214C9B] shadow-lg shadow-blue-950/20" : "text-white")}>
                   {item.label}
                   {hasChildren && <ChevronDown size={14} className="transition group-hover:rotate-180" />}
                 </Link>
@@ -63,7 +63,7 @@ export function Header() {
               const hasChildren = "children" in item && item.children;
               return (
                 <div key={item.href} className="rounded-2xl border border-white/10 bg-white/5 p-1">
-                  <Link href={item.href} onClick={() => setOpen(false)} className={cn("block rounded-xl px-4 py-3 text-sm font-bold uppercase tracking-normal text-white", active && "bg-white text-[#214C9B]")}>
+                  <Link href={item.href} onClick={() => setOpen(false)} className={cn("block rounded-xl px-4 py-3 text-sm font-bold uppercase tracking-normal", active ? "bg-white text-[#214C9B]" : "text-white")}>
                     {item.label}
                   </Link>
                   {hasChildren && (
