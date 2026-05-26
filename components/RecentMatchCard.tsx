@@ -4,7 +4,7 @@ import { getCronicaForMatch } from "@/lib/match-articles";
 import { getAvilesMatchResult } from "@/lib/fixtures";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { primerEquipoBase } from "@/lib/primer-equipo";
-import { formatMatchDate, matchResultCardTone } from "@/lib/utils";
+import { formatMatchDate } from "@/lib/utils";
 import type { Match } from "@/types";
 import type { Route } from "next";
 import { RAI_TEAM_ID } from "@/data/mock";
@@ -24,7 +24,7 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
   return (
     <Link
       href={href}
-      className={`block rounded-2xl border p-4 shadow-[0_10px_24px_rgba(17,24,39,0.05)] transition ${result ? matchResultCardTone(result) : "border-[#214C9B]/25 bg-white hover:border-[#214C9B]"}`}
+      className="block rounded-2xl border border-[#214C9B]/25 bg-white p-4 shadow-[0_10px_24px_rgba(17,24,39,0.05)] transition hover:border-[#214C9B]"
     >
       <div className="mb-3 flex items-center justify-between gap-3">
         <Badge tone={result === "W" ? "green" : result === "D" ? "amber" : result === "L" ? "red" : "slate"}>
