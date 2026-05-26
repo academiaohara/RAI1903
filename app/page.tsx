@@ -32,7 +32,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-6">
-      <PageHero eyebrow="Web fan no oficial" title="Real Aviles Industrial" description="Inicio blanquiazul para seguir ultimo partido, proxima previa, clasificacion, forma, calendario, stats y noticiero." />
+      <PageHero title="Real Aviles Industrial" description="Inicio blanquiazul para seguir ultimo partido, proxima previa, clasificacion, forma, calendario, stats y noticiero." />
 
       <section className="grid gap-4">
         {latestMatch && (

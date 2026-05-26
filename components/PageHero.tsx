@@ -3,7 +3,7 @@ import { Badge } from "@/components/Badge";
 import { cn } from "@/lib/utils";
 
 type PageHeroProps = {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   description: string;
   children?: ReactNode;
@@ -13,7 +13,7 @@ type PageHeroProps = {
 export function PageHero({ eyebrow, title, description, children, className }: PageHeroProps) {
   return (
     <section className={cn(className)}>
-      <Badge tone="blue">{eyebrow}</Badge>
+      {eyebrow && <Badge tone="blue">{eyebrow}</Badge>}
       <div className="mt-4 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
         <div className="w-fit max-w-full">
           <h1 className="text-5xl font-extrabold uppercase leading-none text-[#214C9B] sm:text-6xl">{title}</h1>

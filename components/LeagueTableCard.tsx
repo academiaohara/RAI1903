@@ -21,8 +21,11 @@ export function LeagueTableCard({ eyebrow, title, teams, highlightTeamId, compac
 
   return (
     <>
-      <Card eyebrow={eyebrow} title={title} className={className}>
-        <div className="mb-3 flex justify-end">
+      <Card
+        eyebrow={eyebrow}
+        title={title}
+        className={className}
+        action={
           <button
             type="button"
             onClick={() => setOpen(true)}
@@ -32,7 +35,8 @@ export function LeagueTableCard({ eyebrow, title, teams, highlightTeamId, compac
             <Maximize2 size={16} />
             Ver en grande
           </button>
-        </div>
+        }
+      >
         <LeagueTable teams={teams} highlightTeamId={highlightTeamId} compact={compact} />
       </Card>
 
