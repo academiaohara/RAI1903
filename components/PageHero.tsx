@@ -12,11 +12,11 @@ type PageHeroProps = {
 
 export function PageHero({ eyebrow, title, description, children, className }: PageHeroProps) {
   return (
-    <section className={cn("rounded-[2rem] border border-[#981915]/25 bg-white p-6 shadow-[0_18px_45px_rgba(17,24,39,0.08)]", className)}>
-      <Badge tone="red">{eyebrow}</Badge>
+    <section className={cn("rounded-[2rem] border border-[#214C9B]/25 bg-white p-6 shadow-[0_18px_45px_rgba(17,24,39,0.08)]", className)}>
+      <Badge tone="blue">{eyebrow}</Badge>
       <div className="mt-4 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
-          <h1 className="text-5xl font-black uppercase leading-none text-[#981915] sm:text-6xl">{title}</h1>
+          <h1 className="text-5xl font-extrabold uppercase leading-none text-[#214C9B] sm:text-6xl">{title}</h1>
           <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">{description}</p>
         </div>
         {children}

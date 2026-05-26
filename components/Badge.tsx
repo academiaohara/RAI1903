@@ -9,12 +9,12 @@ const toneClasses: Record<BadgeTone, string> = {
   green: "border-emerald-200 bg-emerald-50 text-emerald-700",
   amber: "border-amber-200 bg-amber-50 text-amber-700",
   slate: "border-slate-200 bg-slate-100 text-slate-700",
-  white: "border-white bg-white text-[#981915]",
+  white: "border-white bg-white text-[#214C9B]",
 };
 
 export function Badge({ children, tone = "blue", className }: { children: ReactNode; tone?: BadgeTone; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.16em]", toneClasses[tone], className)}>
+    <span className={cn("inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.08em]", toneClasses[tone], className)}>
       {children}
     </span>
   );

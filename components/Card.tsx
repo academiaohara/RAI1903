@@ -12,12 +12,12 @@ type CardProps = {
 
 export function Card({ eyebrow, title, action, children, className, dense = false }: CardProps) {
   return (
-    <section className={cn("card-shine rounded-3xl border border-[#981915]/20 bg-white shadow-[0_18px_45px_rgba(17,24,39,0.08)]", className)}>
+    <section className={cn("card-shine rounded-3xl border border-[#214C9B]/20 bg-white shadow-[0_18px_45px_rgba(17,24,39,0.08)]", className)}>
       {(eyebrow || title || action) && (
-        <div className={cn("flex items-start justify-between gap-4 border-b border-[#981915]/15", dense ? "p-4" : "p-5")}>
+        <div className={cn("flex items-start justify-between gap-4 border-b border-[#214C9B]/15", dense ? "p-4" : "p-5")}>
           <div>
-            {eyebrow && <p className="text-xs font-black uppercase tracking-[0.24em] text-[#214C9B]">{eyebrow}</p>}
-            {title && <h2 className="mt-1 text-xl font-black uppercase tracking-tight text-[#981915]">{title}</h2>}
+            {eyebrow && <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">{eyebrow}</p>}
+            {title && <h2 className="mt-1 text-xl font-extrabold uppercase tracking-tight text-[#214C9B]">{title}</h2>}
           </div>
           {action}
         </div>

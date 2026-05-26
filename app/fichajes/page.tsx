@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function FichajesPage() {
-  redirect("/primer-equipo#noticias");
+  redirect("/primer-equipo/noticias");
 }

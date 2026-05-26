@@ -29,19 +29,19 @@ export function PredictionForm({ match, prediction, onChange }: { match: Match; 
   };
 
   return (
-    <div className="rounded-2xl border border-[#981915]/20 bg-white p-4 shadow-[0_10px_24px_rgba(17,24,39,0.05)]">
+    <div className="rounded-2xl border border-[#214C9B]/20 bg-white p-4 shadow-[0_10px_24px_rgba(17,24,39,0.05)]">
       <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">{match.venue}</p>
+          <p className="text-xs font-bold uppercase tracking-normal text-slate-500">{match.venue}</p>
           <div className="mt-2 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-            <p className="font-black text-slate-800">{match.homeTeam}</p>
-            <span className="rounded-xl bg-[#981915] px-3 py-2 text-sm font-black text-white">vs</span>
-            <p className="text-right font-black text-slate-800">{match.awayTeam}</p>
+            <p className="font-extrabold text-slate-800">{match.homeTeam}</p>
+            <span className="rounded-xl bg-[#214C9B] px-3 py-2 text-sm font-extrabold text-white">vs</span>
+            <p className="text-right font-extrabold text-slate-800">{match.awayTeam}</p>
           </div>
         </div>
         <div className="flex items-center gap-2" aria-label="Prediccion 1 X 2">
           {(["1", "X", "2"] as PredictionOutcome[]).map((outcome) => (
-            <button key={outcome} onClick={() => update({ outcome })} className={`h-12 w-12 rounded-2xl border text-lg font-black transition ${prediction?.outcome === outcome ? "border-[#981915] bg-[#981915] text-white" : "border-[#981915]/20 bg-white text-slate-700 hover:bg-red-50"}`}>
+            <button key={outcome} onClick={() => update({ outcome })} className={`h-12 w-12 rounded-2xl border text-lg font-extrabold transition ${prediction?.outcome === outcome ? "border-[#214C9B] bg-[#214C9B] text-white" : "border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50"}`}>
               {outcome}
             </button>
           ))}
@@ -50,7 +50,7 @@ export function PredictionForm({ match, prediction, onChange }: { match: Match; 
 
       {isAvilesMatch && (
         <div className="mt-4 rounded-2xl border border-blue-200 bg-blue-50 p-4">
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-[#214C9B]">Detalle Real Aviles</p>
+          <p className="text-xs font-bold uppercase tracking-normal text-[#214C9B]">Detalle Real Aviles</p>
           <div className="mt-3 grid gap-3 md:grid-cols-[auto_auto_1fr]">
             <label className="text-sm font-bold text-slate-700">
               Goles local
@@ -67,7 +67,7 @@ export function PredictionForm({ match, prediction, onChange }: { match: Match; 
                   <option value="">Seleccionar jugador</option>
                   {avilesScorers.map((player) => <option key={player.id} value={player.displayName}>{player.displayName}</option>)}
                 </select>
-                <button onClick={addScorer} className="rounded-xl bg-[#981915] px-3 py-2 text-white transition hover:bg-[#76120f]" aria-label="Anadir goleador"><Plus size={18} /></button>
+                <button onClick={addScorer} className="rounded-xl bg-[#214C9B] px-3 py-2 text-white transition hover:bg-[#173a78]" aria-label="Anadir goleador"><Plus size={18} /></button>
               </div>
             </div>
           </div>
