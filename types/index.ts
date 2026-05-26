@@ -1,4 +1,4 @@
-export type PlayerStatus = "titular" | "suplente" | "lesionado" | "cantera" | "nuevo fichaje";
+export type PlayerStatus = "titular" | "suplente" | "lesionado" | "sancionado" | "cantera" | "nuevo fichaje";
 export type PlayerPosition = "Portero" | "Defensa" | "Centrocampista" | "Delantero";
 
 export type Player = {
@@ -75,7 +75,7 @@ export type Matchday = {
   matches: Match[];
 };
 
-export type NewsTag = "partido" | "fichajes" | "cantera" | "previa" | "cronica" | "club";
+export type NewsTag = "partido" | "fichajes" | "cantera" | "previa" | "cronica" | "club" | "lesionados" | "rumores" | "renovaciones" | "entrevistas" | "otros";
 
 export type NewsItem = {
   id: string;
@@ -87,6 +87,8 @@ export type NewsItem = {
   tags: NewsTag[];
   featured?: boolean;
 };
+
+export type NewsCategory = "Fichajes" | "Lesionados" | "Rumores" | "Renovaciones" | "Entrevistas" | "Otros";
 
 export type TransferStatus = "Interes" | "Negociacion" | "Cercano" | "Oficial" | "Descartado";
 export type TransferCategory = "Rumores" | "Altas" | "Bajas" | "Renovaciones";
@@ -131,4 +133,29 @@ export type AcademyTeam = {
   nextMatch: string;
   standoutPlayers: string[];
   news: string[];
+  roster: Array<Pick<Player, "id" | "displayName" | "number" | "position" | "age">>;
+  table: Team[];
+  calendar: Match[];
+};
+
+export type PressLink = {
+  id: string;
+  name: string;
+  outlet: string;
+  url: string;
+  description: string;
+};
+
+export type UserPredictionSummary = {
+  user: string;
+  points: number;
+  hits: number;
+  exactScores: number;
+};
+
+export type DataComparison = {
+  label: string;
+  aviles: number;
+  rival: number;
+  unit: string;
 };
