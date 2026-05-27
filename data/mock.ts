@@ -476,28 +476,20 @@ export const fanRdpVideos: FanYouTubeVideo[] = [
   { id: "rdp-v5", title: "RDP", url: "https://youtu.be/eCeLvze6axY" },
 ];
 
-/** Contenido de aficion y pe?as: tertulias, directos y apoyo a la plantilla. */
+/** Contenido de aficion y pe?as: tertulias y directos en X Spaces. */
 export const fanTenteFirme: FanMediaLink[] = [
   {
-    id: "tente-firme-tertulia",
-    name: "Espacio para tertulia de aficion",
-    platform: "youtube",
-    url: RAI_YOUTUBE_CHANNEL,
-    description: "Hueco para directos o tertulias de pe?as y medios fan que animan al equipo.",
-  },
-  {
-    id: "tente-firme-twitter",
-    name: "Espacio en X / Twitter",
+    id: "tente-firme-space-1",
+    name: "Tente firme ? Space I",
     platform: "twitter",
-    url: "https://x.com/realavilesind",
-    description: "Clips, hilos y reacciones de la aficion en redes.",
+    url: "https://x.com/i/spaces/1vKpPPNBdVXKE",
+    description: "Tertulia o directo de aficion grabado en X Spaces.",
   },
   {
-    id: "tente-firme-ivoox",
-    name: "Radio Adelantado 1903",
-    platform: "ivoox",
-    url: "https://www.ivoox.com",
-    description: "Podcast de pe?as y aficionados. Enlaza el episodio concreto en iVoox.",
-    schedule: "Cuando haya novedad",
+    id: "tente-firme-space-2",
+    name: "Tente firme ? Space II",
+    platform: "twitter",
+    url: "https://x.com/i/spaces/1kKzDMRrDYNJv",
+    description: "Tertulia o directo de aficion grabado en X Spaces.",
   },
 ];

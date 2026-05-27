@@ -63,7 +63,7 @@ export const contenidoFanSections: Record<ContenidoFanSlug, ContenidoFanSectionC
     cardEyebrow: "Afición",
     cardTitle: "Tente firme",
     cardIntro:
-      "Huecos para enlazar programas de peñas, tertulias de aficionados o vídeos de apoyo al equipo fuera del canal oficial.",
+      "Tertulias y directos de aficion en X Spaces. Pulsa una tarjeta para escuchar la grabacion en X.",
     links: fanTenteFirme,
   },
 };
