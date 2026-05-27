@@ -129,16 +129,37 @@ export type TransferRumor = {
 
 export type PredictionOutcome = "1" | "X" | "2";
 
+/** Porra del Aviles: 0, 1, 2 o M (3 o mas goles). */
+export type GoalsPick = 0 | 1 | 2 | "M";
+
 export type Prediction = {
   matchId: string;
   matchday: number;
   outcome?: PredictionOutcome;
-  exactScore?: {
-    home: number;
-    away: number;
-  };
-  scorers: string[];
+  goalsHome?: GoalsPick;
+  goalsAway?: GoalsPick;
+  /** Un solo goleador del Aviles o "nadie". */
+  scorer?: string;
   updatedAt: string;
+};
+
+export type OutcomePickStats = {
+  outcome: PredictionOutcome;
+  count: number;
+  percent: number;
+};
+
+export type MatchPickStats = {
+  matchId: string;
+  total: number;
+  picks: OutcomePickStats[];
+};
+
+export type JornadaParticipant = {
+  user: string;
+  submittedAt: string;
+  points: number;
+  hits: number;
 };
 
 export type AcademyTeam = {

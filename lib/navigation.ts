@@ -77,7 +77,7 @@ export const navItems: NavItem[] = [
     label: "Quiniela",
     icon: CalendarCheck2,
     children: [
-      { href: "/quiniela/pronosticos", label: "Pronosticos", icon: ClipboardList },
+      { href: "/quiniela/quiniela", label: "Quiniela", icon: ClipboardList },
       { href: "/quiniela/resultado", label: "Resultado", icon: Swords },
       { href: "/quiniela/ranking", label: "Ranking", icon: Medal },
     ],

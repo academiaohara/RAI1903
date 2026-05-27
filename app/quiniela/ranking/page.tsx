@@ -4,11 +4,9 @@ import { PageHero } from "@/components/PageHero";
 import { SectionTabs } from "@/components/SectionTabs";
 import { quinielaRanking } from "@/data/mock";
 
-const tabs = [
-  { href: "/quiniela/pronosticos", label: "Pronosticos" },
-  { href: "/quiniela/resultado", label: "Resultado" },
-  { href: "/quiniela/ranking", label: "Ranking" },
-];
+import { QUINIELA_TABS } from "@/lib/quiniela";
+
+const tabs = [...QUINIELA_TABS];
 
 export default function QuinielaRankingPage() {
   return (
