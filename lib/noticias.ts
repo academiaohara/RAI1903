@@ -6,5 +6,10 @@ export const NOTICIAS_TABS: { href: Route; label: string }[] = [
   { href: "/noticias/prensa", label: "Prensa" },
 ];
 
-export const newsByChannel = <T extends { channel: NewsChannel }>(items: T[], channel: NewsChannel) =>
-  items.filter((item) => item.channel === channel);
+export const sortNewsByDate = <T extends { date: string; id: string }>(items: T[]) =>
+  [...items].sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
+
+export const newsByChannel = <T extends { channel: NewsChannel; date: string; id: string }>(
+  items: T[],
+  channel: NewsChannel,
+) => sortNewsByDate(items.filter((item) => item.channel === channel));
