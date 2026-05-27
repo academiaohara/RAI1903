@@ -1,4 +1,4 @@
-import { CURRENT_QUINIELA_ROUND, matchdays, RAI_TEAM_ID, teams } from "@/data/mock";
+import { CURRENT_QUINIELA_ROUND, matchdays, players, RAI_TEAM_ID, teams } from "@/data/mock";
 import type { GoalsPick, Match, Matchday, Prediction, PredictionOutcome } from "@/types";
 
 export { CURRENT_QUINIELA_ROUND };
@@ -34,6 +34,33 @@ export function isAvilesMatch(match: Match): boolean {
   return match.homeTeamId === RAI_TEAM_ID || match.awayTeamId === RAI_TEAM_ID;
 }
 
+export function getAvilesGoalsPick(match: Match, prediction: Prediction): GoalsPick | undefined {
+  return match.homeTeamId === RAI_TEAM_ID ? prediction.goalsHome : prediction.goalsAway;
+}
+
+export function getAvilesScore(match: Match): number | null {
+  if (!isAvilesMatch(match) || match.homeScore === undefined || match.awayScore === undefined) {
+    return null;
+  }
+  return match.homeTeamId === RAI_TEAM_ID ? match.homeScore : match.awayScore;
+}
+
+export function actualAvilesScorer(match: Match): string | null {
+  const goals = getAvilesScore(match);
+  if (goals === null) return null;
+  if (goals === 0) return "nadie";
+
+  const outfield = players.filter((player) => player.position !== "Portero");
+  const hash = match.id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return outfield[hash % outfield.length]?.displayName ?? "nadie";
+}
+
+export function isScorerPredictionCorrect(match: Match, prediction: Prediction): boolean {
+  if (!prediction.scorer) return false;
+  const actual = actualAvilesScorer(match);
+  return actual !== null && prediction.scorer === actual;
+}
+
 export function getTeamById(teamId: string) {
   return teams.find((team) => team.id === teamId);
 }
@@ -63,11 +90,11 @@ export function scorePredictionPoints(match: Match, prediction?: Prediction): nu
   if (!outcome || !prediction?.outcome) return 0;
 
   if (isAvilesMatch(match)) {
-    const outcomeCorrect = prediction.outcome === outcome;
-    const goalsCorrect = areGoalsPredictionCorrect(match, prediction);
-    if (outcomeCorrect && goalsCorrect) return 2;
-    if (outcomeCorrect || goalsCorrect) return 1;
-    return 0;
+    let points = 0;
+    if (prediction.outcome === outcome) points += 1;
+    if (areGoalsPredictionCorrect(match, prediction)) points += 1;
+    if (isScorerPredictionCorrect(match, prediction)) points += 1;
+    return points;
   }
 
   return prediction.outcome === outcome ? 1 : 0;
