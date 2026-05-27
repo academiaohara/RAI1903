@@ -9,6 +9,6 @@ type AnimatedPageTitleProps = {
 
 export function AnimatedPageTitle({ title, className }: AnimatedPageTitleProps) {
   return (
-    <TitleWithOrnament title={title} as="h1" size="page" animated className={className} />
+    <TitleWithOrnament title={title} as="h1" animated className={className} />
   );
 }

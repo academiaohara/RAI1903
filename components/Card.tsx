@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { TitleWithOrnament } from "@/components/TitleWithOrnament";
 import { cn } from "@/lib/utils";
 
 type CardProps = {
@@ -19,9 +18,9 @@ export function Card({ eyebrow, title, action, children, className, dense = fals
           <div>
             {eyebrow && <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">{eyebrow}</p>}
             {title && (
-              <div className="mt-1">
-                <TitleWithOrnament title={title} as="h2" size="section" />
-              </div>
+              <h2 className="mt-1 text-2xl font-extrabold uppercase leading-none text-[#214C9B] sm:text-3xl lg:text-4xl">
+                {title}
+              </h2>
             )}
           </div>
           {action}
