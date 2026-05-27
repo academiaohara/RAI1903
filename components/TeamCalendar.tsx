@@ -1,5 +1,6 @@
 import { CalendarMatchCell } from "@/components/CalendarMatchCell";
 import { WEEKDAY_LABELS, type CalendarMonth } from "@/lib/calendar";
+import { matchCompetitionShortLabel } from "@/lib/competition-labels";
 import { getCompetitionAccentClass } from "@/lib/competition-styles";
 import { cn } from "@/lib/utils";
 import type { CalendarMatch } from "@/types";
@@ -76,7 +77,9 @@ function MobileCalendarCard({ match }: { match: CalendarMatch }) {
 
   return (
     <div className="space-y-2">
-      <p className={cn("text-[11px] font-bold uppercase tracking-[0.1em]", accent)}>{match.competition}</p>
+      <p className={cn("text-[11px] font-bold uppercase tracking-[0.1em]", accent)}>
+        {matchCompetitionShortLabel(match)}
+      </p>
       <CalendarMatchCell match={match} day={day} className="min-h-[9rem] w-full sm:aspect-auto" />
     </div>
   );

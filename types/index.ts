@@ -28,6 +28,11 @@ export type Player = {
   };
 };
 
+/** Spanish form badges: G (ganado), E (empatado), P (perdido). */
+export type FormCode = "G" | "E" | "P";
+
+export type StandingsZone = "promotion" | "playoff" | "relegation" | "mid";
+
 export type Team = {
   id: string;
   name: string;
@@ -39,7 +44,8 @@ export type Team = {
   crestInitials: string;
   colors: string[];
   position: number;
-  form: ResultCode[];
+  zone?: StandingsZone;
+  form: FormCode[];
   stats: {
     played: number;
     won: number;
@@ -51,7 +57,17 @@ export type Team = {
   };
 };
 
+/** Aviles-centric match result for cards and badges. */
 export type ResultCode = "W" | "D" | "L";
+
+export type CompetitionId =
+  | "liga-raij903"
+  | "primera-rfef"
+  | "copa-rey"
+  | "amistoso"
+  | "liga-femenina"
+  | "primera-asturfutbol"
+  | "liga-nacional-juvenil";
 
 export type MatchStatus = "scheduled" | "finished";
 
@@ -63,7 +79,9 @@ export type Match = {
   homeTeam: string;
   awayTeam: string;
   date: string;
-  competition: string;
+  competition: CompetitionId;
+  /** Copa del Rey round label (e.g. Dieciseisavos). */
+  competitionStage?: string;
   venue: string;
   status: MatchStatus;
   homeScore?: number;
@@ -167,7 +185,9 @@ export type CalendarMatch = {
   date: string;
   opponent: string;
   opponentLogo: string;
-  competition: string;
+  competition: CompetitionId;
+  competitionStage?: string;
+  matchday?: number;
   isHome: boolean;
   time: string | null;
   played: boolean;

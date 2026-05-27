@@ -17,7 +17,7 @@ export function GearAdornoHalf({ side, clipId, className }: GearAdornoHalfProps)
     <svg
       aria-hidden
       viewBox={ADORNO_VIEWBOX}
-      className={cn("block h-[0.68em] w-[0.34em] shrink-0 text-[#214C9B]", className)}
+      className={cn("block h-[1em] w-[0.5em] shrink-0 self-center text-[#214C9B]", className)}
       preserveAspectRatio="xMidYMid meet"
     >
       <defs>

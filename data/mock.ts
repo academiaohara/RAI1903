@@ -1,4 +1,18 @@
-import type { AcademyTeam, DataComparison, Match, MatchArticle, Matchday, NewsItem, Player, PressLink, Team, TransferRumor, UserPredictionSummary } from "@/types";
+import { applyStandingsToTeams } from "@/lib/standings";
+import type {
+  AcademyTeam,
+  CompetitionId,
+  DataComparison,
+  Match,
+  MatchArticle,
+  Matchday,
+  NewsItem,
+  Player,
+  PressLink,
+  Team,
+  TransferRumor,
+  UserPredictionSummary,
+} from "@/types";
 
 export const RAI_TEAM_ID = "real-aviles-industrial";
 export const RAI_FEM_TEAM_ID = "real-aviles-industrial-femenino";
@@ -15,30 +29,30 @@ export type CompetitionSeasonId = (typeof competitionSeasons)[number]["id"];
 
 export const DEFAULT_COMPETITION_SEASON_ID: CompetitionSeasonId = "2025-26";
 
-export const teams: Team[] = [
-  { id: RAI_TEAM_ID, name: "Real Aviles Industrial", shortName: "Aviles", city: "Aviles", stadium: "Roman Suarez Puerta", coach: "Miguel Alonso", founded: 1903, crestInitials: "RAI", colors: ["#214C9B", "#FFFFFF"], position: 3, form: ["W", "W", "D", "L", "W"], stats: { played: 9, won: 5, drawn: 2, lost: 2, goalsFor: 16, goalsAgainst: 9, points: 17 } },
-  { id: "pontevedra", name: "Pontevedra CF", shortName: "Pontevedra", city: "Pontevedra", stadium: "Pasaron", coach: "Javi Rey", founded: 1941, crestInitials: "PON", colors: ["#7A1435", "#FFFFFF"], position: 1, form: ["W", "D", "W", "W", "W"], stats: { played: 9, won: 6, drawn: 2, lost: 1, goalsFor: 18, goalsAgainst: 7, points: 20 } },
-  { id: "numancia", name: "CD Numancia", shortName: "Numancia", city: "Soria", stadium: "Los Pajaritos", coach: "Aitor Calle", founded: 1945, crestInitials: "NUM", colors: ["#D71920", "#1D2D50"], position: 2, form: ["D", "W", "W", "D", "W"], stats: { played: 9, won: 5, drawn: 3, lost: 1, goalsFor: 14, goalsAgainst: 6, points: 18 } },
-  { id: "langreo", name: "UP Langreo", shortName: "Langreo", city: "Langreo", stadium: "Nuevo Ganzabal", coach: "Javi Vazquez", founded: 1961, crestInitials: "LAN", colors: ["#1D4ED8", "#E11D48"], position: 4, form: ["W", "L", "W", "D", "D"], stats: { played: 9, won: 4, drawn: 3, lost: 2, goalsFor: 12, goalsAgainst: 8, points: 15 } },
-  { id: "coruxo", name: "Coruxo FC", shortName: "Coruxo", city: "Vigo", stadium: "O Vao", coach: "David de Dios", founded: 1930, crestInitials: "COR", colors: ["#0F766E", "#FFFFFF"], position: 5, form: ["D", "W", "L", "W", "D"], stats: { played: 9, won: 4, drawn: 2, lost: 3, goalsFor: 13, goalsAgainst: 11, points: 14 } },
-  { id: "marino-luanco", name: "Marino de Luanco", shortName: "Marino", city: "Luanco", stadium: "Miramar", coach: "Sergio Sanchez", founded: 1931, crestInitials: "MAR", colors: ["#1E3A8A", "#F8FAFC"], position: 6, form: ["L", "W", "D", "W", "D"], stats: { played: 9, won: 3, drawn: 4, lost: 2, goalsFor: 10, goalsAgainst: 9, points: 13 } },
-  { id: "compostela", name: "SD Compostela", shortName: "Compos", city: "Santiago", stadium: "Vero Bono", coach: "Anton Permuy", founded: 1962, crestInitials: "SDC", colors: ["#0EA5E9", "#FFFFFF"], position: 7, form: ["W", "D", "L", "D", "W"], stats: { played: 9, won: 3, drawn: 4, lost: 2, goalsFor: 11, goalsAgainst: 11, points: 13 } },
-  { id: "bergantinos", name: "Bergantinos FC", shortName: "Bergantinos", city: "Carballo", stadium: "As Eiroas", coach: "Jose Luis Lemos", founded: 1923, crestInitials: "BER", colors: ["#EF4444", "#FFFFFF"], position: 8, form: ["D", "D", "W", "L", "W"], stats: { played: 9, won: 3, drawn: 3, lost: 3, goalsFor: 12, goalsAgainst: 12, points: 12 } },
-  { id: "guijuelo", name: "CD Guijuelo", shortName: "Guijuelo", city: "Guijuelo", stadium: "Municipal Luis Ramos", coach: "Mario Sanchez", founded: 1974, crestInitials: "GUI", colors: ["#166534", "#FFFFFF"], position: 9, form: ["W", "L", "D", "D", "L"], stats: { played: 9, won: 3, drawn: 2, lost: 4, goalsFor: 9, goalsAgainst: 10, points: 11 } },
-  { id: "zamora", name: "Zamora CF", shortName: "Zamora", city: "Zamora", stadium: "Ruta de la Plata", coach: "Yago Iglesias", founded: 1968, crestInitials: "ZAM", colors: ["#DC2626", "#111827"], position: 10, form: ["L", "D", "W", "D", "L"], stats: { played: 9, won: 2, drawn: 4, lost: 3, goalsFor: 8, goalsAgainst: 9, points: 10 } },
-  { id: "racing-villalbes", name: "Racing Villalbes", shortName: "Villalbes", city: "Vilalba", stadium: "A Magdalena", coach: "Simon Lamas", founded: 1931, crestInitials: "RCV", colors: ["#16A34A", "#FFFFFF"], position: 11, form: ["D", "L", "D", "W", "L"], stats: { played: 9, won: 2, drawn: 4, lost: 3, goalsFor: 7, goalsAgainst: 9, points: 10 } },
-  { id: "llanera", name: "UD Llanera", shortName: "Llanera", city: "Llanera", stadium: "Pepe Quimaran", coach: "Chuchi Collado", founded: 1981, crestInitials: "LLA", colors: ["#111827", "#F59E0B"], position: 12, form: ["W", "L", "L", "D", "D"], stats: { played: 9, won: 2, drawn: 3, lost: 4, goalsFor: 9, goalsAgainst: 13, points: 9 } },
-  { id: "ourense", name: "Ourense CF", shortName: "Ourense", city: "Ourense", stadium: "O Couto", coach: "Ruben Dominguez", founded: 1977, crestInitials: "OUR", colors: ["#2563EB", "#FFFFFF"], position: 13, form: ["L", "D", "W", "L", "D"], stats: { played: 9, won: 2, drawn: 3, lost: 4, goalsFor: 8, goalsAgainst: 12, points: 9 } },
-  { id: "covadonga", name: "CD Covadonga", shortName: "Covadonga", city: "Oviedo", stadium: "Juan Antonio Alvarez Rabanal", coach: "Ivan Ania", founded: 1979, crestInitials: "COV", colors: ["#0F172A", "#60A5FA"], position: 14, form: ["D", "L", "L", "W", "L"], stats: { played: 9, won: 2, drawn: 2, lost: 5, goalsFor: 7, goalsAgainst: 14, points: 8 } },
-  { id: "lealtad", name: "CD Lealtad", shortName: "Lealtad", city: "Villaviciosa", stadium: "Les Caleyes", coach: "Samuel Banos", founded: 1916, crestInitials: "LEA", colors: ["#111827", "#FFFFFF"], position: 15, form: ["L", "D", "D", "L", "W"], stats: { played: 9, won: 2, drawn: 2, lost: 5, goalsFor: 6, goalsAgainst: 11, points: 8 } },
-  { id: "aviles-b", name: "Sporting Atletico", shortName: "Sporting B", city: "Gijon", stadium: "Mareo", coach: "Dani Mori", founded: 1960, crestInitials: "SGB", colors: ["#EF4444", "#FFFFFF"], position: 16, form: ["L", "W", "L", "L", "D"], stats: { played: 9, won: 2, drawn: 2, lost: 5, goalsFor: 10, goalsAgainst: 16, points: 8 } },
-  { id: "unionistas-b", name: "Unionistas Promesas", shortName: "Unionistas B", city: "Salamanca", stadium: "Reina Sofia Anexo", coach: "Sergio Garcia", founded: 2013, crestInitials: "UNI", colors: ["#111827", "#FFFFFF"], position: 17, form: ["D", "L", "L", "D", "L"], stats: { played: 9, won: 1, drawn: 4, lost: 4, goalsFor: 6, goalsAgainst: 12, points: 7 } },
-  { id: "torrelavega", name: "RS Gimnastica", shortName: "Gimnastica", city: "Torrelavega", stadium: "El Malecon", coach: "Cristian Fernandez", founded: 1907, crestInitials: "RSG", colors: ["#1D4ED8", "#FFFFFF"], position: 18, form: ["L", "D", "L", "L", "D"], stats: { played: 9, won: 1, drawn: 3, lost: 5, goalsFor: 5, goalsAgainst: 13, points: 6 } },
-  { id: "rayo-cantabria", name: "Rayo Cantabria", shortName: "Rayo Cantabria", city: "Santander", stadium: "La Albericia", coach: "Ezequiel Loza", founded: 1993, crestInitials: "RAC", colors: ["#22C55E", "#FFFFFF"], position: 19, form: ["L", "L", "D", "L", "L"], stats: { played: 9, won: 1, drawn: 2, lost: 6, goalsFor: 5, goalsAgainst: 15, points: 5 } },
-  { id: "cristo-atletico", name: "CD Cristo Atletico", shortName: "Cristo", city: "Palencia", stadium: "Nueva Balastera", coach: "Ruben Gala", founded: 1985, crestInitials: "CTA", colors: ["#6D28D9", "#F8FAFC"], position: 20, form: ["L", "L", "D", "L", "D"], stats: { played: 9, won: 0, drawn: 4, lost: 5, goalsFor: 4, goalsAgainst: 15, points: 4 } },
+const baseTeams: Team[] = [
+  { id: RAI_TEAM_ID, name: "Real Aviles Industrial", shortName: "Aviles", city: "Aviles", stadium: "Roman Suarez Puerta", coach: "Miguel Alonso", founded: 1903, crestInitials: "RAI", colors: ["#214C9B", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "pontevedra", name: "Pontevedra CF", shortName: "Pontevedra", city: "Pontevedra", stadium: "Pasaron", coach: "Javi Rey", founded: 1941, crestInitials: "PON", colors: ["#7A1435", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "numancia", name: "CD Numancia", shortName: "Numancia", city: "Soria", stadium: "Los Pajaritos", coach: "Aitor Calle", founded: 1945, crestInitials: "NUM", colors: ["#D71920", "#1D2D50"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "langreo", name: "UP Langreo", shortName: "Langreo", city: "Langreo", stadium: "Nuevo Ganzabal", coach: "Javi Vazquez", founded: 1961, crestInitials: "LAN", colors: ["#1D4ED8", "#E11D48"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "coruxo", name: "Coruxo FC", shortName: "Coruxo", city: "Vigo", stadium: "O Vao", coach: "David de Dios", founded: 1930, crestInitials: "COR", colors: ["#0F766E", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "marino-luanco", name: "Marino de Luanco", shortName: "Marino", city: "Luanco", stadium: "Miramar", coach: "Sergio Sanchez", founded: 1931, crestInitials: "MAR", colors: ["#1E3A8A", "#F8FAFC"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "compostela", name: "SD Compostela", shortName: "Compos", city: "Santiago", stadium: "Vero Bono", coach: "Anton Permuy", founded: 1962, crestInitials: "SDC", colors: ["#0EA5E9", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "bergantinos", name: "Bergantinos FC", shortName: "Bergantinos", city: "Carballo", stadium: "As Eiroas", coach: "Jose Luis Lemos", founded: 1923, crestInitials: "BER", colors: ["#EF4444", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "guijuelo", name: "CD Guijuelo", shortName: "Guijuelo", city: "Guijuelo", stadium: "Municipal Luis Ramos", coach: "Mario Sanchez", founded: 1974, crestInitials: "GUI", colors: ["#166534", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "zamora", name: "Zamora CF", shortName: "Zamora", city: "Zamora", stadium: "Ruta de la Plata", coach: "Yago Iglesias", founded: 1968, crestInitials: "ZAM", colors: ["#DC2626", "#111827"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "racing-villalbes", name: "Racing Villalbes", shortName: "Villalbes", city: "Vilalba", stadium: "A Magdalena", coach: "Simon Lamas", founded: 1931, crestInitials: "RCV", colors: ["#16A34A", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "llanera", name: "UD Llanera", shortName: "Llanera", city: "Llanera", stadium: "Pepe Quimaran", coach: "Chuchi Collado", founded: 1981, crestInitials: "LLA", colors: ["#111827", "#F59E0B"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "ourense", name: "Ourense CF", shortName: "Ourense", city: "Ourense", stadium: "O Couto", coach: "Ruben Dominguez", founded: 1977, crestInitials: "OUR", colors: ["#2563EB", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "covadonga", name: "CD Covadonga", shortName: "Covadonga", city: "Oviedo", stadium: "Juan Antonio Alvarez Rabanal", coach: "Ivan Ania", founded: 1979, crestInitials: "COV", colors: ["#0F172A", "#60A5FA"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "lealtad", name: "CD Lealtad", shortName: "Lealtad", city: "Villaviciosa", stadium: "Les Caleyes", coach: "Samuel Banos", founded: 1916, crestInitials: "LEA", colors: ["#111827", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "aviles-b", name: "Sporting Atletico", shortName: "Sporting B", city: "Gijon", stadium: "Mareo", coach: "Dani Mori", founded: 1960, crestInitials: "SGB", colors: ["#EF4444", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "unionistas-b", name: "Unionistas Promesas", shortName: "Unionistas B", city: "Salamanca", stadium: "Reina Sofia Anexo", coach: "Sergio Garcia", founded: 2013, crestInitials: "UNI", colors: ["#111827", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "torrelavega", name: "RS Gimnastica", shortName: "Gimnastica", city: "Torrelavega", stadium: "El Malecon", coach: "Cristian Fernandez", founded: 1907, crestInitials: "RSG", colors: ["#1D4ED8", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "rayo-cantabria", name: "Rayo Cantabria", shortName: "Rayo Cantabria", city: "Santander", stadium: "La Albericia", coach: "Ezequiel Loza", founded: 1993, crestInitials: "RAC", colors: ["#22C55E", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "cristo-atletico", name: "CD Cristo Atletico", shortName: "Cristo", city: "Palencia", stadium: "Nueva Balastera", coach: "Ruben Gala", founded: 1985, crestInitials: "CTA", colors: ["#6D28D9", "#F8FAFC"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
 ];
 
-export const teamsFemenino: Team[] = teams.map((team) =>
+const baseTeamsFemenino: Team[] = baseTeams.map((team) =>
   team.id === RAI_TEAM_ID
     ? {
         ...team,
@@ -46,24 +60,22 @@ export const teamsFemenino: Team[] = teams.map((team) =>
         name: "Real Aviles Industrial Femenino",
         shortName: "Aviles Fem.",
         coach: "Laura Menendez",
-        position: 2,
-        form: ["W", "D", "W", "W", "D"],
-        stats: { played: 9, won: 6, drawn: 2, lost: 1, goalsFor: 18, goalsAgainst: 7, points: 20 },
       }
-    : { ...team, position: team.position === 1 ? 3 : team.position === 3 ? 1 : team.position },
+    : { ...team },
 );
 
-const teamById = new Map(teams.map((team) => [team.id, team]));
+const teamById = new Map(baseTeams.map((team) => [team.id, team]));
 
-const competitionForRound = (round: number): string => {
-  if (round === 4 || round === 12) return "Copa del Rey";
-  if (round === 8 || round === 16) return "Amistoso";
-  if (round === 6 || round === 14) return "1? RFEF";
-  return COMPETITION_NAME;
+const competitionForRound = (round: number): { competition: CompetitionId; competitionStage?: string } => {
+  if (round === 4) return { competition: "copa-rey", competitionStage: "Dieciseisavos" };
+  if (round === 12) return { competition: "copa-rey", competitionStage: "Octavos" };
+  if (round === 8 || round === 16) return { competition: "amistoso" };
+  if (round === 6 || round === 14) return { competition: "primera-rfef" };
+  return { competition: "liga-raij903" };
 };
 
 const generateMatchdays = (): Matchday[] => {
-  const ids = teams.map((team) => team.id);
+  const ids = baseTeams.map((team) => team.id);
   const current = [...ids];
   const firstLeg: string[][][] = [];
 
@@ -89,9 +101,13 @@ const generateMatchdays = (): Matchday[] => {
       const home = teamById.get(homeTeamId)!;
       const away = teamById.get(awayTeamId)!;
       const isFinished = round <= 9;
-      const homeScore = isFinished ? (round + matchIndex + home.position) % 4 : undefined;
-      const awayScore = isFinished ? (round + matchIndex + away.position + 1) % 3 : undefined;
+      const homeIndex = ids.indexOf(homeTeamId);
+      const awayIndex = ids.indexOf(awayTeamId);
+      const homeScore = isFinished ? (round + matchIndex + homeIndex) % 4 : undefined;
+      const awayScore = isFinished ? (round + matchIndex + awayIndex + 1) % 3 : undefined;
       const date = new Date(Date.UTC(2026, 7, 23 + (round - 1) * 7, 15 + (matchIndex % 4), matchIndex % 2 === 0 ? 0 : 30));
+
+      const { competition, competitionStage } = competitionForRound(round);
 
       return {
         id: `j${round}-${homeTeamId}-${awayTeamId}`,
@@ -101,7 +117,8 @@ const generateMatchdays = (): Matchday[] => {
         homeTeam: home.name,
         awayTeam: away.name,
         date: date.toISOString(),
-        competition: competitionForRound(round),
+        competition,
+        competitionStage,
         venue: home.stadium,
         status: isFinished ? "finished" : "scheduled",
         homeScore,
@@ -114,6 +131,11 @@ const generateMatchdays = (): Matchday[] => {
 };
 
 export const matchdays = generateMatchdays();
+
+const leagueMatches = matchdays.flatMap((round) => round.matches);
+
+export const teams: Team[] = applyStandingsToTeams(baseTeams, leagueMatches);
+export const teamsFemenino: Team[] = applyStandingsToTeams(baseTeamsFemenino, leagueMatches);
 
 export const players: Player[] = [
   { id: "alvaro-garcia", firstName: "Alvaro", lastName: "Garcia", displayName: "A. Garcia", number: 1, position: "Portero", nationality: "Espana", age: 29, birthDate: "1997-03-14", height: "1,88 m", preferredFoot: "Derecha", seasonsAtClub: 3, status: "titular", rating: 7.18, bio: "Portero sobrio, fuerte por alto y con buen desplazamiento en largo para activar transiciones.", clubHistory: ["Real Oviedo Vetusta", "Marino de Luanco", "Real Aviles Industrial"], stats: { appearances: 9, goals: 0, assists: 0, minutes: 810, yellowCards: 1, redCards: 0 } },
@@ -280,22 +302,22 @@ export const transfers: TransferRumor[] = [
 ];
 
 const academyTable = (teamName: string): Team[] => [
-  { id: `${teamName}-aviles`, name: `Real Aviles ${teamName}`, shortName: "Aviles", city: "Aviles", stadium: "Santo Domingo", coach: "Casa", founded: 1903, crestInitials: "RAI", colors: ["#214C9B", "#FFFFFF"], position: 2, form: ["W", "W", "D", "W", "L"], stats: { played: 9, won: 6, drawn: 1, lost: 2, goalsFor: 19, goalsAgainst: 9, points: 19 } },
-  { id: `${teamName}-oviedo`, name: "Real Oviedo Vetusta", shortName: "Oviedo B", city: "Oviedo", stadium: "El Requexon", coach: "Pablo Lago", founded: 1926, crestInitials: "OVI", colors: ["#214C9B", "#FFFFFF"], position: 1, form: ["W", "D", "W", "W", "W"], stats: { played: 9, won: 6, drawn: 2, lost: 1, goalsFor: 21, goalsAgainst: 8, points: 20 } },
-  { id: `${teamName}-llanera`, name: "UD Llanera", shortName: "Llanera", city: "Llanera", stadium: "Pepe Quimaran", coach: "Adrian Torre", founded: 1981, crestInitials: "LLA", colors: ["#111827", "#F59E0B"], position: 3, form: ["W", "L", "W", "D", "W"], stats: { played: 9, won: 5, drawn: 2, lost: 2, goalsFor: 16, goalsAgainst: 10, points: 17 } },
-  { id: `${teamName}-roces`, name: "TSK Roces", shortName: "Roces", city: "Gijon", stadium: "Covadonga", coach: "Ivan Valdes", founded: 1952, crestInitials: "ROC", colors: ["#DC2626", "#FFFFFF"], position: 4, form: ["D", "W", "L", "W", "D"], stats: { played: 9, won: 4, drawn: 3, lost: 2, goalsFor: 13, goalsAgainst: 11, points: 15 } },
-  { id: `${teamName}-covadonga`, name: "CD Covadonga", shortName: "Covadonga", city: "Oviedo", stadium: "Juan Antonio Alvarez", coach: "Hugo Perez", founded: 1979, crestInitials: "COV", colors: ["#0F172A", "#60A5FA"], position: 5, form: ["L", "W", "D", "W", "L"], stats: { played: 9, won: 4, drawn: 1, lost: 4, goalsFor: 12, goalsAgainst: 14, points: 13 } },
+  { id: `${teamName}-aviles`, name: `Real Aviles ${teamName}`, shortName: "Aviles", city: "Aviles", stadium: "Santo Domingo", coach: "Casa", founded: 1903, crestInitials: "RAI", colors: ["#214C9B", "#FFFFFF"], position: 2, form: ["G", "G", "E", "G", "P"], stats: { played: 9, won: 6, drawn: 1, lost: 2, goalsFor: 19, goalsAgainst: 9, points: 19 } },
+  { id: `${teamName}-oviedo`, name: "Real Oviedo Vetusta", shortName: "Oviedo B", city: "Oviedo", stadium: "El Requexon", coach: "Pablo Lago", founded: 1926, crestInitials: "OVI", colors: ["#214C9B", "#FFFFFF"], position: 1, form: ["G", "E", "G", "G", "G"], stats: { played: 9, won: 6, drawn: 2, lost: 1, goalsFor: 21, goalsAgainst: 8, points: 20 } },
+  { id: `${teamName}-llanera`, name: "UD Llanera", shortName: "Llanera", city: "Llanera", stadium: "Pepe Quimaran", coach: "Adrian Torre", founded: 1981, crestInitials: "LLA", colors: ["#111827", "#F59E0B"], position: 3, form: ["G", "P", "G", "E", "G"], stats: { played: 9, won: 5, drawn: 2, lost: 2, goalsFor: 16, goalsAgainst: 10, points: 17 } },
+  { id: `${teamName}-roces`, name: "TSK Roces", shortName: "Roces", city: "Gijon", stadium: "Covadonga", coach: "Ivan Valdes", founded: 1952, crestInitials: "ROC", colors: ["#DC2626", "#FFFFFF"], position: 4, form: ["E", "G", "P", "G", "E"], stats: { played: 9, won: 4, drawn: 3, lost: 2, goalsFor: 13, goalsAgainst: 11, points: 15 } },
+  { id: `${teamName}-covadonga`, name: "CD Covadonga", shortName: "Covadonga", city: "Oviedo", stadium: "Juan Antonio Alvarez", coach: "Hugo Perez", founded: 1979, crestInitials: "COV", colors: ["#0F172A", "#60A5FA"], position: 5, form: ["P", "G", "E", "G", "P"], stats: { played: 9, won: 4, drawn: 1, lost: 4, goalsFor: 12, goalsAgainst: 14, points: 13 } },
 ];
 
-const academyCalendar = (teamId: string, teamName: string, competition: string): Match[] => [
+const academyCalendar = (teamId: string, teamName: string, competition: CompetitionId): Match[] => [
   { id: `${teamId}-j10`, matchday: 10, homeTeamId: `${teamId}-aviles`, awayTeamId: `${teamId}-roces`, homeTeam: `Real Aviles ${teamName}`, awayTeam: "TSK Roces", date: "2026-10-24T10:30:00.000Z", competition, venue: "Santo Domingo", status: "scheduled" },
   { id: `${teamId}-j11`, matchday: 11, homeTeamId: `${teamId}-covadonga`, awayTeamId: `${teamId}-aviles`, homeTeam: "CD Covadonga", awayTeam: `Real Aviles ${teamName}`, date: "2026-10-31T11:00:00.000Z", competition, venue: "Juan Antonio Alvarez", status: "scheduled" },
   { id: `${teamId}-j12`, matchday: 12, homeTeamId: `${teamId}-aviles`, awayTeamId: `${teamId}-llanera`, homeTeam: `Real Aviles ${teamName}`, awayTeam: "UD Llanera", date: "2026-11-07T12:00:00.000Z", competition, venue: "Santo Domingo", status: "scheduled" },
 ];
 
 export const academyTeams: AcademyTeam[] = [
-  { id: "filial", name: "Filial", coach: "Dani Borrego", category: "Primera Asturfutbol", position: "2º - 19 pts", lastResult: "Real Aviles B 2-0 Llanera B", nextMatch: "Real Aviles B - Roces", standoutPlayers: ["Raul Prendes", "Jorge Villa", "Enol Ferreiro"], news: ["Tercera porteria a cero seguida", "Dos juveniles entrenan con el primer equipo"], roster: players.filter((player) => ["raul-prendes", "jorge-villa", "enol-ferreiro", "diego-moran", "oscar-cabanas"].includes(player.id)).map(({ id, displayName, number, position, age }) => ({ id, displayName, number, position, age })), table: academyTable("filial"), calendar: academyCalendar("filial", "B", "Primera Asturfutbol") },
-  { id: "juvenil-a", name: "Juvenil A", coach: "Borja Fernandez", category: "Liga Nacional Juvenil", position: "1º - 22 pts", lastResult: "Real Aviles 3-1 Verina", nextMatch: "Covadonga - Real Aviles", standoutPlayers: ["Mario Noval", "Leo Paredes", "Enol Ferreiro"], news: ["Cuarta victoria consecutiva", "Debut de dos juveniles con el filial"], roster: [{ id: "mario-noval", displayName: "M. Noval", number: 7, position: "Delantero", age: 17 }, { id: "leo-paredes", displayName: "L. Paredes", number: 10, position: "Centrocampista", age: 18 }, { id: "izan-arias", displayName: "I. Arias", number: 4, position: "Defensa", age: 17 }, { id: "dani-riestra", displayName: "D. Riestra", number: 1, position: "Portero", age: 18 }, { id: "hugo-menendez", displayName: "H. Menendez", number: 9, position: "Delantero", age: 17 }], table: academyTable("juvenil-a"), calendar: academyCalendar("juvenil-a", "Juvenil A", "Liga Nacional Juvenil") },
+  { id: "filial", name: "Filial", coach: "Dani Borrego", category: "Primera Asturfutbol", position: "2º - 19 pts", lastResult: "Real Aviles B 2-0 Llanera B", nextMatch: "Real Aviles B - Roces", standoutPlayers: ["Raul Prendes", "Jorge Villa", "Enol Ferreiro"], news: ["Tercera porteria a cero seguida", "Dos juveniles entrenan con el primer equipo"], roster: players.filter((player) => ["raul-prendes", "jorge-villa", "enol-ferreiro", "diego-moran", "oscar-cabanas"].includes(player.id)).map(({ id, displayName, number, position, age }) => ({ id, displayName, number, position, age })), table: academyTable("filial"), calendar: academyCalendar("filial", "B", "primera-asturfutbol") },
+  { id: "juvenil-a", name: "Juvenil A", coach: "Borja Fernandez", category: "Liga Nacional Juvenil", position: "1º - 22 pts", lastResult: "Real Aviles 3-1 Verina", nextMatch: "Covadonga - Real Aviles", standoutPlayers: ["Mario Noval", "Leo Paredes", "Enol Ferreiro"], news: ["Cuarta victoria consecutiva", "Debut de dos juveniles con el filial"], roster: [{ id: "mario-noval", displayName: "M. Noval", number: 7, position: "Delantero", age: 17 }, { id: "leo-paredes", displayName: "L. Paredes", number: 10, position: "Centrocampista", age: 18 }, { id: "izan-arias", displayName: "I. Arias", number: 4, position: "Defensa", age: 17 }, { id: "dani-riestra", displayName: "D. Riestra", number: 1, position: "Portero", age: 18 }, { id: "hugo-menendez", displayName: "H. Menendez", number: 9, position: "Delantero", age: 17 }], table: academyTable("juvenil-a"), calendar: academyCalendar("juvenil-a", "Juvenil A", "liga-nacional-juvenil") },
 ];
 
 export const pressLinks: PressLink[] = [

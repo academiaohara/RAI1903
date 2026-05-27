@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Bus, Home } from "lucide-react";
 import { OpponentCrest } from "@/components/OpponentCrest";
+import { matchCompetitionShortLabel } from "@/lib/competition-labels";
 import { getCompetitionAccentClass, getCompetitionBorderClass } from "@/lib/competition-styles";
 import { cn } from "@/lib/utils";
 import type { CalendarMatch } from "@/types";
@@ -41,7 +42,7 @@ export function CalendarMatchCell({ match, day, className }: CalendarMatchCellPr
       </div>
 
       <p className="sr-only">
-        {match.opponent}, {match.competition}, {match.isHome ? "local" : "visitante"}
+        {match.opponent}, {matchCompetitionShortLabel(match)}, {match.isHome ? "local" : "visitante"}
       </p>
     </>
   );

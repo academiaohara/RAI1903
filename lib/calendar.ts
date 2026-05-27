@@ -5,7 +5,7 @@ import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { CalendarMatch, Match } from "@/types";
 import type { Route } from "next";
 
-const NO_TIME_COMPETITIONS = new Set(["Amistoso"]);
+const NO_TIME_COMPETITIONS = new Set(["amistoso"]);
 
 function formatKickoffTime(date: string): string | null {
   const parsed = new Date(date);
@@ -43,6 +43,8 @@ export function matchToCalendarMatch(match: Match, gender: PrimerEquipoGender): 
     opponent: avilesHome ? match.awayTeam : match.homeTeam,
     opponentLogo: rival?.crestInitials ?? rivalId.slice(0, 3).toUpperCase(),
     competition: match.competition,
+    competitionStage: match.competitionStage,
+    matchday: match.matchday,
     isHome: avilesHome,
     time: played ? null : hasTime ? formatKickoffTime(match.date) : null,
     played,
