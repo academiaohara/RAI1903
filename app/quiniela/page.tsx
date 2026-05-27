@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function QuinielaPage() {
-  redirect("/quiniela/pronosticos");
+  redirect("/quiniela/quiniela");
 }

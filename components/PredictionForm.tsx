@@ -1,87 +1,222 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { Eye } from "lucide-react";
 import { useMemo, useState } from "react";
-import { RAI_TEAM_ID, players } from "@/data/mock";
-import type { Match, Prediction, PredictionOutcome } from "@/types";
+import { MatchPreviewModal } from "@/components/MatchPreviewModal";
+import { matchPickStats, players } from "@/data/mock";
+import { getPreviaForMatch } from "@/lib/match-articles";
+import { formatGoalsPick, isAvilesMatch } from "@/lib/quiniela";
+import { primerEquipoBase } from "@/lib/primer-equipo";
+import type { GoalsPick, Match, Prediction, PredictionOutcome } from "@/types";
+import type { Route } from "next";
 
-export function PredictionForm({ match, prediction, onChange }: { match: Match; prediction?: Prediction; onChange: (prediction: Prediction) => void }) {
-  const [scorerDraft, setScorerDraft] = useState("");
-  const isAvilesMatch = match.homeTeamId === RAI_TEAM_ID || match.awayTeamId === RAI_TEAM_ID;
+const outcomes: PredictionOutcome[] = ["1", "X", "2"];
+const goalOptions: GoalsPick[] = [0, 1, 2, "M"];
+
+export function PredictionForm({
+  match,
+  prediction,
+  readOnly,
+  onChange,
+}: {
+  match: Match;
+  prediction?: Prediction;
+  readOnly?: boolean;
+  onChange: (prediction: Prediction) => void;
+}) {
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const avilesMatch = isAvilesMatch(match);
   const avilesScorers = useMemo(() => players.filter((player) => player.position !== "Portero"), []);
+  const pickStats = matchPickStats.find((item) => item.matchId === match.id);
+  const previa = getPreviaForMatch(match.id);
+  const previaHref = previa ? (`${primerEquipoBase("masculino")}/previas/${previa.id}` as Route) : undefined;
 
   const update = (patch: Partial<Prediction>) => {
+    if (readOnly) return;
     onChange({
       matchId: match.id,
       matchday: match.matchday,
       outcome: prediction?.outcome,
-      exactScore: prediction?.exactScore,
-      scorers: prediction?.scorers ?? [],
+      goalsHome: prediction?.goalsHome,
+      goalsAway: prediction?.goalsAway,
+      scorer: prediction?.scorer,
       ...patch,
       updatedAt: new Date().toISOString(),
     });
   };
 
-  const addScorer = () => {
-    if (!scorerDraft) return;
-    update({ scorers: [...(prediction?.scorers ?? []), scorerDraft] });
-    setScorerDraft("");
-  };
-
   return (
-    <div className="rounded-2xl border border-[#214C9B]/20 bg-white p-4 shadow-[0_10px_24px_rgba(17,24,39,0.05)]">
-      <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-normal text-slate-500">{match.venue}</p>
-          <div className="mt-2 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-            <p className="font-extrabold text-slate-800">{match.homeTeam}</p>
-            <span className="rounded-xl bg-[#214C9B] px-3 py-2 text-sm font-extrabold text-white">vs</span>
-            <p className="text-right font-extrabold text-slate-800">{match.awayTeam}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2" aria-label="Prediccion 1 X 2">
-          {(["1", "X", "2"] as PredictionOutcome[]).map((outcome) => (
-            <button key={outcome} onClick={() => update({ outcome })} className={`h-12 w-12 rounded-2xl border text-lg font-extrabold transition ${prediction?.outcome === outcome ? "border-[#214C9B] bg-[#214C9B] text-white" : "border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50"}`}>
-              {outcome}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {isAvilesMatch && (
-        <div className="mt-4 rounded-2xl border border-blue-200 bg-blue-50 p-4">
-          <p className="text-xs font-bold uppercase tracking-normal text-[#214C9B]">Detalle Real Aviles</p>
-          <div className="mt-3 grid gap-3 md:grid-cols-[auto_auto_1fr]">
-            <label className="text-sm font-bold text-slate-700">
-              Goles local
-              <input type="number" min={0} value={prediction?.exactScore?.home ?? ""} onChange={(event) => update({ exactScore: { home: Number(event.target.value), away: prediction?.exactScore?.away ?? 0 } })} className="mt-1 block w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-slate-800 outline-none focus:border-[#214C9B]" />
-            </label>
-            <label className="text-sm font-bold text-slate-700">
-              Goles visitante
-              <input type="number" min={0} value={prediction?.exactScore?.away ?? ""} onChange={(event) => update({ exactScore: { home: prediction?.exactScore?.home ?? 0, away: Number(event.target.value) } })} className="mt-1 block w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-slate-800 outline-none focus:border-[#214C9B]" />
-            </label>
-            <div className="text-sm font-bold text-slate-700">
-              Goleadores del Aviles
-              <div className="mt-1 flex gap-2">
-                <select value={scorerDraft} onChange={(event) => setScorerDraft(event.target.value)} className="min-w-0 flex-1 rounded-xl border border-blue-200 bg-white px-3 py-2 text-slate-800 outline-none focus:border-[#214C9B]">
-                  <option value="">Seleccionar jugador</option>
-                  {avilesScorers.map((player) => <option key={player.id} value={player.displayName}>{player.displayName}</option>)}
-                </select>
-                <button onClick={addScorer} className="rounded-xl bg-[#214C9B] px-3 py-2 text-white transition hover:bg-[#173a78]" aria-label="Anadir goleador"><Plus size={18} /></button>
-              </div>
+    <>
+      <div className="rounded-2xl border border-[#214C9B]/20 bg-white p-4 shadow-[0_10px_24px_rgba(17,24,39,0.05)]">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+              <p className="font-extrabold text-slate-800">{match.homeTeam}</p>
+              <span className="text-xs font-bold uppercase text-slate-400">vs</span>
+              <p className="font-extrabold text-slate-800">{match.awayTeam}</p>
             </div>
           </div>
-          {(prediction?.scorers?.length ?? 0) > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {prediction?.scorers.map((scorer, index) => (
-                <button key={`${scorer}-${index}`} onClick={() => update({ scorers: prediction.scorers.filter((_, scorerIndex) => scorerIndex !== index) })} className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-3 py-1 text-xs font-bold text-[#214C9B]">
-                  {scorer} <Trash2 size={13} />
+
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            {avilesMatch && previaHref ? (
+              <Link
+                href={previaHref}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-[#214C9B]/25 px-3 py-2 text-xs font-bold text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
+              >
+                <Eye size={14} /> Previa
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setPreviewOpen(true)}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-[#214C9B]/25 px-3 py-2 text-xs font-bold text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
+              >
+                <Eye size={14} /> Previa
+              </button>
+            )}
+
+            <div className="flex items-center gap-2" aria-label="Prediccion 1 X 2">
+              {outcomes.map((outcome) => (
+                <button
+                  key={outcome}
+                  type="button"
+                  disabled={readOnly}
+                  onClick={() => update({ outcome })}
+                  className={`h-12 w-12 rounded-2xl border text-lg font-extrabold transition disabled:cursor-not-allowed disabled:opacity-70 ${
+                    prediction?.outcome === outcome
+                      ? "border-[#214C9B] bg-[#214C9B] text-white"
+                      : "border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50"
+                  }`}
+                >
+                  {outcome}
                 </button>
               ))}
             </div>
-          )}
+          </div>
         </div>
-      )}
+
+        {pickStats && (
+          <div className="mt-3 flex flex-wrap gap-3 border-t border-[#214C9B]/10 pt-3">
+            {pickStats.picks.map((pick) => (
+              <div key={pick.outcome} className="text-xs text-slate-600">
+                <span className="font-extrabold text-[#214C9B]">{pick.outcome}</span>{" "}
+                <span className="font-bold text-slate-800">{pick.count}</span>{" "}
+                <span className="text-slate-500">({pick.percent}%)</span>
+              </div>
+            ))}
+            <span className="text-xs text-slate-400">{pickStats.total} quinielas</span>
+          </div>
+        )}
+
+        {avilesMatch && (
+          <div className="mt-4 rounded-2xl border border-blue-200 bg-blue-50 p-4">
+            <p className="text-xs font-bold uppercase tracking-normal text-[#214C9B]">Porra del Aviles</p>
+
+            <div className="mt-3 grid gap-4 sm:grid-cols-2">
+              <GoalsPickRow
+                label={`Goles ${match.homeTeam}`}
+                value={prediction?.goalsHome}
+                readOnly={readOnly}
+                onPick={(goalsHome) => update({ goalsHome })}
+              />
+              <GoalsPickRow
+                label={`Goles ${match.awayTeam}`}
+                value={prediction?.goalsAway}
+                readOnly={readOnly}
+                onPick={(goalsAway) => update({ goalsAway })}
+              />
+            </div>
+
+            <div className="mt-4">
+              <p className="text-xs font-bold uppercase tracking-normal text-slate-500">Goleador del Aviles</p>
+              <p className="mt-1 text-xs text-slate-500">Elige un jugador o marca que nadie marca.</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  disabled={readOnly}
+                  onClick={() => update({ scorer: "nadie" })}
+                  className={`rounded-xl border px-3 py-2 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-70 ${
+                    prediction?.scorer === "nadie"
+                      ? "border-[#214C9B] bg-[#214C9B] text-white"
+                      : "border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50"
+                  }`}
+                >
+                  Nadie
+                </button>
+                {avilesScorers.map((player) => (
+                  <button
+                    key={player.id}
+                    type="button"
+                    disabled={readOnly}
+                    onClick={() => update({ scorer: player.displayName })}
+                    className={`rounded-xl border px-3 py-2 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-70 ${
+                      prediction?.scorer === player.displayName
+                        ? "border-[#214C9B] bg-[#214C9B] text-white"
+                        : "border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50"
+                    }`}
+                  >
+                    {player.displayName}
+                  </button>
+                ))}
+              </div>
+              {prediction?.scorer && prediction.scorer !== "nadie" && (
+                <p className="mt-2 text-xs font-bold text-[#214C9B]">
+                  Seleccionado: {prediction.scorer}
+                  {!readOnly && (
+                    <button type="button" onClick={() => update({ scorer: undefined })} className="ml-2 text-[#981915] underline">
+                      Quitar
+                    </button>
+                  )}
+                </p>
+              )}
+            </div>
+
+            {prediction?.goalsHome !== undefined && prediction.goalsAway !== undefined && (
+              <p className="mt-3 text-sm font-bold text-slate-700">
+                Marcador porra: {formatGoalsPick(prediction.goalsHome)} - {formatGoalsPick(prediction.goalsAway)}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+
+      <MatchPreviewModal match={match} open={previewOpen} onClose={() => setPreviewOpen(false)} />
+    </>
+  );
+}
+
+function GoalsPickRow({
+  label,
+  value,
+  readOnly,
+  onPick,
+}: {
+  label: string;
+  value?: GoalsPick;
+  readOnly?: boolean;
+  onPick: (pick: GoalsPick) => void;
+}) {
+  return (
+    <div>
+      <p className="text-sm font-bold text-slate-700">{label}</p>
+      <div className="mt-2 flex gap-2">
+        {goalOptions.map((option) => (
+          <button
+            key={String(option)}
+            type="button"
+            disabled={readOnly}
+            onClick={() => onPick(option)}
+            className={`h-11 w-11 rounded-2xl border text-sm font-extrabold transition disabled:cursor-not-allowed disabled:opacity-70 ${
+              value === option
+                ? "border-[#214C9B] bg-[#214C9B] text-white"
+                : "border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50"
+            }`}
+          >
+            {formatGoalsPick(option)}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
