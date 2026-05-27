@@ -55,6 +55,13 @@ export const teamsFemenino: Team[] = teams.map((team) =>
 
 const teamById = new Map(teams.map((team) => [team.id, team]));
 
+const competitionForRound = (round: number): string => {
+  if (round === 4 || round === 12) return "Copa del Rey";
+  if (round === 8 || round === 16) return "Amistoso";
+  if (round === 6 || round === 14) return "1? RFEF";
+  return COMPETITION_NAME;
+};
+
 const generateMatchdays = (): Matchday[] => {
   const ids = teams.map((team) => team.id);
   const current = [...ids];
@@ -94,7 +101,7 @@ const generateMatchdays = (): Matchday[] => {
         homeTeam: home.name,
         awayTeam: away.name,
         date: date.toISOString(),
-        competition: COMPETITION_NAME,
+        competition: competitionForRound(round),
         venue: home.stadium,
         status: isFinished ? "finished" : "scheduled",
         homeScore,

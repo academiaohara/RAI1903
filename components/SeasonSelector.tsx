@@ -27,7 +27,7 @@ export function SeasonSelector({ className }: { className?: string }) {
 
   return (
     <div
-      className={cn("inline-flex items-center gap-1 rounded-full border border-[#214C9B]/20 bg-white p-1 shadow-sm", className)}
+      className={cn("inline-flex items-center gap-0.5 rounded-xl border p-1", className)}
       role="group"
       aria-label="Temporada"
     >

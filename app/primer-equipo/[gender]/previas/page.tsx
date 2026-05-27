@@ -12,7 +12,7 @@ export default async function PreviasPage({ params }: { params: Promise<{ gender
 
   return (
     <>
-      <PrimerEquipoPageHero gender={gender} title="Previas" description="Analisis previos a cada jornada con forma reciente, claves tacticas y estado de la plantilla." />
+      <PrimerEquipoPageHero title="Previas" description="Analisis previos a cada jornada con forma reciente, claves tacticas y estado de la plantilla." />
 
       <Card>
         <div className="space-y-3">

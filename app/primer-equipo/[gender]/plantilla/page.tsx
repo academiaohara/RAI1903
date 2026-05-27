@@ -25,7 +25,6 @@ export default function PlantillaPage({ params }: { params: Promise<{ gender: st
   return (
     <>
       <PrimerEquipoPageHero
-        gender={gender}
         title="Plantilla"
         description={`Jugadores, parte semanal y fichas individuales de ${genderLabels[gender].club}.`}
       />
