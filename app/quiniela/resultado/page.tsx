@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Badge } from "@/components/Badge";
 import { Card } from "@/components/Card";
 import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
@@ -56,20 +55,13 @@ export default function QuinielaResultadoPage() {
         </div>
 
         <div className="space-y-2">
-          {sortedParticipants.map((row, index) => (
+          {sortedParticipants.map((row) => (
             <div
               key={row.user}
-              className="grid items-center gap-3 rounded-2xl border border-[#214C9B]/20 bg-white p-4 text-sm sm:grid-cols-[auto_1fr_auto_auto]"
+              className="flex items-center justify-between gap-3 rounded-2xl border border-[#214C9B]/20 bg-white p-4 text-sm"
             >
-              <Badge tone={started && index === 0 ? "blue" : "red"}>{started ? index + 1 : index + 1}</Badge>
-              <div>
-                <p className="font-extrabold uppercase text-[#214C9B]">{row.user}</p>
-                <p className="text-xs text-slate-500">
-                  Enviado: {new Date(row.submittedAt).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })}
-                </p>
-              </div>
+              <p className="font-extrabold uppercase text-[#214C9B]">{row.user}</p>
               <span className="font-extrabold text-slate-900">{row.points} pts</span>
-              <span className="text-slate-600">{row.hits} aciertos 1X2</span>
             </div>
           ))}
         </div>

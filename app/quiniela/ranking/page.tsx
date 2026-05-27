@@ -1,4 +1,3 @@
-import { Badge } from "@/components/Badge";
 import { Card } from "@/components/Card";
 import { PageHero } from "@/components/PageHero";
 import { SectionTabs } from "@/components/SectionTabs";
@@ -16,13 +15,13 @@ export default function QuinielaRankingPage() {
 
       <Card eyebrow="Ranking" title="Clasificacion de usuarios">
         <div className="space-y-3">
-          {quinielaRanking.map((row, index) => (
-            <div key={row.user} className="grid items-center gap-3 rounded-2xl border border-[#214C9B]/20 bg-white p-4 text-sm sm:grid-cols-[auto_1fr_auto_auto_auto]">
-              <Badge tone={index === 0 ? "blue" : "red"}>{index + 1}</Badge>
+          {quinielaRanking.map((row) => (
+            <div
+              key={row.user}
+              className="flex items-center justify-between gap-3 rounded-2xl border border-[#214C9B]/20 bg-white p-4 text-sm"
+            >
               <p className="font-extrabold uppercase text-[#214C9B]">{row.user}</p>
-              <span>{row.points} pts</span>
-              <span>{row.hits} aciertos</span>
-              <span>{row.exactScores} exactos</span>
+              <span className="font-extrabold text-slate-900">{row.points} pts</span>
             </div>
           ))}
         </div>
