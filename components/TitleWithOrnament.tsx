@@ -53,7 +53,7 @@ export function TitleWithOrnament({
         <GearAdorno
           cutoutId={cutoutId}
           className={cn(
-            "title-gear-icon pointer-events-none shrink-0 self-center bg-transparent text-[#981915]",
+            "title-gear-icon pointer-events-none shrink-0 self-center bg-transparent text-[var(--rai-red)]",
             gearSizeClass[size],
             animated && "title-gear-icon-reveal",
           )}
