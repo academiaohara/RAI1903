@@ -8,13 +8,21 @@ type CardProps = {
   children: ReactNode;
   className?: string;
   dense?: boolean;
+  /** Sin borde inferior en la cabecera (p. ej. seccion Competicion). */
+  borderlessHeader?: boolean;
 };
 
-export function Card({ eyebrow, title, action, children, className, dense = false }: CardProps) {
+export function Card({ eyebrow, title, action, children, className, dense = false, borderlessHeader = false }: CardProps) {
   return (
     <section className={cn(className)}>
       {(eyebrow || title || action) && (
-        <div className={cn("flex items-start justify-between gap-4 border-b border-[#214C9B]/15", dense ? "p-4" : "p-5")}>
+        <div
+          className={cn(
+            "flex items-start justify-between gap-4",
+            !borderlessHeader && "border-b border-[#214C9B]/15",
+            dense ? "p-4" : "p-5",
+          )}
+        >
           <div>
             {eyebrow && <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">{eyebrow}</p>}
             {title && (

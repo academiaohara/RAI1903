@@ -5,9 +5,17 @@ import { matchFixtureCardClassName } from "@/lib/match-card-styles";
 import { formatMatchDate } from "@/lib/utils";
 import type { Match } from "@/types";
 
-export function MatchCard({ match, compact = false }: { match: Match; compact?: boolean }) {
-  const avilesHome = match.homeTeamId === RAI_TEAM_ID;
-  const avilesAway = match.awayTeamId === RAI_TEAM_ID;
+export function MatchCard({
+  match,
+  compact = false,
+  highlightTeamId = RAI_TEAM_ID,
+}: {
+  match: Match;
+  compact?: boolean;
+  highlightTeamId?: string;
+}) {
+  const avilesHome = match.homeTeamId === highlightTeamId;
+  const avilesAway = match.awayTeamId === highlightTeamId;
 
   return (
     <article className={matchFixtureCardClassName}>
