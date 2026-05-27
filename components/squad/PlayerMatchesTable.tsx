@@ -23,7 +23,36 @@ export function PlayerMatchesTable({ player }: { player: SquadPlayer }) {
   return (
     <div className="space-y-4">
       <div className="overflow-hidden rounded-2xl border border-slate-200">
-        <div className="overflow-x-auto">
+        <div className="divide-y divide-slate-100 md:hidden">
+          {pageItems.map((match, index) => (
+            <motion.article
+              key={`${match.fecha}-${match.rival}`}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.03 }}
+              className="p-4"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-extrabold text-slate-900">{match.rival}</p>
+                  <p className="mt-1 text-xs font-semibold text-slate-500">{match.competicion}</p>
+                </div>
+                <p className="shrink-0 text-right text-xs font-bold uppercase text-[#981915]">
+                  {new Date(match.fecha).toLocaleDateString("es-ES", { day: "2-digit", month: "short" })}
+                </p>
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-2 text-center text-xs font-bold text-slate-600 sm:grid-cols-5">
+                <span className="rounded-xl bg-slate-100 px-2 py-1">Min {match.minutos}</span>
+                <span className="rounded-xl bg-blue-50 px-2 py-1 text-[#214C9B]">G {match.goles}</span>
+                <span className="rounded-xl bg-slate-100 px-2 py-1">A {match.asistencias}</span>
+                <span className="rounded-xl bg-amber-50 px-2 py-1 text-amber-700">TA {match.amarillas}</span>
+                <span className="rounded-xl bg-red-50 px-2 py-1 text-red-700">TR {match.rojas}</span>
+              </div>
+            </motion.article>
+          ))}
+        </div>
+
+        <div className="hidden overflow-x-auto md:block">
           <table className="w-full min-w-[680px] border-collapse text-left text-sm">
             <thead>
               <tr className="bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-500">

@@ -4,7 +4,7 @@ import { GearAdorno } from "@/components/GearAdorno";
 import { cn } from "@/lib/utils";
 import { useId, type ElementType } from "react";
 
-const pageTitleClass = "text-5xl sm:text-6xl";
+const pageTitleClass = "text-[clamp(2rem,9vw,3.75rem)]";
 const gearSizeClass = "h-[1.38em] w-[1.38em]";
 const gearTextOverlapClass = "-ml-[0.74em]";
 
@@ -48,7 +48,7 @@ export function TitleWithOrnament({
         <Tag
           className={cn(
             gearTextOverlapClass,
-            "relative z-10 mb-[2px] min-w-0 self-center bg-transparent py-[0.22em] pr-[0.35em] pl-0 font-extrabold leading-none whitespace-nowrap uppercase text-[#214C9B]",
+            "relative z-10 mb-[2px] min-w-0 self-center bg-transparent py-[0.22em] pr-[0.35em] pl-0 font-extrabold leading-[0.95] break-words uppercase text-[#214C9B]",
             animated && "title-gear-text",
             startsWithC && "title-gear-text-c",
             className,

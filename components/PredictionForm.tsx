@@ -91,11 +91,11 @@ export function PredictionForm({
   return (
     <>
       <div className="space-y-4 rounded-2xl border border-[#214C9B]/20 bg-white p-4 shadow-[0_10px_24px_rgba(17,24,39,0.05)]">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="font-extrabold text-slate-800">{match.homeTeam}</p>
+            <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4">
+              <div className="flex min-w-0 flex-col gap-2 rounded-xl bg-slate-50 p-3 sm:flex-row sm:items-center sm:bg-transparent sm:p-0">
+                <p className="min-w-0 break-words font-extrabold leading-tight text-slate-800">{match.homeTeam}</p>
                 {avilesMatch && (
                   <GoalsPickButtons
                     value={prediction?.goalsHome}
@@ -104,9 +104,9 @@ export function PredictionForm({
                   />
                 )}
               </div>
-              <span className="text-xs font-bold uppercase text-slate-400">vs</span>
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="font-extrabold text-slate-800">{match.awayTeam}</p>
+              <span className="self-center text-xs font-bold uppercase text-slate-400">vs</span>
+              <div className="flex min-w-0 flex-col gap-2 rounded-xl bg-slate-50 p-3 sm:flex-row sm:items-center sm:bg-transparent sm:p-0">
+                <p className="min-w-0 break-words font-extrabold leading-tight text-slate-800">{match.awayTeam}</p>
                 {avilesMatch && (
                   <GoalsPickButtons
                     value={prediction?.goalsAway}
@@ -142,7 +142,7 @@ export function PredictionForm({
           </div>
 
           <div className="flex shrink-0 flex-wrap items-center gap-2">
-            <div className="flex items-center gap-2" aria-label="Prediccion 1 X 2">
+            <div className="flex w-full items-center gap-2 sm:w-auto" aria-label="Prediccion 1 X 2">
               {outcomes.map((outcome) => {
                 const selected = (outcomeLocked ? derivedOutcome : prediction?.outcome) === outcome;
                 return (
@@ -151,7 +151,7 @@ export function PredictionForm({
                     type="button"
                     disabled={readOnly || outcomeLocked}
                     onClick={() => update({ outcome })}
-                    className={`h-12 w-12 rounded-2xl border text-lg font-extrabold transition disabled:cursor-not-allowed disabled:opacity-70 ${
+                    className={`h-12 flex-1 rounded-2xl border text-lg font-extrabold transition disabled:cursor-not-allowed disabled:opacity-70 sm:w-12 sm:flex-none ${
                       selected
                         ? "border-[#214C9B] bg-[#214C9B] text-white"
                         : "border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50"
@@ -214,7 +214,7 @@ function ScorerCombobox({
   };
 
   return (
-    <div ref={rootRef} className="relative flex min-w-[12rem] flex-1 items-center gap-2 sm:max-w-xs">
+    <div ref={rootRef} className="relative flex w-full min-w-0 flex-col gap-2 sm:max-w-xs sm:flex-row sm:items-center">
       <label htmlFor={inputId} className="shrink-0 text-sm font-bold text-slate-700">
         Goleador:
       </label>
@@ -283,7 +283,7 @@ function GoalsPickButtons({
   onPick: (pick: GoalsPick) => void;
 }) {
   return (
-    <div className="flex gap-1">
+    <div className="grid grid-cols-4 gap-1 sm:flex">
       {goalOptions.map((option) => (
         <button
           key={String(option)}

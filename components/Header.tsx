@@ -43,21 +43,21 @@ export function Header() {
 
   return (
     <header
-      className="fixed inset-x-0 top-0 z-40 border-b-4 border-[#981915] bg-[#214C9B] text-white shadow-xl shadow-blue-950/15"
+      className="sticky top-0 z-40 border-b-4 border-[#981915] bg-[#214C9B] text-white shadow-xl shadow-blue-950/15"
       onMouseLeave={scheduleClose}
     >
-      <div className="mx-auto flex h-20 max-w-[1480px] items-center gap-4 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-16 max-w-[1480px] items-center gap-3 px-4 sm:h-20 sm:gap-4 sm:px-6 lg:px-8">
         <Link href="/" className="group flex shrink-0 items-center gap-3" onClick={() => setOpen(false)}>
           <Image
             src="/logo.png"
             alt="RAI1903"
             width={52}
             height={52}
-            className="h-[3.25rem] w-[3.25rem] object-contain"
+            className="h-11 w-11 object-contain sm:h-[3.25rem] sm:w-[3.25rem]"
             priority
           />
           <span>
-            <span className="block text-2xl font-extrabold tracking-tight">RAI1903</span>
+            <span className="block text-xl font-extrabold tracking-tight sm:text-2xl">RAI1903</span>
             <span className="block text-[10px] font-bold uppercase tracking-[0.12em] text-white/75">Fan made</span>
           </span>
         </Link>

@@ -13,7 +13,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <div className="min-h-screen athletic-shell">
           <Header />
-          <main className="mx-auto max-w-[1480px] px-4 pb-12 pt-28 sm:px-6 lg:px-8">{children}</main>
+          <main className="mx-auto max-w-[1480px] px-4 pb-12 pt-6 sm:px-6 sm:pt-8 lg:px-8">{children}</main>
         </div>
       </body>
     </html>

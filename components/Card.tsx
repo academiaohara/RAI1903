@@ -18,15 +18,15 @@ export function Card({ eyebrow, title, action, children, className, dense = fals
       {(eyebrow || title || action) && (
         <div
           className={cn(
-            "flex items-start justify-between gap-4",
+            "flex flex-wrap items-start justify-between gap-3 sm:gap-4",
             !borderlessHeader && "border-b border-[#214C9B]/15",
             dense ? "p-4" : "p-5",
           )}
         >
-          <div>
+          <div className="min-w-0 flex-1">
             {eyebrow && <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">{eyebrow}</p>}
             {title && (
-              <h2 className="mt-1 text-2xl font-extrabold uppercase leading-none text-[#214C9B] sm:text-3xl lg:text-4xl">
+              <h2 className="mt-1 text-xl font-extrabold uppercase leading-tight text-[#214C9B] sm:text-2xl lg:text-4xl">
                 {title}
               </h2>
             )}
