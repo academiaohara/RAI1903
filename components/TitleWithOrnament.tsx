@@ -6,7 +6,7 @@ import { useId, type ElementType } from "react";
 
 const sizeClasses = {
   page: "text-5xl sm:text-6xl",
-  section: "text-xl sm:text-2xl",
+  section: "text-2xl sm:text-3xl lg:text-4xl",
 } as const;
 
 type TitleWithOrnamentProps = {
