@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef, type WheelEvent } from "react";
+
 export function JornadaSelector({
   value,
   total,
@@ -11,8 +13,28 @@ export function JornadaSelector({
   currentRound: number;
   onChange: (round: number) => void;
 }) {
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+
+    const selected = list.querySelector<HTMLButtonElement>(`[data-round="${value}"]`);
+    selected?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+  }, [value]);
+
+  const handleWheel = (event: WheelEvent<HTMLDivElement>) => {
+    if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+
+    const list = event.currentTarget;
+    if (list.scrollWidth <= list.clientWidth) return;
+
+    event.preventDefault();
+    list.scrollLeft += event.deltaY;
+  };
+
   return (
-    <div className="rounded-3xl border border-[#214C9B]/20 bg-white p-4 shadow-[0_12px_30px_rgba(17,24,39,0.06)]">
+    <div className="min-w-0 rounded-3xl border border-[#214C9B]/20 bg-white p-4 shadow-[0_12px_30px_rgba(17,24,39,0.06)]">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs font-bold uppercase tracking-normal text-[#214C9B]">Jornadas</p>
@@ -33,8 +55,12 @@ export function JornadaSelector({
         aria-label="Barra de jornadas"
       />
 
-      <div className="no-scrollbar mt-3 flex gap-2 overflow-x-auto pb-1">
-        {Array.from({ length: total }).map((_, index) => {
+      <div
+        ref={listRef}
+        onWheel={handleWheel}
+        className="no-scrollbar mt-3 flex w-full min-w-0 touch-pan-x flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-1"
+      >
+        {Array.from({ length: total }, (_, index) => {
           const round = index + 1;
           const isCurrent = round === currentRound;
           const isSelected = value === round;
@@ -43,6 +69,7 @@ export function JornadaSelector({
             <button
               key={round}
               type="button"
+              data-round={round}
               onClick={() => onChange(round)}
               className={`h-11 min-w-11 shrink-0 rounded-2xl border text-sm font-extrabold transition ${
                 isSelected
