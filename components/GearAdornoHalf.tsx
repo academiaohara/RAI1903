@@ -1,4 +1,10 @@
-import { ADORNO_PATH, ADORNO_SPLIT_X, ADORNO_TRANSFORM, ADORNO_VIEWBOX } from "@/lib/adorno-path";
+import {
+  ADORNO_PATH,
+  ADORNO_SPLIT_X,
+  ADORNO_TRANSFORM,
+  ADORNO_VIEWBOX,
+  ADORNO_VIEWBOX_HEIGHT,
+} from "@/lib/adorno-path";
 import { cn } from "@/lib/utils";
 
 type GearAdornoHalfProps = {
@@ -10,14 +16,14 @@ type GearAdornoHalfProps = {
 export function GearAdornoHalf({ side, clipId, className }: GearAdornoHalfProps) {
   const clipRect =
     side === "left"
-      ? { x: 0, y: 0, width: ADORNO_SPLIT_X, height: 1149.9065 }
-      : { x: ADORNO_SPLIT_X, y: 0, width: ADORNO_SPLIT_X, height: 1149.9065 };
+      ? { x: 0, y: 0, width: ADORNO_SPLIT_X, height: ADORNO_VIEWBOX_HEIGHT }
+      : { x: ADORNO_SPLIT_X, y: 0, width: ADORNO_SPLIT_X, height: ADORNO_VIEWBOX_HEIGHT };
 
   return (
     <svg
       aria-hidden
       viewBox={ADORNO_VIEWBOX}
-      className={cn("block h-[1em] w-[0.5em] shrink-0 self-center text-[#214C9B]", className)}
+      className={cn("block h-[1em] w-[0.5em] shrink-0 self-center overflow-visible text-[#981915]", className)}
       preserveAspectRatio="xMidYMid meet"
     >
       <defs>

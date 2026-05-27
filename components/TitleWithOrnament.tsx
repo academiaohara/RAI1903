@@ -10,8 +10,8 @@ const sizeClasses = {
 } as const;
 
 /** Gear icon size; text overlaps by half so it reaches the adorno center line. */
-const gearSizeClass = "h-[1.3em] w-[1.3em]";
-const gearTextOverlapClass = "-ml-[0.65em]";
+const gearSizeClass = "h-[1.38em] w-[1.38em]";
+const gearTextOverlapClass = "-ml-[0.74em]";
 
 type TitleWithOrnamentProps = {
   title: string;
@@ -33,7 +33,7 @@ export function TitleWithOrnament({
   return (
     <div
       className={cn(
-        "page-title-gear inline-flex max-w-full items-center overflow-visible bg-transparent leading-none text-[#214C9B]",
+        "page-title-gear inline-flex max-w-full items-center overflow-visible bg-transparent text-[#981915]",
         sizeClasses[size],
       )}
     >
@@ -46,7 +46,7 @@ export function TitleWithOrnament({
         <GearAdorno
           cutoutId={cutoutId}
           className={cn(
-            "page-title-gear-icon pointer-events-none shrink-0 bg-transparent text-current",
+            "page-title-gear-icon pointer-events-none shrink-0 self-center bg-transparent text-current",
             gearSizeClass,
             animated && "page-title-gear-left",
           )}
@@ -54,7 +54,7 @@ export function TitleWithOrnament({
         <Tag
           className={cn(
             gearTextOverlapClass,
-            "relative z-10 min-w-0 bg-transparent py-[0.14em] pr-[0.35em] pl-0 font-extrabold whitespace-nowrap uppercase text-current",
+            "relative z-10 min-w-0 self-center bg-transparent py-[0.22em] pr-[0.35em] pl-0 font-extrabold leading-none whitespace-nowrap uppercase text-current",
             animated && "page-title-gear-text",
             className,
           )}

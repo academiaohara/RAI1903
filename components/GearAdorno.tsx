@@ -18,8 +18,9 @@ export function GearAdorno({ className, cutoutId }: GearAdornoProps) {
     <svg
       aria-hidden
       viewBox={ADORNO_VIEWBOX}
-      className={cn("block overflow-visible text-current", className)}
+      className={cn("block shrink-0 overflow-visible text-current", className)}
       preserveAspectRatio="xMidYMid meet"
+      style={{ overflow: "visible" }}
     >
       {cutoutId && (
         <defs>
