@@ -146,7 +146,7 @@ function MatchBanner({ match, label, href, action }: { match: Match; label: stri
       <div className="grid items-stretch md:grid-cols-[1fr_auto_1fr]">
         <div className="flex items-center gap-4 p-5">
           {jornadaLabel && (
-            <span className="flex h-14 min-w-14 items-center justify-center rounded-2xl border border-[#214C9B]/20 bg-blue-50 px-2 text-center text-[10px] font-extrabold leading-tight text-[#214C9B] transition group-hover:border-[#214C9B] group-hover:bg-[#214C9B] group-hover:text-white">
+            <span className="flex h-14 min-w-14 items-center justify-center rounded-2xl border border-[#214C9B]/20 bg-blue-50 px-2 text-center text-sm font-extrabold leading-tight text-[#214C9B] transition group-hover:border-[#214C9B] group-hover:bg-[#214C9B] group-hover:text-white">
               {jornadaLabel}
             </span>
           )}
