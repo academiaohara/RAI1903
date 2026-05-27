@@ -3,7 +3,6 @@ import { LeagueTableCard } from "@/components/LeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
 import { PageHero } from "@/components/PageHero";
 import { RivalCard } from "@/components/RivalCard";
-import { PrimerEquipoSubnav } from "@/components/PrimerEquipoSubnav";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import { getTeamsByGender, getUpcomingAvilesMatchesByGender } from "@/lib/fixtures";
 import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -15,20 +14,18 @@ export default async function PrimerEquipoCompeticionPage({ params }: { params: 
   const upcoming = getUpcomingAvilesMatchesByGender(gender, 6);
 
   return (
-    <div className="space-y-6">
+    <>
       <PageHero
-        eyebrow={`Primer Equipo · ${genderLabels[gender].title}`}
         title="Competicion"
-        description="Clasificacion, proximos partidos y rivales directos en una pagina independiente."
+        description={`Clasificacion, proximos partidos y rivales directos de ${genderLabels[gender].club}.`}
       />
-      <PrimerEquipoSubnav gender={gender} />
 
       <section className="grid gap-6 xl:grid-cols-[1fr_0.85fr]">
-        <LeagueTableCard eyebrow="Competicion" title="Clasificacion" teams={teams} highlightTeamId={highlightTeamId} />
-        <Card eyebrow="Calendario" title="Proximos partidos">
+        <LeagueTableCard teams={teams} highlightTeamId={highlightTeamId} />
+        <Card>
           <div className="space-y-3">{upcoming.map((match) => <MatchCard key={match.id} match={match} />)}</div>
         </Card>
-        <Card eyebrow="Rivales" title="Equipos a seguir" className="xl:col-span-2">
+        <Card className="xl:col-span-2">
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {teams.filter((team) => team.id !== highlightTeamId).slice(0, 8).map((team) => (
               <RivalCard key={team.id} team={team} />
@@ -36,6 +33,6 @@ export default async function PrimerEquipoCompeticionPage({ params }: { params: 
           </div>
         </Card>
       </section>
-    </div>
+    </>
   );
 }

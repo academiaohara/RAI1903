@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { isPrimerEquipoGender } from "@/lib/primer-equipo";
+import { PrimerEquipoSubnav } from "@/components/PrimerEquipoSubnav";
+import { isPrimerEquipoGender, type PrimerEquipoGender } from "@/lib/primer-equipo";
 
 export default async function PrimerEquipoGenderLayout({
   children,
@@ -10,5 +11,11 @@ export default async function PrimerEquipoGenderLayout({
 }) {
   const { gender } = await params;
   if (!isPrimerEquipoGender(gender)) notFound();
-  return children;
+
+  return (
+    <div className="space-y-6">
+      <PrimerEquipoSubnav gender={gender as PrimerEquipoGender} />
+      {children}
+    </div>
+  );
 }

@@ -6,7 +6,6 @@ import { Card } from "@/components/Card";
 import { Modal } from "@/components/Modal";
 import { PageHero } from "@/components/PageHero";
 import { PlayerCard } from "@/components/PlayerCard";
-import { PrimerEquipoSubnav } from "@/components/PrimerEquipoSubnav";
 import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getPlayersByGender } from "@/lib/primer-equipo-data";
 import type { Player, PlayerPosition } from "@/types";
@@ -24,15 +23,13 @@ export default function PlantillaPage({ params }: { params: Promise<{ gender: st
   const suspensionList = squad.filter((player) => player.status === "sancionado");
 
   return (
-    <div className="space-y-6">
+    <>
       <PageHero
-        eyebrow={`Primer Equipo · ${genderLabels[gender].title}`}
         title="Plantilla"
         description={`Jugadores, parte semanal y fichas individuales de ${genderLabels[gender].club}.`}
       />
-      <PrimerEquipoSubnav gender={gender} />
 
-      <Card eyebrow="Plantilla" title="Lista de jugadores">
+      <Card>
         <div className="mb-5 flex flex-wrap gap-2">
           {positions.map((item) => (
             <button key={item} onClick={() => setPosition(item)} className={`rounded-2xl px-4 py-3 text-xs font-bold uppercase tracking-normal transition ${position === item ? "bg-[#214C9B] text-white" : "border border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50"}`}>
@@ -82,13 +79,14 @@ export default function PlantillaPage({ params }: { params: Promise<{ gender: st
           </div>
         )}
       </Modal>
-    </div>
+    </>
   );
 }
 
 function AvailabilityCard({ title, players: list, empty }: { title: string; players: Player[]; empty: string }) {
   return (
-    <Card eyebrow="Parte semanal" title={title}>
+    <Card>
+      <h2 className="mb-4 text-xl font-extrabold uppercase tracking-tight text-[#214C9B]">{title}</h2>
       <div className="space-y-3">
         {list.length > 0 ? (
           list.map((player) => (

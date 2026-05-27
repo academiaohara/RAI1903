@@ -8,8 +8,8 @@ import { Modal } from "@/components/Modal";
 import type { Team } from "@/types";
 
 type LeagueTableCardProps = {
-  eyebrow: string;
-  title: string;
+  eyebrow?: string;
+  title?: string;
   teams: Team[];
   highlightTeamId: string;
   compact?: boolean;
@@ -18,14 +18,12 @@ type LeagueTableCardProps = {
 
 export function LeagueTableCard({ eyebrow, title, teams, highlightTeamId, compact = false, className }: LeagueTableCardProps) {
   const [open, setOpen] = useState(false);
+  const modalTitle = title ?? "Clasificacion";
 
   return (
     <>
-      <Card
-        eyebrow={eyebrow}
-        title={title}
-        className={className}
-        action={
+      <Card eyebrow={eyebrow} title={title} className={className}>
+        <div className="mb-4 flex justify-end">
           <button
             type="button"
             onClick={() => setOpen(true)}
@@ -35,12 +33,11 @@ export function LeagueTableCard({ eyebrow, title, teams, highlightTeamId, compac
             <Maximize2 size={16} />
             Ver en grande
           </button>
-        }
-      >
+        </div>
         <LeagueTable teams={teams} highlightTeamId={highlightTeamId} compact={compact} />
       </Card>
 
-      <Modal open={open} title={title} onClose={() => setOpen(false)}>
+      <Modal open={open} title={modalTitle} onClose={() => setOpen(false)}>
         <LeagueTable teams={teams} highlightTeamId={highlightTeamId} />
       </Modal>
     </>
