@@ -1,5 +1,5 @@
 import { RAI_TEAM_ID } from "@/data/mock";
-import { STANDINGS_ZONE_LEGEND, standingsZoneRowClass } from "@/lib/standings-styles";
+import { STANDINGS_ZONE_LEGEND, getStandingsZoneRowClass } from "@/lib/standings-styles";
 import { cn, formatGoalDifference, resultTone } from "@/lib/utils";
 import type { Team } from "@/types";
 
@@ -66,7 +66,7 @@ export function LeagueTable({
               return (
                 <tr
                   key={team.id}
-                  className={cn("transition-colors", standingsZoneRowClass(team.zone, highlighted))}
+                  className={cn("transition-colors", getStandingsZoneRowClass(team.zone, highlighted))}
                 >
                   <td className="px-2 py-2.5 text-center font-extrabold tabular-nums">{team.position}</td>
                   <td className="px-2 py-2.5">

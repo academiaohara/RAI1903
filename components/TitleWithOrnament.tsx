@@ -33,29 +33,29 @@ export function TitleWithOrnament({
   return (
     <div
       className={cn(
-        "page-title-gear inline-flex max-w-full items-center overflow-visible bg-transparent text-[#214C9B]",
+        "title-gear inline-flex max-w-full items-center overflow-visible bg-transparent text-[#214C9B]",
         sizeClasses[size],
       )}
     >
       <div
         className={cn(
           "inline-flex max-w-full items-center overflow-visible bg-transparent",
-          animated && "page-title-gear-wrap",
+          animated && "title-gear-wrap",
         )}
       >
         <GearAdorno
           cutoutId={cutoutId}
           className={cn(
-            "page-title-gear-icon pointer-events-none shrink-0 self-center bg-transparent text-current",
+            "title-gear-icon pointer-events-none shrink-0 self-center bg-transparent text-current",
             gearSizeClass,
-            animated && "page-title-gear-left",
+            animated && "title-gear-icon-reveal",
           )}
         />
         <Tag
           className={cn(
             gearTextOverlapClass,
             "relative z-10 mb-[2px] min-w-0 self-center bg-transparent py-[0.22em] pr-[0.35em] pl-0 font-extrabold leading-none whitespace-nowrap uppercase text-current",
-            animated && "page-title-gear-text",
+            animated && "title-gear-text",
             className,
           )}
         >
