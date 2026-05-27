@@ -9,8 +9,9 @@ import { useCallback, useRef, useState } from "react";
 import { navItems, type NavItem } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 
-function isNavActive(pathname: string, href: string) {
-  return pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
+function isNavActive(pathname: string, item: NavItem) {
+  const activeHref = item.activePrefix ?? item.href;
+  return pathname === activeHref || (activeHref !== "/" && pathname.startsWith(`${activeHref}/`));
 }
 
 export function Header() {
@@ -63,7 +64,7 @@ export function Header() {
 
         <nav className="no-scrollbar ml-auto hidden items-center gap-1 overflow-x-auto lg:flex" aria-label="Navegacion principal">
           {navItems.map((item) => {
-            const active = isNavActive(pathname, item.href);
+            const active = isNavActive(pathname, item);
             const hasChildren = Boolean(item.children?.length);
             const megaOpen = hoveredNav?.href === item.href;
             return (
@@ -73,8 +74,10 @@ export function Header() {
                   style={active ? { color: "#214C9B" } : undefined}
                   className={cn(
                     "inline-flex items-center gap-1 rounded-full border border-transparent px-4 py-2 text-sm font-bold uppercase tracking-normal transition hover:border-white",
-                    active || megaOpen ? "border-white bg-white shadow-lg shadow-blue-950/20" : "text-white",
-                    active || megaOpen ? "text-[#214C9B]" : "",
+                    active
+                      ? "border-white bg-white text-[#214C9B] shadow-lg shadow-blue-950/20"
+                      : "bg-transparent text-white hover:bg-transparent hover:text-white",
+                    megaOpen && !active ? "border-white bg-transparent text-white" : "",
                   )}
                 >
                   {item.label}
@@ -138,7 +141,7 @@ export function Header() {
         <div className="border-t border-white/20 bg-[#173a78] px-4 py-4 shadow-xl lg:hidden">
           <nav className="mx-auto grid max-w-[1480px] gap-2" aria-label="Navegacion movil">
             {navItems.map((item) => {
-              const active = isNavActive(pathname, item.href);
+              const active = isNavActive(pathname, item);
               const hasChildren = Boolean(item.children?.length);
               return (
                 <div key={item.href} className="rounded-2xl border border-white/10 bg-white/5 p-1">
