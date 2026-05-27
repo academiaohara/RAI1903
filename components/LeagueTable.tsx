@@ -1,5 +1,9 @@
 import { RAI_TEAM_ID } from "@/data/mock";
-import { STANDINGS_ZONE_LEGEND, getStandingsZoneRowClass } from "@/lib/standings-styles";
+import {
+  STANDINGS_ZONE_LEGEND,
+  getStandingsHighlightPositionClass,
+  getStandingsHighlightRowClass,
+} from "@/lib/standings-styles";
 import { cn, formatGoalDifference, resultTone } from "@/lib/utils";
 import type { Team } from "@/types";
 
@@ -36,39 +40,64 @@ export function LeagueTable({
         {visibleRows.map((team) => {
           const diff = team.stats.goalsFor - team.stats.goalsAgainst;
           const highlighted = team.id === highlightTeamId;
-          const zoneClassName = getStandingsZoneRowClass(team.zone, highlighted);
+          const rowClassName = getStandingsHighlightRowClass(highlighted);
+          const positionClassName = getStandingsHighlightPositionClass(highlighted, team.zone);
 
           return (
             <article
               key={team.id}
               className={cn(
                 "rounded-2xl border border-[#214C9B]/15 p-3 shadow-[0_8px_20px_rgba(17,24,39,0.04)]",
-                zoneClassName,
-                !highlighted && !team.zone && "bg-white",
+                rowClassName,
               )}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-2">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#214C9B] text-xs font-extrabold tabular-nums text-white">
+                  <span
+                    className={cn(
+                      "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-extrabold tabular-nums",
+                      positionClassName,
+                    )}
+                  >
                     {team.position}
                   </span>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-extrabold">{compact ? team.shortName : team.name}</p>
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500">
+                    <p
+                      className={cn(
+                        "text-[11px] font-semibold uppercase tracking-[0.06em]",
+                        highlighted ? "text-white/80" : "text-slate-500",
+                      )}
+                    >
                       PJ {team.stats.played} · DG {formatGoalDifference(diff)}
                     </p>
                   </div>
                 </div>
                 <div className="shrink-0 text-right">
-                  <p className="text-2xl font-extrabold tabular-nums text-[#214C9B]">{team.stats.points}</p>
-                  <p className="text-[10px] font-bold uppercase text-slate-500">Pts</p>
+                  <p className={cn("text-2xl font-extrabold tabular-nums", highlighted ? "text-white" : "text-[#214C9B]")}>
+                    {team.stats.points}
+                  </p>
+                  <p className={cn("text-[10px] font-bold uppercase", highlighted ? "text-white/80" : "text-slate-500")}>
+                    Pts
+                  </p>
                 </div>
               </div>
-              <div className="mt-3 grid grid-cols-4 gap-2 text-center text-xs font-bold text-slate-600">
-                <span className="rounded-xl bg-white/70 px-2 py-1">G {team.stats.won}</span>
-                <span className="rounded-xl bg-white/70 px-2 py-1">E {team.stats.drawn}</span>
-                <span className="rounded-xl bg-white/70 px-2 py-1">P {team.stats.lost}</span>
-                <span className="rounded-xl bg-white/70 px-2 py-1">
+              <div
+                className={cn(
+                  "mt-3 grid grid-cols-4 gap-2 text-center text-xs font-bold",
+                  highlighted ? "text-white/90" : "text-slate-600",
+                )}
+              >
+                <span className={cn("rounded-xl px-2 py-1", highlighted ? "bg-white/15" : "bg-slate-50")}>
+                  G {team.stats.won}
+                </span>
+                <span className={cn("rounded-xl px-2 py-1", highlighted ? "bg-white/15" : "bg-slate-50")}>
+                  E {team.stats.drawn}
+                </span>
+                <span className={cn("rounded-xl px-2 py-1", highlighted ? "bg-white/15" : "bg-slate-50")}>
+                  P {team.stats.lost}
+                </span>
+                <span className={cn("rounded-xl px-2 py-1", highlighted ? "bg-white/15" : "bg-slate-50")}>
                   {team.stats.goalsFor}:{team.stats.goalsAgainst}
                 </span>
               </div>
@@ -120,16 +149,31 @@ export function LeagueTable({
             {visibleRows.map((team) => {
               const diff = team.stats.goalsFor - team.stats.goalsAgainst;
               const highlighted = team.id === highlightTeamId;
+              const rowClassName = getStandingsHighlightRowClass(highlighted);
+              const positionClassName = getStandingsHighlightPositionClass(highlighted, team.zone);
 
               return (
-                <tr
-                  key={team.id}
-                  className={cn("transition-colors", getStandingsZoneRowClass(team.zone, highlighted))}
-                >
-                  <td className="px-2 py-2.5 text-center font-extrabold tabular-nums">{team.position}</td>
+                <tr key={team.id} className={cn("transition-colors", rowClassName)}>
+                  <td className="px-2 py-2.5 text-center">
+                    <span
+                      className={cn(
+                        "inline-flex h-7 min-w-7 items-center justify-center rounded-lg px-1 text-xs font-extrabold tabular-nums",
+                        positionClassName,
+                      )}
+                    >
+                      {team.position}
+                    </span>
+                  </td>
                   <td className="px-2 py-2.5">
                     <div className="flex min-w-0 items-center gap-2">
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#214C9B]/15 bg-white text-[9px] font-extrabold text-[#214C9B]">
+                      <span
+                        className={cn(
+                          "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border text-[9px] font-extrabold",
+                          highlighted
+                            ? "border-white/30 bg-white/15 text-white"
+                            : "border-[#214C9B]/15 bg-white text-[#214C9B]",
+                        )}
+                      >
                         {team.crestInitials}
                       </span>
                       <span className="truncate font-bold">{compact ? team.shortName : team.name}</span>
@@ -141,7 +185,12 @@ export function LeagueTable({
                       <td className="px-2 py-2.5 text-center tabular-nums">{team.stats.won}</td>
                       <td className="px-2 py-2.5 text-center tabular-nums">{team.stats.drawn}</td>
                       <td className="px-2 py-2.5 text-center tabular-nums">{team.stats.lost}</td>
-                      <td className="px-2 py-2.5 text-center tabular-nums text-slate-600">
+                      <td
+                        className={cn(
+                          "px-2 py-2.5 text-center tabular-nums",
+                          highlighted ? "text-white/90" : "text-slate-600",
+                        )}
+                      >
                         {team.stats.goalsFor}:{team.stats.goalsAgainst}
                       </td>
                     </>
@@ -153,7 +202,12 @@ export function LeagueTable({
                     </>
                   )}
                   <td className="px-2 py-2.5 text-center font-semibold tabular-nums">{formatGoalDifference(diff)}</td>
-                  <td className="px-2 py-2.5 text-center text-base font-extrabold tabular-nums text-[#214C9B]">
+                  <td
+                    className={cn(
+                      "px-2 py-2.5 text-center text-base font-extrabold tabular-nums",
+                      highlighted ? "text-white" : "text-[#214C9B]",
+                    )}
+                  >
                     {team.stats.points}
                   </td>
                   {!compact && (

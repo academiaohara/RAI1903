@@ -6,7 +6,7 @@ export type RivalPlayer = {
   displayName: string;
   position: PlayerPosition;
   status: PlayerStatus;
-  stats: Pick<Player["stats"], "appearances" | "goals" | "assists">;
+  stats: Pick<Player["stats"], "appearances" | "goals" | "assists" | "yellowCards" | "redCards">;
 };
 
 const POSITIONS: PlayerPosition[] = ["Portero", "Defensa", "Centrocampista", "Delantero"];
@@ -93,6 +93,8 @@ function buildRoster(team: Team): RivalPlayer[] {
       const appearances = 5 + (mix % 5);
       const goals = position === "Portero" ? 0 : mix % 4;
       const assists = position === "Delantero" ? mix % 3 : mix % 2;
+      const yellowCards = mix % 17 === 0 ? 4 : mix % 7;
+      const redCards = mix % 23 === 0 ? 1 : 0;
       let status: PlayerStatus = mix % 11 === 0 ? "lesionado" : mix % 13 === 0 ? "sancionado" : "titular";
 
       if (team.id.includes("aviles") && status !== "titular") {
@@ -105,7 +107,7 @@ function buildRoster(team: Team): RivalPlayer[] {
         displayName,
         position,
         status,
-        stats: { appearances, goals, assists },
+        stats: { appearances, goals, assists, yellowCards, redCards },
       });
       playerIndex += 1;
     }
@@ -129,6 +131,9 @@ export function getRivalAvailability(team: Team) {
   const squad = getRivalSquad(team);
   return {
     injured: squad.filter((player) => player.status === "lesionado"),
+    cautioned: squad.filter(
+      (player) => player.status !== "lesionado" && player.status !== "sancionado" && player.stats.yellowCards >= 4,
+    ),
     suspended: squad.filter((player) => player.status === "sancionado"),
   };
 }
