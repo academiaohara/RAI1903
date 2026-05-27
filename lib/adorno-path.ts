@@ -12,8 +12,8 @@ export const ADORNO_VIEWBOX = `0 0 ${ADORNO_VIEWBOX_WIDTH} ${ADORNO_VIEWBOX_HEIG
 export const ADORNO_GEAR_CENTER_X = ADORNO_VIEWBOX_WIDTH / 2;
 export const ADORNO_GEAR_CENTER_Y = ADORNO_GEAR_HEIGHT / 2;
 /** Text cutout sector edges (degrees, 0° = right, positive = clockwise). */
-export const ADORNO_CUTOUT_UPPER_DEG = -60;
-export const ADORNO_CUTOUT_LOWER_DEG = 75;
+export const ADORNO_CUTOUT_UPPER_DEG = -48;
+export const ADORNO_CUTOUT_LOWER_DEG = 65;
 export const ADORNO_TRANSFORM = "translate(-46.596128,-32)";
 /** Horizontal center of the gear in viewBox coordinates (middle of adorno.svg). */
 export const ADORNO_SPLIT_X = ADORNO_VIEWBOX_WIDTH / 2;

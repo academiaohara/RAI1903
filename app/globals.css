@@ -81,8 +81,26 @@ a {
   transform: translateX(80%);
 }
 
-.-ml-\[0\.65em\] {
-  margin-left: -0.75em;
+.-ml-\[0\.74em\] {
+  margin-left: -0.9em;
+}
+
+.news-ticker-item {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.news-ticker-item:hover {
+  background-color: var(--rai-blue);
+  border-color: var(--rai-blue);
+}
+
+.news-ticker-item:hover .news-ticker-source,
+.news-ticker-item:hover .news-ticker-title,
+.news-ticker-item:hover .news-ticker-excerpt {
+  color: #fff;
 }
 
 .news-ticker-track {

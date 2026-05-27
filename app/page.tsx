@@ -8,7 +8,7 @@ import { NewsTicker } from "@/components/NewsTicker";
 import { PageHero } from "@/components/PageHero";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
 import { RAI_TEAM_ID, newsItems, players } from "@/data/mock";
-import { matchCompetitionShortLabel, matchFixtureMeta } from "@/lib/competition-labels";
+import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
 import { getLatestAvilesMatches, getNextAvilesMatch, getTeamsByGender, getUpcomingAvilesMatches } from "@/lib/fixtures";
 import { getCronicaForMatch, getPreviaForMatch } from "@/lib/match-articles";
 import { primerEquipoBase } from "@/lib/primer-equipo";
@@ -139,13 +139,17 @@ export default function HomePage() {
 }
 
 function MatchBanner({ match, label, href, action }: { match: Match; label: string; href: Route; action: string }) {
+  const jornadaLabel = matchJornadaLabel(match);
+
   return (
     <Link href={href} className="group overflow-hidden rounded-[2rem] border border-[#214C9B]/25 bg-white shadow-[0_18px_45px_rgba(17,24,39,0.08)] transition hover:-translate-y-1 hover:border-[#214C9B]">
       <div className="grid items-stretch md:grid-cols-[1fr_auto_1fr]">
         <div className="flex items-center gap-4 p-5">
-          <span className="flex h-14 min-w-14 items-center justify-center rounded-2xl border border-[#214C9B]/20 bg-blue-50 px-2 text-center text-[10px] font-extrabold leading-tight text-[#214C9B]">
-            {matchFixtureMeta(match)}
-          </span>
+          {jornadaLabel && (
+            <span className="flex h-14 min-w-14 items-center justify-center rounded-2xl border border-[#214C9B]/20 bg-blue-50 px-2 text-center text-[10px] font-extrabold leading-tight text-[#214C9B] transition group-hover:border-[#214C9B] group-hover:bg-[#214C9B] group-hover:text-white">
+              {jornadaLabel}
+            </span>
+          )}
           <div>
             <p className="text-xs font-bold uppercase tracking-normal text-[#981915]">{label}</p>
             <p className="mt-1 text-xl font-extrabold text-slate-900">{match.homeTeam}</p>
