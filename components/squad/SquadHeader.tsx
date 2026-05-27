@@ -48,10 +48,10 @@ export function SquadHeader({ club }: { club: SquadClubInfo }) {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 * index, duration: 0.35 }}
-              className="rounded-2xl border border-white/15 bg-white/10 px-3 py-3 text-center backdrop-blur-sm sm:px-4"
+              className="flex min-h-[4.5rem] flex-col items-center justify-center rounded-2xl border border-white/15 bg-white/10 px-3 py-3 text-center backdrop-blur-sm sm:min-h-[5rem] sm:px-4"
             >
-              <p className="text-[10px] font-bold uppercase tracking-wider text-white/65">{item.label}</p>
-              <p className="mt-1 text-xl font-extrabold tabular-nums sm:text-3xl">{club.stats[item.key]}</p>
+              <p className="w-full text-center text-[10px] font-bold uppercase tracking-wider text-white/65">{item.label}</p>
+              <p className="mt-1 w-full text-center text-xl font-extrabold tabular-nums sm:text-3xl">{club.stats[item.key]}</p>
             </motion.div>
           ))}
         </div>
