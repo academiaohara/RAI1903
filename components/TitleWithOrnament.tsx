@@ -33,7 +33,7 @@ export function TitleWithOrnament({
   return (
     <div
       className={cn(
-        "page-title-gear inline-flex max-w-full items-center overflow-visible bg-transparent text-[#981915]",
+        "page-title-gear inline-flex max-w-full items-center overflow-visible bg-transparent text-[#214C9B]",
         sizeClasses[size],
       )}
     >
@@ -54,7 +54,7 @@ export function TitleWithOrnament({
         <Tag
           className={cn(
             gearTextOverlapClass,
-            "relative z-10 min-w-0 self-center bg-transparent py-[0.22em] pr-[0.35em] pl-0 font-extrabold leading-none whitespace-nowrap uppercase text-current",
+            "relative z-10 mb-[2px] min-w-0 self-center bg-transparent py-[0.22em] pr-[0.35em] pl-0 font-extrabold leading-none whitespace-nowrap uppercase text-current",
             animated && "page-title-gear-text",
             className,
           )}

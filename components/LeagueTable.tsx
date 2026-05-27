@@ -38,13 +38,19 @@ export function LeagueTable({
             <tr>
               <th className="px-2 py-2.5 text-center font-bold">#</th>
               <th className="px-2 py-2.5 font-bold">Equipo</th>
-              {!compact && (
+              {!compact ? (
                 <>
                   <th className="px-2 py-2.5 text-center font-bold">PJ</th>
                   <th className="px-2 py-2.5 text-center font-bold">G</th>
                   <th className="px-2 py-2.5 text-center font-bold">E</th>
                   <th className="px-2 py-2.5 text-center font-bold">P</th>
                   <th className="px-2 py-2.5 text-center font-bold">GF:GC</th>
+                </>
+              ) : (
+                <>
+                  <th className="px-2 py-2.5 text-center font-bold">G</th>
+                  <th className="px-2 py-2.5 text-center font-bold">E</th>
+                  <th className="px-2 py-2.5 text-center font-bold">P</th>
                 </>
               )}
               <th className="px-2 py-2.5 text-center font-bold">DG</th>
@@ -71,7 +77,7 @@ export function LeagueTable({
                       <span className="truncate font-bold">{compact ? team.shortName : team.name}</span>
                     </div>
                   </td>
-                  {!compact && (
+                  {!compact ? (
                     <>
                       <td className="px-2 py-2.5 text-center tabular-nums">{team.stats.played}</td>
                       <td className="px-2 py-2.5 text-center tabular-nums">{team.stats.won}</td>
@@ -80,6 +86,12 @@ export function LeagueTable({
                       <td className="px-2 py-2.5 text-center tabular-nums text-slate-600">
                         {team.stats.goalsFor}:{team.stats.goalsAgainst}
                       </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="px-2 py-2.5 text-center tabular-nums">{team.stats.won}</td>
+                      <td className="px-2 py-2.5 text-center tabular-nums">{team.stats.drawn}</td>
+                      <td className="px-2 py-2.5 text-center tabular-nums">{team.stats.lost}</td>
                     </>
                   )}
                   <td className="px-2 py-2.5 text-center font-semibold tabular-nums">{formatGoalDifference(diff)}</td>

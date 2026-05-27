@@ -44,6 +44,14 @@ export function matchCompetitionShortLabel(match: FixtureMetaSource): string {
   return match.competition;
 }
 
+/** Jornada badge label (e.g. J9) for league fixtures. */
+export function matchJornadaLabel(match: FixtureMetaSource & { matchday?: number }): string | null {
+  if (match.competition === "copa-rey" || match.matchday === undefined) {
+    return null;
+  }
+  return `J${match.matchday}`;
+}
+
 /** Corner meta: competition + round (jornada or cup stage). */
 export function matchFixtureMeta(match: FixtureMetaSource & { matchday: number }): string {
   const label = matchCompetitionShortLabel(match);
