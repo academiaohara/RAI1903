@@ -22,18 +22,21 @@ export function LeagueTableCard({ eyebrow, title, teams, highlightTeamId, compac
 
   return (
     <>
-      <Card eyebrow={eyebrow} title={title} className={className}>
-        <div className="mb-4 flex justify-end">
+      <Card
+        eyebrow={eyebrow}
+        title={title}
+        className={className}
+        action={
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="inline-flex items-center gap-2 rounded-2xl border border-[#214C9B]/20 px-3 py-2 text-xs font-bold uppercase tracking-normal text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
+            className="inline-flex shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 p-2 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
             aria-label="Abrir clasificacion en grande"
           >
             <Maximize2 size={16} />
-            Ver en grande
           </button>
-        </div>
+        }
+      >
         <LeagueTable teams={teams} highlightTeamId={highlightTeamId} compact={compact} />
       </Card>
 
