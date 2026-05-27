@@ -25,7 +25,7 @@ export function PrimerEquipoContextBar({ gender }: { gender: PrimerEquipoGender 
                 className={cn(
                   "shrink-0 rounded-xl px-4 py-2.5 text-sm font-bold uppercase tracking-normal transition",
                   active
-                    ? "bg-[#214C9B] text-white shadow-md shadow-blue-950/15"
+                    ? "bg-[#214C9B] !text-white shadow-md shadow-blue-950/15 hover:!text-white"
                     : "text-[#214C9B] hover:bg-blue-50",
                 )}
               >
