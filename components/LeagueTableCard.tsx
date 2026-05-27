@@ -11,12 +11,25 @@ type LeagueTableCardProps = {
   eyebrow?: string;
   title?: string;
   teams: Team[];
+  /** Tabla completa en el modal; por defecto usa `teams`. */
+  fullTeams?: Team[];
   highlightTeamId: string;
   compact?: boolean;
   className?: string;
+  borderlessHeader?: boolean;
 };
 
-export function LeagueTableCard({ eyebrow, title, teams, highlightTeamId, compact = false, className }: LeagueTableCardProps) {
+export function LeagueTableCard({
+  eyebrow,
+  title,
+  teams,
+  fullTeams,
+  highlightTeamId,
+  compact = false,
+  className,
+  borderlessHeader = false,
+}: LeagueTableCardProps) {
+  const modalTeams = fullTeams ?? teams;
   const [open, setOpen] = useState(false);
   const modalTitle = title ?? "Clasificacion";
 
@@ -26,6 +39,7 @@ export function LeagueTableCard({ eyebrow, title, teams, highlightTeamId, compac
         eyebrow={eyebrow}
         title={title}
         className={className}
+        borderlessHeader={borderlessHeader}
         action={
           <button
             type="button"
@@ -41,7 +55,7 @@ export function LeagueTableCard({ eyebrow, title, teams, highlightTeamId, compac
       </Card>
 
       <Modal open={open} title={modalTitle} onClose={() => setOpen(false)}>
-        <LeagueTable teams={teams} highlightTeamId={highlightTeamId} />
+        <LeagueTable teams={modalTeams} highlightTeamId={highlightTeamId} />
       </Modal>
     </>
   );
