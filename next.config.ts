@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
       { source: "/primer-equipo/competicion", destination: "/primer-equipo/masculino/competicion", permanent: false },
       { source: "/primer-equipo/cronicas", destination: "/primer-equipo/masculino/cronicas", permanent: false },
       { source: "/primer-equipo/previas", destination: "/primer-equipo/masculino/previas", permanent: false },
+      { source: "/prensa", destination: "/noticias/club", permanent: false },
+      { source: "/prensa/noticias-externas", destination: "/noticias/prensa", permanent: false },
+      { source: "/prensa/medios", destination: "/noticias/prensa", permanent: false },
+      { source: "/prensa/archivo", destination: "/noticias/prensa", permanent: false },
     ];
   },
 };

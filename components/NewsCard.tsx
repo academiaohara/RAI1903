@@ -22,7 +22,7 @@ export function NewsCard({ item, featured = false }: { item: NewsItem; featured?
           ))}
         </div>
         <a href={item.url} target="_blank" rel="noreferrer" className="mt-5 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-normal text-[#214C9B] transition hover:text-[#981915]">
-          Leer en medio externo <ExternalLink size={15} />
+          {item.channel === "club" ? "Leer noticia" : "Leer en medio externo"} <ExternalLink size={15} />
         </a>
       </div>
     </article>
