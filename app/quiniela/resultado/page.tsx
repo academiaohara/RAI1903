@@ -4,9 +4,8 @@ import { useMemo, useState } from "react";
 import { Card } from "@/components/Card";
 import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
-import { SectionTabs } from "@/components/SectionTabs";
 import { CURRENT_QUINIELA_ROUND, jornadaParticipants, matchdays } from "@/data/mock";
-import { getMatchdayByRound, hasFirstMatchStarted, QUINIELA_TABS } from "@/lib/quiniela";
+import { getMatchdayByRound, hasFirstMatchStarted } from "@/lib/quiniela";
 
 export default function QuinielaResultadoPage() {
   const [round, setRound] = useState(CURRENT_QUINIELA_ROUND);
@@ -29,7 +28,6 @@ export default function QuinielaResultadoPage() {
         title="Resultado"
         description="Participantes por orden de envio. Cuando arranca la jornada, los puntos se actualizan y la tabla se ordena por clasificacion."
       />
-      <SectionTabs tabs={[...QUINIELA_TABS]} />
       <JornadaSelector
         value={round}
         total={matchdays.length}

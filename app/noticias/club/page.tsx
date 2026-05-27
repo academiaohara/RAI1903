@@ -4,9 +4,8 @@ import { useMemo, useState } from "react";
 import { Card } from "@/components/Card";
 import { NewsCard } from "@/components/NewsCard";
 import { PageHero } from "@/components/PageHero";
-import { SectionTabs } from "@/components/SectionTabs";
 import { newsItems } from "@/data/mock";
-import { NOTICIAS_TABS, newsByChannel } from "@/lib/noticias";
+import { newsByChannel } from "@/lib/noticias";
 import type { NewsTag } from "@/types";
 
 const clubNews = newsByChannel(newsItems, "club");
@@ -30,7 +29,6 @@ export default function NoticiasClubPage() {
   return (
     <div className="space-y-6">
       <PageHero eyebrow="Noticias" title="Club" description="Comunicados y actualidad oficial del Real Aviles Industrial." />
-      <SectionTabs tabs={NOTICIAS_TABS} />
       {featured && <NewsCard item={featured} featured />}
 
       <Card eyebrow="Club" title="Busca por texto o etiqueta">

@@ -5,13 +5,11 @@ import { Card } from "@/components/Card";
 import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
 import { PredictionForm } from "@/components/PredictionForm";
-import { SectionTabs } from "@/components/SectionTabs";
 import { CURRENT_QUINIELA_ROUND, matchdays } from "@/data/mock";
 import {
   getMatchdayByRound,
   hasFirstMatchStarted,
   isMatchdayComplete,
-  QUINIELA_TABS,
   sortQuinielaMatches,
 } from "@/lib/quiniela";
 import { loadPredictions, loadSavedRounds, savePredictions, saveRoundAsSaved } from "@/lib/storage";
@@ -82,7 +80,6 @@ export default function MiQuinielaPage() {
         title="Mi quiniela"
         description="Rellena la quiniela de la jornada. Al guardar queda bloqueada hasta que pulses editar. Cuando empiece el primer partido ya no podras cambiarla."
       />
-      <SectionTabs tabs={[...QUINIELA_TABS]} />
       <JornadaSelector
         value={round}
         total={matchdays.length}

@@ -1,5 +1,6 @@
 import type { Route } from "next";
-import type { NewsChannel } from "@/types";
+import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
+import type { NewsChannel, NewsItem } from "@/types";
 
 export const NOTICIAS_TABS: { href: Route; label: string }[] = [
   { href: "/noticias/club", label: "Club" },
@@ -13,6 +14,18 @@ export const newsByChannel = <T extends { channel: NewsChannel; date: string; id
   items: T[],
   channel: NewsChannel,
 ) => sortNewsByDate(items.filter((item) => item.channel === channel));
+
+export const newsAppliesToTeam = (item: Pick<NewsItem, "teams">, gender: PrimerEquipoGender) =>
+  !item.teams || item.teams.length === 0 || item.teams.includes(gender);
+
+export const newsForTeam = (items: NewsItem[], gender: PrimerEquipoGender) =>
+  sortNewsByDate(items.filter((item) => newsAppliesToTeam(item, gender)));
+
+export const teamScopeLabel = (teams: PrimerEquipoGender[] | undefined) => {
+  if (!teams || teams.length === 0) return null;
+  if (teams.length === 2) return "Primer equipo";
+  return genderLabels[teams[0]!].title;
+};
 
 export const RAI_BRAND_BLUE = "#214C9B";
 export const RAI_LOGO_PATH = "/rai_logo.webp";

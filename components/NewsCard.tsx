@@ -1,10 +1,13 @@
 import { ExternalLink } from "lucide-react";
 import { Badge } from "@/components/Badge";
 import { NewsMedia } from "@/components/NewsMedia";
+import { teamScopeLabel } from "@/lib/noticias";
 import { formatDate } from "@/lib/utils";
 import type { NewsItem } from "@/types";
 
 export function NewsCard({ item, featured = false }: { item: NewsItem; featured?: boolean }) {
+  const teamLabel = teamScopeLabel(item.teams);
+
   return (
     <article
       className={`grid items-stretch gap-4 rounded-3xl border border-[#214C9B]/30 bg-white p-4 shadow-[0_12px_30px_rgba(17,24,39,0.06)] transition hover:-translate-y-0.5 hover:border-[#214C9B] sm:grid-cols-[9rem_1fr] ${featured ? "border-[#214C9B] bg-gradient-to-br from-white to-blue-50 sm:grid-cols-[11rem_1fr]" : ""}`}
@@ -13,6 +16,9 @@ export function NewsCard({ item, featured = false }: { item: NewsItem; featured?
       <div className="min-w-0">
         <div className="mb-3 flex flex-wrap items-center gap-2">
           <Badge tone={featured ? "blue" : "red"}>{item.source}</Badge>
+          {teamLabel && (
+            <Badge tone="slate">{teamLabel}</Badge>
+          )}
           <span className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">{formatDate(item.date)}</span>
         </div>
         <h3 className={featured ? "text-2xl font-extrabold uppercase leading-tight text-[#214C9B] sm:text-3xl" : "text-xl font-extrabold uppercase leading-tight text-[#214C9B]"}>{item.title}</h3>
