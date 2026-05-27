@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { Badge } from "@/components/Badge";
 import { Card } from "@/components/Card";
 import { Modal } from "@/components/Modal";
-import { PageHero } from "@/components/PageHero";
+import { PrimerEquipoPageHero } from "@/components/PrimerEquipoPageHero";
 import { PlayerCard } from "@/components/PlayerCard";
 import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getPlayersByGender } from "@/lib/primer-equipo-data";
@@ -24,7 +24,8 @@ export default function PlantillaPage({ params }: { params: Promise<{ gender: st
 
   return (
     <>
-      <PageHero
+      <PrimerEquipoPageHero
+        gender={gender}
         title="Plantilla"
         description={`Jugadores, parte semanal y fichas individuales de ${genderLabels[gender].club}.`}
       />

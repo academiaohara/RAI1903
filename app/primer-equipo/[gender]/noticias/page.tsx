@@ -3,7 +3,7 @@
 import { use, useState } from "react";
 import { Card } from "@/components/Card";
 import { NewsCard } from "@/components/NewsCard";
-import { PageHero } from "@/components/PageHero";
+import { PrimerEquipoPageHero } from "@/components/PrimerEquipoPageHero";
 import { newsItems } from "@/data/mock";
 import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { NewsCategory, NewsTag } from "@/types";
@@ -24,7 +24,8 @@ export default function PrimerEquipoNoticiasPage({ params }: { params: Promise<{
 
   return (
     <>
-      <PageHero
+      <PrimerEquipoPageHero
+        gender={gender}
         title="Noticias"
         description={`Actualidad del primer equipo ${genderLabels[gender].club.toLowerCase()} filtrada por categorias mock.`}
       />

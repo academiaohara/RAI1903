@@ -1,7 +1,7 @@
 import { Card } from "@/components/Card";
 import { LeagueTableCard } from "@/components/LeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
-import { PageHero } from "@/components/PageHero";
+import { PrimerEquipoPageHero } from "@/components/PrimerEquipoPageHero";
 import { RivalCard } from "@/components/RivalCard";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import { getTeamsByGender, getUpcomingAvilesMatchesByGender } from "@/lib/fixtures";
@@ -15,7 +15,8 @@ export default async function PrimerEquipoCompeticionPage({ params }: { params: 
 
   return (
     <>
-      <PageHero
+      <PrimerEquipoPageHero
+        gender={gender}
         title="Competicion"
         description={`Clasificacion, proximos partidos y rivales directos de ${genderLabels[gender].club}.`}
       />

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Card } from "@/components/Card";
-import { PageHero } from "@/components/PageHero";
+import { PrimerEquipoPageHero } from "@/components/PrimerEquipoPageHero";
 import { getMatchArticles } from "@/lib/match-articles";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { formatDate } from "@/lib/utils";
@@ -12,7 +12,7 @@ export default async function PreviasPage({ params }: { params: Promise<{ gender
 
   return (
     <>
-      <PageHero title="Previas" description="Analisis previos a cada jornada con forma reciente, claves tacticas y estado de la plantilla." />
+      <PrimerEquipoPageHero gender={gender} title="Previas" description="Analisis previos a cada jornada con forma reciente, claves tacticas y estado de la plantilla." />
 
       <Card>
         <div className="space-y-3">

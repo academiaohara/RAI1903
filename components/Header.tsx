@@ -21,7 +21,7 @@ export function Header() {
             alt="RAI1903"
             width={48}
             height={48}
-            className="h-12 w-12 rounded-full border-2 border-white bg-white object-contain p-1"
+            className="h-12 w-12 rounded-full border-2 border-white/90 bg-[#173a78] object-contain p-1.5"
             priority
           />
           <span>

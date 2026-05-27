@@ -5,6 +5,16 @@ export const RAI_FEM_TEAM_ID = "real-aviles-industrial-femenino";
 export const COMPETITION_NAME = "Liga RAI1903 Norte";
 export const COMPETITION_NAME_FEM = "Liga Femenina RAI1903";
 
+export const competitionSeasons = [
+  { id: "2024-25", label: "2024/25" },
+  { id: "2025-26", label: "2025/26" },
+  { id: "2026-27", label: "2026/27" },
+] as const;
+
+export type CompetitionSeasonId = (typeof competitionSeasons)[number]["id"];
+
+export const DEFAULT_COMPETITION_SEASON_ID: CompetitionSeasonId = "2025-26";
+
 export const teams: Team[] = [
   { id: RAI_TEAM_ID, name: "Real Aviles Industrial", shortName: "Aviles", city: "Aviles", stadium: "Roman Suarez Puerta", coach: "Miguel Alonso", founded: 1903, crestInitials: "RAI", colors: ["#214C9B", "#FFFFFF"], position: 3, form: ["W", "W", "D", "L", "W"], stats: { played: 9, won: 5, drawn: 2, lost: 2, goalsFor: 16, goalsAgainst: 9, points: 17 } },
   { id: "pontevedra", name: "Pontevedra CF", shortName: "Pontevedra", city: "Pontevedra", stadium: "Pasaron", coach: "Javi Rey", founded: 1941, crestInitials: "PON", colors: ["#7A1435", "#FFFFFF"], position: 1, form: ["W", "D", "W", "W", "W"], stats: { played: 9, won: 6, drawn: 2, lost: 1, goalsFor: 18, goalsAgainst: 7, points: 20 } },

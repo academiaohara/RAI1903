@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Card } from "@/components/Card";
-import { PageHero } from "@/components/PageHero";
+import { PrimerEquipoPageHero } from "@/components/PrimerEquipoPageHero";
 import { getMatchArticles } from "@/lib/match-articles";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { formatDate } from "@/lib/utils";
@@ -12,7 +12,7 @@ export default async function CronicasPage({ params }: { params: Promise<{ gende
 
   return (
     <>
-      <PageHero title="Cronicas" description="Resumenes de partidos disputados con lectura tactica y sensaciones del vestuario." />
+      <PrimerEquipoPageHero gender={gender} title="Cronicas" description="Resumenes de partidos disputados con lectura tactica y sensaciones del vestuario." />
 
       <Card>
         <div className="space-y-3">

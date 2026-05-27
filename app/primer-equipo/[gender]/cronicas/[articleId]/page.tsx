@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MatchArticleContent } from "@/components/MatchArticleContent";
-import { PageHero } from "@/components/PageHero";
+import { PrimerEquipoPageHero } from "@/components/PrimerEquipoPageHero";
 import { getMatchArticleById } from "@/lib/match-articles";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Route } from "next";
@@ -14,7 +14,7 @@ export default async function CronicaDetailPage({ params }: { params: Promise<{ 
 
   return (
     <>
-      <PageHero title="Cronica" description="Lectura completa del partido." />
+      <PrimerEquipoPageHero gender={gender} title="Cronica" description="Lectura completa del partido." />
       <div className="rounded-[2rem] border border-[#214C9B]/20 bg-white p-6 shadow-[0_12px_30px_rgba(17,24,39,0.06)] sm:p-8">
         <MatchArticleContent article={article} />
       </div>

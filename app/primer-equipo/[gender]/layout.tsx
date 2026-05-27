@@ -13,9 +13,9 @@ export default async function PrimerEquipoGenderLayout({
   if (!isPrimerEquipoGender(gender)) notFound();
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
       <PrimerEquipoSubnav gender={gender as PrimerEquipoGender} />
-      {children}
+      <div className="min-w-0 flex-1 space-y-6">{children}</div>
     </div>
   );
 }
