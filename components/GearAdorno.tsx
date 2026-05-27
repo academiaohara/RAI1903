@@ -38,7 +38,7 @@ export function GearAdorno({ className, cutoutId }: GearAdornoProps) {
         </defs>
       )}
       <g transform={ADORNO_TRANSFORM} mask={cutoutId ? `url(#${cutoutId})` : undefined}>
-        <path d={ADORNO_PATH} fill="currentColor" />
+        <path d={ADORNO_PATH} fill="var(--rai-red)" />
       </g>
     </svg>
   );

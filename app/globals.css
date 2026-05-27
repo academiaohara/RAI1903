@@ -85,6 +85,10 @@ a {
   margin-left: -0.9em;
 }
 
+.-ml-\[0\.79em\] {
+  margin-left: -0.9em;
+}
+
 .news-ticker-item {
   transition:
     background-color 0.2s ease,
@@ -138,6 +142,7 @@ a {
 }
 
 .title-gear-icon {
+  color: var(--rai-red);
   overflow: visible;
 }
 
