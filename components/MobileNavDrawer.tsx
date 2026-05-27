@@ -73,21 +73,21 @@ export function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps) {
                       className={cn(
                         "flex items-center gap-3 rounded-[11px] px-4 py-3.5 text-[15px] font-semibold leading-tight transition",
                         active
-                          ? "bg-white text-[#244A86]"
+                          ? "bg-white text-[#981915]"
                           : "text-white hover:bg-white/12 active:bg-white/15",
                       )}
                     >
                       <Icon
                         size={20}
                         strokeWidth={2.25}
-                        className={cn("shrink-0", active ? "text-[#244A86]" : "text-[#981915]")}
+                        className={cn("shrink-0", active ? "text-[#981915]" : "text-white")}
                         aria-hidden
                       />
                       <span className="min-w-0 flex-1">{item.label}</span>
                       <ChevronRight
                         size={18}
                         strokeWidth={2.25}
-                        className={cn("shrink-0", active ? "text-[#244A86]/55" : "text-white/45")}
+                        className={cn("shrink-0", active ? "text-[#981915]/55" : "text-white/45")}
                         aria-hidden
                       />
                     </Link>
