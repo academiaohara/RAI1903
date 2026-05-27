@@ -207,6 +207,12 @@ export type FanMediaLink = {
   schedule?: string;
 };
 
+export type FanYouTubeVideo = {
+  id: string;
+  title: string;
+  url: string;
+};
+
 export type PrimerEquipoGender = "masculino" | "femenino";
 
 export type CalendarMatch = {

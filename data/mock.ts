@@ -3,6 +3,7 @@ import type {
   AcademyTeam,
   CompetitionId,
   FanMediaLink,
+  FanYouTubeVideo,
   Match,
   MatchArticle,
   Matchday,
@@ -413,6 +414,30 @@ export const matchdayResult = {
 
 const RAI_YOUTUBE_CHANNEL = "https://www.youtube.com/channel/UCqnlVJmxk-zGSSNCb9noziw";
 const RAI_SPOTIFY_PODCAST = "https://open.spotify.com/show/5kHriw0nbuCDhY5qtLHuQC";
+
+/** Episodios recientes de Zona Mixta en YouTube (el ?ltimo se muestra destacado). */
+export const fanZonaMixtaVideos: FanYouTubeVideo[] = [
+  {
+    id: "zona-mixta-v1",
+    title: "Zona Mixta",
+    url: "https://youtu.be/cFMjxc7ifGA",
+  },
+  {
+    id: "zona-mixta-v2",
+    title: "Zona Mixta",
+    url: "https://youtu.be/E3G45yeP17k",
+  },
+  {
+    id: "zona-mixta-v3",
+    title: "Zona Mixta",
+    url: "https://youtu.be/1C8YDs_y75w",
+  },
+  {
+    id: "zona-mixta-v4",
+    title: "Zona Mixta",
+    url: "https://youtu.be/_gb5fS8lIbE",
+  },
+];
 
 /** Zona Mixta: programa oficial del club en RAI Radio y YouTube. */
 export const fanZonaMixta: FanMediaLink[] = [
