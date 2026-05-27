@@ -3,11 +3,7 @@ import { FanMediaLinkCard } from "@/components/FanMediaLinkCard";
 import { PageHero } from "@/components/PageHero";
 import { SectionTabs } from "@/components/SectionTabs";
 import { fanPodcasts } from "@/data/mock";
-
-const tabs = [
-  { href: "/contenido-fan/youtube", label: "YouTube" },
-  { href: "/contenido-fan/podcasts", label: "Podcasts" },
-];
+import { getContenidoFanTabs } from "@/lib/contenido-fan";
 
 export default function ContenidoFanPodcastsPage() {
   return (
@@ -17,7 +13,7 @@ export default function ContenidoFanPodcastsPage() {
         title="Podcasts y audio"
         description="Espacios para enlazar podcasts y audio de aficionados en Spotify, X, iVoox y otras plataformas."
       />
-      <SectionTabs tabs={tabs} />
+      <SectionTabs tabs={getContenidoFanTabs()} />
 
       <Card eyebrow="Audio fan" title="Podcasts y redes">
         <p className="mb-5 text-sm leading-6 text-slate-600">
