@@ -1,6 +1,7 @@
 import { RAI_TEAM_ID } from "@/data/mock";
 import {
   STANDINGS_ZONE_LEGEND,
+  getStandingsHighlightCellClass,
   getStandingsHighlightPositionClass,
   getStandingsHighlightRowClass,
 } from "@/lib/standings-styles";
@@ -41,26 +42,35 @@ export function LeagueTable({
           const diff = team.stats.goalsFor - team.stats.goalsAgainst;
           const highlighted = team.id === highlightTeamId;
           const rowClassName = getStandingsHighlightRowClass(highlighted);
+          const highlightCellClassName = getStandingsHighlightCellClass(highlighted);
           const positionClassName = getStandingsHighlightPositionClass(highlighted, team.zone);
 
           return (
             <article
               key={team.id}
               className={cn(
-                "rounded-2xl border border-[#214C9B]/15 p-3 shadow-[0_8px_20px_rgba(17,24,39,0.04)]",
-                rowClassName,
+                "overflow-hidden rounded-2xl border border-[#214C9B]/15 shadow-[0_8px_20px_rgba(17,24,39,0.04)]",
+                highlighted ? "bg-white text-slate-700" : rowClassName,
               )}
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex min-w-0 items-center gap-2">
+              <div className="flex items-stretch">
+                <div className="flex shrink-0 items-center bg-white p-3 pr-2">
                   <span
                     className={cn(
-                      "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-extrabold tabular-nums",
+                      "flex h-8 w-8 items-center justify-center rounded-xl text-xs font-extrabold tabular-nums",
                       positionClassName,
                     )}
                   >
                     {team.position}
                   </span>
+                </div>
+                <div
+                  className={cn(
+                    "flex min-w-0 flex-1 items-start justify-between gap-3 p-3 pl-0",
+                    highlightCellClassName,
+                    rowClassName,
+                  )}
+                >
                   <div className="min-w-0">
                     <p className="truncate text-sm font-extrabold">{compact ? team.shortName : team.name}</p>
                     <p
@@ -72,19 +82,21 @@ export function LeagueTable({
                       PJ {team.stats.played} · DG {formatGoalDifference(diff)}
                     </p>
                   </div>
-                </div>
-                <div className="shrink-0 text-right">
-                  <p className={cn("text-2xl font-extrabold tabular-nums", highlighted ? "text-white" : "text-[#214C9B]")}>
-                    {team.stats.points}
-                  </p>
-                  <p className={cn("text-[10px] font-bold uppercase", highlighted ? "text-white/80" : "text-slate-500")}>
-                    Pts
-                  </p>
+                  <div className="shrink-0 text-right">
+                    <p className={cn("text-2xl font-extrabold tabular-nums", highlighted ? "text-white" : "text-[#214C9B]")}>
+                      {team.stats.points}
+                    </p>
+                    <p className={cn("text-[10px] font-bold uppercase", highlighted ? "text-white/80" : "text-slate-500")}>
+                      Pts
+                    </p>
+                  </div>
                 </div>
               </div>
               <div
                 className={cn(
-                  "mt-3 grid grid-cols-4 gap-2 text-center text-xs font-bold",
+                  "grid grid-cols-4 gap-2 px-3 pb-3 text-center text-xs font-bold",
+                  highlightCellClassName,
+                  rowClassName,
                   highlighted ? "text-white/90" : "text-slate-600",
                 )}
               >
@@ -102,7 +114,13 @@ export function LeagueTable({
                 </span>
               </div>
               {!compact && (
-                <div className="mt-3 flex gap-1">
+                <div
+                  className={cn(
+                    "flex gap-1 px-3 pb-3",
+                    highlightCellClassName,
+                    rowClassName,
+                  )}
+                >
                   {team.form.map((result, index) => (
                     <span
                       key={`${team.id}-${result}-${index}`}
@@ -150,11 +168,16 @@ export function LeagueTable({
               const diff = team.stats.goalsFor - team.stats.goalsAgainst;
               const highlighted = team.id === highlightTeamId;
               const rowClassName = getStandingsHighlightRowClass(highlighted);
+              const highlightCellClassName = getStandingsHighlightCellClass(highlighted);
               const positionClassName = getStandingsHighlightPositionClass(highlighted, team.zone);
+              const dataCellClassName = cn("px-2 py-2.5", highlightCellClassName, rowClassName);
 
               return (
-                <tr key={team.id} className={cn("transition-colors", rowClassName)}>
-                  <td className="px-2 py-2.5 text-center">
+                <tr
+                  key={team.id}
+                  className={cn("transition-colors", highlighted ? "bg-white text-slate-700" : rowClassName)}
+                >
+                  <td className="bg-white px-2 py-2.5 text-center">
                     <span
                       className={cn(
                         "inline-flex h-7 min-w-7 items-center justify-center rounded-lg px-1 text-xs font-extrabold tabular-nums",
@@ -164,7 +187,7 @@ export function LeagueTable({
                       {team.position}
                     </span>
                   </td>
-                  <td className="px-2 py-2.5">
+                  <td className={dataCellClassName}>
                     <div className="flex min-w-0 items-center gap-2">
                       <span
                         className={cn(
@@ -181,13 +204,14 @@ export function LeagueTable({
                   </td>
                   {!compact ? (
                     <>
-                      <td className="px-2 py-2.5 text-center tabular-nums">{team.stats.played}</td>
-                      <td className="px-2 py-2.5 text-center tabular-nums">{team.stats.won}</td>
-                      <td className="px-2 py-2.5 text-center tabular-nums">{team.stats.drawn}</td>
-                      <td className="px-2 py-2.5 text-center tabular-nums">{team.stats.lost}</td>
+                      <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.played}</td>
+                      <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.won}</td>
+                      <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.drawn}</td>
+                      <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.lost}</td>
                       <td
                         className={cn(
-                          "px-2 py-2.5 text-center tabular-nums",
+                          dataCellClassName,
+                          "text-center tabular-nums",
                           highlighted ? "text-white/90" : "text-slate-600",
                         )}
                       >
@@ -196,22 +220,25 @@ export function LeagueTable({
                     </>
                   ) : (
                     <>
-                      <td className="px-2 py-2.5 text-center tabular-nums">{team.stats.won}</td>
-                      <td className="px-2 py-2.5 text-center tabular-nums">{team.stats.drawn}</td>
-                      <td className="px-2 py-2.5 text-center tabular-nums">{team.stats.lost}</td>
+                      <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.won}</td>
+                      <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.drawn}</td>
+                      <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.lost}</td>
                     </>
                   )}
-                  <td className="px-2 py-2.5 text-center font-semibold tabular-nums">{formatGoalDifference(diff)}</td>
+                  <td className={cn(dataCellClassName, "text-center font-semibold tabular-nums")}>
+                    {formatGoalDifference(diff)}
+                  </td>
                   <td
                     className={cn(
-                      "px-2 py-2.5 text-center text-base font-extrabold tabular-nums",
+                      dataCellClassName,
+                      "text-center text-base font-extrabold tabular-nums",
                       highlighted ? "text-white" : "text-[#214C9B]",
                     )}
                   >
                     {team.stats.points}
                   </td>
                   {!compact && (
-                    <td className="px-2 py-2.5">
+                    <td className={dataCellClassName}>
                       <div className="flex justify-center gap-0.5">
                         {team.form.map((result, index) => (
                           <span

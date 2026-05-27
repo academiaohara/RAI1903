@@ -14,12 +14,17 @@ export function getStandingsZonePositionClass(zone: StandingsZone | undefined): 
 }
 
 export function getStandingsHighlightRowClass(highlighted: boolean): string {
-  if (highlighted) return "bg-[#981915] text-white";
+  if (highlighted) return "text-white";
   return "bg-white text-slate-700";
 }
 
-export function getStandingsHighlightPositionClass(highlighted: boolean, zone: StandingsZone | undefined): string {
-  if (highlighted) return "bg-white text-[#981915]";
+/** Granate highlight for table/card cells — never applied to the position column. */
+export function getStandingsHighlightCellClass(highlighted: boolean): string {
+  if (highlighted) return "bg-[#981915]";
+  return "";
+}
+
+export function getStandingsHighlightPositionClass(_highlighted: boolean, zone: StandingsZone | undefined): string {
   return getStandingsZonePositionClass(zone);
 }
 
