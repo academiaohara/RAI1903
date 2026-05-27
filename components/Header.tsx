@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import type { Route } from "next";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
+import { MobileNavDrawer } from "@/components/MobileNavDrawer";
 import { navItems, type NavItem } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 
@@ -93,7 +94,7 @@ export function Header() {
           onClick={() => setOpen((current) => !current)}
           className="ml-auto rounded-full border border-white/40 p-2 text-white lg:hidden"
           aria-expanded={open}
-          aria-label="Abrir navegacion"
+          aria-label={open ? "Cerrar navegacion" : "Abrir navegacion"}
         >
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -137,55 +138,7 @@ export function Header() {
         </div>
       )}
 
-      {open && (
-        <div className="border-t border-white/20 bg-[#173a78] px-4 py-4 shadow-xl lg:hidden">
-          <nav className="mx-auto grid max-w-[1480px] gap-2" aria-label="Navegacion movil">
-            {navItems.map((item) => {
-              const active = isNavActive(pathname, item);
-              const hasChildren = Boolean(item.children?.length);
-              return (
-                <div key={item.href} className="rounded-2xl border border-white/10 bg-white/5 p-1">
-                  <Link
-                    href={item.href as Route}
-                    style={active ? { color: "#214C9B" } : undefined}
-                    onClick={() => setOpen(false)}
-                    className={cn(
-                      "block rounded-xl border border-transparent px-4 py-3 text-sm font-bold uppercase tracking-normal",
-                      active ? "border-white bg-white" : "text-white",
-                    )}
-                  >
-                    {item.label}
-                  </Link>
-                  {hasChildren && (
-                    <div className="flex flex-wrap justify-center gap-2 px-2 pb-2 pt-1">
-                      {item.children!.map((child) => {
-                        const childActive = pathname === child.href || pathname.startsWith(`${child.href}/`);
-                        const Icon = child.icon;
-                        return (
-                          <Link
-                            key={child.href}
-                            href={child.href as Route}
-                            onClick={() => setOpen(false)}
-                            className={cn(
-                              "flex h-[4.25rem] w-[4.25rem] flex-col items-center justify-center gap-1 rounded-[10px] border border-[#d8d8d8] bg-white px-1 py-1.5 text-center shadow-[0_1px_2px_rgba(0,0,0,0.06)]",
-                              childActive ? "border-[#981915] shadow-[0_2px_6px_rgba(152,25,21,0.12)]" : "",
-                            )}
-                          >
-                            <Icon size={18} strokeWidth={2.25} className="shrink-0 text-[#981915]" aria-hidden />
-                            <span className="line-clamp-2 text-[9px] font-semibold leading-tight text-neutral-800">
-                              {child.label}
-                            </span>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </nav>
-        </div>
-      )}
+      <MobileNavDrawer open={open} onClose={() => setOpen(false)} />
     </header>
   );
 }

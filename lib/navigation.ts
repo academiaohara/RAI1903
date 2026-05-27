@@ -103,3 +103,49 @@ export const navItems: NavItem[] = [
     ],
   },
 ];
+
+export type MobileNavSection = {
+  title: string;
+  items: NavChild[];
+};
+
+function navChildren(activePrefix: string) {
+  return navItems.find((item) => item.activePrefix === activePrefix)?.children ?? [];
+}
+
+function navChildrenByHref(href: string) {
+  return navItems.find((item) => item.href === href)?.children ?? [];
+}
+
+/** Secciones del menu hamburguesa (lista vertical compacta). */
+export const mobileNavSections: MobileNavSection[] = [
+  {
+    title: "INICIO",
+    items: [{ href: "/", label: "Inicio", icon: Home }],
+  },
+  {
+    title: "PRIMER EQUIPO",
+    items: navChildren("/primer-equipo/masculino"),
+  },
+  {
+    title: "FEMENINO",
+    items: navChildren("/primer-equipo/femenino"),
+  },
+  {
+    title: "CANTERA",
+    items: navChildrenByHref("/cantera"),
+  },
+  {
+    title: "PRENSA",
+    items: navChildrenByHref("/noticias"),
+  },
+  {
+    title: "APPS",
+    items: [...navChildrenByHref("/quiniela"), ...navChildrenByHref("/contenido-fan")],
+  },
+];
+
+export function isMobileNavItemActive(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
