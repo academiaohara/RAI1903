@@ -187,6 +187,12 @@ a {
   }
 }
 
+.squad-page {
+  --squad-blue: #214c9b;
+  --squad-blue-dark: #173a78;
+  --squad-silver: #e8edf4;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .title-gear-wrap {
     animation: none;
