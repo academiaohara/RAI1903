@@ -1,5 +1,5 @@
-import type { FanMediaLink } from "@/types";
-import { fanPrevia, fanRdp, fanTenteFirme, fanZonaMixta } from "@/data/mock";
+import type { FanMediaLink, FanYouTubeVideo } from "@/types";
+import { fanPrevia, fanRdp, fanTenteFirme, fanZonaMixta, fanZonaMixtaVideos } from "@/data/mock";
 
 export const CONTENIDO_FAN_SLUGS = ["zona-mixta", "previa", "rdp", "tente-firme"] as const;
 
@@ -18,6 +18,7 @@ type ContenidoFanSectionConfig = {
   cardTitle: string;
   cardIntro: string;
   links: FanMediaLink[];
+  videos?: FanYouTubeVideo[];
 };
 
 export const contenidoFanSections: Record<ContenidoFanSlug, ContenidoFanSectionConfig> = {
@@ -30,8 +31,9 @@ export const contenidoFanSections: Record<ContenidoFanSlug, ContenidoFanSectionC
     cardEyebrow: "RAI Radio",
     cardTitle: "Zona Mixta",
     cardIntro:
-      "Espacio semanal de actualidad blanquiazul. Sustituye las URLs por el episodio o playlist concreta cuando quieras destacar uno.",
+      "Espacio semanal de actualidad blanquiazul. El último episodio se reproduce arriba; el resto aparece en el carrusel inferior.",
     links: fanZonaMixta,
+    videos: fanZonaMixtaVideos,
   },
   previa: {
     slug: "previa",
