@@ -1,5 +1,5 @@
 import type { FanMediaLink, FanYouTubeVideo } from "@/types";
-import { fanPrevia, fanRdp, fanTenteFirme, fanZonaMixtaVideos } from "@/data/mock";
+import { fanPreviaVideos, fanRdpVideos, fanTenteFirme, fanZonaMixtaVideos } from "@/data/mock";
 
 export const CONTENIDO_FAN_SLUGS = ["zona-mixta", "previa", "rdp", "tente-firme"] as const;
 
@@ -39,21 +39,20 @@ export const contenidoFanSections: Record<ContenidoFanSlug, ContenidoFanSectionC
     label: "Previa",
     heroTitle: "Previas",
     heroDescription: "Entrevistas y piezas de antes del partido con rivales, entrenadores y claves del duelo.",
-    cardEyebrow: "Antes del partido",
-    cardTitle: "La previa",
-    cardIntro:
-      "Enlaza las previas publicadas en YouTube u otras plataformas. Cada tarjeta puede apuntar a un vídeo concreto de la jornada.",
-    links: fanPrevia,
+    cardTitle: "Previas",
+    cardIntro: "El último vídeo se reproduce arriba; el resto aparece en el carrusel inferior.",
+    links: [],
+    videos: fanPreviaVideos,
   },
   rdp: {
     slug: "rdp",
     label: "RDP",
     heroTitle: "Ruedas de prensa",
     heroDescription: "RDP del Real Avilés Industrial: comparecencias de Lolo Escobar y el cuerpo técnico tras cada jornada.",
-    cardEyebrow: "RDP",
     cardTitle: "Ruedas de prensa",
-    cardIntro: "Añade el enlace de cada rueda de prensa oficial. El formato habitual en el canal es «RDP | …».",
-    links: fanRdp,
+    cardIntro: "El último vídeo se reproduce arriba; el resto aparece en el carrusel inferior.",
+    links: [],
+    videos: fanRdpVideos,
   },
   "tente-firme": {
     slug: "tente-firme",
@@ -75,6 +74,5 @@ export function getContenidoFanTabs() {
     { href: "/contenido-fan/previa", label: "Previa" },
     { href: "/contenido-fan/rdp", label: "RDP" },
     { href: "/contenido-fan/tente-firme", label: "Tente firme" },
-    { href: "/contenido-fan/podcasts", label: "Podcasts" },
   ];
 }
