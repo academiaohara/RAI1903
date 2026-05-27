@@ -47,23 +47,34 @@ export function actualOutcome(match: Match): PredictionOutcome | null {
   return "2";
 }
 
+export function areGoalsPredictionCorrect(match: Match, prediction: Prediction): boolean {
+  if (prediction.goalsHome === undefined || prediction.goalsAway === undefined) return false;
+  if (match.homeScore === undefined || match.awayScore === undefined) return false;
+
+  const predictedHome = goalsPickToNumber(prediction.goalsHome);
+  const predictedAway = goalsPickToNumber(prediction.goalsAway);
+  const actualHome = match.homeScore >= 3 ? 3 : match.homeScore;
+  const actualAway = match.awayScore >= 3 ? 3 : match.awayScore;
+  return predictedHome === actualHome && predictedAway === actualAway;
+}
+
 export function scorePredictionPoints(match: Match, prediction?: Prediction): number {
   const outcome = actualOutcome(match);
   if (!outcome || !prediction?.outcome) return 0;
 
-  let points = prediction.outcome === outcome ? 1 : 0;
-
-  if (isAvilesMatch(match) && prediction.goalsHome !== undefined && prediction.goalsAway !== undefined && match.homeScore !== undefined && match.awayScore !== undefined) {
-    const predictedHome = goalsPickToNumber(prediction.goalsHome);
-    const predictedAway = goalsPickToNumber(prediction.goalsAway);
-    const actualHome = match.homeScore >= 3 ? 3 : match.homeScore;
-    const actualAway = match.awayScore >= 3 ? 3 : match.awayScore;
-    if (predictedHome === actualHome && predictedAway === actualAway) {
-      points += 2;
-    }
+  if (isAvilesMatch(match)) {
+    const outcomeCorrect = prediction.outcome === outcome;
+    const goalsCorrect = areGoalsPredictionCorrect(match, prediction);
+    if (outcomeCorrect && goalsCorrect) return 2;
+    if (outcomeCorrect || goalsCorrect) return 1;
+    return 0;
   }
 
-  return points;
+  return prediction.outcome === outcome ? 1 : 0;
+}
+
+export function sortQuinielaMatches(matches: Match[]): Match[] {
+  return [...matches].sort((a, b) => Number(isAvilesMatch(a)) - Number(isAvilesMatch(b)));
 }
 
 export function isMatchdayComplete(matchday: Matchday, predictions: Record<string, Prediction>): boolean {

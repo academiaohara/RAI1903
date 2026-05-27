@@ -12,6 +12,7 @@ import {
   hasFirstMatchStarted,
   isMatchdayComplete,
   QUINIELA_TABS,
+  sortQuinielaMatches,
 } from "@/lib/quiniela";
 import { loadPredictions, loadSavedRounds, savePredictions, saveRoundAsSaved } from "@/lib/storage";
 import type { Prediction } from "@/types";
@@ -33,6 +34,10 @@ export default function MiQuinielaPage() {
   }, []);
 
   const selectedMatchday = useMemo(() => getMatchdayByRound(round), [round]);
+  const orderedMatches = useMemo(
+    () => sortQuinielaMatches(selectedMatchday.matches),
+    [selectedMatchday.matches],
+  );
   const isSaved = Boolean(savedRounds[round]);
   const isLocked = hasFirstMatchStarted(selectedMatchday);
   const readOnly = isLocked || (isSaved && !isEditing);
@@ -98,7 +103,7 @@ export default function MiQuinielaPage() {
 
       <Card eyebrow={`Jornada ${selectedMatchday.round}`}>
         <div className="space-y-4">
-          {selectedMatchday.matches.map((match) => (
+          {orderedMatches.map((match) => (
             <PredictionForm
               key={match.id}
               match={match}
