@@ -1,10 +1,11 @@
 "use client";
 
+import { sortNewsByDate } from "@/lib/noticias";
 import { formatDate } from "@/lib/utils";
 import type { NewsItem } from "@/types";
 
 export function NewsTicker({ items }: { items: NewsItem[] }) {
-  const loop = [...items, ...items];
+  const loop = [...sortNewsByDate(items), ...sortNewsByDate(items)];
 
   return (
     <div className="news-ticker overflow-hidden py-1">

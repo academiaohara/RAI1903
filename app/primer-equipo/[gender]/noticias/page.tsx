@@ -5,6 +5,7 @@ import { Card } from "@/components/Card";
 import { NewsCard } from "@/components/NewsCard";
 import { PrimerEquipoPageHero } from "@/components/PrimerEquipoPageHero";
 import { newsItems } from "@/data/mock";
+import { sortNewsByDate } from "@/lib/noticias";
 import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { NewsCategory, NewsTag } from "@/types";
 
@@ -20,7 +21,7 @@ const newsCategoryTags: Record<NewsCategory, NewsTag> = {
 export default function PrimerEquipoNoticiasPage({ params }: { params: Promise<{ gender: string }> }) {
   const { gender } = use(params) as { gender: PrimerEquipoGender };
   const [category, setCategory] = useState<NewsCategory>("Fichajes");
-  const categoryNews = newsItems.filter((item) => item.tags.includes(newsCategoryTags[category]));
+  const categoryNews = sortNewsByDate(newsItems.filter((item) => item.tags.includes(newsCategoryTags[category])));
 
   return (
     <>
