@@ -1,13 +1,11 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Archive,
-  BarChart3,
   CalendarCheck2,
   CalendarDays,
   ClipboardList,
   FileText,
-  GitCompare,
-  History,
+  Headphones,
   Home,
   Medal,
   Megaphone,
@@ -18,6 +16,7 @@ import {
   Target,
   Trophy,
   Users,
+  Video,
 } from "lucide-react";
 
 export type NavChild = {
@@ -94,13 +93,12 @@ export const navItems: NavItem[] = [
     ],
   },
   {
-    href: "/data-hub",
-    label: "Data Hub",
-    icon: BarChart3,
+    href: "/contenido-fan",
+    label: "Contenido fan",
+    icon: Video,
     children: [
-      { href: "/data-hub/generales", label: "Generales", icon: BarChart3 },
-      { href: "/data-hub/comparativas", label: "Comparativas", icon: GitCompare },
-      { href: "/data-hub/historial", label: "Historial", icon: History },
+      { href: "/contenido-fan/youtube", label: "YouTube", icon: Video },
+      { href: "/contenido-fan/podcasts", label: "Podcasts", icon: Headphones },
     ],
   },
 ];
