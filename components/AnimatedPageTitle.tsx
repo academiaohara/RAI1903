@@ -15,11 +15,11 @@ export function AnimatedPageTitle({ title, className }: AnimatedPageTitleProps) 
   const rightClipId = `${baseId}-gear-right`;
 
   return (
-    <div className="page-title-gear inline-flex max-w-full items-center">
+    <div className="page-title-gear inline-flex max-w-full items-center text-5xl leading-none text-[#214C9B] sm:text-6xl">
       <GearAdornoHalf side="left" clipId={leftClipId} />
       <h1
         className={cn(
-          "page-title-gear-text min-w-0 overflow-hidden whitespace-nowrap text-5xl font-extrabold uppercase leading-none text-[#214C9B] sm:text-6xl",
+          "page-title-gear-text min-w-0 overflow-hidden whitespace-nowrap font-extrabold uppercase",
           className,
         )}
       >
