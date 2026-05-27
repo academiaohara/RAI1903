@@ -12,7 +12,22 @@ type PlayerTableProps = {
   onSelect: (player: SquadPlayer) => void;
 };
 
-const columns = ["Jugador", "Pos.", "Edad", "PJ", "G", "A", "TA", "TR", "Contrato"] as const;
+const columns = [
+  { label: "Jugador", align: "left" as const },
+  { label: "Pos.", align: "center" as const },
+  { label: "Edad", align: "center" as const },
+  { label: "PJ", align: "center" as const },
+  { label: "G", align: "center" as const },
+  { label: "A", align: "center" as const },
+  { label: "TA", align: "center" as const },
+  { label: "TR", align: "center" as const },
+  { label: "Contrato", align: "center" as const },
+];
+
+const alignClass = {
+  left: "text-left",
+  center: "text-center",
+};
 
 export function PlayerTable({ players, onSelect }: PlayerTableProps) {
   const grouped = groupPlayersByPosition(players);
@@ -27,13 +42,25 @@ export function PlayerTable({ players, onSelect }: PlayerTableProps) {
           <PositionSection key={position} position={position} delay={sectionIndex * 0.04}>
             <div className="overflow-hidden rounded-[1.5rem] border border-[#214C9B]/12 bg-white shadow-[0_16px_40px_rgba(17,24,39,0.05)]">
               <div className="hidden overflow-x-auto md:block">
-                <table className="w-full min-w-[760px] border-collapse text-left">
+                <table className="w-full min-w-[760px] table-fixed border-collapse">
+                  <colgroup>
+                    <col className="w-14" />
+                    <col />
+                    <col className="w-16" />
+                    <col className="w-14" />
+                    <col className="w-12" />
+                    <col className="w-12" />
+                    <col className="w-12" />
+                    <col className="w-12" />
+                    <col className="w-12" />
+                    <col className="w-16" />
+                  </colgroup>
                   <thead>
                     <tr className="border-b border-slate-100 bg-slate-50/90 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                      <th className="px-5 py-4">#</th>
+                      <th className={`px-5 py-4 ${alignClass.center}`}>#</th>
                       {columns.map((col) => (
-                        <th key={col} className="px-4 py-4">
-                          {col}
+                        <th key={col.label} className={`px-4 py-4 ${alignClass[col.align]}`}>
+                          {col.label}
                         </th>
                       ))}
                     </tr>
@@ -76,24 +103,26 @@ function PlayerRow({
       onClick={() => onSelect(player)}
       className="group cursor-pointer border-b border-slate-50 text-sm transition last:border-0 hover:bg-blue-50/60"
     >
-      <td className="px-5 py-4 font-extrabold tabular-nums text-[#214C9B]">{player.dorsal}</td>
-      <td className="px-4 py-4">
+      <td className={`px-5 py-4 font-extrabold tabular-nums text-[#214C9B] ${alignClass.center}`}>{player.dorsal}</td>
+      <td className={`px-4 py-4 ${alignClass.left}`}>
         <div className="flex items-center gap-3">
-          <PlayerAvatar player={player} size="sm" className="rounded-xl" />
-          <div>
-            <p className="font-extrabold uppercase text-slate-900">{getPlayerFullName(player)}</p>
-            <p className="text-xs font-semibold text-slate-500">{player.nacionalidad}</p>
+          <PlayerAvatar player={player} size="sm" className="shrink-0 rounded-xl" />
+          <div className="min-w-0">
+            <p className="truncate font-extrabold uppercase text-slate-900">{getPlayerFullName(player)}</p>
+            <p className="truncate text-xs font-semibold text-slate-500">{player.nacionalidad}</p>
           </div>
         </div>
       </td>
-      <td className="px-4 py-4 font-semibold text-slate-600">{player.posicion}</td>
-      <td className="px-4 py-4 tabular-nums text-slate-700">{player.edad}</td>
+      <td className={`px-4 py-4 font-semibold text-slate-600 ${alignClass.center}`}>{player.posicion}</td>
+      <td className={`px-4 py-4 tabular-nums text-slate-700 ${alignClass.center}`}>{player.edad}</td>
       <StatCell value={player.partidos} />
       <StatCell value={player.goles} highlight={player.goles > 0} />
       <StatCell value={player.asistencias} highlight={player.asistencias > 0} />
       <StatCell value={player.amarillas} warn={player.amarillas > 0} />
       <StatCell value={player.rojas} warn={player.rojas > 0} />
-      <td className="px-4 py-4 text-xs font-bold uppercase text-slate-500">{formatContractDate(player.contratoHasta)}</td>
+      <td className={`px-4 py-4 text-xs font-bold tabular-nums text-slate-500 ${alignClass.center}`}>
+        {formatContractDate(player.contratoHasta)}
+      </td>
     </motion.tr>
   );
 }

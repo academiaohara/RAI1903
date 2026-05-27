@@ -44,8 +44,7 @@ export function filterSquadPlayers(
 }
 
 export function formatContractDate(isoDate: string): string {
-  const date = new Date(isoDate);
-  return date.toLocaleDateString("es-ES", { month: "short", year: "numeric" });
+  return isoDate.slice(0, 4);
 }
 
 export function formatBirthDate(isoDate: string): string {
