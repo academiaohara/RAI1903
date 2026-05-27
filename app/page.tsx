@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Users } from "lucide-react";
 import { Card } from "@/components/Card";
 import { LeagueTableCard } from "@/components/LeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
@@ -59,7 +59,19 @@ export default function HomePage() {
 
       <section className="grid gap-6 xl:grid-cols-[1fr_0.42fr]">
         <LeagueTableCard eyebrow="Estado competitivo" title="Clasificacion" teams={teams} highlightTeamId={RAI_TEAM_ID} compact />
-        <Card eyebrow="Jugadores destacados" title="Stats de plantilla">
+        <Card
+          eyebrow="Jugadores destacados"
+          title="Stats de plantilla"
+          action={
+            <Link
+              href={`${primerEquipoBase("masculino")}/plantilla` as Route}
+              className="inline-flex items-center justify-center rounded-2xl border border-[#214C9B]/20 p-2 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
+              aria-label="Ir a plantilla"
+            >
+              <Users size={16} />
+            </Link>
+          }
+        >
           <ul className="space-y-3">
             {statHighlights.map((item) => {
               const value = "fixedValue" in item ? item.fixedValue : item.player.stats[item.valueKey];
