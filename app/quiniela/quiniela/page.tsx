@@ -96,7 +96,7 @@ export default function MiQuinielaPage() {
         </p>
       )}
 
-      <Card eyebrow={`Jornada ${selectedMatchday.round}`} title="Mi quiniela">
+      <Card eyebrow={`Jornada ${selectedMatchday.round}`}>
         <div className="space-y-4">
           {selectedMatchday.matches.map((match) => (
             <PredictionForm
