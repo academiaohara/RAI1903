@@ -102,39 +102,40 @@ export function Header() {
 
       {hoveredNav?.children && (
         <div
-          className="hidden border-t border-neutral-300/70 bg-[#e8eaee] lg:block"
+          className="fixed inset-x-0 top-16 z-[999] hidden border-b-[3px] border-[var(--rai-red)] bg-[#f9f9f9] shadow-[0_10px_20px_rgba(0,0,0,0.15)] sm:top-20 lg:block"
           onMouseEnter={clearCloseTimer}
           onMouseLeave={scheduleClose}
         >
-          <div className="mx-auto flex max-w-[1480px] justify-center px-4 py-2.5 sm:px-6 lg:px-8">
-            <nav
-              className="flex flex-wrap items-center justify-center gap-2"
-              aria-label={`Subsecciones de ${hoveredNav.label}`}
-            >
-              {hoveredNav.children.map((child) => {
-                const childActive = pathname === child.href || pathname.startsWith(`${child.href}/`);
-                const Icon = child.icon;
-                return (
-                  <Link
-                    key={child.href}
-                    href={child.href as Route}
-                    aria-current={childActive ? "page" : undefined}
-                    className={cn(
-                      "flex h-[4.25rem] w-[4.25rem] flex-col items-center justify-center gap-1 rounded-[10px] border border-[#d8d8d8] bg-white px-1 py-1.5 text-center shadow-[0_1px_2px_rgba(0,0,0,0.06)] transition",
-                      childActive
-                        ? "border-[#981915] shadow-[0_2px_6px_rgba(152,25,21,0.12)]"
-                        : "hover:border-[#981915]/50 hover:shadow-[0_2px_4px_rgba(0,0,0,0.08)]",
-                    )}
-                  >
-                    <Icon size={18} strokeWidth={2.25} className="shrink-0 text-[#981915]" aria-hidden />
-                    <span className="line-clamp-2 text-[9px] font-semibold leading-tight text-neutral-800">
-                      {child.label}
-                    </span>
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
+          <nav
+            className="mx-auto grid max-w-[1200px] grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-6 px-8 py-10"
+            aria-label={`Subsecciones de ${hoveredNav.label}`}
+          >
+            {hoveredNav.children.map((child) => {
+              const childActive = pathname === child.href || pathname.startsWith(`${child.href}/`);
+              const Icon = child.icon;
+              return (
+                <Link
+                  key={child.href}
+                  href={child.href as Route}
+                  aria-current={childActive ? "page" : undefined}
+                  className={cn(
+                    "group flex flex-col items-center justify-center rounded-xl border border-[#e0e0e0] bg-white px-4 py-6 text-center text-[0.95rem] font-medium text-[#444] transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]",
+                    childActive
+                      ? "border-[var(--rai-red)] shadow-[0_4px_12px_rgba(152,25,21,0.15)]"
+                      : "hover:-translate-y-0.5 hover:border-[var(--rai-red)]/40 hover:shadow-[0_6px_16px_rgba(0,0,0,0.08)]",
+                  )}
+                >
+                  <Icon
+                    size={40}
+                    strokeWidth={2}
+                    className="mb-3 h-10 w-10 shrink-0 text-[var(--rai-red)] transition-transform duration-300 group-hover:scale-105"
+                    aria-hidden
+                  />
+                  <span className="line-clamp-2 leading-snug">{child.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
         </div>
       )}
 
