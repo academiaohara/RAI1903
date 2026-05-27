@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight, Users } from "lucide-react";
+import { CalendarNavButton } from "@/components/CalendarNavButton";
 import { Card } from "@/components/Card";
 import { LeagueTableCard } from "@/components/LeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
@@ -95,7 +96,11 @@ export default function HomePage() {
         <Card eyebrow="Resultados" title="Ultimos 5 partidos">
           <div className="space-y-3">{latestMatches.map((match) => <RecentMatchCard key={match.id} match={match} />)}</div>
         </Card>
-        <Card eyebrow="Calendario" title="Proximos 5 partidos">
+        <Card
+          eyebrow="Calendario"
+          title="Proximos 5 partidos"
+          action={<CalendarNavButton href={`${primerEquipoBase("masculino")}/calendario` as Route} />}
+        >
           <div className="space-y-3">{upcomingMatches.map((match) => <MatchCard key={match.id} match={match} />)}</div>
         </Card>
       </section>
@@ -106,9 +111,12 @@ export default function HomePage() {
             <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">Resultados</p>
             <h2 className="text-3xl font-extrabold uppercase text-[#214C9B]">Ultimos 5 partidos</h2>
           </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">Calendario</p>
-            <h2 className="text-3xl font-extrabold uppercase text-[#214C9B]">Proximos 5 partidos</h2>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">Calendario</p>
+              <h2 className="text-3xl font-extrabold uppercase text-[#214C9B]">Proximos 5 partidos</h2>
+            </div>
+            <CalendarNavButton href={`${primerEquipoBase("masculino")}/calendario` as Route} />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">

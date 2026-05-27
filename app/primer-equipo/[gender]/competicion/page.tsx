@@ -1,3 +1,4 @@
+import { CalendarNavButton } from "@/components/CalendarNavButton";
 import { Card } from "@/components/Card";
 import { LeagueTableCard } from "@/components/LeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
@@ -5,7 +6,8 @@ import { PrimerEquipoPageHero } from "@/components/PrimerEquipoPageHero";
 import { RivalCard } from "@/components/RivalCard";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import { getTeamsByGender, getUpcomingAvilesMatchesByGender } from "@/lib/fixtures";
-import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
+import { genderLabels, primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
+import type { Route } from "next";
 
 export default async function PrimerEquipoCompeticionPage({ params }: { params: Promise<{ gender: PrimerEquipoGender }> }) {
   const { gender } = await params;
@@ -22,7 +24,11 @@ export default async function PrimerEquipoCompeticionPage({ params }: { params: 
 
       <section className="grid gap-6 xl:grid-cols-[1fr_0.85fr]">
         <LeagueTableCard teams={teams} highlightTeamId={highlightTeamId} />
-        <Card>
+        <Card
+          eyebrow="Calendario"
+          title="Proximos partidos"
+          action={<CalendarNavButton href={`${primerEquipoBase(gender)}/calendario` as Route} />}
+        >
           <div className="space-y-3">{upcoming.map((match) => <MatchCard key={match.id} match={match} />)}</div>
         </Card>
         <Card className="xl:col-span-2">

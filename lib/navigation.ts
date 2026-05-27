@@ -3,6 +3,7 @@ import {
   Archive,
   BarChart3,
   CalendarCheck2,
+  CalendarDays,
   ClipboardList,
   FileText,
   GitCompare,
@@ -41,6 +42,7 @@ export const navItems: NavItem[] = [
     children: [
       { href: "/primer-equipo/masculino/plantilla", label: "Plantilla", icon: Users },
       { href: "/primer-equipo/masculino/competicion", label: "Competicion", icon: Trophy },
+      { href: "/primer-equipo/masculino/calendario", label: "Calendario", icon: CalendarDays },
       { href: "/primer-equipo/masculino/cronicas", label: "Cronicas", icon: FileText },
       { href: "/primer-equipo/masculino/previas", label: "Previas", icon: Target },
       { href: "/primer-equipo/masculino/noticias", label: "Noticias", icon: Newspaper },
