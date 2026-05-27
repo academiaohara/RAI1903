@@ -1,17 +1,49 @@
-import { BarChart3, CalendarCheck2, Home, Newspaper, Shield, Trophy } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import {
+  Archive,
+  BarChart3,
+  CalendarCheck2,
+  ClipboardList,
+  FileText,
+  GitCompare,
+  History,
+  Home,
+  Medal,
+  Megaphone,
+  Newspaper,
+  Radio,
+  Shield,
+  Swords,
+  Target,
+  Trophy,
+  Users,
+} from "lucide-react";
 
-export const navItems = [
+export type NavChild = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+};
+
+export type NavItem = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  children?: NavChild[];
+};
+
+export const navItems: NavItem[] = [
   { href: "/", label: "Inicio", icon: Home },
   {
     href: "/primer-equipo",
     label: "Primer Equipo",
     icon: Shield,
     children: [
-      { href: "/primer-equipo/masculino/plantilla", label: "Plantilla" },
-      { href: "/primer-equipo/masculino/competicion", label: "Competicion" },
-      { href: "/primer-equipo/masculino/cronicas", label: "Cronicas" },
-      { href: "/primer-equipo/masculino/previas", label: "Previas" },
-      { href: "/primer-equipo/masculino/noticias", label: "Noticias" },
+      { href: "/primer-equipo/masculino/plantilla", label: "Plantilla", icon: Users },
+      { href: "/primer-equipo/masculino/competicion", label: "Competicion", icon: Trophy },
+      { href: "/primer-equipo/masculino/cronicas", label: "Cronicas", icon: FileText },
+      { href: "/primer-equipo/masculino/previas", label: "Previas", icon: Target },
+      { href: "/primer-equipo/masculino/noticias", label: "Noticias", icon: Newspaper },
     ],
   },
   {
@@ -19,8 +51,8 @@ export const navItems = [
     label: "Cantera",
     icon: Trophy,
     children: [
-      { href: "/cantera/filial", label: "Filial" },
-      { href: "/cantera/juvenil-a", label: "Juvenil A" },
+      { href: "/cantera/filial", label: "Filial", icon: Users },
+      { href: "/cantera/juvenil-a", label: "Juvenil A", icon: Medal },
     ],
   },
   {
@@ -28,9 +60,9 @@ export const navItems = [
     label: "Quiniela",
     icon: CalendarCheck2,
     children: [
-      { href: "/quiniela/pronosticos", label: "Pronosticos" },
-      { href: "/quiniela/resultado", label: "Resultado" },
-      { href: "/quiniela/ranking", label: "Ranking" },
+      { href: "/quiniela/pronosticos", label: "Pronosticos", icon: ClipboardList },
+      { href: "/quiniela/resultado", label: "Resultado", icon: Swords },
+      { href: "/quiniela/ranking", label: "Ranking", icon: Medal },
     ],
   },
   {
@@ -38,9 +70,9 @@ export const navItems = [
     label: "Prensa",
     icon: Newspaper,
     children: [
-      { href: "/prensa/noticias-externas", label: "Noticias externas" },
-      { href: "/prensa/medios", label: "Medios" },
-      { href: "/prensa/archivo", label: "Archivo" },
+      { href: "/prensa/noticias-externas", label: "Noticias externas", icon: Radio },
+      { href: "/prensa/medios", label: "Medios", icon: Megaphone },
+      { href: "/prensa/archivo", label: "Archivo", icon: Archive },
     ],
   },
   {
@@ -48,9 +80,9 @@ export const navItems = [
     label: "Data Hub",
     icon: BarChart3,
     children: [
-      { href: "/data-hub/generales", label: "Generales" },
-      { href: "/data-hub/comparativas", label: "Comparativas" },
-      { href: "/data-hub/historial", label: "Historial" },
+      { href: "/data-hub/generales", label: "Generales", icon: BarChart3 },
+      { href: "/data-hub/comparativas", label: "Comparativas", icon: GitCompare },
+      { href: "/data-hub/historial", label: "Historial", icon: History },
     ],
   },
-] as const;
+];

@@ -25,7 +25,6 @@ export default function PrimerEquipoNoticiasPage({ params }: { params: Promise<{
   return (
     <>
       <PrimerEquipoPageHero
-        gender={gender}
         title="Noticias"
         description={`Actualidad del primer equipo ${genderLabels[gender].club.toLowerCase()} filtrada por categorias mock.`}
       />

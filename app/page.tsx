@@ -79,13 +79,38 @@ export default function HomePage() {
         </Card>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-2">
+      <section className="grid gap-6 xl:hidden">
         <Card eyebrow="Resultados" title="Ultimos 5 partidos">
           <div className="space-y-3">{latestMatches.map((match) => <RecentMatchCard key={match.id} match={match} />)}</div>
         </Card>
         <Card eyebrow="Calendario" title="Proximos 5 partidos">
           <div className="space-y-3">{upcomingMatches.map((match) => <MatchCard key={match.id} match={match} />)}</div>
         </Card>
+      </section>
+
+      <section className="hidden space-y-4 xl:block">
+        <div className="grid grid-cols-2 gap-6">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">Resultados</p>
+            <h2 className="text-3xl font-extrabold uppercase text-[#214C9B]">Ultimos 5 partidos</h2>
+          </div>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">Calendario</p>
+            <h2 className="text-3xl font-extrabold uppercase text-[#214C9B]">Proximos 5 partidos</h2>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {latestMatches.map((match, index) =>
+            upcomingMatches[index] ? (
+              <div key={match.id} className="contents">
+                <RecentMatchCard match={match} />
+                <MatchCard match={upcomingMatches[index]} />
+              </div>
+            ) : (
+              <RecentMatchCard key={match.id} match={match} />
+            ),
+          )}
+        </div>
       </section>
     </div>
   );

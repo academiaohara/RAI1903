@@ -14,7 +14,7 @@ export default async function PreviaDetailPage({ params }: { params: Promise<{ g
 
   return (
     <>
-      <PrimerEquipoPageHero gender={gender} title="Previa" description="Analisis completo del proximo duelo." />
+      <PrimerEquipoPageHero title="Previa" description="Analisis completo del proximo duelo." />
       <div className="rounded-[2rem] border border-[#214C9B]/20 bg-white p-6 shadow-[0_12px_30px_rgba(17,24,39,0.06)] sm:p-8">
         <MatchArticleContent article={article} />
       </div>

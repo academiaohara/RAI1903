@@ -12,7 +12,7 @@ export default async function CronicasPage({ params }: { params: Promise<{ gende
 
   return (
     <>
-      <PrimerEquipoPageHero gender={gender} title="Cronicas" description="Resumenes de partidos disputados con lectura tactica y sensaciones del vestuario." />
+      <PrimerEquipoPageHero title="Cronicas" description="Resumenes de partidos disputados con lectura tactica y sensaciones del vestuario." />
 
       <Card>
         <div className="space-y-3">
