@@ -38,6 +38,28 @@ export function getAvilesGoalsPick(match: Match, prediction: Prediction): GoalsP
   return match.homeTeamId === RAI_TEAM_ID ? prediction.goalsHome : prediction.goalsAway;
 }
 
+/** 1/X/2 derivado de los goles elegidos; null si faltan datos o ambos son M. */
+export function outcomeFromGoalsPicks(
+  goalsHome: GoalsPick | undefined,
+  goalsAway: GoalsPick | undefined,
+): PredictionOutcome | null {
+  if (goalsHome === undefined || goalsAway === undefined) return null;
+  if (goalsHome === "M" && goalsAway === "M") return null;
+
+  const home = goalsPickToNumber(goalsHome);
+  const away = goalsPickToNumber(goalsAway);
+  if (home > away) return "1";
+  if (home < away) return "2";
+  return "X";
+}
+
+export function isOutcomeLockedByGoals(
+  goalsHome: GoalsPick | undefined,
+  goalsAway: GoalsPick | undefined,
+): boolean {
+  return outcomeFromGoalsPicks(goalsHome, goalsAway) !== null;
+}
+
 export function getAvilesScore(match: Match): number | null {
   if (!isAvilesMatch(match) || match.homeScore === undefined || match.awayScore === undefined) {
     return null;
@@ -109,7 +131,11 @@ export function isMatchdayComplete(matchday: Matchday, predictions: Record<strin
     const prediction = predictions[match.id];
     if (!prediction?.outcome) return false;
     if (!isAvilesMatch(match)) return true;
-    return prediction.goalsHome !== undefined && prediction.goalsAway !== undefined && prediction.scorer !== undefined;
+    if (prediction.goalsHome === undefined || prediction.goalsAway === undefined) return false;
+    if (!prediction.outcome) return false;
+    const avilesGoals = getAvilesGoalsPick(match, prediction);
+    if (avilesGoals === 0) return prediction.scorer === "nadie";
+    return Boolean(prediction.scorer && prediction.scorer !== "nadie");
   });
 }
 
