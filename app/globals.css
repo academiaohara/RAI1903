@@ -105,6 +105,11 @@ a {
   overflow: hidden;
 }
 
+.page-title-gear-icon,
+.page-title-gear-text {
+  background: transparent;
+}
+
 .page-title-gear-text {
   animation: page-title-text-reveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   opacity: 0.35;
@@ -138,11 +143,11 @@ a {
 @keyframes page-title-gear-left {
   from {
     opacity: 0;
-    transform: translate(-70%, -50%) scale(0.88);
+    transform: translateX(-18%) scale(0.88);
   }
   to {
     opacity: 1;
-    transform: translate(-46%, -50%) scale(1);
+    transform: translateX(0) scale(1);
   }
 }
 
@@ -162,6 +167,6 @@ a {
   .page-title-gear-left {
     animation: none;
     opacity: 1;
-    transform: translate(-46%, -50%);
+    transform: none;
   }
 }
