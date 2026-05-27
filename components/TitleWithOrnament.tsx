@@ -13,6 +13,7 @@ type TitleWithOrnamentProps = {
   as?: ElementType;
   animated?: boolean;
   className?: string;
+  wrapperClassName?: string;
 };
 
 export function TitleWithOrnament({
@@ -20,6 +21,7 @@ export function TitleWithOrnament({
   as: Tag = "h1",
   animated = false,
   className,
+  wrapperClassName,
 }: TitleWithOrnamentProps) {
   const cutoutId = `title-gear-cutout-${useId().replaceAll(":", "")}`;
   const startsWithC = /^c/i.test(title.trim());
@@ -29,6 +31,7 @@ export function TitleWithOrnament({
       className={cn(
         "title-gear inline-flex max-w-full items-center overflow-visible bg-transparent",
         pageTitleClass,
+        wrapperClassName,
       )}
     >
       <div
