@@ -95,6 +95,23 @@ a {
   margin-left: -1.07em;
 }
 
+@media (max-width: 639px) {
+  .title-gear-rai-home .-ml-\[0\.74em\],
+  .title-gear-rai-home .-ml-\[0\.79em\] {
+    margin-left: -1.4em;
+  }
+
+  .title-gear-rai-home h1,
+  .title-gear-rai-home h2,
+  .title-gear-rai-home h3,
+  .title-gear-rai-home h4,
+  .title-gear-rai-home h5,
+  .title-gear-rai-home h6 {
+    font-size: 24px;
+    font-weight: inherit;
+  }
+}
+
 .news-ticker-item {
   transition:
     background-color 0.2s ease,
