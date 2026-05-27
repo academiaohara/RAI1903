@@ -1,6 +1,6 @@
 import { matchdays, RAI_FEM_TEAM_ID, RAI_TEAM_ID, teams, teamsFemenino } from "@/data/mock";
-import type { Match, ResultCode, Team } from "@/types";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import type { Match, ResultCode, Team } from "@/types";
 
 export const getTeam = (teamId: string): Team | undefined => teams.find((team) => team.id === teamId);
 

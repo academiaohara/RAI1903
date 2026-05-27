@@ -1,4 +1,4 @@
-import type { ResultCode } from "@/types";
+import type { FormCode, ResultCode } from "@/types";
 
 export const cn = (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(" ");
 
@@ -19,10 +19,12 @@ export const formatMatchDate = (date: string) =>
     minute: "2-digit",
   }).format(new Date(date));
 
-export const resultTone = (result: ResultCode) => {
-  if (result === "W") return "bg-emerald-400 text-emerald-950";
-  if (result === "D") return "bg-amber-300 text-amber-950";
+export const resultTone = (result: ResultCode | FormCode) => {
+  if (result === "W" || result === "G") return "bg-emerald-500 text-white";
+  if (result === "D" || result === "E") return "bg-orange-400 text-orange-950";
   return "bg-rose-500 text-white";
 };
+
+export const formatGoalDifference = (value: number) => (value > 0 ? `+${value}` : `${value}`);
 
 export const pluralize = (count: number, singular: string, plural = `${singular}s`) => `${count} ${count === 1 ? singular : plural}`;

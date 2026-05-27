@@ -1,5 +1,6 @@
 import { Badge } from "@/components/Badge";
 import { RAI_TEAM_ID } from "@/data/mock";
+import { matchFixtureMeta } from "@/lib/competition-labels";
 import { matchFixtureCardClassName } from "@/lib/match-card-styles";
 import { formatMatchDate } from "@/lib/utils";
 import type { Match } from "@/types";
@@ -11,11 +12,10 @@ export function MatchCard({ match, compact = false }: { match: Match; compact?: 
   return (
     <article className={matchFixtureCardClassName}>
       <div className="mb-3 flex items-start justify-between gap-3">
-        <div className="min-w-0 space-y-1">
-          <Badge tone={match.status === "finished" ? "slate" : "blue"}>{match.status === "finished" ? "Finalizado" : "Programado"}</Badge>
-          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#981915]">{match.competition}</p>
-        </div>
-        <span className="shrink-0 text-xs font-bold uppercase tracking-[0.08em] text-slate-500">J{match.matchday}</span>
+        <Badge tone={match.status === "finished" ? "slate" : "blue"}>{match.status === "finished" ? "Finalizado" : "Programado"}</Badge>
+        <span className="shrink-0 text-right text-[11px] font-bold uppercase leading-tight tracking-[0.06em] text-[#981915]">
+          {matchFixtureMeta(match)}
+        </span>
       </div>
       <div className="mt-auto grid grid-cols-[1fr_auto_1fr] items-center gap-3">
         <p className={`text-sm font-extrabold leading-snug ${avilesHome ? "text-[#214C9B]" : "text-slate-700"}`}>{match.homeTeam}</p>

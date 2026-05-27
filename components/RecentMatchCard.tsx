@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Badge } from "@/components/Badge";
+import { matchFixtureMeta } from "@/lib/competition-labels";
 import { getCronicaForMatch } from "@/lib/match-articles";
 import { getAvilesMatchResult } from "@/lib/fixtures";
 import { matchFixtureCardClassName } from "@/lib/match-card-styles";
@@ -25,13 +26,12 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
   return (
     <Link href={href} className={matchFixtureCardClassName}>
       <div className="mb-3 flex items-start justify-between gap-3">
-        <div className="min-w-0 space-y-1">
-          <Badge tone={result === "W" ? "green" : result === "D" ? "amber" : result === "L" ? "red" : "slate"}>
-            {result === "W" ? "Victoria" : result === "D" ? "Empate" : result === "L" ? "Derrota" : "Finalizado"}
-          </Badge>
-          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#981915]">{match.competition}</p>
-        </div>
-        <span className="shrink-0 text-xs font-bold uppercase tracking-[0.08em] text-slate-600">J{match.matchday}</span>
+        <Badge tone={result === "W" ? "green" : result === "D" ? "amber" : result === "L" ? "red" : "slate"}>
+          {result === "W" ? "Victoria" : result === "D" ? "Empate" : result === "L" ? "Derrota" : "Finalizado"}
+        </Badge>
+        <span className="shrink-0 text-right text-[11px] font-bold uppercase leading-tight tracking-[0.06em] text-[#981915]">
+          {matchFixtureMeta(match)}
+        </span>
       </div>
       <div className="mt-auto grid grid-cols-[1fr_auto_1fr] items-center gap-3">
         <p className={`text-sm font-extrabold leading-snug ${avilesHome ? "text-[#214C9B]" : "text-slate-800"}`}>{match.homeTeam}</p>

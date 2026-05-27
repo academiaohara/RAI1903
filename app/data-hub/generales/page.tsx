@@ -3,7 +3,8 @@ import { Card } from "@/components/Card";
 import { LeagueTable } from "@/components/LeagueTable";
 import { PageHero } from "@/components/PageHero";
 import { SectionTabs } from "@/components/SectionTabs";
-import { players, teams } from "@/data/mock";
+import { players } from "@/data/mock";
+import { getTeamsByGender } from "@/lib/fixtures";
 
 const tabs = [
   { href: "/data-hub/generales", label: "Generales" },
@@ -19,6 +20,8 @@ const statLeaders = [
 ];
 
 export default function DataHubGeneralesPage() {
+  const teams = getTeamsByGender("masculino");
+
   return (
     <div className="space-y-6">
       <PageHero eyebrow="Data Hub" title="Datos generales" description="Lideres del primer equipo y tabla compacta en una pagina propia." />
