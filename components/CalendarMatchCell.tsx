@@ -34,7 +34,7 @@ export function CalendarMatchCell({ match, day, className }: CalendarMatchCellPr
         </span>
       </div>
 
-      <div className="mt-auto flex items-end justify-between gap-2">
+      <div className="flex items-end justify-between gap-2">
         <p className={cn("text-sm font-extrabold tabular-nums", match.played ? "text-slate-900" : "text-[#214C9B]")}>
           {bottomLabel(match)}
         </p>
@@ -48,7 +48,7 @@ export function CalendarMatchCell({ match, day, className }: CalendarMatchCellPr
   );
 
   const cellClassName = cn(
-    "relative flex min-h-[8.5rem] flex-col rounded-2xl border border-[#214C9B]/15 bg-white p-3 shadow-[0_8px_20px_rgba(17,24,39,0.05)] transition sm:min-h-[9.5rem] sm:aspect-square sm:p-3.5",
+    "relative flex min-h-[6.5rem] flex-col justify-between gap-1 rounded-2xl border border-[#214C9B]/15 bg-white p-2.5 shadow-[0_8px_20px_rgba(17,24,39,0.05)] transition sm:aspect-square sm:min-h-0 sm:p-3",
     clickable
       ? cn("cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(17,24,39,0.1)]", borderHover)
       : "cursor-default opacity-95",
