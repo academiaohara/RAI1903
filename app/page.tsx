@@ -5,11 +5,12 @@ import { Card } from "@/components/Card";
 import { LeagueTableCard } from "@/components/LeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
 import { NewsTicker } from "@/components/NewsTicker";
+import { OpponentCrest } from "@/components/OpponentCrest";
 import { PageHero } from "@/components/PageHero";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
 import { RAI_TEAM_ID, newsItems, players } from "@/data/mock";
 import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
-import { getLatestAvilesMatches, getNextAvilesMatch, getTeamsByGender, getUpcomingAvilesMatches } from "@/lib/fixtures";
+import { getLatestAvilesMatches, getNextAvilesMatch, getTeam, getTeamsByGender, getUpcomingAvilesMatches } from "@/lib/fixtures";
 import { getCronicaForMatch, getPreviaForMatch } from "@/lib/match-articles";
 import { primerEquipoBase } from "@/lib/primer-equipo";
 import { formatMatchDate } from "@/lib/utils";
@@ -142,36 +143,63 @@ export default function HomePage() {
   );
 }
 
+function teamCrestLogo(teamId: string): string {
+  if (teamId === RAI_TEAM_ID) return "/logo.png";
+  return getTeam(teamId)?.crestInitials ?? teamId.slice(0, 3).toUpperCase();
+}
+
 function MatchBanner({ match, label, href, action }: { match: Match; label: string; href: Route; action: string }) {
   const jornadaLabel = matchJornadaLabel(match);
+  const competitionLabel = matchCompetitionShortLabel(match);
+  const centerRoundLabel = jornadaLabel ?? (match.competition === "copa-rey" ? competitionLabel : null);
+  const scoreLabel = match.status === "finished" ? `${match.homeScore}-${match.awayScore}` : "vs";
 
   return (
     <Link
       href={href}
       className="group overflow-hidden rounded-xl border border-[#214C9B]/25 bg-white shadow-[0_10px_28px_rgba(17,24,39,0.06)] transition hover:-translate-y-1 hover:border-[#214C9B] md:rounded-[1.5rem] md:shadow-[0_18px_45px_rgba(17,24,39,0.08)] lg:rounded-[2rem]"
     >
-      <div className="grid grid-cols-[1fr_auto_1fr] items-stretch md:grid-cols-[1fr_auto_1fr]">
-        <div className="flex min-w-0 items-center gap-2 p-2.5 md:gap-3 md:p-4 lg:gap-4 lg:p-5">
+      <div className="p-3 md:hidden">
+        <div className="mb-3 flex items-start justify-between gap-3">
+          <p className="text-[10px] font-bold uppercase tracking-normal text-[#981915]">{label}</p>
+          <p className="text-right text-[10px] font-bold uppercase tracking-normal text-[#981915]">{competitionLabel}</p>
+        </div>
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+          <OpponentCrest logo={teamCrestLogo(match.homeTeamId)} opponent={match.homeTeam} size="md" className="mx-auto" />
+          <div className="min-w-[5.5rem] px-1 text-center">
+            {centerRoundLabel && (
+              <p className="text-xs font-extrabold uppercase tracking-normal text-[#214C9B]">{centerRoundLabel}</p>
+            )}
+            <p className={`font-extrabold leading-none text-[#214C9B] ${centerRoundLabel ? "mt-1 text-2xl" : "text-3xl"}`}>{scoreLabel}</p>
+            <p className="mt-1 text-[10px] font-bold uppercase tracking-normal text-slate-500">{formatMatchDate(match.date)}</p>
+            <p className="mt-1 text-[11px] font-bold leading-snug text-slate-700">{match.venue}</p>
+          </div>
+          <OpponentCrest logo={teamCrestLogo(match.awayTeamId)} opponent={match.awayTeam} size="md" className="mx-auto" />
+        </div>
+      </div>
+
+      <div className="hidden grid-cols-[1fr_auto_1fr] items-stretch md:grid">
+        <div className="flex min-w-0 items-center gap-2 p-4 lg:gap-4 lg:p-5">
           {jornadaLabel && (
-            <span className="flex h-9 min-w-9 shrink-0 items-center justify-center rounded-xl border border-[#214C9B]/20 bg-blue-50 px-1 text-center text-[10px] font-extrabold leading-tight text-[#214C9B] transition group-hover:border-[#214C9B] group-hover:bg-[#214C9B] group-hover:text-white md:h-12 md:min-w-12 md:rounded-2xl md:px-2 md:text-xs lg:h-14 lg:min-w-14 lg:text-sm">
+            <span className="flex h-12 min-w-12 shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 bg-blue-50 px-2 text-center text-xs font-extrabold leading-tight text-[#214C9B] transition group-hover:border-[#214C9B] group-hover:bg-[#214C9B] group-hover:text-white lg:h-14 lg:min-w-14 lg:text-sm">
               {jornadaLabel}
             </span>
           )}
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-normal text-[#981915] md:text-xs">{label}</p>
-            <p className="mt-0.5 break-words text-sm font-extrabold leading-tight text-slate-900 md:mt-1 md:text-lg lg:text-xl">{match.homeTeam}</p>
+            <p className="text-xs font-bold uppercase tracking-normal text-[#981915]">{label}</p>
+            <p className="mt-1 break-words text-lg font-extrabold leading-tight text-slate-900 lg:text-xl">{match.homeTeam}</p>
           </div>
         </div>
-        <div className="flex min-w-[4.5rem] flex-col items-center justify-center bg-[#214C9B] px-2 py-2.5 text-white md:min-w-40 md:px-5 md:py-4 lg:px-8 lg:py-5">
-          <p className="text-xl font-extrabold leading-none md:text-3xl lg:text-4xl">{match.status === "finished" ? `${match.homeScore}-${match.awayScore}` : "vs"}</p>
-          <p className="mt-0.5 text-[10px] font-bold uppercase tracking-normal text-white/80 md:mt-1 md:text-xs">{formatMatchDate(match.date)}</p>
+        <div className="flex min-w-40 flex-col items-center justify-center bg-[#214C9B] px-5 py-4 text-white lg:px-8 lg:py-5">
+          <p className="text-3xl font-extrabold leading-none lg:text-4xl">{scoreLabel}</p>
+          <p className="mt-1 text-xs font-bold uppercase tracking-normal text-white/80">{formatMatchDate(match.date)}</p>
         </div>
-        <div className="flex min-w-0 items-center p-2.5 md:flex-row md:items-center md:justify-between md:gap-3 md:p-4 lg:gap-4 lg:p-5">
+        <div className="flex min-w-0 items-center justify-between gap-3 p-4 lg:gap-4 lg:p-5">
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-normal text-[#981915] md:text-xs">{matchCompetitionShortLabel(match)}</p>
-            <p className="mt-0.5 break-words text-sm font-extrabold leading-tight text-slate-900 md:mt-1 md:text-lg lg:text-xl">{match.awayTeam}</p>
+            <p className="text-xs font-bold uppercase tracking-normal text-[#981915]">{competitionLabel}</p>
+            <p className="mt-1 break-words text-lg font-extrabold leading-tight text-slate-900 lg:text-xl">{match.awayTeam}</p>
           </div>
-          <span className="hidden items-center justify-center gap-2 rounded-full border border-[#214C9B]/20 px-4 py-2 text-sm font-bold text-[#214C9B] transition group-hover:bg-[#214C9B] group-hover:text-white md:inline-flex md:w-full lg:w-auto lg:shrink-0">
+          <span className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#214C9B]/20 px-4 py-2 text-sm font-bold text-[#214C9B] transition group-hover:bg-[#214C9B] group-hover:text-white lg:w-auto lg:shrink-0">
             {action} <ArrowUpRight size={16} />
           </span>
         </div>
