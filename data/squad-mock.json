@@ -1,0 +1,9 @@
+{
+  "meta": {
+    "club": "Real Aviles Industrial",
+    "temporada": "2025/26",
+    "source": "mock",
+    "apiReady": true
+  },
+  "nota": "Los datos en tiempo de ejecucion se generan desde lib/squad-data.ts a partir de data/mock.ts. Este JSON documenta el contrato de datos para futura integracion API."
+}
