@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
       { source: "/prensa/noticias-externas", destination: "/noticias/prensa", permanent: false },
       { source: "/prensa/medios", destination: "/noticias/prensa", permanent: false },
       { source: "/prensa/archivo", destination: "/noticias/prensa", permanent: false },
+      { source: "/contenido-fan/youtube", destination: "/contenido-fan/zona-mixta", permanent: false },
     ];
   },
 };

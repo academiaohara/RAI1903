@@ -411,30 +411,103 @@ export const matchdayResult = {
   highlightedMatch: matchdays[8].matches.find((match) => match.homeTeamId === RAI_TEAM_ID || match.awayTeamId === RAI_TEAM_ID),
 };
 
-/** Programas de YouTube que repasan la actualidad del club. Sustituye las URLs por los canales reales. */
-export const youtubePrograms: FanMediaLink[] = [
+const RAI_YOUTUBE_CHANNEL = "https://www.youtube.com/channel/UCqnlVJmxk-zGSSNCb9noziw";
+const RAI_SPOTIFY_PODCAST = "https://open.spotify.com/show/5kHriw0nbuCDhY5qtLHuQC";
+
+/** Zona Mixta: programa oficial del club en RAI Radio y YouTube. */
+export const fanZonaMixta: FanMediaLink[] = [
   {
-    id: "programa-oficial",
-    name: "Canal oficial del club",
+    id: "zona-mixta-youtube",
+    name: "Zona Mixta",
     platform: "youtube",
-    url: "https://www.youtube.com",
-    description: "Resumenes, entrevistas y piezas institucionales del Real Aviles Industrial.",
-    schedule: "Publicaciones semanales",
+    url: RAI_YOUTUBE_CHANNEL,
+    description: "Entrevistas con directivos, entrenadores y jugadores. Presentado por Jorge Quir?s.",
+    schedule: "Semanal",
   },
   {
-    id: "programa-actualidad",
-    name: "Espacio para programa de actualidad",
+    id: "zona-mixta-spotify",
+    name: "Zona Mixta en Spotify",
+    platform: "spotify",
+    url: RAI_SPOTIFY_PODCAST,
+    description: "Episodios del programa en el canal de podcast oficial de RAI Radio.",
+  },
+];
+
+/** Previas oficiales antes de cada partido. */
+export const fanPrevia: FanMediaLink[] = [
+  {
+    id: "previa-barakaldo",
+    name: "La previa con Lolo Escobar (Barakaldo CF)",
     platform: "youtube",
-    url: "https://www.youtube.com",
-    description: "Enlaza aqui el programa de YouTube que repasa cada jornada, fichajes y ruedas de prensa.",
-    schedule: "Tras cada partido",
+    url: RAI_YOUTUBE_CHANNEL,
+    description: "Entrevista previa al duelo con el entrenador del Barakaldo.",
+    schedule: "Antes del partido",
   },
   {
-    id: "programa-tertulia",
-    name: "Espacio para tertulia blanquiazul",
+    id: "previa-guadalajara",
+    name: "La previa con Lolo Escobar (CD Guadalajara)",
     platform: "youtube",
-    url: "https://www.youtube.com",
-    description: "Hueco reservado para tertulias o directos de aficionados con analisis del equipo.",
+    url: RAI_YOUTUBE_CHANNEL,
+    description: "Pieza previa con el mister rival de la jornada.",
+  },
+  {
+    id: "previa-cayarga",
+    name: "La previa con Cayarga",
+    platform: "youtube",
+    url: RAI_YOUTUBE_CHANNEL,
+    description: "Espacio reservado para enlazar la previa con el rival de turno.",
+  },
+];
+
+/** Ruedas de prensa (RDP) del cuerpo tecnico. */
+export const fanRdp: FanMediaLink[] = [
+  {
+    id: "rdp-barakaldo",
+    name: "RDP | Lolo Escobar (Barakaldo CF)",
+    platform: "youtube",
+    url: RAI_YOUTUBE_CHANNEL,
+    description: "Rueda de prensa tras el partido ante el Barakaldo.",
+    schedule: "Postpartido",
+  },
+  {
+    id: "rdp-guadalajara",
+    name: "RDP | Lolo Escobar (CD Guadalajara)",
+    platform: "youtube",
+    url: RAI_YOUTUBE_CHANNEL,
+    description: "Comparecencia oficial del entrenador tras la jornada.",
+  },
+  {
+    id: "rdp-ferrol",
+    name: "RDP | Lolo Escobar (Racing Ferrol)",
+    platform: "youtube",
+    url: RAI_YOUTUBE_CHANNEL,
+    description: "Enlaza aqui la RDP de la jornada que quieras destacar.",
+  },
+];
+
+/** Contenido de aficion y pe?as: tertulias, directos y apoyo a la plantilla. */
+export const fanTenteFirme: FanMediaLink[] = [
+  {
+    id: "tente-firme-tertulia",
+    name: "Espacio para tertulia de aficion",
+    platform: "youtube",
+    url: RAI_YOUTUBE_CHANNEL,
+    description: "Hueco para directos o tertulias de pe?as y medios fan que animan al equipo.",
+  },
+  {
+    id: "tente-firme-twitter",
+    name: "Espacio en X / Twitter",
+    platform: "twitter",
+    url: "https://x.com/realavilesind",
+    description: "Clips, hilos y reacciones de la aficion en redes.",
+  },
+  {
+    id: "tente-firme-ivoox",
+    name: "Radio Adelantado 1903",
+    platform: "ivoox",
+    url: "https://www.ivoox.com",
+    description: "Podcast de pe?as y aficionados. Enlaza el episodio concreto en iVoox.",
+    schedule: "Cuando haya novedad",
   },
 ];
 
