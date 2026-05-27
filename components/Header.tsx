@@ -98,13 +98,15 @@ export function Header() {
 
       {hoveredNav?.children && (
         <div
-          className="hidden border-t border-[#981915]/15 bg-white lg:block"
+          className="hidden border-t border-neutral-200/80 bg-[#f0f1f3] lg:block"
           onMouseEnter={clearCloseTimer}
           onMouseLeave={scheduleClose}
         >
-          <div className="mx-auto max-w-[1480px] px-4 py-5 sm:px-6 lg:px-8">
-            <p className="mb-4 text-xs font-bold uppercase tracking-[0.12em] text-[#981915]">{hoveredNav.label}</p>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          <div className="mx-auto flex max-w-[1480px] justify-center px-4 py-2.5 sm:px-6 lg:px-8">
+            <nav
+              className="flex flex-wrap items-center justify-center gap-2"
+              aria-label={`Subsecciones de ${hoveredNav.label}`}
+            >
               {hoveredNav.children.map((child) => {
                 const childActive = pathname === child.href || pathname.startsWith(`${child.href}/`);
                 const Icon = child.icon;
@@ -112,19 +114,22 @@ export function Header() {
                   <Link
                     key={child.href}
                     href={child.href as Route}
+                    aria-current={childActive ? "page" : undefined}
                     className={cn(
-                      "flex aspect-square flex-col items-center justify-center gap-3 rounded-2xl border p-4 text-center transition",
+                      "flex h-[4.25rem] w-[4.25rem] flex-col items-center justify-center gap-1 rounded-[10px] border bg-white px-1 py-1.5 text-center transition",
                       childActive
-                        ? "border-[#981915] bg-[#981915]/5 text-[#981915] shadow-md shadow-[#981915]/10"
-                        : "border-[#981915]/20 text-[#981915] hover:border-[#981915] hover:bg-[#981915]/5",
+                        ? "border-[#981915] shadow-sm shadow-[#981915]/10"
+                        : "border-[#e0e0e0] hover:border-[#981915]/50 hover:shadow-sm",
                     )}
                   >
-                    <Icon size={32} strokeWidth={2.25} aria-hidden />
-                    <span className="text-xs font-bold uppercase leading-tight tracking-normal">{child.label}</span>
+                    <Icon size={18} strokeWidth={2.25} className="shrink-0 text-[#981915]" aria-hidden />
+                    <span className="line-clamp-2 text-[9px] font-semibold leading-tight text-neutral-800">
+                      {child.label}
+                    </span>
                   </Link>
                 );
               })}
-            </div>
+            </nav>
           </div>
         </div>
       )}
@@ -149,9 +154,9 @@ export function Header() {
                     {item.label}
                   </Link>
                   {hasChildren && (
-                    <div className="grid grid-cols-2 gap-2 px-2 pb-2 pt-1">
+                    <div className="flex flex-wrap justify-center gap-2 px-2 pb-2 pt-1">
                       {item.children!.map((child) => {
-                        const childActive = pathname === child.href;
+                        const childActive = pathname === child.href || pathname.startsWith(`${child.href}/`);
                         const Icon = child.icon;
                         return (
                           <Link
@@ -159,14 +164,14 @@ export function Header() {
                             href={child.href as Route}
                             onClick={() => setOpen(false)}
                             className={cn(
-                              "flex aspect-square flex-col items-center justify-center gap-2 rounded-xl border p-3 text-center",
-                              childActive
-                                ? "border-white bg-white text-[#981915]"
-                                : "border-white/15 bg-white/5 text-white",
+                              "flex h-[4.25rem] w-[4.25rem] flex-col items-center justify-center gap-1 rounded-[10px] border bg-white px-1 py-1.5 text-center",
+                              childActive ? "border-[#981915] shadow-sm" : "border-[#e0e0e0]",
                             )}
                           >
-                            <Icon size={24} aria-hidden />
-                            <span className="text-[10px] font-bold uppercase leading-tight">{child.label}</span>
+                            <Icon size={18} strokeWidth={2.25} className="shrink-0 text-[#981915]" aria-hidden />
+                            <span className="line-clamp-2 text-[9px] font-semibold leading-tight text-neutral-800">
+                              {child.label}
+                            </span>
                           </Link>
                         );
                       })}
