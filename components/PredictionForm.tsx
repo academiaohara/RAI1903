@@ -6,7 +6,13 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { MatchPreviewModal } from "@/components/MatchPreviewModal";
 import { players, RAI_TEAM_ID } from "@/data/mock";
 import { getPreviaForMatch } from "@/lib/match-articles";
-import { formatGoalsPick, getAvilesGoalsPick, isAvilesMatch } from "@/lib/quiniela";
+import {
+  formatGoalsPick,
+  getAvilesGoalsPick,
+  isAvilesMatch,
+  isOutcomeLockedByGoals,
+  outcomeFromGoalsPicks,
+} from "@/lib/quiniela";
 import { primerEquipoBase } from "@/lib/primer-equipo";
 import type { GoalsPick, Match, Prediction, PredictionOutcome } from "@/types";
 import type { Route } from "next";
@@ -39,6 +45,25 @@ export function PredictionForm({
   const previaHref = previa ? (`${primerEquipoBase("masculino")}/previas/${previa.id}` as Route) : undefined;
   const avilesGoalsPick = prediction ? getAvilesGoalsPick(match, prediction) : undefined;
   const scorerLockedToNadie = avilesGoalsPick === 0;
+  const derivedOutcome =
+    prediction?.goalsHome !== undefined && prediction?.goalsAway !== undefined
+      ? outcomeFromGoalsPicks(prediction.goalsHome, prediction.goalsAway)
+      : null;
+  const outcomeLocked = avilesMatch && isOutcomeLockedByGoals(prediction?.goalsHome, prediction?.goalsAway);
+
+  const applyAvilesRules = (next: Prediction): Prediction => {
+    const avilesGoals = getAvilesGoalsPick(match, next);
+    if (avilesGoals === 0) {
+      next.scorer = "nadie";
+    } else if (avilesGoals !== undefined) {
+      if (next.scorer === "nadie") next.scorer = undefined;
+    }
+
+    const outcome = outcomeFromGoalsPicks(next.goalsHome, next.goalsAway);
+    if (outcome !== null) next.outcome = outcome;
+
+    return next;
+  };
 
   const update = (patch: Partial<Prediction>) => {
     if (readOnly) return;
@@ -52,16 +77,13 @@ export function PredictionForm({
       ...patch,
       updatedAt: new Date().toISOString(),
     };
-    if (avilesMatch && getAvilesGoalsPick(match, next) === 0) {
-      next.scorer = "nadie";
-    }
-    onChange(next);
+    onChange(avilesMatch ? applyAvilesRules(next) : next);
   };
 
   const handleAvilesGoalsPick = (isHomeSide: boolean, pick: GoalsPick) => {
     const patch: Partial<Prediction> = isHomeSide ? { goalsHome: pick } : { goalsAway: pick };
     if ((avilesIsHome && isHomeSide) || (!avilesIsHome && !isHomeSide)) {
-      if (pick === 0) patch.scorer = "nadie";
+      patch.scorer = pick === 0 ? "nadie" : undefined;
     }
     update(patch);
   };
@@ -121,21 +143,24 @@ export function PredictionForm({
 
           <div className="flex shrink-0 flex-wrap items-center gap-2">
             <div className="flex items-center gap-2" aria-label="Prediccion 1 X 2">
-              {outcomes.map((outcome) => (
-                <button
-                  key={outcome}
-                  type="button"
-                  disabled={readOnly}
-                  onClick={() => update({ outcome })}
-                  className={`h-12 w-12 rounded-2xl border text-lg font-extrabold transition disabled:cursor-not-allowed disabled:opacity-70 ${
-                    prediction?.outcome === outcome
-                      ? "border-[#214C9B] bg-[#214C9B] text-white"
-                      : "border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50"
-                  }`}
-                >
-                  {outcome}
-                </button>
-              ))}
+              {outcomes.map((outcome) => {
+                const selected = (outcomeLocked ? derivedOutcome : prediction?.outcome) === outcome;
+                return (
+                  <button
+                    key={outcome}
+                    type="button"
+                    disabled={readOnly || outcomeLocked}
+                    onClick={() => update({ outcome })}
+                    className={`h-12 w-12 rounded-2xl border text-lg font-extrabold transition disabled:cursor-not-allowed disabled:opacity-70 ${
+                      selected
+                        ? "border-[#214C9B] bg-[#214C9B] text-white"
+                        : "border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50"
+                    }`}
+                  >
+                    {outcome}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
