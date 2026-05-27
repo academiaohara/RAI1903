@@ -15,7 +15,7 @@ export function NewsTicker({ items }: { items: NewsItem[] }) {
             href={item.url}
             target="_blank"
             rel="noreferrer"
-            className="news-ticker-item flex min-w-[280px] max-w-[320px] shrink-0 flex-col rounded-2xl border border-[#214C9B]/15 bg-white p-4"
+            className="news-ticker-item flex w-[min(82vw,320px)] shrink-0 flex-col rounded-2xl border border-[#214C9B]/15 bg-white p-4"
           >
             <p className="news-ticker-source text-xs font-bold uppercase tracking-normal text-[#981915]">
               {item.source} · {formatDate(item.date)}

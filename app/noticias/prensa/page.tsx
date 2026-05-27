@@ -85,7 +85,7 @@ export default function NoticiasPrensaPage() {
               className="rounded-3xl border border-[#214C9B]/25 bg-white p-5 transition hover:-translate-y-1 hover:border-[#214C9B]"
             >
               <Badge tone="blue">{link.outlet}</Badge>
-              <h3 className="mt-4 text-2xl font-extrabold uppercase text-[#214C9B]">{link.name}</h3>
+              <h3 className="mt-4 break-words text-xl font-extrabold uppercase text-[#214C9B] sm:text-2xl">{link.name}</h3>
               <p className="mt-2 text-sm leading-6 text-slate-600">{link.description}</p>
             </a>
           ))}
@@ -94,7 +94,19 @@ export default function NoticiasPrensaPage() {
 
       <Card eyebrow="Archivo" title="Historico reciente">
         <div className="overflow-hidden rounded-2xl border border-[#214C9B]/20 bg-white">
-          <table className="w-full text-left text-sm">
+          <div className="divide-y divide-slate-100 md:hidden">
+            {pressNews.map((item) => (
+              <article key={item.id} className="p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="min-w-0 break-words text-sm font-extrabold leading-snug text-slate-900">{item.title}</h3>
+                  <span className="shrink-0 text-right text-[11px] font-bold uppercase text-slate-500">{item.date}</span>
+                </div>
+                <p className="mt-2 text-xs font-bold uppercase tracking-[0.06em] text-[#214C9B]">{item.source}</p>
+              </article>
+            ))}
+          </div>
+
+          <table className="hidden w-full text-left text-sm md:table">
             <thead className="bg-[#214C9B] text-[11px] uppercase tracking-normal text-white">
               <tr>
                 <th className="px-4 py-3">Fecha</th>

@@ -142,29 +142,29 @@ function MatchBanner({ match, label, href, action }: { match: Match; label: stri
   const jornadaLabel = matchJornadaLabel(match);
 
   return (
-    <Link href={href} className="group overflow-hidden rounded-[2rem] border border-[#214C9B]/25 bg-white shadow-[0_18px_45px_rgba(17,24,39,0.08)] transition hover:-translate-y-1 hover:border-[#214C9B]">
+    <Link href={href} className="group overflow-hidden rounded-[1.5rem] border border-[#214C9B]/25 bg-white shadow-[0_18px_45px_rgba(17,24,39,0.08)] transition hover:-translate-y-1 hover:border-[#214C9B] sm:rounded-[2rem]">
       <div className="grid items-stretch md:grid-cols-[1fr_auto_1fr]">
-        <div className="flex items-center gap-4 p-5">
+        <div className="flex min-w-0 items-center gap-3 p-4 sm:gap-4 sm:p-5">
           {jornadaLabel && (
-            <span className="flex h-14 min-w-14 items-center justify-center rounded-2xl border border-[#214C9B]/20 bg-blue-50 px-2 text-center text-sm font-extrabold leading-tight text-[#214C9B] transition group-hover:border-[#214C9B] group-hover:bg-[#214C9B] group-hover:text-white">
+            <span className="flex h-12 min-w-12 items-center justify-center rounded-2xl border border-[#214C9B]/20 bg-blue-50 px-2 text-center text-xs font-extrabold leading-tight text-[#214C9B] transition group-hover:border-[#214C9B] group-hover:bg-[#214C9B] group-hover:text-white sm:h-14 sm:min-w-14 sm:text-sm">
               {jornadaLabel}
             </span>
           )}
-          <div>
+          <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-normal text-[#981915]">{label}</p>
-            <p className="mt-1 text-xl font-extrabold text-slate-900">{match.homeTeam}</p>
+            <p className="mt-1 break-words text-lg font-extrabold leading-tight text-slate-900 sm:text-xl">{match.homeTeam}</p>
           </div>
         </div>
-        <div className="flex min-w-40 flex-col items-center justify-center bg-[#214C9B] px-8 py-5 text-white">
-          <p className="text-4xl font-extrabold">{match.status === "finished" ? `${match.homeScore}-${match.awayScore}` : "vs"}</p>
+        <div className="flex flex-col items-center justify-center bg-[#214C9B] px-5 py-4 text-white sm:px-8 sm:py-5 md:min-w-40">
+          <p className="text-3xl font-extrabold sm:text-4xl">{match.status === "finished" ? `${match.homeScore}-${match.awayScore}` : "vs"}</p>
           <p className="mt-1 text-xs font-bold uppercase tracking-normal text-white/80">{formatMatchDate(match.date)}</p>
         </div>
-        <div className="flex items-center justify-between gap-4 p-5">
-          <div>
+        <div className="flex min-w-0 flex-col items-stretch gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-5">
+          <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-normal text-[#981915]">{matchCompetitionShortLabel(match)}</p>
-            <p className="mt-1 text-xl font-extrabold text-slate-900">{match.awayTeam}</p>
+            <p className="mt-1 break-words text-lg font-extrabold leading-tight text-slate-900 sm:text-xl">{match.awayTeam}</p>
           </div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-[#214C9B]/20 px-4 py-2 text-sm font-bold text-[#214C9B] transition group-hover:bg-[#214C9B] group-hover:text-white">
+          <span className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#214C9B]/20 px-4 py-2 text-sm font-bold text-[#214C9B] transition group-hover:bg-[#214C9B] group-hover:text-white sm:w-auto sm:shrink-0">
             {action} <ArrowUpRight size={16} />
           </span>
         </div>

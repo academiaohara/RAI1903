@@ -32,7 +32,65 @@ export function LeagueTable({
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-2xl border border-[#214C9B]/20 bg-white">
+      <div className="space-y-2 md:hidden">
+        {visibleRows.map((team) => {
+          const diff = team.stats.goalsFor - team.stats.goalsAgainst;
+          const highlighted = team.id === highlightTeamId;
+          const zoneClassName = getStandingsZoneRowClass(team.zone, highlighted);
+
+          return (
+            <article
+              key={team.id}
+              className={cn(
+                "rounded-2xl border border-[#214C9B]/15 p-3 shadow-[0_8px_20px_rgba(17,24,39,0.04)]",
+                zoneClassName,
+                !highlighted && !team.zone && "bg-white",
+              )}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-2">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#214C9B] text-xs font-extrabold tabular-nums text-white">
+                    {team.position}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-extrabold">{compact ? team.shortName : team.name}</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500">
+                      PJ {team.stats.played} · DG {formatGoalDifference(diff)}
+                    </p>
+                  </div>
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="text-2xl font-extrabold tabular-nums text-[#214C9B]">{team.stats.points}</p>
+                  <p className="text-[10px] font-bold uppercase text-slate-500">Pts</p>
+                </div>
+              </div>
+              <div className="mt-3 grid grid-cols-4 gap-2 text-center text-xs font-bold text-slate-600">
+                <span className="rounded-xl bg-white/70 px-2 py-1">G {team.stats.won}</span>
+                <span className="rounded-xl bg-white/70 px-2 py-1">E {team.stats.drawn}</span>
+                <span className="rounded-xl bg-white/70 px-2 py-1">P {team.stats.lost}</span>
+                <span className="rounded-xl bg-white/70 px-2 py-1">
+                  {team.stats.goalsFor}:{team.stats.goalsAgainst}
+                </span>
+              </div>
+              {!compact && (
+                <div className="mt-3 flex gap-1">
+                  {team.form.map((result, index) => (
+                    <span
+                      key={`${team.id}-${result}-${index}`}
+                      className={cn("flex h-6 w-6 items-center justify-center rounded text-[10px] font-extrabold", resultTone(result))}
+                      title={result === "G" ? "Victoria" : result === "E" ? "Empate" : "Derrota"}
+                    >
+                      {result}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </article>
+          );
+        })}
+      </div>
+
+      <div className="hidden overflow-x-auto rounded-2xl border border-[#214C9B]/20 bg-white md:block">
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead className="bg-[#214C9B] text-[10px] uppercase tracking-[0.1em] text-white">
             <tr>

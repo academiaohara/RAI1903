@@ -25,12 +25,12 @@ export function MatchCard({
           {matchFixtureMeta(match)}
         </span>
       </div>
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-        <p className={`text-sm font-extrabold leading-snug ${avilesHome ? "text-[#214C9B]" : "text-slate-700"}`}>{match.homeTeam}</p>
+      <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
+        <p className={`min-w-0 break-words text-sm font-extrabold leading-snug ${avilesHome ? "text-[#214C9B]" : "text-slate-700"}`}>{match.homeTeam}</p>
         <div className="rounded-2xl bg-[#214C9B] px-3 py-2 text-center font-extrabold text-white shadow-md shadow-blue-950/10">
           {match.status === "finished" ? `${match.homeScore} - ${match.awayScore}` : "vs"}
         </div>
-        <p className={`text-right text-sm font-extrabold leading-snug ${avilesAway ? "text-[#214C9B]" : "text-slate-700"}`}>{match.awayTeam}</p>
+        <p className={`min-w-0 break-words text-right text-sm font-extrabold leading-snug ${avilesAway ? "text-[#214C9B]" : "text-slate-700"}`}>{match.awayTeam}</p>
       </div>
       {!compact && (
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
