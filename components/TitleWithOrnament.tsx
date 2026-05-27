@@ -22,6 +22,7 @@ export function TitleWithOrnament({
   className,
 }: TitleWithOrnamentProps) {
   const cutoutId = `title-gear-cutout-${useId().replaceAll(":", "")}`;
+  const startsWithC = /^c/i.test(title.trim());
 
   return (
     <div
@@ -49,6 +50,7 @@ export function TitleWithOrnament({
             gearTextOverlapClass,
             "relative z-10 mb-[2px] min-w-0 self-center bg-transparent py-[0.22em] pr-[0.35em] pl-0 font-extrabold leading-none whitespace-nowrap uppercase text-[#214C9B]",
             animated && "title-gear-text",
+            startsWithC && "title-gear-text-c",
             className,
           )}
         >
