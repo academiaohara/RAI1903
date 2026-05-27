@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import type { SquadPlayer, SquadPosition, SquadViewMode } from "@/types/squad";
+import type { SquadPlayer, SquadRoleCode, SquadViewMode } from "@/types/squad";
 import { getSquadClubInfo, getSquadPlayers } from "@/lib/squad-data";
 import { filterSquadPlayers } from "@/lib/squad-utils";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -21,7 +21,7 @@ export function SquadPage({ gender }: SquadPageProps) {
   const club = useMemo(() => getSquadClubInfo(gender), [gender]);
 
   const [query, setQuery] = useState("");
-  const [position, setPosition] = useState<SquadPosition | "Todas">("Todas");
+  const [position, setPosition] = useState<SquadRoleCode | "Todas">("Todas");
   const [viewMode, setViewMode] = useState<SquadViewMode>("fichas");
   const [selected, setSelected] = useState<SquadPlayer | null>(null);
 

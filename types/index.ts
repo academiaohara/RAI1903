@@ -1,6 +1,8 @@
 export type PlayerStatus = "titular" | "suplente" | "lesionado" | "sancionado" | "cantera" | "nuevo fichaje";
 export type PlayerPosition = "Portero" | "Defensa" | "Centrocampista" | "Delantero";
 
+export type PlayerRoleCode = "POR" | "LD" | "LI" | "DFC" | "MC" | "MCO" | "MCD" | "SD" | "ED" | "DC" | "MP" | "EI";
+
 export type Player = {
   id: string;
   firstName: string;

@@ -1,4 +1,8 @@
+import type { PlayerRoleCode } from "@/types";
+
 export type SquadPosition = "Portero" | "Defensa" | "Centrocampista" | "Delantero";
+
+export type SquadRoleCode = PlayerRoleCode;
 
 export type SquadViewMode = "lista" | "fichas";
 
@@ -27,6 +31,7 @@ export type SquadPlayer = {
   apellido: string;
   dorsal: number;
   posicion: SquadPosition;
+  rol: SquadRoleCode;
   edad: number;
   fechaNacimiento: string;
   lugarNacimiento: string;
@@ -69,6 +74,10 @@ export type SquadClubInfo = {
 export type SquadModalTab = "resumen" | "partidos" | "estadisticas" | "trayectoria";
 
 export const SQUAD_POSITIONS: SquadPosition[] = ["Portero", "Defensa", "Centrocampista", "Delantero"];
+
+export const SQUAD_ROLE_CODES: SquadRoleCode[] = [
+  "POR", "LD", "LI", "DFC", "MC", "MCO", "MCD", "SD", "ED", "DC", "MP", "EI",
+];
 
 export const SQUAD_POSITION_LABELS: Record<SquadPosition, string> = {
   Portero: "Porteros",

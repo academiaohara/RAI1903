@@ -35,7 +35,7 @@ export function PlayerCard({ player, onSelect, index = 0 }: SquadPlayerCardProps
 
         <div className="relative mt-4 space-y-3">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#214C9B]/70">{player.posicion}</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#214C9B]/70">{player.rol}</p>
             <h3 className="mt-1 text-lg font-extrabold uppercase leading-tight text-slate-900">{getPlayerFullName(player)}</h3>
             <p className="text-xs font-semibold text-slate-500">
               {player.edad} anos · {player.nacionalidad}

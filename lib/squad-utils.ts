@@ -1,4 +1,4 @@
-import type { SquadPlayer, SquadPosition } from "@/types/squad";
+import type { SquadPlayer, SquadPosition, SquadRoleCode } from "@/types/squad";
 import { SQUAD_POSITIONS } from "@/types/squad";
 
 export function getPlayerFullName(player: SquadPlayer): string {
@@ -29,12 +29,12 @@ export function groupPlayersByPosition(players: SquadPlayer[]): Record<SquadPosi
 export function filterSquadPlayers(
   players: SquadPlayer[],
   query: string,
-  position: SquadPosition | "Todas",
+  role: SquadRoleCode | "Todas",
 ): SquadPlayer[] {
   const normalized = query.trim().toLowerCase();
 
   return players.filter((player) => {
-    const matchesPosition = position === "Todas" || player.posicion === position;
+    const matchesPosition = role === "Todas" || player.rol === role;
     if (!matchesPosition) return false;
     if (!normalized) return true;
 

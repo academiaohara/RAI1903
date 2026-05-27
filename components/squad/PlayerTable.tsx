@@ -42,11 +42,11 @@ export function PlayerTable({ players, onSelect }: PlayerTableProps) {
           <PositionSection key={position} position={position} delay={sectionIndex * 0.04}>
             <div className="overflow-hidden rounded-[1.5rem] border border-[#214C9B]/12 bg-white shadow-[0_16px_40px_rgba(17,24,39,0.05)]">
               <div className="hidden overflow-x-auto md:block">
-                <table className="w-full min-w-[760px] table-fixed border-collapse">
+                <table className="w-full min-w-[640px] table-fixed border-collapse">
                   <colgroup>
-                    <col className="w-14" />
-                    <col />
-                    <col className="w-16" />
+                    <col className="w-12" />
+                    <col className="w-[11.5rem]" />
+                    <col className="w-12" />
                     <col className="w-14" />
                     <col className="w-12" />
                     <col className="w-12" />
@@ -103,17 +103,17 @@ function PlayerRow({
       onClick={() => onSelect(player)}
       className="group cursor-pointer border-b border-slate-50 text-sm transition last:border-0 hover:bg-blue-50/60"
     >
-      <td className={`px-5 py-4 font-extrabold tabular-nums text-[#214C9B] ${alignClass.center}`}>{player.dorsal}</td>
-      <td className={`px-4 py-4 ${alignClass.left}`}>
-        <div className="flex items-center gap-3">
+      <td className={`px-3 py-3 font-extrabold tabular-nums text-[#214C9B] ${alignClass.center}`}>{player.dorsal}</td>
+      <td className={`max-w-[11.5rem] px-3 py-3 ${alignClass.left}`}>
+        <div className="flex min-w-0 items-center gap-2">
           <PlayerAvatar player={player} size="sm" className="shrink-0 rounded-xl" />
           <div className="min-w-0">
-            <p className="truncate font-extrabold uppercase text-slate-900">{getPlayerFullName(player)}</p>
-            <p className="truncate text-xs font-semibold text-slate-500">{player.nacionalidad}</p>
+            <p className="truncate text-sm font-extrabold uppercase text-slate-900">{getPlayerFullName(player)}</p>
+            <p className="truncate text-[11px] font-semibold text-slate-500">{player.nacionalidad}</p>
           </div>
         </div>
       </td>
-      <td className={`px-4 py-4 font-semibold text-slate-600 ${alignClass.center}`}>{player.posicion}</td>
+      <td className={`px-2 py-3 text-xs font-extrabold tracking-wide text-slate-600 ${alignClass.center}`}>{player.rol}</td>
       <td className={`px-4 py-4 tabular-nums text-slate-700 ${alignClass.center}`}>{player.edad}</td>
       <StatCell value={player.partidos} />
       <StatCell value={player.goles} highlight={player.goles > 0} />
@@ -152,7 +152,7 @@ function PlayerMobileRow({
           <p className="truncate font-extrabold uppercase text-slate-900">{getPlayerFullName(player)}</p>
         </div>
         <p className="text-xs font-semibold text-slate-500">
-          {player.posicion} · {player.edad} anos
+          {player.rol} · {player.edad} anos
         </p>
         <div className="mt-2 flex flex-wrap gap-2 text-xs font-bold text-slate-600">
           <span className="rounded-lg bg-slate-100 px-2 py-1">PJ {player.partidos}</span>

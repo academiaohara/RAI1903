@@ -1,5 +1,6 @@
 import { players, playersFemenino, teams, teamsFemenino } from "@/data/mock";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
+import { getPlayerRole } from "@/lib/player-roles";
 import type { Player } from "@/types";
 import type { PlayerCareerRecord, PlayerMatchRecord, SquadClubInfo, SquadPlayer } from "@/types/squad";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -133,6 +134,7 @@ function toSquadPlayer(player: Player, clubName: string): SquadPlayer {
     apellido: player.lastName,
     dorsal: player.number,
     posicion: player.position,
+    rol: getPlayerRole(player),
     edad: player.age,
     fechaNacimiento: player.birthDate,
     lugarNacimiento: birthPlace,

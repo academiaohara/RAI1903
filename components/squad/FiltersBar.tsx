@@ -2,22 +2,21 @@
 
 import { Search } from "lucide-react";
 import { motion } from "framer-motion";
-import type { SquadPosition } from "@/types/squad";
-import { SQUAD_POSITIONS } from "@/types/squad";
+import type { SquadRoleCode, SquadViewMode } from "@/types/squad";
+import { SQUAD_ROLE_CODES } from "@/types/squad";
 import { ViewToggle } from "@/components/squad/ViewToggle";
-import type { SquadViewMode } from "@/types/squad";
 
 type FiltersBarProps = {
   query: string;
   onQueryChange: (value: string) => void;
-  position: SquadPosition | "Todas";
-  onPositionChange: (value: SquadPosition | "Todas") => void;
+  position: SquadRoleCode | "Todas";
+  onPositionChange: (value: SquadRoleCode | "Todas") => void;
   viewMode: SquadViewMode;
   onViewModeChange: (mode: SquadViewMode) => void;
   resultsCount: number;
 };
 
-const positionFilters: Array<SquadPosition | "Todas"> = ["Todas", ...SQUAD_POSITIONS];
+const positionFilters: Array<SquadRoleCode | "Todas"> = ["Todas", ...SQUAD_ROLE_CODES];
 
 export function FiltersBar({
   query,
@@ -48,7 +47,7 @@ export function FiltersBar({
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <ViewToggle value={viewMode} onChange={onViewModeChange} />
-          <p className="text-center text-xs font-bold uppercase tracking-wide text-slate-500 sm:min-w-[5.5rem] sm:text-right">
+          <p className="text-center text-[11px] font-bold uppercase tracking-wide text-slate-500 sm:min-w-[5.5rem] sm:text-right">
             {resultsCount} {resultsCount === 1 ? "jugador" : "jugadores"}
           </p>
         </div>
@@ -62,7 +61,7 @@ export function FiltersBar({
               key={item}
               type="button"
               onClick={() => onPositionChange(item)}
-              className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wide transition ${
+              className={`rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide transition ${
                 active
                   ? "bg-[#214C9B] text-white shadow-md shadow-blue-950/15"
                   : "border border-slate-200 bg-white text-slate-600 hover:border-[#214C9B]/30 hover:text-[#214C9B]"
