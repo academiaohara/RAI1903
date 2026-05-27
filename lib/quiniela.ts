@@ -4,7 +4,7 @@ import type { GoalsPick, Match, Matchday, Prediction, PredictionOutcome } from "
 export { CURRENT_QUINIELA_ROUND };
 
 export const QUINIELA_TABS = [
-  { href: "/quiniela/quiniela", label: "Quiniela" },
+  { href: "/quiniela/quiniela", label: "Pronosticos" },
   { href: "/quiniela/resultado", label: "Resultado" },
   { href: "/quiniela/ranking", label: "Ranking" },
 ] as const;

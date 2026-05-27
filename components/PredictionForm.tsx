@@ -51,31 +51,30 @@ export function PredictionForm({
       <div className="rounded-2xl border border-[#214C9B]/20 bg-white p-4 shadow-[0_10px_24px_rgba(17,24,39,0.05)]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
               <p className="font-extrabold text-slate-800">{match.homeTeam}</p>
               <span className="text-xs font-bold uppercase text-slate-400">vs</span>
               <p className="font-extrabold text-slate-800">{match.awayTeam}</p>
+              {avilesMatch && previaHref ? (
+                <Link
+                  href={previaHref}
+                  className="ml-2 inline-flex items-center gap-1.5 rounded-xl border border-[#214C9B]/25 px-3 py-1.5 text-xs font-bold text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
+                >
+                  <Eye size={14} /> Previa
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setPreviewOpen(true)}
+                  className="ml-2 inline-flex items-center gap-1.5 rounded-xl border border-[#214C9B]/25 px-3 py-1.5 text-xs font-bold text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
+                >
+                  <Eye size={14} /> Previa
+                </button>
+              )}
             </div>
           </div>
 
           <div className="flex shrink-0 flex-wrap items-center gap-2">
-            {avilesMatch && previaHref ? (
-              <Link
-                href={previaHref}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-[#214C9B]/25 px-3 py-2 text-xs font-bold text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
-              >
-                <Eye size={14} /> Previa
-              </Link>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setPreviewOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-[#214C9B]/25 px-3 py-2 text-xs font-bold text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
-              >
-                <Eye size={14} /> Previa
-              </button>
-            )}
-
             <div className="flex items-center gap-2" aria-label="Prediccion 1 X 2">
               {outcomes.map((outcome) => (
                 <button
@@ -97,15 +96,14 @@ export function PredictionForm({
         </div>
 
         {pickStats && (
-          <div className="mt-3 flex flex-wrap gap-3 border-t border-[#214C9B]/10 pt-3">
-            {pickStats.picks.map((pick) => (
-              <div key={pick.outcome} className="text-xs text-slate-600">
-                <span className="font-extrabold text-[#214C9B]">{pick.outcome}</span>{" "}
-                <span className="font-bold text-slate-800">{pick.count}</span>{" "}
-                <span className="text-slate-500">({pick.percent}%)</span>
-              </div>
-            ))}
-            <span className="text-xs text-slate-400">{pickStats.total} quinielas</span>
+          <div className="mt-3 border-t border-[#214C9B]/10 pt-3">
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">Apuestas de la comunidad</p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              {pickStats.picks.map((pick) => (
+                <OutcomeStatBadge key={pick.outcome} outcome={pick.outcome} count={pick.count} percent={pick.percent} />
+              ))}
+              <span className="ml-auto text-xs text-slate-400">{pickStats.total} quinielas</span>
+            </div>
           </div>
         )}
 
@@ -160,16 +158,6 @@ export function PredictionForm({
                   </button>
                 ))}
               </div>
-              {prediction?.scorer && prediction.scorer !== "nadie" && (
-                <p className="mt-2 text-xs font-bold text-[#214C9B]">
-                  Seleccionado: {prediction.scorer}
-                  {!readOnly && (
-                    <button type="button" onClick={() => update({ scorer: undefined })} className="ml-2 text-[#981915] underline">
-                      Quitar
-                    </button>
-                  )}
-                </p>
-              )}
             </div>
 
             {prediction?.goalsHome !== undefined && prediction.goalsAway !== undefined && (
@@ -183,6 +171,32 @@ export function PredictionForm({
 
       <MatchPreviewModal match={match} open={previewOpen} onClose={() => setPreviewOpen(false)} />
     </>
+  );
+}
+
+const outcomeStatStyles: Record<PredictionOutcome, string> = {
+  "1": "border-[#981915]/30 bg-[#981915]/10 text-[#981915]",
+  X: "border-amber-300 bg-amber-50 text-amber-900",
+  "2": "border-[#214C9B]/30 bg-[#214C9B]/10 text-[#214C9B]",
+};
+
+function OutcomeStatBadge({
+  outcome,
+  count,
+  percent,
+}: {
+  outcome: PredictionOutcome;
+  count: number;
+  percent: number;
+}) {
+  return (
+    <div
+      className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs ${outcomeStatStyles[outcome]}`}
+    >
+      <span className="text-base font-extrabold leading-none">{outcome}</span>
+      <span className="font-bold">{count}</span>
+      <span className="opacity-70">({percent}%)</span>
+    </div>
   );
 }
 
