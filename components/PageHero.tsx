@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { AnimatedPageTitle } from "@/components/AnimatedPageTitle";
 import { cn } from "@/lib/utils";
 
 type PageHeroProps = {
@@ -17,7 +18,7 @@ export function PageHero({ eyebrow, title, description, children, titleActions, 
       <div className={cn("grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end", eyebrow && "mt-2")}>
         <div className="min-w-0 max-w-full">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
-            <h1 className="text-5xl font-extrabold uppercase leading-none text-[#214C9B] sm:text-6xl">{title}</h1>
+            <AnimatedPageTitle title={title} />
             {titleActions}
           </div>
           <p className="mt-3 text-base leading-7 text-slate-600">{description}</p>
