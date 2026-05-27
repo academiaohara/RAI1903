@@ -115,13 +115,16 @@ a {
   background: transparent;
 }
 
+.page-title-gear {
+  overflow: visible;
+}
+
 .page-title-gear-icon {
   overflow: visible;
 }
 
 .page-title-gear-text {
   animation: page-title-text-reveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  margin-bottom: 1px;
   opacity: 0.35;
 }
 
