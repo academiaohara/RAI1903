@@ -1,6 +1,6 @@
 import type { StandingsZone } from "@/types";
 
-export function standingsZoneRowClass(zone: StandingsZone | undefined, highlighted: boolean): string {
+export function getStandingsZoneRowClass(zone: StandingsZone | undefined, highlighted: boolean): string {
   if (highlighted) return "bg-blue-50 text-[#214C9B] ring-1 ring-inset ring-[#214C9B]/25";
   switch (zone) {
     case "promotion":

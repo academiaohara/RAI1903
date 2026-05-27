@@ -120,38 +120,38 @@ a {
   }
 }
 
-.page-title-gear-wrap {
-  animation: page-title-wrap-reveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+.title-gear-wrap {
+  animation: title-gear-wrap-reveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   max-width: 0;
   opacity: 0.35;
   overflow-x: clip;
   overflow-y: visible;
 }
 
-.page-title-gear-icon,
-.page-title-gear-text {
+.title-gear-icon,
+.title-gear-text {
   background: transparent;
 }
 
-.page-title-gear {
+.title-gear {
   overflow: visible;
 }
 
-.page-title-gear-icon {
+.title-gear-icon {
   overflow: visible;
 }
 
-.page-title-gear-text {
-  animation: page-title-text-reveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+.title-gear-text {
+  animation: title-gear-text-reveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   opacity: 0.35;
 }
 
-.page-title-gear-left {
-  animation: page-title-gear-left 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+.title-gear-icon-reveal {
+  animation: title-gear-icon-reveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   opacity: 0;
 }
 
-@keyframes page-title-wrap-reveal {
+@keyframes title-gear-wrap-reveal {
   from {
     max-width: 0;
     opacity: 0.35;
@@ -162,7 +162,7 @@ a {
   }
 }
 
-@keyframes page-title-text-reveal {
+@keyframes title-gear-text-reveal {
   from {
     opacity: 0.35;
   }
@@ -171,7 +171,7 @@ a {
   }
 }
 
-@keyframes page-title-gear-left {
+@keyframes title-gear-icon-reveal {
   from {
     opacity: 0;
     transform: translateX(-18%) scale(0.88);
@@ -183,19 +183,19 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .page-title-gear-wrap {
+  .title-gear-wrap {
     animation: none;
     max-width: none;
     opacity: 1;
     overflow: visible;
   }
 
-  .page-title-gear-text {
+  .title-gear-text {
     animation: none;
     opacity: 1;
   }
 
-  .page-title-gear-left {
+  .title-gear-icon-reveal {
     animation: none;
     opacity: 1;
     transform: none;
