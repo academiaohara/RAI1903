@@ -2,7 +2,7 @@ import { applyStandingsToTeams } from "@/lib/standings";
 import type {
   AcademyTeam,
   CompetitionId,
-  DataComparison,
+  FanMediaLink,
   Match,
   MatchArticle,
   Matchday,
@@ -342,15 +342,62 @@ export const matchdayResult = {
   highlightedMatch: matchdays[8].matches.find((match) => match.homeTeamId === RAI_TEAM_ID || match.awayTeamId === RAI_TEAM_ID),
 };
 
-export const dataComparisons: DataComparison[] = [
-  { label: "Goles a favor", aviles: 16, rival: 14, unit: "goles" },
-  { label: "Goles encajados", aviles: 9, rival: 6, unit: "goles" },
-  { label: "Puntos por partido", aviles: 1.89, rival: 2, unit: "ppp" },
-  { label: "Porterias a cero", aviles: 4, rival: 5, unit: "partidos" },
+/** Programas de YouTube que repasan la actualidad del club. Sustituye las URLs por los canales reales. */
+export const youtubePrograms: FanMediaLink[] = [
+  {
+    id: "programa-oficial",
+    name: "Canal oficial del club",
+    platform: "youtube",
+    url: "https://www.youtube.com",
+    description: "Resumenes, entrevistas y piezas institucionales del Real Aviles Industrial.",
+    schedule: "Publicaciones semanales",
+  },
+  {
+    id: "programa-actualidad",
+    name: "Espacio para programa de actualidad",
+    platform: "youtube",
+    url: "https://www.youtube.com",
+    description: "Enlaza aqui el programa de YouTube que repasa cada jornada, fichajes y ruedas de prensa.",
+    schedule: "Tras cada partido",
+  },
+  {
+    id: "programa-tertulia",
+    name: "Espacio para tertulia blanquiazul",
+    platform: "youtube",
+    url: "https://www.youtube.com",
+    description: "Hueco reservado para tertulias o directos de aficionados con analisis del equipo.",
+  },
 ];
 
-export const historicalMilestones = [
-  { season: "1903", title: "Nacimiento del club", detail: "Origen industrial y obrero del futbol avilesino." },
-  { season: "1952-53", title: "Primera etapa nacional", detail: "El Roman Suarez Puerta se convierte en punto de encuentro blanquiazul." },
-  { season: "2026-27", title: "RAI1903 como archivo fan", detail: "Mocks editables hoy, preparados para tablas Supabase manana." },
+/** Podcasts y audio fan compartidos en Spotify, Twitter/X, iVoox y similares. */
+export const fanPodcasts: FanMediaLink[] = [
+  {
+    id: "podcast-spotify",
+    name: "Espacio en Spotify",
+    platform: "spotify",
+    url: "https://open.spotify.com",
+    description: "Enlaza el podcast de aficionados que sigues en Spotify.",
+    schedule: "Episodio semanal",
+  },
+  {
+    id: "podcast-ivoox",
+    name: "Espacio en iVoox",
+    platform: "ivoox",
+    url: "https://www.ivoox.com",
+    description: "Para programas de audio alojados en iVoox u otras plataformas locales.",
+  },
+  {
+    id: "podcast-twitter",
+    name: "Espacio en X / Twitter",
+    platform: "twitter",
+    url: "https://x.com",
+    description: "Cuenta o espacio donde los aficionados comparten clips, directos o hilos de actualidad.",
+  },
+  {
+    id: "podcast-apple",
+    name: "Espacio en Apple Podcasts",
+    platform: "apple",
+    url: "https://podcasts.apple.com",
+    description: "Enlaza el feed de Apple Podcasts si el programa tambien esta alli.",
+  },
 ];

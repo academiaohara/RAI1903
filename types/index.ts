@@ -171,11 +171,16 @@ export type UserPredictionSummary = {
   exactScores: number;
 };
 
-export type DataComparison = {
-  label: string;
-  aviles: number;
-  rival: number;
-  unit: string;
+export type FanMediaPlatform = "youtube" | "spotify" | "twitter" | "ivoox" | "apple" | "otro";
+
+export type FanMediaLink = {
+  id: string;
+  name: string;
+  platform: FanMediaPlatform;
+  url: string;
+  description: string;
+  /** Ej. "Lunes y jueves" o "Cada domingo tras el partido". */
+  schedule?: string;
 };
 
 export type PrimerEquipoGender = "masculino" | "femenino";
