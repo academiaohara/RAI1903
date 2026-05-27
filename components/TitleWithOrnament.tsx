@@ -2,11 +2,11 @@
 
 import { GearAdorno } from "@/components/GearAdorno";
 import { cn } from "@/lib/utils";
-import type { ElementType } from "react";
+import { useId, type ElementType } from "react";
 
 const sizeClasses = {
   page: "text-5xl sm:text-6xl",
-  section: "text-xl sm:text-2xl",
+  section: "text-2xl sm:text-3xl lg:text-4xl",
 } as const;
 
 type TitleWithOrnamentProps = {
@@ -24,41 +24,37 @@ export function TitleWithOrnament({
   animated = false,
   className,
 }: TitleWithOrnamentProps) {
+  const cutoutId = `title-gear-cutout-${useId().replaceAll(":", "")}`;
+
   return (
     <div
       className={cn(
-        "page-title-gear inline-flex max-w-full items-center leading-none text-[#214C9B]",
+        "page-title-gear inline-flex max-w-full items-center bg-transparent leading-none text-[#214C9B]",
         sizeClasses[size],
       )}
     >
       <div
         className={cn(
-          "relative inline-flex max-w-full items-center",
+          "inline-flex max-w-full items-center bg-transparent",
           animated && "page-title-gear-wrap overflow-hidden",
         )}
       >
         <GearAdorno
+          cutoutId={cutoutId}
           className={cn(
-            "pointer-events-none absolute top-1/2 left-0 z-10 h-[1.12em] w-[1.12em] -translate-x-[46%] -translate-y-1/2 shrink-0",
+            "page-title-gear-icon pointer-events-none h-[1.12em] w-[1.12em] shrink-0 bg-transparent text-current",
             animated && "page-title-gear-left",
           )}
         />
-        <div
+        <Tag
           className={cn(
-            "relative bg-white py-[0.14em] pr-[0.35em] pl-[0.62em] shadow-[0_1px_0_rgba(33,76,155,0.08)]",
-            animated && "page-title-gear-bar",
+            "-ml-[0.22em] min-w-0 bg-transparent py-[0.14em] pr-[0.35em] pl-0 font-extrabold whitespace-nowrap uppercase text-current",
+            animated && "page-title-gear-text",
+            className,
           )}
         >
-          <Tag
-            className={cn(
-              "min-w-0 font-extrabold whitespace-nowrap uppercase",
-              animated && "page-title-gear-text",
-              className,
-            )}
-          >
-            {title}
-          </Tag>
-        </div>
+          {title}
+        </Tag>
       </div>
     </div>
   );
