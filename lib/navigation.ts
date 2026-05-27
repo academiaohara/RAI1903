@@ -30,15 +30,17 @@ export type NavItem = {
   href: string;
   label: string;
   icon: LucideIcon;
+  activePrefix?: string;
   children?: NavChild[];
 };
 
 export const navItems: NavItem[] = [
   { href: "/", label: "Inicio", icon: Home },
   {
-    href: "/primer-equipo",
+    href: "/primer-equipo/masculino/plantilla",
     label: "Primer Equipo",
     icon: Shield,
+    activePrefix: "/primer-equipo/masculino",
     children: [
       { href: "/primer-equipo/masculino/plantilla", label: "Plantilla", icon: Users },
       { href: "/primer-equipo/masculino/competicion", label: "Competicion", icon: Trophy },
@@ -46,6 +48,20 @@ export const navItems: NavItem[] = [
       { href: "/primer-equipo/masculino/cronicas", label: "Cronicas", icon: FileText },
       { href: "/primer-equipo/masculino/previas", label: "Previas", icon: Target },
       { href: "/primer-equipo/masculino/noticias", label: "Noticias", icon: Newspaper },
+    ],
+  },
+  {
+    href: "/primer-equipo/femenino/plantilla",
+    label: "Femenino",
+    icon: Shield,
+    activePrefix: "/primer-equipo/femenino",
+    children: [
+      { href: "/primer-equipo/femenino/plantilla", label: "Plantilla", icon: Users },
+      { href: "/primer-equipo/femenino/competicion", label: "Competicion", icon: Trophy },
+      { href: "/primer-equipo/femenino/calendario", label: "Calendario", icon: CalendarDays },
+      { href: "/primer-equipo/femenino/cronicas", label: "Cronicas", icon: FileText },
+      { href: "/primer-equipo/femenino/previas", label: "Previas", icon: Target },
+      { href: "/primer-equipo/femenino/noticias", label: "Noticias", icon: Newspaper },
     ],
   },
   {
