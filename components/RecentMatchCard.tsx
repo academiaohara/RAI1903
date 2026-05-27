@@ -25,7 +25,7 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
 
   return (
     <Link href={href} className={matchFixtureCardClassName}>
-      <div className="mb-3 flex items-start justify-between gap-3">
+      <div className="mb-1 flex items-start justify-between gap-2">
         <Badge tone={result === "W" ? "green" : result === "D" ? "amber" : result === "L" ? "red" : "slate"}>
           {result === "W" ? "Victoria" : result === "D" ? "Empate" : result === "L" ? "Derrota" : "Finalizado"}
         </Badge>
@@ -33,14 +33,14 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
           {matchFixtureMeta(match)}
         </span>
       </div>
-      <div className="mt-auto grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
         <p className={`text-sm font-extrabold leading-snug ${avilesHome ? "text-[#214C9B]" : "text-slate-800"}`}>{match.homeTeam}</p>
         <div className="rounded-2xl bg-[#214C9B] px-3 py-2 text-center text-sm font-extrabold text-white">
           {match.homeScore} - {match.awayScore}
         </div>
         <p className={`text-right text-sm font-extrabold leading-snug ${avilesAway ? "text-[#214C9B]" : "text-slate-800"}`}>{match.awayTeam}</p>
       </div>
-      <p className="mt-3 text-xs font-bold text-slate-600">{formatMatchDate(match.date)} · Pulsa para leer la cronica</p>
+      <p className="mt-2 text-xs font-bold text-slate-600">{formatMatchDate(match.date)} · Pulsa para leer la cronica</p>
     </Link>
   );
 }

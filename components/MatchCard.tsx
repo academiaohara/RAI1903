@@ -11,13 +11,13 @@ export function MatchCard({ match, compact = false }: { match: Match; compact?: 
 
   return (
     <article className={matchFixtureCardClassName}>
-      <div className="mb-3 flex items-start justify-between gap-3">
+      <div className="mb-1 flex items-start justify-between gap-2">
         <Badge tone={match.status === "finished" ? "slate" : "blue"}>{match.status === "finished" ? "Finalizado" : "Programado"}</Badge>
         <span className="shrink-0 text-right text-[11px] font-bold uppercase leading-tight tracking-[0.06em] text-[#981915]">
           {matchFixtureMeta(match)}
         </span>
       </div>
-      <div className="mt-auto grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
         <p className={`text-sm font-extrabold leading-snug ${avilesHome ? "text-[#214C9B]" : "text-slate-700"}`}>{match.homeTeam}</p>
         <div className="rounded-2xl bg-[#214C9B] px-3 py-2 text-center font-extrabold text-white shadow-md shadow-blue-950/10">
           {match.status === "finished" ? `${match.homeScore} - ${match.awayScore}` : "vs"}
@@ -25,7 +25,7 @@ export function MatchCard({ match, compact = false }: { match: Match; compact?: 
         <p className={`text-right text-sm font-extrabold leading-snug ${avilesAway ? "text-[#214C9B]" : "text-slate-700"}`}>{match.awayTeam}</p>
       </div>
       {!compact && (
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
           <span>{formatMatchDate(match.date)}</span>
           <span>{match.venue}</span>
         </div>
