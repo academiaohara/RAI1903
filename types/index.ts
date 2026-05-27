@@ -95,8 +95,11 @@ export type Matchday = {
 
 export type NewsTag = "partido" | "fichajes" | "cantera" | "previa" | "cronica" | "club" | "lesionados" | "rumores" | "renovaciones" | "entrevistas" | "otros";
 
+export type NewsChannel = "club" | "prensa";
+
 export type NewsItem = {
   id: string;
+  channel: NewsChannel;
   source: string;
   date: string;
   title: string;

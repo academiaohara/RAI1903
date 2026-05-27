@@ -1,6 +1,5 @@
 import type { LucideIcon } from "lucide-react";
 import {
-  Archive,
   CalendarCheck2,
   CalendarDays,
   ClipboardList,
@@ -10,7 +9,6 @@ import {
   Medal,
   Megaphone,
   Newspaper,
-  Radio,
   Shield,
   Swords,
   Target,
@@ -83,13 +81,12 @@ export const navItems: NavItem[] = [
     ],
   },
   {
-    href: "/prensa",
-    label: "Prensa",
+    href: "/noticias",
+    label: "Noticias",
     icon: Newspaper,
     children: [
-      { href: "/prensa/noticias-externas", label: "Noticias externas", icon: Radio },
-      { href: "/prensa/medios", label: "Medios", icon: Megaphone },
-      { href: "/prensa/archivo", label: "Archivo", icon: Archive },
+      { href: "/noticias/club", label: "Club", icon: Shield },
+      { href: "/noticias/prensa", label: "Prensa", icon: Megaphone },
     ],
   },
   {
