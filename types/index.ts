@@ -105,6 +105,7 @@ export type NewsItem = {
   title: string;
   excerpt: string;
   url: string;
+  imageUrl?: string;
   tags: NewsTag[];
   featured?: boolean;
 };

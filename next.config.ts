@@ -2,6 +2,15 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   typedRoutes: true,
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "estaticos-cdn.prensaiberica.es" },
+      { protocol: "https", hostname: "s2.ppllstatics.com" },
+      { protocol: "https", hostname: "s3.ppllstatics.com" },
+      { protocol: "https", hostname: "www.rtpa.es" },
+      { protocol: "https", hostname: "www.realavilesindustrial1903.com" },
+    ],
+  },
   async redirects() {
     return [
       { source: "/primer-equipo", destination: "/primer-equipo/masculino/plantilla", permanent: false },
