@@ -458,56 +458,22 @@ export const fanZonaMixta: FanMediaLink[] = [
   },
 ];
 
-/** Previas oficiales antes de cada partido. */
-export const fanPrevia: FanMediaLink[] = [
-  {
-    id: "previa-barakaldo",
-    name: "La previa con Lolo Escobar (Barakaldo CF)",
-    platform: "youtube",
-    url: RAI_YOUTUBE_CHANNEL,
-    description: "Entrevista previa al duelo con el entrenador del Barakaldo.",
-    schedule: "Antes del partido",
-  },
-  {
-    id: "previa-guadalajara",
-    name: "La previa con Lolo Escobar (CD Guadalajara)",
-    platform: "youtube",
-    url: RAI_YOUTUBE_CHANNEL,
-    description: "Pieza previa con el mister rival de la jornada.",
-  },
-  {
-    id: "previa-cayarga",
-    name: "La previa con Cayarga",
-    platform: "youtube",
-    url: RAI_YOUTUBE_CHANNEL,
-    description: "Espacio reservado para enlazar la previa con el rival de turno.",
-  },
+/** Previas oficiales antes de cada partido (el ultimo se muestra destacado). */
+export const fanPreviaVideos: FanYouTubeVideo[] = [
+  { id: "previa-v1", title: "Previa", url: "https://youtu.be/57y06JKzZa8" },
+  { id: "previa-v2", title: "Previa", url: "https://youtu.be/w7Ayjxe76aA" },
+  { id: "previa-v3", title: "Previa", url: "https://youtu.be/7QoTrVnOUmw" },
+  { id: "previa-v4", title: "Previa", url: "https://youtu.be/Y4MobJJerF4" },
+  { id: "previa-v5", title: "Previa", url: "https://youtu.be/Wd8uN3Z5J3U" },
 ];
 
-/** Ruedas de prensa (RDP) del cuerpo tecnico. */
-export const fanRdp: FanMediaLink[] = [
-  {
-    id: "rdp-barakaldo",
-    name: "RDP | Lolo Escobar (Barakaldo CF)",
-    platform: "youtube",
-    url: RAI_YOUTUBE_CHANNEL,
-    description: "Rueda de prensa tras el partido ante el Barakaldo.",
-    schedule: "Postpartido",
-  },
-  {
-    id: "rdp-guadalajara",
-    name: "RDP | Lolo Escobar (CD Guadalajara)",
-    platform: "youtube",
-    url: RAI_YOUTUBE_CHANNEL,
-    description: "Comparecencia oficial del entrenador tras la jornada.",
-  },
-  {
-    id: "rdp-ferrol",
-    name: "RDP | Lolo Escobar (Racing Ferrol)",
-    platform: "youtube",
-    url: RAI_YOUTUBE_CHANNEL,
-    description: "Enlaza aqui la RDP de la jornada que quieras destacar.",
-  },
+/** Ruedas de prensa (RDP) del cuerpo tecnico (el ultimo se muestra destacado). */
+export const fanRdpVideos: FanYouTubeVideo[] = [
+  { id: "rdp-v1", title: "RDP", url: "https://youtu.be/UoOSohza1kE" },
+  { id: "rdp-v2", title: "RDP", url: "https://youtu.be/tFKmZC99qSs" },
+  { id: "rdp-v3", title: "RDP", url: "https://youtu.be/Kxuks6EiBdg" },
+  { id: "rdp-v4", title: "RDP", url: "https://youtu.be/V7TtRlBDveE" },
+  { id: "rdp-v5", title: "RDP", url: "https://youtu.be/eCeLvze6axY" },
 ];
 
 /** Contenido de aficion y pe?as: tertulias, directos y apoyo a la plantilla. */
@@ -533,38 +499,5 @@ export const fanTenteFirme: FanMediaLink[] = [
     url: "https://www.ivoox.com",
     description: "Podcast de pe?as y aficionados. Enlaza el episodio concreto en iVoox.",
     schedule: "Cuando haya novedad",
-  },
-];
-
-/** Podcasts y audio fan compartidos en Spotify, Twitter/X, iVoox y similares. */
-export const fanPodcasts: FanMediaLink[] = [
-  {
-    id: "podcast-spotify",
-    name: "Espacio en Spotify",
-    platform: "spotify",
-    url: "https://open.spotify.com",
-    description: "Enlaza el podcast de aficionados que sigues en Spotify.",
-    schedule: "Episodio semanal",
-  },
-  {
-    id: "podcast-ivoox",
-    name: "Espacio en iVoox",
-    platform: "ivoox",
-    url: "https://www.ivoox.com",
-    description: "Para programas de audio alojados en iVoox u otras plataformas locales.",
-  },
-  {
-    id: "podcast-twitter",
-    name: "Espacio en X / Twitter",
-    platform: "twitter",
-    url: "https://x.com",
-    description: "Cuenta o espacio donde los aficionados comparten clips, directos o hilos de actualidad.",
-  },
-  {
-    id: "podcast-apple",
-    name: "Espacio en Apple Podcasts",
-    platform: "apple",
-    url: "https://podcasts.apple.com",
-    description: "Enlaza el feed de Apple Podcasts si el programa tambien esta alli.",
   },
 ];

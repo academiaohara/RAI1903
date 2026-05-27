@@ -4,7 +4,6 @@ import {
   CalendarDays,
   ClipboardList,
   FileText,
-  Headphones,
   Heart,
   Home,
   Medal,
@@ -101,7 +100,6 @@ export const navItems: NavItem[] = [
       { href: "/contenido-fan/previa", label: "Previa", icon: Target },
       { href: "/contenido-fan/rdp", label: "RDP", icon: Mic2 },
       { href: "/contenido-fan/tente-firme", label: "Tente firme", icon: Heart },
-      { href: "/contenido-fan/podcasts", label: "Podcasts", icon: Headphones },
     ],
   },
 ];
