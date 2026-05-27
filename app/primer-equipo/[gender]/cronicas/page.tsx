@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { Card } from "@/components/Card";
 import { PageHero } from "@/components/PageHero";
-import { PrimerEquipoSubnav } from "@/components/PrimerEquipoSubnav";
 import { getMatchArticles } from "@/lib/match-articles";
-import { genderLabels, primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
+import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { formatDate } from "@/lib/utils";
 import type { Route } from "next";
 
@@ -12,11 +11,10 @@ export default async function CronicasPage({ params }: { params: Promise<{ gende
   const articles = getMatchArticles(gender, "cronica");
 
   return (
-    <div className="space-y-6">
-      <PageHero eyebrow={`Primer Equipo · ${genderLabels[gender].title}`} title="Cronicas" description="Resumenes de partidos disputados con lectura tactica y sensaciones del vestuario." />
-      <PrimerEquipoSubnav gender={gender} />
+    <>
+      <PageHero title="Cronicas" description="Resumenes de partidos disputados con lectura tactica y sensaciones del vestuario." />
 
-      <Card eyebrow="Partidos disputados" title="Archivo de cronicas">
+      <Card>
         <div className="space-y-3">
           {articles.map((article) => (
             <Link
@@ -31,6 +29,6 @@ export default async function CronicasPage({ params }: { params: Promise<{ gende
           ))}
         </div>
       </Card>
-    </div>
+    </>
   );
 }
