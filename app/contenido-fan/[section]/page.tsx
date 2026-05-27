@@ -28,11 +28,13 @@ export default async function ContenidoFanSectionPage({ params }: { params: Prom
             <ZonaMixtaVideoShowcase videos={config.videos} />
           </div>
         )}
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {config.links.map((link) => (
-            <FanMediaLinkCard key={link.id} link={link} />
-          ))}
-        </div>
+        {config.links.length > 0 && (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {config.links.map((link) => (
+              <FanMediaLinkCard key={link.id} link={link} />
+            ))}
+          </div>
+        )}
       </Card>
     </div>
   );
