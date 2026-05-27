@@ -1,5 +1,5 @@
 import type { FanMediaLink, FanYouTubeVideo } from "@/types";
-import { fanPrevia, fanRdp, fanTenteFirme, fanZonaMixta, fanZonaMixtaVideos } from "@/data/mock";
+import { fanPrevia, fanRdp, fanTenteFirme, fanZonaMixtaVideos } from "@/data/mock";
 
 export const CONTENIDO_FAN_SLUGS = ["zona-mixta", "previa", "rdp", "tente-firme"] as const;
 
@@ -31,7 +31,7 @@ export const contenidoFanSections: Record<ContenidoFanSlug, ContenidoFanSectionC
     cardTitle: "Zona Mixta",
     cardIntro:
       "Espacio semanal de actualidad blanquiazul. El último episodio se reproduce arriba; el resto aparece en el carrusel inferior.",
-    links: fanZonaMixta,
+    links: [],
     videos: fanZonaMixtaVideos,
   },
   previa: {
