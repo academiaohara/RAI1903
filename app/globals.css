@@ -102,12 +102,17 @@ a {
   animation: page-title-wrap-reveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   max-width: 0;
   opacity: 0.35;
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 .page-title-gear-icon,
 .page-title-gear-text {
   background: transparent;
+}
+
+.page-title-gear-icon {
+  overflow: visible;
 }
 
 .page-title-gear-text {
