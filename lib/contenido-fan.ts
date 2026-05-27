@@ -14,7 +14,7 @@ type ContenidoFanSectionConfig = {
   label: string;
   heroTitle: string;
   heroDescription: string;
-  cardEyebrow: string;
+  cardEyebrow?: string;
   cardTitle: string;
   cardIntro: string;
   links: FanMediaLink[];
@@ -27,8 +27,7 @@ export const contenidoFanSections: Record<ContenidoFanSlug, ContenidoFanSectionC
     label: "Zona Mixta",
     heroTitle: "Zona Mixta",
     heroDescription:
-      "Programa oficial del club con entrevistas a directivos, entrenadores y jugadores. Presentado por Jorge Quirós en RAI Radio.",
-    cardEyebrow: "RAI Radio",
+      "Programa oficial del club con entrevistas a directivos, entrenadores y jugadores. Presentado por Jorge Quirós.",
     cardTitle: "Zona Mixta",
     cardIntro:
       "Espacio semanal de actualidad blanquiazul. El último episodio se reproduce arriba; el resto aparece en el carrusel inferior.",

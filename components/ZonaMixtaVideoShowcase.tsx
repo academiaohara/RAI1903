@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { youtubeEmbedUrl, youtubeVideoId } from "@/lib/youtube";
 import type { FanYouTubeVideo } from "@/types";
 
@@ -29,27 +29,13 @@ export function ZonaMixtaVideoShowcase({ videos }: ZonaMixtaVideoShowcaseProps) 
 
       const nextIndex = ((index % carouselCount) + carouselCount) % carouselCount;
       const slide = track.children[nextIndex] as HTMLElement | undefined;
-      slide?.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+      if (slide) {
+        track.scrollTo({ left: slide.offsetLeft, behavior: "smooth" });
+      }
       setCarouselIndex(nextIndex);
     },
     [carouselCount],
   );
-
-  useEffect(() => {
-    if (carouselCount <= 1) return;
-
-    const timer = window.setInterval(() => {
-      setCarouselIndex((current) => {
-        const nextIndex = (current + 1) % carouselCount;
-        const track = trackRef.current;
-        const slide = track?.children[nextIndex] as HTMLElement | undefined;
-        slide?.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
-        return nextIndex;
-      });
-    }, 6000);
-
-    return () => window.clearInterval(timer);
-  }, [carouselCount]);
 
   if (resolved.length === 0) return null;
 

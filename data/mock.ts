@@ -439,7 +439,7 @@ export const fanZonaMixtaVideos: FanYouTubeVideo[] = [
   },
 ];
 
-/** Zona Mixta: programa oficial del club en RAI Radio y YouTube. */
+/** Zona Mixta: programa oficial del club en YouTube y Spotify. */
 export const fanZonaMixta: FanMediaLink[] = [
   {
     id: "zona-mixta-youtube",
@@ -454,7 +454,7 @@ export const fanZonaMixta: FanMediaLink[] = [
     name: "Zona Mixta en Spotify",
     platform: "spotify",
     url: RAI_SPOTIFY_PODCAST,
-    description: "Episodios del programa en el canal de podcast oficial de RAI Radio.",
+    description: "Episodios del programa en el canal de podcast oficial del club.",
   },
 ];
 

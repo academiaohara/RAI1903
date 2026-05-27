@@ -28,7 +28,7 @@ export default async function ContenidoFanSectionPage({ params }: { params: Prom
             <ZonaMixtaVideoShowcase videos={config.videos} />
           </div>
         )}
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className={section === "zona-mixta" ? "space-y-4" : "grid gap-4 md:grid-cols-2 xl:grid-cols-3"}>
           {config.links.map((link) => (
             <FanMediaLinkCard key={link.id} link={link} />
           ))}
