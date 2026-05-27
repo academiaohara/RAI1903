@@ -1,14 +1,35 @@
+import Image from "next/image";
 import { ExternalLink } from "lucide-react";
 import { Badge } from "@/components/Badge";
 import { formatDate } from "@/lib/utils";
 import type { NewsItem } from "@/types";
 
+function NewsCardMedia({ item, featured }: { item: NewsItem; featured: boolean }) {
+  if (item.imageUrl) {
+    return (
+      <div className={`relative min-h-24 overflow-hidden rounded-2xl bg-slate-100 sm:min-h-32 ${featured ? "sm:min-h-40" : ""}`}>
+        <Image
+          src={item.imageUrl}
+          alt=""
+          fill
+          className="object-cover"
+          sizes={featured ? "(max-width: 640px) 100vw, 160px" : "(max-width: 640px) 100vw, 160px"}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex min-h-24 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#214C9B_0%,#214C9B_48%,#ffffff_48%,#ffffff_56%,#981915_56%,#981915_100%)] text-3xl font-extrabold text-white shadow-inner sm:min-h-32 sm:text-4xl">
+      {item.source.slice(0, 2).toUpperCase()}
+    </div>
+  );
+}
+
 export function NewsCard({ item, featured = false }: { item: NewsItem; featured?: boolean }) {
   return (
     <article className={`grid gap-4 rounded-3xl border border-[#214C9B]/30 bg-white p-4 shadow-[0_12px_30px_rgba(17,24,39,0.06)] transition hover:-translate-y-0.5 hover:border-[#214C9B] sm:grid-cols-[160px_1fr] ${featured ? "border-[#214C9B] bg-gradient-to-br from-white to-blue-50" : ""}`}>
-      <div className="flex min-h-24 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#214C9B_0%,#214C9B_48%,#ffffff_48%,#ffffff_56%,#981915_56%,#981915_100%)] text-3xl font-extrabold text-white shadow-inner sm:min-h-32 sm:text-4xl">
-        {item.source.slice(0, 2).toUpperCase()}
-      </div>
+      <NewsCardMedia item={item} featured={featured} />
       <div>
         <div className="mb-3 flex flex-wrap items-center gap-2">
           <Badge tone={featured ? "blue" : "red"}>{item.source}</Badge>
