@@ -54,7 +54,7 @@ function PlayerModalContent({ player, onClose }: { player: SquadPlayer; onClose:
 
                 <div className="min-w-0 flex-1 text-center sm:text-left">
                   <span className="inline-flex rounded-full border border-white/25 bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em]">
-                    {player.posicion}
+                    {player.rol}
                   </span>
                   <h2 className="mt-3 text-3xl font-extrabold uppercase tracking-tight sm:text-4xl">{getPlayerFullName(player)}</h2>
                   <p className="mt-2 text-sm font-semibold text-white/80">
@@ -112,7 +112,7 @@ function PlayerModalContent({ player, onClose }: { player: SquadPlayer; onClose:
                       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
                         <h3 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Perfil</h3>
                         <p className="mt-3 text-sm leading-7 text-slate-600">
-                          Jugador del {player.posicion.toLowerCase()} con presencia en la plantilla del Real Aviles Industrial. Datos
+                          Jugador ({player.rol}) con presencia en la plantilla del Real Aviles Industrial. Datos
                           mock preparados para integracion con API oficial.
                         </p>
                       </div>
