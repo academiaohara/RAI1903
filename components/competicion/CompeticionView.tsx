@@ -7,7 +7,6 @@ import { LeagueTableCard } from "@/components/LeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
 import { getLatestAvilesMatchesByGender, getUpcomingAvilesMatchesByGender } from "@/lib/fixtures";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
-import { getStandingsWindow } from "@/lib/standings-window";
 import type { Route } from "next";
 import type { Team } from "@/types";
 
@@ -18,21 +17,19 @@ type CompeticionViewProps = {
 };
 
 export function CompeticionView({ gender, teams, highlightTeamId }: CompeticionViewProps) {
-  const focusedTeams = getStandingsWindow(teams, highlightTeamId);
   const latest = getLatestAvilesMatchesByGender(gender, 5);
   const upcoming = getUpcomingAvilesMatchesByGender(gender, 5);
   const calendarHref = `${primerEquipoBase(gender)}/calendario` as Route;
 
   return (
     <div className="space-y-6">
-      <GuiaLiga teams={teams} highlightTeamId={highlightTeamId} />
+      <GuiaLiga gender={gender} teams={teams} highlightTeamId={highlightTeamId} />
 
       <section className="grid gap-6 xl:grid-cols-2">
         <LeagueTableCard
-          eyebrow="Tu posicion"
+          eyebrow="Liga"
           title="Clasificacion"
-          teams={focusedTeams}
-          fullTeams={teams}
+          teams={teams}
           highlightTeamId={highlightTeamId}
           borderlessHeader
         />

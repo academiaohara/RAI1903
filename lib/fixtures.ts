@@ -4,6 +4,9 @@ import type { Match, ResultCode, Team } from "@/types";
 
 export const getTeam = (teamId: string): Team | undefined => teams.find((team) => team.id === teamId);
 
+export const getTeamByGender = (teamId: string, gender: PrimerEquipoGender): Team | undefined =>
+  getTeamsByGender(gender).find((team) => team.id === teamId);
+
 export const getAvilesMatches = (): Match[] =>
   matchdays.flatMap((matchday) => matchday.matches).filter((match) => match.homeTeamId === RAI_TEAM_ID || match.awayTeamId === RAI_TEAM_ID);
 
