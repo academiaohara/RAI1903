@@ -162,6 +162,19 @@ export type DataComparison = {
 
 export type PrimerEquipoGender = "masculino" | "femenino";
 
+export type CalendarMatch = {
+  id: string;
+  date: string;
+  opponent: string;
+  opponentLogo: string;
+  competition: string;
+  isHome: boolean;
+  time: string | null;
+  played: boolean;
+  result: string | null;
+  chronicleUrl: string | null;
+};
+
 export type MatchArticle = {
   id: string;
   matchId: string;
