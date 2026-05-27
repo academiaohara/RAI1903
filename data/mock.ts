@@ -291,6 +291,7 @@ export const newsItems: NewsItem[] = [
     url: "https://www.lne.es/real-aviles/2026/05/27/fichajes-invernales-aviles-despiden-club-130718735.html",
     imageUrl: "https://estaticos-cdn.prensaiberica.es/clip/80ff21af-ae10-4481-8e31-92fd6ea4bbe4_16-9-discover-aspect-ratio_default_0_x1257y537.jpg",
     tags: ["fichajes", "club"],
+    teams: ["masculino"],
     featured: true,
   },
   {
@@ -303,6 +304,7 @@ export const newsItems: NewsItem[] = [
     url: "https://www.lne.es/real-aviles/2026/05/27/fichajes-veraniegos-aviles-renovacion-automatica-130694552.html",
     imageUrl: "https://estaticos-cdn.prensaiberica.es/clip/0e112b57-56ba-4eef-8320-15c6f54e4abd_16-9-aspect-ratio_default_0.jpg",
     tags: ["fichajes", "renovaciones"],
+    teams: ["masculino"],
   },
   {
     id: "lne-arquitecto-salvacion",
@@ -336,6 +338,7 @@ export const newsItems: NewsItem[] = [
     url: "https://www.lne.es/real-aviles/2026/05/26/aviles-profunda-reconstruccion-situacion-contratos-130652565.html",
     imageUrl: "https://estaticos-cdn.prensaiberica.es/clip/b79ade27-cb36-4843-92b7-4d4cfd326189_16-9-discover-aspect-ratio_default_0_x596y254.jpg",
     tags: ["club", "renovaciones", "fichajes"],
+    teams: ["masculino"],
   },
   {
     id: "lne-diego-baeza-hoja-ruta",
@@ -423,6 +426,7 @@ export const newsItems: NewsItem[] = [
     excerpt: "Comunicado oficial del club tras certificar la permanencia en Primera Federación.",
     url: "https://www.realavilesindustrial1903.com/somos-de-primera-rfef/",
     tags: ["club", "partido"],
+    teams: ["masculino"],
     featured: true,
   },
   {
@@ -454,6 +458,18 @@ export const newsItems: NewsItem[] = [
     excerpt: "El equipo afronta la recta final con una última oportunidad para asegurar la categoría.",
     url: "https://www.realavilesindustrial1903.com/queda-una-bala/",
     tags: ["previa", "partido"],
+    teams: ["masculino"],
+  },
+  {
+    id: "club-femenino-pretemporada",
+    channel: "club",
+    source: "Real Avilés Industrial Femenino",
+    date: "2026-05-20",
+    title: "El femenino arranca la pretemporada",
+    excerpt: "El primer equipo femenino comienza los trabajos de preparacion con la mirada puesta en la nueva campana.",
+    url: "https://www.realavilesindustrial1903.com/",
+    tags: ["club", "previa"],
+    teams: ["femenino"],
   },
 ];
 

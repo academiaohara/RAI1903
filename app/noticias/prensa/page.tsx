@@ -5,9 +5,8 @@ import { Badge } from "@/components/Badge";
 import { Card } from "@/components/Card";
 import { NewsCard } from "@/components/NewsCard";
 import { PageHero } from "@/components/PageHero";
-import { SectionTabs } from "@/components/SectionTabs";
 import { newsItems, pressLinks } from "@/data/mock";
-import { NOTICIAS_TABS, newsByChannel } from "@/lib/noticias";
+import { newsByChannel } from "@/lib/noticias";
 import type { NewsTag } from "@/types";
 
 const pressNews = newsByChannel(newsItems, "prensa");
@@ -34,7 +33,6 @@ export default function NoticiasPrensaPage() {
   return (
     <div className="space-y-6">
       <PageHero eyebrow="Noticias" title="Prensa" description="Titulares de medios externos, enlaces a fuentes y archivo reciente." />
-      <SectionTabs tabs={NOTICIAS_TABS} />
       {featured && <NewsCard item={featured} featured />}
 
       <Card eyebrow="Prensa" title="Busca por medio, texto o etiqueta">

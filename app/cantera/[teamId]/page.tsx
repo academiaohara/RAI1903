@@ -2,10 +2,7 @@ import { notFound } from "next/navigation";
 import { CanteraTeamSections } from "@/components/cantera/CanteraTeamSections";
 import { Card } from "@/components/Card";
 import { PageHero } from "@/components/PageHero";
-import { SectionTabs } from "@/components/SectionTabs";
 import { academyTeams } from "@/data/mock";
-
-const tabs = academyTeams.map((team) => ({ href: `/cantera/${team.id}`, label: team.name }));
 
 export function generateStaticParams() {
   return academyTeams.map((team) => ({ teamId: team.id }));
@@ -22,7 +19,6 @@ export default async function CanteraTeamPage({ params }: { params: Promise<{ te
   return (
     <div className="space-y-6">
       <PageHero eyebrow="Cantera" title={team.name} description="Plantilla, clasificacion y calendario del equipo en una pagina propia." />
-      <SectionTabs tabs={tabs} />
 
       <Card eyebrow={team.category} title={team.name}>
         <CanteraTeamSections team={team} />

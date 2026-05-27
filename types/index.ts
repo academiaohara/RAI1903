@@ -110,6 +110,8 @@ export type NewsItem = {
   imageUrl?: string;
   tags: NewsTag[];
   featured?: boolean;
+  /** Si se omite, la noticia aplica al club en general (masculino y femenino). */
+  teams?: PrimerEquipoGender[];
 };
 
 export type NewsCategory = "Fichajes" | "Lesionados" | "Rumores" | "Renovaciones" | "Entrevistas" | "Otros";

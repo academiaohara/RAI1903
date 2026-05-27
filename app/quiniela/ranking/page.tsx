@@ -1,17 +1,11 @@
 import { Card } from "@/components/Card";
 import { PageHero } from "@/components/PageHero";
-import { SectionTabs } from "@/components/SectionTabs";
 import { quinielaRanking } from "@/data/mock";
-
-import { QUINIELA_TABS } from "@/lib/quiniela";
-
-const tabs = [...QUINIELA_TABS];
 
 export default function QuinielaRankingPage() {
   return (
     <div className="space-y-6">
       <PageHero eyebrow="Quiniela" title="Ranking" description="Clasificacion de usuarios mock en una pagina separada." />
-      <SectionTabs tabs={tabs} />
 
       <Card eyebrow="Ranking" title="Clasificacion de usuarios">
         <div className="space-y-3">

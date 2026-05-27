@@ -1,13 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { SubsectionFilterNav } from "@/components/SubsectionFilterNav";
 import { LeagueTable } from "@/components/LeagueTable";
 import { MatchCard } from "@/components/MatchCard";
-import { cn } from "@/lib/utils";
 import type { AcademyTeam } from "@/types";
-
-const sectionShellClassName =
-  "rounded-3xl border border-[#214C9B]/20 bg-white p-3 shadow-[0_12px_30px_rgba(17,24,39,0.06)] no-scrollbar flex gap-2 overflow-x-auto";
 
 const sections = [
   { id: "plantilla", label: "Plantilla" },
@@ -26,31 +23,17 @@ export function CanteraTeamSections({ team }: CanteraTeamSectionsProps) {
 
   return (
     <div className="space-y-5">
+      <SubsectionFilterNav
+        items={sections.map((section) => section.id)}
+        value={activeSection}
+        onChange={setActiveSection}
+        getLabel={(id) => sections.find((section) => section.id === id)?.label ?? id}
+        ariaLabel="Secciones del equipo"
+      />
+
       <p className="text-sm text-slate-600">
         <strong className="text-slate-900">Entrenador:</strong> {team.coach}
       </p>
-
-      <nav className={sectionShellClassName} aria-label="Secciones del equipo">
-        {sections.map((section) => {
-          const active = activeSection === section.id;
-          return (
-            <button
-              key={section.id}
-              type="button"
-              aria-pressed={active}
-              onClick={() => setActiveSection(section.id)}
-              className={cn(
-                "min-w-fit rounded-2xl border px-4 py-3 text-sm font-bold uppercase tracking-normal transition",
-                active
-                  ? "border-[#214C9B] bg-[#214C9B] text-white shadow-md shadow-blue-950/10"
-                  : "border-[#214C9B]/15 bg-white text-[#214C9B] hover:border-[#214C9B] hover:bg-blue-50",
-              )}
-            >
-              {section.label}
-            </button>
-          );
-        })}
-      </nav>
 
       {activeSection === "plantilla" && (
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
