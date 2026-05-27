@@ -9,9 +9,17 @@ export const ADORNO_TRANSFORM = "translate(-46.596128,-32)";
 /** Horizontal center of the gear in viewBox coordinates (middle of adorno.svg). */
 export const ADORNO_SPLIT_X = ADORNO_VIEWBOX_WIDTH / 2;
 
-/** Mask cutout on the right half so title text can sit inside the gear. */
-export function adornoTextCutoutPath(splitX: number = ADORNO_SPLIT_X): string {
-  const curveOuter = splitX + 150;
-  const curveMid = splitX + 98;
-  return `M ${splitX} 344 H ${ADORNO_VIEWBOX_WIDTH} V 805.9065 H ${splitX} C ${curveMid} 744 ${curveOuter} 665 ${curveOuter} 574.9532 C ${curveOuter} 484 ${curveMid} 406 ${splitX} 344 Z`;
+/** Mask a 90-degree sector centered on the right axis, giving the gear a Pac-Man mouth. */
+export function adornoTextCutoutPath(): string {
+  const centerX = ADORNO_VIEWBOX_WIDTH / 2;
+  const centerY = ADORNO_VIEWBOX_HEIGHT / 2;
+  const radius = Math.hypot(ADORNO_VIEWBOX_WIDTH, ADORNO_VIEWBOX_HEIGHT);
+  const upperAngle = (-45 * Math.PI) / 180;
+  const lowerAngle = (45 * Math.PI) / 180;
+  const upperX = centerX + radius * Math.cos(upperAngle);
+  const upperY = centerY + radius * Math.sin(upperAngle);
+  const lowerX = centerX + radius * Math.cos(lowerAngle);
+  const lowerY = centerY + radius * Math.sin(lowerAngle);
+
+  return `M ${centerX} ${centerY} L ${upperX} ${upperY} A ${radius} ${radius} 0 0 1 ${lowerX} ${lowerY} Z`;
 }

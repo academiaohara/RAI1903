@@ -81,6 +81,10 @@ a {
   transform: translateX(80%);
 }
 
+.-ml-\[0\.65em\] {
+  margin-left: -0.75em;
+}
+
 .news-ticker-track {
   animation: news-ticker-right 40s linear infinite;
 }
@@ -117,6 +121,7 @@ a {
 
 .page-title-gear-text {
   animation: page-title-text-reveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  margin-bottom: 1px;
   opacity: 0.35;
 }
 
