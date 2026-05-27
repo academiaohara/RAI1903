@@ -98,7 +98,7 @@ export function Header() {
 
       {hoveredNav?.children && (
         <div
-          className="hidden border-t border-neutral-200/80 bg-[#f0f1f3] lg:block"
+          className="hidden border-t border-neutral-300/70 bg-[#e8eaee] lg:block"
           onMouseEnter={clearCloseTimer}
           onMouseLeave={scheduleClose}
         >
@@ -116,10 +116,10 @@ export function Header() {
                     href={child.href as Route}
                     aria-current={childActive ? "page" : undefined}
                     className={cn(
-                      "flex h-[4.25rem] w-[4.25rem] flex-col items-center justify-center gap-1 rounded-[10px] border bg-white px-1 py-1.5 text-center transition",
+                      "flex h-[4.25rem] w-[4.25rem] flex-col items-center justify-center gap-1 rounded-[10px] border border-[#d8d8d8] bg-white px-1 py-1.5 text-center shadow-[0_1px_2px_rgba(0,0,0,0.06)] transition",
                       childActive
-                        ? "border-[#981915] shadow-sm shadow-[#981915]/10"
-                        : "border-[#e0e0e0] hover:border-[#981915]/50 hover:shadow-sm",
+                        ? "border-[#981915] shadow-[0_2px_6px_rgba(152,25,21,0.12)]"
+                        : "hover:border-[#981915]/50 hover:shadow-[0_2px_4px_rgba(0,0,0,0.08)]",
                     )}
                   >
                     <Icon size={18} strokeWidth={2.25} className="shrink-0 text-[#981915]" aria-hidden />
@@ -164,8 +164,8 @@ export function Header() {
                             href={child.href as Route}
                             onClick={() => setOpen(false)}
                             className={cn(
-                              "flex h-[4.25rem] w-[4.25rem] flex-col items-center justify-center gap-1 rounded-[10px] border bg-white px-1 py-1.5 text-center",
-                              childActive ? "border-[#981915] shadow-sm" : "border-[#e0e0e0]",
+                              "flex h-[4.25rem] w-[4.25rem] flex-col items-center justify-center gap-1 rounded-[10px] border border-[#d8d8d8] bg-white px-1 py-1.5 text-center shadow-[0_1px_2px_rgba(0,0,0,0.06)]",
+                              childActive ? "border-[#981915] shadow-[0_2px_6px_rgba(152,25,21,0.12)]" : "",
                             )}
                           >
                             <Icon size={18} strokeWidth={2.25} className="shrink-0 text-[#981915]" aria-hidden />
