@@ -41,13 +41,5 @@ export function PlayerGrid({ players, onSelect, variant = "default" }: PlayerGri
     </div>
   );
 
-  if (isFichas) {
-    return (
-      <div className="rounded-[1.5rem] bg-gradient-to-b from-[#0f2347] via-[#122d57] to-[#0f2347] p-5 sm:rounded-[2rem] sm:p-8">
-        {content}
-      </div>
-    );
-  }
-
   return content;
 }

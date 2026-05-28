@@ -10,6 +10,8 @@ type PlayerAvatarProps = {
   size?: "sm" | "md" | "lg" | "xl";
   className?: string;
   bare?: boolean;
+  /** Placeholder initials when the player has no photo. */
+  placeholderTone?: "dark" | "light";
 };
 
 const sizeMap = {
@@ -19,7 +21,13 @@ const sizeMap = {
   xl: "h-40 w-40 text-5xl",
 };
 
-export function PlayerAvatar({ player, size = "md", className = "", bare = false }: PlayerAvatarProps) {
+export function PlayerAvatar({
+  player,
+  size = "md",
+  className = "",
+  bare = false,
+  placeholderTone = "dark",
+}: PlayerAvatarProps) {
   const initials = getPlayerInitials(player);
   const hasCustomSize = className.includes("aspect-") || className.includes("h-") || className.includes("w-full");
 
@@ -36,10 +44,17 @@ export function PlayerAvatar({ player, size = "md", className = "", bare = false
       {player.foto ? (
         <Image src={player.foto} alt={`${player.nombre} ${player.apellido}`} fill className="object-cover" sizes="160px" />
       ) : (
-        <div className="flex h-full w-full items-center justify-center font-extrabold tracking-tight text-white">
+        <div
+          className={`flex h-full w-full items-center justify-center font-extrabold tracking-tight ${
+            placeholderTone === "light"
+              ? "bg-gradient-to-b from-sky-200/60 to-transparent text-[#214C9B]"
+              : "text-white"
+          }`}
+        >
           <span className="opacity-95">{initials}</span>
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.35),transparent_45%)]" />
-          <div className="pointer-events-none absolute -bottom-6 -right-4 text-[5rem] font-black leading-none text-white/10">{player.dorsal}</div>
+          {placeholderTone === "dark" ? (
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.35),transparent_45%)]" />
+          ) : null}
         </div>
       )}
     </Wrapper>
