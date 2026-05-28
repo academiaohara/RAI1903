@@ -61,10 +61,21 @@ export type SquadClubStats = {
   golesContra: number;
 };
 
+export type StadiumInfo = {
+  nombre: string;
+  imagen: string;
+  capacidad: number;
+  direccion: string;
+  ciudad: string;
+  inaugurado: number;
+  superficie: string;
+};
+
 export type SquadClubInfo = {
   nombre: string;
   temporada: string;
   estadio: string;
+  estadioInfo: StadiumInfo;
   escudo: string;
   entrenador: string;
   jugadores: number;
