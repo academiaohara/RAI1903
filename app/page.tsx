@@ -4,8 +4,10 @@ import { CalendarNavButton } from "@/components/CalendarNavButton";
 import { Card } from "@/components/Card";
 import { LeagueTableCard } from "@/components/LeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
+import { TransfersCarousel } from "@/components/fichajes/TransfersCarousel";
 import { NewsNavButton } from "@/components/NewsNavButton";
 import { NewsTicker } from "@/components/NewsTicker";
+import { getFeaturedTransfers } from "@/lib/fichajes";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { PageHero } from "@/components/PageHero";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
@@ -26,6 +28,7 @@ export default function HomePage() {
   const upcomingMatches = getUpcomingAvilesMatches();
   const latestCronica = latestMatch ? getCronicaForMatch(latestMatch.id) : undefined;
   const nextPrevia = nextMatch ? getPreviaForMatch(nextMatch.id) : undefined;
+  const featuredTransfers = getFeaturedTransfers();
   const statHighlights = [
     { label: "Mas goles", player: [...players].sort((a, b) => b.stats.goals - a.stats.goals)[0], valueKey: "goals", suffix: "goles" },
     { label: "Mas asistencias", player: [...players].sort((a, b) => b.stats.assists - a.stats.assists)[0], valueKey: "assists", suffix: "asist." },
@@ -70,6 +73,14 @@ export default function HomePage() {
           <NewsNavButton href="/noticias/club" />
         </div>
       </Card>
+
+      {featuredTransfers.length > 0 && (
+        <div id="fichajes">
+          <Card eyebrow="Mercado" title="Fichajes y renovaciones">
+            <TransfersCarousel transfers={featuredTransfers} />
+          </Card>
+        </div>
+      )}
 
       <section className="grid gap-6 xl:grid-cols-[1fr_0.42fr]">
         <LeagueTableCard eyebrow="Estado competitivo" title="Clasificacion" teams={teams} highlightTeamId={RAI_TEAM_ID} compact />
