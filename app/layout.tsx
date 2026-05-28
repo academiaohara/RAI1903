@@ -5,6 +5,11 @@ import { Header } from "@/components/Header";
 export const metadata: Metadata = {
   title: "RAI1903 | Real Aviles Industrial",
   description: "Plataforma no oficial blanquiazul sobre el Real Aviles Industrial.",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    shortcut: "/favicon.svg",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
