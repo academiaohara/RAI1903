@@ -172,6 +172,29 @@ a {
   }
 }
 
+.transfers-ticker-track {
+  animation: transfers-ticker-left var(--transfers-ticker-duration, 45s) linear infinite;
+}
+
+.transfers-ticker:hover .transfers-ticker-track {
+  animation-play-state: paused;
+}
+
+@keyframes transfers-ticker-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transfers-ticker-track {
+    animation: none;
+  }
+}
+
 .title-gear-wrap {
   animation: title-gear-wrap-reveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   max-width: 0;
