@@ -2,29 +2,34 @@
 
 import Image from "next/image";
 import { ChevronRight, Landmark } from "lucide-react";
-import type { SquadClubInfo } from "@/types/squad";
+import { SquadStatsBar } from "@/components/squad/SquadStatsBar";
+import type { SquadClubInfo, SquadClubStats } from "@/types/squad";
 
 type SquadHeaderProps = {
   club: SquadClubInfo;
+  stats: SquadClubStats;
   onStadiumClick: () => void;
 };
 
-export function SquadHeader({ club, onStadiumClick }: SquadHeaderProps) {
+export function SquadHeader({ club, stats, onStadiumClick }: SquadHeaderProps) {
   return (
     <div className="flex w-full flex-col items-start gap-5">
-      <div className="flex w-full min-w-0 flex-col items-start gap-4 text-left sm:w-auto sm:flex-row sm:items-center sm:gap-5 sm:text-left">
-        <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/15 bg-white p-2.5 shadow-sm sm:h-20 sm:w-20">
-          <Image src={club.escudo} alt={club.nombre} width={64} height={64} className="h-auto w-full object-contain drop-shadow-lg" priority />
+      <div className="flex w-full min-w-0 flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+        <div className="flex w-full min-w-0 flex-col items-start gap-4 text-left sm:w-auto sm:flex-row sm:items-center sm:gap-5 sm:text-left">
+          <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/15 bg-white p-2.5 shadow-sm sm:h-20 sm:w-20">
+            <Image src={club.escudo} alt={club.nombre} width={64} height={64} className="h-auto w-full object-contain drop-shadow-lg" priority />
+          </div>
+          <div className="min-w-0">
+            <h1 className="break-words text-2xl font-extrabold uppercase tracking-tight text-slate-950 sm:text-4xl">
+              {club.nombre}
+            </h1>
+            <p className="mt-2 text-sm font-semibold text-slate-700 sm:text-base">
+              <span className="text-slate-500">Entrenador:</span> {club.entrenador}
+            </p>
+            <p className="mt-2 text-xs font-semibold text-slate-500">Temporada {club.temporada}</p>
+          </div>
         </div>
-        <div className="min-w-0">
-          <h1 className="break-words text-2xl font-extrabold uppercase tracking-tight text-slate-950 sm:text-4xl">
-            {club.nombre}
-          </h1>
-          <p className="mt-2 text-sm font-semibold text-slate-700 sm:text-base">
-            <span className="text-slate-500">Entrenador:</span> {club.entrenador}
-          </p>
-          <p className="mt-2 text-xs font-semibold text-slate-500">Temporada {club.temporada}</p>
-        </div>
+        <SquadStatsBar stats={stats} />
       </div>
 
       <button
