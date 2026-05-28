@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { LucideIcon } from "lucide-react";
 import { Calendar, ChevronLeft, Clock, MapPin, User, Users } from "lucide-react";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
@@ -95,26 +96,30 @@ export function MatchCenterTabs({
   active,
   onChange,
 }: {
-  tabs: Array<{ id: string; label: string }>;
+  tabs: Array<{ id: string; label: string; icon: LucideIcon }>;
   active: string;
   onChange: (id: string) => void;
 }) {
   return (
-    <nav className="flex flex-wrap gap-2" aria-label="Secciones del partido">
+    <nav className="flex flex-nowrap justify-between gap-2 sm:flex-wrap sm:justify-start" aria-label="Secciones del partido">
       {tabs.map((tab) => {
         const isActive = tab.id === active;
+        const Icon = tab.icon;
         return (
           <button
             key={tab.id}
             type="button"
             onClick={() => onChange(tab.id)}
             className={cn(
-              "rounded-full px-4 py-2 text-xs font-extrabold uppercase tracking-normal transition sm:text-sm",
+              "inline-flex shrink-0 items-center justify-center rounded-full transition",
+              "size-11 sm:size-auto sm:px-4 sm:py-2 sm:text-xs sm:font-extrabold sm:uppercase sm:tracking-normal sm:text-sm",
               isActive ? "bg-[#214C9B] text-white shadow-md" : "border border-[#214C9B]/20 bg-white text-[#214C9B] hover:border-[#214C9B]",
             )}
+            aria-label={tab.label}
             aria-pressed={isActive}
           >
-            {tab.label}
+            <Icon size={20} className="sm:hidden" aria-hidden />
+            <span className="hidden sm:inline">{tab.label}</span>
           </button>
         );
       })}
