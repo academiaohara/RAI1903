@@ -12,6 +12,7 @@ type PlayerAvatarProps = {
   bare?: boolean;
   /** Placeholder initials when the player has no photo. */
   placeholderTone?: "dark" | "light";
+  imageClassName?: string;
 };
 
 const sizeMap = {
@@ -27,6 +28,7 @@ export function PlayerAvatar({
   className = "",
   bare = false,
   placeholderTone = "dark",
+  imageClassName = "object-cover",
 }: PlayerAvatarProps) {
   const initials = getPlayerInitials(player);
   const hasCustomSize = className.includes("aspect-") || className.includes("h-") || className.includes("w-full");
@@ -42,7 +44,13 @@ export function PlayerAvatar({
       } ${hasCustomSize ? "" : sizeMap[size]} ${className}`}
     >
       {player.foto ? (
-        <Image src={player.foto} alt={`${player.nombre} ${player.apellido}`} fill className="object-cover" sizes="160px" />
+        <Image
+          src={player.foto}
+          alt={`${player.nombre} ${player.apellido}`}
+          fill
+          className={imageClassName}
+          sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 12vw"
+        />
       ) : (
         <div
           className={`flex h-full w-full items-center justify-center font-extrabold tracking-tight ${

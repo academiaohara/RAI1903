@@ -89,30 +89,36 @@ function PlayerFichaCard({
       onClick={() => onSelect(player)}
       className="group w-full text-left"
     >
-      <article className="overflow-hidden rounded-tl-[1.25rem] rounded-br-[1.25rem] rounded-tr-sm rounded-bl-sm border-2 border-[#214C9B] bg-gradient-to-b from-sky-100 via-blue-50/90 to-white shadow-[0_10px_28px_rgba(33,76,155,0.12)] transition-shadow group-hover:shadow-[0_16px_36px_rgba(33,76,155,0.2)]">
-        <div className="relative aspect-[4/5] max-h-[200px] overflow-hidden sm:max-h-[210px]">
+      <article className="mx-auto w-full max-w-[11rem] overflow-hidden rounded-tl-xl rounded-br-xl rounded-tr-sm rounded-bl-sm border-2 border-[#214C9B] bg-gradient-to-b from-sky-100 via-blue-50/90 to-white shadow-[0_6px_18px_rgba(33,76,155,0.1)] transition-shadow group-hover:shadow-[0_10px_24px_rgba(33,76,155,0.18)] sm:max-w-none">
+        <div className="relative aspect-[3/4] overflow-hidden">
           <div
-            className="absolute left-2 top-2 z-10 flex flex-col items-center gap-1.5 rounded-lg bg-white px-2 py-2 shadow-sm"
+            className="absolute left-1.5 top-1.5 z-10 flex flex-col items-center gap-1 rounded-md bg-white px-1.5 py-1.5 shadow-sm"
             aria-label={`${player.nacionalidad}, dorsal ${player.dorsal}`}
           >
-            <span className="text-base leading-none sm:text-lg" role="img" aria-hidden>
+            <span className="text-sm leading-none" role="img" aria-hidden>
               {flag}
             </span>
-            <span className="text-base font-black tabular-nums leading-none text-[#214C9B] sm:text-lg">
-              {player.dorsal}
-            </span>
+            <span className="text-sm font-black tabular-nums leading-none text-[#214C9B]">{player.dorsal}</span>
           </div>
 
-          <PlayerAvatar
-            player={player}
-            bare
-            placeholderTone="light"
-            className="absolute inset-x-0 bottom-0 mx-auto aspect-[3/4] h-[88%] w-auto max-w-[calc(100%-2.5rem)] drop-shadow-[0_6px_16px_rgba(33,76,155,0.25)]"
+          <div className="relative flex h-full items-end justify-center px-1 pb-0 pt-1">
+            <PlayerAvatar
+              player={player}
+              bare
+              placeholderTone="light"
+              imageClassName="object-cover object-top"
+              className="aspect-[3/4] h-[98%] w-[94%] max-w-full drop-shadow-[0_4px_12px_rgba(33,76,155,0.2)]"
+            />
+          </div>
+
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-6 bg-gradient-to-t from-sky-100 via-blue-50/70 to-transparent"
+            aria-hidden
           />
         </div>
 
-        <div className="rounded-br-[1.1rem] bg-[#214C9B] px-3 py-2">
-          <p className="truncate text-sm font-bold text-white sm:text-[15px]">{displayName}</p>
+        <div className="rounded-br-[0.65rem] bg-[#214C9B] px-2 py-1.5">
+          <p className="truncate text-center text-[11px] font-bold leading-tight text-white sm:text-xs">{displayName}</p>
         </div>
       </article>
     </motion.button>
