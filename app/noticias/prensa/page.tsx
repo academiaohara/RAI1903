@@ -17,7 +17,6 @@ export default function NoticiasPrensaPage() {
   const [query, setQuery] = useState("");
   const [tag, setTag] = useState<NewsTag | "todas">("todas");
   const sources = ["Todos", ...Array.from(new Set(pressNews.map((item) => item.source)))];
-  const featured = pressNews.find((item) => item.featured) ?? pressNews[0];
 
   const filtered = useMemo(
     () =>
@@ -33,9 +32,8 @@ export default function NoticiasPrensaPage() {
   return (
     <div className="space-y-6">
       <PageHero eyebrow="Noticias" title="Prensa" description="Titulares de medios externos, enlaces a fuentes y archivo reciente." />
-      {featured && <NewsCard item={featured} featured />}
 
-      <Card eyebrow="Prensa" title="Busca por medio, texto o etiqueta">
+      <div className="space-y-4">
         <div className="grid gap-3 lg:grid-cols-[220px_1fr]">
           <select
             value={source}
@@ -53,7 +51,7 @@ export default function NoticiasPrensaPage() {
             className="rounded-2xl border border-[#214C9B]/25 bg-white px-4 py-3 text-slate-800 outline-none placeholder:text-slate-400 focus:border-[#214C9B]"
           />
         </div>
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
           {tags.map((item) => (
             <button
               key={item}
@@ -64,9 +62,9 @@ export default function NoticiasPrensaPage() {
             </button>
           ))}
         </div>
-      </Card>
+      </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-3 sm:gap-4">
         {filtered.map((item) => (
           <NewsCard key={item.id} item={item} />
         ))}

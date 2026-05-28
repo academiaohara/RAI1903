@@ -1,7 +1,6 @@
 "use client";
 
 import { use, useState } from "react";
-import { Card } from "@/components/Card";
 import { NewsCard } from "@/components/NewsCard";
 import { PrimerEquipoPageHero } from "@/components/PrimerEquipoPageHero";
 import { SubsectionFilterNav } from "@/components/SubsectionFilterNav";
@@ -41,17 +40,15 @@ export default function PrimerEquipoNoticiasPage({ params }: { params: Promise<{
         ariaLabel="Categorias de noticias"
       />
 
-      <Card>
-        <div className="grid gap-4">
-          {categoryNews.length > 0 ? (
-            categoryNews.map((item) => <NewsCard key={item.id} item={item} />)
-          ) : (
-            <p className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm font-bold text-slate-500">
-              Sin noticias en esta categoria para {genderLabels[gender].title.toLowerCase()}.
-            </p>
-          )}
-        </div>
-      </Card>
+      <div className="grid gap-3 sm:gap-4">
+        {categoryNews.length > 0 ? (
+          categoryNews.map((item) => <NewsCard key={item.id} item={item} />)
+        ) : (
+          <p className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm font-bold text-slate-500">
+            Sin noticias en esta categoria para {genderLabels[gender].title.toLowerCase()}.
+          </p>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,6 +1,40 @@
 import type { Route } from "next";
 import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
-import type { NewsChannel, NewsItem } from "@/types";
+import type { NewsChannel, NewsItem, NewsTag } from "@/types";
+
+const newsTagLabels: Record<NewsTag, string> = {
+  partido: "Partido",
+  fichajes: "Fichajes",
+  cantera: "Cantera",
+  previa: "Previa",
+  cronica: "Crónica",
+  club: "Club",
+  lesionados: "Lesionados",
+  rumores: "Rumores",
+  renovaciones: "Renovaciones",
+  entrevistas: "Entrevistas",
+  otros: "Otros",
+};
+
+const categoryPriority: NewsTag[] = ["fichajes", "lesionados", "rumores", "renovaciones", "entrevistas", "cantera", "partido", "previa", "cronica", "club", "otros"];
+
+export const newsCategoryBadge = (item: Pick<NewsItem, "channel" | "tags">) => {
+  const primaryTag = categoryPriority.find((tag) => item.tags.includes(tag));
+
+  if (primaryTag === "fichajes") {
+    return { key: "fichajes", label: newsTagLabels.fichajes, tone: "green" as const };
+  }
+
+  if (primaryTag) {
+    return { key: primaryTag, label: newsTagLabels[primaryTag], tone: "blue" as const };
+  }
+
+  return {
+    key: item.channel === "club" ? "club" : "noticia",
+    label: item.channel === "club" ? "Club" : "Noticia",
+    tone: "blue" as const,
+  };
+};
 
 export const NOTICIAS_TABS: { href: Route; label: string }[] = [
   { href: "/noticias/club", label: "Club" },

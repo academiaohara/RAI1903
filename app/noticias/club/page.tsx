@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Card } from "@/components/Card";
 import { NewsCard } from "@/components/NewsCard";
 import { PageHero } from "@/components/PageHero";
 import { newsItems } from "@/data/mock";
@@ -14,7 +13,6 @@ const tags: Array<NewsTag | "todas"> = ["todas", "partido", "fichajes", "cantera
 export default function NoticiasClubPage() {
   const [query, setQuery] = useState("");
   const [tag, setTag] = useState<NewsTag | "todas">("todas");
-  const featured = clubNews.find((item) => item.featured) ?? clubNews[0];
 
   const filtered = useMemo(
     () =>
@@ -29,16 +27,15 @@ export default function NoticiasClubPage() {
   return (
     <div className="space-y-6">
       <PageHero eyebrow="Noticias" title="Club" description="Comunicados y actualidad oficial del Real Aviles Industrial." />
-      {featured && <NewsCard item={featured} featured />}
 
-      <Card eyebrow="Club" title="Busca por texto o etiqueta">
+      <div className="space-y-4">
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Buscar titulares o extractos..."
           className="w-full rounded-2xl border border-[#214C9B]/25 bg-white px-4 py-3 text-slate-800 outline-none placeholder:text-slate-400 focus:border-[#214C9B]"
         />
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
           {tags.map((item) => (
             <button
               key={item}
@@ -49,9 +46,9 @@ export default function NoticiasClubPage() {
             </button>
           ))}
         </div>
-      </Card>
+      </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-3 sm:gap-4">
         {filtered.map((item) => (
           <NewsCard key={item.id} item={item} />
         ))}

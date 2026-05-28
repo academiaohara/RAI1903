@@ -5,7 +5,7 @@ import type { NewsItem } from "@/types";
 type NewsMediaVariant = "card" | "featured" | "ticker";
 
 const frameByVariant: Record<NewsMediaVariant, string> = {
-  card: "h-[5.5rem] w-[7.5rem] sm:h-24 sm:w-[8.75rem]",
+  card: "h-auto min-h-full w-[7.25rem] shrink-0 self-stretch sm:w-[8.75rem]",
   featured: "h-24 w-[8.75rem] sm:h-28 sm:w-40",
   ticker: "aspect-[16/9] w-full",
 };
@@ -21,7 +21,7 @@ export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?
     variant === "ticker"
       ? "rounded-t-2xl"
       : variant === "card" || variant === "featured"
-        ? "rounded-l-3xl"
+        ? "rounded-l-xl"
         : "rounded-2xl";
   const widthClass = variant === "ticker" ? "w-full" : "";
   const frame = `relative shrink-0 overflow-hidden ${widthClass} ${raiNewsMediaBgClass(item.teams)} ${rounded} ${frameByVariant[variant]}`;
