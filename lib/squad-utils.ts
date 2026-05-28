@@ -56,6 +56,28 @@ export function getNationalityFlagUrl(nacionalidad: string): string {
   return `https://flagcdn.com/w40/${iso}.png`;
 }
 
+export function isSquadPlayerUnavailable(player: SquadPlayer): boolean {
+  return player.estado === "lesionado" || player.estado === "sancionado";
+}
+
+export function splitSquadByAvailability(players: SquadPlayer[]) {
+  const injured: SquadPlayer[] = [];
+  const suspended: SquadPlayer[] = [];
+  const available: SquadPlayer[] = [];
+
+  for (const player of players) {
+    if (player.estado === "lesionado") injured.push(player);
+    else if (player.estado === "sancionado") suspended.push(player);
+    else available.push(player);
+  }
+
+  const byDorsal = (a: SquadPlayer, b: SquadPlayer) => a.dorsal - b.dorsal;
+  injured.sort(byDorsal);
+  suspended.sort(byDorsal);
+
+  return { injured, suspended, available };
+}
+
 export function groupPlayersByPosition(players: SquadPlayer[]): Record<SquadPosition, SquadPlayer[]> {
   const groups = Object.fromEntries(SQUAD_POSITIONS.map((pos) => [pos, [] as SquadPlayer[]])) as Record<
     SquadPosition,

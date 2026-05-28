@@ -5,8 +5,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { SquadPlayer, SquadViewMode } from "@/types/squad";
 import { getSquadClubInfo, getSquadPlayers } from "@/lib/squad-data";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import { splitSquadByAvailability } from "@/lib/squad-utils";
 import { SquadHeader } from "@/components/squad/SquadHeader";
 import { SquadToolbar } from "@/components/squad/SquadToolbar";
+import { SquadAvailability } from "@/components/squad/SquadAvailability";
 import { PlayerTable } from "@/components/squad/PlayerTable";
 import { PlayerGrid } from "@/components/squad/PlayerGrid";
 import { PlayerModal } from "@/components/squad/PlayerModal";
@@ -18,6 +20,7 @@ type SquadPageProps = {
 
 export function SquadPage({ gender }: SquadPageProps) {
   const squad = useMemo(() => getSquadPlayers(gender), [gender]);
+  const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
   const club = useMemo(() => getSquadClubInfo(gender), [gender]);
 
   const [viewMode, setViewMode] = useState<SquadViewMode>("fichas");
@@ -29,6 +32,8 @@ export function SquadPage({ gender }: SquadPageProps) {
       <SquadHeader club={club} stats={club.stats} onStadiumClick={() => setStadiumOpen(true)} />
       <SquadToolbar viewMode={viewMode} onViewModeChange={setViewMode} />
 
+      <SquadAvailability injured={injured} suspended={suspended} onSelect={setSelected} />
+
       <AnimatePresence mode="wait">
         <motion.div
           key={viewMode}
@@ -38,9 +43,9 @@ export function SquadPage({ gender }: SquadPageProps) {
           transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
         >
           {viewMode === "lista" ? (
-            <PlayerTable players={squad} onSelect={setSelected} />
+            <PlayerTable players={available} onSelect={setSelected} />
           ) : (
-            <PlayerGrid players={squad} onSelect={setSelected} variant="fichas" />
+            <PlayerGrid players={available} onSelect={setSelected} variant="fichas" />
           )}
         </motion.div>
       </AnimatePresence>

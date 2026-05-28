@@ -6,7 +6,13 @@ import { saveSeasonId } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
-export function SeasonSelector({ className }: { className?: string }) {
+type SeasonSelectorProps = {
+  className?: string;
+  /** Si es true, solo muestra la temporada 25/26 sin permitir cambiar. */
+  singleSeason?: boolean;
+};
+
+export function SeasonSelector({ className, singleSeason = false }: SeasonSelectorProps) {
   const [seasonId, setSeasonId] = useState<CompetitionSeasonId>(DEFAULT_COMPETITION_SEASON_ID);
 
   const index = competitionSeasons.findIndex((season) => season.id === seasonId);
@@ -19,6 +25,18 @@ export function SeasonSelector({ className }: { className?: string }) {
     setSeasonId(next.id);
     saveSeasonId(next.id);
   };
+
+  if (singleSeason) {
+    const locked = competitionSeasons.find((season) => season.id === DEFAULT_COMPETITION_SEASON_ID) ?? current;
+    return (
+      <div
+        className={cn("inline-flex items-center justify-center rounded-xl border px-4 py-2.5", className)}
+        aria-label="Temporada"
+      >
+        <span className="text-xs font-bold uppercase tracking-normal text-[#214C9B]">Temporada {locked.label}</span>
+      </div>
+    );
+  }
 
   return (
     <div
