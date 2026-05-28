@@ -27,7 +27,7 @@ export default async function PrimerEquipoCalendarioPage({ params }: { params: P
             <span className="text-emerald-700">{played}</span> jugados
           </span>
           <span>
-            <span className="text-[#214C9B]">{upcoming}</span> pendientes
+            <span className="text-[#981915]">{upcoming}</span> pendientes
           </span>
         </div>
         <TeamCalendar months={months} />

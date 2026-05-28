@@ -47,7 +47,7 @@ function TeamPreviewBlock({ teamId, side }: { teamId: string; side: "home" | "aw
           <ul className="mt-1 space-y-1 text-slate-700">
             {avilesUnavailable.map((player) => (
               <li key={player.id}>
-                {player.displayName} <span className="text-xs font-bold uppercase text-[#214C9B]">({player.status})</span>
+                {player.displayName} <span className="text-xs font-bold uppercase text-[#981915]">({player.status})</span>
               </li>
             ))}
           </ul>

@@ -44,7 +44,7 @@ export function Header() {
 
   return (
     <header
-      className="sticky top-0 z-40 border-b-4 border-[#214C9B] bg-[#214C9B] text-white shadow-xl shadow-blue-950/15"
+      className="sticky top-0 z-40 border-b-4 border-[#981915] bg-[#214C9B] text-white shadow-xl shadow-blue-950/15"
       onMouseLeave={scheduleClose}
     >
       <div className="mx-auto flex h-16 max-w-[1480px] items-center gap-3 px-4 sm:h-20 sm:gap-4 sm:px-6 lg:px-8">

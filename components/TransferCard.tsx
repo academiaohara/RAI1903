@@ -19,7 +19,7 @@ export function TransferCard({ transfer }: { transfer: TransferRumor }) {
     <article className="overflow-hidden rounded-3xl border border-[#214C9B]/25 bg-white shadow-[0_18px_45px_rgba(17,24,39,0.08)] transition hover:-translate-y-1 hover:border-[#214C9B]">
       <div className="relative flex aspect-[4/3] items-center justify-center bg-[radial-gradient(circle_at_top,#ffffff_0%,#dbeafe_26%,#214C9B_62%,#173a78_100%)] text-6xl font-extrabold text-white">
         {initials}
-        <div className="absolute right-4 top-4 flex h-14 w-14 items-center justify-center rounded-full border-4 border-white bg-[#214C9B] text-sm font-extrabold text-white shadow-lg">
+        <div className="absolute right-4 top-4 flex h-14 w-14 items-center justify-center rounded-full border-4 border-white bg-[#981915] text-sm font-extrabold text-white shadow-lg">
           {(transfer.destinationClub ?? transfer.originClub ?? "RAI").slice(0, 3).toUpperCase()}
         </div>
       </div>
@@ -39,7 +39,7 @@ export function TransferCard({ transfer }: { transfer: TransferRumor }) {
           </div>
         </div>
         <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
-          <div className="h-full rounded-full bg-gradient-to-r from-[#214C9B] to-[#214C9B]" style={{ width: `${transfer.probability}%` }} />
+          <div className="h-full rounded-full bg-gradient-to-r from-[#214C9B] to-[#981915]" style={{ width: `${transfer.probability}%` }} />
         </div>
         <div className="mt-4 grid grid-cols-2 gap-3 text-sm text-slate-700">
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3"><span className="block text-xs uppercase tracking-normal text-slate-500">Origen</span>{transfer.originClub ?? "-"}</div>

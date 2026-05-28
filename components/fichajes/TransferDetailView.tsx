@@ -36,8 +36,8 @@ const toneByKind = {
   fichaje: {
     hero: "from-[#173a78] via-[#214C9B] to-[#2d6fd4]",
     chip: "border-white/25 bg-white/10",
-    accent: "text-[#214C9B]",
-    pill: "bg-[#214C9B]/10 text-[#214C9B]",
+    accent: "text-[#981915]",
+    pill: "bg-[#981915]/10 text-[#981915]",
   },
   renovacion: {
     hero: "from-[#0f2347] via-[#173a78] to-[#214C9B]",
@@ -154,7 +154,7 @@ export function TransferDetailView({ transfer, player }: TransferDetailViewProps
                       <Megaphone className={tone.accent} size={18} aria-hidden />
                       <h2 className="text-sm font-extrabold uppercase tracking-wide text-slate-900">Comunicado del club</h2>
                     </div>
-                    <div className={`rounded-2xl border p-5 ${kind === "fichaje" ? "border-[#214C9B]/20 bg-blue-50/50" : "border-[#214C9B]/20 bg-blue-50/40"}`}>
+                    <div className={`rounded-2xl border p-5 ${kind === "fichaje" ? "border-[#981915]/20 bg-rose-50/50" : "border-[#214C9B]/20 bg-blue-50/40"}`}>
                       <p className="text-sm leading-7 text-slate-700">{transfer.clubAnnouncement}</p>
                       <p className="mt-4 text-xs font-bold uppercase tracking-wide text-slate-500">
                         Real Aviles Industrial · {formatDate(transfer.date)}

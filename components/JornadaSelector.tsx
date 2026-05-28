@@ -42,7 +42,7 @@ export function JornadaSelector({
             Jornada <span className="text-[#214C9B]">{value}</span> de {total}
           </p>
         </div>
-        <p className="text-xs font-bold uppercase tracking-normal text-[#214C9B]">Actual: J{currentRound}</p>
+        <p className="text-xs font-bold uppercase tracking-normal text-[#981915]">Actual: J{currentRound}</p>
       </div>
 
       <input
@@ -74,10 +74,10 @@ export function JornadaSelector({
               className={`h-11 min-w-11 shrink-0 rounded-2xl border text-sm font-extrabold transition ${
                 isSelected
                   ? isCurrent
-                    ? "border-[#214C9B] bg-[#214C9B] text-white"
+                    ? "border-[#981915] bg-[#981915] text-white"
                     : "border-[#214C9B] bg-[#214C9B] text-white"
                   : isCurrent
-                    ? "border-[#214C9B]/50 bg-[#214C9B]/10 text-[#214C9B] hover:border-[#214C9B] hover:bg-blue-50 hover:text-[#214C9B]"
+                    ? "border-[#981915]/50 bg-[#981915]/10 text-[#981915] hover:border-[#214C9B] hover:bg-blue-50 hover:text-[#214C9B]"
                     : "border-[#214C9B]/20 bg-white text-slate-700 hover:border-[#214C9B] hover:bg-blue-50 hover:text-[#214C9B]"
               }`}
             >

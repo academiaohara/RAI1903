@@ -37,7 +37,7 @@ export function PlayerMatchesTable({ player }: { player: SquadPlayer }) {
                   <p className="truncate text-sm font-extrabold text-slate-900">{match.rival}</p>
                   <p className="mt-1 text-xs font-semibold text-slate-500">{match.competicion}</p>
                 </div>
-                <p className="shrink-0 text-right text-xs font-bold uppercase text-[#214C9B]">
+                <p className="shrink-0 text-right text-xs font-bold uppercase text-[#981915]">
                   {new Date(match.fecha).toLocaleDateString("es-ES", { day: "2-digit", month: "short" })}
                 </p>
               </div>
