@@ -140,6 +140,7 @@ function toSquadPlayer(player: Player, clubName: string, gender: PrimerEquipoGen
     peso: WEIGHT_BY_POSITION[player.position],
     piernaBuena: player.preferredFoot,
     contratoHasta: `${contractYear}-06-30`,
+    descripcion: player.bio,
     foto: gender === "masculino" ? getSquadPlayerPhoto(player.number) : null,
     partidos: player.stats.appearances,
     minutos: player.stats.minutes,

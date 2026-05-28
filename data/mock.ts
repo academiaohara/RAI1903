@@ -371,6 +371,7 @@ export const newsItems: NewsItem[] = [
     url: "https://www.elcomercio.es/real-aviles/temporada-sufrida-final-feliz-real-aviles-20260525211043-nt.html",
     imageUrl: "https://s3.ppllstatics.com/elcomercio/www/multimedia/2026/05/25/real-aviles-RVWTNB5sx6ufOMja1MJoorM-1200x840@El%20Comercio.jpg",
     tags: ["cronica", "partido"],
+    playerIds: ["kevin-bautista"],
   },
   {
     id: "comercio-verano-trabajo",

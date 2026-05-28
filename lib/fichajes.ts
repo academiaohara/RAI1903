@@ -1,4 +1,9 @@
-import { newsItems, players, transfers } from "@/data/mock";
+import { players, transfers } from "@/data/mock";
+import {
+  getPlayerClubAnnouncementNews,
+  getPlayerNews,
+  getPlayerNewsByName,
+} from "@/lib/player-news";
 import { getSquadPlayers } from "@/lib/squad-data";
 import type { NewsItem, TransferKind, TransferRumor } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
@@ -54,32 +59,36 @@ export function getFeaturedTransfers(): TransferRumor[] {
   });
 }
 
-function nameMatchesNews(transfer: TransferRumor, item: NewsItem): boolean {
-  const nameParts = transfer.playerName.toLowerCase().split(/\s+/);
-  const haystack = `${item.title} ${item.excerpt}`.toLowerCase();
-  return nameParts.every((part) => haystack.includes(part));
+export function getTransferForPlayer(playerId: string): TransferRumor | undefined {
+  return transfers.find((transfer) => {
+    if (transfer.playerId === playerId) return true;
+    return resolveTransferPlayerId(transfer) === playerId;
+  });
 }
 
-export function getTransferClubNews(transfer: TransferRumor): NewsItem[] {
-  return newsItems
-    .filter((item) => item.channel === "club")
-    .filter(
-      (item) =>
-        item.tags.includes("fichajes") ||
-        item.tags.includes("renovaciones") ||
-        nameMatchesNews(transfer, item),
-    )
-    .filter((item) => nameMatchesNews(transfer, item) || item.tags.includes("fichajes"))
-    .sort((a, b) => b.date.localeCompare(a.date))
-    .slice(0, 4);
+export function getTransferClubAnnouncementNews(transfer: TransferRumor): NewsItem | undefined {
+  const playerId = resolveTransferPlayerId(transfer);
+  if (playerId) {
+    return getPlayerClubAnnouncementNews(playerId, {
+      announcementNewsId: transfer.clubAnnouncementNewsId,
+      playerName: transfer.playerName,
+    });
+  }
+  return undefined;
 }
 
-export function getTransferPressNews(transfer: TransferRumor): NewsItem[] {
-  return newsItems
-    .filter((item) => item.channel === "prensa")
-    .filter((item) => item.tags.includes("fichajes") || item.tags.includes("renovaciones") || nameMatchesNews(transfer, item))
-    .sort((a, b) => b.date.localeCompare(a.date))
-    .slice(0, 6);
+export function getTransferPlayerNews(transfer: TransferRumor): NewsItem[] {
+  const announcement = getTransferClubAnnouncementNews(transfer);
+  const playerId = resolveTransferPlayerId(transfer);
+
+  if (playerId) {
+    return getPlayerNews(playerId, {
+      excludeNewsId: announcement?.id,
+      playerName: transfer.playerName,
+    });
+  }
+
+  return getPlayerNewsByName(transfer.playerName, announcement?.id);
 }
 
 export function getTransferOriginClub(transfer: TransferRumor): string {
