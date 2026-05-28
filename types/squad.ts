@@ -58,6 +58,7 @@ export type SquadClubStats = {
   derrotas: number;
   golesFavor: number;
   golesContra: number;
+  porteriasImbatidas: number;
 };
 
 export type StadiumInfo = {
