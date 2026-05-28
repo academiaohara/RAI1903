@@ -5,7 +5,7 @@ import type { NewsItem } from "@/types";
 type NewsMediaVariant = "card" | "featured" | "ticker";
 
 const frameByVariant: Record<NewsMediaVariant, string> = {
-  card: "h-auto min-h-full w-[7.25rem] shrink-0 self-stretch sm:w-[8.75rem]",
+  card: "h-auto min-h-full w-[5.25rem] shrink-0 self-stretch sm:w-[7.25rem] md:w-[8.75rem]",
   featured: "h-24 w-[8.75rem] sm:h-28 sm:w-40",
   ticker: "aspect-[16/9] w-full",
 };
