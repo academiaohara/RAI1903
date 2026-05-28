@@ -233,6 +233,7 @@ export type CalendarMatch = {
   played: boolean;
   result: string | null;
   chronicleUrl: string | null;
+  previaUrl: string | null;
 };
 
 export type MatchArticle = {
@@ -245,4 +246,85 @@ export type MatchArticle = {
   source: string;
   excerpt: string;
   body: string[];
+};
+
+export type MatchStatRow = {
+  label: string;
+  home: string | number;
+  away: string | number;
+};
+
+export type MatchStatCategory = {
+  title: string;
+  rows: MatchStatRow[];
+};
+
+export type LineupPlayer = {
+  number: number;
+  name: string;
+  role?: string;
+};
+
+export type MatchLineup = {
+  formation: string;
+  starters: LineupPlayer[];
+  bench: LineupPlayer[];
+};
+
+export type RecentFormMatch = {
+  date: string;
+  homeTeam: string;
+  awayTeam: string;
+  score: string;
+  competition: string;
+  resultCode: FormCode;
+};
+
+export type HeadToHeadEntry = {
+  date: string;
+  homeTeam: string;
+  awayTeam: string;
+  score: string;
+  competition: string;
+  resultCode: FormCode;
+};
+
+export type MatchAvailabilityPlayer = {
+  name: string;
+  reason: "lesionado" | "sancionado";
+  detail: string;
+};
+
+export type MatchAvailability = {
+  home: MatchAvailabilityPlayer[];
+  away: MatchAvailabilityPlayer[];
+};
+
+export type MatchVideo = {
+  id: string;
+  title: string;
+  url: string;
+  label: string;
+};
+
+export type MatchDetail = {
+  match: Match;
+  gender: PrimerEquipoGender;
+  referee: string;
+  attendance: number | null;
+  kickoffTime: string;
+  kickoffDateLabel: string;
+  seasonLabel: string;
+  stats: MatchStatCategory[];
+  homeLineup: MatchLineup;
+  awayLineup: MatchLineup;
+  homeRecentMatches: RecentFormMatch[];
+  awayRecentMatches: RecentFormMatch[];
+  headToHead: HeadToHeadEntry[];
+  h2hSummary: { wins: number; draws: number; losses: number };
+  availability: MatchAvailability;
+  rdpPrevia: MatchVideo | null;
+  rdpPostpartido: MatchVideo | null;
+  pressNews: NewsItem[];
+  chronicleNews: NewsItem[];
 };
