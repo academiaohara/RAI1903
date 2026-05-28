@@ -2,16 +2,21 @@
 
 import { motion } from "framer-motion";
 import type { SquadPlayer } from "@/types/squad";
-import { getPlayerFullName } from "@/lib/squad-utils";
+import { getPlayerDisplayName, getPlayerFullName } from "@/lib/squad-utils";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 
 type SquadPlayerCardProps = {
   player: SquadPlayer;
   onSelect: (player: SquadPlayer) => void;
   index?: number;
+  variant?: "default" | "fichas";
 };
 
-export function PlayerCard({ player, onSelect, index = 0 }: SquadPlayerCardProps) {
+export function PlayerCard({ player, onSelect, index = 0, variant = "default" }: SquadPlayerCardProps) {
+  if (variant === "fichas") {
+    return <PlayerFichaCard player={player} onSelect={onSelect} index={index} />;
+  }
+
   return (
     <motion.button
       type="button"
@@ -56,6 +61,51 @@ export function PlayerCard({ player, onSelect, index = 0 }: SquadPlayerCardProps
             ))}
           </div>
         </div>
+      </article>
+    </motion.button>
+  );
+}
+
+function PlayerFichaCard({
+  player,
+  onSelect,
+  index,
+}: {
+  player: SquadPlayer;
+  onSelect: (player: SquadPlayer) => void;
+  index: number;
+}) {
+  const displayName = getPlayerDisplayName(player);
+
+  return (
+    <motion.button
+      type="button"
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.03, duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -4 }}
+      whileTap={{ scale: 0.99 }}
+      onClick={() => onSelect(player)}
+      className="group w-full text-left"
+    >
+      <article className="overflow-hidden rounded-sm bg-[#1c3d6e]/90 transition hover:bg-[#234b82]/95">
+        <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-[#214C9B] via-[#2a5eb5] to-[#173a78]">
+          <div className="absolute inset-0 scale-125 opacity-70 blur-3xl">
+            <PlayerAvatar player={player} bare className="h-full w-full" />
+          </div>
+          <div className="absolute inset-0 bg-[#0f2347]/30" />
+          <div className="relative flex h-full items-end justify-center px-2 pb-0 pt-3">
+            <PlayerAvatar player={player} bare className="aspect-[3/4] h-[94%] w-auto max-w-full drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]" />
+          </div>
+        </div>
+
+        <div className="h-px bg-white/90" />
+
+        <p className="px-3 py-2.5 text-sm font-semibold text-white sm:text-[15px]">
+          <span className="tabular-nums">{player.dorsal}</span>
+          <span className="mx-2 text-white/60">|</span>
+          <span>{displayName}</span>
+        </p>
       </article>
     </motion.button>
   );

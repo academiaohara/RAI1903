@@ -9,6 +9,7 @@ type PlayerAvatarProps = {
   player: SquadPlayer;
   size?: "sm" | "md" | "lg" | "xl";
   className?: string;
+  bare?: boolean;
 };
 
 const sizeMap = {
@@ -18,16 +19,19 @@ const sizeMap = {
   xl: "h-40 w-40 text-5xl",
 };
 
-export function PlayerAvatar({ player, size = "md", className = "" }: PlayerAvatarProps) {
+export function PlayerAvatar({ player, size = "md", className = "", bare = false }: PlayerAvatarProps) {
   const initials = getPlayerInitials(player);
   const hasCustomSize = className.includes("aspect-") || className.includes("h-") || className.includes("w-full");
 
+  const Wrapper = bare ? "div" : motion.div;
+  const wrapperProps = bare ? {} : { whileHover: { scale: 1.03 } };
+
   return (
-    <motion.div
-      whileHover={{ scale: 1.03 }}
-      className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#214C9B] via-[#2a5eb5] to-[#173a78] shadow-lg shadow-blue-950/25 ${
-        hasCustomSize ? "" : sizeMap[size]
-      } ${className}`}
+    <Wrapper
+      {...wrapperProps}
+      className={`relative overflow-hidden ${
+        bare ? "" : "rounded-2xl bg-gradient-to-br from-[#214C9B] via-[#2a5eb5] to-[#173a78] shadow-lg shadow-blue-950/25"
+      } ${hasCustomSize ? "" : sizeMap[size]} ${className}`}
     >
       {player.foto ? (
         <Image src={player.foto} alt={`${player.nombre} ${player.apellido}`} fill className="object-cover" sizes="160px" />
@@ -38,6 +42,6 @@ export function PlayerAvatar({ player, size = "md", className = "" }: PlayerAvat
           <div className="pointer-events-none absolute -bottom-6 -right-4 text-[5rem] font-black leading-none text-white/10">{player.dorsal}</div>
         </div>
       )}
-    </motion.div>
+    </Wrapper>
   );
 }

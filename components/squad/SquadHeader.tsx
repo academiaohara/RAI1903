@@ -1,19 +1,16 @@
 "use client";
 
 import Image from "next/image";
+import { Building2 } from "lucide-react";
 import { motion } from "framer-motion";
 import type { SquadClubInfo } from "@/types/squad";
 
-const statItems = [
-  { key: "partidos", label: "Partidos" },
-  { key: "victorias", label: "Victorias" },
-  { key: "empates", label: "Empates" },
-  { key: "derrotas", label: "Derrotas" },
-  { key: "golesFavor", label: "GF" },
-  { key: "golesContra", label: "GC" },
-] as const;
+type SquadHeaderProps = {
+  club: SquadClubInfo;
+  onStadiumClick: () => void;
+};
 
-export function SquadHeader({ club }: { club: SquadClubInfo }) {
+export function SquadHeader({ club, onStadiumClick }: SquadHeaderProps) {
   return (
     <motion.section
       initial={{ opacity: 0, y: 16 }}
@@ -24,37 +21,40 @@ export function SquadHeader({ club }: { club: SquadClubInfo }) {
       <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-20 left-1/3 h-48 w-48 rounded-full bg-[#2a5eb5]/40 blur-3xl" />
 
-      <div className="relative flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-          <div className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl border border-white/20 bg-white/10 p-3 backdrop-blur-sm sm:h-24 sm:w-24">
-            <Image src={club.escudo} alt={club.nombre} width={72} height={72} className="h-auto w-full object-contain drop-shadow-lg" priority />
+      <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex min-w-0 flex-1 items-start gap-4 sm:gap-5">
+          <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-white/20 bg-white/10 p-2.5 backdrop-blur-sm sm:h-20 sm:w-20">
+            <Image src={club.escudo} alt={club.nombre} width={64} height={64} className="h-auto w-full object-contain drop-shadow-lg" priority />
           </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/70">Plantilla oficial</p>
-            <h1 className="mt-1 break-words text-2xl font-extrabold uppercase tracking-tight sm:text-4xl">{club.nombre}</h1>
-            <div className="mt-3 flex flex-wrap gap-2 text-sm font-semibold text-white/85">
-              <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1">Temporada {club.temporada}</span>
-              <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1">{club.estadio}</span>
-              <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1">{club.jugadores} jugadores</span>
-              <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1">{club.entrenador}</span>
-            </div>
+          <div className="min-w-0">
+            <h1 className="break-words text-2xl font-extrabold uppercase tracking-tight sm:text-4xl">{club.nombre}</h1>
+            <p className="mt-2 text-sm font-semibold text-white/90 sm:text-base">
+              <span className="text-white/70">Entrenador:</span> {club.entrenador}
+            </p>
+            <p className="mt-2 text-xs font-semibold text-white/65">Temporada {club.temporada}</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-6">
-          {statItems.map((item, index) => (
-            <motion.div
-              key={item.key}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 * index, duration: 0.35 }}
-              className="flex min-h-[4.5rem] flex-col items-center justify-center rounded-2xl border border-white/15 bg-white/10 px-3 py-3 text-center backdrop-blur-sm sm:min-h-[5rem] sm:px-4"
-            >
-              <p className="w-full text-center text-[10px] font-bold uppercase tracking-wider text-white/65">{item.label}</p>
-              <p className="mt-1 w-full text-center text-xl font-extrabold tabular-nums sm:text-3xl">{club.stats[item.key]}</p>
-            </motion.div>
-          ))}
-        </div>
+        <button
+          type="button"
+          onClick={onStadiumClick}
+          className="group flex shrink-0 flex-col items-center gap-2 rounded-2xl border border-white/15 bg-white/5 p-3 text-left transition hover:border-white/30 hover:bg-white/10 sm:items-end sm:p-4"
+          aria-label={`Ver informacion de ${club.estadio}`}
+        >
+          <div className="relative h-20 w-28 overflow-hidden rounded-xl border border-white/20 sm:h-24 sm:w-36">
+            <Image
+              src={club.estadioInfo.imagen}
+              alt={club.estadio}
+              fill
+              className="object-cover transition duration-300 group-hover:scale-105"
+              sizes="144px"
+            />
+          </div>
+          <span className="flex max-w-[9rem] items-center gap-2 text-xs font-bold text-white sm:max-w-[10rem] sm:justify-end sm:text-sm">
+            <Building2 size={16} className="shrink-0 text-white/80" />
+            <span className="truncate">{club.estadio}</span>
+          </span>
+        </button>
       </div>
     </motion.section>
   );

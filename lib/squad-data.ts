@@ -177,10 +177,22 @@ export function getSquadClubInfo(gender: PrimerEquipoGender): SquadClubInfo {
     goalsAgainst: 9,
   };
 
+  const stadiumName = team?.stadium ?? "Roman Suarez Puerta";
+  const city = team?.city ?? "Aviles";
+
   return {
     nombre: team?.name ?? "Real Aviles Industrial",
     temporada: "2025/26",
-    estadio: team?.stadium ?? "Roman Suarez Puerta",
+    estadio: stadiumName,
+    estadioInfo: {
+      nombre: stadiumName,
+      imagen: "/estadio-rai.jpg",
+      capacidad: 5000,
+      direccion: "Calle Roman Suarez Puerta, s/n",
+      ciudad: city,
+      inaugurado: 1923,
+      superficie: "Cesped natural",
+    },
     escudo: "/logo.png",
     entrenador: team?.coach ?? "Miguel Alonso",
     jugadores: squad.length,
