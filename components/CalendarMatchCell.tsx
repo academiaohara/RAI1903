@@ -11,6 +11,8 @@ type CalendarMatchCellProps = {
   match: CalendarMatch;
   day: number;
   className?: string;
+  isToday?: boolean;
+  todayDayClassName?: string;
 };
 
 function bottomLabel(match: CalendarMatch) {
@@ -20,7 +22,7 @@ function bottomLabel(match: CalendarMatch) {
   return "—";
 }
 
-export function CalendarMatchCell({ match, day, className }: CalendarMatchCellProps) {
+export function CalendarMatchCell({ match, day, className, isToday = false, todayDayClassName }: CalendarMatchCellProps) {
   const href = match.played ? match.chronicleUrl : match.previaUrl;
   const clickable = Boolean(href);
   const borderHover = getCompetitionBorderClass(match.competition);
@@ -29,7 +31,9 @@ export function CalendarMatchCell({ match, day, className }: CalendarMatchCellPr
   const content = (
     <>
       <div className="flex items-start justify-between gap-2">
-        <span className="text-sm font-extrabold tabular-nums text-slate-700">{day}</span>
+        <span className={isToday && todayDayClassName ? todayDayClassName : "text-sm font-extrabold tabular-nums text-slate-700"}>
+          {day}
+        </span>
         <span className={cn("rounded-lg bg-slate-100 p-1.5", accent)} aria-label={match.isHome ? "Partido en casa" : "Partido fuera"}>
           {match.isHome ? <Home size={14} strokeWidth={2.25} /> : <Bus size={14} strokeWidth={2.25} />}
         </span>
