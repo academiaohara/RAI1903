@@ -167,7 +167,7 @@ export function TransferDetailView({ transfer, player }: TransferDetailViewProps
                   announcementTone={tone.announcement}
                 />
 
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge tone={kind === "fichaje" ? "red" : "blue"}>{getTransferKindLabel(kind)}</Badge>
                     <Badge tone="slate">{transfer.source}</Badge>
