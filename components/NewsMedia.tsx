@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { RAI_LOGO_PATH, raiNewsFallbackBgClass, shouldUseRaiLogoNewsFallback } from "@/lib/noticias";
+import { RAI_LOGO_PATH, raiNewsMediaBgClass, shouldUseRaiLogoNewsFallback } from "@/lib/noticias";
 import type { NewsItem } from "@/types";
 
 type NewsMediaVariant = "card" | "featured" | "ticker";
@@ -18,7 +18,7 @@ const initialsByVariant: Record<NewsMediaVariant, string> = {
 
 export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?: NewsMediaVariant }) {
   const rounded = variant === "ticker" ? "rounded-t-2xl" : variant === "card" || variant === "featured" ? "rounded-none" : "rounded-2xl";
-  const frame = `relative w-full shrink-0 overflow-hidden bg-slate-100 ${rounded} ${frameByVariant[variant]}`;
+  const frame = `relative w-full shrink-0 overflow-hidden ${raiNewsMediaBgClass(item.teams)} ${rounded} ${frameByVariant[variant]}`;
 
   if (item.imageUrl) {
     return (
@@ -43,7 +43,7 @@ export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?
           : "h-[68%] w-[68%] max-h-28 max-w-28";
 
     return (
-      <div className={`flex items-center justify-center ${raiNewsFallbackBgClass(item.teams)} ${frame}`}>
+      <div className={`flex items-center justify-center ${frame}`}>
         <Image
           src={RAI_LOGO_PATH}
           alt=""

@@ -1,11 +1,13 @@
 import { Badge } from "@/components/Badge";
 import { NewsMedia } from "@/components/NewsMedia";
-import { teamScopeLabel } from "@/lib/noticias";
+import { shouldShowTeamScopeBadge, teamScopeBadgeTone, teamScopeLabel } from "@/lib/noticias";
 import { formatDate } from "@/lib/utils";
 import type { NewsItem } from "@/types";
 
 export function NewsCard({ item, featured = false }: { item: NewsItem; featured?: boolean }) {
   const teamLabel = teamScopeLabel(item.teams);
+  const teamBadgeTone = teamScopeBadgeTone(item.teams);
+  const showTeamBadge = shouldShowTeamScopeBadge(item);
 
   return (
     <a
@@ -20,8 +22,8 @@ export function NewsCard({ item, featured = false }: { item: NewsItem; featured?
           <Badge tone={featured ? "blue" : "red"} className="news-card-badge">
             {item.source}
           </Badge>
-          {teamLabel && (
-            <Badge tone="slate" className="news-card-badge">
+          {showTeamBadge && teamLabel && teamBadgeTone && (
+            <Badge tone={teamBadgeTone} className="news-card-badge">
               {teamLabel}
             </Badge>
           )}
