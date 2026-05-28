@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ExternalLink, Megaphone } from "lucide-react";
 import { MatchNewsCarousel } from "@/components/match-center/MatchNewsCarousel";
 import { formatDate } from "@/lib/utils";
@@ -50,7 +49,7 @@ export function PlayerActualidadSection({
                 {clubAnnouncement.date ? ` · ${formatDate(clubAnnouncement.date)}` : ""}
               </p>
               {clubAnnouncement.newsItem && (
-                <Link
+                <a
                   href={clubAnnouncement.newsItem.url}
                   target="_blank"
                   rel="noreferrer"
@@ -58,7 +57,7 @@ export function PlayerActualidadSection({
                 >
                   Ver noticia oficial
                   <ExternalLink size={14} aria-hidden />
-                </Link>
+                </a>
               )}
             </div>
           </div>
