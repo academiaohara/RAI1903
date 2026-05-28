@@ -20,12 +20,12 @@ export function NewsCard({ item }: { item: NewsItem }) {
       href={item.url}
       target="_blank"
       rel="noreferrer"
-      className="news-card-item group flex min-h-[7.5rem] overflow-hidden rounded-xl border border-[#981915] bg-white sm:min-h-[8.5rem]"
+      className="news-card-item group flex min-h-[7.5rem] overflow-hidden rounded-xl border border-[#214C9B] bg-white sm:min-h-[8.5rem]"
     >
       <NewsMedia item={item} variant="card" />
       <div className="flex min-w-0 flex-1 flex-col justify-between p-4 sm:p-5">
         <div>
-          <h3 className="news-card-title text-base font-extrabold uppercase leading-tight text-[#981915] sm:text-lg">
+          <h3 className="news-card-title text-base font-extrabold uppercase leading-tight text-[#214C9B] sm:text-lg">
             {item.title}
           </h3>
           <p className="news-card-excerpt mt-2 line-clamp-2 text-sm leading-6 text-slate-800 sm:line-clamp-3">{item.excerpt}</p>
