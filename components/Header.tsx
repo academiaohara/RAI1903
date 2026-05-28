@@ -121,7 +121,7 @@ export function Header() {
                   className={cn(
                     "group flex flex-col items-center justify-center rounded-xl border border-[#e0e0e0] bg-white px-4 py-6 text-center text-[0.95rem] font-medium text-[#444] transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]",
                     childActive
-                      ? "border-[var(--rai-red)] shadow-[0_4px_12px_rgba(152,25,21,0.15)]"
+                      ? "border-[var(--rai-red)] text-[var(--rai-red)] shadow-[0_4px_12px_rgba(152,25,21,0.15)]"
                       : "hover:-translate-y-0.5 hover:border-[var(--rai-red)]/40 hover:shadow-[0_6px_16px_rgba(0,0,0,0.08)]",
                   )}
                 >
@@ -131,7 +131,14 @@ export function Header() {
                     className="mb-3 h-10 w-10 shrink-0 text-[var(--rai-red)] transition-transform duration-300 group-hover:scale-105"
                     aria-hidden
                   />
-                  <span className="line-clamp-2 leading-snug">{child.label}</span>
+                  <span
+                    className={cn(
+                      "line-clamp-2 leading-snug",
+                      childActive ? "text-[var(--rai-red)]" : "text-[#444]",
+                    )}
+                  >
+                    {child.label}
+                  </span>
                 </Link>
               );
             })}
