@@ -16,6 +16,25 @@ export function getPlayerInitials(player: SquadPlayer): string {
   return `${player.nombre[0] ?? ""}${player.apellido[0] ?? ""}`.toUpperCase();
 }
 
+const NATIONALITY_FLAGS: Record<string, string> = {
+  Espana: "🇪🇸",
+  España: "🇪🇸",
+  Portugal: "🇵🇹",
+  Francia: "🇫🇷",
+  Argentina: "🇦🇷",
+  Brasil: "🇧🇷",
+  Colombia: "🇨🇴",
+  Mexico: "🇲🇽",
+  México: "🇲🇽",
+  Marruecos: "🇲🇦",
+  Senegal: "🇸🇳",
+  Nigeria: "🇳🇬",
+};
+
+export function getNationalityFlag(nacionalidad: string): string {
+  return NATIONALITY_FLAGS[nacionalidad] ?? "🏳️";
+}
+
 export function groupPlayersByPosition(players: SquadPlayer[]): Record<SquadPosition, SquadPlayer[]> {
   const groups = Object.fromEntries(SQUAD_POSITIONS.map((pos) => [pos, [] as SquadPlayer[]])) as Record<
     SquadPosition,
