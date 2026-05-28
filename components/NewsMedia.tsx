@@ -53,7 +53,7 @@ export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?
       variant === "featured"
         ? "h-[72%] w-[72%] max-h-32 max-w-32"
         : variant === "ticker"
-          ? "h-[64%] w-[64%] max-h-24 max-w-24"
+          ? "h-full w-full max-h-48 max-w-48"
           : "h-[68%] w-[68%] max-h-28 max-w-28";
 
     return (
@@ -64,7 +64,7 @@ export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?
           width={160}
           height={160}
           className={`object-contain ${logoSize}`}
-          sizes={variant === "ticker" ? "96px" : variant === "featured" ? "128px" : "112px"}
+          sizes={variant === "ticker" ? "192px" : variant === "featured" ? "128px" : "112px"}
         />
       </div>
     );
