@@ -28,7 +28,11 @@ export const teamScopeLabel = (teams: PrimerEquipoGender[] | undefined) => {
 };
 
 export const RAI_BRAND_BLUE = "#214C9B";
+export const RAI_BRAND_GRANATE = "#981915";
 export const RAI_LOGO_PATH = "/rai_logo.webp";
+
+export const raiNewsFallbackBgClass = (teams: PrimerEquipoGender[] | undefined) =>
+  teams?.length === 1 && teams[0] === "femenino" ? "bg-[#981915]" : "bg-[#214C9B]";
 const REAL_AVILES_CLUB_SITE = "realavilesindustrial1903.com";
 
 export const isRealAvilesClubSiteNews = (item: { url: string }) =>
