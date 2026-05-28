@@ -21,7 +21,7 @@ export function MatchCard({
     <article className={matchFixtureCardClassName}>
       <div className="mb-1 flex items-start justify-between gap-2">
         <Badge tone={match.status === "finished" ? "slate" : "blue"}>{match.status === "finished" ? "Finalizado" : "Programado"}</Badge>
-        <span className="shrink-0 text-right text-[11px] font-bold uppercase leading-tight tracking-[0.06em] text-[#981915]">
+        <span className="shrink-0 text-right text-[11px] font-bold uppercase leading-tight tracking-[0.06em] text-[#214C9B]">
           {matchFixtureMeta(match)}
         </span>
       </div>

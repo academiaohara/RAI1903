@@ -11,7 +11,7 @@ type MatchNewsCarouselProps = {
   title?: string;
 };
 
-export function MatchNewsCarousel({ items, title = "Noticias de prensa" }: MatchNewsCarouselProps) {
+export function MatchNewsCarousel({ items, title = "Post partido en medios" }: MatchNewsCarouselProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
 
@@ -68,7 +68,7 @@ export function MatchNewsCarousel({ items, title = "Noticias de prensa" }: Match
               <NewsMedia item={item} variant="ticker" />
             </div>
             <div className="space-y-1 p-3">
-              <p className="text-[10px] font-bold uppercase text-[#981915]">
+              <p className="text-[10px] font-bold uppercase text-[#214C9B]">
                 {item.source} · {formatDate(item.date, { day: "numeric", month: "short" })}
               </p>
               <p className="line-clamp-3 text-sm font-extrabold leading-snug text-[#214C9B]">{item.title}</p>

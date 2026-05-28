@@ -33,7 +33,7 @@ export function FanMediaLinkCard({ link }: { link: FanMediaLink }) {
         <ExternalLink size={16} className="shrink-0 text-slate-400 transition group-hover:text-[#214C9B]" aria-hidden />
       </div>
       <h3 className="mt-4 text-2xl font-extrabold uppercase text-[#214C9B]">{link.name}</h3>
-      {link.schedule && <p className="mt-2 text-xs font-bold uppercase tracking-normal text-[#981915]">{link.schedule}</p>}
+      {link.schedule && <p className="mt-2 text-xs font-bold uppercase tracking-normal text-[#214C9B]">{link.schedule}</p>}
       <p className="mt-2 flex-1 text-sm leading-6 text-slate-600">{link.description}</p>
       <p className="mt-4 text-sm font-bold text-[#214C9B] group-hover:underline">Abrir enlace</p>
     </a>

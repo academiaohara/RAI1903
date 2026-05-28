@@ -18,9 +18,9 @@ export function getStandingsHighlightRowClass(highlighted: boolean): string {
   return "bg-white text-slate-700";
 }
 
-/** Granate highlight for table/card cells — never applied to the position column. */
+/** Blue highlight for table/card cells — never applied to the position column. */
 export function getStandingsHighlightCellClass(highlighted: boolean): string {
-  if (highlighted) return "bg-[#981915]";
+  if (highlighted) return "bg-[#214C9B]";
   return "";
 }
 

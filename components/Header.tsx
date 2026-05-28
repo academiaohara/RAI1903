@@ -44,7 +44,7 @@ export function Header() {
 
   return (
     <header
-      className="sticky top-0 z-40 border-b-4 border-[#981915] bg-[#214C9B] text-white shadow-xl shadow-blue-950/15"
+      className="sticky top-0 z-40 border-b-4 border-[#214C9B] bg-[#214C9B] text-white shadow-xl shadow-blue-950/15"
       onMouseLeave={scheduleClose}
     >
       <div className="mx-auto flex h-16 max-w-[1480px] items-center gap-3 px-4 sm:h-20 sm:gap-4 sm:px-6 lg:px-8">
@@ -121,7 +121,7 @@ export function Header() {
                   className={cn(
                     "group flex flex-col items-center justify-center rounded-xl border border-[#e0e0e0] bg-white px-4 py-6 text-center text-[0.95rem] font-medium text-[#444] transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]",
                     childActive
-                      ? "border-[var(--rai-red)] text-[var(--rai-red)] shadow-[0_4px_12px_rgba(152,25,21,0.15)]"
+                      ? "border-[var(--rai-red)] text-[var(--rai-red)] shadow-[0_4px_12px_rgba(33,76,155,0.15)]"
                       : "hover:-translate-y-0.5 hover:border-[var(--rai-red)]/40 hover:shadow-[0_6px_16px_rgba(0,0,0,0.08)]",
                   )}
                 >

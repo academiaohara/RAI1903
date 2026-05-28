@@ -21,7 +21,7 @@ const FINISHED_TABS = [
   { id: "stats", label: "Stats" },
   { id: "lineups", label: "Alineaciones" },
   { id: "previa", label: "Previa" },
-  { id: "prensa", label: "Prensa" },
+  { id: "prensa", label: "Post partido" },
 ] as const;
 
 type FinishedTabId = (typeof FINISHED_TABS)[number]["id"];

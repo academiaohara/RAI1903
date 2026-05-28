@@ -181,8 +181,6 @@ function buildStats(match: Match, seed: number): MatchStatCategory[] {
       rows: [
         { label: "Remates a puerta", home: shotsHome, away: shotsAway },
         { label: "Remates totales", home: shotsHome + 5, away: shotsAway + 4 },
-        { label: "xG (Goles esperados)", home: (homeGoals * 0.45 + seeded(seed, 9) * 1.2).toFixed(2), away: (awayGoals * 0.45 + seeded(seed, 10) * 1.1).toFixed(2) },
-        { label: "xGOT", home: (homeGoals * 0.6 + 0.8).toFixed(2), away: (awayGoals * 0.55 + 0.7).toFixed(2) },
       ],
     },
     {

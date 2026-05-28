@@ -15,7 +15,7 @@ export function MatchCenterSidebar() {
         <p className="text-sm font-semibold text-slate-700">Inicia sesion para ver tus resultados</p>
         <Link
           href={"/quiniela" as Route}
-          className="mt-4 inline-flex w-full items-center justify-center rounded-full border-2 border-[#981915] px-4 py-2 text-sm font-extrabold uppercase text-[#981915] transition hover:bg-[#981915] hover:text-white"
+          className="mt-4 inline-flex w-full items-center justify-center rounded-full border-2 border-[#214C9B] px-4 py-2 text-sm font-extrabold uppercase text-[#214C9B] transition hover:bg-[#214C9B] hover:text-white"
         >
           Entrar
         </Link>

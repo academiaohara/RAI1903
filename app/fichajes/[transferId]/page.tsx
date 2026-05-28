@@ -19,7 +19,7 @@ export default async function FichajeDetailPage({ params }: { params: Promise<{ 
       <PageHero
         eyebrow="Mercado"
         title={getTransferKindLabel(kind)}
-        description={`Seguimiento del movimiento de ${transfer.playerName}: comunicados, prensa y ficha del jugador.`}
+        description={`Seguimiento del movimiento de ${transfer.playerName}: comunicados, post partido y ficha del jugador.`}
       />
       <TransferDetailView transfer={transfer} player={player} />
       <Link href={"/" as Route} className="inline-flex text-sm font-bold uppercase tracking-normal text-[#214C9B] hover:underline">

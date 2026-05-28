@@ -126,7 +126,6 @@ function PlayerModalContent({ player, onClose }: { player: SquadPlayer; onClose:
                         <DetailStat label="Promedio minutos/partido" value={`${Math.round(player.minutos / Math.max(player.partidos, 1))} min`} />
                         <DetailStat label="Contribucion ofensiva" value={`${player.goles + player.asistencias} G+A`} />
                         <DetailStat label="Tarjetas totales" value={String(player.amarillas + player.rojas)} />
-                        <DetailStat label="xG acumulado" value={player.xG.toFixed(2)} />
                       </div>
                     </div>
                   )}
