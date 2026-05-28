@@ -1,4 +1,3 @@
-import { ExternalLink } from "lucide-react";
 import { Badge } from "@/components/Badge";
 import { NewsMedia } from "@/components/NewsMedia";
 import { teamScopeLabel } from "@/lib/noticias";
@@ -9,31 +8,45 @@ export function NewsCard({ item, featured = false }: { item: NewsItem; featured?
   const teamLabel = teamScopeLabel(item.teams);
 
   return (
-    <article
-      className={`grid items-stretch gap-4 rounded-3xl border border-[#214C9B]/30 bg-white p-4 shadow-[0_12px_30px_rgba(17,24,39,0.06)] transition hover:-translate-y-0.5 hover:border-[#214C9B] sm:grid-cols-[9rem_1fr] ${featured ? "border-[#214C9B] bg-gradient-to-br from-white to-blue-50 sm:grid-cols-[11rem_1fr]" : ""}`}
+    <a
+      href={item.url}
+      target="_blank"
+      rel="noreferrer"
+      className="news-card-item group block overflow-hidden rounded-3xl border border-[#214C9B]/30 bg-white shadow-[0_12px_30px_rgba(17,24,39,0.06)]"
     >
       <NewsMedia item={item} variant={featured ? "featured" : "card"} />
-      <div className="min-w-0">
+      <div className="p-4 sm:p-5">
         <div className="mb-3 flex flex-wrap items-center gap-2">
-          <Badge tone={featured ? "blue" : "red"}>{item.source}</Badge>
+          <Badge tone={featured ? "blue" : "red"} className="news-card-badge">
+            {item.source}
+          </Badge>
           {teamLabel && (
-            <Badge tone="slate">{teamLabel}</Badge>
-          )}
-          <span className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">{formatDate(item.date)}</span>
-        </div>
-        <h3 className={featured ? "text-2xl font-extrabold uppercase leading-tight text-[#214C9B] sm:text-3xl" : "text-xl font-extrabold uppercase leading-tight text-[#214C9B]"}>{item.title}</h3>
-        <p className="mt-3 text-sm leading-6 text-slate-600">{item.excerpt}</p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {item.tags.map((tag) => (
-            <Badge key={tag} tone="slate">
-              {tag}
+            <Badge tone="slate" className="news-card-badge">
+              {teamLabel}
             </Badge>
-          ))}
+          )}
+          <span className="news-card-date text-xs font-bold uppercase tracking-[0.08em] text-slate-500">{formatDate(item.date)}</span>
         </div>
-        <a href={item.url} target="_blank" rel="noreferrer" className="mt-5 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-normal text-[#214C9B] transition hover:text-[#981915]">
-          {item.channel === "club" ? "Leer noticia" : "Leer en medio externo"} <ExternalLink size={15} />
-        </a>
+        <h3
+          className={
+            featured
+              ? "news-card-title text-2xl font-extrabold uppercase leading-tight text-[#214C9B] sm:text-3xl"
+              : "news-card-title text-xl font-extrabold uppercase leading-tight text-[#214C9B]"
+          }
+        >
+          {item.title}
+        </h3>
+        <p className="news-card-excerpt mt-3 text-sm leading-6 text-slate-600">{item.excerpt}</p>
+        {item.tags.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {item.tags.map((tag) => (
+              <Badge key={tag} tone="slate" className="news-card-badge">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        )}
       </div>
-    </article>
+    </a>
   );
 }

@@ -66,7 +66,7 @@ export default function NoticiasPrensaPage() {
         </div>
       </Card>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4">
         {filtered.map((item) => (
           <NewsCard key={item.id} item={item} />
         ))}

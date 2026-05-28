@@ -42,7 +42,7 @@ export default function PrimerEquipoNoticiasPage({ params }: { params: Promise<{
       />
 
       <Card>
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-4">
           {categoryNews.length > 0 ? (
             categoryNews.map((item) => <NewsCard key={item.id} item={item} />)
           ) : (
