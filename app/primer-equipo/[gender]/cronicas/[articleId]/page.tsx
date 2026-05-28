@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MatchArticleContent } from "@/components/MatchArticleContent";
-import { PrimerEquipoPageHero } from "@/components/PrimerEquipoPageHero";
+import { MatchCenter } from "@/components/match-center/MatchCenter";
+import { getMatchDetailForArticle } from "@/lib/match-detail";
 import { getMatchArticleById } from "@/lib/match-articles";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Route } from "next";
@@ -12,15 +11,15 @@ export default async function CronicaDetailPage({ params }: { params: Promise<{ 
 
   if (!article || article.type !== "cronica" || article.gender !== gender) notFound();
 
+  const detail = getMatchDetailForArticle(article);
+  if (!detail) notFound();
+
   return (
-    <>
-      <PrimerEquipoPageHero title="Cronica" description="Lectura completa del partido." />
-      <div className="rounded-[2rem] border border-[#214C9B]/20 bg-white p-6 shadow-[0_12px_30px_rgba(17,24,39,0.06)] sm:p-8">
-        <MatchArticleContent article={article} />
-      </div>
-      <Link href={`${primerEquipoBase(gender)}/cronicas` as Route} className="inline-flex text-sm font-bold uppercase tracking-normal text-[#214C9B] hover:underline">
-        Volver a cronicas
-      </Link>
-    </>
+    <MatchCenter
+      detail={detail}
+      article={article}
+      backHref={`${primerEquipoBase(gender)}/cronicas` as Route}
+      backLabel="Volver a cronicas"
+    />
   );
 }

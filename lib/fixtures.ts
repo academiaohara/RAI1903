@@ -56,3 +56,7 @@ export const getLatestAvilesMatchesByGender = (_gender: PrimerEquipoGender, limi
 export const getUpcomingAvilesMatchesByGender = (_gender: PrimerEquipoGender, limit = 5): Match[] => getUpcomingAvilesMatches(limit);
 
 export const getNextAvilesMatchByGender = (gender: PrimerEquipoGender): Match | undefined => getUpcomingAvilesMatchesByGender(gender, 1)[0];
+
+export function getMatchById(matchId: string): Match | undefined {
+  return matchdays.flatMap((round) => round.matches).find((match) => match.id === matchId);
+}

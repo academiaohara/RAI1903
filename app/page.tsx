@@ -5,6 +5,7 @@ import { Card } from "@/components/Card";
 import { LeagueTableCard } from "@/components/LeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
 import { TransfersCarousel } from "@/components/fichajes/TransfersCarousel";
+import { NewsNavButton } from "@/components/NewsNavButton";
 import { NewsTicker } from "@/components/NewsTicker";
 import { getFeaturedTransfers } from "@/lib/fichajes";
 import { OpponentCrest } from "@/components/OpponentCrest";
@@ -65,7 +66,12 @@ export default function HomePage() {
       </section>
 
       <Card eyebrow="Noticiero" title="Actualidad en movimiento">
-        <NewsTicker items={newsItems} />
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="min-w-0 flex-1">
+            <NewsTicker items={newsItems} />
+          </div>
+          <NewsNavButton href="/noticias/club" />
+        </div>
       </Card>
 
       {featuredTransfers.length > 0 && (
