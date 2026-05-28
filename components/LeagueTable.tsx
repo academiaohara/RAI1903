@@ -19,24 +19,13 @@ export function LeagueTable({
   teams,
   compact = false,
   highlightTeamId = RAI_TEAM_ID,
-  showLegend = !compact,
+  showLegend = true,
 }: LeagueTableProps) {
   const rows = [...teams].sort((a, b) => a.position - b.position);
   const visibleRows = compact ? rows.slice(0, 10) : rows;
 
   return (
     <div className="space-y-3">
-      {showLegend && (
-        <div className="flex flex-wrap gap-4 px-1 text-[10px] font-bold uppercase tracking-[0.08em] text-slate-500">
-          {STANDINGS_ZONE_LEGEND.map((item) => (
-            <span key={item.zone} className="inline-flex items-center gap-1.5">
-              <span className={cn("h-2 w-2 rounded-full", item.className)} aria-hidden />
-              {item.label}
-            </span>
-          ))}
-        </div>
-      )}
-
       <div className="space-y-2 md:hidden">
         {visibleRows.map((team) => {
           const diff = team.stats.goalsFor - team.stats.goalsAgainst;
@@ -54,19 +43,17 @@ export function LeagueTable({
               )}
             >
               <div className="flex items-stretch">
-                <div className="flex shrink-0 items-center bg-white p-3 pr-2">
-                  <span
-                    className={cn(
-                      "flex h-8 w-8 items-center justify-center rounded-xl text-xs font-extrabold tabular-nums",
-                      positionClassName,
-                    )}
-                  >
-                    {team.position}
-                  </span>
+                <div
+                  className={cn(
+                    "flex w-7 shrink-0 items-center justify-center text-[11px] font-extrabold tabular-nums",
+                    positionClassName,
+                  )}
+                >
+                  {team.position}
                 </div>
                 <div
                   className={cn(
-                    "flex min-w-0 flex-1 items-start justify-between gap-3 p-3 pl-0",
+                    "flex min-w-0 flex-1 items-start justify-between gap-3 p-3",
                     highlightCellClassName,
                     rowClassName,
                   )}
@@ -141,7 +128,7 @@ export function LeagueTable({
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead className="bg-[#214C9B] text-[10px] uppercase tracking-[0.1em] text-white">
             <tr>
-              <th className="px-2 py-2.5 text-center font-bold">#</th>
+              <th className="w-7 p-0 text-center font-bold">#</th>
               <th className="px-2 py-2.5 font-bold">Equipo</th>
               {!compact ? (
                 <>
@@ -177,15 +164,13 @@ export function LeagueTable({
                   key={team.id}
                   className={cn("transition-colors", highlighted ? "bg-white text-slate-700" : rowClassName)}
                 >
-                  <td className="bg-white px-2 py-2.5 text-center">
-                    <span
-                      className={cn(
-                        "inline-flex h-7 min-w-7 items-center justify-center rounded-lg px-1 text-xs font-extrabold tabular-nums",
-                        positionClassName,
-                      )}
-                    >
-                      {team.position}
-                    </span>
+                  <td
+                    className={cn(
+                      "w-7 p-0 text-center text-[11px] font-extrabold tabular-nums",
+                      positionClassName,
+                    )}
+                  >
+                    {team.position}
                   </td>
                   <td className={dataCellClassName}>
                     <div className="flex min-w-0 items-center gap-2">
@@ -261,6 +246,21 @@ export function LeagueTable({
           </tbody>
         </table>
       </div>
+
+      {showLegend && (
+        <div
+          className="flex flex-wrap justify-center gap-x-4 gap-y-2 px-1 text-[10px] font-bold uppercase tracking-[0.08em] text-slate-500 md:justify-start"
+          role="list"
+          aria-label="Leyenda de zonas en la clasificacion"
+        >
+          {STANDINGS_ZONE_LEGEND.map((item) => (
+            <span key={item.zone} role="listitem" className="inline-flex items-center gap-1.5">
+              <span className={cn("h-2.5 w-2.5 shrink-0 rounded-sm", item.className)} aria-hidden />
+              {item.label}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
