@@ -9,7 +9,7 @@ import { SquadHeader } from "@/components/squad/SquadHeader";
 import { SquadStatsBar } from "@/components/squad/SquadStatsBar";
 import { SquadToolbar } from "@/components/squad/SquadToolbar";
 import { PlayerTable } from "@/components/squad/PlayerTable";
-import { SquadField } from "@/components/squad/SquadField";
+import { PlayerGrid } from "@/components/squad/PlayerGrid";
 import { PlayerModal } from "@/components/squad/PlayerModal";
 import { StadiumModal } from "@/components/squad/StadiumModal";
 
@@ -42,7 +42,7 @@ export function SquadPage({ gender }: SquadPageProps) {
           {viewMode === "lista" ? (
             <PlayerTable players={squad} onSelect={setSelected} />
           ) : (
-            <SquadField players={squad} onSelect={setSelected} />
+            <PlayerGrid players={squad} onSelect={setSelected} variant="fichas" />
           )}
         </motion.div>
       </AnimatePresence>
