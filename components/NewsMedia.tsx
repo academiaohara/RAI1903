@@ -5,9 +5,9 @@ import type { NewsItem } from "@/types";
 type NewsMediaVariant = "card" | "featured" | "ticker";
 
 const frameByVariant: Record<NewsMediaVariant, string> = {
-  card: "aspect-[2/1]",
-  featured: "aspect-[2/1] sm:aspect-[21/9]",
-  ticker: "aspect-[16/9]",
+  card: "h-[5.5rem] w-[7.5rem] sm:h-24 sm:w-[8.75rem]",
+  featured: "h-24 w-[8.75rem] sm:h-28 sm:w-40",
+  ticker: "aspect-[16/9] w-full",
 };
 
 const initialsByVariant: Record<NewsMediaVariant, string> = {
@@ -17,8 +17,14 @@ const initialsByVariant: Record<NewsMediaVariant, string> = {
 };
 
 export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?: NewsMediaVariant }) {
-  const rounded = variant === "ticker" ? "rounded-t-2xl" : variant === "card" || variant === "featured" ? "rounded-none" : "rounded-2xl";
-  const frame = `relative w-full shrink-0 overflow-hidden ${raiNewsMediaBgClass(item.teams)} ${rounded} ${frameByVariant[variant]}`;
+  const rounded =
+    variant === "ticker"
+      ? "rounded-t-2xl"
+      : variant === "card" || variant === "featured"
+        ? "rounded-l-3xl"
+        : "rounded-2xl";
+  const widthClass = variant === "ticker" ? "w-full" : "";
+  const frame = `relative shrink-0 overflow-hidden ${widthClass} ${raiNewsMediaBgClass(item.teams)} ${rounded} ${frameByVariant[variant]}`;
 
   if (item.imageUrl) {
     return (
@@ -28,7 +34,15 @@ export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?
           alt=""
           fill
           className="object-cover"
-          sizes={variant === "ticker" ? "320px" : "(max-width: 640px) 100vw, 960px"}
+          sizes={
+            variant === "ticker"
+              ? "320px"
+              : variant === "featured"
+                ? "160px"
+                : variant === "card"
+                  ? "140px"
+                  : "960px"
+          }
         />
       </div>
     );

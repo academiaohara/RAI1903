@@ -14,11 +14,11 @@ export function NewsCard({ item, featured = false }: { item: NewsItem; featured?
       href={item.url}
       target="_blank"
       rel="noreferrer"
-      className="news-card-item group block overflow-hidden rounded-3xl border border-[#214C9B]/30 bg-white shadow-[0_12px_30px_rgba(17,24,39,0.06)]"
+      className="news-card-item group flex overflow-hidden rounded-3xl border border-[#214C9B]/30 bg-white shadow-[0_12px_30px_rgba(17,24,39,0.06)]"
     >
       <NewsMedia item={item} variant={featured ? "featured" : "card"} />
-      <div className="p-4 sm:p-5">
-        <div className="mb-3 flex flex-wrap items-center gap-2">
+      <div className="flex min-w-0 flex-1 flex-col justify-center p-4 sm:p-5">
+        <div className="mb-2 flex flex-wrap items-center gap-2">
           <Badge tone={featured ? "blue" : "red"} className="news-card-badge">
             {item.source}
           </Badge>
@@ -38,9 +38,9 @@ export function NewsCard({ item, featured = false }: { item: NewsItem; featured?
         >
           {item.title}
         </h3>
-        <p className="news-card-excerpt mt-3 text-sm leading-6 text-slate-600">{item.excerpt}</p>
+        <p className="news-card-excerpt mt-2 line-clamp-2 text-sm leading-6 text-slate-600 sm:line-clamp-3">{item.excerpt}</p>
         {item.tags.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-2">
             {item.tags.map((tag) => (
               <Badge key={tag} tone="slate" className="news-card-badge">
                 {tag}
