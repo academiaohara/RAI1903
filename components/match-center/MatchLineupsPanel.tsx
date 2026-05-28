@@ -53,7 +53,7 @@ export function MatchLineupsPanel({
   awayLineup: MatchLineup;
 }) {
   return (
-    <section className="space-y-4">
+    <section>
       <h2 className="text-lg font-extrabold uppercase tracking-normal text-[#214C9B]">Alineaciones</h2>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <LineupColumn title={homeLabel} lineup={homeLineup} />

@@ -150,7 +150,7 @@ export function MatchPreviaPanel({
   return (
     <div className="space-y-8">
       {!compact && showH2H && (
-        <section className="space-y-4">
+        <section>
           <h2 className="text-lg font-extrabold uppercase tracking-normal text-[#214C9B]">Cara a cara y estado de forma</h2>
           <div className="rounded-2xl border border-[#214C9B]/15 bg-slate-50 p-4 sm:p-6">
             <div className="grid gap-6 md:grid-cols-[1fr_auto_1fr] md:items-center">
@@ -177,7 +177,7 @@ export function MatchPreviaPanel({
       )}
 
       {!compact && (
-        <section className="space-y-4">
+        <section>
           <h2 className="text-lg font-extrabold uppercase tracking-normal text-[#214C9B]">Ultimos 5 partidos</h2>
           <div className="space-y-6">
             <div>

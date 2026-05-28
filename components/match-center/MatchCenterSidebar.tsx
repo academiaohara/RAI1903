@@ -10,7 +10,7 @@ const winners = [
 
 export function MatchCenterSidebar() {
   return (
-    <aside className="space-y-4">
+    <aside>
       <div className="rounded-2xl border border-[#214C9B]/20 bg-white p-5 shadow-sm">
         <p className="text-sm font-semibold text-slate-700">Inicia sesion para ver tus resultados</p>
         <Link
