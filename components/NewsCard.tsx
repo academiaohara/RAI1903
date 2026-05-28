@@ -1,12 +1,14 @@
 import { ExternalLink } from "lucide-react";
 import { Badge } from "@/components/Badge";
 import { NewsMedia } from "@/components/NewsMedia";
-import { teamScopeLabel } from "@/lib/noticias";
+import { shouldShowTeamScopeBadge, teamScopeBadgeTone, teamScopeLabel } from "@/lib/noticias";
 import { formatDate } from "@/lib/utils";
 import type { NewsItem } from "@/types";
 
 export function NewsCard({ item, featured = false }: { item: NewsItem; featured?: boolean }) {
   const teamLabel = teamScopeLabel(item.teams);
+  const teamBadgeTone = teamScopeBadgeTone(item.teams);
+  const showTeamBadge = shouldShowTeamScopeBadge(item);
 
   return (
     <article
@@ -16,8 +18,8 @@ export function NewsCard({ item, featured = false }: { item: NewsItem; featured?
       <div className="min-w-0">
         <div className="mb-3 flex flex-wrap items-center gap-2">
           <Badge tone={featured ? "blue" : "red"}>{item.source}</Badge>
-          {teamLabel && (
-            <Badge tone="slate">{teamLabel}</Badge>
+          {showTeamBadge && teamLabel && teamBadgeTone && (
+            <Badge tone={teamBadgeTone}>{teamLabel}</Badge>
           )}
           <span className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">{formatDate(item.date)}</span>
         </div>
