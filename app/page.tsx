@@ -4,6 +4,7 @@ import { CalendarNavButton } from "@/components/CalendarNavButton";
 import { Card } from "@/components/Card";
 import { LeagueTableCard } from "@/components/LeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
+import { NewsNavButton } from "@/components/NewsNavButton";
 import { NewsTicker } from "@/components/NewsTicker";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { PageHero } from "@/components/PageHero";
@@ -62,7 +63,12 @@ export default function HomePage() {
       </section>
 
       <Card eyebrow="Noticiero" title="Actualidad en movimiento">
-        <NewsTicker items={newsItems} />
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="min-w-0 flex-1">
+            <NewsTicker items={newsItems} />
+          </div>
+          <NewsNavButton href="/noticias/club" />
+        </div>
       </Card>
 
       <section className="grid gap-6 xl:grid-cols-[1fr_0.42fr]">
