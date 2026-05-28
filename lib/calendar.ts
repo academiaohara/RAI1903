@@ -1,6 +1,6 @@
 import { RAI_TEAM_ID } from "@/data/mock";
 import { getTeamMatches, getTeamsByGender } from "@/lib/fixtures";
-import { getCronicaForMatch } from "@/lib/match-articles";
+import { getCronicaForMatch, getPreviaForMatch } from "@/lib/match-articles";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { CalendarMatch, Match } from "@/types";
 import type { Route } from "next";
@@ -34,6 +34,7 @@ export function matchToCalendarMatch(match: Match, gender: PrimerEquipoGender): 
   const rivalId = avilesHome ? match.awayTeamId : match.homeTeamId;
   const rival = getTeamsByGender(gender).find((team) => team.id === rivalId);
   const cronica = getCronicaForMatch(match.id, gender);
+  const previa = getPreviaForMatch(match.id, gender);
   const played = match.status === "finished";
   const hasTime = !NO_TIME_COMPETITIONS.has(match.competition);
 
@@ -50,6 +51,7 @@ export function matchToCalendarMatch(match: Match, gender: PrimerEquipoGender): 
     played,
     result: avilesResult(match, RAI_TEAM_ID),
     chronicleUrl: cronica ? (`${primerEquipoBase(gender)}/cronicas/${cronica.id}` as Route) : null,
+    previaUrl: !played && previa ? (`${primerEquipoBase(gender)}/previas/${previa.id}` as Route) : null,
   };
 }
 

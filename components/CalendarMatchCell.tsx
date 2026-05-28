@@ -21,7 +21,8 @@ function bottomLabel(match: CalendarMatch) {
 }
 
 export function CalendarMatchCell({ match, day, className }: CalendarMatchCellProps) {
-  const clickable = Boolean(match.chronicleUrl);
+  const href = match.played ? match.chronicleUrl : match.previaUrl;
+  const clickable = Boolean(href);
   const borderHover = getCompetitionBorderClass(match.competition);
   const accent = getCompetitionAccentClass(match.competition);
 
@@ -55,9 +56,9 @@ export function CalendarMatchCell({ match, day, className }: CalendarMatchCellPr
     className,
   );
 
-  if (clickable && match.chronicleUrl) {
+  if (clickable && href) {
     return (
-      <Link href={match.chronicleUrl as Route} className={cellClassName}>
+      <Link href={href as Route} className={cellClassName}>
         {content}
       </Link>
     );
