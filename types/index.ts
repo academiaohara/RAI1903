@@ -112,6 +112,8 @@ export type NewsItem = {
   featured?: boolean;
   /** Si se omite, la noticia aplica al club en general (masculino y femenino). */
   teams?: PrimerEquipoGender[];
+  /** Jugadores mencionados en la noticia (id de plantilla). */
+  playerIds?: string[];
 };
 
 export type NewsCategory = "Fichajes" | "Lesionados" | "Rumores" | "Renovaciones" | "Entrevistas" | "Otros";
@@ -139,6 +141,8 @@ export type TransferRumor = {
   playerId?: string;
   /** Comunicado oficial del club (mock). */
   clubAnnouncement?: string;
+  /** Noticia del club enlazada al comunicado (fichaje, renovacion, etc.). */
+  clubAnnouncementNewsId?: string;
 };
 
 export type PredictionOutcome = "1" | "X" | "2";

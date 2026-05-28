@@ -41,6 +41,8 @@ export type SquadPlayer = {
   peso: string;
   piernaBuena: "Derecha" | "Izquierda" | "Ambidiestro";
   contratoHasta: string;
+  /** Texto descriptivo del jugador (web oficial / ficha). */
+  descripcion: string;
   foto: string | null;
   partidos: number;
   minutos: number;
@@ -83,7 +85,7 @@ export type SquadClubInfo = {
   stats: SquadClubStats;
 };
 
-export type SquadModalTab = "resumen" | "partidos" | "estadisticas" | "trayectoria";
+export type SquadModalTab = "actualidad" | "resumen" | "partidos" | "estadisticas" | "trayectoria";
 
 export const SQUAD_POSITIONS: SquadPosition[] = ["Portero", "Defensa", "Centrocampista", "Delantero"];
 

@@ -2,34 +2,35 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Building2, Calendar, Megaphone, Newspaper } from "lucide-react";
+import { Building2, Calendar } from "lucide-react";
 import { Badge } from "@/components/Badge";
-import { NewsCard } from "@/components/NewsCard";
+import { PlayerActualidadSection } from "@/components/squad/PlayerActualidadSection";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 import { PlayerCareerTimeline } from "@/components/squad/PlayerCareerTimeline";
 import { PlayerMatchesTable } from "@/components/squad/PlayerMatchesTable";
+import { PlayerResumenSection } from "@/components/squad/PlayerResumenSection";
 import { PlayerStats } from "@/components/squad/PlayerStats";
 import {
-  getTransferClubNews,
+  getTransferClubAnnouncementNews,
   getTransferDisplayName,
   getTransferKind,
   getTransferKindLabel,
   getTransferOriginClub,
-  getTransferPressNews,
+  getTransferPlayerNews,
 } from "@/lib/fichajes";
-import { formatBirthDate, formatContractDate, getPlayerFullName, getNationalityFlag } from "@/lib/squad-utils";
+import { formatBirthDate, formatContractDate, getNationalityFlag } from "@/lib/squad-utils";
 import { formatDate } from "@/lib/utils";
 import type { TransferRumor } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
 
 type TransferDetailTab = "actualidad" | "resumen" | "partidos" | "estadisticas" | "trayectoria";
 
-const playerTabs: Array<{ id: TransferDetailTab; label: string }> = [
+const allTabs: Array<{ id: TransferDetailTab; label: string; requiresPlayer?: boolean }> = [
   { id: "actualidad", label: "Actualidad" },
-  { id: "resumen", label: "Resumen" },
-  { id: "partidos", label: "Partidos" },
-  { id: "estadisticas", label: "Estadisticas" },
-  { id: "trayectoria", label: "Trayectoria" },
+  { id: "resumen", label: "Resumen", requiresPlayer: true },
+  { id: "partidos", label: "Partidos", requiresPlayer: true },
+  { id: "estadisticas", label: "Estadisticas", requiresPlayer: true },
+  { id: "trayectoria", label: "Trayectoria", requiresPlayer: true },
 ];
 
 const toneByKind = {
@@ -38,12 +39,14 @@ const toneByKind = {
     chip: "border-white/25 bg-white/10",
     accent: "text-[#981915]",
     pill: "bg-[#981915]/10 text-[#981915]",
+    announcement: "fichaje" as const,
   },
   renovacion: {
     hero: "from-[#0f2347] via-[#173a78] to-[#214C9B]",
     chip: "border-white/25 bg-white/10",
     accent: "text-[#214C9B]",
     pill: "bg-blue-50 text-[#214C9B]",
+    announcement: "renovacion" as const,
   },
 } as const;
 
@@ -55,9 +58,10 @@ type TransferDetailViewProps = {
 export function TransferDetailView({ transfer, player }: TransferDetailViewProps) {
   const kind = getTransferKind(transfer);
   const tone = toneByKind[kind];
+  const visibleTabs = allTabs.filter((tab) => !tab.requiresPlayer || player);
   const [activeTab, setActiveTab] = useState<TransferDetailTab>("actualidad");
-  const clubNews = getTransferClubNews(transfer);
-  const pressNews = getTransferPressNews(transfer);
+  const clubAnnouncementNews = getTransferClubAnnouncementNews(transfer);
+  const playerNews = getTransferPlayerNews(transfer);
   const displayName = getTransferDisplayName(transfer);
   const originClub = getTransferOriginClub(transfer);
   const flag = player ? getNationalityFlag(player.nacionalidad) : "🇪🇸";
@@ -115,7 +119,7 @@ export function TransferDetailView({ transfer, player }: TransferDetailViewProps
 
       <div className="border-b border-slate-200 px-4 sm:px-6">
         <div className="flex gap-1 overflow-x-auto no-scrollbar py-3">
-          {(player ? playerTabs : playerTabs.filter((tab) => tab.id === "actualidad")).map((tab) => (
+          {visibleTabs.map((tab) => (
             <button
               key={tab.id}
               type="button"
@@ -148,52 +152,20 @@ export function TransferDetailView({ transfer, player }: TransferDetailViewProps
           >
             {activeTab === "actualidad" && (
               <div className="space-y-8">
-                {transfer.clubAnnouncement && (
-                  <section className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Megaphone className={tone.accent} size={18} aria-hidden />
-                      <h2 className="text-sm font-extrabold uppercase tracking-wide text-slate-900">Comunicado del club</h2>
-                    </div>
-                    <div className={`rounded-2xl border p-5 ${kind === "fichaje" ? "border-[#981915]/20 bg-rose-50/50" : "border-[#214C9B]/20 bg-blue-50/40"}`}>
-                      <p className="text-sm leading-7 text-slate-700">{transfer.clubAnnouncement}</p>
-                      <p className="mt-4 text-xs font-bold uppercase tracking-wide text-slate-500">
-                        Real Aviles Industrial · {formatDate(transfer.date)}
-                      </p>
-                    </div>
-                  </section>
-                )}
-
-                <section className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Newspaper className={tone.accent} size={18} aria-hidden />
-                    <h2 className="text-sm font-extrabold uppercase tracking-wide text-slate-900">Noticias del club</h2>
-                  </div>
-                  {clubNews.length > 0 ? (
-                    <div className="space-y-3">
-                      {clubNews.map((item) => (
-                        <NewsCard key={item.id} item={item} />
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-slate-500">Sin noticias oficiales adicionales en el mock.</p>
-                  )}
-                </section>
-
-                <section className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Megaphone className={tone.accent} size={18} aria-hidden />
-                    <h2 className="text-sm font-extrabold uppercase tracking-wide text-slate-900">Post partido</h2>
-                  </div>
-                  {pressNews.length > 0 ? (
-                    <div className="space-y-3">
-                      {pressNews.map((item) => (
-                        <NewsCard key={item.id} item={item} />
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-slate-500">Sin titulares de post partido vinculados en el mock.</p>
-                  )}
-                </section>
+                <PlayerActualidadSection
+                  clubAnnouncement={
+                    transfer.clubAnnouncement
+                      ? {
+                          text: transfer.clubAnnouncement,
+                          date: transfer.date,
+                          newsItem: clubAnnouncementNews,
+                        }
+                      : undefined
+                  }
+                  playerNews={playerNews}
+                  accentClass={tone.accent}
+                  announcementTone={tone.announcement}
+                />
 
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
                   <div className="flex flex-wrap items-center gap-2">
@@ -205,19 +177,7 @@ export function TransferDetailView({ transfer, player }: TransferDetailViewProps
               </div>
             )}
 
-            {player && activeTab === "resumen" && (
-              <div className="space-y-6">
-                <PlayerStats player={player} />
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                  <h3 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Perfil</h3>
-                  <p className="mt-3 text-sm leading-7 text-slate-600">
-                    {getPlayerFullName(player)} ({player.rol}) en el contexto del {getTransferKindLabel(kind).toLowerCase()} desde{" "}
-                    {originClub}.
-                  </p>
-                </div>
-              </div>
-            )}
-
+            {player && activeTab === "resumen" && <PlayerResumenSection player={player} />}
             {player && activeTab === "partidos" && <PlayerMatchesTable player={player} />}
             {player && activeTab === "estadisticas" && <PlayerStats player={player} />}
             {player && activeTab === "trayectoria" && <PlayerCareerTimeline player={player} />}
