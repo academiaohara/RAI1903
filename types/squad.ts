@@ -1,4 +1,4 @@
-import type { PlayerRoleCode } from "@/types";
+import type { PlayerRoleCode, PlayerStatus } from "@/types";
 
 export type SquadPosition = "Portero" | "Defensa" | "Centrocampista" | "Delantero";
 
@@ -32,6 +32,7 @@ export type SquadPlayer = {
   dorsal: number;
   posicion: SquadPosition;
   rol: SquadRoleCode;
+  estado: PlayerStatus;
   edad: number;
   fechaNacimiento: string;
   lugarNacimiento: string;

@@ -5,7 +5,6 @@ import type { SquadPlayer } from "@/types/squad";
 import { SQUAD_POSITIONS } from "@/types/squad";
 import { formatContractDate, getPlayerFullName, groupPlayersByPosition } from "@/lib/squad-utils";
 import { PositionSection } from "@/components/squad/PositionSection";
-import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 
 type PlayerTableProps = {
   players: SquadPlayer[];
@@ -105,12 +104,9 @@ function PlayerRow({
     >
       <td className={`px-3 py-3 font-extrabold tabular-nums text-[#214C9B] ${alignClass.center}`}>{player.dorsal}</td>
       <td className={`max-w-[11.5rem] px-3 py-3 ${alignClass.left}`}>
-        <div className="flex min-w-0 items-center gap-2">
-          <PlayerAvatar player={player} size="sm" className="shrink-0 rounded-xl" />
-          <div className="min-w-0">
-            <p className="truncate text-sm font-extrabold uppercase text-slate-900">{getPlayerFullName(player)}</p>
-            <p className="truncate text-[11px] font-semibold text-slate-500">{player.nacionalidad}</p>
-          </div>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-extrabold uppercase text-slate-900">{getPlayerFullName(player)}</p>
+          <p className="truncate text-[11px] font-semibold text-slate-500">{player.nacionalidad}</p>
         </div>
       </td>
       <td className={`px-2 py-3 text-xs font-extrabold tracking-wide text-slate-600 ${alignClass.center}`}>{player.rol}</td>
@@ -145,7 +141,6 @@ function PlayerMobileRow({
       onClick={() => onSelect(player)}
       className="flex w-full items-center gap-3 p-4 text-left transition hover:bg-blue-50/70"
     >
-      <PlayerAvatar player={player} size="md" className="rounded-xl" />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <span className="text-lg font-extrabold text-[#214C9B]">#{player.dorsal}</span>

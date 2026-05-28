@@ -131,6 +131,7 @@ function toSquadPlayer(player: Player, clubName: string, gender: PrimerEquipoGen
     dorsal: player.number,
     posicion: player.position,
     rol: getPlayerRole(player),
+    estado: player.status,
     edad: player.age,
     fechaNacimiento: player.birthDate,
     lugarNacimiento: birthPlace,
