@@ -1,6 +1,7 @@
 import { players, playersFemenino, teams, teamsFemenino } from "@/data/mock";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import { getPlayerRole } from "@/lib/player-roles";
+import { getSquadPlayerPhoto, STADIUM_ROMAN_SUAREZ_PHOTO } from "@/lib/squad-photos";
 import type { Player } from "@/types";
 import type { PlayerCareerRecord, PlayerMatchRecord, SquadClubInfo, SquadPlayer } from "@/types/squad";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -118,7 +119,7 @@ function buildCareer(player: Player, clubName: string): PlayerCareerRecord[] {
   return [...past.reverse(), currentSeason];
 }
 
-function toSquadPlayer(player: Player, clubName: string): SquadPlayer {
+function toSquadPlayer(player: Player, clubName: string, gender: PrimerEquipoGender): SquadPlayer {
   const birthPlace = pick(BIRTH_PLACES, player.id);
   const contractYear = player.seasonsAtClub >= 4 ? 2027 : 2026;
 
@@ -137,7 +138,7 @@ function toSquadPlayer(player: Player, clubName: string): SquadPlayer {
     peso: WEIGHT_BY_POSITION[player.position],
     piernaBuena: player.preferredFoot,
     contratoHasta: `${contractYear}-06-30`,
-    foto: null,
+    foto: gender === "masculino" ? getSquadPlayerPhoto(player.number) : null,
     partidos: player.stats.appearances,
     minutos: player.stats.minutes,
     goles: player.stats.goals,
@@ -152,7 +153,7 @@ function toSquadPlayer(player: Player, clubName: string): SquadPlayer {
 export function getSquadPlayers(gender: PrimerEquipoGender): SquadPlayer[] {
   const source = gender === "femenino" ? playersFemenino : players;
   const clubName = gender === "femenino" ? "Real Aviles Industrial Femenino" : "Real Aviles Industrial";
-  return source.map((player) => toSquadPlayer(player, clubName));
+  return source.map((player) => toSquadPlayer(player, clubName, gender));
 }
 
 export function getSquadClubInfo(gender: PrimerEquipoGender): SquadClubInfo {
@@ -179,7 +180,7 @@ export function getSquadClubInfo(gender: PrimerEquipoGender): SquadClubInfo {
     estadio: stadiumName,
     estadioInfo: {
       nombre: stadiumName,
-      imagen: "/estadio-rai.jpg",
+      imagen: STADIUM_ROMAN_SUAREZ_PHOTO,
       capacidad: 5000,
       direccion: "Calle Roman Suarez Puerta, s/n",
       ciudad: city,

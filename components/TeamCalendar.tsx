@@ -3,60 +3,79 @@
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { CalendarMatchCell } from "@/components/CalendarMatchCell";
-import { WEEKDAY_LABELS, type CalendarMonth } from "@/lib/calendar";
+import { buildSingleCalendarMonth, isUtcToday, WEEKDAY_LABELS } from "@/lib/calendar";
 import { matchCompetitionShortLabel } from "@/lib/competition-labels";
 import { getCompetitionAccentClass } from "@/lib/competition-styles";
 import { cn } from "@/lib/utils";
 import type { CalendarMatch } from "@/types";
 
 type TeamCalendarProps = {
-  months: CalendarMonth[];
+  matches: CalendarMatch[];
   className?: string;
 };
+
+const TODAY_DAY_CLASS = "inline-flex min-w-[1.75rem] items-center justify-center rounded-lg bg-[#214C9B] px-2 py-0.5 text-sm font-extrabold text-white";
 
 const EMPTY_CELL_CLASS =
   "flex min-h-[6.5rem] items-start rounded-2xl border border-dashed border-[#214C9B]/10 bg-slate-50/40 p-2.5 sm:aspect-square sm:min-h-0";
 
 const PLACEHOLDER_CELL_CLASS = "min-h-[6.5rem] rounded-2xl bg-slate-50/60 sm:aspect-square sm:min-h-0";
 
-function findInitialMonthIndex(months: CalendarMonth[]): number {
-  if (months.length === 0) return 0;
-  const now = new Date();
-  const key = `${now.getUTCFullYear()}-${now.getUTCMonth()}`;
-  const index = months.findIndex((month) => month.key === key);
-  return index >= 0 ? index : 0;
+function shiftMonth(year: number, month: number, delta: number): { year: number; month: number } {
+  const date = new Date(Date.UTC(year, month + delta, 1));
+  return { year: date.getUTCFullYear(), month: date.getUTCMonth() };
 }
 
-export function TeamCalendar({ months, className }: TeamCalendarProps) {
-  const [monthIndex, setMonthIndex] = useState(() => findInitialMonthIndex(months));
+function initialViewDate(matches: CalendarMatch[]): { year: number; month: number } {
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const month = now.getUTCMonth();
+  const hasMatchesThisMonth = matches.some((match) => {
+    const date = new Date(match.date);
+    return date.getUTCFullYear() === year && date.getUTCMonth() === month;
+  });
+  if (hasMatchesThisMonth || matches.length === 0) return { year, month };
 
-  const safeIndex = Math.min(Math.max(monthIndex, 0), Math.max(months.length - 1, 0));
-  const month = months[safeIndex];
+  const first = new Date(matches[0].date);
+  return { year: first.getUTCFullYear(), month: first.getUTCMonth() };
+}
+
+export function TeamCalendar({ matches, className }: TeamCalendarProps) {
+  const initial = initialViewDate(matches);
+  const [viewYear, setViewYear] = useState(initial.year);
+  const [viewMonth, setViewMonth] = useState(initial.month);
+
+  const month = useMemo(() => buildSingleCalendarMonth(viewYear, viewMonth, matches), [viewYear, viewMonth, matches]);
 
   const monthLabel = useMemo(() => {
-    if (!month) return "";
     return new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(
       new Date(Date.UTC(month.year, month.month, 1)),
     );
-  }, [month]);
+  }, [month.month, month.year]);
 
-  if (months.length === 0) {
+  const goPrev = () => {
+    const next = shiftMonth(viewYear, viewMonth, -1);
+    setViewYear(next.year);
+    setViewMonth(next.month);
+  };
+
+  const goNext = () => {
+    const next = shiftMonth(viewYear, viewMonth, 1);
+    setViewYear(next.year);
+    setViewMonth(next.month);
+  };
+
+  if (matches.length === 0) {
     return <p className="text-sm font-bold text-slate-500">No hay partidos en el calendario de esta temporada.</p>;
   }
-
-  if (!month) return null;
-
-  const atFirst = safeIndex === 0;
-  const atLast = safeIndex === months.length - 1;
 
   return (
     <div className={cn("space-y-4", className)}>
       <div className="flex items-center justify-center gap-1 sm:gap-2" role="group" aria-label="Navegación del calendario">
         <button
           type="button"
-          onClick={() => setMonthIndex((index) => Math.max(0, index - 1))}
-          disabled={atFirst}
-          className="inline-flex shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 p-2 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-35"
+          onClick={goPrev}
+          className="inline-flex shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 p-2 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
           aria-label="Mes anterior"
         >
           <ChevronLeft size={18} />
@@ -69,16 +88,14 @@ export function TeamCalendar({ months, className }: TeamCalendarProps) {
         </h3>
         <button
           type="button"
-          onClick={() => setMonthIndex((index) => Math.min(months.length - 1, index + 1))}
-          disabled={atLast}
-          className="inline-flex shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 p-2 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-35"
+          onClick={goNext}
+          className="inline-flex shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 p-2 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
           aria-label="Mes siguiente"
         >
           <ChevronRight size={18} />
         </button>
       </div>
 
-      {/* Desktop: month grid */}
       <div className="hidden lg:block">
         <div className="mb-1.5 grid grid-cols-7 gap-1.5">
           {WEEKDAY_LABELS.map((label) => (
@@ -92,19 +109,27 @@ export function TeamCalendar({ months, className }: TeamCalendarProps) {
             if (!cell) {
               return <div key={`${month.key}-empty-${index}`} className={PLACEHOLDER_CELL_CLASS} aria-hidden />;
             }
+            const today = isUtcToday(month.year, month.month, cell.day);
             if (!cell.match) {
               return (
                 <div key={`${month.key}-day-${cell.day}`} className={EMPTY_CELL_CLASS}>
-                  <span className="text-sm font-bold text-slate-400">{cell.day}</span>
+                  <span className={today ? TODAY_DAY_CLASS : "text-sm font-bold text-slate-400"}>{cell.day}</span>
                 </div>
               );
             }
-            return <CalendarMatchCell key={cell.match.id} match={cell.match} day={cell.day} />;
+            return (
+              <CalendarMatchCell
+                key={cell.match.id}
+                match={cell.match}
+                day={cell.day}
+                isToday={today}
+                todayDayClassName={TODAY_DAY_CLASS}
+              />
+            );
           })}
         </div>
       </div>
 
-      {/* Mobile / tablet: match cards */}
       <div className="grid gap-3 sm:grid-cols-2 lg:hidden">
         {monthMatchesInOrder(month).map((match) => (
           <MobileCalendarCard key={match.id} match={match} />
@@ -117,7 +142,7 @@ export function TeamCalendar({ months, className }: TeamCalendarProps) {
   );
 }
 
-function monthMatchesInOrder(month: CalendarMonth): CalendarMatch[] {
+function monthMatchesInOrder(month: { weeks: Array<Array<{ day: number; match?: CalendarMatch } | null>> }): CalendarMatch[] {
   return month.weeks
     .flat()
     .filter((cell): cell is { day: number; match: CalendarMatch } => Boolean(cell?.match))

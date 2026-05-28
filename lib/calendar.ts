@@ -73,6 +73,45 @@ const WEEKDAY_LABELS = ["L", "M", "X", "J", "V", "S", "D"] as const;
 
 export { WEEKDAY_LABELS };
 
+function buildMonthGrid(year: number, month: number, monthMatches: CalendarMatch[]): CalendarMonth["weeks"] {
+  const firstDay = new Date(Date.UTC(year, month, 1));
+  const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+  const startOffset = (firstDay.getUTCDay() + 6) % 7;
+  const matchByDay = new Map(monthMatches.map((match) => [new Date(match.date).getUTCDate(), match]));
+
+  const cells: Array<{ day: number; match?: CalendarMatch } | null> = [];
+  for (let index = 0; index < startOffset; index += 1) cells.push(null);
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    cells.push({ day, match: matchByDay.get(day) });
+  }
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  const weeks: CalendarMonth["weeks"] = [];
+  for (let index = 0; index < cells.length; index += 7) {
+    weeks.push(cells.slice(index, index + 7));
+  }
+
+  return weeks;
+}
+
+export function isUtcToday(year: number, month: number, day: number): boolean {
+  const now = new Date();
+  return now.getUTCFullYear() === year && now.getUTCMonth() === month && now.getUTCDate() === day;
+}
+
+export function buildSingleCalendarMonth(year: number, month: number, matches: CalendarMatch[]): CalendarMonth {
+  const key = `${year}-${month}`;
+  const monthMatches = matches.filter((match) => {
+    const date = new Date(match.date);
+    return date.getUTCFullYear() === year && date.getUTCMonth() === month;
+  });
+  const label = new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(
+    new Date(Date.UTC(year, month, 1)),
+  );
+
+  return { key, label, year, month, weeks: buildMonthGrid(year, month, monthMatches) };
+}
+
 export function buildCalendarMonths(matches: CalendarMatch[]): CalendarMonth[] {
   if (matches.length === 0) return [];
 
@@ -91,27 +130,10 @@ export function buildCalendarMonths(matches: CalendarMatch[]): CalendarMonth[] {
       const [yearStr, monthStr] = key.split("-");
       const year = Number(yearStr);
       const month = Number(monthStr);
-      const firstDay = new Date(Date.UTC(year, month, 1));
-      const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
-      const startOffset = (firstDay.getUTCDay() + 6) % 7;
-      const matchByDay = new Map(monthMatches.map((match) => [new Date(match.date).getUTCDate(), match]));
-
-      const cells: Array<{ day: number; match?: CalendarMatch } | null> = [];
-      for (let index = 0; index < startOffset; index += 1) cells.push(null);
-      for (let day = 1; day <= daysInMonth; day += 1) {
-        cells.push({ day, match: matchByDay.get(day) });
-      }
-      while (cells.length % 7 !== 0) cells.push(null);
-
-      const weeks: CalendarMonth["weeks"] = [];
-      for (let index = 0; index < cells.length; index += 7) {
-        weeks.push(cells.slice(index, index + 7));
-      }
-
       const label = new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(
         new Date(Date.UTC(year, month, 1)),
       );
 
-      return { key, label, year, month, weeks };
+      return { key, label, year, month, weeks: buildMonthGrid(year, month, monthMatches) };
     });
 }

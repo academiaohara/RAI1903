@@ -2,17 +2,12 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { competitionSeasons, DEFAULT_COMPETITION_SEASON_ID, type CompetitionSeasonId } from "@/data/mock";
-import { loadSeasonId, saveSeasonId } from "@/lib/storage";
+import { saveSeasonId } from "@/lib/storage";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export function SeasonSelector({ className }: { className?: string }) {
   const [seasonId, setSeasonId] = useState<CompetitionSeasonId>(DEFAULT_COMPETITION_SEASON_ID);
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => setSeasonId(loadSeasonId()), 0);
-    return () => window.clearTimeout(timer);
-  }, []);
 
   const index = competitionSeasons.findIndex((season) => season.id === seasonId);
   const currentIndex = index >= 0 ? index : competitionSeasons.findIndex((season) => season.id === DEFAULT_COMPETITION_SEASON_ID);
