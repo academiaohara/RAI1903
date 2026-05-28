@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { RAI_LOGO_PATH, shouldUseRaiLogoNewsFallback } from "@/lib/noticias";
+import { RAI_LOGO_PATH, raiNewsFallbackBgClass, shouldUseRaiLogoNewsFallback } from "@/lib/noticias";
 import type { NewsItem } from "@/types";
 
 type NewsMediaVariant = "card" | "featured" | "ticker";
@@ -42,17 +42,21 @@ export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?
 
   if (shouldUseRaiLogoNewsFallback(item)) {
     const logoSize =
-      variant === "featured" ? "h-[58%] w-[58%] max-h-24 max-w-24" : variant === "ticker" ? "h-[52%] w-[52%] max-h-20 max-w-20" : "h-[54%] w-[54%] max-h-[4.5rem] max-w-[4.5rem]";
+      variant === "featured"
+        ? "h-[72%] w-[72%] max-h-32 max-w-32"
+        : variant === "ticker"
+          ? "h-[64%] w-[64%] max-h-24 max-w-24"
+          : "h-[68%] w-[68%] max-h-28 max-w-28";
 
     return (
-      <div className={`flex items-center justify-center bg-[#214C9B] ${frame}`}>
+      <div className={`flex items-center justify-center ${raiNewsFallbackBgClass(item.teams)} ${frame}`}>
         <Image
           src={RAI_LOGO_PATH}
           alt=""
-          width={120}
-          height={120}
+          width={160}
+          height={160}
           className={`object-contain ${logoSize}`}
-          sizes={variant === "ticker" ? "80px" : variant === "featured" ? "96px" : "72px"}
+          sizes={variant === "ticker" ? "96px" : variant === "featured" ? "128px" : "112px"}
         />
       </div>
     );
