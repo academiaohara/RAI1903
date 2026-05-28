@@ -4,7 +4,7 @@ import {
   CalendarDays,
   ClipboardList,
   FileText,
-  Heart,
+  Ship,
   Home,
   Medal,
   Megaphone,
@@ -99,7 +99,7 @@ export const navItems: NavItem[] = [
       { href: "/contenido-fan/zona-mixta", label: "Zona Mixta", icon: Radio },
       { href: "/contenido-fan/previa", label: "Previa", icon: Target },
       { href: "/contenido-fan/rdp", label: "RDP", icon: Mic2 },
-      { href: "/contenido-fan/tente-firme", label: "Tente firme", icon: Heart },
+      { href: "/contenido-fan/tente-firme", label: "Tente firme", icon: Ship },
     ],
   },
 ];
