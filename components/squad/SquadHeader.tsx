@@ -29,30 +29,31 @@ export function SquadHeader({ club, stats, onStadiumClick }: SquadHeaderProps) {
             <p className="mt-2 text-xs font-semibold text-slate-500">Temporada {club.temporada}</p>
           </div>
         </div>
-        <SquadStatsBar stats={stats} />
+
+        <button
+          type="button"
+          onClick={onStadiumClick}
+          className="group flex w-full shrink-0 items-center gap-3 rounded-2xl border border-[#214C9B]/15 bg-gradient-to-r from-slate-50 to-blue-50/60 px-4 py-3 text-left shadow-sm transition hover:border-[#214C9B]/30 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#214C9B] sm:ml-auto sm:w-auto sm:min-w-[min(100%,22rem)] lg:min-w-[26rem]"
+          aria-label={`Ver informacion de ${club.estadioInfo.nombre}`}
+        >
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#214C9B]/10 text-[#214C9B] transition group-hover:bg-[#214C9B]/15">
+            <Landmark size={22} strokeWidth={2.25} aria-hidden />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-bold text-slate-900 sm:text-base">{club.estadioInfo.nombre}</span>
+            <span className="mt-0.5 block text-xs font-semibold text-[#214C9B]/80 group-hover:text-[#214C9B]">
+              Ver informacion del estadio
+            </span>
+          </span>
+          <ChevronRight
+            size={20}
+            className="shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-[#214C9B]"
+            aria-hidden
+          />
+        </button>
       </div>
 
-      <button
-        type="button"
-        onClick={onStadiumClick}
-        className="group flex w-full items-center gap-3 rounded-2xl border border-[#214C9B]/15 bg-gradient-to-r from-slate-50 to-blue-50/60 px-4 py-3 text-left shadow-sm transition hover:border-[#214C9B]/30 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#214C9B] sm:w-auto sm:min-w-[min(100%,20rem)]"
-        aria-label={`Ver informacion de ${club.estadioInfo.nombre}`}
-      >
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#214C9B]/10 text-[#214C9B] transition group-hover:bg-[#214C9B]/15">
-          <Landmark size={22} strokeWidth={2.25} aria-hidden />
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-bold text-slate-900 sm:text-base">{club.estadioInfo.nombre}</span>
-          <span className="mt-0.5 block text-xs font-semibold text-[#214C9B]/80 group-hover:text-[#214C9B]">
-            Ver informacion del estadio
-          </span>
-        </span>
-        <ChevronRight
-          size={20}
-          className="shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-[#214C9B]"
-          aria-hidden
-        />
-      </button>
+      <SquadStatsBar stats={stats} />
     </div>
   );
 }

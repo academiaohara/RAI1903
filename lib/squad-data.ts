@@ -1,5 +1,6 @@
-import { players, playersFemenino, teams, teamsFemenino } from "@/data/mock";
+import { matchdays, players, playersFemenino, teams, teamsFemenino } from "@/data/mock";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
+import { matchToFinishedLeagueMatch } from "@/lib/standings";
 import { getPlayerRole } from "@/lib/player-roles";
 import { getSquadPlayerPhoto, STADIUM_ROMAN_SUAREZ_PHOTO } from "@/lib/squad-photos";
 import type { Player } from "@/types";
@@ -150,6 +151,22 @@ function toSquadPlayer(player: Player, clubName: string, gender: PrimerEquipoGen
   };
 }
 
+function countCleanSheets(teamId: string): number {
+  return matchdays
+    .flatMap((round) => round.matches)
+    .reduce((count, match) => {
+      const finished = matchToFinishedLeagueMatch(match);
+      if (!finished) return count;
+
+      const isHome = finished.homeTeamId === teamId;
+      const isAway = finished.awayTeamId === teamId;
+      if (!isHome && !isAway) return count;
+
+      const conceded = isHome ? finished.awayScore : finished.homeScore;
+      return conceded === 0 ? count + 1 : count;
+    }, 0);
+}
+
 export function getSquadPlayers(gender: PrimerEquipoGender): SquadPlayer[] {
   const source = gender === "femenino" ? playersFemenino : players;
   const clubName = gender === "femenino" ? "Real Aviles Industrial Femenino" : "Real Aviles Industrial";
@@ -197,6 +214,7 @@ export function getSquadClubInfo(gender: PrimerEquipoGender): SquadClubInfo {
       derrotas: stats.lost,
       golesFavor: stats.goalsFor,
       golesContra: stats.goalsAgainst,
+      porteriasImbatidas: countCleanSheets(teamId),
     },
   };
 }
