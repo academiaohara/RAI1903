@@ -28,7 +28,7 @@ export function EquipoLigaView({ gender, team, allTeams }: EquipoLigaViewProps) 
     <div className="space-y-6">
       <Link
         href={backHref}
-        className="inline-flex items-center gap-2 text-sm font-bold text-[#214C9B] transition hover:text-[#214C9B]"
+        className="inline-flex items-center gap-2 text-sm font-bold text-[#214C9B] transition hover:text-[#981915]"
       >
         ← Volver a competicion
       </Link>
@@ -121,11 +121,11 @@ function StatBox({ label, value, highlight = false }: { label: string; value: st
     <div
       className={cn(
         "rounded-2xl border px-3 py-3 text-center",
-        highlight ? "border-[#214C9B]/30 bg-[#214C9B]/5" : "border-[#214C9B]/15 bg-slate-50/80",
+        highlight ? "border-[#981915]/30 bg-[#981915]/5" : "border-[#214C9B]/15 bg-slate-50/80",
       )}
     >
       <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-slate-500">{label}</p>
-      <p className={cn("mt-1 text-xl font-extrabold tabular-nums", highlight ? "text-[#214C9B]" : "text-[#214C9B]")}>
+      <p className={cn("mt-1 text-xl font-extrabold tabular-nums", highlight ? "text-[#981915]" : "text-[#214C9B]")}>
         {value}
       </p>
     </div>

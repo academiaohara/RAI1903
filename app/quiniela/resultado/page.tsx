@@ -47,7 +47,7 @@ export default function QuinielaResultadoPage() {
           </div>
           <div className="rounded-2xl border border-red-100 bg-red-50 p-4 text-center">
             <p className="text-xs font-bold uppercase tracking-normal text-slate-500">Lider</p>
-            <p className="mt-2 text-lg font-extrabold text-[#214C9B]">{leader?.user ?? "—"}</p>
+            <p className="mt-2 text-lg font-extrabold text-[#981915]">{leader?.user ?? "—"}</p>
             {leader && <p className="text-sm font-bold text-slate-600">{leader.points} pts</p>}
           </div>
         </div>

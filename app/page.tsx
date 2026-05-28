@@ -132,12 +132,12 @@ export default function HomePage() {
       <section className="hidden space-y-4 xl:block">
         <div className="grid grid-cols-2 gap-6">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#214C9B]">Resultados</p>
+            <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">Resultados</p>
             <h2 className="text-3xl font-extrabold uppercase text-[#214C9B]">Ultimos 5 partidos</h2>
           </div>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#214C9B]">Calendario</p>
+              <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">Calendario</p>
               <h2 className="text-3xl font-extrabold uppercase text-[#214C9B]">Proximos 5 partidos</h2>
             </div>
             <CalendarNavButton href={`${primerEquipoBase("masculino")}/calendario` as Route} />
@@ -201,7 +201,7 @@ function MatchBanner({ match, label, href, action }: { match: Match; label: stri
             </span>
           )}
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-normal text-[#214C9B]">{label}</p>
+            <p className="text-xs font-bold uppercase tracking-normal text-[#981915]">{label}</p>
             <p className="mt-1 break-words text-lg font-extrabold leading-tight text-slate-900 lg:text-xl">{match.homeTeam}</p>
           </div>
         </div>
@@ -211,7 +211,7 @@ function MatchBanner({ match, label, href, action }: { match: Match; label: stri
         </div>
         <div className="flex min-w-0 items-center justify-between gap-3 p-4 lg:gap-4 lg:p-5">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-normal text-[#214C9B]">{competitionLabel}</p>
+            <p className="text-xs font-bold uppercase tracking-normal text-[#981915]">{competitionLabel}</p>
             <p className="mt-1 break-words text-lg font-extrabold leading-tight text-slate-900 lg:text-xl">{match.awayTeam}</p>
           </div>
           <span className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#214C9B]/20 px-4 py-2 text-sm font-bold text-[#214C9B] transition group-hover:bg-[#214C9B] group-hover:text-white lg:w-auto lg:shrink-0">

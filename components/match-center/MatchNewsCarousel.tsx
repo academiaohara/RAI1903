@@ -68,7 +68,7 @@ export function MatchNewsCarousel({ items, title = "Post partido en medios" }: M
               <NewsMedia item={item} variant="ticker" />
             </div>
             <div className="space-y-1 p-3">
-              <p className="text-[10px] font-bold uppercase text-[#214C9B]">
+              <p className="text-[10px] font-bold uppercase text-[#981915]">
                 {item.source} · {formatDate(item.date, { day: "numeric", month: "short" })}
               </p>
               <p className="line-clamp-3 text-sm font-extrabold leading-snug text-[#214C9B]">{item.title}</p>

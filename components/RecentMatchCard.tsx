@@ -29,7 +29,7 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
         <Badge tone={result === "W" ? "green" : result === "D" ? "amber" : result === "L" ? "red" : "slate"}>
           {result === "W" ? "Victoria" : result === "D" ? "Empate" : result === "L" ? "Derrota" : "Finalizado"}
         </Badge>
-        <span className="shrink-0 text-right text-[11px] font-bold uppercase leading-tight tracking-[0.06em] text-[#214C9B]">
+        <span className="shrink-0 text-right text-[11px] font-bold uppercase leading-tight tracking-[0.06em] text-[#981915]">
           {matchFixtureMeta(match)}
         </span>
       </div>

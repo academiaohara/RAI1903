@@ -55,7 +55,7 @@ export function ZonaMixtaVideoShowcase({ videos }: ZonaMixtaVideoShowcaseProps) 
           />
         </div>
         <div className="border-t border-white/10 bg-[#0f1f3d] px-5 py-4">
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#214C9B]">Último episodio</p>
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">Último episodio</p>
           <h3 className="mt-1 text-lg font-extrabold uppercase text-white sm:text-xl">{featured.title}</h3>
         </div>
       </div>

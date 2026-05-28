@@ -111,7 +111,7 @@ function AvailabilityBlock({ availability, homeLabel, awayLabel }: { availabilit
           {players.map((player) => (
             <li key={`${label}-${player.name}`} className="text-sm">
               <span className="font-bold text-slate-800">{player.name}</span>{" "}
-              <span className="text-xs font-bold uppercase text-[#214C9B]">({player.reason})</span>
+              <span className="text-xs font-bold uppercase text-[#981915]">({player.reason})</span>
               <p className="text-xs text-slate-500">{player.detail}</p>
             </li>
           ))}
