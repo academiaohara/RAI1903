@@ -6,7 +6,6 @@ import type { SquadPlayer, SquadViewMode } from "@/types/squad";
 import { getSquadClubInfo, getSquadPlayers } from "@/lib/squad-data";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { SquadHeader } from "@/components/squad/SquadHeader";
-import { SquadStatsBar } from "@/components/squad/SquadStatsBar";
 import { SquadToolbar } from "@/components/squad/SquadToolbar";
 import { PlayerTable } from "@/components/squad/PlayerTable";
 import { PlayerGrid } from "@/components/squad/PlayerGrid";
@@ -27,8 +26,7 @@ export function SquadPage({ gender }: SquadPageProps) {
 
   return (
     <div className="space-y-6">
-      <SquadHeader club={club} onStadiumClick={() => setStadiumOpen(true)} />
-      <SquadStatsBar stats={club.stats} />
+      <SquadHeader club={club} stats={club.stats} onStadiumClick={() => setStadiumOpen(true)} />
       <SquadToolbar viewMode={viewMode} onViewModeChange={setViewMode} />
 
       <AnimatePresence mode="wait">
