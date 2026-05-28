@@ -130,6 +130,30 @@ a {
   color: #fff;
 }
 
+.news-card-item {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.news-card-item:hover {
+  background-color: var(--rai-blue);
+  border-color: var(--rai-blue);
+}
+
+.news-card-item:hover .news-card-date,
+.news-card-item:hover .news-card-title,
+.news-card-item:hover .news-card-excerpt {
+  color: #fff;
+}
+
+.news-card-item:hover .news-card-badge {
+  border-color: rgb(255 255 255 / 0.35);
+  background-color: rgb(255 255 255 / 0.15);
+  color: #fff;
+}
+
 .news-ticker-track {
   animation: news-ticker-left 70s linear infinite;
 }

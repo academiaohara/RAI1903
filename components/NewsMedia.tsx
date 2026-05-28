@@ -5,8 +5,8 @@ import type { NewsItem } from "@/types";
 type NewsMediaVariant = "card" | "featured" | "ticker";
 
 const frameByVariant: Record<NewsMediaVariant, string> = {
-  card: "aspect-[16/9] sm:aspect-auto sm:h-full sm:min-h-[6.75rem]",
-  featured: "aspect-[16/9] sm:aspect-auto sm:h-full sm:min-h-[7.5rem]",
+  card: "aspect-[2/1]",
+  featured: "aspect-[2/1] sm:aspect-[21/9]",
   ticker: "aspect-[16/9]",
 };
 
@@ -17,7 +17,7 @@ const initialsByVariant: Record<NewsMediaVariant, string> = {
 };
 
 export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?: NewsMediaVariant }) {
-  const rounded = variant === "ticker" ? "rounded-t-2xl" : "rounded-2xl";
+  const rounded = variant === "ticker" ? "rounded-t-2xl" : variant === "card" || variant === "featured" ? "rounded-none" : "rounded-2xl";
   const frame = `relative w-full shrink-0 overflow-hidden ${raiNewsMediaBgClass(item.teams)} ${rounded} ${frameByVariant[variant]}`;
 
   if (item.imageUrl) {
@@ -28,13 +28,7 @@ export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?
           alt=""
           fill
           className="object-cover"
-          sizes={
-            variant === "ticker"
-              ? "320px"
-              : variant === "featured"
-                ? "(max-width: 640px) 100vw, 176px"
-                : "(max-width: 640px) 100vw, 144px"
-          }
+          sizes={variant === "ticker" ? "320px" : "(max-width: 640px) 100vw, 960px"}
         />
       </div>
     );
