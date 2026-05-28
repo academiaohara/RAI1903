@@ -36,7 +36,7 @@ export function SquadStatsBar({ stats, className = "" }: SquadStatsBarProps) {
             transition={{ delay: 0.04 * index, duration: 0.3 }}
             className="flex min-w-0 flex-col items-center text-center"
           >
-            <p className="font-serif text-3xl font-black leading-none tabular-nums tracking-tighter text-[#981915] sm:text-4xl lg:text-[2.75rem]">
+            <p className="font-serif text-3xl font-black leading-none tabular-nums tracking-tighter text-[#214C9B] sm:text-4xl lg:text-[2.75rem]">
               {stats[item.key]}
             </p>
             <p className="mt-1.5 text-[11px] font-semibold text-slate-800 sm:text-xs">{item.label}</p>

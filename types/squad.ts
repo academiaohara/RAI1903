@@ -47,7 +47,6 @@ export type SquadPlayer = {
   asistencias: number;
   amarillas: number;
   rojas: number;
-  xG: number;
   historialPartidos: PlayerMatchRecord[];
   trayectoria: PlayerCareerRecord[];
 };

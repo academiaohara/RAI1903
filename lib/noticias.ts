@@ -38,7 +38,7 @@ export const newsCategoryBadge = (item: Pick<NewsItem, "channel" | "tags">) => {
 
 export const NOTICIAS_TABS: { href: Route; label: string }[] = [
   { href: "/noticias/club", label: "Club" },
-  { href: "/noticias/prensa", label: "Prensa" },
+  { href: "/noticias/prensa", label: "Post partido" },
 ];
 
 export const sortNewsByDate = <T extends { date: string; id: string }>(items: T[]) =>
@@ -80,11 +80,10 @@ export const shouldShowTeamScopeBadge = (item: Pick<NewsItem, "teams" | "source"
 };
 
 export const RAI_BRAND_BLUE = "#214C9B";
-export const RAI_BRAND_GRANATE = "#981915";
+export const RAI_BRAND_GRANATE = "#214C9B";
 export const RAI_LOGO_PATH = "/rai_logo.webp";
 
-export const raiNewsMediaBgClass = (teams: PrimerEquipoGender[] | undefined) =>
-  teams?.length === 1 && teams[0] === "femenino" ? "bg-[#981915]" : "bg-[#214C9B]";
+export const raiNewsMediaBgClass = () => "bg-[#214C9B]";
 
 export const raiNewsFallbackBgClass = raiNewsMediaBgClass;
 const REAL_AVILES_CLUB_SITE = "realavilesindustrial1903.com";

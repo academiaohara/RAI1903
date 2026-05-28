@@ -23,7 +23,7 @@ export function PageHero({
 }: PageHeroProps) {
   return (
     <section className={cn(className)}>
-      {eyebrow && <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">{eyebrow}</p>}
+      {eyebrow && <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#214C9B]">{eyebrow}</p>}
       <div className={cn("grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end", eyebrow && "mt-2")}>
         <div className="min-w-0 max-w-full">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-3">

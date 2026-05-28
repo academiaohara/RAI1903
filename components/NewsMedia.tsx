@@ -24,7 +24,7 @@ export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?
         ? "rounded-l-xl"
         : "rounded-2xl";
   const widthClass = variant === "ticker" ? "w-full" : "";
-  const frame = `relative shrink-0 overflow-hidden ${widthClass} ${raiNewsMediaBgClass(item.teams)} ${rounded} ${frameByVariant[variant]}`;
+  const frame = `relative shrink-0 overflow-hidden ${widthClass} ${raiNewsMediaBgClass()} ${rounded} ${frameByVariant[variant]}`;
 
   if (item.imageUrl) {
     return (
@@ -72,7 +72,7 @@ export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?
 
   return (
     <div
-      className={`flex items-center justify-center bg-[linear-gradient(135deg,#214C9B_0%,#214C9B_48%,#ffffff_48%,#ffffff_56%,#981915_56%,#981915_100%)] font-extrabold text-white shadow-inner ${frame} ${initialsByVariant[variant]}`}
+      className={`flex items-center justify-center bg-[linear-gradient(135deg,#214C9B_0%,#214C9B_48%,#ffffff_48%,#ffffff_56%,#214C9B_56%,#214C9B_100%)] font-extrabold text-white shadow-inner ${frame} ${initialsByVariant[variant]}`}
     >
       {item.source.slice(0, 2).toUpperCase()}
     </div>

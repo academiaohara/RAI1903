@@ -88,7 +88,7 @@ export default function MiQuinielaPage() {
       />
 
       {hydrated && isLocked && (
-        <p className="rounded-2xl border border-[#981915]/30 bg-[#981915]/10 px-4 py-3 text-sm font-bold text-[#981915]">
+        <p className="rounded-2xl border border-[#214C9B]/30 bg-[#214C9B]/10 px-4 py-3 text-sm font-bold text-[#214C9B]">
           La jornada {round} ya ha empezado: tu quiniela queda cerrada.
         </p>
       )}

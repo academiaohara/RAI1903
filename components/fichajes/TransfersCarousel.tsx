@@ -39,7 +39,7 @@ export function TransfersCarousel({ transfers }: TransfersCarouselProps) {
         <div className="flex items-center gap-2">
           <Link
             href={"/fichajes" as Route}
-            className="hidden text-xs font-bold uppercase tracking-wide text-[#981915] transition hover:underline sm:inline"
+            className="hidden text-xs font-bold uppercase tracking-wide text-[#214C9B] transition hover:underline sm:inline"
           >
             Ver todos
           </Link>
@@ -68,7 +68,7 @@ export function TransfersCarousel({ transfers }: TransfersCarouselProps) {
         ))}
       </div>
 
-      <Link href={"/fichajes" as Route} className="text-xs font-bold uppercase tracking-wide text-[#981915] transition hover:underline sm:hidden">
+      <Link href={"/fichajes" as Route} className="text-xs font-bold uppercase tracking-wide text-[#214C9B] transition hover:underline sm:hidden">
         Ver todos los fichajes
       </Link>
     </div>

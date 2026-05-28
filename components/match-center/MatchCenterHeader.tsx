@@ -22,7 +22,7 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
   const meta = [matchCompetitionShortLabel(match), jornada, seasonLabel].filter(Boolean).join(" · ");
 
   return (
-    <header className="overflow-hidden rounded-[2rem] bg-[#981915] text-white shadow-[0_20px_50px_rgba(152,25,21,0.35)]">
+    <header className="overflow-hidden rounded-[2rem] bg-[#214C9B] text-white shadow-[0_20px_50px_rgba(33,76,155,0.35)]">
       <div className="px-4 py-4 sm:px-8 sm:py-6">
         <Link
           href={backHref}
@@ -110,7 +110,7 @@ export function MatchCenterTabs({
             onClick={() => onChange(tab.id)}
             className={cn(
               "rounded-full px-4 py-2 text-xs font-extrabold uppercase tracking-normal transition sm:text-sm",
-              isActive ? "bg-[#981915] text-white shadow-md" : "border border-[#214C9B]/20 bg-white text-[#214C9B] hover:border-[#214C9B]",
+              isActive ? "bg-[#214C9B] text-white shadow-md" : "border border-[#214C9B]/20 bg-white text-[#214C9B] hover:border-[#214C9B]",
             )}
             aria-pressed={isActive}
           >

@@ -10,13 +10,13 @@ import type { TransferRumor } from "@/types";
 
 const toneStyles = {
   fichaje: {
-    border: "border-[#981915]",
-    footer: "bg-[#981915]",
-    badge: "bg-[#981915]/10 text-[#981915]",
+    border: "border-[#214C9B]",
+    footer: "bg-[#214C9B]",
+    badge: "bg-[#214C9B]/10 text-[#214C9B]",
     gradient: "from-rose-50 via-orange-50/90 to-white",
-    shadow: "shadow-[0_10px_28px_rgba(152,25,21,0.12)]",
-    hoverShadow: "group-hover:shadow-[0_16px_36px_rgba(152,25,21,0.22)]",
-    dorsal: "text-[#981915]",
+    shadow: "shadow-[0_10px_28px_rgba(33,76,155,0.12)]",
+    hoverShadow: "group-hover:shadow-[0_16px_36px_rgba(33,76,155,0.22)]",
+    dorsal: "text-[#214C9B]",
   },
   renovacion: {
     border: "border-[#214C9B]",

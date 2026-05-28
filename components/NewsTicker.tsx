@@ -21,7 +21,7 @@ export function NewsTicker({ items }: { items: NewsItem[] }) {
           >
             <NewsMedia item={item} variant="ticker" />
             <div className="flex flex-col p-3 sm:p-4">
-              <p className="news-ticker-source hidden text-xs font-bold uppercase tracking-normal text-[#981915] sm:block">
+              <p className="news-ticker-source hidden text-xs font-bold uppercase tracking-normal text-[#214C9B] sm:block">
                 {item.source} · {formatDate(item.date)}
               </p>
               <h3 className="news-ticker-title line-clamp-3 text-sm font-extrabold uppercase leading-snug text-[#214C9B] sm:mt-2 sm:line-clamp-none sm:text-lg sm:leading-tight">

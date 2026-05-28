@@ -23,7 +23,7 @@ export function PlayerCard({ player, onSelect }: { player: Player; onSelect: (pl
         <div className="mt-4">
           <Badge tone={statusTone[player.status]}>{player.status}</Badge>
           <h3 className="mt-3 text-xl font-extrabold uppercase text-[#214C9B]">{player.displayName}</h3>
-          <p className="text-sm font-bold text-[#981915]">{player.position}</p>
+          <p className="text-sm font-bold text-[#214C9B]">{player.position}</p>
           <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-700">
             <span className="rounded-xl border border-slate-200 bg-slate-50 p-2">{player.nationality}</span>
             <span className="rounded-xl border border-slate-200 bg-slate-50 p-2">{player.age} anos</span>

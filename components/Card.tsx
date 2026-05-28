@@ -24,7 +24,7 @@ export function Card({ eyebrow, title, action, children, className, dense = fals
           )}
         >
           <div className="min-w-0 flex-1">
-            {eyebrow && <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">{eyebrow}</p>}
+            {eyebrow && <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#214C9B]">{eyebrow}</p>}
             {title && (
               <h2 className="mt-1 text-xl font-extrabold uppercase leading-tight text-[#214C9B] sm:text-2xl lg:text-4xl">
                 {title}

@@ -53,12 +53,6 @@ function pick<T>(items: readonly T[], seed: string, index = 0): T {
   return items[(hashString(`${seed}-${index}`) + index) % items.length] as T;
 }
 
-function estimateXG(goals: number, position: Player["position"], seed: string): number {
-  const base = position === "Delantero" ? 0.42 : position === "Centrocampista" ? 0.18 : position === "Defensa" ? 0.06 : 0;
-  const variance = (hashString(seed) % 12) / 10;
-  return Number(Math.max(goals * 0.72 + base + variance, 0).toFixed(2));
-}
-
 function buildMatchHistory(player: Player): PlayerMatchRecord[] {
   const count = Math.min(player.stats.appearances, MATCH_FIXTURES.length);
   const records: PlayerMatchRecord[] = [];
@@ -150,7 +144,6 @@ function toSquadPlayer(player: Player, clubName: string): SquadPlayer {
     asistencias: player.stats.assists,
     amarillas: player.stats.yellowCards,
     rojas: player.stats.redCards,
-    xG: estimateXG(player.stats.goals, player.position, player.id),
     historialPartidos: buildMatchHistory(player),
     trayectoria: buildCareer(player, clubName),
   };
