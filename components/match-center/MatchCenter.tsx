@@ -65,8 +65,14 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
         </>
       ) : (
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px]">
-          <div className="min-w-0 rounded-[2rem] border border-[#214C9B]/20 bg-white p-5 shadow-[0_12px_30px_rgba(17,24,39,0.06)] sm:p-8">
+          <div className="min-w-0 space-y-8 rounded-[2rem] border border-[#214C9B]/20 bg-white p-5 shadow-[0_12px_30px_rgba(17,24,39,0.06)] sm:p-8">
             <MatchPreviaPanel detail={detail} compact rdpVideo={detail.rdpPrevia} showH2H={false} />
+            <MatchLineupsPanel
+              homeLabel={detail.match.homeTeam}
+              awayLabel={detail.match.awayTeam}
+              homeLineup={detail.homeLineup}
+              awayLineup={detail.awayLineup}
+            />
           </div>
           <MatchCenterSidebar />
         </div>
