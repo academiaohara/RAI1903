@@ -1,5 +1,6 @@
 "use client";
 
+import { BarChart3, Megaphone, Shirt, Target } from "lucide-react";
 import { useMemo, useState } from "react";
 import { MatchCenterHeader, MatchCenterTabs } from "@/components/match-center/MatchCenterHeader";
 import { MatchLineupsPanel } from "@/components/match-center/MatchLineupsPanel";
@@ -16,10 +17,10 @@ type MatchCenterProps = {
 };
 
 const FINISHED_TABS = [
-  { id: "stats", label: "Stats" },
-  { id: "lineups", label: "Alineaciones" },
-  { id: "previa", label: "Previa" },
-  { id: "prensa", label: "Post partido" },
+  { id: "stats", label: "Stats", icon: BarChart3 },
+  { id: "lineups", label: "Alineaciones", icon: Shirt },
+  { id: "previa", label: "Previa", icon: Target },
+  { id: "prensa", label: "Post partido", icon: Megaphone },
 ] as const;
 
 type FinishedTabId = (typeof FINISHED_TABS)[number]["id"];
