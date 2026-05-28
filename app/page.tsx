@@ -163,13 +163,13 @@ function MatchBanner({ match, label, href, action }: { match: Match; label: stri
         <div className="flex items-center justify-center p-3">
           <OpponentCrest logo={teamCrestLogo(match.homeTeamId)} opponent={match.homeTeam} size="md" className="mx-auto" />
         </div>
-        <div className="flex min-w-[5.5rem] flex-col items-center justify-center bg-[#214C9B] px-1 py-3 text-center text-white">
+        <div className="flex w-32 shrink-0 flex-col items-center justify-center bg-[#214C9B] px-2 py-3 text-center text-white">
           {centerRoundLabel && (
-            <p className="text-xs font-extrabold uppercase tracking-normal text-white/90">{centerRoundLabel}</p>
+            <p className="w-full break-words text-xs font-extrabold uppercase tracking-normal text-white/90">{centerRoundLabel}</p>
           )}
           <p className={`font-extrabold leading-none text-white ${centerRoundLabel ? "mt-1 text-2xl" : "text-3xl"}`}>{scoreLabel}</p>
-          <p className="mt-1 text-[10px] font-bold uppercase tracking-normal text-white/80">{formatMatchDate(match.date)}</p>
-          <p className="mt-1 text-[11px] font-bold leading-snug text-white/90">{match.venue}</p>
+          <p className="mt-1 w-full break-words text-[10px] font-bold uppercase tracking-normal text-white/80">{formatMatchDate(match.date)}</p>
+          <p className="mt-1 w-full break-words text-[11px] font-bold leading-snug text-white/90">{match.venue}</p>
         </div>
         <div className="flex items-center justify-center p-3">
           <OpponentCrest logo={teamCrestLogo(match.awayTeamId)} opponent={match.awayTeam} size="md" className="mx-auto" />
