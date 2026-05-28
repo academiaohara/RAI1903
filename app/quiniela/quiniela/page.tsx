@@ -5,6 +5,7 @@ import { Card } from "@/components/Card";
 import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
 import { PredictionForm } from "@/components/PredictionForm";
+import { QuinielaHowItWorks } from "@/components/QuinielaHowItWorks";
 import { CURRENT_QUINIELA_ROUND, matchdays } from "@/data/mock";
 import {
   getMatchdayByRound,
@@ -80,6 +81,7 @@ export default function MiQuinielaPage() {
         title="Mi quiniela"
         description="Rellena la quiniela de la jornada. Al guardar queda bloqueada hasta que pulses editar. Cuando empiece el primer partido ya no podras cambiarla."
       />
+      <QuinielaHowItWorks />
       <JornadaSelector
         value={round}
         total={matchdays.length}
