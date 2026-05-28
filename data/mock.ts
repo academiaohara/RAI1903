@@ -192,12 +192,8 @@ const buildMatchArticles = (matches: Match[]): MatchArticle[] => {
     date: match.date,
     source: "RAI1903",
     excerpt: `Resumen de la jornada ${match.matchday} con lectura tactica, protagonistas y sensaciones del vestuario blanquiazul.`,
-    body: [
-      `El encuentro de la jornada ${match.matchday} dejo un marcador de ${match.homeScore}-${match.awayScore} en ${match.venue}.`,
-      "El Real Aviles Industrial control? los primeros compases con presion alta y transiciones rapidas por banda.",
-      "La segunda parte confirmo el guion del equipo, que supo administrar ventaja y cerrar espacios sin perder verticalidad.",
-      "Miguel Alonso valor? la intensidad defensiva y la capacidad del grupo para competir partido a partido.",
-    ],
+    body: [],
+    clubNewsId: "club-somos-primera-rfef",
   }));
 
   const previas: MatchArticle[] = scheduled.map((match) => ({
@@ -259,11 +255,7 @@ const buildMatchArticles = (matches: Match[]): MatchArticle[] => {
     date: match.date,
     source: "RAI1903",
     excerpt: "Resumen del bloque femenino con protagonismo de Irene Costa y Claudia Nunez.",
-    body: [
-      `La jornada ${match.matchday} dejo un ${match.homeScore}-${match.awayScore} para el primer equipo femenino.`,
-      "El equipo mostro intensidad sin balon y solvencia en los ultimos metros.",
-      "Laura Menendez destaco la madurez del grupo y la aportacion de la cantera.",
-    ],
+    body: [],
   }));
 
   const previasFemenino: MatchArticle[] = scheduled.map((match) => ({
@@ -432,7 +424,7 @@ export const newsItems: NewsItem[] = [
     title: "Somos de Primera RFEF",
     excerpt: "Comunicado oficial del club tras certificar la permanencia en Primera Federación.",
     url: "https://www.realavilesindustrial1903.com/somos-de-primera-rfef/",
-    tags: ["club", "partido"],
+    tags: ["club", "partido", "cronica"],
     teams: ["masculino"],
     featured: true,
   },

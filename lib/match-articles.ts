@@ -1,5 +1,5 @@
-import { matchArticles } from "@/data/mock";
-import type { MatchArticle, PrimerEquipoGender } from "@/types";
+import { matchArticles, newsItems } from "@/data/mock";
+import type { MatchArticle, NewsItem, PrimerEquipoGender } from "@/types";
 
 export function getMatchArticles(gender: PrimerEquipoGender, type: MatchArticle["type"]) {
   return matchArticles
@@ -17,4 +17,9 @@ export function getCronicaForMatch(matchId: string, gender: PrimerEquipoGender =
 
 export function getPreviaForMatch(matchId: string, gender: PrimerEquipoGender = "masculino") {
   return matchArticles.find((article) => article.matchId === matchId && article.type === "previa" && article.gender === gender);
+}
+
+export function getClubChronicleNews(article: MatchArticle): NewsItem | null {
+  if (!article.clubNewsId) return null;
+  return newsItems.find((item) => item.id === article.clubNewsId) ?? null;
 }

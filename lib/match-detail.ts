@@ -241,6 +241,7 @@ function pickNewsForMatch(match: Match, type: "previa" | "cronica" | "press"): N
   const tag = type === "press" ? undefined : type;
   const filtered = newsItems.filter((item) => {
     if (tag && !item.tags.includes(tag)) return false;
+    if (type === "press" && item.channel === "club") return item.tags.includes("cronica") || item.tags.includes("partido");
     if (type === "press" && item.channel !== "prensa" && !item.tags.includes("cronica")) return false;
     return true;
   });

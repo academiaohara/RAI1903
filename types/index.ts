@@ -252,6 +252,8 @@ export type MatchArticle = {
   source: string;
   excerpt: string;
   body: string[];
+  /** Nota oficial del club en la web (sin contenido propio en RAI1903). */
+  clubNewsId?: string;
 };
 
 export type MatchStatRow = {
