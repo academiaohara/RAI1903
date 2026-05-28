@@ -21,8 +21,8 @@ export function SquadHeader({ club, onStadiumClick }: SquadHeaderProps) {
       <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-20 left-1/3 h-48 w-48 rounded-full bg-[#2a5eb5]/40 blur-3xl" />
 
-      <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex min-w-0 flex-1 items-start gap-4 sm:gap-5">
+      <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center justify-center gap-6 sm:max-w-4xl sm:flex-row sm:gap-8 lg:gap-10">
+        <div className="flex w-full min-w-0 flex-col items-center gap-4 text-center sm:w-auto sm:flex-row sm:items-center sm:gap-5 sm:text-left">
           <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-white/20 bg-white/10 p-2.5 backdrop-blur-sm sm:h-20 sm:w-20">
             <Image src={club.escudo} alt={club.nombre} width={64} height={64} className="h-auto w-full object-contain drop-shadow-lg" priority />
           </div>
@@ -38,7 +38,7 @@ export function SquadHeader({ club, onStadiumClick }: SquadHeaderProps) {
         <button
           type="button"
           onClick={onStadiumClick}
-          className="group flex shrink-0 flex-col items-center gap-2 rounded-2xl border border-white/15 bg-white/5 p-3 text-left transition hover:border-white/30 hover:bg-white/10 sm:items-end sm:p-4"
+          className="group flex shrink-0 flex-col items-center gap-2 rounded-2xl border border-white/15 bg-white/5 p-3 text-center transition hover:border-white/30 hover:bg-white/10 sm:p-4"
           aria-label={`Ver informacion de ${club.estadio}`}
         >
           <div className="relative h-20 w-28 overflow-hidden rounded-xl border border-white/20 sm:h-24 sm:w-36">
@@ -50,7 +50,7 @@ export function SquadHeader({ club, onStadiumClick }: SquadHeaderProps) {
               sizes="144px"
             />
           </div>
-          <span className="flex max-w-[9rem] items-center gap-2 text-xs font-bold text-white sm:max-w-[10rem] sm:justify-end sm:text-sm">
+          <span className="flex max-w-[9rem] items-center justify-center gap-2 text-xs font-bold text-white sm:max-w-[10rem] sm:text-sm">
             <Building2 size={16} className="shrink-0 text-white/80" />
             <span className="truncate">{club.estadio}</span>
           </span>

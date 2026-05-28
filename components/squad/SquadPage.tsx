@@ -26,7 +26,7 @@ export function SquadPage({ gender }: SquadPageProps) {
   const [stadiumOpen, setStadiumOpen] = useState(false);
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-6">
       <SquadHeader club={club} onStadiumClick={() => setStadiumOpen(true)} />
       <SquadStatsBar stats={club.stats} />
       <SquadToolbar viewMode={viewMode} onViewModeChange={setViewMode} />
