@@ -6,12 +6,11 @@ import { MatchLineupsPanel } from "@/components/match-center/MatchLineupsPanel";
 import { MatchPressPanel } from "@/components/match-center/MatchPressPanel";
 import { MatchPreviaPanel } from "@/components/match-center/MatchPreviaPanel";
 import { MatchStatsPanel } from "@/components/match-center/MatchStatsPanel";
-import type { MatchArticle, MatchDetail } from "@/types";
+import type { MatchDetail } from "@/types";
 import type { Route } from "next";
 
 type MatchCenterProps = {
   detail: MatchDetail;
-  article: MatchArticle;
   backHref: Route;
   backLabel: string;
 };
@@ -25,7 +24,7 @@ const FINISHED_TABS = [
 
 type FinishedTabId = (typeof FINISHED_TABS)[number]["id"];
 
-export function MatchCenter({ detail, article, backHref, backLabel }: MatchCenterProps) {
+export function MatchCenter({ detail, backHref, backLabel }: MatchCenterProps) {
   const isFinished = detail.match.status === "finished";
   const [activeTab, setActiveTab] = useState<FinishedTabId>("stats");
 
@@ -56,7 +55,7 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
               />
             )}
             {activeTab === "previa" && <MatchPreviaPanel detail={detail} />}
-            {activeTab === "prensa" && <MatchPressPanel detail={detail} article={article} />}
+            {activeTab === "prensa" && <MatchPressPanel detail={detail} />}
           </div>
         </>
       ) : (

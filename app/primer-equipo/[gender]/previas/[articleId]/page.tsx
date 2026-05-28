@@ -17,7 +17,6 @@ export default async function PreviaDetailPage({ params }: { params: Promise<{ g
   return (
     <MatchCenter
       detail={detail}
-      article={article}
       backHref={`${primerEquipoBase(gender)}/previas` as Route}
       backLabel="Volver a previas"
     />
