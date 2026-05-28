@@ -119,6 +119,8 @@ export type NewsCategory = "Fichajes" | "Lesionados" | "Rumores" | "Renovaciones
 export type TransferStatus = "Interes" | "Negociacion" | "Cercano" | "Oficial" | "Descartado";
 export type TransferCategory = "Rumores" | "Altas" | "Bajas" | "Renovaciones";
 
+export type TransferKind = "fichaje" | "renovacion";
+
 export type TransferRumor = {
   id: string;
   playerName: string;
@@ -133,6 +135,10 @@ export type TransferRumor = {
   destinationClub?: string;
   rating: number;
   analysis: string;
+  /** Enlace con jugador de plantilla cuando existe. */
+  playerId?: string;
+  /** Comunicado oficial del club (mock). */
+  clubAnnouncement?: string;
 };
 
 export type PredictionOutcome = "1" | "X" | "2";
