@@ -27,12 +27,32 @@ export const teamScopeLabel = (teams: PrimerEquipoGender[] | undefined) => {
   return genderLabels[teams[0]!].title;
 };
 
+export type TeamScopeBadgeTone = "masculino" | "femenino";
+
+export const teamScopeBadgeTone = (teams: PrimerEquipoGender[] | undefined): TeamScopeBadgeTone | null => {
+  if (!teams || teams.length === 0) return null;
+  if (teams.length === 2) return "masculino";
+  return teams[0] === "femenino" ? "femenino" : "masculino";
+};
+
+/** Evita duplicar "Femenino" cuando la fuente ya lo indica (p. ej. Real Avilés Industrial Femenino). */
+export const shouldShowTeamScopeBadge = (item: Pick<NewsItem, "teams" | "source">) => {
+  const label = teamScopeLabel(item.teams);
+  if (!label) return false;
+  if (item.teams?.length === 1 && item.teams[0] === "femenino") {
+    return !item.source.toLowerCase().includes("femenino");
+  }
+  return true;
+};
+
 export const RAI_BRAND_BLUE = "#214C9B";
 export const RAI_BRAND_GRANATE = "#981915";
 export const RAI_LOGO_PATH = "/rai_logo.webp";
 
-export const raiNewsFallbackBgClass = (teams: PrimerEquipoGender[] | undefined) =>
+export const raiNewsMediaBgClass = (teams: PrimerEquipoGender[] | undefined) =>
   teams?.length === 1 && teams[0] === "femenino" ? "bg-[#981915]" : "bg-[#214C9B]";
+
+export const raiNewsFallbackBgClass = raiNewsMediaBgClass;
 const REAL_AVILES_CLUB_SITE = "realavilesindustrial1903.com";
 
 export const isRealAvilesClubSiteNews = (item: { url: string }) =>
