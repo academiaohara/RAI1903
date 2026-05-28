@@ -27,6 +27,18 @@ export function StadiumModal({ stadium, open, onClose }: StadiumModalProps) {
       <div className="relative aspect-[16/9] overflow-hidden rounded-2xl">
         <Image src={stadium.imagen} alt={stadium.nombre} fill className="object-cover" sizes="(max-width: 768px) 100vw, 720px" />
       </div>
+      <dl className="mt-4 grid grid-cols-2 gap-4">
+        <div>
+          <dt className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-500">Capacidad</dt>
+          <dd className="mt-1 text-sm font-extrabold text-[#214C9B]">
+            {stadium.capacidad.toLocaleString("es-ES")} espectadores
+          </dd>
+        </div>
+        <div>
+          <dt className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-500">Tipo de césped</dt>
+          <dd className="mt-1 text-sm font-extrabold text-[#214C9B]">{stadium.superficie}</dd>
+        </div>
+      </dl>
     </Modal>
   );
 }
