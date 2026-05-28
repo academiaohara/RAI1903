@@ -17,15 +17,19 @@ export function NewsTicker({ items }: { items: NewsItem[] }) {
             href={item.url}
             target="_blank"
             rel="noreferrer"
-            className="news-ticker-item flex w-[min(82vw,320px)] shrink-0 flex-col overflow-hidden rounded-2xl border border-[#214C9B]/15 bg-white"
+            className="news-ticker-item flex w-[min(72vw,260px)] shrink-0 flex-col overflow-hidden rounded-2xl border border-[#214C9B]/15 bg-white sm:w-[min(82vw,320px)]"
           >
             <NewsMedia item={item} variant="ticker" />
-            <div className="flex flex-col p-4">
-              <p className="news-ticker-source text-xs font-bold uppercase tracking-normal text-[#981915]">
+            <div className="flex flex-col p-3 sm:p-4">
+              <p className="news-ticker-source hidden text-xs font-bold uppercase tracking-normal text-[#981915] sm:block">
                 {item.source} · {formatDate(item.date)}
               </p>
-              <h3 className="news-ticker-title mt-2 text-lg font-extrabold uppercase leading-tight text-[#214C9B]">{item.title}</h3>
-              <p className="news-ticker-excerpt mt-2 line-clamp-2 text-sm leading-6 text-slate-600">{item.excerpt}</p>
+              <h3 className="news-ticker-title line-clamp-3 text-sm font-extrabold uppercase leading-snug text-[#214C9B] sm:mt-2 sm:line-clamp-none sm:text-lg sm:leading-tight">
+                {item.title}
+              </h3>
+              <p className="news-ticker-excerpt mt-2 hidden line-clamp-2 text-sm leading-6 text-slate-600 sm:block">
+                {item.excerpt}
+              </p>
             </div>
           </a>
         ))}

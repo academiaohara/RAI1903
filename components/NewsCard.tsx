@@ -20,17 +20,19 @@ export function NewsCard({ item }: { item: NewsItem }) {
       href={item.url}
       target="_blank"
       rel="noreferrer"
-      className="news-card-item group flex min-h-[7.5rem] overflow-hidden rounded-xl border border-[#214C9B] bg-white sm:min-h-[8.5rem]"
+      className="news-card-item group flex min-h-[4.25rem] overflow-hidden rounded-xl border border-[#214C9B] bg-white sm:min-h-[8.5rem]"
     >
       <NewsMedia item={item} variant="card" />
-      <div className="flex min-w-0 flex-1 flex-col justify-between p-4 sm:p-5">
+      <div className="flex min-w-0 flex-1 flex-col justify-center p-3 sm:justify-between sm:p-5">
         <div>
-          <h3 className="news-card-title text-base font-extrabold uppercase leading-tight text-[#214C9B] sm:text-lg">
+          <h3 className="news-card-title line-clamp-3 text-sm font-extrabold uppercase leading-snug text-[#214C9B] sm:line-clamp-none sm:text-lg sm:leading-tight">
             {item.title}
           </h3>
-          <p className="news-card-excerpt mt-2 line-clamp-2 text-sm leading-6 text-slate-800 sm:line-clamp-3">{item.excerpt}</p>
+          <p className="news-card-excerpt mt-2 hidden line-clamp-2 text-sm leading-6 text-slate-800 sm:block sm:line-clamp-3">
+            {item.excerpt}
+          </p>
         </div>
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 sm:mt-4">
+        <div className="mt-3 hidden flex-wrap items-center justify-between gap-2 sm:flex sm:mt-4">
           <span className="news-card-date text-xs font-medium text-[#214C9B]/65">
             {formatDate(item.date, { day: "numeric", month: "long" })} | {item.source}
           </span>
