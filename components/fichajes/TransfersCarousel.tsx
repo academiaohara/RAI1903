@@ -78,7 +78,7 @@ export function TransfersCarousel({ transfers }: TransfersCarouselProps) {
             ? "overflow-hidden"
             : shouldScroll
               ? "no-scrollbar overflow-x-auto pb-1"
-              : "flex justify-center pb-1"
+              : "flex justify-start pb-1"
         }`}
       >
         <div
