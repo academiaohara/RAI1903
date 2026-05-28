@@ -196,7 +196,7 @@ export function MatchPreviaPanel({
 
       {video && <MatchVideoBlock video={video} />}
 
-      <MatchNewsCarousel items={pressNews} title="Post partido en medios" />
+      <MatchNewsCarousel items={pressNews} title="Pre partido en medios" />
     </div>
   );
 }
