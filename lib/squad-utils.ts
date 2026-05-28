@@ -35,6 +35,27 @@ export function getNationalityFlag(nacionalidad: string): string {
   return NATIONALITY_FLAGS[nacionalidad] ?? "🏳️";
 }
 
+const NATIONALITY_ISO: Record<string, string> = {
+  Espana: "es",
+  España: "es",
+  Portugal: "pt",
+  Francia: "fr",
+  Argentina: "ar",
+  Brasil: "br",
+  Colombia: "co",
+  Mexico: "mx",
+  México: "mx",
+  Marruecos: "ma",
+  Senegal: "sn",
+  Nigeria: "ng",
+};
+
+/** Small flag image for ficha cards (flagcdn, 40px wide). */
+export function getNationalityFlagUrl(nacionalidad: string): string {
+  const iso = NATIONALITY_ISO[nacionalidad] ?? "un";
+  return `https://flagcdn.com/w40/${iso}.png`;
+}
+
 export function groupPlayersByPosition(players: SquadPlayer[]): Record<SquadPosition, SquadPlayer[]> {
   const groups = Object.fromEntries(SQUAD_POSITIONS.map((pos) => [pos, [] as SquadPlayer[]])) as Record<
     SquadPosition,

@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "s3.ppllstatics.com" },
       { protocol: "https", hostname: "www.rtpa.es" },
       { protocol: "https", hostname: "www.realavilesindustrial1903.com" },
+      { protocol: "https", hostname: "flagcdn.com" },
     ],
   },
   async redirects() {
