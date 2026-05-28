@@ -138,20 +138,8 @@ a {
 }
 
 .news-card-item:hover {
-  background-color: var(--rai-blue);
-  border-color: var(--rai-blue);
-}
-
-.news-card-item:hover .news-card-date,
-.news-card-item:hover .news-card-title,
-.news-card-item:hover .news-card-excerpt {
-  color: #fff;
-}
-
-.news-card-item:hover .news-card-badge {
-  border-color: rgb(255 255 255 / 0.35);
-  background-color: rgb(255 255 255 / 0.15);
-  color: #fff;
+  border-color: var(--rai-red-dark);
+  box-shadow: 0 8px 24px rgba(152, 25, 21, 0.12);
 }
 
 .news-ticker-track {

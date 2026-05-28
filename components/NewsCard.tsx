@@ -1,53 +1,44 @@
+import { ArrowLeftRight, Newspaper } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/Badge";
 import { NewsMedia } from "@/components/NewsMedia";
-import { shouldShowTeamScopeBadge, teamScopeBadgeTone, teamScopeLabel } from "@/lib/noticias";
+import { newsCategoryBadge } from "@/lib/noticias";
 import { formatDate } from "@/lib/utils";
 import type { NewsItem } from "@/types";
 
-export function NewsCard({ item, featured = false }: { item: NewsItem; featured?: boolean }) {
-  const teamLabel = teamScopeLabel(item.teams);
-  const teamBadgeTone = teamScopeBadgeTone(item.teams);
-  const showTeamBadge = shouldShowTeamScopeBadge(item);
+const categoryIcons: Record<string, LucideIcon> = {
+  fichajes: ArrowLeftRight,
+  noticia: Newspaper,
+};
+
+export function NewsCard({ item }: { item: NewsItem }) {
+  const category = newsCategoryBadge(item);
+  const CategoryIcon = categoryIcons[category.key] ?? Newspaper;
 
   return (
     <a
       href={item.url}
       target="_blank"
       rel="noreferrer"
-      className="news-card-item group flex overflow-hidden rounded-3xl border border-[#214C9B]/30 bg-white shadow-[0_12px_30px_rgba(17,24,39,0.06)]"
+      className="news-card-item group flex min-h-[7.5rem] overflow-hidden rounded-xl border border-[#981915] bg-white sm:min-h-[8.5rem]"
     >
-      <NewsMedia item={item} variant={featured ? "featured" : "card"} />
-      <div className="flex min-w-0 flex-1 flex-col justify-center p-4 sm:p-5">
-        <div className="mb-2 flex flex-wrap items-center gap-2">
-          <Badge tone={featured ? "blue" : "red"} className="news-card-badge">
-            {item.source}
-          </Badge>
-          {showTeamBadge && teamLabel && teamBadgeTone && (
-            <Badge tone={teamBadgeTone} className="news-card-badge">
-              {teamLabel}
-            </Badge>
-          )}
-          <span className="news-card-date text-xs font-bold uppercase tracking-[0.08em] text-slate-500">{formatDate(item.date)}</span>
+      <NewsMedia item={item} variant="card" />
+      <div className="flex min-w-0 flex-1 flex-col justify-between p-4 sm:p-5">
+        <div>
+          <h3 className="news-card-title text-base font-extrabold uppercase leading-tight text-[#981915] sm:text-lg">
+            {item.title}
+          </h3>
+          <p className="news-card-excerpt mt-2 line-clamp-2 text-sm leading-6 text-slate-800 sm:line-clamp-3">{item.excerpt}</p>
         </div>
-        <h3
-          className={
-            featured
-              ? "news-card-title text-2xl font-extrabold uppercase leading-tight text-[#214C9B] sm:text-3xl"
-              : "news-card-title text-xl font-extrabold uppercase leading-tight text-[#214C9B]"
-          }
-        >
-          {item.title}
-        </h3>
-        <p className="news-card-excerpt mt-2 line-clamp-2 text-sm leading-6 text-slate-600 sm:line-clamp-3">{item.excerpt}</p>
-        {item.tags.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {item.tags.map((tag) => (
-              <Badge key={tag} tone="slate" className="news-card-badge">
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        )}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 sm:mt-4">
+          <span className="news-card-date text-xs font-medium text-[#214C9B]/65">
+            {formatDate(item.date, { day: "numeric", month: "long" })} | {item.source}
+          </span>
+          <Badge tone={category.tone} className="news-card-badge shrink-0 gap-1.5 px-3 py-1.5">
+            <CategoryIcon className="size-3.5 shrink-0" aria-hidden />
+            {category.label}
+          </Badge>
+        </div>
       </div>
     </a>
   );
