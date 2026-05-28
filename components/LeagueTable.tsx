@@ -26,36 +26,30 @@ export function LeagueTable({
 
   return (
     <div className="space-y-3">
-      <div className="space-y-2 md:hidden">
-        {visibleRows.map((team) => (
-          <MobileStandingCard key={team.id} team={team} compact={compact} highlighted={team.id === highlightTeamId} />
-        ))}
-      </div>
-
-      <div className="hidden overflow-x-auto rounded-2xl border border-[#214C9B]/20 bg-white md:block">
-        <table className="w-full min-w-[640px] text-left text-sm">
-          <thead className="bg-[#214C9B] text-[10px] uppercase tracking-[0.1em] text-white">
+      <div className="overflow-x-auto rounded-2xl border border-[#214C9B]/20 bg-white">
+        <table className="w-full text-left text-[10px] md:text-sm">
+          <thead className="bg-[#214C9B] text-[8px] uppercase tracking-[0.06em] text-white md:text-[10px] md:tracking-[0.1em]">
             <tr>
-              <th className="w-7 p-0 text-center font-bold">#</th>
-              <th className="px-2 py-2.5 font-bold">Equipo</th>
+              <th className="w-5 p-0 text-center font-bold md:w-7">#</th>
+              <th className="px-1 py-1.5 font-bold md:px-2 md:py-2.5">Equipo</th>
               {!compact ? (
                 <>
-                  <th className="px-2 py-2.5 text-center font-bold">PJ</th>
-                  <th className="px-2 py-2.5 text-center font-bold">G</th>
-                  <th className="px-2 py-2.5 text-center font-bold">E</th>
-                  <th className="px-2 py-2.5 text-center font-bold">P</th>
-                  <th className="px-2 py-2.5 text-center font-bold">GF:GC</th>
+                  <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">PJ</th>
+                  <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">G</th>
+                  <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">E</th>
+                  <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">P</th>
+                  <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">GF:GC</th>
                 </>
               ) : (
                 <>
-                  <th className="px-2 py-2.5 text-center font-bold">G</th>
-                  <th className="px-2 py-2.5 text-center font-bold">E</th>
-                  <th className="px-2 py-2.5 text-center font-bold">P</th>
+                  <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">G</th>
+                  <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">E</th>
+                  <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">P</th>
                 </>
               )}
-              <th className="px-2 py-2.5 text-center font-bold">DG</th>
-              <th className="px-2 py-2.5 text-center font-bold">Pts</th>
-              {!compact && <th className="px-2 py-2.5 text-center font-bold">Forma</th>}
+              <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">DG</th>
+              <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">Pts</th>
+              {!compact && <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">Forma</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -65,7 +59,12 @@ export function LeagueTable({
               const rowClassName = getStandingsHighlightRowClass(highlighted);
               const highlightCellClassName = getStandingsHighlightCellClass(highlighted);
               const positionClassName = getStandingsHighlightPositionClass(highlighted, team.zone);
-              const dataCellClassName = cn("px-2 py-2.5", highlightCellClassName, rowClassName);
+              const dataCellClassName = cn(
+                "px-0.5 py-1.5 md:px-2 md:py-2.5",
+                highlightCellClassName,
+                rowClassName,
+              );
+              const teamLabel = compact ? team.shortName : team.name;
 
               return (
                 <tr
@@ -74,17 +73,17 @@ export function LeagueTable({
                 >
                   <td
                     className={cn(
-                      "w-7 p-0 text-center text-[11px] font-extrabold tabular-nums",
+                      "w-5 p-0 text-center text-[9px] font-extrabold tabular-nums md:w-7 md:text-[11px]",
                       positionClassName,
                     )}
                   >
                     {team.position}
                   </td>
                   <td className={dataCellClassName}>
-                    <div className="flex min-w-0 items-center gap-2">
+                    <div className="flex min-w-0 items-center gap-1 md:gap-2">
                       <span
                         className={cn(
-                          "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border text-[9px] font-extrabold",
+                          "flex h-5 w-5 shrink-0 items-center justify-center rounded border text-[7px] font-extrabold md:h-7 md:w-7 md:rounded-lg md:text-[9px]",
                           highlighted
                             ? "border-white/30 bg-white/15 text-white"
                             : "border-[#214C9B]/15 bg-white text-[#214C9B]",
@@ -92,7 +91,10 @@ export function LeagueTable({
                       >
                         {team.crestInitials}
                       </span>
-                      <span className="truncate font-bold">{compact ? team.shortName : team.name}</span>
+                      <span className="max-w-[4.5rem] truncate font-bold sm:max-w-none md:max-w-none">
+                        <span className="md:hidden">{team.shortName}</span>
+                        <span className="hidden md:inline">{teamLabel}</span>
+                      </span>
                     </div>
                   </td>
                   {!compact ? (
@@ -124,7 +126,7 @@ export function LeagueTable({
                   <td
                     className={cn(
                       dataCellClassName,
-                      "text-center text-base font-extrabold tabular-nums",
+                      "text-center text-xs font-extrabold tabular-nums md:text-base",
                       highlighted ? "text-white" : "text-[#214C9B]",
                     )}
                   >
@@ -132,12 +134,12 @@ export function LeagueTable({
                   </td>
                   {!compact && (
                     <td className={dataCellClassName}>
-                      <div className="flex justify-center gap-0.5">
+                      <div className="flex justify-center gap-px md:gap-0.5">
                         {team.form.map((result, index) => (
                           <span
                             key={`${team.id}-${result}-${index}`}
                             className={cn(
-                              "flex h-5 w-5 items-center justify-center rounded text-[9px] font-extrabold",
+                              "flex h-3.5 w-3.5 items-center justify-center rounded text-[7px] font-extrabold md:h-5 md:w-5 md:text-[9px]",
                               resultTone(result),
                             )}
                             title={result === "G" ? "Victoria" : result === "E" ? "Empate" : "Derrota"}
@@ -169,93 +171,6 @@ export function LeagueTable({
           ))}
         </div>
       )}
-    </div>
-  );
-}
-
-function MobileStandingCard({ team, compact, highlighted }: { team: Team; compact: boolean; highlighted: boolean }) {
-  const diff = team.stats.goalsFor - team.stats.goalsAgainst;
-  const positionClassName = getStandingsHighlightPositionClass(highlighted, team.zone);
-  const surfaceClassName = highlighted ? "border-[#981915]/35 bg-[#981915] text-white" : "border-[#214C9B]/15 bg-white text-slate-700";
-  const mutedClassName = highlighted ? "text-white/75" : "text-slate-500";
-  const statClassName = highlighted ? "border-white/15 bg-white/10 text-white" : "border-[#214C9B]/10 bg-slate-50 text-slate-700";
-
-  return (
-    <article className={cn("overflow-hidden rounded-2xl border shadow-[0_8px_20px_rgba(17,24,39,0.04)]", surfaceClassName)}>
-      <div className="flex items-start gap-3 p-3 pb-2">
-        <span
-          className={cn(
-            "flex h-11 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-extrabold tabular-nums",
-            positionClassName,
-          )}
-        >
-          {team.position}
-        </span>
-
-        <div className="min-w-0 flex-1">
-          <div className="flex min-w-0 items-center gap-2">
-            <span
-              className={cn(
-                "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border text-[9px] font-extrabold",
-                highlighted ? "border-white/25 bg-white/10 text-white" : "border-[#214C9B]/15 bg-white text-[#214C9B]",
-              )}
-            >
-              {team.crestInitials}
-            </span>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-extrabold leading-tight">{compact ? team.shortName : team.name}</p>
-              <p className={cn("text-[10px] font-bold uppercase tracking-[0.08em]", mutedClassName)}>
-                {team.stats.played} partidos · DG {formatGoalDifference(diff)}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="shrink-0 rounded-xl bg-white px-3 py-1.5 text-center text-[#214C9B] shadow-sm">
-          <p className="text-2xl font-extrabold leading-none tabular-nums">{team.stats.points}</p>
-          <p className="text-[10px] font-extrabold uppercase tracking-[0.08em]">Pts</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-2 px-3 pb-3 min-[360px]:grid-cols-3">
-        <MobileStat label="PJ" value={team.stats.played} className={statClassName} />
-        <MobileStat label="G" value={team.stats.won} className={statClassName} />
-        <MobileStat label="E" value={team.stats.drawn} className={statClassName} />
-        <MobileStat label="P" value={team.stats.lost} className={statClassName} />
-        <MobileStat label="DG" value={formatGoalDifference(diff)} className={statClassName} />
-        <MobileStat label="GF:GC" value={`${team.stats.goalsFor}:${team.stats.goalsAgainst}`} className={statClassName} />
-      </div>
-
-      {!compact && (
-        <div
-          className={cn(
-            "flex items-center justify-between gap-3 border-t px-3 py-3",
-            highlighted ? "border-white/15" : "border-slate-100",
-          )}
-        >
-          <span className={cn("text-[10px] font-extrabold uppercase tracking-[0.1em]", mutedClassName)}>Forma</span>
-          <div className="flex justify-end gap-1.5">
-            {team.form.map((result, index) => (
-              <span
-                key={`${team.id}-${result}-${index}`}
-                className={cn("flex h-7 w-7 items-center justify-center rounded-lg text-[10px] font-extrabold", resultTone(result))}
-                title={result === "G" ? "Victoria" : result === "E" ? "Empate" : "Derrota"}
-              >
-                {result}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-    </article>
-  );
-}
-
-function MobileStat({ label, value, className }: { label: string; value: string | number; className: string }) {
-  return (
-    <div className={cn("rounded-xl border px-2.5 py-2 text-center", className)}>
-      <p className="text-[9px] font-extrabold uppercase tracking-[0.08em] opacity-70">{label}</p>
-      <p className="mt-0.5 text-sm font-extrabold tabular-nums">{value}</p>
     </div>
   );
 }
