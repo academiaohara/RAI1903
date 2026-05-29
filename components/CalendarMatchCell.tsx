@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Bus, Home } from "lucide-react";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { matchCompetitionShortLabel } from "@/lib/competition-labels";
+import { getCompetitionAccentClass } from "@/lib/competition-styles";
 import { cn } from "@/lib/utils";
 import type { CalendarMatch } from "@/types";
 import type { Route } from "next";
@@ -23,18 +24,19 @@ function bottomLabel(match: CalendarMatch) {
 
 const detailTextClass = "text-[#214C9B] transition-colors group-hover:text-white";
 const detailIconClass =
-  "rounded-lg border border-[#214C9B]/20 bg-white p-1.5 text-[#214C9B] transition-colors group-hover:border-white/30 group-hover:bg-white/15 group-hover:text-white";
+  "rounded-md border border-[#214C9B]/20 bg-white p-1 text-[#214C9B] transition-colors group-hover:border-white/30 group-hover:bg-white/15 group-hover:text-white";
 
 export function CalendarMatchCell({ match, day, className, isToday = false, todayDayClassName }: CalendarMatchCellProps) {
   const href = match.played ? match.chronicleUrl : match.previaUrl;
   const clickable = Boolean(href);
+  const accent = getCompetitionAccentClass(match.competition);
 
   const content = (
     <>
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex items-center justify-between gap-2">
         <span
           className={cn(
-            "text-sm font-extrabold tabular-nums transition-colors",
+            "text-sm font-extrabold tabular-nums leading-none transition-colors",
             isToday && todayDayClassName
               ? cn(todayDayClassName, "group-hover:bg-white group-hover:text-[#214C9B]")
               : detailTextClass,
@@ -43,15 +45,23 @@ export function CalendarMatchCell({ match, day, className, isToday = false, toda
           {day}
         </span>
         <span className={detailIconClass} aria-label={match.isHome ? "Partido en casa" : "Partido fuera"}>
-          {match.isHome ? <Home size={14} strokeWidth={2.25} /> : <Bus size={14} strokeWidth={2.25} />}
+          {match.isHome ? <Home size={13} strokeWidth={2.25} /> : <Bus size={13} strokeWidth={2.25} />}
         </span>
       </div>
 
-      <div className="flex items-end justify-between gap-2">
-        <p className={cn("text-sm font-extrabold tabular-nums", detailTextClass)}>{bottomLabel(match)}</p>
+      <div className="space-y-1">
+        <p className={cn("text-[10px] font-bold uppercase tracking-[0.08em] leading-none", accent, "group-hover:text-white")}>
+          {matchCompetitionShortLabel(match)}
+        </p>
+        <p className={cn("line-clamp-2 text-xs font-extrabold leading-snug", detailTextClass)}>{match.opponent}</p>
+      </div>
+
+      <div className="flex items-center justify-between gap-2">
+        <p className={cn("text-sm font-extrabold tabular-nums leading-none", detailTextClass)}>{bottomLabel(match)}</p>
         <OpponentCrest
           logo={match.opponentLogo}
           opponent={match.opponent}
+          size="sm"
           className="shrink-0 text-[#214C9B] transition group-hover:text-white [&_img]:group-hover:brightness-0 [&_img]:group-hover:invert"
         />
       </div>
@@ -63,9 +73,9 @@ export function CalendarMatchCell({ match, day, className, isToday = false, toda
   );
 
   const cellClassName = cn(
-    "group relative flex min-h-[6.5rem] flex-col justify-start gap-0.5 rounded-2xl border border-[#214C9B]/15 bg-white p-2.5 shadow-[0_8px_20px_rgba(17,24,39,0.05)] transition sm:aspect-square sm:min-h-0 sm:p-3",
+    "group relative flex flex-col gap-2.5 rounded-xl border border-[#214C9B]/15 bg-white p-2.5 shadow-[0_4px_14px_rgba(17,24,39,0.05)] transition",
     clickable
-      ? "cursor-pointer hover:-translate-y-0.5 hover:border-[#214C9B] hover:bg-[#214C9B] hover:shadow-[0_14px_28px_rgba(33,76,155,0.25)]"
+      ? "cursor-pointer hover:-translate-y-0.5 hover:border-[#214C9B] hover:bg-[#214C9B] hover:shadow-[0_10px_24px_rgba(33,76,155,0.22)]"
       : "cursor-default opacity-95",
     className,
   );
