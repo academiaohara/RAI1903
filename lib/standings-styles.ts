@@ -1,5 +1,18 @@
 import type { StandingsZone } from "@/types";
 
+export type StandingsRowHighlight = "club" | "viewed" | "none";
+
+/** Club row (Avilés) in blue; viewed rival in granate. Club wins when both match. */
+export function getStandingsRowHighlight(
+  teamId: string,
+  viewedTeamId: string,
+  clubTeamId?: string,
+): StandingsRowHighlight {
+  if (clubTeamId && teamId === clubTeamId) return "club";
+  if (teamId === viewedTeamId) return "viewed";
+  return "none";
+}
+
 export function getStandingsZonePositionClass(zone: StandingsZone | undefined): string {
   switch (zone) {
     case "promotion":
@@ -13,15 +26,20 @@ export function getStandingsZonePositionClass(zone: StandingsZone | undefined): 
   }
 }
 
-export function getStandingsHighlightRowClass(highlighted: boolean): string {
-  if (highlighted) return "text-white";
+export function getStandingsHighlightRowClass(highlight: StandingsRowHighlight | boolean): string {
+  if (highlight === "club" || highlight === "viewed" || highlight === true) return "text-white";
   return "bg-white text-slate-700";
 }
 
-/** Blue highlight for table/card cells — never applied to the position column. */
-export function getStandingsHighlightCellClass(highlighted: boolean): string {
-  if (highlighted) return "bg-[#214C9B]";
+/** Row fill for data cells — never applied to the position column. */
+export function getStandingsHighlightCellClass(highlight: StandingsRowHighlight | boolean): string {
+  if (highlight === "club" || highlight === true) return "bg-[#214C9B]";
+  if (highlight === "viewed") return "bg-[#981915]";
   return "";
+}
+
+export function isStandingsRowHighlighted(highlight: StandingsRowHighlight | boolean): boolean {
+  return highlight === "club" || highlight === "viewed" || highlight === true;
 }
 
 export function getStandingsHighlightPositionClass(_highlighted: boolean, zone: StandingsZone | undefined): string {
