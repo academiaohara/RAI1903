@@ -30,9 +30,39 @@ const SEMIFINAL_LABELS: Record<string, string> = {
 };
 
 const FINAL_LABELS: Record<string, string> = {
-  f1: "Final A",
-  f2: "Final B",
+  f1: "Final cuadro A",
+  f2: "Final cuadro B",
 };
+
+export type PlayoffCuadroId = "A" | "B";
+
+export type PlayoffCuadroView = {
+  id: PlayoffCuadroId;
+  label: string;
+  semifinals: PlayoffBracketTie[];
+  final: PlayoffBracketTie | undefined;
+};
+
+/** Agrupa semifinales y final por cuadro (A: sf1–sf2, B: sf3–sf4). */
+export function groupPlayoffBracketByCuadro(bracket: PlayoffBracket): PlayoffCuadroView[] {
+  const cuadros: Array<{ id: PlayoffCuadroId; label: string; sfIds: [string, string]; finalId: string }> = [
+    { id: "A", label: "Cuadro A", sfIds: ["sf1", "sf2"], finalId: "f1" },
+    { id: "B", label: "Cuadro B", sfIds: ["sf3", "sf4"], finalId: "f2" },
+  ];
+
+  return cuadros.map(({ id, label, sfIds, finalId }) => ({
+    id,
+    label,
+    semifinals: bracket.semifinals.filter((tie) => sfIds.includes(tie.slotId)),
+    final: bracket.finals.find((tie) => tie.slotId === finalId),
+  }));
+}
+
+export function playoffTeamDisplayName(teamId: string): string {
+  if (isWinnerPlaceholder(teamId)) return placeholderLabel(teamId);
+  const team = getTeam(teamId);
+  return team?.name ?? teamId;
+}
 
 /** Jornada de liga tras la que se calculan los clasificados (incluye esa jornada). */
 export function leagueRoundForQualifyingStandings(leagueRound: number): number {
@@ -44,6 +74,39 @@ export const DEFINITIVE_QUALIFYING_LEAGUE_ROUND = RESULTADOS_2526_LAST_ROUND + 1
 
 export function isDefinitiveQualifyingRound(qualifyingLeagueRound: number): boolean {
   return qualifyingLeagueRound >= DEFINITIVE_QUALIFYING_LEAGUE_ROUND;
+}
+
+export type PlayoffDirectChampion = {
+  teamId: string;
+  name: string;
+  groupId: "1" | "2";
+};
+
+/** Campeones de grupo con ascenso directo (1.º de cada grupo). */
+export function getPlayoffDirectChampions(qualifyingLeagueRound: number): PlayoffDirectChampion[] {
+  const teamsG1 = getTeamsAtRound(
+    teams,
+    matchdays,
+    qualifyingLeagueRound,
+    PRIMERA_RFEF_RULES.zones,
+    PRIMERA_RFEF_RULES.tiebreak,
+  );
+  const teamsG2 = getTeamsAtRound(
+    teamsGrupo2,
+    matchdaysGrupo2,
+    qualifyingLeagueRound,
+    PRIMERA_RFEF_RULES.zones,
+    PRIMERA_RFEF_RULES.tiebreak,
+  );
+
+  const champion = (groupTeams: typeof teamsG1, groupId: "1" | "2") => {
+    const leader = [...groupTeams].sort((a, b) => a.position - b.position)[0];
+    return leader ? { teamId: leader.id, name: leader.name, groupId } : null;
+  };
+
+  return [champion(teamsG1, "1"), champion(teamsG2, "2")].filter(
+    (entry): entry is PlayoffDirectChampion => entry !== null,
+  );
 }
 
 export function buildPlayoffBracketThroughLeagueRound(qualifyingLeagueRound: number): PlayoffBracket {

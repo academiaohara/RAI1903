@@ -82,14 +82,24 @@ function match(home: string, away: string, hs: number, as: number) {
     stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 },
   }));
 
-  const qualified = selectPlayoffQualifiers(
+  const withSubstitution = selectPlayoffQualifiers(
     [{ groupId: "1", teams: mockTeams }],
     { positions: [2, 3, 4, 5] },
     ["castilla"],
   );
-  assert(qualified.length === 4, "Cuatro plazas de playoff");
-  assert(!qualified.some((q) => q.teamId === "castilla"), "Castilla excluida");
-  assert(qualified.some((q) => q.teamId === "t6" && q.replacedIneligible), "t6 ocupa plaza de filial");
+  assert(withSubstitution.length === 4, "Cuatro plazas de playoff");
+  assert(!withSubstitution.some((q) => q.teamId === "castilla"), "Castilla excluida si se sustituye");
+  assert(
+    withSubstitution.some((q) => q.teamId === "t6" && q.replacedIneligible),
+    "t6 ocupa plaza de filial sustituido",
+  );
+
+  const direct = selectPlayoffQualifiers(
+    [{ groupId: "1", teams: mockTeams }],
+    { positions: [2, 3, 4, 5] },
+    [],
+  );
+  assert(direct.some((q) => q.teamId === "castilla"), "Castilla clasifica si juega el cuadro");
 }
 
 {

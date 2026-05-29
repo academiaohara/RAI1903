@@ -4,9 +4,14 @@ import { Card } from "@/components/Card";
 import { JornadaMatchRow } from "@/components/jornadas/JornadaMatchRow";
 import { JornadaRoundCarousel } from "@/components/jornadas/JornadaRoundCarousel";
 import { JornadasGrupoSwitcher } from "@/components/jornadas/JornadasGrupoSwitcher";
+import { PlayoffAscensoGuia } from "@/components/jornadas/PlayoffAscensoGuia";
 import { buildJornadasDataset } from "@/lib/jornadas-data";
 import { getRaiTeamId } from "@/lib/fixtures";
-import { leagueRoundForQualifyingStandings } from "@/lib/playoff-jornadas";
+import {
+  buildPlayoffBracketThroughLeagueRound,
+  getPlayoffDirectChampions,
+  leagueRoundForQualifyingStandings,
+} from "@/lib/playoff-jornadas";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import type { JornadaFixture, JornadaRoundId } from "@/types/jornadas";
@@ -64,6 +69,13 @@ export function JornadasView({ gender }: JornadasViewProps) {
       ? `Playoff de ascenso · ${summary.label}${summary.isProvisional ? " (provisional)" : ""}`
       : `Jornada ${summary.roundNumber}`;
 
+  const playoffBracket =
+    gender === "masculino" && summary.kind === "playoff"
+      ? buildPlayoffBracketThroughLeagueRound(qualifyingLeagueRound)
+      : null;
+  const playoffChampions =
+    playoffBracket !== null ? getPlayoffDirectChampions(qualifyingLeagueRound) : [];
+
   return (
     <div className="space-y-6">
       <JornadaRoundCarousel
@@ -71,6 +83,14 @@ export function JornadasView({ gender }: JornadasViewProps) {
         selectedId={selectedRoundId}
         onSelect={handleSelectRound}
       />
+
+      {playoffBracket && (
+        <PlayoffAscensoGuia
+          bracket={playoffBracket}
+          directChampions={playoffChampions}
+          isProvisional={summary.isProvisional}
+        />
+      )}
 
       <Card eyebrow="Resultados" title={title} borderlessHeader>
         {raiMatches.length > 0 && (
