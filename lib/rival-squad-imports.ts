@@ -1,9 +1,11 @@
 import { barakaldoSquadImport } from "@/data/rivals/barakaldo";
 import { castillaSquadImport } from "@/data/rivals/castilla";
 import { celtaFortunaSquadImport } from "@/data/rivals/celta-fortuna";
+import { lugoSquadImport } from "@/data/rivals/lugo";
 import { ponferradinaSquadImport } from "@/data/rivals/ponferradina";
 import { pontevedraSquadImport } from "@/data/rivals/pontevedra";
 import { tenerifeSquadImport } from "@/data/rivals/tenerife";
+import { unionistasSquadImport } from "@/data/rivals/unionistas";
 import { zamoraSquadImport } from "@/data/rivals/zamora";
 import { getTeamCrestById } from "@/lib/team-crests";
 import { STADIUM_ROMAN_SUAREZ_PHOTO } from "@/lib/squad-photos";
@@ -20,9 +22,11 @@ const RIVAL_SQUAD_IMPORTS: Record<string, RivalSquadImport> = {
   barakaldo: barakaldoSquadImport,
   castilla: castillaSquadImport,
   "celta-fortuna": celtaFortunaSquadImport,
+  lugo: lugoSquadImport,
   ponferradina: ponferradinaSquadImport,
   pontevedra: pontevedraSquadImport,
   tenerife: tenerifeSquadImport,
+  unionistas: unionistasSquadImport,
   zamora: zamoraSquadImport,
 };
 
