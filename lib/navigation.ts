@@ -3,6 +3,7 @@ import {
   CalendarCheck2,
   CalendarDays,
   ClipboardList,
+  Columns3,
   FileText,
   Ship,
   Home,
@@ -43,6 +44,7 @@ export const navItems: NavItem[] = [
     children: [
       { href: "/primer-equipo/masculino/plantilla", label: "Plantilla", icon: Users },
       { href: "/primer-equipo/masculino/competicion", label: "Competicion", icon: Trophy },
+      { href: "/primer-equipo/masculino/jornadas", label: "Jornadas", icon: Columns3 },
       { href: "/primer-equipo/masculino/calendario", label: "Calendario", icon: CalendarDays },
       { href: "/primer-equipo/masculino/cronicas", label: "Cronicas", icon: FileText },
       { href: "/primer-equipo/masculino/previas", label: "Previas", icon: Target },
@@ -57,6 +59,7 @@ export const navItems: NavItem[] = [
     children: [
       { href: "/primer-equipo/femenino/plantilla", label: "Plantilla", icon: Users },
       { href: "/primer-equipo/femenino/competicion", label: "Competicion", icon: Trophy },
+      { href: "/primer-equipo/femenino/jornadas", label: "Jornadas", icon: Columns3 },
       { href: "/primer-equipo/femenino/calendario", label: "Calendario", icon: CalendarDays },
       { href: "/primer-equipo/femenino/cronicas", label: "Cronicas", icon: FileText },
       { href: "/primer-equipo/femenino/previas", label: "Previas", icon: Target },
