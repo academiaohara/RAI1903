@@ -1,9 +1,10 @@
-import { RAI_TEAM_ID } from "@/data/mock";
+import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import type { Team } from "@/types";
 
 /** Public paths for 1ª RFEF Grupo I 25/26 crests (see /public/escudos). */
 export const TEAM_CREST_PATHS: Record<string, string> = {
   [RAI_TEAM_ID]: "/escudos/real-aviles-industrial.jpg",
+  [RAI_FEM_TEAM_ID]: "/escudos/real-aviles-industrial.jpg",
   ferrol: "/escudos/ferrol.jpg",
   lugo: "/escudos/lugo.jpg",
   pontevedra: "/escudos/pontevedra.jpg",

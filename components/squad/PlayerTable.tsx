@@ -8,7 +8,7 @@ import { PositionSection } from "@/components/squad/PositionSection";
 
 type PlayerTableProps = {
   players: SquadPlayer[];
-  onSelect: (player: SquadPlayer) => void;
+  onSelect?: (player: SquadPlayer) => void;
 };
 
 const columns = [
@@ -91,16 +91,20 @@ function PlayerRow({
   index,
 }: {
   player: SquadPlayer;
-  onSelect: (player: SquadPlayer) => void;
+  onSelect?: (player: SquadPlayer) => void;
   index: number;
 }) {
+  const interactive = Boolean(onSelect);
+
   return (
     <motion.tr
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: index * 0.02 }}
-      onClick={() => onSelect(player)}
-      className="group cursor-pointer border-b border-slate-50 text-sm transition last:border-0 hover:bg-blue-50/60"
+      onClick={interactive ? () => onSelect?.(player) : undefined}
+      className={`group border-b border-slate-50 text-sm transition last:border-0 ${
+        interactive ? "cursor-pointer hover:bg-blue-50/60" : ""
+      }`}
     >
       <td className={`px-3 py-3 font-extrabold tabular-nums text-[#214C9B] ${alignClass.center}`}>{player.dorsal}</td>
       <td className={`max-w-[11.5rem] px-3 py-3 ${alignClass.left}`}>
@@ -129,9 +133,39 @@ function PlayerMobileRow({
   index,
 }: {
   player: SquadPlayer;
-  onSelect: (player: SquadPlayer) => void;
+  onSelect?: (player: SquadPlayer) => void;
   index: number;
 }) {
+  const content = (
+    <div className="min-w-0 flex-1">
+      <div className="flex items-center gap-2">
+        <span className="text-lg font-extrabold text-[#214C9B]">#{player.dorsal}</span>
+        <p className="truncate font-extrabold uppercase text-slate-900">{getPlayerFullName(player)}</p>
+      </div>
+      <p className="text-xs font-semibold text-slate-500">
+        {player.rol} · {player.edad} anos
+      </p>
+      <div className="mt-2 flex flex-wrap gap-2 text-xs font-bold text-slate-600">
+        <span className="rounded-lg bg-slate-100 px-2 py-1">PJ {player.partidos}</span>
+        <span className="rounded-lg bg-slate-100 px-2 py-1">G {player.goles}</span>
+        <span className="rounded-lg bg-slate-100 px-2 py-1">A {player.asistencias}</span>
+      </div>
+    </div>
+  );
+
+  if (!onSelect) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.03 }}
+        className="flex w-full items-center gap-3 p-4"
+      >
+        {content}
+      </motion.div>
+    );
+  }
+
   return (
     <motion.button
       type="button"
@@ -141,20 +175,7 @@ function PlayerMobileRow({
       onClick={() => onSelect(player)}
       className="flex w-full items-center gap-3 p-4 text-left transition hover:bg-blue-50/70"
     >
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-extrabold text-[#214C9B]">#{player.dorsal}</span>
-          <p className="truncate font-extrabold uppercase text-slate-900">{getPlayerFullName(player)}</p>
-        </div>
-        <p className="text-xs font-semibold text-slate-500">
-          {player.rol} · {player.edad} anos
-        </p>
-        <div className="mt-2 flex flex-wrap gap-2 text-xs font-bold text-slate-600">
-          <span className="rounded-lg bg-slate-100 px-2 py-1">PJ {player.partidos}</span>
-          <span className="rounded-lg bg-slate-100 px-2 py-1">G {player.goles}</span>
-          <span className="rounded-lg bg-slate-100 px-2 py-1">A {player.asistencias}</span>
-        </div>
-      </div>
+      {content}
     </motion.button>
   );
 }
