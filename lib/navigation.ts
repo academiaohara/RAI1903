@@ -91,7 +91,7 @@ export const navItems: NavItem[] = [
     icon: Newspaper,
     children: [
       { href: "/noticias/club", label: "Club", icon: Shield },
-      { href: "/noticias/prensa", label: "Post partido", icon: Megaphone },
+      { href: "/noticias/prensa", label: "Prensa", icon: Megaphone },
     ],
   },
   {
@@ -139,7 +139,7 @@ export const mobileNavSections: MobileNavSection[] = [
     items: navChildrenByHref("/cantera"),
   },
   {
-    title: "POST PARTIDO",
+    title: "NOTICIAS",
     items: navChildrenByHref("/noticias"),
   },
   {

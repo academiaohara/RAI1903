@@ -31,7 +31,7 @@ export default function NoticiasPrensaPage() {
 
   return (
     <div className="space-y-6">
-      <PageHero eyebrow="Noticias" title="Post partido" description="Titulares de medios externos, enlaces a fuentes y archivo reciente." />
+      <PageHero eyebrow="Noticias" title="Prensa" description="Titulares de medios externos, enlaces a fuentes y archivo reciente." />
 
       <div className="space-y-4">
         <div className="grid gap-3 lg:grid-cols-[220px_1fr]">

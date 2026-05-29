@@ -38,7 +38,7 @@ export const newsCategoryBadge = (item: Pick<NewsItem, "channel" | "tags">) => {
 
 export const NOTICIAS_TABS: { href: Route; label: string }[] = [
   { href: "/noticias/club", label: "Club" },
-  { href: "/noticias/prensa", label: "Post partido" },
+  { href: "/noticias/prensa", label: "Prensa" },
 ];
 
 export const sortNewsByDate = <T extends { date: string; id: string }>(items: T[]) =>
