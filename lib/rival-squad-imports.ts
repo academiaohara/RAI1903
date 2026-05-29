@@ -1,0 +1,143 @@
+import { tenerifeSquadImport } from "@/data/rivals/tenerife";
+import { getTeamCrestById } from "@/lib/team-crests";
+import { STADIUM_ROMAN_SUAREZ_PHOTO } from "@/lib/squad-photos";
+import type { Team } from "@/types";
+import type { RivalSquadImport, RivalSquadImportPlayer } from "@/types/rival-squad-import";
+import type { SquadClubInfo, SquadPlayer, SquadPosition } from "@/types/squad";
+import type { SquadRoleCode } from "@/types/squad";
+import type { PlayerStatus } from "@/types";
+
+const GENERIC_STADIUM_IMAGE =
+  "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80";
+
+const RIVAL_SQUAD_IMPORTS: Record<string, RivalSquadImport> = {
+  tenerife: tenerifeSquadImport,
+};
+
+function parsePlayerName(jugador: string): { nombre: string; apellido: string } {
+  const parts = jugador.trim().split(/\s+/);
+  if (parts.length === 1) {
+    return { nombre: parts[0]!, apellido: "" };
+  }
+  return { nombre: parts[0]!, apellido: parts.slice(1).join(" ") };
+}
+
+function mapRivalPosition(pos: string): { posicion: SquadPosition; rol: SquadRoleCode } {
+  const normalized = pos.toLowerCase();
+
+  if (normalized.includes("portero")) {
+    return { posicion: "Portero", rol: "POR" };
+  }
+  if (normalized.includes("lateral izquierdo")) {
+    return { posicion: "Defensa", rol: "LI" };
+  }
+  if (normalized.includes("lateral derecho")) {
+    return { posicion: "Defensa", rol: "LD" };
+  }
+  if (normalized.includes("defensa central")) {
+    return { posicion: "Defensa", rol: "DFC" };
+  }
+  if (normalized.includes("mediocentro ofensivo")) {
+    return { posicion: "Centrocampista", rol: "MCO" };
+  }
+  if (normalized.includes("mediocentro")) {
+    return { posicion: "Centrocampista", rol: "MC" };
+  }
+  if (normalized.includes("extremo izquierdo")) {
+    return { posicion: "Delantero", rol: "EI" };
+  }
+  if (normalized.includes("extremo derecho")) {
+    return { posicion: "Delantero", rol: "ED" };
+  }
+  if (normalized.includes("delantero")) {
+    return { posicion: "Delantero", rol: "DC" };
+  }
+
+  return { posicion: "Centrocampista", rol: "MC" };
+}
+
+function importPlayerToSquadPlayer(
+  team: Team,
+  player: RivalSquadImportPlayer,
+  status: PlayerStatus = "titular",
+): SquadPlayer {
+  const { nombre, apellido } = parsePlayerName(player.jugador);
+  const { posicion, rol } = mapRivalPosition(player.pos);
+  const birthYear = new Date().getFullYear() - player.edad;
+
+  return {
+    id: `${team.id}-d${player.dorsal}`,
+    nombre,
+    apellido,
+    dorsal: player.dorsal,
+    posicion,
+    rol,
+    estado: status,
+    edad: player.edad,
+    fechaNacimiento: `${birthYear}-07-01`,
+    lugarNacimiento: team.city,
+    nacionalidad: "España",
+    altura: "1,78 m",
+    peso: "76 kg",
+    piernaBuena: "Derecha",
+    contratoHasta: `${player.contrato}-06-30`,
+    descripcion: `Valor de mercado: ${player.valor}. Jugador de ${team.shortName} en la temporada 2025/26.`,
+    foto: null,
+    partidos: player.pj,
+    minutos: player.pj * 72,
+    goles: player.g,
+    asistencias: player.a,
+    amarillas: player.ta,
+    rojas: player.tr,
+    historialPartidos: [],
+    trayectoria: [
+      {
+        temporada: "2025/26",
+        club: team.name,
+        partidos: player.pj,
+        goles: player.g,
+        asistencias: player.a,
+      },
+    ],
+  };
+}
+
+export function getImportedRivalSquad(teamId: string): RivalSquadImport | null {
+  return RIVAL_SQUAD_IMPORTS[teamId] ?? null;
+}
+
+export function buildSquadFromImport(team: Team, data: RivalSquadImport): SquadPlayer[] {
+  return data.plantilla.map((player) => importPlayerToSquadPlayer(team, player));
+}
+
+export function buildClubInfoFromImport(team: Team, data: RivalSquadImport): SquadClubInfo {
+  const stadiumImage = team.id.includes("aviles") ? STADIUM_ROMAN_SUAREZ_PHOTO : GENERIC_STADIUM_IMAGE;
+  const shortStadiumName = data.estadio.replace(/^Estadio\s+/i, "");
+
+  return {
+    nombre: team.name,
+    temporada: "2025/26",
+    estadio: shortStadiumName,
+    estadioInfo: {
+      nombre: data.estadio,
+      imagen: stadiumImage,
+      capacidad: data.capacidad,
+      direccion: data.estadio,
+      ciudad: team.city,
+      inaugurado: 1925,
+      superficie: "Césped natural",
+    },
+    escudo: getTeamCrestById(team.id, team.crestInitials),
+    entrenador: data.entrenador,
+    jugadores: data.plantilla.length,
+    stats: {
+      partidos: team.stats.played,
+      victorias: team.stats.won,
+      empates: team.stats.drawn,
+      derrotas: team.stats.lost,
+      golesFavor: team.stats.goalsFor,
+      golesContra: team.stats.goalsAgainst,
+      porteriasImbatidas: Math.max(0, Math.floor(team.stats.won / 2)),
+    },
+  };
+}
