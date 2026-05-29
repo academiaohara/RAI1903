@@ -1,11 +1,19 @@
-import { matchdays, RAI_FEM_TEAM_ID, RAI_TEAM_ID, teams, teamsFemenino } from "@/data/mock";
+import { matchdays, RAI_FEM_TEAM_ID, RAI_TEAM_ID, teams, teamsFemenino, teamsGrupo2 } from "@/data/mock";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Match, ResultCode, Team } from "@/types";
 
-export const getTeam = (teamId: string): Team | undefined => teams.find((team) => team.id === teamId);
+export const getTeam = (teamId: string): Team | undefined =>
+  teams.find((team) => team.id === teamId) ?? teamsGrupo2.find((team) => team.id === teamId);
 
-export const getTeamByGender = (teamId: string, gender: PrimerEquipoGender): Team | undefined =>
-  getTeamsByGender(gender).find((team) => team.id === teamId);
+export const getTeamByGender = (teamId: string, gender: PrimerEquipoGender): Team | undefined => {
+  if (gender === "femenino") {
+    return teamsFemenino.find((team) => team.id === teamId);
+  }
+  return teams.find((team) => team.id === teamId) ?? teamsGrupo2.find((team) => team.id === teamId);
+};
+
+export const getAllTeamsForGender = (gender: PrimerEquipoGender): Team[] =>
+  gender === "femenino" ? teamsFemenino : [...teams, ...teamsGrupo2];
 
 export const getAvilesMatches = (): Match[] =>
   matchdays.flatMap((matchday) => matchday.matches).filter((match) => match.homeTeamId === RAI_TEAM_ID || match.awayTeamId === RAI_TEAM_ID);

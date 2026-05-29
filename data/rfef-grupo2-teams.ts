@@ -1,0 +1,26 @@
+import type { Team } from "@/types";
+
+const emptyStats = { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 };
+
+export const baseTeamsGrupo2: Team[] = [
+  { id: "eldense", name: "CD Eldense", shortName: "Eldense", city: "Eldense", stadium: "Nuevo Pepico Amat", coach: "Claudio Barragán", founded: 1922, crestInitials: "ELD", colors: ["#DC2626", "#FFFFFF"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "sabadell", name: "CE Sabadell FC", shortName: "Sabadell", city: "Sabadell", stadium: "Nova Creu Alta", coach: "TBD", founded: 1903, crestInitials: "SAB", colors: ["#FFFFFF", "#1D4ED8"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "atletico-madrileno", name: "Atlético Madrileño", shortName: "At. Madrileño", city: "Madrid", stadium: "Cerro del Espino", coach: "TBD", founded: 1965, crestInitials: "ATM", colors: ["#DC2626", "#FFFFFF"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "villarreal-b", name: "Villarreal CF B", shortName: "Villarreal B", city: "Villarreal", stadium: "Ciudad Deportiva", coach: "David Albelda", founded: 1999, crestInitials: "VIB", colors: ["#FACC15", "#1D4ED8"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "europa", name: "CE Europa", shortName: "Europa", city: "Barcelona", stadium: "Nou Sardenya", coach: "TBD", founded: 1907, crestInitials: "EUR", colors: ["#166534", "#FFFFFF"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "cartagena", name: "FC Cartagena", shortName: "Cartagena", city: "Cartagena", stadium: "Cartagonova", coach: "Iñigo Vélez", founded: 1995, crestInitials: "CAR", colors: ["#1D4ED8", "#FFFFFF"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "antequera", name: "Antequera CF", shortName: "Antequera", city: "Antequera", stadium: "El Maulí", coach: "Abraham Paz", founded: 1992, crestInitials: "ANT", colors: ["#2563EB", "#FFFFFF"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "algeciras", name: "Algeciras CF", shortName: "Algeciras", city: "Algeciras", stadium: "Municipal", coach: "TBD", founded: 1912, crestInitials: "ALG", colors: ["#1D4ED8", "#FFFFFF"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "hercules", name: "Hércules CF", shortName: "Hércules", city: "Alicante", stadium: "José Rico Pérez", coach: "Beto Company", founded: 1922, crestInitials: "HER", colors: ["#1D4ED8", "#FFFFFF"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "real-murcia", name: "Real Murcia CF", shortName: "Murcia", city: "Murcia", stadium: "Nueva Condomina", coach: "Curro Torres", founded: 1908, crestInitials: "RMU", colors: ["#DC2626", "#FFFFFF"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "alcorcon", name: "AD Alcorcón", shortName: "Alcorcón", city: "Alcorcón", stadium: "Santo Domingo", coach: "TBD", founded: 1971, crestInitials: "ALC", colors: ["#FACC15", "#111827"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "ibiza", name: "UD Ibiza", shortName: "Ibiza", city: "Ibiza", stadium: "Palladium Can Misses", coach: "Miguel Álvarez", founded: 2015, crestInitials: "IBI", colors: ["#0EA5E9", "#FFFFFF"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "teruel", name: "CD Teruel", shortName: "Teruel", city: "Teruel", stadium: "Pinilla", coach: "TBD", founded: 1954, crestInitials: "TER", colors: ["#DC2626", "#111827"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "gimnastic", name: "Gimnàstic de Tarragona", shortName: "Nàstic", city: "Tarragona", stadium: "Nou Estadi", coach: "Pablo Alfaro", founded: 1915, crestInitials: "GIM", colors: ["#166534", "#FFFFFF"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "torremolinos", name: "Juventud Torremolinos CF", shortName: "Torremolinos", city: "Torremolinos", stadium: "El Pozuelo", coach: "Carlos Alós", founded: 1958, crestInitials: "JUV", colors: ["#1D4ED8", "#FFFFFF"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "betis-deportivo", name: "Betis Deportivo", shortName: "Betis Dep.", city: "Sevilla", stadium: "Ciudad Deportiva", coach: "Dani Fragoso", founded: 1957, crestInitials: "BET", colors: ["#15803D", "#FFFFFF"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "tarazona", name: "SD Tarazona", shortName: "Tarazona", city: "Tarazona", stadium: "La Olmeda", coach: "TBD", founded: 1969, crestInitials: "TAR", colors: ["#DC2626", "#FFFFFF"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "marbella", name: "Marbella FC", shortName: "Marbella", city: "Marbella", stadium: "Municipal", coach: "David Cabello", founded: 1997, crestInitials: "MAR", colors: ["#1D4ED8", "#FFFFFF"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "atletico-sanluqueno", name: "Atlético Sanluqueño", shortName: "Sanluqueño", city: "Sanlúcar de Barrameda", stadium: "El Palmar", coach: "Pedro Mateos", founded: 1949, crestInitials: "ATS", colors: ["#DC2626", "#FFFFFF"], position: 0, form: [], stats: { ...emptyStats } },
+  { id: "sevilla-atletico", name: "Sevilla Atlético", shortName: "Sevilla Atl.", city: "Sevilla", stadium: "Jesús Navas", coach: "Marco García", founded: 1958, crestInitials: "SVA", colors: ["#FFFFFF", "#DC2626"], position: 0, form: [], stats: { ...emptyStats } },
+];

@@ -1,6 +1,7 @@
 import { EquipoLigaView } from "@/components/competicion/EquipoLigaView";
 import { PrimerEquipoPageHero } from "@/components/PrimerEquipoPageHero";
-import { getTeamByGender, getTeamsByGender } from "@/lib/fixtures";
+import { getAllTeamsForGender, getTeamByGender } from "@/lib/fixtures";
+import { getTeamsForRfefGrupo, type RfefGrupoId } from "@/lib/rfef-grupos";
 import { genderLabels, isPrimerEquipoGender, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { notFound } from "next/navigation";
 
@@ -22,7 +23,9 @@ export default async function EquipoLigaPage({
     notFound();
   }
 
-  const allTeams = getTeamsByGender(gender);
+  const grupo: RfefGrupoId =
+    gender === "masculino" && getTeamsForRfefGrupo("2").some((entry) => entry.id === teamId) ? "2" : "1";
+  const allTeams = gender === "masculino" ? getTeamsForRfefGrupo(grupo) : getAllTeamsForGender(gender);
 
   return (
     <>

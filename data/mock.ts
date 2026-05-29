@@ -1,4 +1,9 @@
-import { buildMatchdaysFromResultados2526, RESULTADOS_2526_LAST_ROUND } from "@/lib/resultados-2526";
+import { baseTeamsGrupo2 } from "@/data/rfef-grupo2-teams";
+import {
+  buildMatchdaysFromResultados2526,
+  buildMatchdaysGrupo2,
+  RESULTADOS_2526_LAST_ROUND,
+} from "@/lib/resultados-2526";
 import { applyStandingsToTeams } from "@/lib/standings";
 import type {
   AcademyTeam,
@@ -68,10 +73,13 @@ const baseTeamsFemenino: Team[] = baseTeams.map((team) =>
 );
 
 export const matchdays = buildMatchdaysFromResultados2526(baseTeams);
+export const matchdaysGrupo2 = buildMatchdaysGrupo2(baseTeamsGrupo2);
 
 const leagueMatches = matchdays.flatMap((round) => round.matches);
+const leagueMatchesGrupo2 = matchdaysGrupo2.flatMap((round) => round.matches);
 
 export const teams: Team[] = applyStandingsToTeams(baseTeams, leagueMatches);
+export const teamsGrupo2: Team[] = applyStandingsToTeams(baseTeamsGrupo2, leagueMatchesGrupo2);
 export const teamsFemenino: Team[] = applyStandingsToTeams(baseTeamsFemenino, leagueMatches);
 
 export const players: Player[] = [

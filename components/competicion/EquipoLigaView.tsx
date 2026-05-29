@@ -5,7 +5,7 @@ import { Card } from "@/components/Card";
 import { InjuryIcon, RedCardIcon, YellowCardIcon } from "@/components/competicion/AvailabilityIcons";
 import { LeagueTable } from "@/components/LeagueTable";
 import { getRivalAvailability, getRivalSquad, type RivalPlayer } from "@/lib/rival-squads";
-import { getStandingsWindow } from "@/lib/standings-window";
+import { getBalancedStandingsWindow } from "@/lib/standings-window";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { cn, formatGoalDifference } from "@/lib/utils";
 import type { Route } from "next";
@@ -21,7 +21,7 @@ export function EquipoLigaView({ gender, team, allTeams }: EquipoLigaViewProps) 
   const squad = getRivalSquad(team);
   const { injured, cautioned, suspended } = getRivalAvailability(team);
   const fieldPlayers = squad.filter((player) => player.status === "titular" || player.status === "suplente");
-  const windowTeams = getStandingsWindow(allTeams, team.id);
+  const windowTeams = getBalancedStandingsWindow(allTeams, team.id, 10);
   const diff = team.stats.goalsFor - team.stats.goalsAgainst;
   const backHref = `${primerEquipoBase(gender)}/competicion` as Route;
 

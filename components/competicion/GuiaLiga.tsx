@@ -3,25 +3,28 @@ import { TeamCrest } from "@/components/TeamCrest";
 import { Card } from "@/components/Card";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Route } from "next";
+import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import type { Team } from "@/types";
 
 type GuiaLigaProps = {
   gender: PrimerEquipoGender;
   teams: Team[];
-  highlightTeamId: string;
+  grupo: RfefGrupoId;
 };
 
-export function GuiaLiga({ gender, teams, highlightTeamId }: GuiaLigaProps) {
-  const rivals = teams.filter((team) => team.id !== highlightTeamId);
+export function GuiaLiga({ gender, teams, grupo }: GuiaLigaProps) {
+  const sorted = [...teams].sort((a, b) => a.position - b.position);
   const base = `${primerEquipoBase(gender)}/competicion/equipo`;
 
   return (
     <Card eyebrow="Competicion" title="Guia de la liga" borderlessHeader>
       <p className="mb-5 text-sm font-bold text-slate-600">
-        Pulsa un escudo para ver la ficha del rival con plantilla, bajas y sanciones.
+        {grupo === "1"
+          ? "Los 20 equipos del grupo, con el Real Avilés. Pulsa un escudo para ver la ficha del club."
+          : "Los 20 equipos del Grupo II. Pulsa un escudo para ver la ficha del club."}
       </p>
       <div className="grid grid-cols-5 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10">
-        {rivals.map((team) => (
+        {sorted.map((team) => (
           <Link
             key={team.id}
             href={`${base}/${team.id}` as Route}
