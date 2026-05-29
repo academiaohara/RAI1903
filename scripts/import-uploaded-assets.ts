@@ -11,6 +11,9 @@ const competicionesPublic = join(root, "public/competiciones");
 /** Maps team slug → source filename (without path) in Escudos/. */
 const ESCUDO_IMPORT_MAP: Record<string, string> = {
   "real-aviles-industrial": "RealAvilesInd.png",
+  "ferrol": "FERROL.png",
+  "arenas": "ARENAS.png",
+  "barakaldo": "BARAKALDO.png",
   "lugo": "LUGO.png",
   "pontevedra": "PONTEVEDRA.png",
   "zamora": "ZAMORA.png",
