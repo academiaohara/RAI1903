@@ -8,6 +8,7 @@ import { TransfersCarousel } from "@/components/fichajes/TransfersCarousel";
 import { NewsNavButton } from "@/components/NewsNavButton";
 import { NewsTicker } from "@/components/NewsTicker";
 import { getFeaturedTransfers } from "@/lib/fichajes";
+import { MatchScoreCenter } from "@/components/MatchScoreCenter";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { PageHero } from "@/components/PageHero";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
@@ -227,10 +228,14 @@ function MatchBanner({ match, label, href, action }: { match: Match; label: stri
             <p className="mt-1 break-words text-lg font-extrabold leading-tight text-slate-900 lg:text-xl">{match.homeTeam}</p>
           </div>
         </div>
-        <div className="flex min-w-40 flex-col items-center justify-center bg-[#214C9B] px-5 py-4 text-white lg:px-8 lg:py-5">
-          <p className="text-3xl font-extrabold leading-none lg:text-4xl">{scoreLabel}</p>
-          <p className="mt-1 text-xs font-bold uppercase tracking-normal text-white/80">{formatMatchDate(match.date)}</p>
-        </div>
+        <MatchScoreCenter
+          homeLogo={teamCrestLogo(match.homeTeamId)}
+          homeTeam={match.homeTeam}
+          awayLogo={teamCrestLogo(match.awayTeamId)}
+          awayTeam={match.awayTeam}
+          centerLabel={scoreLabel}
+          sublabel={formatMatchDate(match.date)}
+        />
         <div className="flex min-w-0 items-center justify-between gap-3 p-4 lg:gap-4 lg:p-5">
           <div className="min-w-0">
             <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-normal text-[#981915]">
