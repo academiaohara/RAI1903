@@ -1,3 +1,4 @@
+import { castillaSquadImport } from "@/data/rivals/castilla";
 import { celtaFortunaSquadImport } from "@/data/rivals/celta-fortuna";
 import { tenerifeSquadImport } from "@/data/rivals/tenerife";
 import { zamoraSquadImport } from "@/data/rivals/zamora";
@@ -13,6 +14,7 @@ const GENERIC_STADIUM_IMAGE =
   "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80";
 
 const RIVAL_SQUAD_IMPORTS: Record<string, RivalSquadImport> = {
+  castilla: castillaSquadImport,
   "celta-fortuna": celtaFortunaSquadImport,
   tenerife: tenerifeSquadImport,
   zamora: zamoraSquadImport,
@@ -47,7 +49,7 @@ function mapRivalPosition(pos: string): { posicion: SquadPosition; rol: SquadRol
   if (normalized.includes("mediocentro ofensivo") || normalized.includes("mediapunta")) {
     return { posicion: "Centrocampista", rol: "MCO" };
   }
-  if (normalized.includes("mediocentro")) {
+  if (normalized.includes("pivote") || normalized.includes("mediocentro")) {
     return { posicion: "Centrocampista", rol: "MC" };
   }
   if (normalized.includes("extremo izquierdo")) {
