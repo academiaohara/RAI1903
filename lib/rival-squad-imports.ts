@@ -1,4 +1,5 @@
 import { tenerifeSquadImport } from "@/data/rivals/tenerife";
+import { zamoraSquadImport } from "@/data/rivals/zamora";
 import { getTeamCrestById } from "@/lib/team-crests";
 import { STADIUM_ROMAN_SUAREZ_PHOTO } from "@/lib/squad-photos";
 import type { Team } from "@/types";
@@ -12,6 +13,7 @@ const GENERIC_STADIUM_IMAGE =
 
 const RIVAL_SQUAD_IMPORTS: Record<string, RivalSquadImport> = {
   tenerife: tenerifeSquadImport,
+  zamora: zamoraSquadImport,
 };
 
 function parsePlayerName(jugador: string): { nombre: string; apellido: string } {
@@ -37,7 +39,7 @@ function mapRivalPosition(pos: string): { posicion: SquadPosition; rol: SquadRol
   if (normalized.includes("defensa central")) {
     return { posicion: "Defensa", rol: "DFC" };
   }
-  if (normalized.includes("mediocentro ofensivo")) {
+  if (normalized.includes("mediocentro ofensivo") || normalized.includes("mediapunta")) {
     return { posicion: "Centrocampista", rol: "MCO" };
   }
   if (normalized.includes("mediocentro")) {
@@ -81,7 +83,9 @@ function importPlayerToSquadPlayer(
     peso: "76 kg",
     piernaBuena: "Derecha",
     contratoHasta: `${player.contrato}-06-30`,
-    descripcion: `Valor de mercado: ${player.valor}. Jugador de ${team.shortName} en la temporada 2025/26.`,
+    descripcion: player.valor
+      ? `Valor de mercado: ${player.valor}. Jugador de ${team.shortName} en la temporada 2025/26.`
+      : `Jugador de ${team.shortName} en la temporada 2025/26.`,
     foto: null,
     partidos: player.pj,
     minutos: player.pj * 72,
