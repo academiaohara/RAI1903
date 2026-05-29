@@ -1,7 +1,10 @@
 import { Badge } from "@/components/Badge";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
+import { MatchFixtureScorePill } from "@/components/MatchFixtureScorePill";
 import { RAI_TEAM_ID } from "@/data/mock";
 import { matchCompetitionShortLabel, matchFixtureMeta } from "@/lib/competition-labels";
+import { getTeam } from "@/lib/fixtures";
+import { getTeamCrestById } from "@/lib/team-crests";
 import { matchFixtureCardClassName } from "@/lib/match-card-styles";
 import { formatMatchDate } from "@/lib/utils";
 import type { Match } from "@/types";
@@ -29,9 +32,13 @@ export function MatchCard({
       </div>
       <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
         <p className={`min-w-0 break-words text-sm font-extrabold leading-snug ${avilesHome ? "text-[#214C9B]" : "text-slate-700"}`}>{match.homeTeam}</p>
-        <div className="rounded-2xl bg-[#214C9B] px-3 py-2 text-center font-extrabold text-white shadow-md shadow-blue-950/10">
-          {match.status === "finished" ? `${match.homeScore} - ${match.awayScore}` : "vs"}
-        </div>
+        <MatchFixtureScorePill
+          homeLogo={getTeamCrestById(match.homeTeamId, getTeam(match.homeTeamId)?.crestInitials)}
+          homeTeam={match.homeTeam}
+          awayLogo={getTeamCrestById(match.awayTeamId, getTeam(match.awayTeamId)?.crestInitials)}
+          awayTeam={match.awayTeam}
+          label={match.status === "finished" ? `${match.homeScore} - ${match.awayScore}` : "vs"}
+        />
         <p className={`min-w-0 break-words text-right text-sm font-extrabold leading-snug ${avilesAway ? "text-[#214C9B]" : "text-slate-700"}`}>{match.awayTeam}</p>
       </div>
       {compact ? (

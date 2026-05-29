@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { Badge } from "@/components/Badge";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
+import { MatchFixtureScorePill } from "@/components/MatchFixtureScorePill";
 import { matchCompetitionShortLabel, matchFixtureMeta } from "@/lib/competition-labels";
 import { getCronicaForMatch } from "@/lib/match-articles";
-import { getAvilesMatchResult } from "@/lib/fixtures";
+import { getAvilesMatchResult, getTeam } from "@/lib/fixtures";
+import { getTeamCrestById } from "@/lib/team-crests";
 import { matchFixtureCardClassName } from "@/lib/match-card-styles";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { primerEquipoBase } from "@/lib/primer-equipo";
@@ -37,9 +39,13 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
       </div>
       <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
         <p className={`min-w-0 break-words text-sm font-extrabold leading-snug ${avilesHome ? "text-[#214C9B]" : "text-slate-800"}`}>{match.homeTeam}</p>
-        <div className="rounded-2xl bg-[#214C9B] px-3 py-2 text-center text-sm font-extrabold text-white">
-          {match.homeScore} - {match.awayScore}
-        </div>
+        <MatchFixtureScorePill
+          homeLogo={getTeamCrestById(match.homeTeamId, getTeam(match.homeTeamId)?.crestInitials)}
+          homeTeam={match.homeTeam}
+          awayLogo={getTeamCrestById(match.awayTeamId, getTeam(match.awayTeamId)?.crestInitials)}
+          awayTeam={match.awayTeam}
+          label={`${match.homeScore} - ${match.awayScore}`}
+        />
         <p className={`min-w-0 break-words text-right text-sm font-extrabold leading-snug ${avilesAway ? "text-[#214C9B]" : "text-slate-800"}`}>{match.awayTeam}</p>
       </div>
       <p className="mt-2 text-xs font-bold text-slate-600">{formatMatchDate(match.date)} · Pulsa para leer la cronica</p>
