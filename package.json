@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
+    "verify:rfef-rules": "npx --yes tsx scripts/verify-rfef-rules.ts",
     "sync:news": "node --experimental-strip-types scripts/sync-news-from-urls.ts",
     "sync:escudos": "node --experimental-strip-types scripts/sync-escudos-manifest.ts",
     "import:assets": "node --experimental-strip-types scripts/import-uploaded-assets.ts && npm run sync:escudos"

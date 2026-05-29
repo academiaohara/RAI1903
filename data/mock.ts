@@ -4,6 +4,7 @@ import {
   buildMatchdaysGrupo2,
   RESULTADOS_2526_LAST_ROUND,
 } from "@/lib/resultados-2526";
+import { PRIMERA_RFEF_RULES, buildPlayoffBracketFromConfig } from "@/lib/rfef-rules";
 import { applyStandingsToTeams } from "@/lib/standings";
 import type {
   AcademyTeam,
@@ -78,9 +79,28 @@ export const matchdaysGrupo2 = buildMatchdaysGrupo2(baseTeamsGrupo2);
 const leagueMatches = matchdays.flatMap((round) => round.matches);
 const leagueMatchesGrupo2 = matchdaysGrupo2.flatMap((round) => round.matches);
 
-export const teams: Team[] = applyStandingsToTeams(baseTeams, leagueMatches);
-export const teamsGrupo2: Team[] = applyStandingsToTeams(baseTeamsGrupo2, leagueMatchesGrupo2);
-export const teamsFemenino: Team[] = applyStandingsToTeams(baseTeamsFemenino, leagueMatches);
+const rfefTiebreak = PRIMERA_RFEF_RULES.tiebreak;
+const rfefZones = PRIMERA_RFEF_RULES.zones;
+
+export const teams: Team[] = applyStandingsToTeams(baseTeams, leagueMatches, rfefZones, rfefTiebreak);
+export const teamsGrupo2: Team[] = applyStandingsToTeams(
+  baseTeamsGrupo2,
+  leagueMatchesGrupo2,
+  rfefZones,
+  rfefTiebreak,
+);
+export const teamsFemenino: Team[] = applyStandingsToTeams(baseTeamsFemenino, leagueMatches, rfefZones, rfefTiebreak);
+
+export const primeraRfefPlayoffBracket = buildPlayoffBracketFromConfig(
+  [
+    { groupId: "1", teams },
+    { groupId: "2", teams: teamsGrupo2 },
+  ],
+  PRIMERA_RFEF_RULES.playoff.bracket,
+  PRIMERA_RFEF_RULES.playoff.qualification,
+  PRIMERA_RFEF_RULES.playoff.knockout,
+  PRIMERA_RFEF_RULES.ineligiblePlayoffTeamIds ?? [],
+);
 
 export const players: Player[] = [
   { id: "alvaro-fernandez", firstName: "Alvaro", lastName: "Fernandez", displayName: "A. Fernandez", number: 1, position: "Portero", nationality: "Espana", age: 28, birthDate: "1998-04-12", height: "1,88 m", preferredFoot: "Derecha", seasonsAtClub: 2, status: "titular", rating: 7.2, bio: "Portero titular de la temporada 25/26, seguro bajo palos y fuerte en el juego aereo.", clubHistory: ["Marino de Luanco", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
