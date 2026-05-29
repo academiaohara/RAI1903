@@ -88,6 +88,7 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
                 player={player}
                 bare
                 placeholderTone="light"
+                imageClassName="object-contain object-bottom"
                 className="mx-auto aspect-[3/4] h-[94%] w-auto max-w-[88%] drop-shadow-[0_4px_12px_rgba(33,76,155,0.2)]"
               />
             ) : (
