@@ -8,7 +8,7 @@ import { InjuryIcon, RedCardIcon } from "@/components/competicion/AvailabilityIc
 type SquadAvailabilityProps = {
   injured: SquadPlayer[];
   suspended: SquadPlayer[];
-  onSelect: (player: SquadPlayer) => void;
+  onSelect?: (player: SquadPlayer) => void;
 };
 
 export function SquadAvailability({ injured, suspended, onSelect }: SquadAvailabilityProps) {
@@ -43,7 +43,7 @@ function AvailabilityCard({
   players: SquadPlayer[];
   empty: string;
   icon: ReactNode;
-  onSelect: (player: SquadPlayer) => void;
+  onSelect?: (player: SquadPlayer) => void;
 }) {
   return (
     <div className="rounded-2xl border border-[#214C9B]/15 bg-white p-4 shadow-[0_8px_20px_rgba(17,24,39,0.04)]">
@@ -55,24 +55,36 @@ function AvailabilityCard({
         {players.length > 0 ? (
           players.map((player) => (
             <li key={player.id}>
-              <button
-                type="button"
-                onClick={() => onSelect(player)}
-                className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2 text-left transition hover:border-[#214C9B]/30 hover:bg-blue-50/50"
-              >
-                <div>
-                  <p className="font-bold text-slate-800">{getPlayerFullName(player)}</p>
-                  <p className="text-xs font-semibold text-slate-500">
-                    #{player.dorsal} · {player.rol}
-                  </p>
+              {onSelect ? (
+                <button
+                  type="button"
+                  onClick={() => onSelect(player)}
+                  className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2 text-left transition hover:border-[#214C9B]/30 hover:bg-blue-50/50"
+                >
+                  <AvailabilityPlayerInfo player={player} />
+                </button>
+              ) : (
+                <div className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2">
+                  <AvailabilityPlayerInfo player={player} />
                 </div>
-              </button>
+              )}
             </li>
           ))
         ) : (
           <li className="text-sm font-bold text-slate-500">{empty}</li>
         )}
       </ul>
+    </div>
+  );
+}
+
+function AvailabilityPlayerInfo({ player }: { player: SquadPlayer }) {
+  return (
+    <div>
+      <p className="font-bold text-slate-800">{getPlayerFullName(player)}</p>
+      <p className="text-xs font-semibold text-slate-500">
+        #{player.dorsal} · {player.rol}
+      </p>
     </div>
   );
 }

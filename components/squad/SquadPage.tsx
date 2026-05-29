@@ -22,17 +22,20 @@ export function SquadPage({ gender }: SquadPageProps) {
   const squad = useMemo(() => getSquadPlayers(gender), [gender]);
   const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
   const club = useMemo(() => getSquadClubInfo(gender), [gender]);
+  const isFemenino = gender === "femenino";
 
-  const [viewMode, setViewMode] = useState<SquadViewMode>("fichas");
+  const [viewMode, setViewMode] = useState<SquadViewMode>(isFemenino ? "lista" : "fichas");
   const [selected, setSelected] = useState<SquadPlayer | null>(null);
   const [stadiumOpen, setStadiumOpen] = useState(false);
+
+  const handleSelect = isFemenino ? undefined : setSelected;
 
   return (
     <div className="space-y-6">
       <SquadHeader club={club} stats={club.stats} onStadiumClick={() => setStadiumOpen(true)} />
-      <SquadToolbar viewMode={viewMode} onViewModeChange={setViewMode} />
+      <SquadToolbar viewMode={viewMode} onViewModeChange={setViewMode} showViewToggle={!isFemenino} />
 
-      <SquadAvailability injured={injured} suspended={suspended} onSelect={setSelected} />
+      <SquadAvailability injured={injured} suspended={suspended} onSelect={handleSelect} />
 
       <AnimatePresence mode="wait">
         <motion.div
@@ -43,14 +46,14 @@ export function SquadPage({ gender }: SquadPageProps) {
           transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
         >
           {viewMode === "lista" ? (
-            <PlayerTable players={available} onSelect={setSelected} />
+            <PlayerTable players={available} onSelect={handleSelect} />
           ) : (
             <PlayerGrid players={available} onSelect={setSelected} variant="fichas" />
           )}
         </motion.div>
       </AnimatePresence>
 
-      <PlayerModal player={selected} onClose={() => setSelected(null)} />
+      {!isFemenino && <PlayerModal player={selected} onClose={() => setSelected(null)} />}
       <StadiumModal stadium={club.estadioInfo} open={stadiumOpen} onClose={() => setStadiumOpen(false)} />
     </div>
   );
