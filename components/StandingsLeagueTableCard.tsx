@@ -42,7 +42,7 @@ type StandingsLeagueTableCardProps = {
 
 export function StandingsLeagueTableCard({
   eyebrow,
-  title = "Clasificacion",
+  title = "Clasificacion y jornada",
   sourceTeams,
   matchdays,
   highlightTeamId,
@@ -74,7 +74,7 @@ export function StandingsLeagueTableCard({
     return fullTeams.slice(0, 10);
   }, [centerOnHighlight, fullTeams, highlightTeamId]);
 
-  const dynamicTitle =
+  const modalTitle =
     venue === "all" && effectiveJornada === lastPlayedRound
       ? title
       : `${title} · J${effectiveJornada} · ${STANDINGS_VENUE_LABELS[venue]}`;
@@ -102,7 +102,8 @@ export function StandingsLeagueTableCard({
   return (
     <LeagueTableCard
       eyebrow={eyebrow}
-      title={dynamicTitle}
+      title={title}
+      modalTitle={modalTitle}
       teams={tableTeams}
       fullTeams={fullTeams}
       highlightTeamId={highlightTeamId}

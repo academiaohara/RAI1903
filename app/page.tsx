@@ -86,7 +86,6 @@ export default function HomePage() {
       <section className="grid gap-6 xl:grid-cols-[1fr_0.42fr]">
         <StandingsLeagueTableCard
           eyebrow="Estado competitivo"
-          title="Clasificacion"
           sourceTeams={teams}
           matchdays={matchdays}
           highlightTeamId={RAI_TEAM_ID}
