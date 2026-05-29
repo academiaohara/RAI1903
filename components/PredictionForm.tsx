@@ -4,16 +4,19 @@ import Link from "next/link";
 import { Eye } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { MatchPreviewModal } from "@/components/MatchPreviewModal";
+import { MatchScoreCenter } from "@/components/MatchScoreCenter";
 import { players, RAI_TEAM_ID } from "@/data/mock";
 import { getPreviaForMatch } from "@/lib/match-articles";
 import {
   actualOutcome,
   formatGoalsPick,
   getAvilesGoalsPick,
+  getTeamById,
   isAvilesMatch,
   isOutcomeLockedByGoals,
   outcomeFromGoalsPicks,
 } from "@/lib/quiniela";
+import { getTeamCrestById } from "@/lib/team-crests";
 import { primerEquipoBase } from "@/lib/primer-equipo";
 import type { GoalsPick, Match, Prediction, PredictionOutcome } from "@/types";
 import type { Route } from "next";
@@ -107,6 +110,8 @@ export function PredictionForm({
   const formReadOnly = readOnly || isDisplayOnly;
   const actual = actualOutcome(match);
   const userOutcome = (outcomeLocked ? derivedOutcome : prediction?.outcome) ?? undefined;
+  const homeCrest = getTeamCrestById(match.homeTeamId, getTeamById(match.homeTeamId)?.crestInitials);
+  const awayCrest = getTeamCrestById(match.awayTeamId, getTeamById(match.awayTeamId)?.crestInitials);
 
   const applyAvilesRules = (next: Prediction): Prediction => {
     const avilesGoals = getAvilesGoalsPick(match, next);
@@ -147,7 +152,16 @@ export function PredictionForm({
 
   return (
     <>
-      <div className="space-y-4 rounded-2xl border border-[#214C9B]/20 bg-white p-4 shadow-[0_10px_24px_rgba(17,24,39,0.05)]">
+      <div className="overflow-hidden rounded-2xl border border-[#214C9B]/20 bg-white shadow-[0_10px_24px_rgba(17,24,39,0.05)]">
+        <MatchScoreCenter
+          homeLogo={homeCrest}
+          homeTeam={match.homeTeam}
+          awayLogo={awayCrest}
+          awayTeam={match.awayTeam}
+          centerLabel="vs"
+          className="w-full min-w-0 rounded-none"
+        />
+        <div className="space-y-4 p-4">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
           <div className="min-w-0 flex-1">
             <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4">
@@ -224,6 +238,7 @@ export function PredictionForm({
               })}
             </div>
           </div>
+        </div>
         </div>
       </div>
 
