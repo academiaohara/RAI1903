@@ -72,13 +72,13 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect }: JornadaRo
             >
               <span className="text-sm font-extrabold leading-none">{round.label}</span>
 
-              <div className="flex h-10 w-10 items-center justify-center">
+              <div className="flex h-12 w-12 items-center justify-center">
                 {opponent ? (
-                  <TeamCrest team={opponent} size="sm" className="transition group-hover:brightness-110" />
+                  <TeamCrest team={opponent} size="md" className="transition group-hover:brightness-110" />
                 ) : round.kind === "playoff" ? (
                   <span
                     className={cn(
-                      "flex h-9 w-9 items-center justify-center rounded-full border text-[10px] font-extrabold uppercase",
+                      "flex h-11 w-11 items-center justify-center rounded-full border text-[11px] font-extrabold uppercase",
                       isSelected
                         ? "border-white/40 bg-white/15 text-white"
                         : "border-[#214C9B]/25 bg-white text-[#214C9B] group-hover:border-white/40 group-hover:bg-white/15 group-hover:text-white",
@@ -91,7 +91,7 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect }: JornadaRo
                   <OpponentCrest
                     logo="?"
                     opponent="Por determinar"
-                    size="sm"
+                    size="md"
                     className="opacity-60"
                   />
                 )}
