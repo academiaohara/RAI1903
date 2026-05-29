@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { TeamCrest } from "@/components/TeamCrest";
 import { Card } from "@/components/Card";
 import { InjuryIcon, RedCardIcon, YellowCardIcon } from "@/components/competicion/AvailabilityIcons";
 import { LeagueTable } from "@/components/LeagueTable";
@@ -35,9 +36,11 @@ export function EquipoLigaView({ gender, team, allTeams }: EquipoLigaViewProps) 
 
       <Card eyebrow="Guia de la liga" title={team.name} borderlessHeader>
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-          <span className="flex h-28 w-28 shrink-0 items-center justify-center rounded-3xl border border-[#214C9B]/20 bg-gradient-to-br from-blue-50 via-white to-blue-100 text-4xl font-extrabold tracking-tight text-[#214C9B]">
-            {team.crestInitials}
-          </span>
+          <TeamCrest
+            team={team}
+            size="lg"
+            className="shrink-0 rounded-3xl border border-[#214C9B]/20 bg-gradient-to-br from-blue-50 via-white to-blue-100"
+          />
           <div className="grid flex-1 gap-4 sm:grid-cols-2">
             <InfoItem label="Entrenador" value={team.coach} />
             <InfoItem label="Estadio" value={team.stadium} />

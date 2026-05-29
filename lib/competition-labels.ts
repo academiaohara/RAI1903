@@ -17,7 +17,7 @@ export const LEAGUE_COMPETITION_IDS = ["liga-raij903", "primera-rfef"] as const;
 export type LeagueCompetitionId = (typeof LEAGUE_COMPETITION_IDS)[number];
 
 const LEAGUE_COMPETITION_LABELS: Record<LeagueCompetitionId, string> = {
-  "liga-raij903": "Liga RAI1903 Norte",
+  "liga-raij903": "1ª RFEF - Grupo I",
   "primera-rfef": "1ª RFEF",
 };
 

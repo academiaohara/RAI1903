@@ -1,5 +1,6 @@
 import { RAI_TEAM_ID } from "@/data/mock";
 import { getTeamMatches, getTeamsByGender } from "@/lib/fixtures";
+import { getTeamCrest } from "@/lib/team-crests";
 import { getCronicaForMatch, getPreviaForMatch } from "@/lib/match-articles";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { CalendarMatch, Match } from "@/types";
@@ -42,7 +43,7 @@ export function matchToCalendarMatch(match: Match, gender: PrimerEquipoGender): 
     id: match.id,
     date: match.date,
     opponent: avilesHome ? match.awayTeam : match.homeTeam,
-    opponentLogo: rival?.crestInitials ?? rivalId.slice(0, 3).toUpperCase(),
+    opponentLogo: rival ? getTeamCrest(rival) : rivalId.slice(0, 3).toUpperCase(),
     competition: match.competition,
     competitionStage: match.competitionStage,
     matchday: match.matchday,

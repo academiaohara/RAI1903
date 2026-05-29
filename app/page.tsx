@@ -14,6 +14,7 @@ import { RecentMatchCard } from "@/components/RecentMatchCard";
 import { RAI_TEAM_ID, newsItems, players } from "@/data/mock";
 import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
 import { getLatestAvilesMatches, getNextAvilesMatch, getTeam, getTeamsByGender, getUpcomingAvilesMatches } from "@/lib/fixtures";
+import { getTeamCrest } from "@/lib/team-crests";
 import { getCronicaForMatch, getPreviaForMatch } from "@/lib/match-articles";
 import { primerEquipoBase } from "@/lib/primer-equipo";
 import { formatMatchDate } from "@/lib/utils";
@@ -161,8 +162,10 @@ export default function HomePage() {
 }
 
 function teamCrestLogo(teamId: string): string {
+  const team = getTeam(teamId);
+  if (!team) return teamId.slice(0, 3).toUpperCase();
   if (teamId === RAI_TEAM_ID) return "/logo.png";
-  return getTeam(teamId)?.crestInitials ?? teamId.slice(0, 3).toUpperCase();
+  return getTeamCrest(team);
 }
 
 function MatchBanner({ match, label, href, action }: { match: Match; label: string; href: Route; action: string }) {

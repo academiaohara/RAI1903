@@ -31,8 +31,8 @@ const MATCH_FIXTURES: Array<{ rival: string; competicion: string; fecha: string 
   { rival: "CD Guijuelo", competicion: "Liga RAI1903 Norte", fecha: "2025-10-05" },
   { rival: "Zamora CF", competicion: "Liga RAI1903 Norte", fecha: "2025-10-12" },
   { rival: "CD Covadonga", competicion: "Copa del Rey", fecha: "2025-10-19" },
-  { rival: "CD Lealtad", competicion: "Liga RAI1903 Norte", fecha: "2025-10-26" },
-  { rival: "Ourense CF", competicion: "Liga RAI1903 Norte", fecha: "2025-11-02" },
+  { rival: "Barakaldo CF", competicion: "1ª RFEF - Grupo I", fecha: "2025-10-26" },
+  { rival: "Ourense CF", competicion: "1ª RFEF - Grupo I", fecha: "2025-11-02" },
 ];
 
 const WEIGHT_BY_POSITION: Record<Player["position"], string> = {

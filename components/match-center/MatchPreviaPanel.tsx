@@ -1,4 +1,5 @@
 import { OpponentCrest } from "@/components/OpponentCrest";
+import { getTeamCrest } from "@/lib/team-crests";
 import { MatchNewsCarousel } from "@/components/match-center/MatchNewsCarousel";
 import { MatchVideoBlock } from "@/components/match-center/MatchVideoBlock";
 import { getTeamByGender } from "@/lib/fixtures";
@@ -155,7 +156,7 @@ export function MatchPreviaPanel({
           <div className="rounded-2xl border border-[#214C9B]/15 bg-slate-50 p-4 sm:p-6">
             <div className="grid gap-6 md:grid-cols-[1fr_auto_1fr] md:items-center">
               <div className="flex flex-col items-center gap-2 text-center">
-                <OpponentCrest logo={homeTeam?.crestInitials ?? "LOC"} opponent={match.homeTeam} size="md" />
+                <OpponentCrest logo={homeTeam ? getTeamCrest(homeTeam) : "LOC"} opponent={match.homeTeam} size="md" />
                 <p className="text-sm font-extrabold text-slate-800">{match.homeTeam}</p>
                 {homeTeam && <FormBadges form={homeTeam.form} />}
               </div>
@@ -166,7 +167,7 @@ export function MatchPreviaPanel({
                 </p>
               </div>
               <div className="flex flex-col items-center gap-2 text-center">
-                <OpponentCrest logo={awayTeam?.crestInitials ?? "VIS"} opponent={match.awayTeam} size="md" />
+                <OpponentCrest logo={awayTeam ? getTeamCrest(awayTeam) : "VIS"} opponent={match.awayTeam} size="md" />
                 <p className="text-sm font-extrabold text-slate-800">{match.awayTeam}</p>
                 {awayTeam && <FormBadges form={awayTeam.form} />}
               </div>

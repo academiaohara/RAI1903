@@ -1,3 +1,4 @@
+import { TeamCrest } from "@/components/TeamCrest";
 import { RAI_TEAM_ID } from "@/data/mock";
 import {
   STANDINGS_ZONE_LEGEND,
@@ -81,16 +82,14 @@ export function LeagueTable({
                   </td>
                   <td className={dataCellClassName}>
                     <div className="flex min-w-0 items-center gap-1 md:gap-2">
-                      <span
+                      <TeamCrest
+                        team={team}
+                        size="sm"
                         className={cn(
-                          "flex h-5 w-5 shrink-0 items-center justify-center rounded border text-[7px] font-extrabold md:h-7 md:w-7 md:rounded-lg md:text-[9px]",
-                          highlighted
-                            ? "border-white/30 bg-white/15 text-white"
-                            : "border-[#214C9B]/15 bg-white text-[#214C9B]",
+                          "shrink-0 rounded border md:rounded-lg",
+                          highlighted ? "border-white/30 bg-white/10" : "border-[#214C9B]/15 bg-white",
                         )}
-                      >
-                        {team.crestInitials}
-                      </span>
+                      />
                       <span className="max-w-[4.5rem] truncate font-bold sm:max-w-none md:max-w-none">
                         <span className="md:hidden">{team.shortName}</span>
                         <span className="hidden md:inline">{teamLabel}</span>
