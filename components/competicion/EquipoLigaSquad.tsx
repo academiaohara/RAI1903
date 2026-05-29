@@ -25,8 +25,9 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
   const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
   const isFemenino = gender === "femenino";
   const showPlayerModal = isOwnClub && !isFemenino;
+  const listOnlyView = !isOwnClub || isFemenino;
 
-  const [viewMode, setViewMode] = useState<SquadViewMode>(isFemenino ? "lista" : "fichas");
+  const [viewMode, setViewMode] = useState<SquadViewMode>(listOnlyView ? "lista" : "fichas");
   const [selected, setSelected] = useState<SquadPlayer | null>(null);
   const [stadiumOpen, setStadiumOpen] = useState(false);
 
@@ -35,7 +36,11 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
   return (
     <div className="space-y-6">
       <SquadHeader club={club} stats={club.stats} onStadiumClick={() => setStadiumOpen(true)} />
-      <SquadToolbar viewMode={viewMode} onViewModeChange={setViewMode} showViewToggle={!isFemenino} />
+      <SquadToolbar
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        showViewToggle={isOwnClub && !isFemenino}
+      />
 
       <SquadAvailability injured={injured} suspended={suspended} onSelect={handleSelect} />
 
