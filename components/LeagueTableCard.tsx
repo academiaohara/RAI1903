@@ -11,6 +11,8 @@ import type { Team } from "@/types";
 type LeagueTableCardProps = {
   eyebrow?: string;
   title?: string;
+  /** Titulo del modal; por defecto usa `title`. */
+  modalTitle?: string;
   teams: Team[];
   /** Tabla completa en el modal; por defecto usa `teams`. */
   fullTeams?: Team[];
@@ -25,6 +27,7 @@ type LeagueTableCardProps = {
 export function LeagueTableCard({
   eyebrow,
   title,
+  modalTitle: modalTitleProp,
   teams,
   fullTeams,
   highlightTeamId,
@@ -35,7 +38,7 @@ export function LeagueTableCard({
 }: LeagueTableCardProps) {
   const modalTeams = fullTeams ?? teams;
   const [open, setOpen] = useState(false);
-  const modalTitle = title ?? "Clasificacion";
+  const modalTitle = modalTitleProp ?? title ?? "Clasificacion";
 
   return (
     <>

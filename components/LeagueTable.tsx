@@ -42,6 +42,7 @@ export function LeagueTable({
                 </>
               ) : (
                 <>
+                  <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">PJ</th>
                   <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">G</th>
                   <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">E</th>
                   <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">P</th>
@@ -106,6 +107,7 @@ export function LeagueTable({
                     </>
                   ) : (
                     <>
+                      <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.played}</td>
                       <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.won}</td>
                       <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.drawn}</td>
                       <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.lost}</td>
