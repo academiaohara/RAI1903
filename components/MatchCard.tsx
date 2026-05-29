@@ -32,7 +32,11 @@ export function MatchCard({
         </div>
         <p className={`min-w-0 break-words text-right text-sm font-extrabold leading-snug ${avilesAway ? "text-[#214C9B]" : "text-slate-700"}`}>{match.awayTeam}</p>
       </div>
-      {!compact && (
+      {compact ? (
+        match.status === "scheduled" && (
+          <p className="mt-2 text-xs font-bold text-slate-600">{formatMatchDate(match.date)}</p>
+        )
+      ) : (
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
           <span>{formatMatchDate(match.date)}</span>
           <span>{match.venue}</span>
