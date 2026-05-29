@@ -1,7 +1,17 @@
 import { isLeagueCompetition, type LeagueCompetitionId } from "@/lib/competition-labels";
+import { RESULTADOS_2526_LAST_ROUND } from "@/lib/resultados-2526";
 import { sortStandingsByRfefRules } from "@/lib/rfef-rules/tiebreak";
 import type { LeagueTiebreakContext } from "@/lib/rfef-rules/types";
 import type { FormCode, Match, StandingsZone, Team } from "@/types";
+
+/** Alcance de partidos en la tabla: todos, solo como local o solo como visitante. */
+export type StandingsVenue = "all" | "home" | "away";
+
+export const STANDINGS_VENUE_LABELS: Record<StandingsVenue, string> = {
+  all: "General",
+  home: "Local",
+  away: "Visitante",
+};
 
 export type FinishedLeagueMatch = {
   homeTeamId: string;
@@ -146,6 +156,7 @@ export function computeStandings(
   matches: readonly FinishedLeagueMatch[],
   zones: StandingsZonesConfig = DEFAULT_STANDINGS_ZONES,
   tiebreak?: LeagueTiebreakContext,
+  venue: StandingsVenue = "all",
 ): ComputedStandingsRow[] {
   const byTeam = new Map(teamIds.map((id) => [id, createAccumulator(id)]));
 
@@ -153,13 +164,16 @@ export function computeStandings(
     const home = byTeam.get(match.homeTeamId);
     const away = byTeam.get(match.awayTeamId);
     if (!home || !away) continue;
-    applyMatch(home, match, match.homeTeamId);
-    applyMatch(away, match, match.awayTeamId);
+    if (venue !== "away") applyMatch(home, match, match.homeTeamId);
+    if (venue !== "home") applyMatch(away, match, match.awayTeamId);
   }
 
   const rows = [...byTeam.values()];
-  const tiebreakResult = tiebreak ? sortStandingsByRfefRules(rows, matches, tiebreak) : null;
-  const sorted = tiebreak ? sortAccumulators(rows, matches, tiebreak) : [...rows].sort(compareStandingsSimple);
+  const useTiebreak = tiebreak && venue === "all";
+  const tiebreakResult = useTiebreak ? sortStandingsByRfefRules(rows, matches, tiebreak) : null;
+  const sorted = useTiebreak
+    ? sortAccumulators(rows, matches, tiebreak)
+    : [...rows].sort(compareStandingsSimple);
 
   return sorted.map((row, index) => {
     const position = index + 1;
@@ -187,6 +201,7 @@ export function applyStandingsToTeams(
   matches: Match[],
   zones: StandingsZonesConfig = DEFAULT_STANDINGS_ZONES,
   tiebreak?: LeagueTiebreakContext,
+  venue: StandingsVenue = "all",
 ): Team[] {
   const leagueMatches = extractLeagueMatches(matches);
   const standings = computeStandings(
@@ -194,6 +209,7 @@ export function applyStandingsToTeams(
     leagueMatches,
     zones,
     tiebreak,
+    venue,
   );
   const byId = new Map(standings.map((row) => [row.teamId, row]));
 
@@ -239,9 +255,23 @@ export function getTeamsAtRound(
   round: number,
   zones: StandingsZonesConfig = DEFAULT_STANDINGS_ZONES,
   tiebreak?: LeagueTiebreakContext,
+  venue: StandingsVenue = "all",
 ): Team[] {
   const priorMatches = getMatchesBeforeRound(matchdays, round);
-  return applyStandingsToTeams(teams, priorMatches, zones, tiebreak);
+  return applyStandingsToTeams(teams, priorMatches, zones, tiebreak, venue);
+}
+
+/** Jornadas de liga con al menos un partido finalizado. */
+export function getPlayedLeagueRounds(matchdays: Array<{ round: number; matches: Match[] }>): number[] {
+  return matchdays
+    .filter((matchday) => matchday.matches.some((match) => match.status === "finished"))
+    .map((matchday) => matchday.round)
+    .sort((a, b) => a - b);
+}
+
+/** Round exclusivo superior para incluir la jornada indicada en la clasificación. */
+export function qualifyingRoundAfterJornada(jornada: number): number {
+  return Math.min(jornada + 1, RESULTADOS_2526_LAST_ROUND + 1);
 }
 
 export function getHomeAwayRecordBeforeRound(
