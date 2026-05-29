@@ -5,6 +5,7 @@ import { Maximize2 } from "lucide-react";
 import { Card } from "@/components/Card";
 import { LeagueTable } from "@/components/LeagueTable";
 import { Modal } from "@/components/Modal";
+import type { ReactNode } from "react";
 import type { Team } from "@/types";
 
 type LeagueTableCardProps = {
@@ -17,6 +18,8 @@ type LeagueTableCardProps = {
   compact?: boolean;
   className?: string;
   borderlessHeader?: boolean;
+  /** Controles opcionales (filtros) dentro de la tarjeta, encima de la tabla. */
+  toolbar?: ReactNode;
 };
 
 export function LeagueTableCard({
@@ -28,6 +31,7 @@ export function LeagueTableCard({
   compact = false,
   className,
   borderlessHeader = false,
+  toolbar,
 }: LeagueTableCardProps) {
   const modalTeams = fullTeams ?? teams;
   const [open, setOpen] = useState(false);
@@ -51,6 +55,7 @@ export function LeagueTableCard({
           </button>
         }
       >
+        {toolbar && <div className="mb-4 min-w-0 space-y-3">{toolbar}</div>}
         <LeagueTable teams={teams} highlightTeamId={highlightTeamId} compact={compact} />
       </Card>
 
