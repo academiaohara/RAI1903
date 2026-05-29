@@ -7,6 +7,7 @@ import { MatchPreviewModal } from "@/components/MatchPreviewModal";
 import { players, RAI_TEAM_ID } from "@/data/mock";
 import { getPreviaForMatch } from "@/lib/match-articles";
 import {
+  actualOutcome,
   formatGoalsPick,
   getAvilesGoalsPick,
   isAvilesMatch,
@@ -27,15 +28,66 @@ const scorerOptions = [
     .map((player) => ({ value: player.displayName, label: player.displayName })),
 ];
 
+export type PredictionFormMode = "edit" | "results" | "compare";
+
+function outcomeButtonClass({
+  mode,
+  outcome,
+  userOutcome,
+  actual,
+  selected,
+}: {
+  mode: PredictionFormMode;
+  outcome: PredictionOutcome;
+  userOutcome?: PredictionOutcome;
+  actual: PredictionOutcome | null;
+  selected: boolean;
+}): string {
+  const base =
+    "h-12 flex-1 rounded-2xl border text-lg font-extrabold transition disabled:cursor-not-allowed sm:w-12 sm:flex-none";
+
+  if (mode === "results") {
+    const isActual = actual === outcome;
+    return `${base} disabled:opacity-100 ${
+      isActual
+        ? "border-[#981915] bg-[#981915] text-white"
+        : "border-[#214C9B]/15 bg-slate-50 text-slate-400"
+    }`;
+  }
+
+  if (mode === "compare") {
+    const isUser = userOutcome === outcome;
+    const isActual = actual === outcome;
+    if (isUser && isActual) {
+      return `${base} border-[#981915] bg-[#214C9B] text-white ring-2 ring-[#981915] ring-offset-1 disabled:opacity-100`;
+    }
+    if (isUser) {
+      return `${base} border-[#214C9B] bg-[#214C9B] text-white disabled:opacity-100`;
+    }
+    if (isActual) {
+      return `${base} border-[#981915] bg-[#981915] text-white disabled:opacity-100`;
+    }
+    return `${base} border-[#214C9B]/15 bg-slate-50 text-slate-400 disabled:opacity-70`;
+  }
+
+  return `${base} disabled:opacity-70 ${
+    selected
+      ? "border-[#214C9B] bg-[#214C9B] text-white"
+      : "border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50"
+  }`;
+}
+
 export function PredictionForm({
   match,
   prediction,
   readOnly,
+  mode = "edit",
   onChange,
 }: {
   match: Match;
   prediction?: Prediction;
   readOnly?: boolean;
+  mode?: PredictionFormMode;
   onChange: (prediction: Prediction) => void;
 }) {
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -50,6 +102,11 @@ export function PredictionForm({
       ? outcomeFromGoalsPicks(prediction.goalsHome, prediction.goalsAway)
       : null;
   const outcomeLocked = avilesMatch && isOutcomeLockedByGoals(prediction?.goalsHome, prediction?.goalsAway);
+  const displayMode = mode === "edit" ? "edit" : mode;
+  const isDisplayOnly = displayMode !== "edit";
+  const formReadOnly = readOnly || isDisplayOnly;
+  const actual = actualOutcome(match);
+  const userOutcome = (outcomeLocked ? derivedOutcome : prediction?.outcome) ?? undefined;
 
   const applyAvilesRules = (next: Prediction): Prediction => {
     const avilesGoals = getAvilesGoalsPick(match, next);
@@ -66,7 +123,7 @@ export function PredictionForm({
   };
 
   const update = (patch: Partial<Prediction>) => {
-    if (readOnly) return;
+    if (formReadOnly) return;
     const next: Prediction = {
       matchId: match.id,
       matchday: match.matchday,
@@ -99,7 +156,8 @@ export function PredictionForm({
                 {avilesMatch && (
                   <GoalsPickButtons
                     value={prediction?.goalsHome}
-                    readOnly={readOnly}
+                    readOnly={formReadOnly}
+                    highlightVariant={displayMode === "compare" ? "user" : displayMode === "results" ? "neutral" : "user"}
                     onPick={(pick) => handleAvilesGoalsPick(true, pick)}
                   />
                 )}
@@ -110,7 +168,8 @@ export function PredictionForm({
                 {avilesMatch && (
                   <GoalsPickButtons
                     value={prediction?.goalsAway}
-                    readOnly={readOnly}
+                    readOnly={formReadOnly}
+                    highlightVariant={displayMode === "compare" ? "user" : displayMode === "results" ? "neutral" : "user"}
                     onPick={(pick) => handleAvilesGoalsPick(false, pick)}
                   />
                 )}
@@ -134,7 +193,7 @@ export function PredictionForm({
               {avilesMatch && (
                 <ScorerCombobox
                   value={scorerLockedToNadie ? "nadie" : prediction?.scorer}
-                  readOnly={readOnly || scorerLockedToNadie}
+                  readOnly={formReadOnly || scorerLockedToNadie}
                   onChange={(scorer) => update({ scorer })}
                 />
               )}
@@ -144,18 +203,20 @@ export function PredictionForm({
           <div className="flex shrink-0 flex-wrap items-center gap-2">
             <div className="flex w-full items-center gap-2 sm:w-auto" aria-label="Prediccion 1 X 2">
               {outcomes.map((outcome) => {
-                const selected = (outcomeLocked ? derivedOutcome : prediction?.outcome) === outcome;
+                const selected = userOutcome === outcome;
                 return (
                   <button
                     key={outcome}
                     type="button"
-                    disabled={readOnly || outcomeLocked}
+                    disabled={formReadOnly || outcomeLocked}
                     onClick={() => update({ outcome })}
-                    className={`h-12 flex-1 rounded-2xl border text-lg font-extrabold transition disabled:cursor-not-allowed disabled:opacity-70 sm:w-12 sm:flex-none ${
-                      selected
-                        ? "border-[#214C9B] bg-[#214C9B] text-white"
-                        : "border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50"
-                    }`}
+                    className={outcomeButtonClass({
+                      mode: displayMode,
+                      outcome,
+                      userOutcome,
+                      actual,
+                      selected,
+                    })}
                   >
                     {outcome}
                   </button>
@@ -276,10 +337,12 @@ function ScorerCombobox({
 function GoalsPickButtons({
   value,
   readOnly,
+  highlightVariant = "user",
   onPick,
 }: {
   value?: GoalsPick;
   readOnly?: boolean;
+  highlightVariant?: "user" | "neutral";
   onPick: (pick: GoalsPick) => void;
 }) {
   return (
@@ -292,7 +355,9 @@ function GoalsPickButtons({
           onClick={() => onPick(option)}
           className={`h-9 w-9 rounded-xl border text-xs font-extrabold transition disabled:cursor-not-allowed disabled:opacity-70 ${
             value === option
-              ? "border-[#214C9B] bg-[#214C9B] text-white"
+              ? highlightVariant === "user"
+                ? "border-[#214C9B] bg-[#214C9B] text-white"
+                : "border-[#214C9B]/20 bg-white text-slate-700"
               : "border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50"
           }`}
         >

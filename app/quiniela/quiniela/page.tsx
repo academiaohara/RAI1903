@@ -8,9 +8,12 @@ import { PredictionForm } from "@/components/PredictionForm";
 import { QuinielaHowItWorks } from "@/components/QuinielaHowItWorks";
 import { CURRENT_QUINIELA_ROUND, matchdays } from "@/data/mock";
 import {
+  countFinishedMatches,
+  countOutcomeHits,
   getMatchdayByRound,
   hasFirstMatchStarted,
   isMatchdayComplete,
+  isMatchdayFullyFinished,
   sortQuinielaMatches,
 } from "@/lib/quiniela";
 import { loadPredictions, loadSavedRounds, savePredictions, saveRoundAsSaved } from "@/lib/storage";
@@ -42,16 +45,23 @@ export default function MiQuinielaPage() {
   const readOnly = isLocked || (isSaved && !isEditing);
   const canEdit = isSaved && !isLocked;
   const canSave = !isLocked && (!isSaved || isEditing);
+  const finishedMatches = countFinishedMatches(selectedMatchday);
+  const jornadaFinalizada = isMatchdayFullyFinished(selectedMatchday);
+  const hits = countOutcomeHits(selectedMatchday, predictions);
+  const showCompare = readOnly && (isLocked || finishedMatches > 0);
 
-  const updatePrediction = useCallback((prediction: Prediction) => {
-    setPredictions((current) => {
-      const next = { ...current, [prediction.matchId]: prediction };
-      if (!isSaved || isEditing) {
-        savePredictions(next);
-      }
-      return next;
-    });
-  }, [isSaved, isEditing]);
+  const updatePrediction = useCallback(
+    (prediction: Prediction) => {
+      setPredictions((current) => {
+        const next = { ...current, [prediction.matchId]: prediction };
+        if (!isSaved || isEditing) {
+          savePredictions(next);
+        }
+        return next;
+      });
+    },
+    [isSaved, isEditing],
+  );
 
   const handleSave = () => {
     if (!isMatchdayComplete(selectedMatchday, predictions)) {
@@ -78,8 +88,8 @@ export default function MiQuinielaPage() {
     <div className="space-y-6">
       <PageHero
         eyebrow="Quiniela"
-        title="Mi quiniela"
-        description="Rellena la quiniela de la jornada. Al guardar queda bloqueada hasta que pulses editar. Cuando empiece el primer partido ya no podras cambiarla."
+        title="Pronosticos"
+        description="Rellena tu quiniela de la jornada. Al guardar queda bloqueada hasta que pulses editar. Cuando empiece el primer partido ya no podras cambiarla."
       />
       <QuinielaHowItWorks />
       <JornadaSelector
@@ -88,6 +98,12 @@ export default function MiQuinielaPage() {
         currentRound={CURRENT_QUINIELA_ROUND}
         onChange={handleRoundChange}
       />
+
+      {hydrated && !isSaved && (
+        <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900">
+          No has hecho la quiniela de la jornada {round}. Rellena los partidos y pulsa Guardar.
+        </p>
+      )}
 
       {hydrated && isLocked && (
         <p className="rounded-2xl border border-[#981915]/30 bg-[#981915]/10 px-4 py-3 text-sm font-bold text-[#981915]">
@@ -100,7 +116,36 @@ export default function MiQuinielaPage() {
         </p>
       )}
 
-      <Card eyebrow={`Jornada ${selectedMatchday.round}`}>
+      {hydrated && jornadaFinalizada && (
+        <p className="rounded-2xl border border-[#981915]/30 bg-[#981915]/10 px-4 py-3 text-sm font-bold text-[#981915]">
+          La jornada {round} esta finalizada: todos los partidos tienen resultado oficial.
+        </p>
+      )}
+
+      <Card eyebrow={`Jornada ${selectedMatchday.round}`} title="Tu quiniela">
+        {hydrated && isSaved && finishedMatches > 0 && (
+          <p className="mb-4 text-sm font-bold text-slate-700">
+            Aciertos:{" "}
+            <span className="text-[#214C9B]">
+              {hits} de {finishedMatches}
+            </span>
+            {jornadaFinalizada ? " (jornada completa)" : " (partidos con resultado)"}
+          </p>
+        )}
+
+        {hydrated && showCompare && (
+          <div className="mb-4 flex flex-wrap gap-4 text-xs font-bold uppercase tracking-wide text-slate-600">
+            <span className="inline-flex items-center gap-2">
+              <span className="h-3 w-3 rounded bg-[#214C9B]" aria-hidden />
+              Tu pronostico
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <span className="h-3 w-3 rounded bg-[#981915]" aria-hidden />
+              Resultado real
+            </span>
+          </div>
+        )}
+
         <div className="space-y-4">
           {orderedMatches.map((match) => (
             <PredictionForm
@@ -108,6 +153,7 @@ export default function MiQuinielaPage() {
               match={match}
               prediction={predictions[match.id]}
               readOnly={readOnly}
+              mode={showCompare ? "compare" : "edit"}
               onChange={updatePrediction}
             />
           ))}
