@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/Badge";
-import { matchFixtureMeta } from "@/lib/competition-labels";
+import { CompetitionLogo } from "@/components/CompetitionLogo";
+import { matchCompetitionShortLabel, matchFixtureMeta } from "@/lib/competition-labels";
 import { getCronicaForMatch } from "@/lib/match-articles";
 import { getAvilesMatchResult } from "@/lib/fixtures";
 import { matchFixtureCardClassName } from "@/lib/match-card-styles";
@@ -29,7 +30,8 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
         <Badge tone={result === "W" ? "green" : result === "D" ? "amber" : result === "L" ? "red" : "slate"}>
           {result === "W" ? "Victoria" : result === "D" ? "Empate" : result === "L" ? "Derrota" : "Finalizado"}
         </Badge>
-        <span className="shrink-0 text-right text-[11px] font-bold uppercase leading-tight tracking-[0.06em] text-[#981915]">
+        <span className="flex shrink-0 items-center justify-end gap-1.5 text-right text-[11px] font-bold uppercase leading-tight tracking-[0.06em] text-[#981915]">
+          <CompetitionLogo competition={match.competition} alt={matchCompetitionShortLabel(match)} size="xs" />
           {matchFixtureMeta(match)}
         </span>
       </div>
