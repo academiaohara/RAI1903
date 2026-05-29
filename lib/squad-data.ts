@@ -1,5 +1,10 @@
 import { matchdays, players, playersFemenino, teams, teamsFemenino } from "@/data/mock";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
+import {
+  buildClubInfoFromImport,
+  buildSquadFromImport,
+  getImportedRivalSquad,
+} from "@/lib/rival-squad-imports";
 import { getTeamCrestById } from "@/lib/team-crests";
 import { matchToFinishedLeagueMatch } from "@/lib/standings";
 import { getPlayerRole } from "@/lib/player-roles";
@@ -170,7 +175,23 @@ function countCleanSheets(teamId: string): number {
     }, 0);
 }
 
+function getImportedMasculinoSquad(): SquadPlayer[] | null {
+  const team = teams.find((entry) => entry.id === RAI_TEAM_ID);
+  const imported = getImportedRivalSquad(RAI_TEAM_ID);
+  if (!team || !imported) return null;
+
+  return buildSquadFromImport(team, imported).map((player) => ({
+    ...player,
+    foto: getSquadPlayerPhoto(player.dorsal),
+  }));
+}
+
 export function getSquadPlayers(gender: PrimerEquipoGender): SquadPlayer[] {
+  if (gender === "masculino") {
+    const importedSquad = getImportedMasculinoSquad();
+    if (importedSquad) return importedSquad;
+  }
+
   const source = gender === "femenino" ? playersFemenino : players;
   const clubName = gender === "femenino" ? "Real Aviles Industrial Femenino" : "Real Aviles Industrial";
   return source.map((player) => toSquadPlayer(player, clubName, gender));
@@ -181,6 +202,20 @@ export function getSquadClubInfo(gender: PrimerEquipoGender): SquadClubInfo {
   const roster = gender === "femenino" ? teamsFemenino : teams;
   const team = roster.find((entry) => entry.id === teamId);
   const squad = getSquadPlayers(gender);
+
+  if (gender === "masculino" && team) {
+    const imported = getImportedRivalSquad(RAI_TEAM_ID);
+    if (imported) {
+      const club = buildClubInfoFromImport(team, imported);
+      return {
+        ...club,
+        stats: {
+          ...club.stats,
+          porteriasImbatidas: countCleanSheets(teamId),
+        },
+      };
+    }
+  }
 
   const stats = team?.stats ?? {
     played: 9,

@@ -6,7 +6,7 @@ import {
 } from "@/lib/rival-squad-imports";
 import { getRivalSquad, type RivalPlayer } from "@/lib/rival-squads";
 import { getSquadClubInfo, getSquadPlayers } from "@/lib/squad-data";
-import { STADIUM_ROMAN_SUAREZ_PHOTO } from "@/lib/squad-photos";
+import { getSquadPlayerPhoto, STADIUM_ROMAN_SUAREZ_PHOTO } from "@/lib/squad-photos";
 import { getTeamCrestById } from "@/lib/team-crests";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Team } from "@/types";
@@ -128,20 +128,30 @@ export function getCompeticionSquadData(
   gender: PrimerEquipoGender,
   team: Team,
 ): { club: SquadClubInfo; squad: SquadPlayer[]; isOwnClub: boolean } {
-  if (isRaiCompetitionTeam(team.id, gender)) {
+  const isOwnClub = isRaiCompetitionTeam(team.id, gender);
+  const imported = getImportedRivalSquad(team.id);
+
+  if (imported) {
+    const squad =
+      isOwnClub && gender === "masculino"
+        ? buildSquadFromImport(team, imported).map((player) => ({
+            ...player,
+            foto: getSquadPlayerPhoto(player.dorsal),
+          }))
+        : buildSquadFromImport(team, imported);
+
+    return {
+      club: isOwnClub ? getSquadClubInfo(gender) : buildClubInfoFromImport(team, imported),
+      squad,
+      isOwnClub,
+    };
+  }
+
+  if (isOwnClub) {
     return {
       club: getSquadClubInfo(gender),
       squad: getSquadPlayers(gender),
       isOwnClub: true,
-    };
-  }
-
-  const imported = getImportedRivalSquad(team.id);
-  if (imported) {
-    return {
-      club: buildClubInfoFromImport(team, imported),
-      squad: buildSquadFromImport(team, imported),
-      isOwnClub: false,
     };
   }
 

@@ -35,9 +35,18 @@ export function resolveTransferPlayerId(transfer: TransferRumor): string | undef
 }
 
 export function getSquadPlayerForTransfer(transfer: TransferRumor): SquadPlayer | undefined {
+  const squad = getSquadPlayers("masculino");
   const playerId = resolveTransferPlayerId(transfer);
-  if (!playerId) return undefined;
-  return getSquadPlayers("masculino").find((player) => player.id === playerId);
+  if (playerId) {
+    const byId = squad.find((player) => player.id === playerId);
+    if (byId) return byId;
+  }
+
+  const normalized = transfer.playerName.toLowerCase();
+  return squad.find((player) => {
+    const full = `${player.nombre} ${player.apellido}`.trim().toLowerCase();
+    return full === normalized;
+  });
 }
 
 /** Fichajes y renovaciones destacados para el carrusel de inicio. */

@@ -6,6 +6,8 @@ import { lugoSquadImport } from "@/data/rivals/lugo";
 import { meridaSquadImport } from "@/data/rivals/merida";
 import { ponferradinaSquadImport } from "@/data/rivals/ponferradina";
 import { pontevedraSquadImport } from "@/data/rivals/pontevedra";
+import { realAvilesIndustrialSquadImport } from "@/data/rivals/real-aviles-industrial";
+import { talaveraSquadImport } from "@/data/rivals/talavera";
 import { tenerifeSquadImport } from "@/data/rivals/tenerife";
 import { unionistasSquadImport } from "@/data/rivals/unionistas";
 import { zamoraSquadImport } from "@/data/rivals/zamora";
@@ -29,6 +31,8 @@ const RIVAL_SQUAD_IMPORTS: Record<string, RivalSquadImport> = {
   merida: meridaSquadImport,
   ponferradina: ponferradinaSquadImport,
   pontevedra: pontevedraSquadImport,
+  "real-aviles-industrial": realAvilesIndustrialSquadImport,
+  talavera: talaveraSquadImport,
   tenerife: tenerifeSquadImport,
   unionistas: unionistasSquadImport,
   zamora: zamoraSquadImport,
