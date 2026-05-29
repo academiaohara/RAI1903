@@ -1,23 +1,30 @@
 "use client";
 
+import { useMemo } from "react";
 import { Modal } from "@/components/Modal";
 import { players, teams } from "@/data/mock";
-import { getTeamById, isAvilesMatch } from "@/lib/quiniela";
-import type { FormCode, Match } from "@/types";
+import {
+  getTeamHomeAwayRecordBeforeRound,
+  getTeamsBeforeRound,
+  isAvilesMatch,
+} from "@/lib/quiniela";
+import type { HomeAwayRecord } from "@/lib/standings";
+import type { FormCode, Match, Team } from "@/types";
 
 const formLabel: Record<FormCode, string> = { G: "G", E: "E", P: "P" };
 
-function TeamPreviewBlock({ teamId, side }: { teamId: string; side: "home" | "away" }) {
-  const team = getTeamById(teamId) ?? teams[0];
-  const homePlayed = Math.max(1, Math.round(team.stats.played / 2));
-  const awayPlayed = Math.max(1, team.stats.played - homePlayed);
-  const homeWins = Math.round(team.stats.won * 0.6);
-  const awayWins = team.stats.won - homeWins;
+function TeamPreviewBlock({
+  team,
+  sideRecord,
+  side,
+  teamId,
+}: {
+  team: Team;
+  sideRecord: HomeAwayRecord;
+  side: "home" | "away";
+  teamId: string;
+}) {
   const sideLabel = side === "home" ? "Como local" : "Como visitante";
-  const sidePlayed = side === "home" ? homePlayed : awayPlayed;
-  const sideWins = side === "home" ? homeWins : awayWins;
-  const sideDraws = Math.round(team.stats.drawn / 2);
-  const sideLosses = sidePlayed - sideWins - sideDraws;
 
   const avilesUnavailable = teamId === "real-aviles-industrial"
     ? players.filter((player) => player.status === "lesionado" || player.status === "sancionado")
@@ -27,7 +34,10 @@ function TeamPreviewBlock({ teamId, side }: { teamId: string; side: "home" | "aw
     <div className="rounded-2xl border border-[#214C9B]/15 bg-slate-50 p-4">
       <p className="text-lg font-extrabold text-slate-900">{team.name}</p>
       <div className="mt-3 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
-        <p><span className="font-bold text-slate-500">Posicion:</span> {team.position}º</p>
+        <p>
+          <span className="font-bold text-slate-500">Posicion:</span>{" "}
+          {team.stats.played > 0 ? `${team.position}º` : "—"}
+        </p>
         <p><span className="font-bold text-slate-500">Puntos:</span> {team.stats.points}</p>
         <p><span className="font-bold text-slate-500">GF / GC:</span> {team.stats.goalsFor} / {team.stats.goalsAgainst}</p>
         <p>
@@ -38,7 +48,9 @@ function TeamPreviewBlock({ teamId, side }: { teamId: string; side: "home" | "aw
       <div className="mt-3 rounded-xl border border-[#214C9B]/10 bg-white p-3 text-sm">
         <p className="text-xs font-bold uppercase tracking-normal text-[#214C9B]">{sideLabel}</p>
         <p className="mt-1 text-slate-700">
-          {sideWins}V · {sideDraws}E · {sideLosses}D en {sidePlayed} partidos
+          {sideRecord.played > 0
+            ? `${sideRecord.wins}V · ${sideRecord.draws}E · ${sideRecord.losses}D en ${sideRecord.played} partidos`
+            : "Sin partidos previos en esta condicion"}
         </p>
       </div>
       {avilesUnavailable.length > 0 && (
@@ -61,13 +73,26 @@ function TeamPreviewBlock({ teamId, side }: { teamId: string; side: "home" | "aw
 }
 
 export function MatchPreviewModal({ match, open, onClose }: { match: Match; open: boolean; onClose: () => void }) {
+  const beforeRound = match.matchday;
+  const teamsBeforeRound = useMemo(() => getTeamsBeforeRound(beforeRound), [beforeRound]);
+  const homeTeam = teamsBeforeRound.find((team) => team.id === match.homeTeamId) ?? teams[0];
+  const awayTeam = teamsBeforeRound.find((team) => team.id === match.awayTeamId) ?? teams[0];
+  const homeSideRecord = useMemo(
+    () => getTeamHomeAwayRecordBeforeRound(match.homeTeamId, "home", beforeRound),
+    [match.homeTeamId, beforeRound],
+  );
+  const awaySideRecord = useMemo(
+    () => getTeamHomeAwayRecordBeforeRound(match.awayTeamId, "away", beforeRound),
+    [match.awayTeamId, beforeRound],
+  );
+
   if (isAvilesMatch(match)) return null;
 
   return (
     <Modal open={open} title={`Previa · ${match.homeTeam} vs ${match.awayTeam}`} onClose={onClose}>
       <div className="grid gap-4 md:grid-cols-2">
-        <TeamPreviewBlock teamId={match.homeTeamId} side="home" />
-        <TeamPreviewBlock teamId={match.awayTeamId} side="away" />
+        <TeamPreviewBlock team={homeTeam} sideRecord={homeSideRecord} side="home" teamId={match.homeTeamId} />
+        <TeamPreviewBlock team={awayTeam} sideRecord={awaySideRecord} side="away" teamId={match.awayTeamId} />
       </div>
     </Modal>
   );
