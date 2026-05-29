@@ -4,12 +4,13 @@ import Link from "next/link";
 import { Eye } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { MatchPreviewModal } from "@/components/MatchPreviewModal";
-import { MatchScoreCenter } from "@/components/MatchScoreCenter";
+import { OpponentCrest } from "@/components/OpponentCrest";
 import { players, RAI_TEAM_ID } from "@/data/mock";
 import { getPreviaForMatch } from "@/lib/match-articles";
 import {
   actualOutcome,
   formatGoalsPick,
+  getActualGoalsPicks,
   getAvilesGoalsPick,
   getTeamById,
   isAvilesMatch,
@@ -18,6 +19,7 @@ import {
 } from "@/lib/quiniela";
 import { getTeamCrestById } from "@/lib/team-crests";
 import { primerEquipoBase } from "@/lib/primer-equipo";
+import { cn } from "@/lib/utils";
 import type { GoalsPick, Match, Prediction, PredictionOutcome } from "@/types";
 import type { Route } from "next";
 
@@ -112,6 +114,7 @@ export function PredictionForm({
   const userOutcome = (outcomeLocked ? derivedOutcome : prediction?.outcome) ?? undefined;
   const homeCrest = getTeamCrestById(match.homeTeamId, getTeamById(match.homeTeamId)?.crestInitials);
   const awayCrest = getTeamCrestById(match.awayTeamId, getTeamById(match.awayTeamId)?.crestInitials);
+  const actualGoals = getActualGoalsPicks(match);
 
   const applyAvilesRules = (next: Prediction): Prediction => {
     const avilesGoals = getAvilesGoalsPick(match, next);
@@ -152,38 +155,33 @@ export function PredictionForm({
 
   return (
     <>
-      <div className="overflow-hidden rounded-2xl border border-[#214C9B]/20 bg-white shadow-[0_10px_24px_rgba(17,24,39,0.05)]">
-        <MatchScoreCenter
-          homeLogo={homeCrest}
-          homeTeam={match.homeTeam}
-          awayLogo={awayCrest}
-          awayTeam={match.awayTeam}
-          centerLabel="vs"
-          className="w-full min-w-0 rounded-none"
-        />
-        <div className="space-y-4 p-4">
+      <div className="rounded-2xl border border-[#214C9B]/20 bg-white p-4 shadow-[0_10px_24px_rgba(17,24,39,0.05)]">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
           <div className="min-w-0 flex-1">
             <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4">
-              <div className="flex min-w-0 flex-col gap-2 rounded-xl bg-slate-50 p-3 sm:flex-row sm:items-center sm:bg-transparent sm:p-0">
-                <p className="min-w-0 break-words font-extrabold leading-tight text-slate-800">{match.homeTeam}</p>
+              <div className="flex min-w-0 items-center gap-2 rounded-xl bg-slate-50 p-3 sm:bg-transparent sm:p-0">
+                <OpponentCrest logo={homeCrest} opponent={match.homeTeam} size="sm" className="shrink-0" />
+                <p className="min-w-0 truncate font-extrabold leading-tight text-slate-800">{match.homeTeam}</p>
                 {avilesMatch && (
                   <GoalsPickButtons
                     value={prediction?.goalsHome}
+                    actual={actualGoals.home}
+                    mode={displayMode}
                     readOnly={formReadOnly}
-                    highlightVariant={displayMode === "compare" ? "user" : displayMode === "results" ? "neutral" : "user"}
                     onPick={(pick) => handleAvilesGoalsPick(true, pick)}
                   />
                 )}
               </div>
-              <span className="self-center text-xs font-bold uppercase text-slate-400">vs</span>
-              <div className="flex min-w-0 flex-col gap-2 rounded-xl bg-slate-50 p-3 sm:flex-row sm:items-center sm:bg-transparent sm:p-0">
-                <p className="min-w-0 break-words font-extrabold leading-tight text-slate-800">{match.awayTeam}</p>
+              <span className="self-center shrink-0 text-xs font-bold uppercase text-slate-400">vs</span>
+              <div className="flex min-w-0 items-center gap-2 rounded-xl bg-slate-50 p-3 sm:bg-transparent sm:p-0">
+                <OpponentCrest logo={awayCrest} opponent={match.awayTeam} size="sm" className="shrink-0" />
+                <p className="min-w-0 truncate font-extrabold leading-tight text-slate-800">{match.awayTeam}</p>
                 {avilesMatch && (
                   <GoalsPickButtons
                     value={prediction?.goalsAway}
+                    actual={actualGoals.away}
+                    mode={displayMode}
                     readOnly={formReadOnly}
-                    highlightVariant={displayMode === "compare" ? "user" : displayMode === "results" ? "neutral" : "user"}
                     onPick={(pick) => handleAvilesGoalsPick(false, pick)}
                   />
                 )}
@@ -238,7 +236,6 @@ export function PredictionForm({
               })}
             </div>
           </div>
-        </div>
         </div>
       </div>
 
@@ -349,32 +346,77 @@ function ScorerCombobox({
   );
 }
 
+function goalsButtonClass({
+  mode,
+  option,
+  value,
+  actual,
+}: {
+  mode: PredictionFormMode;
+  option: GoalsPick;
+  value?: GoalsPick;
+  actual: GoalsPick | null;
+}): string {
+  const base =
+    "h-9 w-9 rounded-xl border text-xs font-extrabold transition disabled:cursor-not-allowed sm:w-9";
+
+  const isUser = value === option;
+  const isActual = actual === option;
+
+  if (mode === "results") {
+    return `${base} disabled:opacity-100 ${
+      isActual
+        ? "border-[#981915] bg-[#981915] text-white"
+        : "border-[#214C9B]/15 bg-slate-50 text-slate-400"
+    }`;
+  }
+
+  if (mode === "compare") {
+    if (isUser && isActual) {
+      return `${base} border-[#981915] bg-[#214C9B] text-white ring-2 ring-[#981915] ring-offset-1 disabled:opacity-100`;
+    }
+    if (isUser) {
+      return `${base} border-[#214C9B] bg-[#214C9B] text-white disabled:opacity-100`;
+    }
+    if (isActual) {
+      return `${base} border-[#981915] bg-[#981915] text-white disabled:opacity-100`;
+    }
+    return `${base} border-[#214C9B]/15 bg-slate-50 text-slate-400 disabled:opacity-70`;
+  }
+
+  return cn(
+    base,
+    "disabled:opacity-70",
+    isUser
+      ? "border-[#214C9B] bg-[#214C9B] text-white"
+      : "border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50",
+  );
+}
+
 function GoalsPickButtons({
   value,
+  actual,
+  mode = "edit",
   readOnly,
-  highlightVariant = "user",
   onPick,
 }: {
   value?: GoalsPick;
+  actual?: GoalsPick | null;
+  mode?: PredictionFormMode;
   readOnly?: boolean;
-  highlightVariant?: "user" | "neutral";
   onPick: (pick: GoalsPick) => void;
 }) {
+  const resolvedActual = actual ?? null;
+
   return (
-    <div className="grid grid-cols-4 gap-1 sm:flex">
+    <div className="ml-auto grid shrink-0 grid-cols-4 gap-1 sm:ml-0 sm:flex" aria-label="Goles">
       {goalOptions.map((option) => (
         <button
           key={String(option)}
           type="button"
           disabled={readOnly}
           onClick={() => onPick(option)}
-          className={`h-9 w-9 rounded-xl border text-xs font-extrabold transition disabled:cursor-not-allowed disabled:opacity-70 ${
-            value === option
-              ? highlightVariant === "user"
-                ? "border-[#214C9B] bg-[#214C9B] text-white"
-                : "border-[#214C9B]/20 bg-white text-slate-700"
-              : "border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50"
-          }`}
+          className={goalsButtonClass({ mode, option, value, actual: resolvedActual })}
         >
           {formatGoalsPick(option)}
         </button>
