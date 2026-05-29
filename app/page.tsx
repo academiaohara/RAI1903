@@ -137,9 +137,11 @@ export default function HomePage() {
         >
           <div className="space-y-3">
             {upcomingMatches.length > 0 ? (
-              upcomingMatches.map((match) => <MatchCard key={match.id} match={match} />)
+              upcomingMatches.map((match) => <MatchCard key={match.id} match={match} compact />)
             ) : (
-              <p className="text-sm font-bold text-slate-500">No hay proximos partidos actualmente.</p>
+              <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 p-4 text-sm font-bold text-slate-500">
+                No hay proximos partidos actualmente.
+              </p>
             )}
           </div>
         </Card>
@@ -159,17 +161,19 @@ export default function HomePage() {
             <CalendarNavButton href={`${primerEquipoBase("masculino")}/calendario` as Route} />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-3">
+        <div className="grid grid-cols-2 items-start gap-6">
+          <div className="flex flex-col gap-3">
             {latestMatches.map((match) => (
               <RecentMatchCard key={match.id} match={match} />
             ))}
           </div>
-          <div className="space-y-3">
+          <div className="flex flex-col gap-3">
             {upcomingMatches.length > 0 ? (
-              upcomingMatches.map((match) => <MatchCard key={match.id} match={match} />)
+              upcomingMatches.map((match) => <MatchCard key={match.id} match={match} compact />)
             ) : (
-              <p className="text-sm font-bold text-slate-500">No hay proximos partidos actualmente.</p>
+              <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 p-4 text-sm font-bold text-slate-500">
+                No hay proximos partidos actualmente.
+              </p>
             )}
           </div>
         </div>
