@@ -4,7 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Calendar, MapPin, Ruler, Scale, X } from "lucide-react";
 import type { SquadModalTab, SquadPlayer } from "@/types/squad";
-import { formatBirthDate, formatContractDate, getPlayerFullName } from "@/lib/squad-utils";
+import {
+  formatBirthDate,
+  formatContractDate,
+  formatPlayerAgeWithUnit,
+  getPlayerFullName,
+} from "@/lib/squad-utils";
 import { getTransferForPlayer, getTransferKind } from "@/lib/fichajes";
 import { getPlayerClubAnnouncementNews, getPlayerNews } from "@/lib/player-news";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
@@ -83,7 +88,7 @@ function PlayerModalContent({ player, onClose }: { player: SquadPlayer; onClose:
             </span>
             <h2 className="mt-3 text-3xl font-extrabold uppercase tracking-tight sm:text-4xl">{playerName}</h2>
             <p className="mt-2 text-sm font-semibold text-white/80">
-              {player.nacionalidad} · {player.edad} anos
+              {player.nacionalidad} · {formatPlayerAgeWithUnit(player.edad)}
             </p>
 
             <div className="mt-4 grid grid-cols-2 gap-2 text-left text-xs font-semibold sm:grid-cols-3">

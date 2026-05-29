@@ -113,10 +113,20 @@ export function filterSquadPlayers(
 }
 
 export function formatContractDate(isoDate: string): string {
+  if (!isoDate || isoDate === "—") return "—";
   return isoDate.slice(0, 4);
 }
 
+export function formatPlayerAge(edad: number): string {
+  return edad > 0 ? String(edad) : "—";
+}
+
+export function formatPlayerAgeWithUnit(edad: number): string {
+  return edad > 0 ? `${edad} anos` : "—";
+}
+
 export function formatBirthDate(isoDate: string): string {
+  if (!isoDate) return "—";
   const date = new Date(isoDate);
   return date.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
 }

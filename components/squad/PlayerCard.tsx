@@ -2,7 +2,12 @@
 
 import { motion } from "framer-motion";
 import type { SquadPlayer } from "@/types/squad";
-import { getNationalityFlag, getPlayerDisplayName, getPlayerFullName } from "@/lib/squad-utils";
+import {
+  formatPlayerAgeWithUnit,
+  getNationalityFlag,
+  getPlayerDisplayName,
+  getPlayerFullName,
+} from "@/lib/squad-utils";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 
 type SquadPlayerCardProps = {
@@ -43,7 +48,7 @@ export function PlayerCard({ player, onSelect, index = 0, variant = "default" }:
             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#214C9B]/70">{player.rol}</p>
             <h3 className="mt-1 text-lg font-extrabold uppercase leading-tight text-slate-900">{getPlayerFullName(player)}</h3>
             <p className="text-xs font-semibold text-slate-500">
-              {player.edad} anos · {player.nacionalidad}
+              {formatPlayerAgeWithUnit(player.edad)} · {player.nacionalidad}
             </p>
           </div>
 
