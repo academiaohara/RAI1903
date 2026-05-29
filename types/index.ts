@@ -235,6 +235,9 @@ export type CalendarMatch = {
   date: string;
   opponent: string;
   opponentLogo: string;
+  homeTeam: string;
+  awayTeam: string;
+  venue: string;
   competition: CompetitionId;
   competitionStage?: string;
   matchday?: number;
@@ -242,9 +245,13 @@ export type CalendarMatch = {
   time: string | null;
   played: boolean;
   result: string | null;
+  homeScore?: number;
+  awayScore?: number;
   chronicleUrl: string | null;
   previaUrl: string | null;
 };
+
+export type CalendarViewMode = "mes" | "lista";
 
 export type MatchArticle = {
   id: string;

@@ -2,12 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarListView } from "@/components/CalendarListView";
 import { CalendarMatchCell } from "@/components/CalendarMatchCell";
+import { CalendarViewToggle } from "@/components/CalendarViewToggle";
 import { buildSingleCalendarMonth, isUtcToday, WEEKDAY_LABELS } from "@/lib/calendar";
 import { matchCompetitionShortLabel } from "@/lib/competition-labels";
 import { getCompetitionAccentClass } from "@/lib/competition-styles";
 import { cn } from "@/lib/utils";
-import type { CalendarMatch } from "@/types";
+import type { CalendarMatch, CalendarViewMode } from "@/types";
 
 type TeamCalendarProps = {
   matches: CalendarMatch[];
@@ -41,6 +43,7 @@ function initialViewDate(matches: CalendarMatch[]): { year: number; month: numbe
 
 export function TeamCalendar({ matches, className }: TeamCalendarProps) {
   const initial = initialViewDate(matches);
+  const [viewMode, setViewMode] = useState<CalendarViewMode>("mes");
   const [viewYear, setViewYear] = useState(initial.year);
   const [viewMonth, setViewMonth] = useState(initial.month);
 
@@ -70,81 +73,92 @@ export function TeamCalendar({ matches, className }: TeamCalendarProps) {
 
   return (
     <div className={cn("space-y-4", className)}>
-      <div className="flex items-center justify-center gap-1 sm:gap-2" role="group" aria-label="Navegación del calendario">
-        <button
-          type="button"
-          onClick={goPrev}
-          className="inline-flex shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 p-2 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
-          aria-label="Mes anterior"
-        >
-          <ChevronLeft size={18} />
-        </button>
-        <h3
-          id={`cal-month-${month.key}`}
-          className="min-w-[9rem] flex-1 text-center text-base font-extrabold capitalize tracking-tight text-[#214C9B] sm:min-w-[11rem] sm:text-lg"
-        >
-          {monthLabel}
-        </h3>
-        <button
-          type="button"
-          onClick={goNext}
-          className="inline-flex shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 p-2 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
-          aria-label="Mes siguiente"
-        >
-          <ChevronRight size={18} />
-        </button>
-      </div>
-
-      <div className="hidden lg:block">
-        <div className="mb-1.5 grid grid-cols-7 gap-1.5">
-          {WEEKDAY_LABELS.map((label) => (
-            <span key={label} className="text-center text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">
-              {label}
-            </span>
-          ))}
-        </div>
-        <div className="grid grid-cols-7 items-start gap-2">
-          {month.weeks.flat().map((cell, index) => {
-            if (!cell) {
-              return <div key={`${month.key}-empty-${index}`} className={PLACEHOLDER_CELL_CLASS} aria-hidden />;
-            }
-            const today = isUtcToday(month.year, month.month, cell.day);
-            if (!cell.match) {
-              return (
-                <div key={`${month.key}-day-${cell.day}`} className={EMPTY_CELL_CLASS}>
-                  <span
-                    className={
-                      today
-                        ? TODAY_DAY_CLASS
-                        : "inline-flex min-w-[1.75rem] items-center justify-center text-sm font-bold text-slate-400"
-                    }
-                  >
-                    {cell.day}
-                  </span>
-                </div>
-              );
-            }
-            return (
-              <CalendarMatchCell
-                key={cell.match.id}
-                match={cell.match}
-                day={cell.day}
-                isToday={today}
-                todayDayClassName={TODAY_DAY_CLASS}
-              />
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2 lg:hidden">
-        {monthMatchesInOrder(month).map((match) => (
-          <MobileCalendarCard key={match.id} match={match} />
-        ))}
-        {monthMatchesInOrder(month).length === 0 && (
-          <p className="col-span-full text-center text-sm font-bold text-slate-500">Sin partidos este mes.</p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <CalendarViewToggle value={viewMode} onChange={setViewMode} />
+        {viewMode === "mes" && (
+          <div className="flex items-center justify-center gap-1 sm:gap-2 sm:justify-end" role="group" aria-label="Navegación del calendario">
+            <button
+              type="button"
+              onClick={goPrev}
+              className="inline-flex shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 p-2 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
+              aria-label="Mes anterior"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <h3
+              id={`cal-month-${month.key}`}
+              className="min-w-[9rem] flex-1 text-center text-base font-extrabold capitalize tracking-tight text-[#214C9B] sm:min-w-[11rem] sm:flex-none sm:text-lg"
+            >
+              {monthLabel}
+            </h3>
+            <button
+              type="button"
+              onClick={goNext}
+              className="inline-flex shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 p-2 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
+              aria-label="Mes siguiente"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
         )}
       </div>
+
+      {viewMode === "lista" ? (
+        <CalendarListView key="lista" matches={matches} />
+      ) : (
+        <>
+          <div className="hidden lg:block">
+            <div className="mb-1.5 grid grid-cols-7 gap-1.5">
+              {WEEKDAY_LABELS.map((label) => (
+                <span key={label} className="text-center text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">
+                  {label}
+                </span>
+              ))}
+            </div>
+            <div className="grid grid-cols-7 items-start gap-2">
+              {month.weeks.flat().map((cell, index) => {
+                if (!cell) {
+                  return <div key={`${month.key}-empty-${index}`} className={PLACEHOLDER_CELL_CLASS} aria-hidden />;
+                }
+                const today = isUtcToday(month.year, month.month, cell.day);
+                if (!cell.match) {
+                  return (
+                    <div key={`${month.key}-day-${cell.day}`} className={EMPTY_CELL_CLASS}>
+                      <span
+                        className={
+                          today
+                            ? TODAY_DAY_CLASS
+                            : "inline-flex min-w-[1.75rem] items-center justify-center text-sm font-bold text-slate-400"
+                        }
+                      >
+                        {cell.day}
+                      </span>
+                    </div>
+                  );
+                }
+                return (
+                  <CalendarMatchCell
+                    key={cell.match.id}
+                    match={cell.match}
+                    day={cell.day}
+                    isToday={today}
+                    todayDayClassName={TODAY_DAY_CLASS}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:hidden">
+            {monthMatchesInOrder(month).map((match) => (
+              <MobileCalendarCard key={match.id} match={match} />
+            ))}
+            {monthMatchesInOrder(month).length === 0 && (
+              <p className="col-span-full text-center text-sm font-bold text-slate-500">Sin partidos este mes.</p>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

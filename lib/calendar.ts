@@ -44,6 +44,9 @@ export function matchToCalendarMatch(match: Match, gender: PrimerEquipoGender): 
     date: match.date,
     opponent: avilesHome ? match.awayTeam : match.homeTeam,
     opponentLogo: rival ? getTeamCrest(rival) : rivalId.slice(0, 3).toUpperCase(),
+    homeTeam: match.homeTeam,
+    awayTeam: match.awayTeam,
+    venue: match.venue,
     competition: match.competition,
     competitionStage: match.competitionStage,
     matchday: match.matchday,
@@ -51,6 +54,8 @@ export function matchToCalendarMatch(match: Match, gender: PrimerEquipoGender): 
     time: played ? null : hasTime ? formatKickoffTime(match.date) : null,
     played,
     result: avilesResult(match, RAI_TEAM_ID),
+    homeScore: match.homeScore,
+    awayScore: match.awayScore,
     chronicleUrl: cronica ? (`${primerEquipoBase(gender)}/cronicas/${cronica.id}` as Route) : null,
     previaUrl: !played && previa ? (`${primerEquipoBase(gender)}/previas/${previa.id}` as Route) : null,
   };
@@ -111,6 +116,68 @@ export function buildSingleCalendarMonth(year: number, month: number, matches: C
   );
 
   return { key, label, year, month, weeks: buildMonthGrid(year, month, monthMatches) };
+}
+
+export type CalendarMonthGroup = {
+  key: string;
+  label: string;
+  year: number;
+  month: number;
+  matches: CalendarMatch[];
+};
+
+export function groupCalendarMatchesByMonth(matches: CalendarMatch[]): CalendarMonthGroup[] {
+  if (matches.length === 0) return [];
+
+  const byMonth = new Map<string, CalendarMatch[]>();
+  for (const match of matches) {
+    const date = new Date(match.date);
+    const key = `${date.getUTCFullYear()}-${date.getUTCMonth()}`;
+    const bucket = byMonth.get(key) ?? [];
+    bucket.push(match);
+    byMonth.set(key, bucket);
+  }
+
+  return [...byMonth.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, monthMatches]) => {
+      const [yearStr, monthStr] = key.split("-");
+      const year = Number(yearStr);
+      const month = Number(monthStr);
+      const label = new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(
+        new Date(Date.UTC(year, month, 1)),
+      );
+
+      return {
+        key,
+        label,
+        year,
+        month,
+        matches: monthMatches.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
+      };
+    });
+}
+
+/** Match id to scroll to on list view mount: today if present, else next upcoming, else last played. */
+export function getListViewScrollTargetId(matches: CalendarMatch[]): string | null {
+  if (matches.length === 0) return null;
+
+  const now = new Date();
+  const todayYear = now.getUTCFullYear();
+  const todayMonth = now.getUTCMonth();
+  const todayDay = now.getUTCDate();
+
+  const todayMatch = matches.find((match) => {
+    const date = new Date(match.date);
+    return date.getUTCFullYear() === todayYear && date.getUTCMonth() === todayMonth && date.getUTCDate() === todayDay;
+  });
+  if (todayMatch) return todayMatch.id;
+
+  const todayStart = Date.UTC(todayYear, todayMonth, todayDay);
+  const upcoming = matches.find((match) => new Date(match.date).getTime() >= todayStart);
+  if (upcoming) return upcoming.id;
+
+  return matches[matches.length - 1].id;
 }
 
 export function buildCalendarMonths(matches: CalendarMatch[]): CalendarMonth[] {
