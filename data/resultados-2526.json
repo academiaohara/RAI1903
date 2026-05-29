@@ -1,0 +1,3615 @@
+{
+  "competicion": "Primera Federación Grupo 1 2025-2026",
+  "jornadas": [
+    {
+      "jornada": 38,
+      "partidos": [
+        {
+          "fecha": "2026-05-23",
+          "hora": "18:30",
+          "local": "Arenas Getxo",
+          "visitante": "Zamora",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-05-23",
+          "hora": "18:30",
+          "local": "Barakaldo",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-05-23",
+          "hora": "18:30",
+          "local": "Cacereño",
+          "visitante": "CF Talavera",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2026-05-23",
+          "hora": "18:30",
+          "local": "Guadalajara",
+          "visitante": "Real Madrid B",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        },
+        {
+          "fecha": "2026-05-23",
+          "hora": "18:30",
+          "local": "Lugo",
+          "visitante": "Arenteiro",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2026-05-23",
+          "hora": "18:30",
+          "local": "Osasuna B",
+          "visitante": "AD Mérida",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2026-05-23",
+          "hora": "18:30",
+          "local": "Ourense CF",
+          "visitante": "Tenerife",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2026-05-23",
+          "hora": "18:30",
+          "local": "Ponferradina",
+          "visitante": "Athletic Club B",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-05-23",
+          "hora": "18:30",
+          "local": "Pontevedra",
+          "visitante": "Real Avilés",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        },
+        {
+          "fecha": "2026-05-23",
+          "hora": "18:30",
+          "local": "Unionistas",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "resultado": "3-2"
+        }
+      ]
+    },
+    {
+      "jornada": 37,
+      "partidos": [
+        {
+          "fecha": "2026-05-17",
+          "hora": "17:00",
+          "local": "AD Mérida",
+          "visitante": "Unionistas",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-05-17",
+          "hora": "17:00",
+          "local": "Arenteiro",
+          "visitante": "Ponferradina",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2026-05-17",
+          "hora": "17:00",
+          "local": "Athletic Club B",
+          "visitante": "Guadalajara",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2026-05-17",
+          "hora": "17:00",
+          "local": "Celta de Vigo B",
+          "visitante": "Lugo",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2026-05-17",
+          "hora": "17:00",
+          "local": "CF Talavera",
+          "visitante": "Ourense CF",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2026-05-17",
+          "hora": "17:00",
+          "local": "Racing Club Ferrol",
+          "visitante": "Osasuna B",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2026-05-17",
+          "hora": "17:00",
+          "local": "Real Avilés",
+          "visitante": "Barakaldo",
+          "goles_local": 1,
+          "goles_visitante": 4,
+          "resultado": "1-4"
+        },
+        {
+          "fecha": "2026-05-17",
+          "hora": "17:00",
+          "local": "Real Madrid B",
+          "visitante": "Arenas Getxo",
+          "goles_local": 3,
+          "goles_visitante": 3,
+          "resultado": "3-3"
+        },
+        {
+          "fecha": "2026-05-17",
+          "hora": "17:00",
+          "local": "Tenerife",
+          "visitante": "Pontevedra",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "resultado": "3-0"
+        },
+        {
+          "fecha": "2026-05-17",
+          "hora": "17:00",
+          "local": "Zamora",
+          "visitante": "Cacereño",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        }
+      ]
+    },
+    {
+      "jornada": 36,
+      "partidos": [
+        {
+          "fecha": "2026-05-10",
+          "hora": "16:30",
+          "local": "Ourense CF",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 2,
+          "goles_visitante": 4,
+          "resultado": "2-4"
+        },
+        {
+          "fecha": "2026-05-10",
+          "hora": "14:15",
+          "local": "Lugo",
+          "visitante": "Zamora",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "resultado": "1-3"
+        },
+        {
+          "fecha": "2026-05-10",
+          "hora": "12:00",
+          "local": "Osasuna B",
+          "visitante": "CF Talavera",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2026-05-09",
+          "hora": "21:00",
+          "local": "Cacereño",
+          "visitante": "Real Madrid B",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "resultado": "4-1"
+        },
+        {
+          "fecha": "2026-05-09",
+          "hora": "18:30",
+          "local": "Guadalajara",
+          "visitante": "Arenteiro",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2026-05-09",
+          "hora": "18:30",
+          "local": "Ponferradina",
+          "visitante": "Real Avilés",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "resultado": "3-1"
+        },
+        {
+          "fecha": "2026-05-09",
+          "hora": "18:30",
+          "local": "Unionistas",
+          "visitante": "Tenerife",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2026-05-09",
+          "hora": "16:15",
+          "local": "Pontevedra",
+          "visitante": "Athletic Club B",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "resultado": "4-0"
+        },
+        {
+          "fecha": "2026-05-09",
+          "hora": "14:00",
+          "local": "Barakaldo",
+          "visitante": "AD Mérida",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2026-05-08",
+          "hora": "20:30",
+          "local": "Arenas Getxo",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        }
+      ]
+    },
+    {
+      "jornada": 35,
+      "partidos": [
+        {
+          "fecha": "2026-05-03",
+          "hora": "16:00",
+          "local": "AD Mérida",
+          "visitante": "Lugo",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "resultado": "0-2"
+        },
+        {
+          "fecha": "2026-05-03",
+          "hora": "16:00",
+          "local": "Athletic Club B",
+          "visitante": "Ourense CF",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        },
+        {
+          "fecha": "2026-05-03",
+          "hora": "12:00",
+          "local": "Arenteiro",
+          "visitante": "Cacereño",
+          "goles_local": 0,
+          "goles_visitante": 4,
+          "resultado": "0-4"
+        },
+        {
+          "fecha": "2026-05-02",
+          "hora": "21:00",
+          "local": "Real Madrid B",
+          "visitante": "Unionistas",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-05-02",
+          "hora": "18:30",
+          "local": "CF Talavera",
+          "visitante": "Arenas Getxo",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2026-05-02",
+          "hora": "18:30",
+          "local": "Real Avilés",
+          "visitante": "Guadalajara",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        },
+        {
+          "fecha": "2026-05-02",
+          "hora": "18:30",
+          "local": "Zamora",
+          "visitante": "Ponferradina",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "resultado": "3-0"
+        },
+        {
+          "fecha": "2026-05-02",
+          "hora": "16:15",
+          "local": "Racing Club Ferrol",
+          "visitante": "Pontevedra",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2026-05-01",
+          "hora": "19:00",
+          "local": "Tenerife",
+          "visitante": "Barakaldo",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2026-05-01",
+          "hora": "16:15",
+          "local": "Celta de Vigo B",
+          "visitante": "Osasuna B",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        }
+      ]
+    },
+    {
+      "jornada": 34,
+      "partidos": [
+        {
+          "fecha": "2026-04-26",
+          "hora": "20:30",
+          "local": "Racing Club Ferrol",
+          "visitante": "Real Avilés",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        },
+        {
+          "fecha": "2026-04-26",
+          "hora": "18:15",
+          "local": "Unionistas",
+          "visitante": "Athletic Club B",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-04-26",
+          "hora": "16:00",
+          "local": "Ourense CF",
+          "visitante": "Zamora",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2026-04-25",
+          "hora": "21:00",
+          "local": "CF Talavera",
+          "visitante": "Real Madrid B",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2026-04-25",
+          "hora": "18:30",
+          "local": "Barakaldo",
+          "visitante": "Lugo",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "resultado": "3-0"
+        },
+        {
+          "fecha": "2026-04-25",
+          "hora": "18:30",
+          "local": "Ponferradina",
+          "visitante": "Tenerife",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-04-25",
+          "hora": "16:15",
+          "local": "Osasuna B",
+          "visitante": "Arenteiro",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-04-25",
+          "hora": "16:15",
+          "local": "Pontevedra",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-04-24",
+          "hora": "21:15",
+          "local": "Cacereño",
+          "visitante": "Guadalajara",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-04-24",
+          "hora": "20:30",
+          "local": "Arenas Getxo",
+          "visitante": "AD Mérida",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        }
+      ]
+    },
+    {
+      "jornada": 33,
+      "partidos": [
+        {
+          "fecha": "2026-04-19",
+          "hora": "20:30",
+          "local": "Lugo",
+          "visitante": "CF Talavera",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2026-04-19",
+          "hora": "18:15",
+          "local": "Guadalajara",
+          "visitante": "Pontevedra",
+          "goles_local": 1,
+          "goles_visitante": 4,
+          "resultado": "1-4"
+        },
+        {
+          "fecha": "2026-04-19",
+          "hora": "16:00",
+          "local": "Arenteiro",
+          "visitante": "AD Mérida",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "resultado": "0-2"
+        },
+        {
+          "fecha": "2026-04-19",
+          "hora": "16:00",
+          "local": "Ponferradina",
+          "visitante": "Barakaldo",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-04-19",
+          "hora": "16:00",
+          "local": "Zamora",
+          "visitante": "Osasuna B",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-04-19",
+          "hora": "12:00",
+          "local": "Athletic Club B",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2026-04-18",
+          "hora": "18:30",
+          "local": "Tenerife",
+          "visitante": "Arenas Getxo",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2026-04-18",
+          "hora": "16:15",
+          "local": "Real Avilés",
+          "visitante": "Unionistas",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-04-17",
+          "hora": "19:00",
+          "local": "Celta de Vigo B",
+          "visitante": "Cacereño",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "resultado": "3-0"
+        },
+        {
+          "fecha": "2026-04-14",
+          "hora": "17:00",
+          "local": "Real Madrid B",
+          "visitante": "Ourense CF",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        }
+      ]
+    },
+    {
+      "jornada": 32,
+      "partidos": [
+        {
+          "fecha": "2026-04-12",
+          "hora": "18:15",
+          "local": "AD Mérida",
+          "visitante": "Tenerife",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-04-12",
+          "hora": "16:00",
+          "local": "Arenas Getxo",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 0,
+          "goles_visitante": 5,
+          "resultado": "0-5"
+        },
+        {
+          "fecha": "2026-04-12",
+          "hora": "16:00",
+          "local": "Barakaldo",
+          "visitante": "Arenteiro",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-04-12",
+          "hora": "16:00",
+          "local": "CF Talavera",
+          "visitante": "Zamora",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2026-04-12",
+          "hora": "16:00",
+          "local": "Pontevedra",
+          "visitante": "Ponferradina",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "resultado": "3-1"
+        },
+        {
+          "fecha": "2026-04-12",
+          "hora": "16:00",
+          "local": "Unionistas",
+          "visitante": "Guadalajara",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-04-11",
+          "hora": "21:00",
+          "local": "Racing Club Ferrol",
+          "visitante": "Real Madrid B",
+          "goles_local": 0,
+          "goles_visitante": 5,
+          "resultado": "0-5"
+        },
+        {
+          "fecha": "2026-04-11",
+          "hora": "16:15",
+          "local": "Osasuna B",
+          "visitante": "Real Avilés",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2026-04-11",
+          "hora": "16:15",
+          "local": "Ourense CF",
+          "visitante": "Lugo",
+          "goles_local": 4,
+          "goles_visitante": 2,
+          "resultado": "4-2"
+        },
+        {
+          "fecha": "2026-04-10",
+          "hora": "21:15",
+          "local": "Cacereño",
+          "visitante": "Athletic Club B",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        }
+      ]
+    },
+    {
+      "jornada": 28,
+      "partidos": [
+        {
+          "fecha": "2026-04-08",
+          "hora": "19:00",
+          "local": "Arenas Getxo",
+          "visitante": "Pontevedra",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-03-15",
+          "hora": "20:30",
+          "local": "Unionistas",
+          "visitante": "Barakaldo",
+          "goles_local": 0,
+          "goles_visitante": 3,
+          "resultado": "0-3"
+        },
+        {
+          "fecha": "2026-03-15",
+          "hora": "16:00",
+          "local": "Cacereño",
+          "visitante": "Ponferradina",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2026-03-15",
+          "hora": "12:00",
+          "local": "Osasuna B",
+          "visitante": "Athletic Club B",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2026-03-14",
+          "hora": "21:00",
+          "local": "CF Talavera",
+          "visitante": "Real Avilés",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-03-14",
+          "hora": "18:30",
+          "local": "Lugo",
+          "visitante": "Real Madrid B",
+          "goles_local": 0,
+          "goles_visitante": 4,
+          "resultado": "0-4"
+        },
+        {
+          "fecha": "2026-03-14",
+          "hora": "16:15",
+          "local": "Ourense CF",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-03-14",
+          "hora": "16:15",
+          "local": "Zamora",
+          "visitante": "Arenteiro",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-03-13",
+          "hora": "21:15",
+          "local": "Celta de Vigo B",
+          "visitante": "Tenerife",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-03-13",
+          "hora": "19:00",
+          "local": "AD Mérida",
+          "visitante": "Guadalajara",
+          "goles_local": 1,
+          "goles_visitante": 4,
+          "resultado": "1-4"
+        }
+      ]
+    },
+    {
+      "jornada": 31,
+      "partidos": [
+        {
+          "fecha": "2026-04-05",
+          "hora": "20:30",
+          "local": "Real Avilés",
+          "visitante": "Ourense CF",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2026-04-05",
+          "hora": "18:15",
+          "local": "Lugo",
+          "visitante": "Osasuna B",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2026-04-05",
+          "hora": "16:00",
+          "local": "Zamora",
+          "visitante": "Unionistas",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "resultado": "2-3"
+        },
+        {
+          "fecha": "2026-04-05",
+          "hora": "12:00",
+          "local": "Arenteiro",
+          "visitante": "Arenas Getxo",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2026-04-04",
+          "hora": "21:00",
+          "local": "Ponferradina",
+          "visitante": "AD Mérida",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "resultado": "4-1"
+        },
+        {
+          "fecha": "2026-04-04",
+          "hora": "18:30",
+          "local": "Athletic Club B",
+          "visitante": "CF Talavera",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2026-04-04",
+          "hora": "18:30",
+          "local": "Tenerife",
+          "visitante": "Cacereño",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-04-04",
+          "hora": "16:15",
+          "local": "Pontevedra",
+          "visitante": "Barakaldo",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2026-04-03",
+          "hora": "21:15",
+          "local": "Real Madrid B",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 5,
+          "goles_visitante": 1,
+          "resultado": "5-1"
+        },
+        {
+          "fecha": "2026-04-03",
+          "hora": "16:00",
+          "local": "Guadalajara",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        }
+      ]
+    },
+    {
+      "jornada": 30,
+      "partidos": [
+        {
+          "fecha": "2026-03-29",
+          "hora": "21:00",
+          "local": "Cacereño",
+          "visitante": "Lugo",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2026-03-29",
+          "hora": "12:00",
+          "local": "Celta de Vigo B",
+          "visitante": "Athletic Club B",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2026-03-29",
+          "hora": "12:00",
+          "local": "Osasuna B",
+          "visitante": "Guadalajara",
+          "goles_local": 4,
+          "goles_visitante": 3,
+          "resultado": "4-3"
+        },
+        {
+          "fecha": "2026-03-29",
+          "hora": "12:00",
+          "local": "Ourense CF",
+          "visitante": "Ponferradina",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2026-03-28",
+          "hora": "21:00",
+          "local": "CF Talavera",
+          "visitante": "Tenerife",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2026-03-28",
+          "hora": "18:30",
+          "local": "AD Mérida",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2026-03-28",
+          "hora": "18:30",
+          "local": "Arenas Getxo",
+          "visitante": "Real Avilés",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "resultado": "3-2"
+        },
+        {
+          "fecha": "2026-03-28",
+          "hora": "18:30",
+          "local": "Unionistas",
+          "visitante": "Arenteiro",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "resultado": "3-1"
+        },
+        {
+          "fecha": "2026-03-28",
+          "hora": "16:15",
+          "local": "Zamora",
+          "visitante": "Pontevedra",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2026-03-27",
+          "hora": "19:00",
+          "local": "Barakaldo",
+          "visitante": "Real Madrid B",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        }
+      ]
+    },
+    {
+      "jornada": 29,
+      "partidos": [
+        {
+          "fecha": "2026-03-22",
+          "hora": "18:15",
+          "local": "Racing Club Ferrol",
+          "visitante": "Barakaldo",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2026-03-22",
+          "hora": "18:15",
+          "local": "Real Avilés",
+          "visitante": "Cacereño",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-03-22",
+          "hora": "16:00",
+          "local": "Lugo",
+          "visitante": "Arenas Getxo",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-03-22",
+          "hora": "16:00",
+          "local": "Tenerife",
+          "visitante": "Osasuna B",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-03-22",
+          "hora": "12:00",
+          "local": "Guadalajara",
+          "visitante": "CF Talavera",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-03-21",
+          "hora": "21:00",
+          "local": "Ponferradina",
+          "visitante": "Unionistas",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "resultado": "3-1"
+        },
+        {
+          "fecha": "2026-03-21",
+          "hora": "16:15",
+          "local": "Pontevedra",
+          "visitante": "Ourense CF",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2026-03-21",
+          "hora": "14:00",
+          "local": "Real Madrid B",
+          "visitante": "Zamora",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        },
+        {
+          "fecha": "2026-03-20",
+          "hora": "20:30",
+          "local": "Arenteiro",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-03-20",
+          "hora": "19:00",
+          "local": "Athletic Club B",
+          "visitante": "AD Mérida",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        }
+      ]
+    },
+    {
+      "jornada": 27,
+      "partidos": [
+        {
+          "fecha": "2026-03-08",
+          "hora": "20:30",
+          "local": "Racing Club Ferrol",
+          "visitante": "Cacereño",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "resultado": "3-1"
+        },
+        {
+          "fecha": "2026-03-08",
+          "hora": "18:30",
+          "local": "Barakaldo",
+          "visitante": "Ourense CF",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-03-08",
+          "hora": "16:00",
+          "local": "Athletic Club B",
+          "visitante": "Arenas Getxo",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-03-08",
+          "hora": "16:00",
+          "local": "Guadalajara",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "resultado": "3-0"
+        },
+        {
+          "fecha": "2026-03-08",
+          "hora": "16:00",
+          "local": "Pontevedra",
+          "visitante": "Unionistas",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2026-03-08",
+          "hora": "12:00",
+          "local": "Real Avilés",
+          "visitante": "Zamora",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "resultado": "0-2"
+        },
+        {
+          "fecha": "2026-03-07",
+          "hora": "21:00",
+          "local": "AD Mérida",
+          "visitante": "CF Talavera",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2026-03-07",
+          "hora": "18:30",
+          "local": "Ponferradina",
+          "visitante": "Osasuna B",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2026-03-07",
+          "hora": "16:15",
+          "local": "Arenteiro",
+          "visitante": "Real Madrid B",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        },
+        {
+          "fecha": "2026-03-07",
+          "hora": "16:15",
+          "local": "Tenerife",
+          "visitante": "Lugo",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        }
+      ]
+    },
+    {
+      "jornada": 26,
+      "partidos": [
+        {
+          "fecha": "2026-03-01",
+          "hora": "18:15",
+          "local": "Zamora",
+          "visitante": "Guadalajara",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-03-01",
+          "hora": "12:00",
+          "local": "Arenas Getxo",
+          "visitante": "Barakaldo",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2026-03-01",
+          "hora": "12:00",
+          "local": "Real Madrid B",
+          "visitante": "Ponferradina",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2026-02-28",
+          "hora": "16:15",
+          "local": "Cacereño",
+          "visitante": "Unionistas",
+          "goles_local": 3,
+          "goles_visitante": 3,
+          "resultado": "3-3"
+        },
+        {
+          "fecha": "2026-02-28",
+          "hora": "16:15",
+          "local": "Osasuna B",
+          "visitante": "Pontevedra",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2026-02-28",
+          "hora": "16:15",
+          "local": "Ourense CF",
+          "visitante": "Arenteiro",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2026-02-28",
+          "hora": "16:00",
+          "local": "Celta de Vigo B",
+          "visitante": "AD Mérida",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-02-28",
+          "hora": "14:00",
+          "local": "CF Talavera",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "resultado": "3-1"
+        },
+        {
+          "fecha": "2026-02-27",
+          "hora": "21:15",
+          "local": "Tenerife",
+          "visitante": "Real Avilés",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        },
+        {
+          "fecha": "2026-02-27",
+          "hora": "19:00",
+          "local": "Lugo",
+          "visitante": "Athletic Club B",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        }
+      ]
+    },
+    {
+      "jornada": 25,
+      "partidos": [
+        {
+          "fecha": "2026-02-22",
+          "hora": "18:30",
+          "local": "Barakaldo",
+          "visitante": "Osasuna B",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-02-22",
+          "hora": "16:00",
+          "local": "AD Mérida",
+          "visitante": "Cacereño",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-02-22",
+          "hora": "16:00",
+          "local": "Guadalajara",
+          "visitante": "Ourense CF",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-02-21",
+          "hora": "21:00",
+          "local": "Real Avilés",
+          "visitante": "Real Madrid B",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-02-21",
+          "hora": "18:30",
+          "local": "Arenteiro",
+          "visitante": "Tenerife",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2026-02-21",
+          "hora": "18:30",
+          "local": "Pontevedra",
+          "visitante": "Lugo",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-02-21",
+          "hora": "18:30",
+          "local": "Unionistas",
+          "visitante": "Arenas Getxo",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2026-02-21",
+          "hora": "14:00",
+          "local": "Athletic Club B",
+          "visitante": "Zamora",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-02-20",
+          "hora": "21:15",
+          "local": "Ponferradina",
+          "visitante": "CF Talavera",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-02-20",
+          "hora": "19:00",
+          "local": "Racing Club Ferrol",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        }
+      ]
+    },
+    {
+      "jornada": 24,
+      "partidos": [
+        {
+          "fecha": "2026-02-15",
+          "hora": "16:00",
+          "local": "CF Talavera",
+          "visitante": "Arenteiro",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2026-02-15",
+          "hora": "16:00",
+          "local": "Lugo",
+          "visitante": "Guadalajara",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2026-02-15",
+          "hora": "12:00",
+          "local": "Celta de Vigo B",
+          "visitante": "Real Avilés",
+          "goles_local": 4,
+          "goles_visitante": 2,
+          "resultado": "4-2"
+        },
+        {
+          "fecha": "2026-02-15",
+          "hora": "12:00",
+          "local": "Osasuna B",
+          "visitante": "Unionistas",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "resultado": "0-2"
+        },
+        {
+          "fecha": "2026-02-15",
+          "hora": "12:00",
+          "local": "Zamora",
+          "visitante": "Barakaldo",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        },
+        {
+          "fecha": "2026-02-14",
+          "hora": "18:30",
+          "local": "Tenerife",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2026-02-14",
+          "hora": "16:15",
+          "local": "Arenas Getxo",
+          "visitante": "Ponferradina",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2026-02-14",
+          "hora": "16:15",
+          "local": "Ourense CF",
+          "visitante": "AD Mérida",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "resultado": "3-1"
+        },
+        {
+          "fecha": "2026-02-14",
+          "hora": "14:00",
+          "local": "Cacereño",
+          "visitante": "Pontevedra",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-02-13",
+          "hora": "21:15",
+          "local": "Real Madrid B",
+          "visitante": "Athletic Club B",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        }
+      ]
+    },
+    {
+      "jornada": 23,
+      "partidos": [
+        {
+          "fecha": "2026-02-08",
+          "hora": "20:30",
+          "local": "Ponferradina",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2026-02-08",
+          "hora": "18:15",
+          "local": "AD Mérida",
+          "visitante": "Zamora",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2026-02-08",
+          "hora": "16:00",
+          "local": "Guadalajara",
+          "visitante": "Arenas Getxo",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-02-08",
+          "hora": "12:00",
+          "local": "Osasuna B",
+          "visitante": "Cacereño",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        },
+        {
+          "fecha": "2026-02-08",
+          "hora": "12:00",
+          "local": "Pontevedra",
+          "visitante": "Real Madrid B",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2026-02-07",
+          "hora": "18:30",
+          "local": "Unionistas",
+          "visitante": "Ourense CF",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-02-07",
+          "hora": "16:15",
+          "local": "Arenteiro",
+          "visitante": "Real Avilés",
+          "goles_local": 6,
+          "goles_visitante": 3,
+          "resultado": "6-3"
+        },
+        {
+          "fecha": "2026-02-07",
+          "hora": "16:15",
+          "local": "Racing Club Ferrol",
+          "visitante": "Lugo",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-02-07",
+          "hora": "14:00",
+          "local": "Athletic Club B",
+          "visitante": "Tenerife",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2026-02-06",
+          "hora": "19:00",
+          "local": "Barakaldo",
+          "visitante": "CF Talavera",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        }
+      ]
+    },
+    {
+      "jornada": 22,
+      "partidos": [
+        {
+          "fecha": "2026-02-01",
+          "hora": "18:15",
+          "local": "Cacereño",
+          "visitante": "Barakaldo",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2026-02-01",
+          "hora": "18:15",
+          "local": "Lugo",
+          "visitante": "Ponferradina",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "resultado": "0-2"
+        },
+        {
+          "fecha": "2026-02-01",
+          "hora": "12:00",
+          "local": "Arenas Getxo",
+          "visitante": "Ourense CF",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2026-01-31",
+          "hora": "21:00",
+          "local": "Real Avilés",
+          "visitante": "AD Mérida",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2026-01-31",
+          "hora": "18:30",
+          "local": "Zamora",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-01-31",
+          "hora": "16:15",
+          "local": "CF Talavera",
+          "visitante": "Pontevedra",
+          "goles_local": 0,
+          "goles_visitante": 4,
+          "resultado": "0-4"
+        },
+        {
+          "fecha": "2026-01-31",
+          "hora": "16:15",
+          "local": "Tenerife",
+          "visitante": "Guadalajara",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "resultado": "4-0"
+        },
+        {
+          "fecha": "2026-01-31",
+          "hora": "16:00",
+          "local": "Celta de Vigo B",
+          "visitante": "Unionistas",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2026-01-30",
+          "hora": "20:30",
+          "local": "Arenteiro",
+          "visitante": "Athletic Club B",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-01-30",
+          "hora": "19:00",
+          "local": "Real Madrid B",
+          "visitante": "Osasuna B",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        }
+      ]
+    },
+    {
+      "jornada": 21,
+      "partidos": [
+        {
+          "fecha": "2026-01-25",
+          "hora": "18:15",
+          "local": "Athletic Club B",
+          "visitante": "Barakaldo",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2026-01-25",
+          "hora": "18:15",
+          "local": "Real Avilés",
+          "visitante": "Lugo",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2026-01-25",
+          "hora": "16:00",
+          "local": "Ourense CF",
+          "visitante": "Cacereño",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2026-01-25",
+          "hora": "16:00",
+          "local": "Tenerife",
+          "visitante": "Real Madrid B",
+          "goles_local": 4,
+          "goles_visitante": 2,
+          "resultado": "4-2"
+        },
+        {
+          "fecha": "2026-01-25",
+          "hora": "12:00",
+          "local": "Guadalajara",
+          "visitante": "Ponferradina",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2026-01-24",
+          "hora": "18:30",
+          "local": "Unionistas",
+          "visitante": "CF Talavera",
+          "goles_local": 5,
+          "goles_visitante": 1,
+          "resultado": "5-1"
+        },
+        {
+          "fecha": "2026-01-24",
+          "hora": "16:15",
+          "local": "Osasuna B",
+          "visitante": "Arenas Getxo",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "resultado": "2-3"
+        },
+        {
+          "fecha": "2026-01-24",
+          "hora": "16:15",
+          "local": "Racing Club Ferrol",
+          "visitante": "Arenteiro",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2026-01-23",
+          "hora": "21:15",
+          "local": "AD Mérida",
+          "visitante": "Pontevedra",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-01-23",
+          "hora": "19:00",
+          "local": "Celta de Vigo B",
+          "visitante": "Zamora",
+          "goles_local": 3,
+          "goles_visitante": 3,
+          "resultado": "3-3"
+        }
+      ]
+    },
+    {
+      "jornada": 20,
+      "partidos": [
+        {
+          "fecha": "2026-01-18",
+          "hora": "18:15",
+          "local": "Barakaldo",
+          "visitante": "Guadalajara",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2026-01-18",
+          "hora": "18:15",
+          "local": "Real Madrid B",
+          "visitante": "AD Mérida",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-01-18",
+          "hora": "16:00",
+          "local": "Cacereño",
+          "visitante": "Arenas Getxo",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2026-01-18",
+          "hora": "16:00",
+          "local": "Lugo",
+          "visitante": "Unionistas",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "resultado": "1-3"
+        },
+        {
+          "fecha": "2026-01-18",
+          "hora": "12:00",
+          "local": "Ourense CF",
+          "visitante": "Osasuna B",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2026-01-17",
+          "hora": "21:00",
+          "local": "Ponferradina",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "resultado": "3-0"
+        },
+        {
+          "fecha": "2026-01-17",
+          "hora": "18:30",
+          "local": "CF Talavera",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-01-17",
+          "hora": "18:30",
+          "local": "Zamora",
+          "visitante": "Tenerife",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2026-01-17",
+          "hora": "16:15",
+          "local": "Pontevedra",
+          "visitante": "Arenteiro",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-01-16",
+          "hora": "21:15",
+          "local": "Athletic Club B",
+          "visitante": "Real Avilés",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "resultado": "0-2"
+        }
+      ]
+    },
+    {
+      "jornada": 19,
+      "partidos": [
+        {
+          "fecha": "2026-01-11",
+          "hora": "16:00",
+          "local": "Unionistas",
+          "visitante": "Zamora",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2026-01-11",
+          "hora": "12:00",
+          "local": "AD Mérida",
+          "visitante": "Osasuna B",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-01-11",
+          "hora": "12:00",
+          "local": "Celta de Vigo B",
+          "visitante": "Barakaldo",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2026-01-10",
+          "hora": "21:00",
+          "local": "Ponferradina",
+          "visitante": "Ourense CF",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2026-01-10",
+          "hora": "18:30",
+          "local": "Guadalajara",
+          "visitante": "Cacereño",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2026-01-10",
+          "hora": "18:30",
+          "local": "Real Avilés",
+          "visitante": "Pontevedra",
+          "goles_local": 0,
+          "goles_visitante": 3,
+          "resultado": "0-3"
+        },
+        {
+          "fecha": "2026-01-10",
+          "hora": "16:15",
+          "local": "Arenas Getxo",
+          "visitante": "Real Madrid B",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "resultado": "4-1"
+        },
+        {
+          "fecha": "2026-01-10",
+          "hora": "16:15",
+          "local": "Arenteiro",
+          "visitante": "Lugo",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "resultado": "0-2"
+        },
+        {
+          "fecha": "2026-01-10",
+          "hora": "16:15",
+          "local": "Racing Club Ferrol",
+          "visitante": "Athletic Club B",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2026-01-09",
+          "hora": "21:15",
+          "local": "Tenerife",
+          "visitante": "CF Talavera",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        }
+      ]
+    },
+    {
+      "jornada": 18,
+      "partidos": [
+        {
+          "fecha": "2026-01-04",
+          "hora": "16:30",
+          "local": "Athletic Club B",
+          "visitante": "Ponferradina",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-01-04",
+          "hora": "16:30",
+          "local": "Zamora",
+          "visitante": "Arenas Getxo",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2026-01-04",
+          "hora": "14:15",
+          "local": "Osasuna B",
+          "visitante": "Tenerife",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "resultado": "0-2"
+        },
+        {
+          "fecha": "2026-01-04",
+          "hora": "12:00",
+          "local": "Cacereño",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "resultado": "2-3"
+        },
+        {
+          "fecha": "2026-01-04",
+          "hora": "12:00",
+          "local": "CF Talavera",
+          "visitante": "Guadalajara",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2026-01-04",
+          "hora": "12:00",
+          "local": "Real Madrid B",
+          "visitante": "Arenteiro",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2026-01-03",
+          "hora": "18:45",
+          "local": "Barakaldo",
+          "visitante": "Unionistas",
+          "goles_local": 5,
+          "goles_visitante": 0,
+          "resultado": "5-0"
+        },
+        {
+          "fecha": "2026-01-03",
+          "hora": "18:45",
+          "local": "Ourense CF",
+          "visitante": "Real Avilés",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2026-01-03",
+          "hora": "16:30",
+          "local": "Pontevedra",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2026-01-03",
+          "hora": "12:00",
+          "local": "Lugo",
+          "visitante": "AD Mérida",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        }
+      ]
+    },
+    {
+      "jornada": 17,
+      "partidos": [
+        {
+          "fecha": "2025-12-21",
+          "hora": null,
+          "local": "Real Avilés",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2025-12-21",
+          "hora": null,
+          "local": "Lugo",
+          "visitante": "Ourense CF",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2025-12-21",
+          "hora": null,
+          "local": "Barakaldo",
+          "visitante": "Pontevedra",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2025-12-21",
+          "hora": null,
+          "local": "Guadalajara",
+          "visitante": "Zamora",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "resultado": "2-3"
+        },
+        {
+          "fecha": "2025-12-21",
+          "hora": null,
+          "local": "Arenas Getxo",
+          "visitante": "CF Talavera",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2025-12-21",
+          "hora": null,
+          "local": "Arenteiro",
+          "visitante": "Osasuna B",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2025-12-20",
+          "hora": null,
+          "local": "Tenerife",
+          "visitante": "Ponferradina",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2025-12-20",
+          "hora": null,
+          "local": "Unionistas",
+          "visitante": "Cacereño",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        },
+        {
+          "fecha": "2025-12-20",
+          "hora": null,
+          "local": "Celta de Vigo B",
+          "visitante": "Real Madrid B",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2025-12-19",
+          "hora": null,
+          "local": "AD Mérida",
+          "visitante": "Athletic Club B",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "resultado": "2-3"
+        }
+      ]
+    },
+    {
+      "jornada": 16,
+      "partidos": [
+        {
+          "fecha": "2025-12-14",
+          "hora": null,
+          "local": "Pontevedra",
+          "visitante": "Arenas Getxo",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2025-12-14",
+          "hora": null,
+          "local": "Racing Club Ferrol",
+          "visitante": "Unionistas",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2025-12-14",
+          "hora": null,
+          "local": "Athletic Club B",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2025-12-14",
+          "hora": null,
+          "local": "CF Talavera",
+          "visitante": "AD Mérida",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2025-12-13",
+          "hora": null,
+          "local": "Ourense CF",
+          "visitante": "Barakaldo",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        },
+        {
+          "fecha": "2025-12-13",
+          "hora": null,
+          "local": "Real Avilés",
+          "visitante": "Tenerife",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2025-12-13",
+          "hora": null,
+          "local": "Osasuna B",
+          "visitante": "Lugo",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2025-12-13",
+          "hora": null,
+          "local": "Ponferradina",
+          "visitante": "Arenteiro",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "resultado": "1-3"
+        },
+        {
+          "fecha": "2025-12-13",
+          "hora": null,
+          "local": "Real Madrid B",
+          "visitante": "Guadalajara",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "resultado": "3-1"
+        },
+        {
+          "fecha": "2025-12-12",
+          "hora": null,
+          "local": "Cacereño",
+          "visitante": "Zamora",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "resultado": "0-2"
+        }
+      ]
+    },
+    {
+      "jornada": 15,
+      "partidos": [
+        {
+          "fecha": "2025-12-08",
+          "hora": null,
+          "local": "Unionistas",
+          "visitante": "Ponferradina",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        },
+        {
+          "fecha": "2025-12-07",
+          "hora": null,
+          "local": "Lugo",
+          "visitante": "Tenerife",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        },
+        {
+          "fecha": "2025-12-07",
+          "hora": null,
+          "local": "Barakaldo",
+          "visitante": "Real Avilés",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2025-12-07",
+          "hora": null,
+          "local": "Guadalajara",
+          "visitante": "Osasuna B",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2025-12-07",
+          "hora": null,
+          "local": "Zamora",
+          "visitante": "Real Madrid B",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        },
+        {
+          "fecha": "2025-12-07",
+          "hora": null,
+          "local": "AD Mérida",
+          "visitante": "Ourense CF",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "resultado": "3-2"
+        },
+        {
+          "fecha": "2025-12-07",
+          "hora": null,
+          "local": "Arenas Getxo",
+          "visitante": "Athletic Club B",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "resultado": "3-1"
+        },
+        {
+          "fecha": "2025-12-07",
+          "hora": null,
+          "local": "Arenteiro",
+          "visitante": "CF Talavera",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2025-12-06",
+          "hora": null,
+          "local": "Cacereño",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2025-12-06",
+          "hora": null,
+          "local": "Celta de Vigo B",
+          "visitante": "Pontevedra",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        }
+      ]
+    },
+    {
+      "jornada": 14,
+      "partidos": [
+        {
+          "fecha": "2025-11-30",
+          "hora": null,
+          "local": "Real Avilés",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2025-11-30",
+          "hora": null,
+          "local": "CF Talavera",
+          "visitante": "Cacereño",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2025-11-30",
+          "hora": null,
+          "local": "Osasuna B",
+          "visitante": "Zamora",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "resultado": "1-3"
+        },
+        {
+          "fecha": "2025-11-29",
+          "hora": null,
+          "local": "Racing Club Ferrol",
+          "visitante": "AD Mérida",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        },
+        {
+          "fecha": "2025-11-29",
+          "hora": null,
+          "local": "Ponferradina",
+          "visitante": "Arenas Getxo",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2025-11-29",
+          "hora": null,
+          "local": "Pontevedra",
+          "visitante": "Guadalajara",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2025-11-29",
+          "hora": null,
+          "local": "Tenerife",
+          "visitante": "Arenteiro",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2025-11-29",
+          "hora": null,
+          "local": "Athletic Club B",
+          "visitante": "Lugo",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2025-11-29",
+          "hora": null,
+          "local": "Ourense CF",
+          "visitante": "Unionistas",
+          "goles_local": 4,
+          "goles_visitante": 3,
+          "resultado": "4-3"
+        },
+        {
+          "fecha": "2025-11-29",
+          "hora": null,
+          "local": "Real Madrid B",
+          "visitante": "Barakaldo",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        }
+      ]
+    },
+    {
+      "jornada": 13,
+      "partidos": [
+        {
+          "fecha": "2025-11-23",
+          "hora": null,
+          "local": "Cacereño",
+          "visitante": "Osasuna B",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2025-11-23",
+          "hora": null,
+          "local": "Barakaldo",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2025-11-23",
+          "hora": null,
+          "local": "Zamora",
+          "visitante": "CF Talavera",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2025-11-23",
+          "hora": null,
+          "local": "Celta de Vigo B",
+          "visitante": "Ponferradina",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2025-11-22",
+          "hora": null,
+          "local": "Arenas Getxo",
+          "visitante": "Tenerife",
+          "goles_local": 1,
+          "goles_visitante": 4,
+          "resultado": "1-4"
+        },
+        {
+          "fecha": "2025-11-22",
+          "hora": null,
+          "local": "Arenteiro",
+          "visitante": "Ourense CF",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "resultado": "0-2"
+        },
+        {
+          "fecha": "2025-11-22",
+          "hora": null,
+          "local": "Guadalajara",
+          "visitante": "Athletic Club B",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "resultado": "2-3"
+        },
+        {
+          "fecha": "2025-11-22",
+          "hora": null,
+          "local": "AD Mérida",
+          "visitante": "Real Avilés",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2025-11-22",
+          "hora": null,
+          "local": "Lugo",
+          "visitante": "Pontevedra",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2025-11-21",
+          "hora": null,
+          "local": "Unionistas",
+          "visitante": "Real Madrid B",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "resultado": "3-0"
+        }
+      ]
+    },
+    {
+      "jornada": 12,
+      "partidos": [
+        {
+          "fecha": "2025-11-16",
+          "hora": null,
+          "local": "Racing Club Ferrol",
+          "visitante": "Zamora",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2025-11-16",
+          "hora": null,
+          "local": "Athletic Club B",
+          "visitante": "Arenteiro",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2025-11-16",
+          "hora": null,
+          "local": "CF Talavera",
+          "visitante": "Unionistas",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2025-11-16",
+          "hora": null,
+          "local": "Ourense CF",
+          "visitante": "Guadalajara",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "resultado": "3-0"
+        },
+        {
+          "fecha": "2025-11-15",
+          "hora": null,
+          "local": "Tenerife",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "resultado": "4-0"
+        },
+        {
+          "fecha": "2025-11-15",
+          "hora": null,
+          "local": "Ponferradina",
+          "visitante": "Lugo",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2025-11-15",
+          "hora": null,
+          "local": "Pontevedra",
+          "visitante": "AD Mérida",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2025-11-15",
+          "hora": null,
+          "local": "Osasuna B",
+          "visitante": "Barakaldo",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2025-11-15",
+          "hora": null,
+          "local": "Real Madrid B",
+          "visitante": "Cacereño",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2025-11-14",
+          "hora": null,
+          "local": "Real Avilés",
+          "visitante": "Arenas Getxo",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        }
+      ]
+    },
+    {
+      "jornada": 11,
+      "partidos": [
+        {
+          "fecha": "2025-11-12",
+          "hora": null,
+          "local": "Zamora",
+          "visitante": "Ourense CF",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2025-11-09",
+          "hora": null,
+          "local": "Barakaldo",
+          "visitante": "Ponferradina",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2025-11-09",
+          "hora": null,
+          "local": "Guadalajara",
+          "visitante": "Lugo",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2025-11-09",
+          "hora": null,
+          "local": "Cacereño",
+          "visitante": "Real Avilés",
+          "goles_local": 0,
+          "goles_visitante": 4,
+          "resultado": "0-4"
+        },
+        {
+          "fecha": "2025-11-09",
+          "hora": null,
+          "local": "AD Mérida",
+          "visitante": "Real Madrid B",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "resultado": "3-0"
+        },
+        {
+          "fecha": "2025-11-08",
+          "hora": null,
+          "local": "Arenas Getxo",
+          "visitante": "Osasuna B",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2025-11-08",
+          "hora": null,
+          "local": "Tenerife",
+          "visitante": "Athletic Club B",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2025-11-08",
+          "hora": null,
+          "local": "Unionistas",
+          "visitante": "Pontevedra",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2025-11-08",
+          "hora": null,
+          "local": "Arenteiro",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "resultado": "0-2"
+        },
+        {
+          "fecha": "2025-11-08",
+          "hora": null,
+          "local": "Celta de Vigo B",
+          "visitante": "CF Talavera",
+          "goles_local": 4,
+          "goles_visitante": 3,
+          "resultado": "4-3"
+        }
+      ]
+    },
+    {
+      "jornada": 10,
+      "partidos": [
+        {
+          "fecha": "2025-11-02",
+          "hora": null,
+          "local": "Ponferradina",
+          "visitante": "Cacereño",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2025-11-02",
+          "hora": null,
+          "local": "Real Avilés",
+          "visitante": "Arenteiro",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2025-11-02",
+          "hora": null,
+          "local": "Real Madrid B",
+          "visitante": "CF Talavera",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2025-11-02",
+          "hora": null,
+          "local": "Ourense CF",
+          "visitante": "Arenas Getxo",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2025-11-01",
+          "hora": null,
+          "local": "Racing Club Ferrol",
+          "visitante": "Tenerife",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "resultado": "0-2"
+        },
+        {
+          "fecha": "2025-11-01",
+          "hora": null,
+          "local": "Osasuna B",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2025-11-01",
+          "hora": null,
+          "local": "Athletic Club B",
+          "visitante": "Unionistas",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2025-11-01",
+          "hora": null,
+          "local": "Guadalajara",
+          "visitante": "AD Mérida",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "resultado": "0-2"
+        },
+        {
+          "fecha": "2025-11-01",
+          "hora": null,
+          "local": "Pontevedra",
+          "visitante": "Zamora",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "resultado": "4-1"
+        },
+        {
+          "fecha": "2025-10-31",
+          "hora": null,
+          "local": "Lugo",
+          "visitante": "Barakaldo",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        }
+      ]
+    },
+    {
+      "jornada": 9,
+      "partidos": [
+        {
+          "fecha": "2025-10-26",
+          "hora": null,
+          "local": "Zamora",
+          "visitante": "Athletic Club B",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "resultado": "4-1"
+        },
+        {
+          "fecha": "2025-10-26",
+          "hora": null,
+          "local": "Unionistas",
+          "visitante": "Lugo",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2025-10-26",
+          "hora": null,
+          "local": "Arenteiro",
+          "visitante": "Pontevedra",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2025-10-25",
+          "hora": null,
+          "local": "Real Madrid B",
+          "visitante": "Real Avilés",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2025-10-25",
+          "hora": null,
+          "local": "CF Talavera",
+          "visitante": "Osasuna B",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2025-10-25",
+          "hora": null,
+          "local": "Arenas Getxo",
+          "visitante": "Guadalajara",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "resultado": "3-0"
+        },
+        {
+          "fecha": "2025-10-25",
+          "hora": null,
+          "local": "Cacereño",
+          "visitante": "Ourense CF",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2025-10-25",
+          "hora": null,
+          "local": "Celta de Vigo B",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2025-10-24",
+          "hora": null,
+          "local": "Barakaldo",
+          "visitante": "Tenerife",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2025-10-24",
+          "hora": null,
+          "local": "AD Mérida",
+          "visitante": "Ponferradina",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        }
+      ]
+    },
+    {
+      "jornada": 8,
+      "partidos": [
+        {
+          "fecha": "2025-10-19",
+          "hora": null,
+          "local": "Athletic Club B",
+          "visitante": "Cacereño",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "resultado": "1-3"
+        },
+        {
+          "fecha": "2025-10-19",
+          "hora": null,
+          "local": "Real Avilés",
+          "visitante": "CF Talavera",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2025-10-19",
+          "hora": null,
+          "local": "Ourense CF",
+          "visitante": "Real Madrid B",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "resultado": "1-3"
+        },
+        {
+          "fecha": "2025-10-19",
+          "hora": null,
+          "local": "Ponferradina",
+          "visitante": "Zamora",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2025-10-18",
+          "hora": null,
+          "local": "Lugo",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2025-10-18",
+          "hora": null,
+          "local": "Tenerife",
+          "visitante": "Unionistas",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "resultado": "0-2"
+        },
+        {
+          "fecha": "2025-10-18",
+          "hora": null,
+          "local": "AD Mérida",
+          "visitante": "Arenteiro",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "resultado": "3-1"
+        },
+        {
+          "fecha": "2025-10-18",
+          "hora": null,
+          "local": "Guadalajara",
+          "visitante": "Barakaldo",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2025-10-18",
+          "hora": null,
+          "local": "Pontevedra",
+          "visitante": "Osasuna B",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        },
+        {
+          "fecha": "2025-10-18",
+          "hora": null,
+          "local": "Racing Club Ferrol",
+          "visitante": "Arenas Getxo",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "resultado": "3-1"
+        }
+      ]
+    },
+    {
+      "jornada": 7,
+      "partidos": [
+        {
+          "fecha": "2025-10-12",
+          "hora": null,
+          "local": "Cacereño",
+          "visitante": "Tenerife",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2025-10-12",
+          "hora": null,
+          "local": "Arenteiro",
+          "visitante": "Guadalajara",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2025-10-12",
+          "hora": null,
+          "local": "Zamora",
+          "visitante": "Real Avilés",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "resultado": "2-3"
+        },
+        {
+          "fecha": "2025-10-12",
+          "hora": null,
+          "local": "Osasuna B",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2025-10-12",
+          "hora": null,
+          "local": "Real Madrid B",
+          "visitante": "Pontevedra",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2025-10-11",
+          "hora": null,
+          "local": "Arenas Getxo",
+          "visitante": "Lugo",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2025-10-11",
+          "hora": null,
+          "local": "CF Talavera",
+          "visitante": "Ponferradina",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2025-10-11",
+          "hora": null,
+          "local": "Unionistas",
+          "visitante": "AD Mérida",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2025-10-11",
+          "hora": null,
+          "local": "Celta de Vigo B",
+          "visitante": "Ourense CF",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2025-10-10",
+          "hora": null,
+          "local": "Barakaldo",
+          "visitante": "Athletic Club B",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        }
+      ]
+    },
+    {
+      "jornada": 6,
+      "partidos": [
+        {
+          "fecha": "2025-10-05",
+          "hora": null,
+          "local": "Athletic Club B",
+          "visitante": "Osasuna B",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2025-10-05",
+          "hora": null,
+          "local": "Guadalajara",
+          "visitante": "Real Avilés",
+          "goles_local": 3,
+          "goles_visitante": 4,
+          "resultado": "3-4"
+        },
+        {
+          "fecha": "2025-10-05",
+          "hora": null,
+          "local": "Ponferradina",
+          "visitante": "Real Madrid B",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "resultado": "2-3"
+        },
+        {
+          "fecha": "2025-10-05",
+          "hora": null,
+          "local": "Arenteiro",
+          "visitante": "Barakaldo",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2025-10-05",
+          "hora": null,
+          "local": "AD Mérida",
+          "visitante": "Arenas Getxo",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "resultado": "3-0"
+        },
+        {
+          "fecha": "2025-10-05",
+          "hora": null,
+          "local": "Pontevedra",
+          "visitante": "CF Talavera",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2025-10-04",
+          "hora": null,
+          "local": "Tenerife",
+          "visitante": "Zamora",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "resultado": "3-1"
+        },
+        {
+          "fecha": "2025-10-04",
+          "hora": null,
+          "local": "Racing Club Ferrol",
+          "visitante": "Ourense CF",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2025-10-04",
+          "hora": null,
+          "local": "Unionistas",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "resultado": "0-2"
+        },
+        {
+          "fecha": "2025-10-04",
+          "hora": null,
+          "local": "Lugo",
+          "visitante": "Cacereño",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        }
+      ]
+    },
+    {
+      "jornada": 5,
+      "partidos": [
+        {
+          "fecha": "2025-09-28",
+          "hora": null,
+          "local": "Osasuna B",
+          "visitante": "Ponferradina",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2025-09-28",
+          "hora": null,
+          "local": "Zamora",
+          "visitante": "AD Mérida",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "resultado": "3-0"
+        },
+        {
+          "fecha": "2025-09-28",
+          "hora": null,
+          "local": "Real Avilés",
+          "visitante": "Athletic Club B",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "resultado": "3-2"
+        },
+        {
+          "fecha": "2025-09-27",
+          "hora": null,
+          "local": "Real Madrid B",
+          "visitante": "Tenerife",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "resultado": "1-3"
+        },
+        {
+          "fecha": "2025-09-27",
+          "hora": null,
+          "local": "Arenas Getxo",
+          "visitante": "Unionistas",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2025-09-27",
+          "hora": null,
+          "local": "Celta de Vigo B",
+          "visitante": "Arenteiro",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2025-09-27",
+          "hora": null,
+          "local": "Ourense CF",
+          "visitante": "Pontevedra",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2025-09-27",
+          "hora": null,
+          "local": "Barakaldo",
+          "visitante": "Cacereño",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2025-09-26",
+          "hora": null,
+          "local": "Racing Club Ferrol",
+          "visitante": "Guadalajara",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2025-09-26",
+          "hora": null,
+          "local": "CF Talavera",
+          "visitante": "Lugo",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        }
+      ]
+    },
+    {
+      "jornada": 4,
+      "partidos": [
+        {
+          "fecha": "2025-09-21",
+          "hora": null,
+          "local": "Unionistas",
+          "visitante": "Real Avilés",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "resultado": "3-2"
+        },
+        {
+          "fecha": "2025-09-21",
+          "hora": null,
+          "local": "Celta de Vigo B",
+          "visitante": "Arenas Getxo",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2025-09-21",
+          "hora": null,
+          "local": "Lugo",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2025-09-21",
+          "hora": null,
+          "local": "CF Talavera",
+          "visitante": "Barakaldo",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2025-09-21",
+          "hora": null,
+          "local": "Osasuna B",
+          "visitante": "Real Madrid B",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2025-09-21",
+          "hora": null,
+          "local": "Tenerife",
+          "visitante": "Ourense CF",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "resultado": "3-0"
+        },
+        {
+          "fecha": "2025-09-20",
+          "hora": null,
+          "local": "Athletic Club B",
+          "visitante": "Pontevedra",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2025-09-20",
+          "hora": null,
+          "local": "Cacereño",
+          "visitante": "AD Mérida",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2025-09-20",
+          "hora": null,
+          "local": "Arenteiro",
+          "visitante": "Zamora",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2025-09-19",
+          "hora": null,
+          "local": "Ponferradina",
+          "visitante": "Guadalajara",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "resultado": "1-3"
+        }
+      ]
+    },
+    {
+      "jornada": 2,
+      "partidos": [
+        {
+          "fecha": "2025-09-17",
+          "hora": null,
+          "local": "Real Madrid B",
+          "visitante": "Racing Club Ferrol",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2025-09-07",
+          "hora": null,
+          "local": "Arenteiro",
+          "visitante": "Unionistas",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2025-09-07",
+          "hora": null,
+          "local": "Osasuna B",
+          "visitante": "Ourense CF",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2025-09-07",
+          "hora": null,
+          "local": "Celta de Vigo B",
+          "visitante": "Guadalajara",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2025-09-07",
+          "hora": null,
+          "local": "CF Talavera",
+          "visitante": "Athletic Club B",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2025-09-06",
+          "hora": null,
+          "local": "Tenerife",
+          "visitante": "AD Mérida",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "resultado": "3-0"
+        },
+        {
+          "fecha": "2025-09-06",
+          "hora": null,
+          "local": "Ponferradina",
+          "visitante": "Pontevedra",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2025-09-06",
+          "hora": null,
+          "local": "Arenas Getxo",
+          "visitante": "Cacereño",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "resultado": "2-2"
+        },
+        {
+          "fecha": "2025-09-06",
+          "hora": null,
+          "local": "Barakaldo",
+          "visitante": "Zamora",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2025-09-06",
+          "hora": null,
+          "local": "Lugo",
+          "visitante": "Real Avilés",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        }
+      ]
+    },
+    {
+      "jornada": 3,
+      "partidos": [
+        {
+          "fecha": "2025-09-14",
+          "hora": null,
+          "local": "Racing Club Ferrol",
+          "visitante": "Ponferradina",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2025-09-14",
+          "hora": null,
+          "local": "Guadalajara",
+          "visitante": "Unionistas",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2025-09-14",
+          "hora": null,
+          "local": "Pontevedra",
+          "visitante": "Tenerife",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "resultado": "0-2"
+        },
+        {
+          "fecha": "2025-09-14",
+          "hora": null,
+          "local": "Zamora",
+          "visitante": "Lugo",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2025-09-14",
+          "hora": null,
+          "local": "Athletic Club B",
+          "visitante": "Real Madrid B",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2025-09-14",
+          "hora": null,
+          "local": "Cacereño",
+          "visitante": "Arenteiro",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "resultado": "0-2"
+        },
+        {
+          "fecha": "2025-09-14",
+          "hora": null,
+          "local": "Ourense CF",
+          "visitante": "CF Talavera",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "resultado": "1-2"
+        },
+        {
+          "fecha": "2025-09-14",
+          "hora": null,
+          "local": "Real Avilés",
+          "visitante": "Osasuna B",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "resultado": "2-0"
+        },
+        {
+          "fecha": "2025-09-13",
+          "hora": null,
+          "local": "AD Mérida",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 2,
+          "goles_visitante": 4,
+          "resultado": "2-4"
+        },
+        {
+          "fecha": "2025-09-12",
+          "hora": null,
+          "local": "Barakaldo",
+          "visitante": "Arenas Getxo",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        }
+      ]
+    },
+    {
+      "jornada": 1,
+      "partidos": [
+        {
+          "fecha": "2025-08-31",
+          "hora": null,
+          "local": "Real Avilés",
+          "visitante": "Ponferradina",
+          "goles_local": 0,
+          "goles_visitante": 3,
+          "resultado": "0-3"
+        },
+        {
+          "fecha": "2025-08-31",
+          "hora": null,
+          "local": "Ourense CF",
+          "visitante": "Athletic Club B",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2025-08-31",
+          "hora": null,
+          "local": "Guadalajara",
+          "visitante": "Tenerife",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "resultado": "0-2"
+        },
+        {
+          "fecha": "2025-08-31",
+          "hora": null,
+          "local": "Arenas Getxo",
+          "visitante": "Arenteiro",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2025-08-31",
+          "hora": null,
+          "local": "Racing Club Ferrol",
+          "visitante": "CF Talavera",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        },
+        {
+          "fecha": "2025-08-30",
+          "hora": null,
+          "local": "AD Mérida",
+          "visitante": "Barakaldo",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "resultado": "1-0"
+        },
+        {
+          "fecha": "2025-08-30",
+          "hora": null,
+          "local": "Unionistas",
+          "visitante": "Osasuna B",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "resultado": "0-1"
+        },
+        {
+          "fecha": "2025-08-30",
+          "hora": null,
+          "local": "Zamora",
+          "visitante": "Celta de Vigo B",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "resultado": "0-0"
+        },
+        {
+          "fecha": "2025-08-30",
+          "hora": null,
+          "local": "Pontevedra",
+          "visitante": "Cacereño",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "resultado": "1-1"
+        },
+        {
+          "fecha": "2025-08-29",
+          "hora": null,
+          "local": "Real Madrid B",
+          "visitante": "Lugo",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "resultado": "2-1"
+        }
+      ]
+    }
+  ]
+}

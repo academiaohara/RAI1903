@@ -1,3 +1,4 @@
+import { buildMatchdaysFromResultados2526, RESULTADOS_2526_LAST_ROUND } from "@/lib/resultados-2526";
 import { applyStandingsToTeams } from "@/lib/standings";
 import type {
   AcademyTeam,
@@ -6,7 +7,6 @@ import type {
   FanYouTubeVideo,
   Match,
   MatchArticle,
-  Matchday,
   NewsItem,
   Player,
   PressLink,
@@ -67,72 +67,7 @@ const baseTeamsFemenino: Team[] = baseTeams.map((team) =>
     : { ...team },
 );
 
-const teamById = new Map(baseTeams.map((team) => [team.id, team]));
-
-const competitionForRound = (round: number): { competition: CompetitionId; competitionStage?: string } => {
-  if (round === 4) return { competition: "copa-rey", competitionStage: "Dieciseisavos" };
-  if (round === 12) return { competition: "copa-rey", competitionStage: "Octavos" };
-  if (round === 8 || round === 16) return { competition: "amistoso" };
-  return { competition: "primera-rfef" };
-};
-
-const generateMatchdays = (): Matchday[] => {
-  const ids = baseTeams.map((team) => team.id);
-  const current = [...ids];
-  const firstLeg: string[][][] = [];
-
-  for (let round = 0; round < ids.length - 1; round += 1) {
-    const pairings: string[][] = [];
-    for (let index = 0; index < ids.length / 2; index += 1) {
-      const left = current[index];
-      const right = current[ids.length - 1 - index];
-      pairings.push(round % 2 === 0 ? [left, right] : [right, left]);
-    }
-    firstLeg.push(pairings);
-    const fixed = current[0];
-    const rest = current.slice(1);
-    rest.unshift(rest.pop() as string);
-    current.splice(0, current.length, fixed, ...rest);
-  }
-
-  const rounds = [...firstLeg, ...firstLeg.map((round) => round.map(([home, away]) => [away, home]))];
-
-  return rounds.map((roundMatches, roundIndex) => {
-    const round = roundIndex + 1;
-    const matches: Match[] = roundMatches.map(([homeTeamId, awayTeamId], matchIndex) => {
-      const home = teamById.get(homeTeamId)!;
-      const away = teamById.get(awayTeamId)!;
-      const isFinished = round <= 9;
-      const homeIndex = ids.indexOf(homeTeamId);
-      const awayIndex = ids.indexOf(awayTeamId);
-      const homeScore = isFinished ? (round + matchIndex + homeIndex) % 4 : undefined;
-      const awayScore = isFinished ? (round + matchIndex + awayIndex + 1) % 3 : undefined;
-      const date = new Date(Date.UTC(2026, 7, 23 + (round - 1) * 7, 15 + (matchIndex % 4), matchIndex % 2 === 0 ? 0 : 30));
-
-      const { competition, competitionStage } = competitionForRound(round);
-
-      return {
-        id: `j${round}-${homeTeamId}-${awayTeamId}`,
-        matchday: round,
-        homeTeamId,
-        awayTeamId,
-        homeTeam: home.name,
-        awayTeam: away.name,
-        date: date.toISOString(),
-        competition,
-        competitionStage,
-        venue: home.stadium,
-        status: isFinished ? "finished" : "scheduled",
-        homeScore,
-        awayScore,
-      };
-    });
-
-    return { round, matches };
-  });
-};
-
-export const matchdays = generateMatchdays();
+export const matchdays = buildMatchdaysFromResultados2526(baseTeams);
 
 const leagueMatches = matchdays.flatMap((round) => round.matches);
 
@@ -595,7 +530,7 @@ export const pressLinks: PressLink[] = [
   { id: "asturfutbol", name: "AsturFutbol", outlet: "Digital", url: "https://example.com/asturfutbol", description: "Calendarios, rivales y mercado de futbol modesto." },
 ];
 
-export const CURRENT_QUINIELA_ROUND = 10;
+export const CURRENT_QUINIELA_ROUND = RESULTADOS_2526_LAST_ROUND;
 
 const hashSeed = (value: string) => {
   let hash = 0;
@@ -643,7 +578,7 @@ const participantNames = [
 
 export const jornadaParticipants: Record<number, JornadaParticipant[]> = Object.fromEntries(
   matchdays.map((matchday) => {
-    const finished = matchday.round <= 9;
+    const finished = matchday.round <= RESULTADOS_2526_LAST_ROUND;
     const entries = participantNames
       .slice(0, 8 + (matchday.round % 5))
       .map((user, index) => ({
@@ -670,11 +605,13 @@ export const quinielaRanking: UserPredictionSummary[] = [
 ];
 
 export const matchdayResult = {
-  round: 9,
+  round: RESULTADOS_2526_LAST_ROUND,
   pointsAvailable: 20,
   averagePoints: 9.6,
   bestUser: quinielaRanking[0],
-  highlightedMatch: matchdays[8].matches.find((match) => match.homeTeamId === RAI_TEAM_ID || match.awayTeamId === RAI_TEAM_ID),
+  highlightedMatch: matchdays
+    .find((matchday) => matchday.round === RESULTADOS_2526_LAST_ROUND)
+    ?.matches.find((match) => match.homeTeamId === RAI_TEAM_ID || match.awayTeamId === RAI_TEAM_ID),
 };
 
 const RAI_YOUTUBE_CHANNEL = "https://www.youtube.com/channel/UCqnlVJmxk-zGSSNCb9noziw";
