@@ -1,6 +1,8 @@
+import { barakaldoSquadImport } from "@/data/rivals/barakaldo";
 import { castillaSquadImport } from "@/data/rivals/castilla";
 import { celtaFortunaSquadImport } from "@/data/rivals/celta-fortuna";
 import { ponferradinaSquadImport } from "@/data/rivals/ponferradina";
+import { pontevedraSquadImport } from "@/data/rivals/pontevedra";
 import { tenerifeSquadImport } from "@/data/rivals/tenerife";
 import { zamoraSquadImport } from "@/data/rivals/zamora";
 import { getTeamCrestById } from "@/lib/team-crests";
@@ -15,9 +17,11 @@ const GENERIC_STADIUM_IMAGE =
   "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80";
 
 const RIVAL_SQUAD_IMPORTS: Record<string, RivalSquadImport> = {
+  barakaldo: barakaldoSquadImport,
   castilla: castillaSquadImport,
   "celta-fortuna": celtaFortunaSquadImport,
   ponferradina: ponferradinaSquadImport,
+  pontevedra: pontevedraSquadImport,
   tenerife: tenerifeSquadImport,
   zamora: zamoraSquadImport,
 };
