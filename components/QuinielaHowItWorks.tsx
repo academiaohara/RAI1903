@@ -5,8 +5,7 @@ const rules = [
     title: "Signo 1-X-2",
     description: "En los 10 partidos de la jornada, acierta si gana el local (1), empatan (X) o gana el visitante (2).",
     points: "+1 pt",
-    pointsSuffix: "c/u",
-    iconBg: "bg-emerald-600",
+    iconBg: "bg-[#214C9B]",
     icon: (
       <div className="flex gap-0.5 text-[10px] font-extrabold leading-none text-white">
         <span>1</span>
@@ -67,9 +66,6 @@ export function QuinielaHowItWorks() {
             </div>
             <p className="shrink-0 text-right">
               <span className="block text-lg font-extrabold text-[#981915]">{rule.points}</span>
-              {"pointsSuffix" in rule && rule.pointsSuffix ? (
-                <span className="text-xs font-bold text-slate-500">{rule.pointsSuffix}</span>
-              ) : null}
             </p>
           </li>
         ))}
