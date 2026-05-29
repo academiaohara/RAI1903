@@ -5,7 +5,7 @@ import { CalendarNavButton } from "@/components/CalendarNavButton";
 import { Card } from "@/components/Card";
 import { GrupoSwitcher } from "@/components/competicion/GrupoSwitcher";
 import { GuiaLiga } from "@/components/competicion/GuiaLiga";
-import { LeagueTableCard } from "@/components/LeagueTableCard";
+import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
 import {
   getLatestAvilesMatchesByGender,
@@ -14,7 +14,7 @@ import {
 } from "@/lib/fixtures";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getTeamsForRfefGrupo, type RfefGrupoId } from "@/lib/rfef-grupos";
-import { getBalancedStandingsWindow } from "@/lib/standings-window";
+import { matchdays, matchdaysGrupo2 } from "@/data/mock";
 import type { Route } from "next";
 type CompeticionViewProps = {
   gender: PrimerEquipoGender;
@@ -26,10 +26,8 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
   const [grupo, setGrupo] = useState<RfefGrupoId>(initialGrupo);
   const isMasculino = gender === "masculino";
   const teams = isMasculino ? getTeamsForRfefGrupo(grupo) : getTeamsByGender(gender);
+  const standingsMatchdays = isMasculino && grupo === "2" ? matchdaysGrupo2 : matchdays;
   const showAvilesSidebar = !isMasculino || grupo === "1";
-  const tableTeams = showAvilesSidebar
-    ? getBalancedStandingsWindow(teams, highlightTeamId, 10)
-    : teams.slice(0, 10);
   const latest = getLatestAvilesMatchesByGender(gender, 5);
   const upcoming = getUpcomingAvilesMatchesByGender(gender, 5);
   const calendarHref = `${primerEquipoBase(gender)}/calendario` as Route;
@@ -48,12 +46,14 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
       <GuiaLiga gender={gender} teams={teams} grupo={isMasculino ? grupo : "1"} />
 
       <section className="grid gap-6 xl:grid-cols-2">
-        <LeagueTableCard
+        <StandingsLeagueTableCard
+          key={`${gender}-${grupo}`}
           eyebrow="Liga"
           title="Clasificacion"
-          teams={tableTeams}
-          fullTeams={teams}
+          sourceTeams={teams}
+          matchdays={standingsMatchdays}
           highlightTeamId={showAvilesSidebar ? highlightTeamId : ""}
+          centerOnHighlight={showAvilesSidebar}
           compact
           borderlessHeader
         />
