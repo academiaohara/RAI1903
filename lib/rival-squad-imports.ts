@@ -1,7 +1,9 @@
+import { arenasSquadImport } from "@/data/rivals/arenas";
 import { barakaldoSquadImport } from "@/data/rivals/barakaldo";
 import { castillaSquadImport } from "@/data/rivals/castilla";
 import { celtaFortunaSquadImport } from "@/data/rivals/celta-fortuna";
 import { lugoSquadImport } from "@/data/rivals/lugo";
+import { meridaSquadImport } from "@/data/rivals/merida";
 import { ponferradinaSquadImport } from "@/data/rivals/ponferradina";
 import { pontevedraSquadImport } from "@/data/rivals/pontevedra";
 import { tenerifeSquadImport } from "@/data/rivals/tenerife";
@@ -19,10 +21,12 @@ const GENERIC_STADIUM_IMAGE =
   "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80";
 
 const RIVAL_SQUAD_IMPORTS: Record<string, RivalSquadImport> = {
+  arenas: arenasSquadImport,
   barakaldo: barakaldoSquadImport,
   castilla: castillaSquadImport,
   "celta-fortuna": celtaFortunaSquadImport,
   lugo: lugoSquadImport,
+  merida: meridaSquadImport,
   ponferradina: ponferradinaSquadImport,
   pontevedra: pontevedraSquadImport,
   tenerife: tenerifeSquadImport,
