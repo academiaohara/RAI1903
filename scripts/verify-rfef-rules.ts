@@ -3,7 +3,8 @@
  * Ejecutar: npm run verify:rfef-rules
  */
 
-import { PRIMERA_RFEF_RULES } from "@/lib/rfef-rules/config";
+import { PRIMERA_RFEF_RULES, PRIMERA_RFEF_STANDINGS_ZONES } from "@/lib/rfef-rules/config";
+import { computeStandings } from "@/lib/standings";
 import { resolveKnockoutTwoLeg } from "@/lib/rfef-rules/knockout";
 import { headToHeadGoalDifference } from "@/lib/rfef-rules/mini-league";
 import { selectPlayoffQualifiers } from "@/lib/rfef-rules/playoff";
@@ -119,6 +120,22 @@ function match(home: string, away: string, hs: number, as: number) {
     PRIMERA_RFEF_RULES.playoff.knockout,
   );
   assert("winnerId" in result && result.winnerId === "away", "Sin away goals: pasa mejor en liga (3º)");
+}
+
+{
+  const teamIds = Array.from({ length: 20 }, (_, i) => `t${i + 1}`);
+  const standings = computeStandings(teamIds, [], PRIMERA_RFEF_STANDINGS_ZONES);
+  assert(standings[0]?.zone === "promotion", "1º: ascenso directo");
+  assert(standings[1]?.zone === "playoff" && standings[4]?.zone === "playoff", "2º–5º: playoff");
+  assert(standings[5]?.zone === "mid", "6º: zona media");
+  assert(standings[14]?.zone === "mid", "15º: zona media");
+  assert(standings[15]?.zone === "relegation" && standings[19]?.zone === "relegation", "5 últimos: descenso");
+  assert(
+    PRIMERA_RFEF_RULES.zones.promotion === 1 &&
+      PRIMERA_RFEF_RULES.zones.playoff === 4 &&
+      PRIMERA_RFEF_RULES.zones.relegation === 5,
+    "Reglas exportadas con zonas 1ª RFEF",
+  );
 }
 
 console.log("OK: reglas RFEF verificadas");

@@ -1,6 +1,7 @@
 export {
   PRIMERA_RFEF_INELIGIBLE_PLAYOFF_TEAM_IDS,
   PRIMERA_RFEF_RULES,
+  PRIMERA_RFEF_STANDINGS_ZONES,
 } from "@/lib/rfef-rules/config";
 export { resolveKnockoutTwoLeg } from "@/lib/rfef-rules/knockout";
 export {

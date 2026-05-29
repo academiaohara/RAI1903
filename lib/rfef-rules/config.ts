@@ -1,5 +1,12 @@
-import { DEFAULT_STANDINGS_ZONES } from "@/lib/standings";
+import type { StandingsZonesConfig } from "@/lib/standings";
 import type { RfefCompetitionRules } from "@/lib/rfef-rules/types";
+
+/** 1ª RFEF por grupo: 1º ascenso directo; 2º–5º playoff; 5 últimos descenso. */
+export const PRIMERA_RFEF_STANDINGS_ZONES: StandingsZonesConfig = {
+  promotion: 1,
+  playoff: 4,
+  relegation: 5,
+};
 
 /** Filiales y equipos dependientes sin derecho al playoff de ascenso en 1ª RFEF. */
 export const PRIMERA_RFEF_INELIGIBLE_PLAYOFF_TEAM_IDS = [
@@ -14,7 +21,7 @@ export const PRIMERA_RFEF_INELIGIBLE_PLAYOFF_TEAM_IDS = [
 ] as const;
 
 export const PRIMERA_RFEF_RULES: RfefCompetitionRules = {
-  zones: DEFAULT_STANDINGS_ZONES,
+  zones: PRIMERA_RFEF_STANDINGS_ZONES,
   tiebreak: {
     rules: {
       twoTeam: [
