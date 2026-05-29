@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
-    "sync:news": "node --experimental-strip-types scripts/sync-news-from-urls.ts"
+    "sync:news": "node --experimental-strip-types scripts/sync-news-from-urls.ts",
+    "sync:escudos": "node --experimental-strip-types scripts/sync-escudos-manifest.ts"
   },
   "repository": {
     "type": "git",
