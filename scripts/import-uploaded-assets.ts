@@ -10,7 +10,7 @@ const competicionesPublic = join(root, "public/competiciones");
 
 /** Maps team slug → source filename (without path) in Escudos/. */
 const ESCUDO_IMPORT_MAP: Record<string, string> = {
-  "real-aviles-industrial": "logo.png",
+  "real-aviles-industrial": "RealAvilesInd.png",
   "lugo": "LUGO.png",
   "pontevedra": "PONTEVEDRA.png",
   "zamora": "ZAMORA.png",
@@ -67,8 +67,7 @@ function importEscudos() {
   let copied = 0;
 
   for (const [slug, sourceName] of Object.entries(ESCUDO_IMPORT_MAP)) {
-    const sourceDir = sourceName === "logo.png" ? join(root, "public") : escudosSource;
-    const sourcePath = resolveSource(sourceDir, sourceName);
+    const sourcePath = resolveSource(escudosSource, sourceName);
     if (!sourcePath) {
       console.warn(`Omitido ${slug}: no se encuentra ${sourceName}`);
       continue;
