@@ -1,6 +1,7 @@
 import { Badge } from "@/components/Badge";
+import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { RAI_TEAM_ID } from "@/data/mock";
-import { matchFixtureMeta } from "@/lib/competition-labels";
+import { matchCompetitionShortLabel, matchFixtureMeta } from "@/lib/competition-labels";
 import { matchFixtureCardClassName } from "@/lib/match-card-styles";
 import { formatMatchDate } from "@/lib/utils";
 import type { Match } from "@/types";
@@ -21,7 +22,8 @@ export function MatchCard({
     <article className={matchFixtureCardClassName}>
       <div className="mb-1 flex items-start justify-between gap-2">
         <Badge tone={match.status === "finished" ? "slate" : "blue"}>{match.status === "finished" ? "Finalizado" : "Programado"}</Badge>
-        <span className="shrink-0 text-right text-[11px] font-bold uppercase leading-tight tracking-[0.06em] text-[#981915]">
+        <span className="flex shrink-0 items-center justify-end gap-1.5 text-right text-[11px] font-bold uppercase leading-tight tracking-[0.06em] text-[#981915]">
+          <CompetitionLogo competition={match.competition} alt={matchCompetitionShortLabel(match)} size="xs" />
           {matchFixtureMeta(match)}
         </span>
       </div>

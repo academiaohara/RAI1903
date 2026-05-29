@@ -12,6 +12,7 @@ import { OpponentCrest } from "@/components/OpponentCrest";
 import { PageHero } from "@/components/PageHero";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
 import { RAI_TEAM_ID, newsItems, players } from "@/data/mock";
+import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
 import { getLatestAvilesMatches, getNextAvilesMatch, getTeam, getTeamsByGender, getUpcomingAvilesMatches } from "@/lib/fixtures";
 import { getBalancedStandingsWindow } from "@/lib/standings-window";
@@ -228,7 +229,10 @@ function MatchBanner({ match, label, href, action }: { match: Match; label: stri
         </div>
         <div className="flex min-w-0 items-center justify-between gap-3 p-4 lg:gap-4 lg:p-5">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-normal text-[#981915]">{competitionLabel}</p>
+            <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-normal text-[#981915]">
+              <CompetitionLogo competition={match.competition} alt={competitionLabel} size="xs" />
+              {competitionLabel}
+            </p>
             <p className="mt-1 break-words text-lg font-extrabold leading-tight text-slate-900 lg:text-xl">{match.awayTeam}</p>
           </div>
           <span className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#214C9B]/20 px-4 py-2 text-sm font-bold text-[#214C9B] transition group-hover:bg-[#214C9B] group-hover:text-white lg:w-auto lg:shrink-0">

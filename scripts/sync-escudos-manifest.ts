@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 const RAI_TEAM_ID = "real-aviles-industrial";
 const RAI_FEM_TEAM_ID = "real-aviles-industrial-femenino";
 
-const BASE_TEAM_IDS = [
+const GRUPO1_TEAM_IDS = [
   RAI_TEAM_ID,
   "ferrol",
   "lugo",
@@ -27,6 +27,31 @@ const BASE_TEAM_IDS = [
   "athletic-bilbao-b",
   "osasuna-promesas",
 ] as const;
+
+const GRUPO2_TEAM_IDS = [
+  "eldense",
+  "sabadell",
+  "atletico-madrileno",
+  "villarreal-b",
+  "europa",
+  "cartagena",
+  "antequera",
+  "algeciras",
+  "hercules",
+  "real-murcia",
+  "alcorcon",
+  "ibiza",
+  "teruel",
+  "gimnastic",
+  "torremolinos",
+  "betis-deportivo",
+  "tarazona",
+  "marbella",
+  "atletico-sanluqueno",
+  "sevilla-atletico",
+] as const;
+
+const REQUIRED_TEAM_IDS = [...GRUPO1_TEAM_IDS, ...GRUPO2_TEAM_IDS] as const;
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const escudosDir = join(root, "public/escudos");
@@ -62,8 +87,10 @@ writeFileSync(manifestPath, source);
 
 console.log(`Escudos sincronizados: ${bySlug.size} archivos → lib/escudo-manifest.ts`);
 
-const missing = BASE_TEAM_IDS.filter((id) => !bySlug.has(id));
-const orphans = [...bySlug.keys()].filter((slug) => !BASE_TEAM_IDS.includes(slug as (typeof BASE_TEAM_IDS)[number]));
+const missing = REQUIRED_TEAM_IDS.filter((id) => !bySlug.has(id));
+const orphans = [...bySlug.keys()].filter(
+  (slug) => !REQUIRED_TEAM_IDS.includes(slug as (typeof REQUIRED_TEAM_IDS)[number]),
+);
 
 if (missing.length > 0) {
   console.error(`Faltan escudos para: ${missing.join(", ")}`);
