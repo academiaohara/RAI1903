@@ -8,7 +8,7 @@ export type RivalSquadImportPlayer = {
   a: number;
   ta: number;
   tr: number;
-  valor: string;
+  valor: string | null;
   contrato: number;
 };
 
