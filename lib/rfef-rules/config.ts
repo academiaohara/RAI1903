@@ -8,7 +8,10 @@ export const PRIMERA_RFEF_STANDINGS_ZONES: StandingsZonesConfig = {
   relegation: 5,
 };
 
-/** Filiales y equipos dependientes sin derecho al playoff de ascenso en 1ª RFEF. */
+/**
+ * Filiales y equipos dependientes que no pueden ascender aunque ganen el playoff.
+ * Participan en el cuadro si terminan entre el 2.º y el 5.º de su grupo.
+ */
 export const PRIMERA_RFEF_INELIGIBLE_PLAYOFF_TEAM_IDS = [
   "castilla",
   "celta-fortuna",
@@ -54,12 +57,12 @@ export const PRIMERA_RFEF_RULES: RfefCompetitionRules = {
         {
           id: "sf2",
           home: { groupId: "1", position: 4 },
-          away: { groupId: "2", position: 3 },
+          away: { groupId: "2", position: 2 },
         },
         {
           id: "sf3",
           home: { groupId: "1", position: 5 },
-          away: { groupId: "2", position: 2 },
+          away: { groupId: "2", position: 3 },
         },
         {
           id: "sf4",
@@ -81,5 +84,6 @@ export const PRIMERA_RFEF_RULES: RfefCompetitionRules = {
       aggregateDrawTiebreaker: "better-league-position",
     },
   },
-  ineligiblePlayoffTeamIds: [...PRIMERA_RFEF_INELIGIBLE_PLAYOFF_TEAM_IDS],
+  /** Vacío: los clasificados del 2.º al 5.º juegan el cuadro; los filiales no ascienden si ganan. */
+  ineligiblePlayoffTeamIds: [],
 };
