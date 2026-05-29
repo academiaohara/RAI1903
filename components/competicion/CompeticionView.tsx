@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { CalendarNavButton } from "@/components/CalendarNavButton";
 import { Card } from "@/components/Card";
 import { GrupoSwitcher } from "@/components/competicion/GrupoSwitcher";
@@ -14,6 +14,7 @@ import {
 } from "@/lib/fixtures";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getTeamsForRfefGrupo, type RfefGrupoId } from "@/lib/rfef-grupos";
+import { getPlayedLeagueRounds } from "@/lib/standings";
 import { matchdays, matchdaysGrupo2 } from "@/data/mock";
 import type { Route } from "next";
 type CompeticionViewProps = {
@@ -31,6 +32,16 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
   const latest = getLatestAvilesMatchesByGender(gender, 5);
   const upcoming = getUpcomingAvilesMatchesByGender(gender, 5);
   const calendarHref = `${primerEquipoBase(gender)}/calendario` as Route;
+
+  const lastGrupoJornada = useMemo(() => {
+    if (showAvilesSidebar) return null;
+    const playedRounds = getPlayedLeagueRounds(standingsMatchdays);
+    const lastRound = playedRounds[playedRounds.length - 1];
+    if (!lastRound) return null;
+    const matchday = standingsMatchdays.find((round) => round.round === lastRound);
+    if (!matchday) return null;
+    return { round: lastRound, matches: matchday.matches };
+  }, [showAvilesSidebar, standingsMatchdays]);
 
   return (
     <div className="space-y-6">
@@ -90,12 +101,17 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
               </Card>
             </>
           )}
-          {isMasculino && !showAvilesSidebar && (
-            <Card eyebrow="Real Avilés" title="Tu equipo" borderlessHeader>
-              <p className="text-sm font-bold leading-relaxed text-slate-600">
-                El Real Avilés compite en el Grupo I. Cambia al Grupo 1 para ver resultados, calendario y la
-                clasificacion con el tramo centrado en el blanquiazul.
-              </p>
+          {isMasculino && !showAvilesSidebar && lastGrupoJornada && (
+            <Card
+              eyebrow="Grupo II"
+              title={`Ultima jornada · J${lastGrupoJornada.round}`}
+              borderlessHeader
+            >
+              <div className="space-y-3">
+                {lastGrupoJornada.matches.map((match) => (
+                  <MatchCard key={match.id} match={match} compact highlightTeamId="" />
+                ))}
+              </div>
             </Card>
           )}
         </div>
