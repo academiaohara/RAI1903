@@ -5,6 +5,8 @@ import {
   getStandingsHighlightCellClass,
   getStandingsHighlightPositionClass,
   getStandingsHighlightRowClass,
+  getStandingsRowHighlight,
+  isStandingsRowHighlighted,
 } from "@/lib/standings-styles";
 import { cn, formatGoalDifference, resultTone } from "@/lib/utils";
 import type { Team } from "@/types";
@@ -13,6 +15,8 @@ type LeagueTableProps = {
   teams: Team[];
   compact?: boolean;
   highlightTeamId?: string;
+  /** With highlightTeamId: club row (Avilés) blue, viewed team granate. */
+  clubHighlightTeamId?: string;
   showLegend?: boolean;
 };
 
@@ -20,6 +24,7 @@ export function LeagueTable({
   teams,
   compact = false,
   highlightTeamId = RAI_TEAM_ID,
+  clubHighlightTeamId,
   showLegend = true,
 }: LeagueTableProps) {
   const visibleRows = [...teams].sort((a, b) => a.position - b.position);
@@ -56,10 +61,13 @@ export function LeagueTable({
           <tbody className="divide-y divide-slate-100">
             {visibleRows.map((team) => {
               const diff = team.stats.goalsFor - team.stats.goalsAgainst;
-              const highlighted = team.id === highlightTeamId;
-              const rowClassName = getStandingsHighlightRowClass(highlighted);
-              const highlightCellClassName = getStandingsHighlightCellClass(highlighted);
-              const positionClassName = getStandingsHighlightPositionClass(highlighted, team.zone);
+              const rowHighlight = clubHighlightTeamId
+                ? getStandingsRowHighlight(team.id, highlightTeamId, clubHighlightTeamId)
+                : team.id === highlightTeamId;
+              const highlighted = isStandingsRowHighlighted(rowHighlight);
+              const rowClassName = getStandingsHighlightRowClass(rowHighlight);
+              const highlightCellClassName = getStandingsHighlightCellClass(rowHighlight);
+              const positionClassName = getStandingsHighlightPositionClass(false, team.zone);
               const dataCellClassName = cn(
                 "px-0.5 py-1.5 md:px-2 md:py-2.5",
                 highlightCellClassName,
