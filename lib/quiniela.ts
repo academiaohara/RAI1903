@@ -167,6 +167,23 @@ export function isMatchdayComplete(matchday: Matchday, predictions: Record<strin
   });
 }
 
+export function countFinishedMatches(matchday: Matchday): number {
+  return matchday.matches.filter((match) => actualOutcome(match) !== null).length;
+}
+
+export function isMatchdayFullyFinished(matchday: Matchday): boolean {
+  return countFinishedMatches(matchday) === matchday.matches.length;
+}
+
+export function countOutcomeHits(matchday: Matchday, predictions: Record<string, Prediction>): number {
+  return matchday.matches.reduce((total, match) => {
+    const outcome = actualOutcome(match);
+    const prediction = predictions[match.id];
+    if (!outcome || !prediction?.outcome) return total;
+    return total + (prediction.outcome === outcome ? 1 : 0);
+  }, 0);
+}
+
 export function migratePrediction(raw: Prediction & { exactScore?: { home: number; away: number }; scorers?: string[] }): Prediction {
   const goalsHome =
     raw.goalsHome ??

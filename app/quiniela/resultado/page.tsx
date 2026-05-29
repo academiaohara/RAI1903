@@ -4,12 +4,25 @@ import { useMemo, useState } from "react";
 import { Card } from "@/components/Card";
 import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
+import { PredictionForm } from "@/components/PredictionForm";
+import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
 import { CURRENT_QUINIELA_ROUND, jornadaParticipants, matchdays } from "@/data/mock";
-import { getMatchdayByRound, hasFirstMatchStarted } from "@/lib/quiniela";
+import {
+  getMatchdayByRound,
+  hasFirstMatchStarted,
+  sortQuinielaMatches,
+} from "@/lib/quiniela";
+
+type ResultadoView = "quiniela" | "ranking";
 
 export default function QuinielaResultadoPage() {
   const [round, setRound] = useState(CURRENT_QUINIELA_ROUND);
+  const [view, setView] = useState<ResultadoView>("quiniela");
   const selectedMatchday = useMemo(() => getMatchdayByRound(round), [round]);
+  const orderedMatches = useMemo(
+    () => sortQuinielaMatches(selectedMatchday.matches),
+    [selectedMatchday.matches],
+  );
   const started = hasFirstMatchStarted(selectedMatchday);
   const sortedParticipants = useMemo(() => {
     const list = [...(jornadaParticipants[round] ?? [])];
@@ -19,14 +32,12 @@ export default function QuinielaResultadoPage() {
     return list;
   }, [round, started]);
 
-  const leader = sortedParticipants[0];
-
   return (
     <div className="space-y-6">
       <PageHero
         eyebrow="Quiniela"
         title="Resultado"
-        description="Participantes por orden de envio. Cuando arranca la jornada, los puntos se actualizan y la tabla se ordena por clasificacion."
+        description="Consulta el resultado oficial de la jornada o la clasificacion de participantes."
       />
       <JornadaSelector
         value={round}
@@ -36,38 +47,57 @@ export default function QuinielaResultadoPage() {
       />
 
       <Card eyebrow={`Jornada ${round}`} title="Resultado de la jornada">
-        <div className="mb-5 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl border border-[#214C9B]/20 bg-blue-50 p-4 text-center">
-            <p className="text-xs font-bold uppercase tracking-normal text-slate-500">Participantes</p>
-            <p className="mt-2 text-3xl font-extrabold text-[#214C9B]">{sortedParticipants.length}</p>
-          </div>
-          <div className="rounded-2xl border border-[#214C9B]/20 bg-blue-50 p-4 text-center">
-            <p className="text-xs font-bold uppercase tracking-normal text-slate-500">Estado</p>
-            <p className="mt-2 text-lg font-extrabold text-[#214C9B]">{started ? "En juego" : "Pendiente de inicio"}</p>
-          </div>
-          <div className="rounded-2xl border border-red-100 bg-red-50 p-4 text-center">
-            <p className="text-xs font-bold uppercase tracking-normal text-slate-500">Lider</p>
-            <p className="mt-2 text-lg font-extrabold text-[#981915]">{leader?.user ?? "—"}</p>
-            {leader && <p className="text-sm font-bold text-slate-600">{leader.points} pts</p>}
-          </div>
-        </div>
+        <QuinielaViewToggle
+          value={view}
+          onChange={setView}
+          layoutId="quiniela-resultado-view"
+          options={[
+            { id: "quiniela", label: "Resultado quiniela" },
+            { id: "ranking", label: "Ranking jornada" },
+          ]}
+          className="mb-5"
+        />
 
-        <div className="space-y-2">
-          {sortedParticipants.map((row) => (
-            <div
-              key={row.user}
-              className="flex items-center justify-between gap-3 rounded-2xl border border-[#214C9B]/20 bg-white p-4 text-sm"
-            >
-              <p className="font-extrabold uppercase text-[#214C9B]">{row.user}</p>
-              <span className="font-extrabold text-slate-900">{row.points} pts</span>
+        {view === "quiniela" ? (
+          <div className="space-y-4">
+            <p className="text-sm text-slate-600">
+              Signos 1-X-2 oficiales de la jornada. Las casillas con resultado aparecen en granate.
+            </p>
+            {orderedMatches.map((match) => (
+              <PredictionForm
+                key={match.id}
+                match={match}
+                mode="results"
+                readOnly
+                onChange={() => undefined}
+              />
+            ))}
+          </div>
+        ) : (
+          <>
+            <div className="space-y-2">
+              {sortedParticipants.map((row, index) => (
+                <div
+                  key={row.user}
+                  className="flex items-center justify-between gap-3 rounded-2xl border border-[#214C9B]/20 bg-white p-4 text-sm"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#214C9B]/10 text-xs font-extrabold text-[#214C9B]">
+                      {index + 1}
+                    </span>
+                    <p className="truncate font-extrabold uppercase text-[#214C9B]">{row.user}</p>
+                  </div>
+                  <span className="shrink-0 font-extrabold text-slate-900">{row.points} pts</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {!started && (
-          <p className="mt-4 text-sm text-slate-500">
-            Todos los participantes aparecen con 0 puntos hasta que empiece el primer partido de la jornada.
-          </p>
+            {!started && (
+              <p className="mt-4 text-sm text-slate-500">
+                Todos los participantes aparecen con 0 puntos hasta que empiece el primer partido de la jornada.
+              </p>
+            )}
+          </>
         )}
       </Card>
     </div>
