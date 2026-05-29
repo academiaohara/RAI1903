@@ -8,7 +8,7 @@ import {
 import { getTeamCrestById } from "@/lib/team-crests";
 import { matchToFinishedLeagueMatch } from "@/lib/standings";
 import { getPlayerRole } from "@/lib/player-roles";
-import { getSquadPlayerPhoto, STADIUM_ROMAN_SUAREZ_PHOTO } from "@/lib/squad-photos";
+import { getSquadPlayerPhoto, getStadiumPhoto } from "@/lib/squad-photos";
 import type { Player } from "@/types";
 import type { PlayerCareerRecord, PlayerMatchRecord, SquadClubInfo, SquadPlayer } from "@/types/squad";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -235,7 +235,7 @@ export function getSquadClubInfo(gender: PrimerEquipoGender): SquadClubInfo {
     estadio: stadiumName,
     estadioInfo: {
       nombre: stadiumName,
-      imagen: STADIUM_ROMAN_SUAREZ_PHOTO,
+      imagen: getStadiumPhoto(teamId),
       capacidad: 5000,
       direccion: "Calle Roman Suarez Puerta, s/n",
       ciudad: city,

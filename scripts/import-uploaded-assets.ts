@@ -5,8 +5,10 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const escudosSource = join(root, "Escudos");
 const competicionesSource = join(root, "Competiciones");
+const estadiosSource = join(root, "Estadios");
 const escudosPublic = join(root, "public/escudos");
 const competicionesPublic = join(root, "public/competiciones");
+const estadioPublic = join(root, "public/estadio");
 
 /** Maps team slug → source filename (without path) in Escudos/. */
 const ESCUDO_IMPORT_MAP: Record<string, string> = {
@@ -55,6 +57,30 @@ const ESCUDO_IMPORT_MAP: Record<string, string> = {
 const COMPETICION_IMPORT_MAP: Record<string, string> = {
   "primera-rfef": "1rfef.png",
   "copa-rey": "Copadelrey.png",
+};
+
+/** Maps team slug → source filename in Estadios/. Destination uses the same extension. */
+const ESTADIO_IMPORT_MAP: Record<string, string> = {
+  "real-aviles-industrial": "Roman_suarez_puerta.jpg",
+  ferrol: "a_malata.jpg",
+  lugo: "anxo_carro.webp",
+  pontevedra: "pasaron.jpg",
+  zamora: "ruta_de_la_plata.JPG",
+  arenteiro: "espiñedo.jpg",
+  unionistas: "Reina_sofia.jpg",
+  ponferradina: "toralin.jpg",
+  castilla: "alfredo_di_stefano.jpg",
+  tenerife: "Heliodoro.webp",
+  talavera: "talavera.jpg",
+  merida: "jose_fouto.jpg",
+  "celta-fortuna": "Estadio de Barreiro.jpg",
+  cacereno: "Principe_felipe.webp",
+  guadalajara: "Pedro_escartin.jpg",
+  ourense: "o_couto.jpg",
+  arenas: "fadura.png",
+  barakaldo: "lasesarre.jpg",
+  "athletic-bilbao-b": "lezama.jpg",
+  "osasuna-promesas": "tajonar.jpg",
 };
 
 function resolveSource(dir: string, filename: string): string | null {
@@ -106,5 +132,30 @@ function importCompeticiones() {
   console.log(`Logos de competicion importados: ${copied} → public/competiciones/*.png`);
 }
 
+function extensionOf(filename: string): string {
+  const match = filename.match(/\.(jpe?g|png|webp)$/i);
+  return match ? match[0]!.toLowerCase() : ".jpg";
+}
+
+function importEstadios() {
+  mkdirSync(estadioPublic, { recursive: true });
+  let copied = 0;
+
+  for (const [slug, sourceName] of Object.entries(ESTADIO_IMPORT_MAP)) {
+    const sourcePath = resolveSource(estadiosSource, sourceName);
+    if (!sourcePath) {
+      console.warn(`Omitido estadio ${slug}: no se encuentra ${sourceName}`);
+      continue;
+    }
+
+    const ext = extensionOf(sourceName);
+    copyFileSync(sourcePath, join(estadioPublic, `${slug}${ext}`));
+    copied += 1;
+  }
+
+  console.log(`Estadios importados: ${copied} → public/estadio/*`);
+}
+
 importEscudos();
 importCompeticiones();
+importEstadios();

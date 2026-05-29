@@ -6,7 +6,7 @@ import {
 } from "@/lib/rival-squad-imports";
 import { getRivalSquad, type RivalPlayer } from "@/lib/rival-squads";
 import { getSquadClubInfo, getSquadPlayers } from "@/lib/squad-data";
-import { getSquadPlayerPhoto, STADIUM_ROMAN_SUAREZ_PHOTO } from "@/lib/squad-photos";
+import { getSquadPlayerPhoto, getStadiumPhoto } from "@/lib/squad-photos";
 import { getTeamCrestById } from "@/lib/team-crests";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Team } from "@/types";
@@ -19,9 +19,6 @@ const ROLES_BY_POSITION: Record<SquadPosition, SquadRoleCode[]> = {
   Centrocampista: ["MC", "MCD", "MCO"],
   Delantero: ["ED", "EI", "DC", "SD"],
 };
-
-const GENERIC_STADIUM_IMAGE =
-  "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80";
 
 function hashString(value: string): number {
   let hash = 0;
@@ -90,7 +87,7 @@ function rivalToSquadPlayer(player: RivalPlayer, team: Team, index: number): Squ
 }
 
 function buildClubInfoFromTeam(team: Team, playerCount: number): SquadClubInfo {
-  const stadiumImage = team.id.includes("aviles") ? STADIUM_ROMAN_SUAREZ_PHOTO : GENERIC_STADIUM_IMAGE;
+  const stadiumImage = getStadiumPhoto(team.id);
 
   return {
     nombre: team.name,
