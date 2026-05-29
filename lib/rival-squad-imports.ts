@@ -1,9 +1,11 @@
 import { arenasSquadImport } from "@/data/rivals/arenas";
 import { athleticBilbaoBSquadImport } from "@/data/rivals/athletic-bilbao-b";
 import { barakaldoSquadImport } from "@/data/rivals/barakaldo";
+import { cacerenoSquadImport } from "@/data/rivals/cacereno";
 import { castillaSquadImport } from "@/data/rivals/castilla";
 import { celtaFortunaSquadImport } from "@/data/rivals/celta-fortuna";
 import { ferrolSquadImport } from "@/data/rivals/ferrol";
+import { guadalajaraSquadImport } from "@/data/rivals/guadalajara";
 import { lugoSquadImport } from "@/data/rivals/lugo";
 import { meridaSquadImport } from "@/data/rivals/merida";
 import { ponferradinaSquadImport } from "@/data/rivals/ponferradina";
@@ -26,9 +28,11 @@ const RIVAL_SQUAD_IMPORTS: Record<string, RivalSquadImport> = {
   arenas: arenasSquadImport,
   "athletic-bilbao-b": athleticBilbaoBSquadImport,
   barakaldo: barakaldoSquadImport,
+  cacereno: cacerenoSquadImport,
   castilla: castillaSquadImport,
   "celta-fortuna": celtaFortunaSquadImport,
   ferrol: ferrolSquadImport,
+  guadalajara: guadalajaraSquadImport,
   lugo: lugoSquadImport,
   merida: meridaSquadImport,
   ponferradina: ponferradinaSquadImport,
