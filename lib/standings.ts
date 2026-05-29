@@ -1,4 +1,6 @@
 import { isLeagueCompetition, type LeagueCompetitionId } from "@/lib/competition-labels";
+import { sortStandingsByRfefRules } from "@/lib/rfef-rules/tiebreak";
+import type { LeagueTiebreakContext } from "@/lib/rfef-rules/types";
 import type { FormCode, Match, StandingsZone, Team } from "@/types";
 
 export type FinishedLeagueMatch = {
@@ -40,6 +42,7 @@ export type ComputedStandingsRow = TeamStandingsAccumulator & {
   goalDifference: number;
   zone: StandingsZone;
   form: FormCode[];
+  tiebreakNote?: string;
 };
 
 function outcomeForTeam(homeTeamId: string, awayTeamId: string, teamId: string, homeScore: number, awayScore: number): FormCode {
@@ -87,13 +90,27 @@ function applyMatch(acc: TeamStandingsAccumulator, match: FinishedLeagueMatch, t
   }
 }
 
-function compareStandings(a: TeamStandingsAccumulator, b: TeamStandingsAccumulator): number {
+function compareStandingsSimple(a: TeamStandingsAccumulator, b: TeamStandingsAccumulator): number {
   if (b.points !== a.points) return b.points - a.points;
   const dgA = a.goalsFor - a.goalsAgainst;
   const dgB = b.goalsFor - b.goalsAgainst;
   if (dgB !== dgA) return dgB - dgA;
   if (b.goalsFor !== a.goalsFor) return b.goalsFor - a.goalsFor;
   return a.teamId.localeCompare(b.teamId);
+}
+
+function sortAccumulators(
+  rows: TeamStandingsAccumulator[],
+  matches: readonly FinishedLeagueMatch[],
+  tiebreak?: LeagueTiebreakContext,
+): TeamStandingsAccumulator[] {
+  if (!tiebreak) {
+    return [...rows].sort(compareStandingsSimple);
+  }
+
+  const { orderedTeamIds } = sortStandingsByRfefRules(rows, matches, tiebreak);
+  const byId = new Map(rows.map((row) => [row.teamId, row]));
+  return orderedTeamIds.map((id) => byId.get(id)!);
 }
 
 function zoneForPosition(position: number, teamCount: number, zones: StandingsZonesConfig): StandingsZone {
@@ -128,6 +145,7 @@ export function computeStandings(
   teamIds: readonly string[],
   matches: readonly FinishedLeagueMatch[],
   zones: StandingsZonesConfig = DEFAULT_STANDINGS_ZONES,
+  tiebreak?: LeagueTiebreakContext,
 ): ComputedStandingsRow[] {
   const byTeam = new Map(teamIds.map((id) => [id, createAccumulator(id)]));
 
@@ -139,7 +157,9 @@ export function computeStandings(
     applyMatch(away, match, match.awayTeamId);
   }
 
-  const sorted = [...byTeam.values()].sort(compareStandings);
+  const rows = [...byTeam.values()];
+  const tiebreakResult = tiebreak ? sortStandingsByRfefRules(rows, matches, tiebreak) : null;
+  const sorted = tiebreak ? sortAccumulators(rows, matches, tiebreak) : [...rows].sort(compareStandingsSimple);
 
   return sorted.map((row, index) => {
     const position = index + 1;
@@ -148,6 +168,8 @@ export function computeStandings(
       .slice(-5)
       .map((entry) => entry.outcome);
 
+    const meta = tiebreakResult?.metaByTeamId.get(row.teamId);
+
     return {
       ...row,
       recentResults: [],
@@ -155,6 +177,7 @@ export function computeStandings(
       goalDifference: row.goalsFor - row.goalsAgainst,
       zone: zoneForPosition(position, sorted.length, zones),
       form,
+      tiebreakNote: meta?.note,
     };
   });
 }
@@ -163,12 +186,14 @@ export function applyStandingsToTeams(
   teams: Team[],
   matches: Match[],
   zones: StandingsZonesConfig = DEFAULT_STANDINGS_ZONES,
+  tiebreak?: LeagueTiebreakContext,
 ): Team[] {
   const leagueMatches = extractLeagueMatches(matches);
   const standings = computeStandings(
     teams.map((team) => team.id),
     leagueMatches,
     zones,
+    tiebreak,
   );
   const byId = new Map(standings.map((row) => [row.teamId, row]));
 
@@ -180,6 +205,7 @@ export function applyStandingsToTeams(
       position: row.position,
       zone: row.zone,
       form: row.form,
+      tiebreakNote: row.tiebreakNote,
       stats: {
         played: row.played,
         won: row.won,
@@ -212,9 +238,10 @@ export function getTeamsAtRound(
   matchdays: Array<{ round: number; matches: Match[] }>,
   round: number,
   zones: StandingsZonesConfig = DEFAULT_STANDINGS_ZONES,
+  tiebreak?: LeagueTiebreakContext,
 ): Team[] {
   const priorMatches = getMatchesBeforeRound(matchdays, round);
-  return applyStandingsToTeams(teams, priorMatches, zones);
+  return applyStandingsToTeams(teams, priorMatches, zones, tiebreak);
 }
 
 export function getHomeAwayRecordBeforeRound(

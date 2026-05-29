@@ -47,6 +47,8 @@ export type Team = {
   colors: string[];
   position: number;
   zone?: StandingsZone;
+  /** Aviso cuando el desempate queda pendiente de resolución oficial. */
+  tiebreakNote?: string;
   form: FormCode[];
   stats: {
     played: number;
