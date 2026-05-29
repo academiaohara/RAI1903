@@ -8,7 +8,7 @@ export function RivalCard({ team }: { team: Team }) {
     <article className="rounded-3xl border border-[#214C9B]/25 bg-white p-5 shadow-[0_14px_34px_rgba(17,24,39,0.07)] transition hover:-translate-y-1 hover:border-[#214C9B]">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <TeamCrest team={team} size="md" className="h-14 w-14 rounded-2xl border border-[#214C9B]/20 bg-blue-50" />
+          <TeamCrest team={team} size="md" className="h-14 w-14" />
           <div>
             <h3 className="text-2xl font-extrabold uppercase leading-none text-[#214C9B]">{team.shortName}</h3>
             <p className="mt-1 text-sm font-bold text-slate-500">{team.city}</p>
