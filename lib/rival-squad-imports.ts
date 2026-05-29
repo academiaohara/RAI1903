@@ -1,4 +1,5 @@
 import { celtaFortunaSquadImport } from "@/data/rivals/celta-fortuna";
+import { tenerifeSquadImport } from "@/data/rivals/tenerife";
 import { getTeamCrestById } from "@/lib/team-crests";
 import { STADIUM_ROMAN_SUAREZ_PHOTO } from "@/lib/squad-photos";
 import type { Team } from "@/types";
@@ -12,6 +13,7 @@ const GENERIC_STADIUM_IMAGE =
 
 const RIVAL_SQUAD_IMPORTS: Record<string, RivalSquadImport> = {
   "celta-fortuna": celtaFortunaSquadImport,
+  tenerife: tenerifeSquadImport,
 };
 
 function parsePlayerName(jugador: string): { nombre: string; apellido: string } {

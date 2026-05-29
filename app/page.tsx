@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight, Users } from "lucide-react";
 import { CalendarNavButton } from "@/components/CalendarNavButton";
 import { Card } from "@/components/Card";
-import { LeagueTableCard } from "@/components/LeagueTableCard";
+import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
 import { TransfersCarousel } from "@/components/fichajes/TransfersCarousel";
 import { NewsNavButton } from "@/components/NewsNavButton";
@@ -12,11 +12,10 @@ import { MatchScoreCenter } from "@/components/MatchScoreCenter";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { PageHero } from "@/components/PageHero";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
-import { RAI_TEAM_ID, newsItems, players } from "@/data/mock";
+import { RAI_TEAM_ID, matchdays, newsItems, players, teams } from "@/data/mock";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
-import { getLatestAvilesMatches, getNextAvilesMatch, getTeam, getTeamsByGender, getUpcomingAvilesMatches } from "@/lib/fixtures";
-import { getBalancedStandingsWindow } from "@/lib/standings-window";
+import { getLatestAvilesMatches, getNextAvilesMatch, getTeam, getUpcomingAvilesMatches } from "@/lib/fixtures";
 import { getTeamCrestById } from "@/lib/team-crests";
 import { getCronicaForMatch, getPreviaForMatch } from "@/lib/match-articles";
 import { primerEquipoBase } from "@/lib/primer-equipo";
@@ -25,8 +24,6 @@ import type { Route } from "next";
 import type { Match } from "@/types";
 
 export default function HomePage() {
-  const teams = getTeamsByGender("masculino");
-  const tableTeams = getBalancedStandingsWindow(teams, RAI_TEAM_ID, 10);
   const nextMatch = getNextAvilesMatch();
   const latestMatches = getLatestAvilesMatches();
   const latestMatch = latestMatches[0];
@@ -87,11 +84,11 @@ export default function HomePage() {
       )}
 
       <section className="grid gap-6 xl:grid-cols-[1fr_0.42fr]">
-        <LeagueTableCard
+        <StandingsLeagueTableCard
           eyebrow="Estado competitivo"
           title="Clasificacion"
-          teams={tableTeams}
-          fullTeams={teams}
+          sourceTeams={teams}
+          matchdays={matchdays}
           highlightTeamId={RAI_TEAM_ID}
           compact
         />
