@@ -50,6 +50,14 @@ export default function MiQuinielaPage() {
   const hits = countOutcomeHits(selectedMatchday, predictions);
   const showCompare = readOnly && (isLocked || finishedMatches > 0);
 
+  const statusBanner = useMemo(() => {
+    if (jornadaFinalizada) return "finished" as const;
+    if (isLocked) return "locked" as const;
+    if (isSaved && !isEditing) return "saved" as const;
+    if (!isSaved) return "unsaved" as const;
+    return null;
+  }, [jornadaFinalizada, isLocked, isSaved, isEditing]);
+
   const updatePrediction = useCallback(
     (prediction: Prediction) => {
       setPredictions((current) => {
@@ -99,24 +107,25 @@ export default function MiQuinielaPage() {
         onChange={handleRoundChange}
       />
 
-      {hydrated && !isSaved && (
+      {hydrated && statusBanner === "unsaved" && (
         <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900">
           No has hecho la quiniela de la jornada {round}. Rellena los partidos y pulsa Guardar.
         </p>
       )}
 
-      {hydrated && isLocked && (
+      {hydrated && statusBanner === "locked" && (
         <p className="rounded-2xl border border-[#981915]/30 bg-[#981915]/10 px-4 py-3 text-sm font-bold text-[#981915]">
           La jornada {round} ya ha empezado: tu quiniela queda cerrada.
         </p>
       )}
-      {hydrated && isSaved && !isEditing && !isLocked && (
+
+      {hydrated && statusBanner === "saved" && (
         <p className="rounded-2xl border border-[#214C9B]/20 bg-blue-50 px-4 py-3 text-sm font-bold text-[#214C9B]">
           Quiniela guardada. Pulsa Editar si quieres modificar algo antes del pitido inicial.
         </p>
       )}
 
-      {hydrated && jornadaFinalizada && (
+      {hydrated && statusBanner === "finished" && (
         <p className="rounded-2xl border border-[#981915]/30 bg-[#981915]/10 px-4 py-3 text-sm font-bold text-[#981915]">
           La jornada {round} esta finalizada: todos los partidos tienen resultado oficial.
         </p>
