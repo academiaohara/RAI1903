@@ -1,4 +1,9 @@
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
+import {
+  buildClubInfoFromImport,
+  buildSquadFromImport,
+  getImportedRivalSquad,
+} from "@/lib/rival-squad-imports";
 import { getRivalSquad, type RivalPlayer } from "@/lib/rival-squads";
 import { getSquadClubInfo, getSquadPlayers } from "@/lib/squad-data";
 import { STADIUM_ROMAN_SUAREZ_PHOTO } from "@/lib/squad-photos";
@@ -128,6 +133,15 @@ export function getCompeticionSquadData(
       club: getSquadClubInfo(gender),
       squad: getSquadPlayers(gender),
       isOwnClub: true,
+    };
+  }
+
+  const imported = getImportedRivalSquad(team.id);
+  if (imported) {
+    return {
+      club: buildClubInfoFromImport(team, imported),
+      squad: buildSquadFromImport(team, imported),
+      isOwnClub: false,
     };
   }
 
