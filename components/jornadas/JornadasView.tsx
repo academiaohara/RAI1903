@@ -6,10 +6,11 @@ import { JornadaRoundCarousel } from "@/components/jornadas/JornadaRoundCarousel
 import { JornadasGrupoSwitcher } from "@/components/jornadas/JornadasGrupoSwitcher";
 import { buildJornadasDataset } from "@/lib/jornadas-data";
 import { getRaiTeamId } from "@/lib/fixtures";
+import { leagueRoundForQualifyingStandings } from "@/lib/playoff-jornadas";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import type { JornadaFixture, JornadaRoundId } from "@/types/jornadas";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 type JornadasViewProps = {
   gender: PrimerEquipoGender;
@@ -25,17 +26,42 @@ export function JornadasView({ gender }: JornadasViewProps) {
   const dataset = useMemo(() => buildJornadasDataset(gender), [gender]);
   const raiTeamId = getRaiTeamId(gender);
   const [selectedRoundId, setSelectedRoundId] = useState<JornadaRoundId>(dataset.currentRoundId);
+  const [lastLeagueQualifyingRound, setLastLeagueQualifyingRound] = useState(
+    dataset.definitiveQualifyingLeagueRound,
+  );
   const [grupo, setGrupo] = useState<RfefGrupoId>("1");
 
-  const roundData = dataset.getRound(selectedRoundId);
+  const qualifyingLeagueRound = useMemo(() => {
+    const summary = dataset.getRound(selectedRoundId).summary;
+    if (summary.kind === "league" && summary.roundNumber) {
+      return leagueRoundForQualifyingStandings(summary.roundNumber);
+    }
+    return lastLeagueQualifyingRound;
+  }, [dataset, lastLeagueQualifyingRound, selectedRoundId]);
+
+  const handleSelectRound = useCallback(
+    (roundId: JornadaRoundId) => {
+      setSelectedRoundId(roundId);
+      const summary = dataset.getRound(roundId).summary;
+      if (summary.kind === "league" && summary.roundNumber) {
+        setLastLeagueQualifyingRound(leagueRoundForQualifyingStandings(summary.roundNumber));
+      }
+    },
+    [dataset],
+  );
+
+  const roundData = dataset.getRound(selectedRoundId, { qualifyingLeagueRound });
   const { summary } = roundData;
-  const grupoMatches = roundData.matchesByGrupo[grupo];
+  const grupoMatches =
+    summary.kind === "playoff"
+      ? roundData.matchesByGrupo["1"]
+      : roundData.matchesByGrupo[grupo];
   const { rai: raiMatches, rest: otherMatches } = partitionMatches(grupoMatches);
   const showGrupoSwitcher = gender === "masculino" && summary.kind === "league";
 
   const title =
     summary.kind === "playoff"
-      ? `Playoff de ascenso · ${summary.label}`
+      ? `Playoff de ascenso · ${summary.label}${summary.isProvisional ? " (provisional)" : ""}`
       : `Jornada ${summary.roundNumber}`;
 
   return (
@@ -43,7 +69,7 @@ export function JornadasView({ gender }: JornadasViewProps) {
       <JornadaRoundCarousel
         rounds={dataset.rounds}
         selectedId={selectedRoundId}
-        onSelect={setSelectedRoundId}
+        onSelect={handleSelectRound}
       />
 
       <Card eyebrow="Resultados" title={title} borderlessHeader>
@@ -61,10 +87,16 @@ export function JornadasView({ gender }: JornadasViewProps) {
           </div>
         )}
 
-        {summary.kind === "playoff" && raiMatches.length === 0 && (
+        {summary.kind === "playoff" && summary.isProvisional && (
           <p className="text-sm font-bold text-slate-600">
-            Los cruces del playoff de ascenso se publicarán cuando estén confirmados. La estructura de datos
-            ya está preparada para cargarlos desde API o JSON local.
+            Cruces calculados según la clasificación tras la jornada de liga que tenías seleccionada. Al cerrar
+            la temporada se muestran los equipos definitivos.
+          </p>
+        )}
+
+        {summary.kind === "playoff" && raiMatches.length === 0 && otherMatches.length === 0 && (
+          <p className="text-sm font-bold text-slate-600">
+            No hay partidos del Real Avilés en esta fase del playoff de ascenso.
           </p>
         )}
 

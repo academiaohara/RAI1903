@@ -98,7 +98,10 @@ export type RfefCompetitionRules = {
 export type PlayoffQualifiedTeam = {
   teamId: string;
   groupId: RfefGrupoId;
+  /** Puesto real en la tabla al cerrar la fase (puede ser >5 si sustituye a un filial). */
   leaguePosition: number;
+  /** Plaza de playoff (2º–5º) que ocupa en el cuadro. */
+  qualificationPosition: number;
   replacedIneligible?: boolean;
 };
 

@@ -1,4 +1,12 @@
 import { matchdays, matchdaysGrupo2, RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
+import {
+  DEFINITIVE_QUALIFYING_LEAGUE_ROUND,
+  buildPlayoffBracketThroughLeagueRound,
+  buildPlayoffFixturesForRound,
+  isDefinitiveQualifyingRound,
+  playoffFixturesForBothGrupos,
+  type PlayoffRoundKey,
+} from "@/lib/playoff-jornadas";
 import { RESULTADOS_2526_LAST_ROUND } from "@/lib/resultados-2526";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getTeam } from "@/lib/fixtures";
@@ -10,6 +18,7 @@ import type {
   JornadaRoundId,
   JornadaRoundSummary,
   JornadasDataset,
+  JornadasGetRoundOptions,
 } from "@/types/jornadas";
 
 const PLAYOFF_ROUNDS: Array<{
@@ -106,6 +115,7 @@ function buildLeagueRoundSummary(
 function buildPlayoffRoundSummary(
   playoff: (typeof PLAYOFF_ROUNDS)[number],
   isCurrent: boolean,
+  qualifyingLeagueRound: number,
 ): JornadaRoundSummary {
   return {
     id: playoff.id,
@@ -114,6 +124,31 @@ function buildPlayoffRoundSummary(
     date: playoff.date,
     shortDate: formatShortDate(playoff.date),
     isCurrent,
+    isProvisional: !isDefinitiveQualifyingRound(qualifyingLeagueRound),
+  };
+}
+
+function buildPlayoffRoundData(
+  summary: JornadaRoundSummary,
+  qualifyingLeagueRound: number,
+  raiId: string,
+): JornadaRoundData {
+  const playoffMeta = PLAYOFF_ROUNDS.find((round) => round.id === summary.id);
+  if (!playoffMeta) {
+    return { summary, matchesByGrupo: { "1": [], "2": [] } };
+  }
+
+  const bracket = buildPlayoffBracketThroughLeagueRound(qualifyingLeagueRound);
+  const fixtures = buildPlayoffFixturesForRound(
+    summary.id as PlayoffRoundKey,
+    playoffMeta.date,
+    bracket,
+    raiId,
+  );
+
+  return {
+    summary,
+    matchesByGrupo: playoffFixturesForBothGrupos(fixtures),
   };
 }
 
@@ -145,8 +180,8 @@ function matchdayByRound(matchdaysList: Matchday[], round: number): Matchday | u
 
 /**
  * Construye el dataset de jornadas para la UI.
- * Los partidos de liga provienen de los JSON de resultados; las fases de playoff
- * quedan preparadas para rellenarse desde API o JSON local.
+ * Los partidos de liga provienen de los JSON de resultados; el playoff de ascenso
+ * se genera desde el cuadro RFEF (clasificados definitivos o provisionales por jornada).
  */
 export function buildJornadasDataset(gender: PrimerEquipoGender): JornadasDataset {
   const raiId = raiTeamId(gender);
@@ -157,33 +192,47 @@ export function buildJornadasDataset(gender: PrimerEquipoGender): JornadasDatase
     .sort((a, b) => a.round - b.round)
     .map((md) => buildLeagueRoundSummary(md, raiId, currentRound));
 
-  const playoffSummaries = PLAYOFF_ROUNDS.map((po) => buildPlayoffRoundSummary(po, false));
+  const playoffSummaries = PLAYOFF_ROUNDS.map((po) =>
+    buildPlayoffRoundSummary(po, false, DEFINITIVE_QUALIFYING_LEAGUE_ROUND),
+  );
 
   const rounds: JornadaRoundSummary[] = [...leagueSummaries, ...playoffSummaries];
 
-  const roundDataCache = new Map<JornadaRoundId, JornadaRoundData>();
+  const leagueRoundDataCache = new Map<JornadaRoundId, JornadaRoundData>();
 
   for (const summary of leagueSummaries) {
     const round = summary.roundNumber!;
     const g1 = matchdayByRound(matchdays, round)?.matches ?? [];
     const g2 = matchdayByRound(matchdaysGrupo2, round)?.matches ?? [];
-    roundDataCache.set(summary.id, buildRoundData(summary, g1, g2, raiId));
-  }
-
-  for (const summary of playoffSummaries) {
-    roundDataCache.set(summary.id, buildRoundData(summary, [], [], raiId));
+    leagueRoundDataCache.set(summary.id, buildRoundData(summary, g1, g2, raiId));
   }
 
   return {
     rounds,
     currentRoundId,
-    getRound(roundId) {
-      const data = roundDataCache.get(roundId);
-      if (!data) {
-        const fallback = rounds[0];
-        return roundDataCache.get(fallback.id)!;
+    definitiveQualifyingLeagueRound: DEFINITIVE_QUALIFYING_LEAGUE_ROUND,
+    getRound(roundId, options?: JornadasGetRoundOptions) {
+      const qualifyingLeagueRound =
+        options?.qualifyingLeagueRound ?? DEFINITIVE_QUALIFYING_LEAGUE_ROUND;
+
+      const leagueData = leagueRoundDataCache.get(roundId);
+      if (leagueData) return leagueData;
+
+      const playoffMeta = PLAYOFF_ROUNDS.find((round) => round.id === roundId);
+      if (playoffMeta) {
+        const summary = buildPlayoffRoundSummary(playoffMeta, false, qualifyingLeagueRound);
+        return buildPlayoffRoundData(summary, qualifyingLeagueRound, raiId);
       }
-      return data;
+
+      const fallback = rounds[0];
+      return (
+        leagueRoundDataCache.get(fallback.id) ??
+        buildPlayoffRoundData(
+          buildPlayoffRoundSummary(PLAYOFF_ROUNDS[0], false, qualifyingLeagueRound),
+          qualifyingLeagueRound,
+          raiId,
+        )
+      );
     },
   };
 }
