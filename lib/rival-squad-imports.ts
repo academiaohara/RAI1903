@@ -1,5 +1,6 @@
 import { castillaSquadImport } from "@/data/rivals/castilla";
 import { celtaFortunaSquadImport } from "@/data/rivals/celta-fortuna";
+import { ponferradinaSquadImport } from "@/data/rivals/ponferradina";
 import { tenerifeSquadImport } from "@/data/rivals/tenerife";
 import { zamoraSquadImport } from "@/data/rivals/zamora";
 import { getTeamCrestById } from "@/lib/team-crests";
@@ -16,6 +17,7 @@ const GENERIC_STADIUM_IMAGE =
 const RIVAL_SQUAD_IMPORTS: Record<string, RivalSquadImport> = {
   castilla: castillaSquadImport,
   "celta-fortuna": celtaFortunaSquadImport,
+  ponferradina: ponferradinaSquadImport,
   tenerife: tenerifeSquadImport,
   zamora: zamoraSquadImport,
 };
