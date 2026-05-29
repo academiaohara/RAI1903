@@ -15,7 +15,15 @@ export function primerEquipoBase(gender: PrimerEquipoGender) {
   return `/primer-equipo/${gender}`;
 }
 
-export const PRIMER_EQUIPO_SECTIONS = ["plantilla", "noticias", "competicion", "calendario", "cronicas", "previas"] as const;
+export const PRIMER_EQUIPO_SECTIONS = [
+  "plantilla",
+  "noticias",
+  "competicion",
+  "jornadas",
+  "calendario",
+  "cronicas",
+  "previas",
+] as const;
 
 export type PrimerEquipoSection = (typeof PRIMER_EQUIPO_SECTIONS)[number];
 
@@ -25,6 +33,7 @@ export function getPrimerEquipoTabs(gender: PrimerEquipoGender) {
     { href: `${base}/plantilla`, label: "Plantilla" },
     { href: `${base}/noticias`, label: "Noticias" },
     { href: `${base}/competicion`, label: "Competicion" },
+    { href: `${base}/jornadas`, label: "Jornadas" },
     { href: `${base}/calendario`, label: "Calendario" },
     { href: `${base}/cronicas`, label: "Cronicas" },
     { href: `${base}/previas`, label: "Previas" },
