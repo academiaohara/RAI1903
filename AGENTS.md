@@ -25,4 +25,4 @@ npm run build      # Next.js production build
 - The dev server uses Turbopack for fast refresh.
 - Browser state (Quiniela predictions) persists via `localStorage` only.
 - Package manager is **npm** (lockfile: `package-lock.json`).
-- Team crests live in `/public/escudos` (slug filenames). Source uploads go in `/Escudos` and `/Competiciones` at repo root; run `npm run import:assets` to copy PNGs into `public/` and regenerate `lib/escudo-manifest.ts`.
+- Team crests live in `/public/escudos` (slug filenames). Upload all team PNGs to `/Escudos` (not the repo root); competition logos go in `/Competiciones`. Run `npm run import:assets` to copy into `public/` and regenerate `lib/escudo-manifest.ts`.
