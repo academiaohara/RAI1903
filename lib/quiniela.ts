@@ -1,5 +1,10 @@
 import { CURRENT_QUINIELA_ROUND, matchdays, players, RAI_TEAM_ID, teams } from "@/data/mock";
-import type { GoalsPick, Match, Matchday, Prediction, PredictionOutcome } from "@/types";
+import {
+  getHomeAwayRecordBeforeRound,
+  getTeamsAtRound,
+  type HomeAwayRecord,
+} from "@/lib/standings";
+import type { GoalsPick, Match, Matchday, Prediction, PredictionOutcome, Team } from "@/types";
 
 export { CURRENT_QUINIELA_ROUND };
 
@@ -85,6 +90,29 @@ export function isScorerPredictionCorrect(match: Match, prediction: Prediction):
 
 export function getTeamById(teamId: string) {
   return teams.find((team) => team.id === teamId);
+}
+
+const zeroedTeams: Team[] = teams.map((team) => ({
+  ...team,
+  position: 0,
+  form: [],
+  stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 },
+}));
+
+export function getTeamsBeforeRound(round: number): Team[] {
+  return getTeamsAtRound(zeroedTeams, matchdays, round);
+}
+
+export function getTeamByIdBeforeRound(teamId: string, round: number): Team | undefined {
+  return getTeamsBeforeRound(round).find((team) => team.id === teamId);
+}
+
+export function getTeamHomeAwayRecordBeforeRound(
+  teamId: string,
+  side: "home" | "away",
+  round: number,
+): HomeAwayRecord {
+  return getHomeAwayRecordBeforeRound(teamId, side, matchdays, round);
 }
 
 export function actualOutcome(match: Match): PredictionOutcome | null {

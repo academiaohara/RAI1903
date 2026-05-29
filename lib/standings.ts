@@ -193,6 +193,64 @@ export function applyStandingsToTeams(
   });
 }
 
+export type HomeAwayRecord = {
+  played: number;
+  wins: number;
+  draws: number;
+  losses: number;
+};
+
+export function getMatchesBeforeRound(
+  matchdays: Array<{ round: number; matches: Match[] }>,
+  round: number,
+): Match[] {
+  return matchdays.filter((matchday) => matchday.round < round).flatMap((matchday) => matchday.matches);
+}
+
+export function getTeamsAtRound(
+  teams: Team[],
+  matchdays: Array<{ round: number; matches: Match[] }>,
+  round: number,
+  zones: StandingsZonesConfig = DEFAULT_STANDINGS_ZONES,
+): Team[] {
+  const priorMatches = getMatchesBeforeRound(matchdays, round);
+  return applyStandingsToTeams(teams, priorMatches, zones);
+}
+
+export function getHomeAwayRecordBeforeRound(
+  teamId: string,
+  side: "home" | "away",
+  matchdays: Array<{ round: number; matches: Match[] }>,
+  round: number,
+): HomeAwayRecord {
+  const record: HomeAwayRecord = { played: 0, wins: 0, draws: 0, losses: 0 };
+  const priorMatches = getMatchesBeforeRound(matchdays, round);
+
+  for (const match of priorMatches) {
+    const finished = matchToFinishedLeagueMatch(match);
+    if (!finished) continue;
+
+    const isHomeSide = side === "home";
+    if (isHomeSide && finished.homeTeamId !== teamId) continue;
+    if (!isHomeSide && finished.awayTeamId !== teamId) continue;
+
+    const outcome = outcomeForTeam(
+      finished.homeTeamId,
+      finished.awayTeamId,
+      teamId,
+      finished.homeScore,
+      finished.awayScore,
+    );
+
+    record.played += 1;
+    if (outcome === "G") record.wins += 1;
+    else if (outcome === "E") record.draws += 1;
+    else record.losses += 1;
+  }
+
+  return record;
+}
+
 export function leagueMatchesFromMatchdays(
   matchdays: Array<{ matches: Match[] }>,
   competitionFilter?: readonly LeagueCompetitionId[],
