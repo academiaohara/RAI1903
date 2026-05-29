@@ -58,7 +58,7 @@ const baseTeams: Team[] = [
   { id: "arenas", name: "Arenas Club de Getxo", shortName: "Arenas", city: "Getxo", stadium: "Municipal de Fadura", coach: "Jon Erice", founded: 1909, crestInitials: "ACG", colors: ["#1E3A8A", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
   { id: "barakaldo", name: "Barakaldo CF", shortName: "Barakaldo", city: "Barakaldo", stadium: "Lasesarre", coach: "Imanol de la Sota Aberasturi", founded: 1921, crestInitials: "BAR", colors: ["#DC2626", "#111827"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
   { id: "athletic-bilbao-b", name: "Athletic Club B", shortName: "Athletic B", city: "Bilbao", stadium: "Instalaciones de Lezama", coach: "Jokin Aranbarri", founded: 1964, crestInitials: "ATH", colors: ["#DC2626", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
-  { id: "osasuna-promesas", name: "CA Osasuna Promesas", shortName: "Osasuna B", city: "Pamplona", stadium: "Tajonar Facilities", coach: "Santi Castillejo", founded: 1967, crestInitials: "OSA", colors: ["#DC2626", "#1D2D50"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: "osasuna-promesas", name: "CA Osasuna Promesas", shortName: "Osasuna B", city: "Pamplona", stadium: "Tajonar", coach: "Santi Castillejo", founded: 1967, crestInitials: "OSA", colors: ["#DC2626", "#1D2D50"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
 ];
 
 const baseTeamsFemenino: Team[] = baseTeams.map((team) =>
