@@ -89,69 +89,63 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
         />
       ) : (
         <>
-      {showAvilesSidebar && (
-        <GuiaLiga gender={gender} teams={teams} grupo={isMasculino ? grupo : "1"} />
-      )}
+          {showAvilesSidebar && <GuiaLiga gender={gender} teams={teams} grupo={isMasculino ? grupo : "1"} />}
 
-      <section className="grid gap-6 xl:grid-cols-2">
-        <StandingsLeagueTableCard
-          key={`${gender}-${grupo}`}
-          eyebrow="Liga"
-          sourceTeams={teams}
-          matchdays={standingsMatchdays}
-          highlightTeamId={showAvilesSidebar ? highlightTeamId : ""}
-          centerOnHighlight={showAvilesSidebar}
-          compact
-          borderlessHeader
-          gender={gender}
-        />
-        <div className="grid gap-6">
-          {showAvilesSidebar && (
-            <>
-              <Card eyebrow="Forma reciente" title="Ultimos resultados" borderlessHeader>
-                <div className="space-y-3">
-                  {latest.length > 0 ? (
-                    latest.map((match) => (
-                      <MatchCard key={match.id} match={match} compact highlightTeamId={highlightTeamId} gender={gender} />
-                    ))
-                  ) : (
-                    <p className="text-sm font-bold text-slate-500">Sin partidos finalizados.</p>
-                  )}
-                </div>
-              </Card>
-              <Card
-                eyebrow="Calendario"
-                title="Proximos partidos"
-                borderlessHeader
-                action={<CalendarNavButton href={calendarHref} />}
-              >
-                <div className="space-y-3">
-                  {upcoming.length > 0 ? (
-                    upcoming.map((match) => (
-                      <MatchCard key={match.id} match={match} compact highlightTeamId={highlightTeamId} gender={gender} />
-                    ))
-                  ) : (
-                    <p className="text-sm font-bold text-slate-500">Sin partidos programados.</p>
-                  )}
-                </div>
-              </Card>
-            </>
-          )}
-          {isMasculino && !showAvilesSidebar && lastGrupoJornada && (
-            <Card
-              eyebrow="Grupo II"
-              title={`Ultima jornada · J${lastGrupoJornada.round}`}
+          <section className="grid gap-6 xl:grid-cols-2">
+            <StandingsLeagueTableCard
+              key={`${gender}-${grupo}`}
+              eyebrow="Liga"
+              sourceTeams={teams}
+              matchdays={standingsMatchdays}
+              highlightTeamId={showAvilesSidebar ? highlightTeamId : ""}
+              centerOnHighlight={showAvilesSidebar}
+              compact
               borderlessHeader
-            >
-              <div className="space-y-3">
-                {lastGrupoJornada.matches.map((match) => (
-                  <MatchCard key={match.id} match={match} compact highlightTeamId="" gender={gender} />
-                ))}
-              </div>
-            </Card>
-          )}
-        </div>
-      </section>
+              gender={gender}
+            />
+            <div className="grid gap-6">
+              {showAvilesSidebar && (
+                <>
+                  <Card eyebrow="Forma reciente" title="Ultimos resultados" borderlessHeader>
+                    <div className="space-y-3">
+                      {latest.length > 0 ? (
+                        latest.map((match) => (
+                          <MatchCard key={match.id} match={match} compact highlightTeamId={highlightTeamId} gender={gender} />
+                        ))
+                      ) : (
+                        <p className="text-sm font-bold text-slate-500">Sin partidos finalizados.</p>
+                      )}
+                    </div>
+                  </Card>
+                  <Card
+                    eyebrow="Calendario"
+                    title="Proximos partidos"
+                    borderlessHeader
+                    action={<CalendarNavButton href={calendarHref} />}
+                  >
+                    <div className="space-y-3">
+                      {upcoming.length > 0 ? (
+                        upcoming.map((match) => (
+                          <MatchCard key={match.id} match={match} compact highlightTeamId={highlightTeamId} gender={gender} />
+                        ))
+                      ) : (
+                        <p className="text-sm font-bold text-slate-500">Sin partidos programados.</p>
+                      )}
+                    </div>
+                  </Card>
+                </>
+              )}
+              {isMasculino && !showAvilesSidebar && lastGrupoJornada && (
+                <Card eyebrow="Grupo II" title={`Ultima jornada · J${lastGrupoJornada.round}`} borderlessHeader>
+                  <div className="space-y-3">
+                    {lastGrupoJornada.matches.map((match) => (
+                      <MatchCard key={match.id} match={match} compact highlightTeamId="" gender={gender} />
+                    ))}
+                  </div>
+                </Card>
+              )}
+            </div>
+          </section>
         </>
       )}
     </div>
@@ -171,9 +165,10 @@ function CopaDelReyPanel({
 }) {
   const wins = matches.filter((match) => getAvilesGoals(match, highlightTeamId) > getRivalGoals(match, highlightTeamId)).length;
   const lastMatch = matches[matches.length - 1];
-  const status = lastMatch && getAvilesGoals(lastMatch, highlightTeamId) < getRivalGoals(lastMatch, highlightTeamId)
-    ? `Eliminado en ${lastMatch.competitionStage ?? "Copa del Rey"}`
-    : "En competicion";
+  const status =
+    lastMatch && getAvilesGoals(lastMatch, highlightTeamId) < getRivalGoals(lastMatch, highlightTeamId)
+      ? `Eliminado en ${lastMatch.competitionStage ?? "Copa del Rey"}`
+      : "En competicion";
 
   return (
     <Card
