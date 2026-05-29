@@ -16,10 +16,9 @@ type TeamCalendarProps = {
 
 const TODAY_DAY_CLASS = "inline-flex min-w-[1.75rem] items-center justify-center rounded-lg bg-[#214C9B] px-2 py-0.5 text-sm font-extrabold text-white";
 
-const EMPTY_CELL_CLASS =
-  "flex min-h-[6.5rem] items-start rounded-2xl border border-dashed border-[#214C9B]/10 bg-slate-50/40 p-2.5 sm:aspect-square sm:min-h-0";
+const EMPTY_CELL_CLASS = "flex items-start rounded-xl px-2 py-2.5";
 
-const PLACEHOLDER_CELL_CLASS = "min-h-[6.5rem] rounded-2xl bg-slate-50/60 sm:aspect-square sm:min-h-0";
+const PLACEHOLDER_CELL_CLASS = "px-2 py-2.5";
 
 function shiftMonth(year: number, month: number, delta: number): { year: number; month: number } {
   const date = new Date(Date.UTC(year, month + delta, 1));
@@ -104,7 +103,7 @@ export function TeamCalendar({ matches, className }: TeamCalendarProps) {
             </span>
           ))}
         </div>
-        <div className="grid grid-cols-7 gap-1.5">
+        <div className="grid grid-cols-7 items-start gap-2">
           {month.weeks.flat().map((cell, index) => {
             if (!cell) {
               return <div key={`${month.key}-empty-${index}`} className={PLACEHOLDER_CELL_CLASS} aria-hidden />;
@@ -113,7 +112,15 @@ export function TeamCalendar({ matches, className }: TeamCalendarProps) {
             if (!cell.match) {
               return (
                 <div key={`${month.key}-day-${cell.day}`} className={EMPTY_CELL_CLASS}>
-                  <span className={today ? TODAY_DAY_CLASS : "text-sm font-bold text-slate-400"}>{cell.day}</span>
+                  <span
+                    className={
+                      today
+                        ? TODAY_DAY_CLASS
+                        : "inline-flex min-w-[1.75rem] items-center justify-center text-sm font-bold text-slate-400"
+                    }
+                  >
+                    {cell.day}
+                  </span>
                 </div>
               );
             }
@@ -158,7 +165,7 @@ function MobileCalendarCard({ match }: { match: CalendarMatch }) {
       <p className={cn("text-[11px] font-bold uppercase tracking-[0.1em]", accent)}>
         {matchCompetitionShortLabel(match)}
       </p>
-      <CalendarMatchCell match={match} day={day} className="min-h-[7rem] w-full sm:aspect-auto" />
+      <CalendarMatchCell match={match} day={day} className="w-full" />
     </div>
   );
 }
