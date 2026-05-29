@@ -22,6 +22,20 @@ export function formatGoalsPick(pick: GoalsPick): string {
   return pick === "M" ? "M" : String(pick);
 }
 
+export function scoreToGoalsPick(score: number): GoalsPick {
+  return score >= 3 ? "M" : (score as 0 | 1 | 2);
+}
+
+export function getActualGoalsPicks(match: Match): { home: GoalsPick | null; away: GoalsPick | null } {
+  if (match.status !== "finished" || match.homeScore === undefined || match.awayScore === undefined) {
+    return { home: null, away: null };
+  }
+  return {
+    home: scoreToGoalsPick(match.homeScore),
+    away: scoreToGoalsPick(match.awayScore),
+  };
+}
+
 export function getMatchdayByRound(round: number): Matchday {
   return matchdays.find((matchday) => matchday.round === round) ?? matchdays[0];
 }

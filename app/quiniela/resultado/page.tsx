@@ -61,7 +61,7 @@ export default function QuinielaResultadoPage() {
         {view === "quiniela" ? (
           <div className="space-y-4">
             <p className="text-sm text-slate-600">
-              Signos 1-X-2 oficiales de la jornada. Las casillas con resultado aparecen en granate.
+              Signos 1-X-2 y goles del Aviles oficiales de la jornada. Las casillas con resultado aparecen en granate.
             </p>
             {orderedMatches.map((match) => (
               <PredictionForm
