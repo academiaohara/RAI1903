@@ -1,3 +1,4 @@
+import { arenteiroSquadImport } from "@/data/rivals/arenteiro";
 import { arenasSquadImport } from "@/data/rivals/arenas";
 import { athleticBilbaoBSquadImport } from "@/data/rivals/athletic-bilbao-b";
 import { barakaldoSquadImport } from "@/data/rivals/barakaldo";
@@ -8,6 +9,7 @@ import { ferrolSquadImport } from "@/data/rivals/ferrol";
 import { guadalajaraSquadImport } from "@/data/rivals/guadalajara";
 import { lugoSquadImport } from "@/data/rivals/lugo";
 import { meridaSquadImport } from "@/data/rivals/merida";
+import { osasunaPromesasSquadImport } from "@/data/rivals/osasuna-promesas";
 import { ponferradinaSquadImport } from "@/data/rivals/ponferradina";
 import { pontevedraSquadImport } from "@/data/rivals/pontevedra";
 import { realAvilesIndustrialSquadImport } from "@/data/rivals/real-aviles-industrial";
@@ -27,6 +29,7 @@ const GENERIC_STADIUM_IMAGE =
   "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80";
 
 const RIVAL_SQUAD_IMPORTS: Record<string, RivalSquadImport> = {
+  arenteiro: arenteiroSquadImport,
   arenas: arenasSquadImport,
   "athletic-bilbao-b": athleticBilbaoBSquadImport,
   barakaldo: barakaldoSquadImport,
@@ -37,6 +40,7 @@ const RIVAL_SQUAD_IMPORTS: Record<string, RivalSquadImport> = {
   guadalajara: guadalajaraSquadImport,
   lugo: lugoSquadImport,
   merida: meridaSquadImport,
+  "osasuna-promesas": osasunaPromesasSquadImport,
   ponferradina: ponferradinaSquadImport,
   pontevedra: pontevedraSquadImport,
   "real-aviles-industrial": realAvilesIndustrialSquadImport,
@@ -84,8 +88,11 @@ function mapRivalPosition(pos: string): { posicion: SquadPosition; rol: SquadRol
   if (normalized.includes("extremo derecho")) {
     return { posicion: "Delantero", rol: "ED" };
   }
-  if (normalized.includes("delantero")) {
+  if (normalized.includes("delantero") || normalized.includes("atacante")) {
     return { posicion: "Delantero", rol: "DC" };
+  }
+  if (normalized.includes("centrocampista")) {
+    return { posicion: "Centrocampista", rol: "MC" };
   }
 
   return { posicion: "Centrocampista", rol: "MC" };
