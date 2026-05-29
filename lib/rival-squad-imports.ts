@@ -18,15 +18,12 @@ import { tenerifeSquadImport } from "@/data/rivals/tenerife";
 import { unionistasSquadImport } from "@/data/rivals/unionistas";
 import { zamoraSquadImport } from "@/data/rivals/zamora";
 import { getTeamCrestById } from "@/lib/team-crests";
-import { STADIUM_ROMAN_SUAREZ_PHOTO } from "@/lib/squad-photos";
+import { getStadiumPhoto } from "@/lib/squad-photos";
 import type { Team } from "@/types";
 import type { RivalSquadImport, RivalSquadImportPlayer } from "@/types/rival-squad-import";
 import type { SquadClubInfo, SquadPlayer, SquadPosition } from "@/types/squad";
 import type { SquadRoleCode } from "@/types/squad";
 import type { PlayerStatus } from "@/types";
-
-const GENERIC_STADIUM_IMAGE =
-  "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80";
 
 const RIVAL_SQUAD_IMPORTS: Record<string, RivalSquadImport> = {
   arenteiro: arenteiroSquadImport,
@@ -156,7 +153,7 @@ export function buildSquadFromImport(team: Team, data: RivalSquadImport): SquadP
 }
 
 export function buildClubInfoFromImport(team: Team, data: RivalSquadImport): SquadClubInfo {
-  const stadiumImage = team.id.includes("aviles") ? STADIUM_ROMAN_SUAREZ_PHOTO : GENERIC_STADIUM_IMAGE;
+  const stadiumImage = getStadiumPhoto(team.id);
   const shortStadiumName = data.estadio.replace(/^Estadio\s+/i, "");
 
   return {
