@@ -125,7 +125,13 @@ export default function HomePage() {
           title="Proximos 5 partidos"
           action={<CalendarNavButton href={`${primerEquipoBase("masculino")}/calendario` as Route} />}
         >
-          <div className="space-y-3">{upcomingMatches.map((match) => <MatchCard key={match.id} match={match} />)}</div>
+          <div className="space-y-3">
+            {upcomingMatches.length > 0 ? (
+              upcomingMatches.map((match) => <MatchCard key={match.id} match={match} />)
+            ) : (
+              <p className="text-sm font-bold text-slate-500">No hay proximos partidos actualmente.</p>
+            )}
+          </div>
         </Card>
       </section>
 
@@ -144,16 +150,18 @@ export default function HomePage() {
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          {latestMatches.map((match, index) =>
-            upcomingMatches[index] ? (
-              <div key={match.id} className="contents">
-                <RecentMatchCard match={match} />
-                <MatchCard match={upcomingMatches[index]} />
-              </div>
-            ) : (
+          <div className="space-y-3">
+            {latestMatches.map((match) => (
               <RecentMatchCard key={match.id} match={match} />
-            ),
-          )}
+            ))}
+          </div>
+          <div className="space-y-3">
+            {upcomingMatches.length > 0 ? (
+              upcomingMatches.map((match) => <MatchCard key={match.id} match={match} />)
+            ) : (
+              <p className="text-sm font-bold text-slate-500">No hay proximos partidos actualmente.</p>
+            )}
+          </div>
         </div>
       </section>
     </div>
