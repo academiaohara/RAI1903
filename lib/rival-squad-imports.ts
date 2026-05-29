@@ -1,3 +1,4 @@
+import { celtaFortunaSquadImport } from "@/data/rivals/celta-fortuna";
 import { tenerifeSquadImport } from "@/data/rivals/tenerife";
 import { zamoraSquadImport } from "@/data/rivals/zamora";
 import { getTeamCrestById } from "@/lib/team-crests";
@@ -12,6 +13,7 @@ const GENERIC_STADIUM_IMAGE =
   "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80";
 
 const RIVAL_SQUAD_IMPORTS: Record<string, RivalSquadImport> = {
+  "celta-fortuna": celtaFortunaSquadImport,
   tenerife: tenerifeSquadImport,
   zamora: zamoraSquadImport,
 };
@@ -37,6 +39,9 @@ function mapRivalPosition(pos: string): { posicion: SquadPosition; rol: SquadRol
     return { posicion: "Defensa", rol: "LD" };
   }
   if (normalized.includes("defensa central")) {
+    return { posicion: "Defensa", rol: "DFC" };
+  }
+  if (normalized === "defensa") {
     return { posicion: "Defensa", rol: "DFC" };
   }
   if (normalized.includes("mediocentro ofensivo") || normalized.includes("mediapunta")) {
@@ -65,7 +70,8 @@ function importPlayerToSquadPlayer(
 ): SquadPlayer {
   const { nombre, apellido } = parsePlayerName(player.jugador);
   const { posicion, rol } = mapRivalPosition(player.pos);
-  const birthYear = new Date().getFullYear() - player.edad;
+  const birthYear =
+    player.edad != null ? new Date().getFullYear() - player.edad : new Date().getFullYear();
 
   return {
     id: `${team.id}-d${player.dorsal}`,
@@ -75,14 +81,14 @@ function importPlayerToSquadPlayer(
     posicion,
     rol,
     estado: status,
-    edad: player.edad,
-    fechaNacimiento: `${birthYear}-07-01`,
+    edad: player.edad ?? 0,
+    fechaNacimiento: player.edad != null ? `${birthYear}-07-01` : "",
     lugarNacimiento: team.city,
     nacionalidad: "España",
     altura: "1,78 m",
     peso: "76 kg",
     piernaBuena: "Derecha",
-    contratoHasta: `${player.contrato}-06-30`,
+    contratoHasta: player.contrato != null ? `${player.contrato}-06-30` : "—",
     descripcion: player.valor
       ? `Valor de mercado: ${player.valor}. Jugador de ${team.shortName} en la temporada 2025/26.`
       : `Jugador de ${team.shortName} en la temporada 2025/26.`,

@@ -3,7 +3,13 @@
 import { motion } from "framer-motion";
 import type { SquadPlayer } from "@/types/squad";
 import { SQUAD_POSITIONS } from "@/types/squad";
-import { formatContractDate, getPlayerFullName, groupPlayersByPosition } from "@/lib/squad-utils";
+import {
+  formatContractDate,
+  formatPlayerAge,
+  formatPlayerAgeWithUnit,
+  getPlayerFullName,
+  groupPlayersByPosition,
+} from "@/lib/squad-utils";
 import { PositionSection } from "@/components/squad/PositionSection";
 
 type PlayerTableProps = {
@@ -114,7 +120,9 @@ function PlayerRow({
         </div>
       </td>
       <td className={`px-2 py-3 text-xs font-extrabold tracking-wide text-slate-600 ${alignClass.center}`}>{player.rol}</td>
-      <td className={`px-4 py-4 tabular-nums text-slate-700 ${alignClass.center}`}>{player.edad}</td>
+      <td className={`px-4 py-4 tabular-nums text-slate-700 ${alignClass.center}`}>
+        {formatPlayerAge(player.edad)}
+      </td>
       <StatCell value={player.partidos} />
       <StatCell value={player.goles} highlight={player.goles > 0} />
       <StatCell value={player.asistencias} highlight={player.asistencias > 0} />
@@ -143,7 +151,7 @@ function PlayerMobileRow({
         <p className="truncate font-extrabold uppercase text-slate-900">{getPlayerFullName(player)}</p>
       </div>
       <p className="text-xs font-semibold text-slate-500">
-        {player.rol} · {player.edad} anos
+        {player.rol} · {formatPlayerAgeWithUnit(player.edad)}
       </p>
       <div className="mt-2 flex flex-wrap gap-2 text-xs font-bold text-slate-600">
         <span className="rounded-lg bg-slate-100 px-2 py-1">PJ {player.partidos}</span>
