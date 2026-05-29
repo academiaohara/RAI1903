@@ -1,5 +1,8 @@
+import Link from "next/link";
 import { TeamCrest } from "@/components/TeamCrest";
 import { RAI_TEAM_ID } from "@/data/mock";
+import { equipoLigaHref } from "@/lib/equipo-liga";
+import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import {
   STANDINGS_ZONE_LEGEND,
   getStandingsHighlightCellClass,
@@ -18,6 +21,7 @@ type LeagueTableProps = {
   /** With highlightTeamId: club row (Avilés) blue, viewed team granate. */
   clubHighlightTeamId?: string;
   showLegend?: boolean;
+  gender?: PrimerEquipoGender;
 };
 
 export function LeagueTable({
@@ -26,6 +30,7 @@ export function LeagueTable({
   highlightTeamId = RAI_TEAM_ID,
   clubHighlightTeamId,
   showLegend = true,
+  gender = "masculino",
 }: LeagueTableProps) {
   const visibleRows = [...teams].sort((a, b) => a.position - b.position);
 
@@ -89,13 +94,17 @@ export function LeagueTable({
                     {team.position}
                   </td>
                   <td className={dataCellClassName}>
-                    <div className="flex min-w-0 items-center gap-1 md:gap-2">
+                    <Link
+                      href={equipoLigaHref(gender, team.id)}
+                      className="group/team flex min-w-0 items-center gap-1 rounded-lg outline-none transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[#214C9B] focus-visible:ring-offset-1 md:gap-2"
+                      aria-label={`Ver ficha de ${team.name}`}
+                    >
                       <TeamCrest team={team} size="sm" className="shrink-0" />
-                      <span className="max-w-[4.5rem] truncate font-bold sm:max-w-none md:max-w-none">
+                      <span className="max-w-[4.5rem] truncate font-bold group-hover/team:underline group-hover/team:decoration-[#214C9B]/40 group-hover/team:underline-offset-2 sm:max-w-none md:max-w-none">
                         <span className="md:hidden">{team.shortName}</span>
                         <span className="hidden md:inline">{teamLabel}</span>
                       </span>
-                    </div>
+                    </Link>
                   </td>
                   {!compact ? (
                     <>

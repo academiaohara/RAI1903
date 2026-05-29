@@ -87,6 +87,7 @@ export function JornadasView({ gender }: JornadasViewProps) {
                 fixture={fixture}
                 highlighted
                 highlightTeamId={raiTeamId}
+                gender={gender}
               />
             ))}
           </div>
@@ -117,7 +118,7 @@ export function JornadasView({ gender }: JornadasViewProps) {
             {otherMatches.length > 0 ? (
               <div className="space-y-2">
                 {otherMatches.map((fixture) => (
-                  <JornadaMatchRow key={fixture.id} fixture={fixture} highlightTeamId={raiTeamId} />
+                  <JornadaMatchRow key={fixture.id} fixture={fixture} highlightTeamId={raiTeamId} gender={gender} />
                 ))}
               </div>
             ) : (

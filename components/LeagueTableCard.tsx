@@ -6,6 +6,7 @@ import { Card } from "@/components/Card";
 import { LeagueTable } from "@/components/LeagueTable";
 import { Modal } from "@/components/Modal";
 import type { ReactNode } from "react";
+import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Team } from "@/types";
 
 type LeagueTableCardProps = {
@@ -22,6 +23,7 @@ type LeagueTableCardProps = {
   borderlessHeader?: boolean;
   /** Controles opcionales (filtros) dentro de la tarjeta, encima de la tabla. */
   toolbar?: ReactNode;
+  gender?: PrimerEquipoGender;
 };
 
 export function LeagueTableCard({
@@ -35,6 +37,7 @@ export function LeagueTableCard({
   className,
   borderlessHeader = false,
   toolbar,
+  gender = "masculino",
 }: LeagueTableCardProps) {
   const modalTeams = fullTeams ?? teams;
   const [open, setOpen] = useState(false);
@@ -59,11 +62,11 @@ export function LeagueTableCard({
         }
       >
         {toolbar && <div className="mb-4 min-w-0 space-y-3">{toolbar}</div>}
-        <LeagueTable teams={teams} highlightTeamId={highlightTeamId} compact={compact} />
+        <LeagueTable teams={teams} highlightTeamId={highlightTeamId} compact={compact} gender={gender} />
       </Card>
 
       <Modal open={open} title={modalTitle} onClose={() => setOpen(false)}>
-        <LeagueTable teams={modalTeams} highlightTeamId={highlightTeamId} />
+        <LeagueTable teams={modalTeams} highlightTeamId={highlightTeamId} gender={gender} />
       </Modal>
     </>
   );

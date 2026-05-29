@@ -5,6 +5,7 @@ import { Eye } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { MatchPreviewModal } from "@/components/MatchPreviewModal";
 import { OpponentCrest } from "@/components/OpponentCrest";
+import { TeamLink } from "@/components/TeamLink";
 import { players, RAI_TEAM_ID } from "@/data/mock";
 import { getPreviaForMatch } from "@/lib/match-articles";
 import {
@@ -160,8 +161,17 @@ export function PredictionForm({
           <div className="min-w-0 flex-1">
             <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4">
               <div className="flex min-w-0 items-center gap-2 rounded-xl bg-slate-50 p-3 sm:bg-transparent sm:p-0">
-                <OpponentCrest logo={homeCrest} opponent={match.homeTeam} size="sm" className="shrink-0" />
-                <p className="min-w-0 truncate font-extrabold leading-tight text-slate-800">{match.homeTeam}</p>
+                <TeamLink gender="masculino" teamId={match.homeTeamId} teamName={match.homeTeam} className="shrink-0">
+                  <OpponentCrest logo={homeCrest} opponent={match.homeTeam} size="sm" className="shrink-0" />
+                </TeamLink>
+                <TeamLink
+                  gender="masculino"
+                  teamId={match.homeTeamId}
+                  teamName={match.homeTeam}
+                  className="min-w-0 truncate font-extrabold leading-tight text-slate-800"
+                >
+                  {match.homeTeam}
+                </TeamLink>
                 {avilesMatch && (
                   <GoalsPickButtons
                     value={prediction?.goalsHome}
@@ -174,8 +184,17 @@ export function PredictionForm({
               </div>
               <span className="self-center shrink-0 text-xs font-bold uppercase text-slate-400">vs</span>
               <div className="flex min-w-0 items-center gap-2 rounded-xl bg-slate-50 p-3 sm:bg-transparent sm:p-0">
-                <OpponentCrest logo={awayCrest} opponent={match.awayTeam} size="sm" className="shrink-0" />
-                <p className="min-w-0 truncate font-extrabold leading-tight text-slate-800">{match.awayTeam}</p>
+                <TeamLink gender="masculino" teamId={match.awayTeamId} teamName={match.awayTeam} className="shrink-0">
+                  <OpponentCrest logo={awayCrest} opponent={match.awayTeam} size="sm" className="shrink-0" />
+                </TeamLink>
+                <TeamLink
+                  gender="masculino"
+                  teamId={match.awayTeamId}
+                  teamName={match.awayTeam}
+                  className="min-w-0 truncate font-extrabold leading-tight text-slate-800"
+                >
+                  {match.awayTeam}
+                </TeamLink>
                 {avilesMatch && (
                   <GoalsPickButtons
                     value={prediction?.goalsAway}

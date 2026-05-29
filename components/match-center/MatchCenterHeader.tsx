@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { Calendar, ChevronLeft, Clock, MapPin, User, Users } from "lucide-react";
 import { OpponentCrest } from "@/components/OpponentCrest";
+import { TeamLink } from "@/components/TeamLink";
 import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
 import { getTeamByGender } from "@/lib/fixtures";
 import { getTeamCrest } from "@/lib/team-crests";
@@ -38,8 +39,10 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
 
         <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-6">
           <div className="flex flex-col items-center gap-2 text-center">
-            <OpponentCrest logo={homeTeam ? getTeamCrest(homeTeam) : "LOC"} opponent={match.homeTeam} size="md" />
-            <p className="text-xs font-extrabold uppercase leading-tight sm:text-sm">{match.homeTeam}</p>
+            <TeamLink gender={gender} teamId={match.homeTeamId} teamName={match.homeTeam} className="flex flex-col items-center gap-2">
+              <OpponentCrest logo={homeTeam ? getTeamCrest(homeTeam) : "LOC"} opponent={match.homeTeam} size="md" />
+              <span className="text-xs font-extrabold uppercase leading-tight sm:text-sm">{match.homeTeam}</span>
+            </TeamLink>
           </div>
 
           <div className="text-center">
@@ -54,8 +57,10 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
           </div>
 
           <div className="flex flex-col items-center gap-2 text-center">
-            <OpponentCrest logo={awayTeam ? getTeamCrest(awayTeam) : "VIS"} opponent={match.awayTeam} size="md" />
-            <p className="text-xs font-extrabold uppercase leading-tight sm:text-sm">{match.awayTeam}</p>
+            <TeamLink gender={gender} teamId={match.awayTeamId} teamName={match.awayTeam} className="flex flex-col items-center gap-2">
+              <OpponentCrest logo={awayTeam ? getTeamCrest(awayTeam) : "VIS"} opponent={match.awayTeam} size="md" />
+              <span className="text-xs font-extrabold uppercase leading-tight sm:text-sm">{match.awayTeam}</span>
+            </TeamLink>
           </div>
         </div>
 

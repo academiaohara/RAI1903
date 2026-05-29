@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { Bus, Home, MapPin } from "lucide-react";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
+import { MatchTeamLink } from "@/components/TeamLink";
 import { OpponentCrest } from "@/components/OpponentCrest";
+import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getListViewScrollTargetId, groupCalendarMatchesByMonth, isUtcToday } from "@/lib/calendar";
 import { matchCompetitionShortLabel } from "@/lib/competition-labels";
 import { getCompetitionAccentClass } from "@/lib/competition-styles";
@@ -15,6 +17,7 @@ import type { Route } from "next";
 type CalendarListViewProps = {
   matches: CalendarMatch[];
   className?: string;
+  gender?: PrimerEquipoGender;
 };
 
 function formatListMatchDate(date: string): string {
@@ -34,7 +37,7 @@ function scoreLabel(match: CalendarMatch): string {
   return "—";
 }
 
-export function CalendarListView({ matches, className }: CalendarListViewProps) {
+export function CalendarListView({ matches, className, gender = "masculino" }: CalendarListViewProps) {
   const scrollTargetId = getListViewScrollTargetId(matches);
   const monthGroups = groupCalendarMatchesByMonth(matches);
   const hasScrolledRef = useRef(false);
@@ -65,7 +68,7 @@ export function CalendarListView({ matches, className }: CalendarListViewProps) 
             <ul className="space-y-3">
               {group.matches.map((match) => (
                 <li key={match.id}>
-                  <CalendarListRow match={match} scrollTarget={match.id === scrollTargetId} />
+                  <CalendarListRow match={match} scrollTarget={match.id === scrollTargetId} gender={gender} />
                 </li>
               ))}
             </ul>
@@ -76,9 +79,17 @@ export function CalendarListView({ matches, className }: CalendarListViewProps) 
   );
 }
 
-function CalendarListRow({ match, scrollTarget }: { match: CalendarMatch; scrollTarget: boolean }) {
+function CalendarListRow({
+  match,
+  scrollTarget,
+  gender,
+}: {
+  match: CalendarMatch;
+  scrollTarget: boolean;
+  gender: PrimerEquipoGender;
+}) {
   const href = match.played ? match.chronicleUrl : match.previaUrl;
-  const clickable = Boolean(href);
+  const chronicleHref = href;
   const accent = getCompetitionAccentClass(match.competition);
   const date = new Date(match.date);
   const today = isUtcToday(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
@@ -110,11 +121,17 @@ function CalendarListRow({ match, scrollTarget }: { match: CalendarMatch; scroll
       </div>
 
       <div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
-        <p className="min-w-0 break-words text-sm font-extrabold leading-snug text-[#214C9B]">{match.homeTeam}</p>
+        <MatchTeamLink
+          gender={gender}
+          teamId={match.homeTeamId}
+          teamName={match.homeTeam}
+          highlighted
+          className="text-[#214C9B]"
+        />
         <span className="shrink-0 rounded-2xl bg-[#214C9B] px-3 py-1.5 text-sm font-extrabold tabular-nums text-white shadow-md shadow-blue-950/10">
           {scoreLabel(match)}
         </span>
-        <p className="min-w-0 break-words text-right text-sm font-extrabold leading-snug text-slate-700">{match.awayTeam}</p>
+        <MatchTeamLink gender={gender} teamId={match.awayTeamId} teamName={match.awayTeam} align="right" />
       </div>
 
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs font-bold text-slate-500">
@@ -136,27 +153,25 @@ function CalendarListRow({ match, scrollTarget }: { match: CalendarMatch; scroll
   const rowClassName = cn(
     "block rounded-2xl border border-[#214C9B]/15 bg-white p-4 shadow-[0_4px_14px_rgba(17,24,39,0.05)] transition",
     scrollTarget && "ring-2 ring-[#214C9B]/30",
-    clickable && "hover:-translate-y-0.5 hover:border-[#214C9B] hover:shadow-[0_10px_24px_rgba(33,76,155,0.12)]",
   );
-
-  if (clickable && href) {
-    return (
-      <Link id={`cal-list-match-${match.id}`} href={href as Route} className={rowClassName}>
-        <div className="mb-2 flex items-center gap-1.5">
-          <CompetitionLogo competition={match.competition} alt="" size="xs" />
-          <span className="sr-only">{matchCompetitionShortLabel(match)}</span>
-        </div>
-        {content}
-      </Link>
-    );
-  }
 
   return (
     <article id={`cal-list-match-${match.id}`} className={rowClassName}>
       <div className="mb-2 flex items-center gap-1.5">
         <CompetitionLogo competition={match.competition} alt="" size="xs" />
+        <span className="sr-only">{matchCompetitionShortLabel(match)}</span>
       </div>
       {content}
+      {chronicleHref && (
+        <p className="mt-2 text-xs font-bold">
+          <Link
+            href={chronicleHref as Route}
+            className="text-[#214C9B] underline decoration-[#214C9B]/30 underline-offset-2 hover:decoration-[#214C9B]"
+          >
+            {match.played ? "Leer la cronica" : "Ver la previa"}
+          </Link>
+        </p>
+      )}
     </article>
   );
 }

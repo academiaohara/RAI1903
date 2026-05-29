@@ -1,5 +1,7 @@
 import { TeamCrest } from "@/components/TeamCrest";
+import { TeamLink } from "@/components/TeamLink";
 import { getJornadaTeam } from "@/lib/jornadas-data";
+import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { formatMatchDate } from "@/lib/utils";
 import type { JornadaFixture } from "@/types/jornadas";
 import { cn } from "@/lib/utils";
@@ -8,6 +10,7 @@ type JornadaMatchRowProps = {
   fixture: JornadaFixture;
   highlighted?: boolean;
   highlightTeamId?: string;
+  gender?: PrimerEquipoGender;
 };
 
 function scoreOrTime(fixture: JornadaFixture): string {
@@ -18,11 +21,22 @@ function scoreOrTime(fixture: JornadaFixture): string {
   return formatMatchDate(fixture.date).split(",").pop()?.trim() ?? "—";
 }
 
-export function JornadaMatchRow({ fixture, highlighted = false, highlightTeamId }: JornadaMatchRowProps) {
+export function JornadaMatchRow({
+  fixture,
+  highlighted = false,
+  highlightTeamId,
+  gender = "masculino",
+}: JornadaMatchRowProps) {
   const home = getJornadaTeam(fixture.homeTeamId);
   const away = getJornadaTeam(fixture.awayTeamId);
   const highlightHome = Boolean(highlightTeamId && fixture.homeTeamId === highlightTeamId);
   const highlightAway = Boolean(highlightTeamId && fixture.awayTeamId === highlightTeamId);
+
+  const nameClass = (isHighlight: boolean) =>
+    cn(
+      "min-w-0 truncate text-sm font-extrabold",
+      isHighlight ? (highlighted ? "text-[#981915]" : "text-[#214C9B]") : "text-slate-800",
+    );
 
   return (
     <article
@@ -34,15 +48,14 @@ export function JornadaMatchRow({ fixture, highlighted = false, highlightTeamId 
       )}
     >
       <div className="flex min-w-0 items-center gap-2">
-        {home ? <TeamCrest team={home} size="sm" className="shrink-0" /> : null}
-        <p
-          className={cn(
-            "min-w-0 truncate text-sm font-extrabold",
-            highlightHome ? (highlighted ? "text-[#981915]" : "text-[#214C9B]") : "text-slate-800",
-          )}
-        >
+        {home ? (
+          <TeamLink gender={gender} teamId={fixture.homeTeamId} teamName={fixture.homeTeamName} className="shrink-0">
+            <TeamCrest team={home} size="sm" className="shrink-0" />
+          </TeamLink>
+        ) : null}
+        <TeamLink gender={gender} teamId={fixture.homeTeamId} teamName={fixture.homeTeamName} className={nameClass(highlightHome)}>
           {fixture.homeTeamName}
-        </p>
+        </TeamLink>
       </div>
 
       <div
@@ -55,15 +68,19 @@ export function JornadaMatchRow({ fixture, highlighted = false, highlightTeamId 
       </div>
 
       <div className="flex min-w-0 items-center justify-end gap-2">
-        <p
-          className={cn(
-            "min-w-0 truncate text-right text-sm font-extrabold",
-            highlightAway ? (highlighted ? "text-[#981915]" : "text-[#214C9B]") : "text-slate-800",
-          )}
+        <TeamLink
+          gender={gender}
+          teamId={fixture.awayTeamId}
+          teamName={fixture.awayTeamName}
+          className={cn(nameClass(highlightAway), "text-right")}
         >
           {fixture.awayTeamName}
-        </p>
-        {away ? <TeamCrest team={away} size="sm" className="shrink-0" /> : null}
+        </TeamLink>
+        {away ? (
+          <TeamLink gender={gender} teamId={fixture.awayTeamId} teamName={fixture.awayTeamName} className="shrink-0">
+            <TeamCrest team={away} size="sm" className="shrink-0" />
+          </TeamLink>
+        ) : null}
       </div>
     </article>
   );

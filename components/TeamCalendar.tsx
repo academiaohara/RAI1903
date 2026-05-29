@@ -9,11 +9,13 @@ import { buildSingleCalendarMonth, isUtcToday, WEEKDAY_LABELS } from "@/lib/cale
 import { matchCompetitionShortLabel } from "@/lib/competition-labels";
 import { getCompetitionAccentClass } from "@/lib/competition-styles";
 import { cn } from "@/lib/utils";
+import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { CalendarMatch, CalendarViewMode } from "@/types";
 
 type TeamCalendarProps = {
   matches: CalendarMatch[];
   className?: string;
+  gender?: PrimerEquipoGender;
 };
 
 const TODAY_DAY_CLASS = "inline-flex min-w-[1.75rem] items-center justify-center rounded-lg bg-[#214C9B] px-2 py-0.5 text-sm font-extrabold text-white";
@@ -41,7 +43,7 @@ function initialViewDate(matches: CalendarMatch[]): { year: number; month: numbe
   return { year: first.getUTCFullYear(), month: first.getUTCMonth() };
 }
 
-export function TeamCalendar({ matches, className }: TeamCalendarProps) {
+export function TeamCalendar({ matches, className, gender = "masculino" }: TeamCalendarProps) {
   const initial = initialViewDate(matches);
   const [viewMode, setViewMode] = useState<CalendarViewMode>("mes");
   const [viewYear, setViewYear] = useState(initial.year);
@@ -104,7 +106,7 @@ export function TeamCalendar({ matches, className }: TeamCalendarProps) {
       </div>
 
       {viewMode === "lista" ? (
-        <CalendarListView key="lista" matches={matches} />
+        <CalendarListView key="lista" matches={matches} gender={gender} />
       ) : (
         <>
           <div className="hidden lg:block">
@@ -143,6 +145,7 @@ export function TeamCalendar({ matches, className }: TeamCalendarProps) {
                     day={cell.day}
                     isToday={today}
                     todayDayClassName={TODAY_DAY_CLASS}
+                    gender={gender}
                   />
                 );
               })}
@@ -151,7 +154,7 @@ export function TeamCalendar({ matches, className }: TeamCalendarProps) {
 
           <div className="grid gap-3 sm:grid-cols-2 lg:hidden">
             {monthMatchesInOrder(month).map((match) => (
-              <MobileCalendarCard key={match.id} match={match} />
+              <MobileCalendarCard key={match.id} match={match} gender={gender} />
             ))}
             {monthMatchesInOrder(month).length === 0 && (
               <p className="col-span-full text-center text-sm font-bold text-slate-500">Sin partidos este mes.</p>
@@ -170,7 +173,7 @@ function monthMatchesInOrder(month: { weeks: Array<Array<{ day: number; match?: 
     .map((cell) => cell.match);
 }
 
-function MobileCalendarCard({ match }: { match: CalendarMatch }) {
+function MobileCalendarCard({ match, gender }: { match: CalendarMatch; gender: PrimerEquipoGender }) {
   const day = new Date(match.date).getUTCDate();
   const accent = getCompetitionAccentClass(match.competition);
 
@@ -179,7 +182,7 @@ function MobileCalendarCard({ match }: { match: CalendarMatch }) {
       <p className={cn("text-[11px] font-bold uppercase tracking-[0.1em]", accent)}>
         {matchCompetitionShortLabel(match)}
       </p>
-      <CalendarMatchCell match={match} day={day} className="w-full" />
+      <CalendarMatchCell match={match} day={day} className="w-full" gender={gender} />
     </div>
   );
 }

@@ -37,6 +37,7 @@ export function EquipoLigaView({ gender, team, allTeams }: EquipoLigaViewProps) 
           clubHighlightTeamId={clubHighlightTeamId}
           compact
           showLegend={false}
+          gender={gender}
         />
       </Card>
     </div>

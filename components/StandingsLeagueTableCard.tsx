@@ -15,6 +15,7 @@ import {
 } from "@/lib/standings";
 import type { StandingsZonesConfig } from "@/lib/standings";
 import { cn } from "@/lib/utils";
+import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Matchday } from "@/types";
 import type { LeagueTiebreakContext } from "@/lib/rfef-rules/types";
 import type { Team } from "@/types";
@@ -38,6 +39,7 @@ type StandingsLeagueTableCardProps = {
   borderlessHeader?: boolean;
   zones?: StandingsZonesConfig;
   tiebreak?: LeagueTiebreakContext;
+  gender?: PrimerEquipoGender;
 };
 
 export function StandingsLeagueTableCard({
@@ -52,6 +54,7 @@ export function StandingsLeagueTableCard({
   borderlessHeader = false,
   zones = PRIMERA_RFEF_RULES.zones,
   tiebreak = PRIMERA_RFEF_RULES.tiebreak,
+  gender = "masculino",
 }: StandingsLeagueTableCardProps) {
   const playedRounds = useMemo(() => getPlayedLeagueRounds(matchdays), [matchdays]);
   const lastPlayedRound = playedRounds[playedRounds.length - 1] ?? 1;
@@ -111,6 +114,7 @@ export function StandingsLeagueTableCard({
       className={cn("min-w-0", className)}
       borderlessHeader={borderlessHeader}
       toolbar={toolbar}
+      gender={gender}
     />
   );
 }

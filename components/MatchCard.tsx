@@ -1,10 +1,9 @@
 import { Badge } from "@/components/Badge";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
-import { MatchFixtureScorePill } from "@/components/MatchFixtureScorePill";
+import { MatchFixtureTeamLinks } from "@/components/MatchFixtureTeamLinks";
 import { RAI_TEAM_ID } from "@/data/mock";
 import { matchCompetitionShortLabel, matchFixtureMeta } from "@/lib/competition-labels";
-import { getTeam } from "@/lib/fixtures";
-import { getTeamCrestById } from "@/lib/team-crests";
+import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { matchFixtureCardClassName } from "@/lib/match-card-styles";
 import { formatMatchDate } from "@/lib/utils";
 import type { Match } from "@/types";
@@ -13,13 +12,14 @@ export function MatchCard({
   match,
   compact = false,
   highlightTeamId = RAI_TEAM_ID,
+  gender = "masculino",
 }: {
   match: Match;
   compact?: boolean;
   highlightTeamId?: string;
+  gender?: PrimerEquipoGender;
 }) {
-  const avilesHome = match.homeTeamId === highlightTeamId;
-  const avilesAway = match.awayTeamId === highlightTeamId;
+  const scoreLabel = match.status === "finished" ? `${match.homeScore} - ${match.awayScore}` : "vs";
 
   return (
     <article className={matchFixtureCardClassName}>
@@ -30,17 +30,12 @@ export function MatchCard({
           {matchFixtureMeta(match)}
         </span>
       </div>
-      <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
-        <p className={`min-w-0 break-words text-sm font-extrabold leading-snug ${avilesHome ? "text-[#214C9B]" : "text-slate-700"}`}>{match.homeTeam}</p>
-        <MatchFixtureScorePill
-          homeLogo={getTeamCrestById(match.homeTeamId, getTeam(match.homeTeamId)?.crestInitials)}
-          homeTeam={match.homeTeam}
-          awayLogo={getTeamCrestById(match.awayTeamId, getTeam(match.awayTeamId)?.crestInitials)}
-          awayTeam={match.awayTeam}
-          label={match.status === "finished" ? `${match.homeScore} - ${match.awayScore}` : "vs"}
-        />
-        <p className={`min-w-0 break-words text-right text-sm font-extrabold leading-snug ${avilesAway ? "text-[#214C9B]" : "text-slate-700"}`}>{match.awayTeam}</p>
-      </div>
+      <MatchFixtureTeamLinks
+        match={match}
+        gender={gender}
+        highlightTeamId={highlightTeamId}
+        scoreLabel={scoreLabel}
+      />
       {compact ? (
         match.status === "scheduled" && (
           <p className="mt-2 text-xs font-bold text-slate-600">{formatMatchDate(match.date)}</p>
