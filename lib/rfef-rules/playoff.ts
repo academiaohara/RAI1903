@@ -52,6 +52,7 @@ export function selectPlayoffQualifiers(
         teamId: team.id,
         groupId: group.groupId,
         leaguePosition: team.position,
+        qualificationPosition: slot,
         replacedIneligible: team.position !== slot,
       });
     }
@@ -64,7 +65,7 @@ function findQualified(
   qualified: readonly PlayoffQualifiedTeam[],
   ref: PlayoffGroupRef,
 ): PlayoffQualifiedTeam | undefined {
-  return qualified.find((q) => q.groupId === ref.groupId && q.leaguePosition === ref.position);
+  return qualified.find((q) => q.groupId === ref.groupId && q.qualificationPosition === ref.position);
 }
 
 function resolveSlotTeams(
@@ -85,8 +86,9 @@ function buildSemifinalTie(
 ): PlayoffBracketTie {
   const worseIsHome = knockout.firstLegHome === "worse-league-position";
   const homeWorse =
-    home.leaguePosition > away.leaguePosition ||
-    (home.leaguePosition === away.leaguePosition && home.teamId.localeCompare(away.teamId) > 0);
+    home.qualificationPosition > away.qualificationPosition ||
+    (home.qualificationPosition === away.qualificationPosition &&
+      home.teamId.localeCompare(away.teamId) > 0);
 
   const firstLegHome = worseIsHome
     ? homeWorse
@@ -103,8 +105,8 @@ function buildSemifinalTie(
     round: "semifinal",
     homeTeamId: home.teamId,
     awayTeamId: away.teamId,
-    homeLeaguePosition: home.leaguePosition,
-    awayLeaguePosition: away.leaguePosition,
+    homeLeaguePosition: home.qualificationPosition,
+    awayLeaguePosition: away.qualificationPosition,
     firstLegHomeTeamId: firstLegHome,
     secondLegHomeTeamId: secondLegHome,
   };

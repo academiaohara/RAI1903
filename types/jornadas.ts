@@ -38,6 +38,8 @@ export type JornadaRoundSummary = {
   opponentTeamId?: string;
   opponentName?: string;
   isCurrent: boolean;
+  /** Clasificados al playoff calculados con tabla parcial (no temporada cerrada). */
+  isProvisional?: boolean;
 };
 
 export type JornadaRoundData = {
@@ -45,8 +47,15 @@ export type JornadaRoundData = {
   matchesByGrupo: Record<JornadaGrupo, JornadaFixture[]>;
 };
 
+export type JornadasGetRoundOptions = {
+  /** Jornada de liga tras la que calcular los cruces de playoff (incluye esa jornada). */
+  qualifyingLeagueRound?: number;
+};
+
 export type JornadasDataset = {
   rounds: JornadaRoundSummary[];
   currentRoundId: JornadaRoundId;
-  getRound: (roundId: JornadaRoundId) => JornadaRoundData;
+  /** Jornada de liga con la que se fijan los clasificados definitivos al playoff. */
+  definitiveQualifyingLeagueRound: number;
+  getRound: (roundId: JornadaRoundId, options?: JornadasGetRoundOptions) => JornadaRoundData;
 };
