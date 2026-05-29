@@ -128,6 +128,12 @@ export type CalendarMonthGroup = {
   matches: CalendarMatch[];
 };
 
+function compareCalendarMonthKeys(a: string, b: string): number {
+  const [yearA, monthA] = a.split("-").map(Number);
+  const [yearB, monthB] = b.split("-").map(Number);
+  return yearA - yearB || monthA - monthB;
+}
+
 export function groupCalendarMatchesByMonth(matches: CalendarMatch[]): CalendarMonthGroup[] {
   if (matches.length === 0) return [];
 
@@ -141,7 +147,7 @@ export function groupCalendarMatchesByMonth(matches: CalendarMatch[]): CalendarM
   }
 
   return [...byMonth.entries()]
-    .sort(([a], [b]) => a.localeCompare(b))
+    .sort(([a], [b]) => compareCalendarMonthKeys(a, b))
     .map(([key, monthMatches]) => {
       const [yearStr, monthStr] = key.split("-");
       const year = Number(yearStr);
@@ -195,7 +201,7 @@ export function buildCalendarMonths(matches: CalendarMatch[]): CalendarMonth[] {
   }
 
   return [...byMonth.entries()]
-    .sort(([a], [b]) => a.localeCompare(b))
+    .sort(([a], [b]) => compareCalendarMonthKeys(a, b))
     .map(([key, monthMatches]) => {
       const [yearStr, monthStr] = key.split("-");
       const year = Number(yearStr);

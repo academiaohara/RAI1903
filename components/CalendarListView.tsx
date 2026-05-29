@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
-import { Check, Circle } from "lucide-react";
+import { useMemo } from "react";
+import { Home, MapPin } from "lucide-react";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamLink } from "@/components/TeamLink";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
-import { getListViewScrollTargetId, groupCalendarMatchesByMonth, isUtcToday } from "@/lib/calendar";
+import { getListViewScrollTargetId, isUtcToday } from "@/lib/calendar";
 import { matchCompetitionShortLabel } from "@/lib/competition-labels";
 import { getCompetitionAccentClass } from "@/lib/competition-styles";
 import { cn } from "@/lib/utils";
@@ -21,7 +21,7 @@ type CalendarListViewProps = {
 };
 
 const LIST_ROW_GRID =
-  "grid w-full min-w-[44rem] grid-cols-[1.25rem_7rem_2.75rem_minmax(8rem,1.15fr)_1.5rem_minmax(6rem,1fr)_3.25rem_minmax(5.5rem,0.95fr)] items-center gap-x-3";
+  "grid w-full min-w-[42rem] grid-cols-[7rem_2.75rem_minmax(8rem,1.15fr)_1.75rem_minmax(6rem,1fr)_3.25rem_minmax(5.5rem,0.95fr)] items-center gap-x-3";
 
 function formatListMatchDate(date: string): string {
   return new Intl.DateTimeFormat("es-ES", {
@@ -46,68 +46,26 @@ function timeLabel(match: CalendarMatch): string {
 }
 
 export function CalendarListView({ matches, className, gender = "masculino" }: CalendarListViewProps) {
-  const scrollTargetId = getListViewScrollTargetId(matches);
-  const monthGroups = groupCalendarMatchesByMonth(matches);
-  const hasScrolledRef = useRef(false);
-
-  useEffect(() => {
-    if (!scrollTargetId || hasScrolledRef.current) return;
-
-    const frame = requestAnimationFrame(() => {
-      const element = document.getElementById(`cal-list-match-${scrollTargetId}`);
-      element?.scrollIntoView({ block: "center", behavior: "auto" });
-      hasScrolledRef.current = true;
-    });
-
-    return () => cancelAnimationFrame(frame);
-  }, [scrollTargetId]);
+  const sortedMatches = useMemo(
+    () => [...matches].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
+    [matches],
+  );
+  const scrollTargetId = getListViewScrollTargetId(sortedMatches);
 
   return (
-    <div className={cn("max-h-[min(70vh,42rem)] overflow-y-auto scroll-smooth pr-1", className)}>
-      <div className="space-y-6">
-        {monthGroups.map((group) => (
-          <section key={group.key} aria-labelledby={`cal-list-month-${group.key}`}>
-            <h3
-              id={`cal-list-month-${group.key}`}
-              className="mb-2 border-b-2 border-[#214C9B] pb-1 text-lg font-extrabold capitalize tracking-tight text-[#214C9B]"
-            >
-              {group.label}
-            </h3>
-            <div className="overflow-x-auto rounded-xl border border-[#214C9B]/15">
-              <div className="min-w-[44rem]">
-                <div
-                  className={cn(
-                    LIST_ROW_GRID,
-                    "border-b border-[#214C9B]/10 bg-slate-50 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.1em] text-slate-500",
-                  )}
-                  aria-hidden
-                >
-                  <span />
-                  <span>Fecha</span>
-                  <span>Hora</span>
-                  <span>Rival</span>
-                  <span className="text-center">L/V</span>
-                  <span>Estadio</span>
-                  <span className="text-center">Res.</span>
-                  <span>Competición</span>
-                </div>
-                <ul>
-                  {group.matches.map((match, index) => (
-                    <li key={match.id}>
-                      <CalendarListRow
-                        match={match}
-                        scrollTarget={match.id === scrollTargetId}
-                        gender={gender}
-                        zebra={index % 2 === 1}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </section>
+    <div className={cn("overflow-x-auto rounded-xl border border-[#214C9B]/15 bg-white", className)}>
+      <ul className="min-w-[42rem]">
+        {sortedMatches.map((match, index) => (
+          <li key={match.id}>
+            <CalendarListRow
+              match={match}
+              scrollTarget={match.id === scrollTargetId}
+              gender={gender}
+              zebra={index % 2 === 1}
+            />
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }
@@ -141,14 +99,6 @@ function CalendarListRow({
 
   const content = (
     <>
-      <span className="flex justify-center" aria-hidden>
-        {match.played ? (
-          <Check size={14} className="text-emerald-600" strokeWidth={2.5} />
-        ) : (
-          <Circle size={14} className="text-slate-300" strokeWidth={2} />
-        )}
-      </span>
-
       <time
         dateTime={match.date}
         className={cn(
@@ -176,10 +126,11 @@ function CalendarListRow({
       </span>
 
       <span
-        className="text-center text-xs font-extrabold uppercase tabular-nums text-[#214C9B]"
+        className="flex justify-center text-[#214C9B]"
         aria-label={match.isHome ? "Partido en casa" : "Partido fuera"}
+        title={match.isHome ? "Local" : "Visitante"}
       >
-        {match.isHome ? "L" : "V"}
+        {match.isHome ? <Home size={16} strokeWidth={2.4} aria-hidden /> : <MapPin size={16} strokeWidth={2.4} aria-hidden />}
       </span>
 
       <span className="min-w-0 truncate text-xs font-semibold text-slate-600" title={match.venue}>
@@ -214,7 +165,7 @@ function CalendarListRow({
       <Link
         id={`cal-list-match-${match.id}`}
         href={href as Route}
-        className={cn(rowClassName, "block no-underline")}
+        className={cn(rowClassName, "no-underline")}
         aria-label={`${match.opponent}, ${match.played ? "cronica" : "previa"}`}
       >
         {content}
