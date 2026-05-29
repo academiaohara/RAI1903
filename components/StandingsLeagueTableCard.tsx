@@ -14,6 +14,7 @@ import {
   type StandingsVenue,
 } from "@/lib/standings";
 import type { StandingsZonesConfig } from "@/lib/standings";
+import { cn } from "@/lib/utils";
 import type { Matchday } from "@/types";
 import type { LeagueTiebreakContext } from "@/lib/rfef-rules/types";
 import type { Team } from "@/types";
@@ -78,35 +79,37 @@ export function StandingsLeagueTableCard({
       ? title
       : `${title} · J${effectiveJornada} · ${STANDINGS_VENUE_LABELS[venue]}`;
 
-  return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-3">
-        <QuinielaViewToggle
-          value={venue}
-          onChange={setVenue}
-          options={VENUE_OPTIONS}
-          layoutId="standings-venue-toggle"
-        />
-        {playedRounds.length > 1 && (
-          <JornadaSelector
-            value={effectiveJornada}
-            total={lastPlayedRound}
-            currentRound={lastPlayedRound}
-            onChange={setJornada}
-          />
-        )}
-      </div>
-
-      <LeagueTableCard
-        eyebrow={eyebrow}
-        title={dynamicTitle}
-        teams={tableTeams}
-        fullTeams={fullTeams}
-        highlightTeamId={highlightTeamId}
-        compact={compact}
-        className={className}
-        borderlessHeader={borderlessHeader}
+  const toolbar = (
+    <>
+      <QuinielaViewToggle
+        value={venue}
+        onChange={setVenue}
+        options={VENUE_OPTIONS}
+        layoutId="standings-venue-toggle"
       />
-    </div>
+      {playedRounds.length > 1 && (
+        <JornadaSelector
+          compact
+          value={effectiveJornada}
+          total={lastPlayedRound}
+          currentRound={lastPlayedRound}
+          onChange={setJornada}
+        />
+      )}
+    </>
+  );
+
+  return (
+    <LeagueTableCard
+      eyebrow={eyebrow}
+      title={dynamicTitle}
+      teams={tableTeams}
+      fullTeams={fullTeams}
+      highlightTeamId={highlightTeamId}
+      compact={compact}
+      className={cn("min-w-0", className)}
+      borderlessHeader={borderlessHeader}
+      toolbar={toolbar}
+    />
   );
 }
