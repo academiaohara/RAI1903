@@ -23,7 +23,7 @@ export function OpponentCrest({ logo, opponent, className, size = "lg" }: Oppone
       <img
         src={logo}
         alt={`Escudo de ${opponent}`}
-        className={cn("object-contain drop-shadow-sm", sizeClass, className)}
+        className={cn("object-contain", sizeClass, className)}
       />
     );
   }
@@ -31,7 +31,7 @@ export function OpponentCrest({ logo, opponent, className, size = "lg" }: Oppone
   return (
     <span
       className={cn(
-        "flex items-center justify-center rounded-2xl border-2 border-[#214C9B]/15 bg-gradient-to-br from-slate-50 to-blue-50 font-extrabold text-[#214C9B] shadow-inner",
+        "flex items-center justify-center font-extrabold text-[#214C9B]",
         sizeClass,
         className,
       )}

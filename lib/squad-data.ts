@@ -1,5 +1,6 @@
 import { matchdays, players, playersFemenino, teams, teamsFemenino } from "@/data/mock";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
+import { getTeamCrestById } from "@/lib/team-crests";
 import { matchToFinishedLeagueMatch } from "@/lib/standings";
 import { getPlayerRole } from "@/lib/player-roles";
 import { getSquadPlayerPhoto, STADIUM_ROMAN_SUAREZ_PHOTO } from "@/lib/squad-photos";
@@ -206,7 +207,7 @@ export function getSquadClubInfo(gender: PrimerEquipoGender): SquadClubInfo {
       inaugurado: 1923,
       superficie: "Cesped natural",
     },
-    escudo: "/logo.png",
+    escudo: getTeamCrestById(teamId),
     entrenador: team?.coach ?? "Miguel Alonso",
     jugadores: squad.length,
     stats: {

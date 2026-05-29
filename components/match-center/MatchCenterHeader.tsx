@@ -38,7 +38,7 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
 
         <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-6">
           <div className="flex flex-col items-center gap-2 text-center">
-            <OpponentCrest logo={homeTeam ? getTeamCrest(homeTeam) : "LOC"} opponent={match.homeTeam} size="md" className="border-white/30 bg-white/10 text-white" />
+            <OpponentCrest logo={homeTeam ? getTeamCrest(homeTeam) : "LOC"} opponent={match.homeTeam} size="md" />
             <p className="text-xs font-extrabold uppercase leading-tight sm:text-sm">{match.homeTeam}</p>
           </div>
 
@@ -54,7 +54,7 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
           </div>
 
           <div className="flex flex-col items-center gap-2 text-center">
-            <OpponentCrest logo={awayTeam ? getTeamCrest(awayTeam) : "VIS"} opponent={match.awayTeam} size="md" className="border-white/30 bg-white/10 text-white" />
+            <OpponentCrest logo={awayTeam ? getTeamCrest(awayTeam) : "VIS"} opponent={match.awayTeam} size="md" />
             <p className="text-xs font-extrabold uppercase leading-tight sm:text-sm">{match.awayTeam}</p>
           </div>
         </div>

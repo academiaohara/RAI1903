@@ -36,11 +36,7 @@ export function EquipoLigaView({ gender, team, allTeams }: EquipoLigaViewProps) 
 
       <Card eyebrow="Guia de la liga" title={team.name} borderlessHeader>
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-          <TeamCrest
-            team={team}
-            size="lg"
-            className="shrink-0 rounded-3xl border border-[#214C9B]/20 bg-gradient-to-br from-blue-50 via-white to-blue-100"
-          />
+          <TeamCrest team={team} size="lg" className="shrink-0" />
           <div className="grid flex-1 gap-4 sm:grid-cols-2">
             <InfoItem label="Entrenador" value={team.coach} />
             <InfoItem label="Estadio" value={team.stadium} />

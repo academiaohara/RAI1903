@@ -18,7 +18,7 @@ const opponentSize = {
 const wrapperSize = {
   sm: "h-7 w-7",
   md: "h-12 w-12",
-  lg: "h-28 w-28 [&>img]:h-28 [&>img]:w-28 [&>span]:h-28 [&>span]:w-28 [&>span]:rounded-3xl [&>span]:text-4xl",
+  lg: "h-28 w-28 [&>img]:h-28 [&>img]:w-28 [&>span]:h-28 [&>span]:w-28 [&>span]:text-4xl",
 } as const;
 
 export function TeamCrest({ team, size = "md", className }: TeamCrestProps) {

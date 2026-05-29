@@ -82,14 +82,7 @@ export function LeagueTable({
                   </td>
                   <td className={dataCellClassName}>
                     <div className="flex min-w-0 items-center gap-1 md:gap-2">
-                      <TeamCrest
-                        team={team}
-                        size="sm"
-                        className={cn(
-                          "shrink-0 rounded border md:rounded-lg",
-                          highlighted ? "border-white/30 bg-white/10" : "border-[#214C9B]/15 bg-white",
-                        )}
-                      />
+                      <TeamCrest team={team} size="sm" className="shrink-0" />
                       <span className="max-w-[4.5rem] truncate font-bold sm:max-w-none md:max-w-none">
                         <span className="md:hidden">{team.shortName}</span>
                         <span className="hidden md:inline">{teamLabel}</span>
