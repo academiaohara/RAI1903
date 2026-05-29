@@ -68,6 +68,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
           centerOnHighlight={showAvilesSidebar}
           compact
           borderlessHeader
+          gender={gender}
         />
         <div className="grid gap-6">
           {showAvilesSidebar && (
@@ -76,7 +77,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
                 <div className="space-y-3">
                   {latest.length > 0 ? (
                     latest.map((match) => (
-                      <MatchCard key={match.id} match={match} compact highlightTeamId={highlightTeamId} />
+                      <MatchCard key={match.id} match={match} compact highlightTeamId={highlightTeamId} gender={gender} />
                     ))
                   ) : (
                     <p className="text-sm font-bold text-slate-500">Sin partidos finalizados.</p>
@@ -92,7 +93,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
                 <div className="space-y-3">
                   {upcoming.length > 0 ? (
                     upcoming.map((match) => (
-                      <MatchCard key={match.id} match={match} compact highlightTeamId={highlightTeamId} />
+                      <MatchCard key={match.id} match={match} compact highlightTeamId={highlightTeamId} gender={gender} />
                     ))
                   ) : (
                     <p className="text-sm font-bold text-slate-500">Sin partidos programados.</p>
@@ -109,7 +110,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
             >
               <div className="space-y-3">
                 {lastGrupoJornada.matches.map((match) => (
-                  <MatchCard key={match.id} match={match} compact highlightTeamId="" />
+                  <MatchCard key={match.id} match={match} compact highlightTeamId="" gender={gender} />
                 ))}
               </div>
             </Card>

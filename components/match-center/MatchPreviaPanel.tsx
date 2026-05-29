@@ -1,4 +1,5 @@
 import { OpponentCrest } from "@/components/OpponentCrest";
+import { TeamLink } from "@/components/TeamLink";
 import { getTeamCrest } from "@/lib/team-crests";
 import { MatchNewsCarousel } from "@/components/match-center/MatchNewsCarousel";
 import { MatchVideoBlock } from "@/components/match-center/MatchVideoBlock";
@@ -156,8 +157,10 @@ export function MatchPreviaPanel({
           <div className="rounded-2xl border border-[#214C9B]/15 bg-slate-50 p-4 sm:p-6">
             <div className="grid gap-6 md:grid-cols-[1fr_auto_1fr] md:items-center">
               <div className="flex flex-col items-center gap-2 text-center">
-                <OpponentCrest logo={homeTeam ? getTeamCrest(homeTeam) : "LOC"} opponent={match.homeTeam} size="md" />
-                <p className="text-sm font-extrabold text-slate-800">{match.homeTeam}</p>
+                <TeamLink gender={gender} teamId={match.homeTeamId} teamName={match.homeTeam} className="flex flex-col items-center gap-2">
+                  <OpponentCrest logo={homeTeam ? getTeamCrest(homeTeam) : "LOC"} opponent={match.homeTeam} size="md" />
+                  <span className="text-sm font-extrabold text-slate-800">{match.homeTeam}</span>
+                </TeamLink>
                 {homeTeam && <FormBadges form={homeTeam.form} />}
               </div>
               <div className="text-center">
@@ -167,8 +170,10 @@ export function MatchPreviaPanel({
                 </p>
               </div>
               <div className="flex flex-col items-center gap-2 text-center">
-                <OpponentCrest logo={awayTeam ? getTeamCrest(awayTeam) : "VIS"} opponent={match.awayTeam} size="md" />
-                <p className="text-sm font-extrabold text-slate-800">{match.awayTeam}</p>
+                <TeamLink gender={gender} teamId={match.awayTeamId} teamName={match.awayTeam} className="flex flex-col items-center gap-2">
+                  <OpponentCrest logo={awayTeam ? getTeamCrest(awayTeam) : "VIS"} opponent={match.awayTeam} size="md" />
+                  <span className="text-sm font-extrabold text-slate-800">{match.awayTeam}</span>
+                </TeamLink>
                 {awayTeam && <FormBadges form={awayTeam.form} />}
               </div>
             </div>
@@ -182,11 +187,19 @@ export function MatchPreviaPanel({
           <h2 className="text-lg font-extrabold uppercase tracking-normal text-[#214C9B]">Ultimos 5 partidos</h2>
           <div className="space-y-6">
             <div>
-              <h3 className="mb-2 text-sm font-extrabold text-slate-800">{match.homeTeam}</h3>
+              <h3 className="mb-2 text-sm font-extrabold text-slate-800">
+                <TeamLink gender={gender} teamId={match.homeTeamId} teamName={match.homeTeam}>
+                  {match.homeTeam}
+                </TeamLink>
+              </h3>
               <RecentMatchesTable title={match.homeTeam} matches={homeRecentMatches} />
             </div>
             <div>
-              <h3 className="mb-2 text-sm font-extrabold text-slate-800">{match.awayTeam}</h3>
+              <h3 className="mb-2 text-sm font-extrabold text-slate-800">
+                <TeamLink gender={gender} teamId={match.awayTeamId} teamName={match.awayTeam}>
+                  {match.awayTeam}
+                </TeamLink>
+              </h3>
               <RecentMatchesTable title={match.awayTeam} matches={awayRecentMatches} />
             </div>
           </div>

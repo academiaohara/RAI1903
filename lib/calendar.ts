@@ -46,6 +46,8 @@ export function matchToCalendarMatch(match: Match, gender: PrimerEquipoGender): 
     opponentLogo: rival ? getTeamCrest(rival) : rivalId.slice(0, 3).toUpperCase(),
     homeTeam: match.homeTeam,
     awayTeam: match.awayTeam,
+    homeTeamId: match.homeTeamId,
+    awayTeamId: match.awayTeamId,
     venue: match.venue,
     competition: match.competition,
     competitionStage: match.competitionStage,

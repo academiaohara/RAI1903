@@ -239,6 +239,8 @@ export type CalendarMatch = {
   opponentLogo: string;
   homeTeam: string;
   awayTeam: string;
+  homeTeamId: string;
+  awayTeamId: string;
   venue: string;
   competition: CompetitionId;
   competitionStage?: string;
