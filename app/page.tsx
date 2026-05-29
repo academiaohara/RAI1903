@@ -66,13 +66,12 @@ export default function HomePage() {
         )}
       </section>
 
-      <Card eyebrow="Noticiero" title="Actualidad en movimiento">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="min-w-0 flex-1">
-            <NewsTicker items={newsItems} />
-          </div>
-          <NewsNavButton href="/noticias/club" />
-        </div>
+      <Card
+        eyebrow="Noticiero"
+        title="Actualidad en movimiento"
+        action={<NewsNavButton href="/noticias/club" />}
+      >
+        <NewsTicker items={newsItems} />
       </Card>
 
       {featuredTransfers.length > 0 && (
