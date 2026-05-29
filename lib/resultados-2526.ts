@@ -1,4 +1,5 @@
-import resultados2526 from "@/data/resultados-2526.json";
+import resultados2526Grupo1 from "@/data/resultados-2526.json";
+import resultados2526Grupo2 from "@/data/resultados-2526-grupo2.json";
 import type { Match, Matchday, Team } from "@/types";
 
 type ResultadosPartido = {
@@ -22,7 +23,7 @@ type Resultados2526 = {
 };
 
 /** Maps official 1ª RFEF Grupo I names from resultados JSON to internal team ids. */
-export const TEAM_NAME_TO_ID: Record<string, string> = {
+export const TEAM_NAME_TO_ID_GRUPO1: Record<string, string> = {
   "Real Avilés": "real-aviles-industrial",
   "Racing Club Ferrol": "ferrol",
   Lugo: "lugo",
@@ -45,10 +46,37 @@ export const TEAM_NAME_TO_ID: Record<string, string> = {
   "Osasuna B": "osasuna-promesas",
 };
 
+/** Maps official 1ª RFEF Grupo II names from resultados JSON to internal team ids. */
+export const TEAM_NAME_TO_ID_GRUPO2: Record<string, string> = {
+  "AD Alcorcón": "alcorcon",
+  "Algeciras CF": "algeciras",
+  "Antequera CF": "antequera",
+  "Atlético Madrileño": "atletico-madrileno",
+  "Atlético Sanluqueño": "atletico-sanluqueno",
+  "Betis Deportivo": "betis-deportivo",
+  "FC Cartagena": "cartagena",
+  "CD Eldense": "eldense",
+  "CE Europa": "europa",
+  "Gimnàstic de Tarragona": "gimnastic",
+  "Hércules CF": "hercules",
+  "UD Ibiza": "ibiza",
+  "Juventud Torremolinos CF": "torremolinos",
+  "Marbella FC": "marbella",
+  "Real Murcia CF": "real-murcia",
+  "CE Sabadell FC": "sabadell",
+  "Sevilla Atlético": "sevilla-atletico",
+  "SD Tarazona": "tarazona",
+  "CD Teruel": "teruel",
+  "Villarreal CF B": "villarreal-b",
+};
+
+/** @deprecated Use TEAM_NAME_TO_ID_GRUPO1 */
+export const TEAM_NAME_TO_ID = TEAM_NAME_TO_ID_GRUPO1;
+
 export const RESULTADOS_2526_LAST_ROUND = 38;
 
-function resolveTeamId(name: string): string {
-  const teamId = TEAM_NAME_TO_ID[name];
+function resolveTeamId(name: string, nameToId: Record<string, string>): string {
+  const teamId = nameToId[name];
   if (!teamId) {
     throw new Error(`Unknown team name in resultados 25/26: "${name}"`);
   }
@@ -65,9 +93,10 @@ function buildMatch(
   partido: ResultadosPartido,
   round: number,
   teamById: Map<string, Team>,
+  nameToId: Record<string, string>,
 ): Match {
-  const homeTeamId = resolveTeamId(partido.local);
-  const awayTeamId = resolveTeamId(partido.visitante);
+  const homeTeamId = resolveTeamId(partido.local, nameToId);
+  const awayTeamId = resolveTeamId(partido.visitante, nameToId);
   const home = teamById.get(homeTeamId)!;
   const away = teamById.get(awayTeamId)!;
 
@@ -87,14 +116,25 @@ function buildMatch(
   };
 }
 
-export function buildMatchdaysFromResultados2526(teams: readonly Team[]): Matchday[] {
+export function buildMatchdaysFromResultados2526(
+  teams: readonly Team[],
+  data: Resultados2526 = resultados2526Grupo1 as Resultados2526,
+  nameToId: Record<string, string> = TEAM_NAME_TO_ID_GRUPO1,
+): Matchday[] {
   const teamById = new Map(teams.map((team) => [team.id, team]));
-  const data = resultados2526 as Resultados2526;
 
   return [...data.jornadas]
     .sort((a, b) => a.jornada - b.jornada)
     .map((jornada) => ({
       round: jornada.jornada,
-      matches: jornada.partidos.map((partido) => buildMatch(partido, jornada.jornada, teamById)),
+      matches: jornada.partidos.map((partido) => buildMatch(partido, jornada.jornada, teamById, nameToId)),
     }));
+}
+
+export function buildMatchdaysGrupo2(teams: readonly Team[]): Matchday[] {
+  return buildMatchdaysFromResultados2526(
+    teams,
+    resultados2526Grupo2 as Resultados2526,
+    TEAM_NAME_TO_ID_GRUPO2,
+  );
 }

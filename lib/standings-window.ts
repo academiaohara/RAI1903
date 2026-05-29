@@ -19,3 +19,11 @@ export function getStandingsWindow(
 
   return sorted.slice(index - above, index + below + 1);
 }
+
+/** Balanced window around `highlightTeamId` with up to `totalRows` teams (including self). */
+export function getBalancedStandingsWindow(teams: Team[], highlightTeamId: string, totalRows = 10): Team[] {
+  const extra = Math.max(0, totalRows - 1);
+  const aboveTarget = Math.floor(extra / 2);
+  const belowTarget = extra - aboveTarget;
+  return getStandingsWindow(teams, highlightTeamId, aboveTarget, belowTarget);
+}

@@ -22,8 +22,7 @@ export function LeagueTable({
   highlightTeamId = RAI_TEAM_ID,
   showLegend = true,
 }: LeagueTableProps) {
-  const rows = [...teams].sort((a, b) => a.position - b.position);
-  const visibleRows = compact ? rows.slice(0, 10) : rows;
+  const visibleRows = [...teams].sort((a, b) => a.position - b.position);
 
   return (
     <div className="space-y-3">

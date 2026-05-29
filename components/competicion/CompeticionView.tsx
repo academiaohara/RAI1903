@@ -1,62 +1,102 @@
 "use client";
 
+import { useState } from "react";
 import { CalendarNavButton } from "@/components/CalendarNavButton";
 import { Card } from "@/components/Card";
+import { GrupoSwitcher } from "@/components/competicion/GrupoSwitcher";
 import { GuiaLiga } from "@/components/competicion/GuiaLiga";
 import { LeagueTableCard } from "@/components/LeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
-import { getLatestAvilesMatchesByGender, getUpcomingAvilesMatchesByGender } from "@/lib/fixtures";
+import {
+  getLatestAvilesMatchesByGender,
+  getTeamsByGender,
+  getUpcomingAvilesMatchesByGender,
+} from "@/lib/fixtures";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
+import { getTeamsForRfefGrupo, type RfefGrupoId } from "@/lib/rfef-grupos";
+import { getBalancedStandingsWindow } from "@/lib/standings-window";
 import type { Route } from "next";
-import type { Team } from "@/types";
-
 type CompeticionViewProps = {
   gender: PrimerEquipoGender;
-  teams: Team[];
   highlightTeamId: string;
+  initialGrupo?: RfefGrupoId;
 };
 
-export function CompeticionView({ gender, teams, highlightTeamId }: CompeticionViewProps) {
+export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }: CompeticionViewProps) {
+  const [grupo, setGrupo] = useState<RfefGrupoId>(initialGrupo);
+  const isMasculino = gender === "masculino";
+  const teams = isMasculino ? getTeamsForRfefGrupo(grupo) : getTeamsByGender(gender);
+  const showAvilesSidebar = !isMasculino || grupo === "1";
+  const tableTeams = showAvilesSidebar
+    ? getBalancedStandingsWindow(teams, highlightTeamId, 10)
+    : teams.slice(0, 10);
   const latest = getLatestAvilesMatchesByGender(gender, 5);
   const upcoming = getUpcomingAvilesMatchesByGender(gender, 5);
   const calendarHref = `${primerEquipoBase(gender)}/calendario` as Route;
 
   return (
     <div className="space-y-6">
-      <GuiaLiga gender={gender} teams={teams} highlightTeamId={highlightTeamId} />
+      {isMasculino && (
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <GrupoSwitcher value={grupo} onChange={setGrupo} />
+          <p className="text-sm font-bold text-slate-600">
+            {grupo === "1" ? "1ª RFEF - Grupo I (Real Avilés)" : "1ª RFEF - Grupo II"}
+          </p>
+        </div>
+      )}
+
+      <GuiaLiga gender={gender} teams={teams} grupo={isMasculino ? grupo : "1"} />
 
       <section className="grid gap-6 xl:grid-cols-2">
         <LeagueTableCard
           eyebrow="Liga"
           title="Clasificacion"
-          teams={teams}
-          highlightTeamId={highlightTeamId}
+          teams={tableTeams}
+          fullTeams={teams}
+          highlightTeamId={showAvilesSidebar ? highlightTeamId : ""}
+          compact
           borderlessHeader
         />
         <div className="grid gap-6">
-          <Card eyebrow="Forma reciente" title="Ultimos resultados" borderlessHeader>
-            <div className="space-y-3">
-              {latest.length > 0 ? (
-                latest.map((match) => <MatchCard key={match.id} match={match} compact highlightTeamId={highlightTeamId} />)
-              ) : (
-                <p className="text-sm font-bold text-slate-500">Sin partidos finalizados.</p>
-              )}
-            </div>
-          </Card>
-          <Card
-            eyebrow="Calendario"
-            title="Proximos partidos"
-            borderlessHeader
-            action={<CalendarNavButton href={calendarHref} />}
-          >
-            <div className="space-y-3">
-              {upcoming.length > 0 ? (
-                upcoming.map((match) => <MatchCard key={match.id} match={match} compact highlightTeamId={highlightTeamId} />)
-              ) : (
-                <p className="text-sm font-bold text-slate-500">Sin partidos programados.</p>
-              )}
-            </div>
-          </Card>
+          {showAvilesSidebar && (
+            <>
+              <Card eyebrow="Forma reciente" title="Ultimos resultados" borderlessHeader>
+                <div className="space-y-3">
+                  {latest.length > 0 ? (
+                    latest.map((match) => (
+                      <MatchCard key={match.id} match={match} compact highlightTeamId={highlightTeamId} />
+                    ))
+                  ) : (
+                    <p className="text-sm font-bold text-slate-500">Sin partidos finalizados.</p>
+                  )}
+                </div>
+              </Card>
+              <Card
+                eyebrow="Calendario"
+                title="Proximos partidos"
+                borderlessHeader
+                action={<CalendarNavButton href={calendarHref} />}
+              >
+                <div className="space-y-3">
+                  {upcoming.length > 0 ? (
+                    upcoming.map((match) => (
+                      <MatchCard key={match.id} match={match} compact highlightTeamId={highlightTeamId} />
+                    ))
+                  ) : (
+                    <p className="text-sm font-bold text-slate-500">Sin partidos programados.</p>
+                  )}
+                </div>
+              </Card>
+            </>
+          )}
+          {isMasculino && !showAvilesSidebar && (
+            <Card eyebrow="Real Avilés" title="Tu equipo" borderlessHeader>
+              <p className="text-sm font-bold leading-relaxed text-slate-600">
+                El Real Avilés compite en el Grupo I. Cambia al Grupo 1 para ver resultados, calendario y la
+                clasificacion con el tramo centrado en el blanquiazul.
+              </p>
+            </Card>
+          )}
         </div>
       </section>
     </div>
