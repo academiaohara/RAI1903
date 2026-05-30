@@ -758,20 +758,25 @@ export const fanRdpVideos: FanYouTubeVideo[] = [
   { id: "rdp-v5", title: "RDP", url: "https://youtu.be/eCeLvze6axY" },
 ];
 
-/** Contenido de aficion y peñas: tertulias y directos en X Spaces. */
+/** Contenido de aficion y peñas: tertulias y directos en X Spaces (el primero se muestra destacado). */
 export const fanTenteFirme: FanMediaLink[] = [
   {
     id: "tente-firme-space-1",
-    name: "Tente firme · Space I",
+    name: "Tente firme · Jornada 38",
     platform: "twitter",
     url: "https://x.com/i/spaces/1vKpPPNBdVXKE",
     description: "Tertulia o directo de aficion grabado en X Spaces.",
+    avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop",
   },
   {
     id: "tente-firme-space-2",
-    name: "Tente firme · Space II",
+    name: "Tente firme · Previa playoff",
     platform: "twitter",
     url: "https://x.com/i/spaces/1kKzDMRrDYNJv",
     description: "Tertulia o directo de aficion grabado en X Spaces.",
+    avatarUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop",
   },
 ];
+
+/** Vídeos opcionales de Tente firme en YouTube (el último se muestra destacado). */
+export const fanTenteFirmeVideos: FanYouTubeVideo[] = [];

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { Card } from "@/components/Card";
-import { FanMediaLinkCard } from "@/components/FanMediaLinkCard";
+import { TenteFirmeShowcase } from "@/components/TenteFirmeShowcase";
 import { ZonaMixtaVideoShowcase } from "@/components/ZonaMixtaVideoShowcase";
 import { PageHero } from "@/components/PageHero";
 import { contenidoFanSections, isContenidoFanSlug } from "@/lib/contenido-fan";
@@ -10,6 +10,7 @@ export default async function ContenidoFanSectionPage({ params }: { params: Prom
   if (!isContenidoFanSlug(section)) notFound();
 
   const config = contenidoFanSections[section];
+  const isTenteFirme = section === "tente-firme";
 
   return (
     <div className="space-y-6">
@@ -19,19 +20,13 @@ export default async function ContenidoFanSectionPage({ params }: { params: Prom
         description={config.heroDescription}
       />
 
-      <Card eyebrow={config.cardEyebrow} title={config.cardTitle}>
+      <Card eyebrow={config.cardEyebrow} borderlessHeader={!config.cardEyebrow}>
         <p className="mb-5 text-sm leading-6 text-slate-600">{config.cardIntro}</p>
-        {config.videos && config.videos.length > 0 && (
-          <div className="mb-8">
-            <ZonaMixtaVideoShowcase videos={config.videos} />
-          </div>
-        )}
-        {config.links.length > 0 && (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {config.links.map((link) => (
-              <FanMediaLinkCard key={link.id} link={link} />
-            ))}
-          </div>
+        {isTenteFirme ? (
+          <TenteFirmeShowcase spaces={config.links} videos={config.videos} />
+        ) : (
+          config.videos &&
+          config.videos.length > 0 && <ZonaMixtaVideoShowcase videos={config.videos} />
         )}
       </Card>
     </div>
