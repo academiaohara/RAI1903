@@ -17,8 +17,7 @@ export function TenteFirmeShowcase({ spaces, videos = [] }: TenteFirmeShowcasePr
   const trackRef = useRef<HTMLDivElement>(null);
   const handleWheel = useHorizontalWheelScroll();
 
-  const featured = spaces[0] ?? null;
-  const carouselItems = spaces.slice(1);
+  const carouselItems = spaces;
   const carouselCount = carouselItems.length;
 
   const scrollToIndex = useCallback(
@@ -36,50 +35,43 @@ export function TenteFirmeShowcase({ spaces, videos = [] }: TenteFirmeShowcasePr
     [carouselCount],
   );
 
-  if (!featured && videos.length === 0) return null;
+  if (carouselCount === 0 && videos.length === 0) return null;
 
   return (
     <div className="space-y-10">
-      {featured && (
+      {carouselCount > 0 && (
         <section className="space-y-5">
-          <p className="text-sm font-bold uppercase text-[#214C9B]">X Spaces</p>
-          <TenteFirmeSpaceCard link={featured} variant="featured" />
-
-          {carouselItems.length > 0 && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-bold uppercase text-slate-500">Más espacios</p>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => scrollToIndex(carouselIndex - 1)}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#214C9B]/25 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
-                    aria-label="Espacio anterior"
-                  >
-                    <ChevronLeft size={18} aria-hidden />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => scrollToIndex(carouselIndex + 1)}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#214C9B]/25 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
-                    aria-label="Espacio siguiente"
-                  >
-                    <ChevronRight size={18} aria-hidden />
-                  </button>
-                </div>
-              </div>
-
-              <div
-                ref={trackRef}
-                onWheel={handleWheel}
-                className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-1"
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm font-bold uppercase text-[#214C9B]">X Spaces</p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => scrollToIndex(carouselIndex - 1)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#214C9B]/25 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
+                aria-label="Espacio anterior"
               >
-                {carouselItems.map((link) => (
-                  <TenteFirmeSpaceCard key={link.id} link={link} />
-                ))}
-              </div>
+                <ChevronLeft size={18} aria-hidden />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollToIndex(carouselIndex + 1)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#214C9B]/25 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
+                aria-label="Espacio siguiente"
+              >
+                <ChevronRight size={18} aria-hidden />
+              </button>
             </div>
-          )}
+          </div>
+
+          <div
+            ref={trackRef}
+            onWheel={handleWheel}
+            className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-1"
+          >
+            {carouselItems.map((link) => (
+              <TenteFirmeSpaceCard key={link.id} link={link} />
+            ))}
+          </div>
         </section>
       )}
 

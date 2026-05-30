@@ -58,7 +58,7 @@ export const contenidoFanSections: Record<ContenidoFanSlug, ContenidoFanSectionC
       "Contenido de afición, peñas y apoyo a la plantilla: directos, tertulias y piezas que animan a «tenerse firme» en cada jornada.",
     cardEyebrow: "Afición",
     cardIntro:
-      "Tertulias y directos de aficion en X Spaces. El espacio destacado abre la grabacion en X; el resto aparece en el carrusel.",
+      "Tertulias y directos de aficion en X Spaces. Recorre el carrusel para escuchar cada episodio en X.",
     links: fanTenteFirme,
     videos: fanTenteFirmeVideos,
   },
