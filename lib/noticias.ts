@@ -44,6 +44,9 @@ export const NOTICIAS_TABS: { href: Route; label: string }[] = [
 export const sortNewsByDate = <T extends { date: string; id: string }>(items: T[]) =>
   [...items].sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
 
+/** Máximo de noticias en el carrusel animado de inicio y fichas. */
+export const NEWS_TICKER_LIMIT = 10;
+
 export const newsByChannel = <T extends { channel: NewsChannel; date: string; id: string }>(
   items: T[],
   channel: NewsChannel,

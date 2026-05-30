@@ -1,7 +1,7 @@
 "use client";
 
 import { NewsMedia } from "@/components/NewsMedia";
-import { sortNewsByDate } from "@/lib/noticias";
+import { NEWS_TICKER_LIMIT, sortNewsByDate } from "@/lib/noticias";
 import {
   useHorizontalWheelScroll,
   useHorizontalWheelScrollListener,
@@ -9,11 +9,11 @@ import {
 } from "@/lib/use-horizontal-wheel-scroll";
 import { formatDate } from "@/lib/utils";
 import type { NewsItem } from "@/types";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 
 export function NewsTicker({ items }: { items: NewsItem[] }) {
-  const sorted = sortNewsByDate(items);
+  const sorted = sortNewsByDate(items).slice(0, NEWS_TICKER_LIMIT);
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [manualScroll, setManualScroll] = useState(false);
@@ -21,8 +21,18 @@ export function NewsTicker({ items }: { items: NewsItem[] }) {
   const useTicker = sorted.length > 1;
   const loop = useTicker ? [...sorted, ...sorted] : sorted;
 
-  const handleScrollWheel = useHorizontalWheelScroll({ blockPageScroll: true, smooth: true });
-  const smoothScroll = useSmoothHorizontalWheelScroll();
+  const getLoopWidth = useCallback(() => {
+    const track = trackRef.current;
+    if (!track || !useTicker) return 0;
+    return track.scrollWidth / 2;
+  }, [useTicker]);
+
+  const handleScrollWheel = useHorizontalWheelScroll({
+    blockPageScroll: true,
+    smooth: true,
+    getLoopWidth: useTicker ? getLoopWidth : undefined,
+  });
+  const smoothScroll = useSmoothHorizontalWheelScroll(useTicker ? getLoopWidth : undefined);
 
   const resetManualScroll = useCallback(() => {
     const container = containerRef.current;
@@ -30,7 +40,9 @@ export function NewsTicker({ items }: { items: NewsItem[] }) {
     if (!track) return;
 
     smoothScroll.cancel();
-    if (container) smoothScroll.syncTarget(container);
+    if (container) {
+      container.scrollLeft = 0;
+    }
 
     track.style.animation = "";
     track.style.transform = "";
@@ -53,7 +65,11 @@ export function NewsTicker({ items }: { items: NewsItem[] }) {
         if (transform && transform !== "none") {
           currentX = new DOMMatrixReadOnly(transform).m41;
         }
-        const nextOffset = Math.max(0, -currentX - event.deltaY);
+        const loopWidth = track.scrollWidth / 2;
+        let nextOffset = Math.max(0, -currentX - event.deltaY);
+        if (loopWidth > 0) {
+          nextOffset %= loopWidth;
+        }
 
         track.style.animation = "none";
         track.style.transform = "none";
@@ -70,6 +86,27 @@ export function NewsTicker({ items }: { items: NewsItem[] }) {
   );
 
   useHorizontalWheelScrollListener(containerRef, handleWheel);
+
+  useEffect(() => {
+    if (!manualScroll || !useTicker) return;
+
+    const container = containerRef.current;
+    const track = trackRef.current;
+    if (!container || !track) return;
+
+    const onScroll = () => {
+      const loopWidth = track.scrollWidth / 2;
+      if (loopWidth <= 0) return;
+
+      if (container.scrollLeft >= loopWidth) {
+        container.scrollLeft -= loopWidth;
+        smoothScroll.syncTarget(container);
+      }
+    };
+
+    container.addEventListener("scroll", onScroll, { passive: true });
+    return () => container.removeEventListener("scroll", onScroll);
+  }, [manualScroll, smoothScroll, useTicker]);
 
   if (sorted.length === 0) return null;
 
