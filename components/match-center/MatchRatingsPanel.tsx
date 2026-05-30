@@ -52,7 +52,7 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
   return (
     <section>
       <h2 className="text-lg font-extrabold uppercase tracking-normal text-[#214C9B]">Valoraciones</h2>
-      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
+      <p className="mt-2 text-sm leading-relaxed text-slate-600">
         Puntúa el rendimiento de cada jugador tras el partido. Tu nota se guarda en este dispositivo y alimenta la media
         de valoración de la ficha.
       </p>
@@ -69,34 +69,16 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
               key={player.id}
               className="rounded-2xl border border-[#214C9B]/15 bg-slate-50/80 p-4 sm:p-5"
             >
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-                <div className="min-w-0 shrink-0 sm:w-36">
-                  <p className="flex items-center gap-2 text-sm font-extrabold uppercase text-slate-900">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#214C9B] text-xs font-extrabold text-white">
-                      {player.dorsal}
-                    </span>
-                    <span className="truncate">{getPlayerFullName(player)}</span>
-                  </p>
-                </div>
-
-                <div className="flex min-w-0 flex-1 basis-[12rem] items-center gap-3">
-                  <input
-                    type="range"
-                    min={SLIDER_MIN}
-                    max={SLIDER_MAX}
-                    step={SLIDER_STEP}
-                    value={sliderValue}
-                    onChange={(event) => handleRate(player.id, Number(event.target.value))}
-                    className="h-2 min-w-0 flex-1 cursor-pointer appearance-none rounded-full bg-[#214C9B]/15 accent-[#214C9B]"
-                    aria-label={`Valoración de ${getPlayerFullName(player)}`}
-                  />
-                  <span className="w-9 shrink-0 text-right text-sm font-extrabold tabular-nums text-[#214C9B]">
-                    {formatFanRating(sliderValue)}
+              <div className="flex items-start justify-between gap-3 sm:gap-4">
+                <p className="flex min-w-0 items-center gap-2 text-sm font-extrabold uppercase text-slate-900">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#214C9B] text-xs font-extrabold text-white">
+                    {player.dorsal}
                   </span>
-                </div>
+                  <span className="truncate">{getPlayerFullName(player)}</span>
+                </p>
 
                 <div
-                  className="ml-auto flex shrink-0 flex-col items-center justify-center rounded-xl border border-[#214C9B]/20 bg-white px-3 py-2 text-center"
+                  className="flex shrink-0 flex-col items-center justify-center rounded-xl border border-[#214C9B]/20 bg-white px-3 py-2 text-center"
                   title="Media de la afición en este partido"
                 >
                   <span className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Media</span>
@@ -104,6 +86,22 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
                     {formatFanRating(communityAverage)}
                   </span>
                 </div>
+              </div>
+
+              <div className="mt-3 flex items-center gap-3">
+                <input
+                  type="range"
+                  min={SLIDER_MIN}
+                  max={SLIDER_MAX}
+                  step={SLIDER_STEP}
+                  value={sliderValue}
+                  onChange={(event) => handleRate(player.id, Number(event.target.value))}
+                  className="h-2 min-w-0 flex-1 cursor-pointer appearance-none rounded-full bg-[#214C9B]/15 accent-[#214C9B]"
+                  aria-label={`Valoración de ${getPlayerFullName(player)}`}
+                />
+                <span className="w-9 shrink-0 text-right text-sm font-extrabold tabular-nums text-[#214C9B]">
+                  {formatFanRating(sliderValue)}
+                </span>
               </div>
             </li>
           );
