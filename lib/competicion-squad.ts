@@ -65,6 +65,7 @@ function rivalToSquadPlayer(player: RivalPlayer, team: Team, index: number): Squ
     peso: "76 kg",
     piernaBuena: seed % 5 === 0 ? "Izquierda" : "Derecha",
     contratoHasta: "2026-06-30",
+    valorMercado: null,
     descripcion: `Jugador de ${team.shortName} en la temporada 2025/26.`,
     foto: null,
     partidos: player.stats.appearances,

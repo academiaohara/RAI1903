@@ -121,6 +121,7 @@ function importPlayerToSquadPlayer(
     peso: "76 kg",
     piernaBuena: "Derecha",
     contratoHasta: player.contrato != null ? `${player.contrato}-06-30` : "—",
+    valorMercado: player.valor,
     descripcion: player.valor
       ? `Valor de mercado: ${player.valor}. Jugador de ${team.shortName} en la temporada 2025/26.`
       : `Jugador de ${team.shortName} en la temporada 2025/26.`,

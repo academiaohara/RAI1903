@@ -41,6 +41,8 @@ export type SquadPlayer = {
   peso: string;
   piernaBuena: "Derecha" | "Izquierda" | "Ambidiestro";
   contratoHasta: string;
+  /** Valor de mercado (Transfermarkt u origen importado). */
+  valorMercado: string | null;
   /** Texto descriptivo del jugador (web oficial / ficha). */
   descripcion: string;
   foto: string | null;

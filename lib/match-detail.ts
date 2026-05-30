@@ -1,6 +1,8 @@
 import { fanPreviaVideos, fanRdpVideos, newsItems, players, playersFemenino } from "@/data/mock";
 import { matchCompetitionShortLabel } from "@/lib/competition-labels";
 import { getMatchById, getRaiTeamId, getTeamByGender, getTeamMatches } from "@/lib/fixtures";
+import { getSquadPlayers } from "@/lib/squad-data";
+import { getPlayerFullName } from "@/lib/squad-utils";
 import { youtubeVideoId } from "@/lib/youtube";
 import type {
   FormCode,
@@ -15,7 +17,6 @@ import type {
   MatchStatCategory,
   MatchVideo,
   NewsItem,
-  Player,
   PrimerEquipoGender,
   RecentFormMatch,
 } from "@/types";
@@ -133,23 +134,23 @@ function buildHeadToHead(homeId: string, awayId: string, seed: number): HeadToHe
 }
 
 function buildLineup(teamId: string, gender: PrimerEquipoGender, seed: number, isAviles: boolean): MatchLineup {
-  const squad: Player[] = isAviles ? (gender === "femenino" ? playersFemenino : players) : [];
   const formations = ["4-2-3-1", "4-4-2", "4-3-3", "3-5-2"];
   const formation = formations[Math.floor(seeded(seed, 1) * formations.length)];
 
-  const pickAviles = () => {
-    const titulares = squad.filter((player) => player.status === "titular" || player.status === "nuevo fichaje").slice(0, 11);
-    const bench = squad.filter((player) => player.status === "suplente" || player.status === "cantera").slice(0, 7);
-    return { titulares, bench };
-  };
+  if (isAviles) {
+    const squad = getSquadPlayers(gender);
+    const titulares = squad
+      .filter((player) => player.estado === "titular" || player.estado === "nuevo fichaje")
+      .slice(0, 11);
+    const bench = squad.filter((player) => player.estado === "suplente" || player.estado === "cantera").slice(0, 7);
 
-  if (isAviles && squad.length > 0) {
-    const picked = pickAviles();
-    return {
-      formation,
-      starters: picked.titulares.map((player) => ({ number: player.number, name: player.displayName })),
-      bench: picked.bench.map((player) => ({ number: player.number, name: player.displayName })),
-    };
+    if (titulares.length > 0) {
+      return {
+        formation,
+        starters: titulares.map((player) => ({ number: player.dorsal, name: getPlayerFullName(player) })),
+        bench: bench.map((player) => ({ number: player.dorsal, name: getPlayerFullName(player) })),
+      };
+    }
   }
 
   const starters: LineupPlayer[] = Array.from({ length: 11 }, (_, index) => ({
