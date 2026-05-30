@@ -29,7 +29,7 @@ export default async function PrimerEquipoCalendarioPage({ params }: { params: P
             <span className="text-[#981915]">{upcoming}</span> pendientes
           </span>
         </div>
-        <TeamCalendar matches={matches} gender={gender} />
+        <TeamCalendar matches={matches} gender={gender} showVenue={gender !== "femenino"} />
       </Card>
     </>
   );

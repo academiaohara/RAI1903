@@ -23,7 +23,7 @@ type RawJornada = {
 };
 
 const JUVENIL_COMPETITION = "liga-nacional-juvenil" as const;
-const JUVENIL_AVILES_NAMES = ["Real Avilés U19", "At. Avilés A U19"];
+const JUVENIL_AVILES_NAMES = ["Real Avilés U19"];
 
 export function slugifyCanteraTeamName(name: string): string {
   return name
@@ -60,7 +60,7 @@ export function isAvilesCanteraTeamName(name: string): boolean {
     .normalize("NFD")
     .replace(/\p{M}/gu, "")
     .toLowerCase();
-  return normalized.includes("aviles");
+  return normalized.includes("real") && normalized.includes("aviles");
 }
 
 function rawPartidoToMatch(partido: RawPartido, jornada: number, index: number): Match {
