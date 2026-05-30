@@ -1,5 +1,5 @@
 import type { FanMediaLink, FanYouTubeVideo } from "@/types";
-import { fanPreviaVideos, fanRdpVideos, fanTenteFirme, fanZonaMixtaVideos } from "@/data/mock";
+import { fanPreviaVideos, fanRdpVideos, fanTenteFirme, fanTenteFirmeVideos, fanZonaMixtaVideos } from "@/data/mock";
 
 export const CONTENIDO_FAN_SLUGS = ["zona-mixta", "previa", "rdp", "tente-firme"] as const;
 
@@ -15,7 +15,6 @@ type ContenidoFanSectionConfig = {
   heroTitle: string;
   heroDescription: string;
   cardEyebrow?: string;
-  cardTitle: string;
   cardIntro: string;
   links: FanMediaLink[];
   videos?: FanYouTubeVideo[];
@@ -28,7 +27,6 @@ export const contenidoFanSections: Record<ContenidoFanSlug, ContenidoFanSectionC
     heroTitle: "Zona Mixta",
     heroDescription:
       "Programa oficial del club con entrevistas a directivos, entrenadores y jugadores. Presentado por Jorge Quirós.",
-    cardTitle: "Zona Mixta",
     cardIntro:
       "Espacio semanal de actualidad blanquiazul. El último episodio se reproduce arriba; el resto aparece en el carrusel inferior.",
     links: [],
@@ -39,7 +37,6 @@ export const contenidoFanSections: Record<ContenidoFanSlug, ContenidoFanSectionC
     label: "Previa",
     heroTitle: "Previas",
     heroDescription: "Entrevistas y piezas de antes del partido con rivales, entrenadores y claves del duelo.",
-    cardTitle: "Previas",
     cardIntro: "El último vídeo se reproduce arriba; el resto aparece en el carrusel inferior.",
     links: [],
     videos: fanPreviaVideos,
@@ -49,7 +46,6 @@ export const contenidoFanSections: Record<ContenidoFanSlug, ContenidoFanSectionC
     label: "RDP",
     heroTitle: "Ruedas de prensa",
     heroDescription: "RDP del Real Avilés Industrial: comparecencias de Lolo Escobar y el cuerpo técnico tras cada jornada.",
-    cardTitle: "Ruedas de prensa",
     cardIntro: "El último vídeo se reproduce arriba; el resto aparece en el carrusel inferior.",
     links: [],
     videos: fanRdpVideos,
@@ -61,10 +57,10 @@ export const contenidoFanSections: Record<ContenidoFanSlug, ContenidoFanSectionC
     heroDescription:
       "Contenido de afición, peñas y apoyo a la plantilla: directos, tertulias y piezas que animan a «tenerse firme» en cada jornada.",
     cardEyebrow: "Afición",
-    cardTitle: "Tente firme",
     cardIntro:
-      "Tertulias y directos de aficion en X Spaces. Pulsa una tarjeta para escuchar la grabacion en X.",
+      "Tertulias y directos de aficion en X Spaces. El espacio destacado abre la grabacion en X; el resto aparece en el carrusel.",
     links: fanTenteFirme,
+    videos: fanTenteFirmeVideos,
   },
 };
 
