@@ -1,8 +1,8 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useHorizontalCarousel } from "@/lib/use-horizontal-carousel";
 import { useHorizontalWheelScroll } from "@/lib/use-horizontal-wheel-scroll";
-import { useCallback, useRef, useState } from "react";
 import { youtubeEmbedUrl, youtubeVideoId } from "@/lib/youtube";
 import type { FanYouTubeVideo } from "@/types";
 
@@ -18,31 +18,13 @@ function resolveVideo(video: FanYouTubeVideo) {
 
 export function ZonaMixtaVideoShowcase({ videos }: ZonaMixtaVideoShowcaseProps) {
   const resolved = videos.map(resolveVideo).filter((video): video is NonNullable<typeof video> => video !== null);
-  const carouselCount = Math.max(0, resolved.length - 1);
-
-  const [carouselIndex, setCarouselIndex] = useState(0);
-  const trackRef = useRef<HTMLDivElement>(null);
+  const featured = resolved.length > 0 ? resolved[resolved.length - 1] : null;
+  const carouselItems = resolved.length > 0 ? resolved.slice(0, -1) : [];
+  const carouselCount = carouselItems.length;
+  const { trackRef, goPrev, goNext } = useHorizontalCarousel(carouselCount);
   const handleWheel = useHorizontalWheelScroll();
 
-  const scrollToIndex = useCallback(
-    (index: number) => {
-      const track = trackRef.current;
-      if (!track || carouselCount === 0) return;
-
-      const nextIndex = ((index % carouselCount) + carouselCount) % carouselCount;
-      const slide = track.children[nextIndex] as HTMLElement | undefined;
-      if (slide) {
-        track.scrollTo({ left: slide.offsetLeft, behavior: "smooth" });
-      }
-      setCarouselIndex(nextIndex);
-    },
-    [carouselCount],
-  );
-
-  if (resolved.length === 0) return null;
-
-  const featured = resolved[resolved.length - 1];
-  const carouselItems = resolved.slice(0, -1);
+  if (!featured) return null;
 
   return (
     <div className="space-y-5">
@@ -62,28 +44,30 @@ export function ZonaMixtaVideoShowcase({ videos }: ZonaMixtaVideoShowcaseProps) 
         </div>
       </div>
 
-      {carouselItems.length > 0 && (
+      {carouselCount > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-bold uppercase text-[#214C9B]">Más episodios</p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => scrollToIndex(carouselIndex - 1)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#214C9B]/25 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
-                aria-label="Episodio anterior"
-              >
-                <ChevronLeft size={18} aria-hidden />
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollToIndex(carouselIndex + 1)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#214C9B]/25 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
-                aria-label="Episodio siguiente"
-              >
-                <ChevronRight size={18} aria-hidden />
-              </button>
-            </div>
+            {carouselCount > 1 && (
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={goPrev}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#214C9B]/25 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
+                  aria-label="Episodio anterior"
+                >
+                  <ChevronLeft size={18} aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  onClick={goNext}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#214C9B]/25 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
+                  aria-label="Episodio siguiente"
+                >
+                  <ChevronRight size={18} aria-hidden />
+                </button>
+              </div>
+            )}
           </div>
 
           <div

@@ -78,7 +78,7 @@ const TEAM_SEEDS: TeamSeed[] = [
     shortName: "Avilés Fem.",
     city: "Avilés",
     stadium: "Roman Suarez Puerta",
-    coach: "Laura Menendez",
+    coach: "Javi Gómez",
     crestInitials: "RAI",
     colors: ["#214C9B", "#FFFFFF"],
   },
