@@ -10,6 +10,9 @@ type MatchFixtureTeamLinksProps = {
   gender?: PrimerEquipoGender;
   highlightTeamId: string;
   scoreLabel: string;
+  homeTeamLinkClassName?: string;
+  awayTeamLinkClassName?: string;
+  scorePillClassName?: string;
 };
 
 export function MatchFixtureTeamLinks({
@@ -17,6 +20,9 @@ export function MatchFixtureTeamLinks({
   gender = "masculino",
   highlightTeamId,
   scoreLabel,
+  homeTeamLinkClassName,
+  awayTeamLinkClassName,
+  scorePillClassName,
 }: MatchFixtureTeamLinksProps) {
   const avilesHome = match.homeTeamId === highlightTeamId;
   const avilesAway = match.awayTeamId === highlightTeamId;
@@ -28,6 +34,7 @@ export function MatchFixtureTeamLinks({
         teamId={match.homeTeamId}
         teamName={match.homeTeam}
         highlighted={avilesHome}
+        className={homeTeamLinkClassName}
       />
       <MatchFixtureScorePill
         homeLogo={getTeamCrestById(match.homeTeamId, getTeam(match.homeTeamId)?.crestInitials)}
@@ -35,6 +42,7 @@ export function MatchFixtureTeamLinks({
         awayLogo={getTeamCrestById(match.awayTeamId, getTeam(match.awayTeamId)?.crestInitials)}
         awayTeam={match.awayTeam}
         label={scoreLabel}
+        className={scorePillClassName}
       />
       <MatchTeamLink
         gender={gender}
@@ -42,6 +50,7 @@ export function MatchFixtureTeamLinks({
         teamName={match.awayTeam}
         highlighted={avilesAway}
         align="right"
+        className={awayTeamLinkClassName}
       />
     </div>
   );
