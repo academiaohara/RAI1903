@@ -114,10 +114,7 @@ function PlayerRow({
     >
       <td className={`px-3 py-3 font-extrabold tabular-nums text-[#214C9B] ${alignClass.center}`}>{player.dorsal}</td>
       <td className={`max-w-[11.5rem] px-3 py-3 ${alignClass.left}`}>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-extrabold uppercase text-slate-900">{getPlayerFullName(player)}</p>
-          <p className="truncate text-[11px] font-semibold text-slate-500">{player.nacionalidad}</p>
-        </div>
+        <p className="truncate text-sm font-extrabold uppercase text-slate-900">{getPlayerFullName(player)}</p>
       </td>
       <td className={`px-2 py-3 text-xs font-extrabold tracking-wide text-slate-600 ${alignClass.center}`}>{player.rol}</td>
       <td className={`px-4 py-4 tabular-nums text-slate-700 ${alignClass.center}`}>
