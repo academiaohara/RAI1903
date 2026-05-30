@@ -5,11 +5,10 @@ import { NEWS_TICKER_LIMIT, sortNewsByDate } from "@/lib/noticias";
 import {
   useHorizontalWheelScroll,
   useHorizontalWheelScrollListener,
-  useSmoothHorizontalWheelScroll,
 } from "@/lib/use-horizontal-wheel-scroll";
 import { formatDate } from "@/lib/utils";
 import type { NewsItem } from "@/types";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 
 export function NewsTicker({ items }: { items: NewsItem[] }) {
@@ -27,14 +26,16 @@ export function NewsTicker({ items }: { items: NewsItem[] }) {
     return track.scrollWidth / 2;
   }, [useTicker]);
 
-  const handleScrollWheel = useHorizontalWheelScroll({
+  const { onWheel: handleScrollWheel, smoothScroll } = useHorizontalWheelScroll({
     blockPageScroll: true,
     smooth: true,
     getLoopWidth: useTicker ? getLoopWidth : undefined,
   });
-  const smoothScroll = useSmoothHorizontalWheelScroll(useTicker ? getLoopWidth : undefined);
+
+  const pendingManualWheelRef = useRef<{ offset: number; deltaY: number } | null>(null);
 
   const resetManualScroll = useCallback(() => {
+    pendingManualWheelRef.current = null;
     const container = containerRef.current;
     const track = trackRef.current;
     if (!track) return;
@@ -50,11 +51,27 @@ export function NewsTicker({ items }: { items: NewsItem[] }) {
     setManualScroll(false);
   }, [smoothScroll]);
 
+  useLayoutEffect(() => {
+    const pending = pendingManualWheelRef.current;
+    if (!manualScroll || !pending) return;
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    pendingManualWheelRef.current = null;
+    const { offset, deltaY } = pending;
+
+    container.scrollLeft = offset;
+    smoothScroll.syncTarget(container);
+    if (deltaY !== 0) {
+      smoothScroll.addDelta(container, deltaY);
+    }
+  }, [manualScroll, smoothScroll]);
+
   const handleWheel = useCallback(
     (event: WheelEvent) => {
       if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
 
-      const container = event.currentTarget as HTMLDivElement;
       const track = trackRef.current;
 
       if (useTicker && !manualScroll && track) {
@@ -66,23 +83,23 @@ export function NewsTicker({ items }: { items: NewsItem[] }) {
           currentX = new DOMMatrixReadOnly(transform).m41;
         }
         const loopWidth = track.scrollWidth / 2;
-        let nextOffset = Math.max(0, -currentX - event.deltaY);
+        let offset = Math.max(0, -currentX);
         if (loopWidth > 0) {
-          nextOffset %= loopWidth;
+          offset %= loopWidth;
         }
 
         track.style.animation = "none";
         track.style.transform = "none";
         track.style.animationPlayState = "";
 
+        pendingManualWheelRef.current = { offset, deltaY: event.deltaY };
         flushSync(() => setManualScroll(true));
-        smoothScroll.setOffset(container, nextOffset);
         return;
       }
 
       handleScrollWheel(event);
     },
-    [handleScrollWheel, manualScroll, smoothScroll, useTicker],
+    [handleScrollWheel, manualScroll, useTicker],
   );
 
   useHorizontalWheelScrollListener(containerRef, handleWheel);
@@ -114,12 +131,8 @@ export function NewsTicker({ items }: { items: NewsItem[] }) {
     <div
       ref={containerRef}
       onMouseLeave={manualScroll ? resetManualScroll : undefined}
-      className={`py-1${
-        useTicker
-          ? manualScroll
-            ? " no-scrollbar overflow-x-auto overscroll-x-contain overscroll-y-none"
-            : " news-ticker overflow-hidden overscroll-y-none"
-          : " no-scrollbar overflow-x-auto overscroll-x-contain overscroll-y-none"
+      className={`py-1 no-scrollbar overflow-x-auto overscroll-x-contain overscroll-y-none${
+        useTicker && !manualScroll ? " news-ticker" : ""
       }`}
     >
       <div
