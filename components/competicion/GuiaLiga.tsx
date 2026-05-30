@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { TeamCrest } from "@/components/TeamCrest";
 import { Card } from "@/components/Card";
-import { equipoLigaHref } from "@/lib/equipo-liga";
+import { canLinkEquipoLiga, equipoLigaHref } from "@/lib/equipo-liga";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import type { Team } from "@/types";
@@ -23,16 +23,33 @@ export function GuiaLiga({ gender, teams, grupo }: GuiaLigaProps) {
           : "Los 20 equipos del Grupo II. Pulsa un escudo para ver la ficha del club."}
       </p>
       <div className="grid grid-cols-5 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10">
-        {sorted.map((team) => (
-          <Link
-            key={team.id}
-            href={equipoLigaHref(gender, team.id)}
-            className="group flex aspect-square items-center justify-center p-1 transition hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#214C9B]"
-            aria-label={`Ver ficha de ${team.name}`}
-          >
-            <TeamCrest team={team} size="md" className="h-full w-full max-h-14 max-w-14" />
-          </Link>
-        ))}
+        {sorted.map((team) => {
+          const linkable = canLinkEquipoLiga(gender, team.id);
+          const crest = <TeamCrest team={team} size="md" className="h-full w-full max-h-14 max-w-14" />;
+
+          if (!linkable) {
+            return (
+              <div
+                key={team.id}
+                className="flex aspect-square items-center justify-center p-1 opacity-90"
+                aria-label={team.name}
+              >
+                {crest}
+              </div>
+            );
+          }
+
+          return (
+            <Link
+              key={team.id}
+              href={equipoLigaHref(gender, team.id)}
+              className="group flex aspect-square items-center justify-center p-1 transition hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#214C9B]"
+              aria-label={`Ver ficha de ${team.name}`}
+            >
+              {crest}
+            </Link>
+          );
+        })}
       </div>
     </Card>
   );

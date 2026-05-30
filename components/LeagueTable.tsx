@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { TeamCrest } from "@/components/TeamCrest";
 import { RAI_TEAM_ID } from "@/data/mock";
-import { equipoLigaHref } from "@/lib/equipo-liga";
+import { canLinkEquipoLiga, equipoLigaHref } from "@/lib/equipo-liga";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import {
   STANDINGS_ZONE_LEGEND,
@@ -79,6 +79,16 @@ export function LeagueTable({
                 rowClassName,
               );
               const teamLabel = compact ? team.shortName : team.name;
+              const teamLinkable = canLinkEquipoLiga(gender, team.id);
+              const teamCellContent = (
+                <>
+                  <TeamCrest team={team} size="sm" className="shrink-0" />
+                  <span className="max-w-[4.5rem] truncate font-bold group-hover/team:underline group-hover/team:decoration-[#214C9B]/40 group-hover/team:underline-offset-2 sm:max-w-none md:max-w-none">
+                    <span className="md:hidden">{team.shortName}</span>
+                    <span className="hidden md:inline">{teamLabel}</span>
+                  </span>
+                </>
+              );
 
               return (
                 <tr
@@ -94,17 +104,17 @@ export function LeagueTable({
                     {team.position}
                   </td>
                   <td className={dataCellClassName}>
-                    <Link
-                      href={equipoLigaHref(gender, team.id)}
-                      className="group/team flex min-w-0 items-center gap-1 rounded-lg outline-none transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[#214C9B] focus-visible:ring-offset-1 md:gap-2"
-                      aria-label={`Ver ficha de ${team.name}`}
-                    >
-                      <TeamCrest team={team} size="sm" className="shrink-0" />
-                      <span className="max-w-[4.5rem] truncate font-bold group-hover/team:underline group-hover/team:decoration-[#214C9B]/40 group-hover/team:underline-offset-2 sm:max-w-none md:max-w-none">
-                        <span className="md:hidden">{team.shortName}</span>
-                        <span className="hidden md:inline">{teamLabel}</span>
-                      </span>
-                    </Link>
+                    {teamLinkable ? (
+                      <Link
+                        href={equipoLigaHref(gender, team.id)}
+                        className="group/team flex min-w-0 items-center gap-1 rounded-lg outline-none transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[#214C9B] focus-visible:ring-offset-1 md:gap-2"
+                        aria-label={`Ver ficha de ${team.name}`}
+                      >
+                        {teamCellContent}
+                      </Link>
+                    ) : (
+                      <div className="flex min-w-0 items-center gap-1 md:gap-2">{teamCellContent}</div>
+                    )}
                   </td>
                   {!compact ? (
                     <>

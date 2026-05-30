@@ -16,4 +16,12 @@ export function getTeamsForRfefGrupo(grupo: RfefGrupoId): Team[] {
   return grupo === "2" ? teamsGrupo2 : teamsGrupo1;
 }
 
+export function isTeamInRfefGrupo(teamId: string, grupo: RfefGrupoId): boolean {
+  return getTeamsForRfefGrupo(grupo).some((team) => team.id === teamId);
+}
+
+export function isTeamInRfefGrupo1(teamId: string): boolean {
+  return isTeamInRfefGrupo(teamId, "1");
+}
+
 export { teamsGrupo1 };

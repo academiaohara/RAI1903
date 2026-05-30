@@ -1,4 +1,5 @@
 import { getTeamByGender } from "@/lib/fixtures";
+import { isTeamInRfefGrupo1 } from "@/lib/rfef-grupos";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Route } from "next";
 
@@ -7,7 +8,13 @@ export function equipoLigaHref(gender: PrimerEquipoGender, teamId: string): Rout
   return `${primerEquipoBase(gender)}/competicion/equipo/${teamId}` as Route;
 }
 
-/** Solo enlaza si el equipo existe en los datos de liga para ese género. */
+/** Plantillas rivales solo para equipos del Grupo I (masculino). */
 export function canLinkEquipoLiga(gender: PrimerEquipoGender, teamId: string): boolean {
-  return Boolean(getTeamByGender(teamId, gender));
+  if (!getTeamByGender(teamId, gender)) {
+    return false;
+  }
+  if (gender === "masculino") {
+    return isTeamInRfefGrupo1(teamId);
+  }
+  return true;
 }

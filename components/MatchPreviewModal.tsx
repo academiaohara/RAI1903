@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { Modal } from "@/components/Modal";
-import { equipoLigaHref } from "@/lib/equipo-liga";
+import { canLinkEquipoLiga, equipoLigaHref } from "@/lib/equipo-liga";
 import { players, teams } from "@/data/mock";
 import {
   getTeamHomeAwayRecordBeforeRound,
@@ -32,14 +32,21 @@ function TeamPreviewBlock({
     ? players.filter((player) => player.status === "lesionado" || player.status === "sancionado")
     : [];
 
+  const teamNameClass =
+    "text-lg font-extrabold text-slate-900" +
+    (canLinkEquipoLiga("masculino", teamId)
+      ? " underline decoration-[#214C9B]/30 underline-offset-2 transition hover:text-[#214C9B] hover:decoration-[#214C9B]"
+      : "");
+
   return (
     <div className="rounded-2xl border border-[#214C9B]/15 bg-slate-50 p-4">
-      <Link
-        href={equipoLigaHref("masculino", teamId)}
-        className="text-lg font-extrabold text-slate-900 underline decoration-[#214C9B]/30 underline-offset-2 transition hover:text-[#214C9B] hover:decoration-[#214C9B]"
-      >
-        {team.name}
-      </Link>
+      {canLinkEquipoLiga("masculino", teamId) ? (
+        <Link href={equipoLigaHref("masculino", teamId)} className={teamNameClass}>
+          {team.name}
+        </Link>
+      ) : (
+        <p className={teamNameClass}>{team.name}</p>
+      )}
       <div className="mt-3 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
         <p>
           <span className="font-bold text-slate-500">Posicion:</span>{" "}

@@ -1,18 +1,17 @@
 import Link from "next/link";
 import { TeamCrest } from "@/components/TeamCrest";
 import { Badge } from "@/components/Badge";
-import { equipoLigaHref } from "@/lib/equipo-liga";
+import { canLinkEquipoLiga, equipoLigaHref } from "@/lib/equipo-liga";
 import { resultTone } from "@/lib/utils";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Team } from "@/types";
 
+const cardClassName =
+  "block rounded-3xl border border-[#214C9B]/25 bg-white p-5 shadow-[0_14px_34px_rgba(17,24,39,0.07)]";
+
 export function RivalCard({ team, gender = "masculino" }: { team: Team; gender?: PrimerEquipoGender }) {
-  return (
-    <Link
-      href={equipoLigaHref(gender, team.id)}
-      className="block rounded-3xl border border-[#214C9B]/25 bg-white p-5 shadow-[0_14px_34px_rgba(17,24,39,0.07)] transition hover:-translate-y-1 hover:border-[#214C9B]"
-      aria-label={`Ver ficha de ${team.name}`}
-    >
+  const content = (
+    <>
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
           <TeamCrest team={team} size="md" className="h-14 w-14" />
@@ -40,6 +39,20 @@ export function RivalCard({ team, gender = "masculino" }: { team: Team; gender?:
           </span>
         ))}
       </div>
+    </>
+  );
+
+  if (!canLinkEquipoLiga(gender, team.id)) {
+    return <div className={cardClassName}>{content}</div>;
+  }
+
+  return (
+    <Link
+      href={equipoLigaHref(gender, team.id)}
+      className={`${cardClassName} transition hover:-translate-y-1 hover:border-[#214C9B]`}
+      aria-label={`Ver ficha de ${team.name}`}
+    >
+      {content}
     </Link>
   );
 }
