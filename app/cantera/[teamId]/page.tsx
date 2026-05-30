@@ -22,14 +22,6 @@ export default async function CanteraTeamPage({ params }: { params: Promise<{ te
 
       <Card eyebrow={team.category} title={team.name}>
         <CanteraTeamSections team={team} />
-        <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <p className="text-xs font-bold uppercase tracking-normal text-slate-500">Notas</p>
-          {team.news.map((item) => (
-            <p key={item} className="mt-2 text-sm font-bold text-slate-700">
-              {item}
-            </p>
-          ))}
-        </div>
       </Card>
     </div>
   );
