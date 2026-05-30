@@ -53,7 +53,12 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
           transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
         >
           {viewMode === "lista" ? (
-            <PlayerTable players={available} onSelect={handleSelect} showMarketValue={!isFemenino} />
+            <PlayerTable
+              players={available}
+              onSelect={handleSelect}
+              showMarketValue={!isFemenino}
+              showAge={!isFemenino}
+            />
           ) : (
             <PlayerGrid
               players={available}
