@@ -124,6 +124,7 @@ a {
   border-color: var(--rai-blue);
 }
 
+.news-ticker-item:hover .news-ticker-date,
 .news-ticker-item:hover .news-ticker-source,
 .news-ticker-item:hover .news-ticker-title,
 .news-ticker-item:hover .news-ticker-excerpt {
