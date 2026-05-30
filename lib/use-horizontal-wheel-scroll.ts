@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   type MutableRefObject,
   type RefObject,
@@ -107,17 +108,27 @@ function useSmoothHorizontalScroll(getLoopWidth?: () => number) {
     [animateToTarget, getLoopWidth],
   );
 
-  return { addDelta, setOffset, syncTarget, cancel };
+  return useMemo(
+    () => ({ addDelta, setOffset, syncTarget, cancel }),
+    [addDelta, cancel, setOffset, syncTarget],
+  );
 }
 
+export type HorizontalWheelScrollController = ReturnType<typeof useSmoothHorizontalScroll>;
+
+export type HorizontalWheelScrollResult = {
+  onWheel: (event: ReactWheelEvent<HTMLDivElement> | WheelEvent) => void;
+  smoothScroll: HorizontalWheelScrollController;
+};
+
 /** Convierte el scroll vertical de la rueda en desplazamiento horizontal del contenedor. */
-export function useHorizontalWheelScroll(options?: HorizontalWheelScrollOptions) {
+export function useHorizontalWheelScroll(options?: HorizontalWheelScrollOptions): HorizontalWheelScrollResult {
   const smoothScroll = useSmoothHorizontalScroll(options?.getLoopWidth);
   const blockPageScroll = options?.blockPageScroll ?? false;
   const smooth = options?.smooth ?? false;
   const getLoopWidth = options?.getLoopWidth;
 
-  return useCallback(
+  const onWheel = useCallback(
     (event: ReactWheelEvent<HTMLDivElement> | WheelEvent) => {
       if (!isVerticalWheelIntent(event)) return;
 
@@ -143,6 +154,8 @@ export function useHorizontalWheelScroll(options?: HorizontalWheelScrollOptions)
     },
     [blockPageScroll, getLoopWidth, smooth, smoothScroll],
   );
+
+  return useMemo(() => ({ onWheel, smoothScroll }), [onWheel, smoothScroll]);
 }
 
 /** Registra wheel con `{ passive: false }` para que `preventDefault` bloquee el scroll de página. */

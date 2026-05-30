@@ -22,7 +22,7 @@ export function ZonaMixtaVideoShowcase({ videos }: ZonaMixtaVideoShowcaseProps) 
   const carouselItems = resolved.length > 0 ? resolved.slice(0, -1) : [];
   const carouselCount = carouselItems.length;
   const { trackRef, goPrev, goNext } = useHorizontalCarousel(carouselCount);
-  const handleWheel = useHorizontalWheelScroll();
+  const { onWheel: handleWheel } = useHorizontalWheelScroll();
 
   if (!featured) return null;
 
