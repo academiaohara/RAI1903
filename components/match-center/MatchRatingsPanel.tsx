@@ -1,14 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Star } from "lucide-react";
 import { getSquadPlayers } from "@/lib/squad-data";
 import { getRaiTeamId } from "@/lib/fixtures";
 import { lineupPlayersToSquad } from "@/lib/squad-lineup";
 import {
   formatFanRating,
+  getMatchCommunityAverage,
   getMatchRatings,
-  getPlayerAverageFanRating,
   getPlayerMatchRating,
   savePlayerMatchRating,
 } from "@/lib/player-ratings";
@@ -19,7 +18,10 @@ type MatchRatingsPanelProps = {
   detail: MatchDetail;
 };
 
-const RATING_OPTIONS = [5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10] as const;
+const SLIDER_MIN = 0;
+const SLIDER_MAX = 10;
+const SLIDER_STEP = 0.5;
+const SLIDER_DEFAULT = 5;
 
 export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
   const raiId = getRaiTeamId(detail.gender);
@@ -58,60 +60,50 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
       <ul className="mt-6 space-y-4">
         {lineupEntries.map((entry) => {
           const player = entry.player!;
-          const userRating = ratings[player.id] ?? getPlayerMatchRating(detail.match.id, player.id);
-          const seasonAverage = getPlayerAverageFanRating(player.id);
+          const savedRating = ratings[player.id] ?? getPlayerMatchRating(detail.match.id, player.id);
+          const sliderValue = savedRating ?? SLIDER_DEFAULT;
+          const communityAverage = getMatchCommunityAverage(detail.match.id, player.id);
 
           return (
             <li
               key={player.id}
               className="rounded-2xl border border-[#214C9B]/15 bg-slate-50/80 p-4 sm:p-5"
             >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                <div className="min-w-0 shrink-0 sm:w-36">
                   <p className="flex items-center gap-2 text-sm font-extrabold uppercase text-slate-900">
                     <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#214C9B] text-xs font-extrabold text-white">
                       {player.dorsal}
                     </span>
-                    {getPlayerFullName(player)}
-                  </p>
-                  <p className="mt-1 text-xs font-semibold text-slate-500">
-                    {player.rol}
-                    {seasonAverage ? (
-                      <>
-                        {" "}
-                        · Media temporada:{" "}
-                        <span className="text-[#214C9B]">{formatFanRating(seasonAverage.average)}</span>
-                        <span className="text-slate-400"> ({seasonAverage.count})</span>
-                      </>
-                    ) : null}
+                    <span className="truncate">{getPlayerFullName(player)}</span>
                   </p>
                 </div>
-                {userRating != null && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-[#214C9B] px-3 py-1 text-xs font-bold text-white">
-                    <Star size={12} className="fill-current" />
-                    Tu nota: {formatFanRating(userRating)}
-                  </span>
-                )}
-              </div>
 
-              <div className="mt-4 flex flex-wrap gap-1.5">
-                {RATING_OPTIONS.map((rating) => {
-                  const active = userRating === rating;
-                  return (
-                    <button
-                      key={rating}
-                      type="button"
-                      onClick={() => handleRate(player.id, rating)}
-                      className={`min-w-[2.75rem] rounded-lg px-2 py-2 text-xs font-extrabold tabular-nums transition ${
-                        active
-                          ? "bg-[#214C9B] text-white shadow-md"
-                          : "border border-slate-200 bg-white text-slate-700 hover:border-[#214C9B]/40 hover:bg-blue-50"
-                      }`}
-                    >
-                      {formatFanRating(rating)}
-                    </button>
-                  );
-                })}
+                <div className="flex min-w-0 flex-1 basis-[12rem] items-center gap-3">
+                  <input
+                    type="range"
+                    min={SLIDER_MIN}
+                    max={SLIDER_MAX}
+                    step={SLIDER_STEP}
+                    value={sliderValue}
+                    onChange={(event) => handleRate(player.id, Number(event.target.value))}
+                    className="h-2 min-w-0 flex-1 cursor-pointer appearance-none rounded-full bg-[#214C9B]/15 accent-[#214C9B]"
+                    aria-label={`Valoración de ${getPlayerFullName(player)}`}
+                  />
+                  <span className="w-9 shrink-0 text-right text-sm font-extrabold tabular-nums text-[#214C9B]">
+                    {formatFanRating(sliderValue)}
+                  </span>
+                </div>
+
+                <div
+                  className="ml-auto flex shrink-0 flex-col items-center justify-center rounded-xl border border-[#214C9B]/20 bg-white px-3 py-2 text-center"
+                  title="Media de la afición en este partido"
+                >
+                  <span className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Media</span>
+                  <span className="text-lg font-extrabold tabular-nums text-[#214C9B]">
+                    {formatFanRating(communityAverage)}
+                  </span>
+                </div>
               </div>
             </li>
           );
