@@ -127,7 +127,7 @@ function buildCareer(player: Player, clubName: string): PlayerCareerRecord[] {
 }
 
 function toSquadPlayer(player: Player, clubName: string, gender: PrimerEquipoGender): SquadPlayer {
-  const birthPlace = pick(BIRTH_PLACES, player.id);
+  const birthPlace = player.birthPlace ?? pick(BIRTH_PLACES, player.id);
   const contractYear = player.seasonsAtClub >= 4 ? 2027 : 2026;
 
   return {
