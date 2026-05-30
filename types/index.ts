@@ -1,3 +1,5 @@
+import type { CanteraRosterPlayer } from "@/types/cantera-squad";
+
 export type PlayerStatus = "titular" | "suplente" | "lesionado" | "sancionado" | "cantera" | "nuevo fichaje";
 export type PlayerPosition = "Portero" | "Defensa" | "Centrocampista" | "Delantero";
 
@@ -195,7 +197,7 @@ export type AcademyTeam = {
   nextMatch: string;
   standoutPlayers: string[];
   news: string[];
-  roster: Array<Pick<Player, "id" | "displayName" | "number" | "position" | "age">>;
+  roster: CanteraRosterPlayer[];
   table: Team[];
   calendar: Match[];
 };

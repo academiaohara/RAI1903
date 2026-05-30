@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { CanteraJornadasView } from "@/components/cantera/CanteraJornadasView";
+import { CanteraRosterTable } from "@/components/cantera/CanteraRosterTable";
+import { FILIAL_AVILES_B_AVERAGE_AGE } from "@/data/filial-real-aviles-b-squad";
 import { SubsectionFilterNav } from "@/components/SubsectionFilterNav";
 import { LeagueTable } from "@/components/LeagueTable";
 import { TeamCalendar } from "@/components/TeamCalendar";
@@ -61,18 +63,10 @@ export function CanteraTeamSections({ team }: CanteraTeamSectionsProps) {
       </p>
 
       {activeSection === "plantilla" && (
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {team.roster.map((player) => (
-            <div key={player.id} className="rounded-2xl border border-[#214C9B]/15 bg-blue-50 p-3">
-              <p className="font-extrabold uppercase text-[#214C9B]">
-                #{player.number} {player.displayName}
-              </p>
-              <p className="text-sm font-bold text-slate-500">
-                {player.position} · {player.age} años
-              </p>
-            </div>
-          ))}
-        </div>
+        <CanteraRosterTable
+          roster={team.roster}
+          averageAge={canteraTeamId === "filial" ? FILIAL_AVILES_B_AVERAGE_AGE : undefined}
+        />
       )}
 
       {activeSection === "calendario" && (
