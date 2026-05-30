@@ -18,10 +18,14 @@ type CalendarListViewProps = {
   className?: string;
   gender?: PrimerEquipoGender;
   showCrests?: boolean;
+  showVenue?: boolean;
 };
 
-const LIST_ROW_GRID =
+const LIST_ROW_GRID_WITH_VENUE =
   "grid w-full min-w-[44rem] grid-cols-[7rem_2.75rem_5.5rem_minmax(6rem,1fr)_3.25rem_minmax(8rem,1.15fr)_minmax(5.5rem,0.95fr)] items-center gap-x-3";
+
+const LIST_ROW_GRID_WITHOUT_VENUE =
+  "grid w-full min-w-[38rem] grid-cols-[7rem_2.75rem_5.5rem_3.25rem_minmax(8rem,1.15fr)_minmax(5.5rem,0.95fr)] items-center gap-x-3";
 
 function formatListMatchDate(date: string): string {
   return new Intl.DateTimeFormat("es-ES", {
@@ -56,7 +60,13 @@ function homeAwayLabel(isHome: boolean): string {
   return isHome ? "Local" : "Visitante";
 }
 
-export function CalendarListView({ matches, className, gender = "masculino", showCrests = true }: CalendarListViewProps) {
+export function CalendarListView({
+  matches,
+  className,
+  gender = "masculino",
+  showCrests = true,
+  showVenue = true,
+}: CalendarListViewProps) {
   const sortedMatches = useMemo(
     () => [...matches].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
     [matches],
@@ -65,7 +75,7 @@ export function CalendarListView({ matches, className, gender = "masculino", sho
 
   return (
     <div className={cn("overflow-x-auto rounded-xl border border-[#214C9B]/15 bg-white", className)} role="table" aria-label="Calendario de partidos">
-      <div className="min-w-[44rem]">
+      <div className={showVenue ? "min-w-[44rem]" : "min-w-[38rem]"}>
         <ul role="rowgroup">
           {sortedMatches.map((match, index) => (
             <li key={match.id} role="row">
@@ -75,6 +85,7 @@ export function CalendarListView({ matches, className, gender = "masculino", sho
                 gender={gender}
                 zebra={index % 2 === 1}
                 showCrests={showCrests}
+                showVenue={showVenue}
               />
             </li>
           ))}
@@ -90,12 +101,14 @@ function CalendarListRow({
   gender,
   zebra,
   showCrests,
+  showVenue,
 }: {
   match: CalendarMatch;
   scrollTarget: boolean;
   gender: PrimerEquipoGender;
   zebra: boolean;
   showCrests: boolean;
+  showVenue: boolean;
 }) {
   const href = match.played ? match.chronicleUrl : match.previaUrl;
   const opponentTeamId = match.isHome ? match.awayTeamId : match.homeTeamId;
@@ -105,7 +118,7 @@ function CalendarListRow({
   const competitionLabel = `${matchCompetitionShortLabel(match)}${match.matchday !== undefined ? ` · J${match.matchday}` : ""}`;
 
   const rowClassName = cn(
-    LIST_ROW_GRID,
+    showVenue ? LIST_ROW_GRID_WITH_VENUE : LIST_ROW_GRID_WITHOUT_VENUE,
     "border-b border-[#214C9B]/8 px-3 py-2.5 text-sm transition last:border-b-0",
     zebra ? "bg-slate-50/80" : "bg-white",
     scrollTarget && "bg-blue-50/90 ring-1 ring-inset ring-[#214C9B]/25",
@@ -134,9 +147,11 @@ function CalendarListRow({
         {homeAwayLabel(match.isHome)}
       </span>
 
-      <span className="min-w-0 truncate text-xs font-semibold text-slate-600" title={match.venue}>
-        {match.venue}
-      </span>
+      {showVenue ? (
+        <span className="min-w-0 truncate text-xs font-semibold text-slate-600" title={match.venue}>
+          {match.venue}
+        </span>
+      ) : null}
 
       <span
         className={cn(
@@ -175,7 +190,8 @@ function CalendarListRow({
       </span>
 
       <span className="sr-only">
-        {match.opponent}, {competitionLabel}, {homeAwayLabel(match.isHome)}, {match.venue}
+        {match.opponent}, {competitionLabel}, {homeAwayLabel(match.isHome)}
+        {showVenue ? `, ${match.venue}` : ""}
         {match.played ? `, resultado ${resultLabel(match)}` : `, ${timeLabel(match)}`}
       </span>
     </>

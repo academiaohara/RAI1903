@@ -64,7 +64,7 @@ export function CanteraTeamSections({ team }: CanteraTeamSectionsProps) {
       {activeSection === "plantilla" && <CanteraSquadTable teamId={canteraTeamId} />}
 
       {activeSection === "calendario" && (
-        <TeamCalendar matches={calendarMatches} listOnly showCrests={false} />
+        <TeamCalendar matches={calendarMatches} listOnly showCrests={false} showVenue={false} />
       )}
 
       {activeSection === "clasificacion" && (

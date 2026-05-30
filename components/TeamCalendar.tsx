@@ -19,6 +19,7 @@ type TeamCalendarProps = {
   /** When true, only the list view is shown (no month toggle). */
   listOnly?: boolean;
   showCrests?: boolean;
+  showVenue?: boolean;
 };
 
 const TODAY_DAY_CLASS = "inline-flex min-w-[1.75rem] items-center justify-center rounded-lg bg-[#214C9B] px-2 py-0.5 text-sm font-extrabold text-white";
@@ -52,6 +53,7 @@ export function TeamCalendar({
   gender = "masculino",
   listOnly = false,
   showCrests: showCrestsProp,
+  showVenue = true,
 }: TeamCalendarProps) {
   const showCrests = showCrestsProp ?? gender !== "femenino";
   const initial = initialViewDate(matches);
@@ -116,7 +118,7 @@ export function TeamCalendar({
       </div>
 
       {viewMode === "lista" ? (
-        <CalendarListView key="lista" matches={matches} gender={gender} showCrests={showCrests} />
+        <CalendarListView key="lista" matches={matches} gender={gender} showCrests={showCrests} showVenue={showVenue} />
       ) : (
         <>
           <div className="hidden lg:block">
