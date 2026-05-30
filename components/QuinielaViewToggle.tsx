@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 type QuinielaViewToggleProps<T extends string> = {
   value: T;
   onChange: (value: T) => void;
-  options: { id: T; label: string }[];
+  options: readonly { id: T; label: string }[];
   layoutId?: string;
   className?: string;
 };

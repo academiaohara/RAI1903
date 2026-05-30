@@ -76,6 +76,39 @@ const baseTeamsFemenino: Team[] = baseTeams.map((team) =>
 export const matchdays = buildMatchdaysFromResultados2526(baseTeams);
 export const matchdaysGrupo2 = buildMatchdaysGrupo2(baseTeamsGrupo2);
 
+export const copaDelReyMatches: Match[] = [
+  {
+    id: "copa-rey-primera-eliminatoria-covadonga-real-aviles",
+    matchday: 1,
+    homeTeamId: "covadonga",
+    awayTeamId: RAI_TEAM_ID,
+    homeTeam: "CD Covadonga",
+    awayTeam: "Real Aviles Industrial",
+    date: "2025-10-29T19:00:00.000Z",
+    competition: "copa-rey",
+    competitionStage: "Primera eliminatoria",
+    venue: "Juan Antonio Alvarez Rabanal",
+    status: "finished",
+    homeScore: 1,
+    awayScore: 2,
+  },
+  {
+    id: "copa-rey-segunda-eliminatoria-real-aviles-burgos",
+    matchday: 2,
+    homeTeamId: RAI_TEAM_ID,
+    awayTeamId: "burgos",
+    homeTeam: "Real Aviles Industrial",
+    awayTeam: "Burgos CF",
+    date: "2025-12-03T20:00:00.000Z",
+    competition: "copa-rey",
+    competitionStage: "Segunda eliminatoria",
+    venue: "Roman Suarez Puerta",
+    status: "finished",
+    homeScore: 0,
+    awayScore: 1,
+  },
+];
+
 const leagueMatches = matchdays.flatMap((round) => round.matches);
 const leagueMatchesGrupo2 = matchdaysGrupo2.flatMap((round) => round.matches);
 
