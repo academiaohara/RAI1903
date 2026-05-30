@@ -11,6 +11,8 @@ export type Player = {
   number: number;
   position: PlayerPosition;
   nationality: string;
+  /** Lugar de nacimiento cuando consta en la ficha oficial. */
+  birthPlace?: string;
   age: number;
   birthDate: string;
   height: string;
@@ -221,6 +223,8 @@ export type FanMediaLink = {
   platform: FanMediaPlatform;
   url: string;
   description: string;
+  /** Fecha del espacio o episodio (p. ej. "26/05/2026"). */
+  date?: string;
   /** Foto de perfil de la cuenta (p. ej. avatar de X). */
   avatarUrl?: string;
   /** Ej. "Lunes y jueves" o "Cada domingo tras el partido". */
