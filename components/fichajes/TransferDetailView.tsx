@@ -72,7 +72,12 @@ export function TransferDetailView({ transfer, player }: TransferDetailViewProps
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end">
           <div className="relative mx-auto w-[58%] max-w-[220px] sm:mx-0 sm:w-[200px]">
             {player ? (
-              <PlayerAvatar player={player} size="xl" className="aspect-[4/5] h-auto w-full rounded-[1.5rem] shadow-2xl" />
+              <PlayerAvatar
+                player={player}
+                size="xl"
+                imageClassName="object-contain object-bottom"
+                className="aspect-[4/5] h-auto w-full rounded-[1.5rem] shadow-2xl"
+              />
             ) : (
               <div className="flex aspect-[4/5] items-center justify-center rounded-[1.5rem] bg-white/15 text-5xl font-extrabold shadow-2xl">
                 {transfer.playerName

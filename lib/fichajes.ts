@@ -4,11 +4,77 @@ import {
   getPlayerNews,
   getPlayerNewsByName,
 } from "@/lib/player-news";
+import { getPlayerRole } from "@/lib/player-roles";
 import { getSquadPlayers } from "@/lib/squad-data";
-import type { NewsItem, TransferKind, TransferRumor } from "@/types";
+import { getSquadPlayerPhoto } from "@/lib/squad-photos";
+import type { NewsItem, Player, TransferKind, TransferRumor } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
 
 const RAI_CLUB = "Real Aviles Industrial";
+
+function normalizeName(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .trim()
+    .toLowerCase();
+}
+
+function getPlayerFullName(player: Player): string {
+  return `${player.firstName} ${player.lastName}`.trim();
+}
+
+function getRosterPlayerForTransfer(transfer: TransferRumor): Player | undefined {
+  if (transfer.playerId) {
+    const byId = players.find((player) => player.id === transfer.playerId);
+    if (byId) return byId;
+  }
+
+  const normalized = normalizeName(transfer.playerName);
+  return players.find((player) => {
+    const full = normalizeName(getPlayerFullName(player));
+    const displayName = normalizeName(player.displayName);
+    return full === normalized || displayName === normalized;
+  });
+}
+
+function rosterPlayerToSquadPlayer(player: Player): SquadPlayer {
+  const contractYear = player.seasonsAtClub >= 4 ? 2027 : 2026;
+
+  return {
+    id: player.id,
+    nombre: player.firstName,
+    apellido: player.lastName,
+    dorsal: player.number,
+    posicion: player.position,
+    rol: getPlayerRole(player),
+    estado: player.status,
+    edad: player.age,
+    fechaNacimiento: player.birthDate,
+    lugarNacimiento: "Aviles",
+    nacionalidad: player.nationality,
+    altura: player.height,
+    peso: "76 kg",
+    piernaBuena: player.preferredFoot,
+    contratoHasta: `${contractYear}-06-30`,
+    descripcion: player.bio,
+    foto: getSquadPlayerPhoto(player.number),
+    partidos: player.stats.appearances,
+    minutos: player.stats.minutes,
+    goles: player.stats.goals,
+    asistencias: player.stats.assists,
+    amarillas: player.stats.yellowCards,
+    rojas: player.stats.redCards,
+    historialPartidos: [],
+    trayectoria: player.clubHistory.map((club) => ({
+      temporada: club === RAI_CLUB ? "2025/26" : "Trayectoria",
+      club,
+      partidos: club === RAI_CLUB ? player.stats.appearances : 0,
+      goles: club === RAI_CLUB ? player.stats.goals : 0,
+      asistencias: club === RAI_CLUB ? player.stats.assists : 0,
+    })),
+  };
+}
 
 export function getTransferKind(transfer: TransferRumor): TransferKind {
   if (transfer.category === "Renovaciones") return "renovacion";
@@ -26,27 +92,38 @@ export function getTransferById(id: string): TransferRumor | undefined {
 export function resolveTransferPlayerId(transfer: TransferRumor): string | undefined {
   if (transfer.playerId) return transfer.playerId;
 
-  const normalized = transfer.playerName.toLowerCase();
+  const normalized = normalizeName(transfer.playerName);
   const match = players.find((player) => {
-    const full = `${player.firstName} ${player.lastName}`.toLowerCase();
-    return full === normalized || player.displayName.toLowerCase() === normalized;
+    const full = normalizeName(getPlayerFullName(player));
+    return full === normalized || normalizeName(player.displayName) === normalized;
   });
   return match?.id;
 }
 
 export function getSquadPlayerForTransfer(transfer: TransferRumor): SquadPlayer | undefined {
   const squad = getSquadPlayers("masculino");
-  const playerId = resolveTransferPlayerId(transfer);
+  const rosterPlayer = getRosterPlayerForTransfer(transfer);
+  const playerId = rosterPlayer?.id ?? resolveTransferPlayerId(transfer);
+
   if (playerId) {
     const byId = squad.find((player) => player.id === playerId);
     if (byId) return byId;
   }
 
-  const normalized = transfer.playerName.toLowerCase();
-  return squad.find((player) => {
-    const full = `${player.nombre} ${player.apellido}`.trim().toLowerCase();
-    return full === normalized;
+  const normalized = normalizeName(transfer.playerName);
+  const byName = squad.find((player) => {
+    const full = normalizeName(`${player.nombre} ${player.apellido}`);
+    const shortName = normalizeName(player.apellido || player.nombre);
+    return full === normalized || shortName === normalized;
   });
+  if (byName) return byName;
+
+  if (rosterPlayer) {
+    const byDorsal = squad.find((player) => player.dorsal === rosterPlayer.number);
+    return byDorsal ?? rosterPlayerToSquadPlayer(rosterPlayer);
+  }
+
+  return undefined;
 }
 
 /** Fichajes y renovaciones destacados para el carrusel de inicio. */
