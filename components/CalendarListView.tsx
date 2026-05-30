@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { Home, MapPin } from "lucide-react";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamLink } from "@/components/TeamLink";
@@ -21,7 +20,7 @@ type CalendarListViewProps = {
 };
 
 const LIST_ROW_GRID =
-  "grid w-full min-w-[42rem] grid-cols-[7rem_2.75rem_minmax(8rem,1.15fr)_1.75rem_minmax(6rem,1fr)_3.25rem_minmax(5.5rem,0.95fr)] items-center gap-x-3";
+  "grid w-full min-w-[44rem] grid-cols-[7rem_2.75rem_5.5rem_minmax(6rem,1fr)_3.25rem_minmax(8rem,1.15fr)_minmax(5.5rem,0.95fr)] items-center gap-x-3";
 
 function formatListMatchDate(date: string): string {
   return new Intl.DateTimeFormat("es-ES", {
@@ -41,8 +40,19 @@ function resultLabel(match: CalendarMatch): string {
 }
 
 function timeLabel(match: CalendarMatch): string {
-  if (match.played) return "—";
-  return match.time ?? "—";
+  if (match.time) return match.time;
+  const parsed = new Date(match.date);
+  if (Number.isNaN(parsed.getTime())) return "—";
+  if (parsed.getUTCHours() === 0 && parsed.getUTCMinutes() === 0) return "—";
+  return new Intl.DateTimeFormat("es-ES", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(parsed);
+}
+
+function homeAwayLabel(isHome: boolean): string {
+  return isHome ? "Local" : "Visitante";
 }
 
 export function CalendarListView({ matches, className, gender = "masculino" }: CalendarListViewProps) {
@@ -53,19 +63,50 @@ export function CalendarListView({ matches, className, gender = "masculino" }: C
   const scrollTargetId = getListViewScrollTargetId(sortedMatches);
 
   return (
-    <div className={cn("overflow-x-auto rounded-xl border border-[#214C9B]/15 bg-white", className)}>
-      <ul className="min-w-[42rem]">
-        {sortedMatches.map((match, index) => (
-          <li key={match.id}>
-            <CalendarListRow
-              match={match}
-              scrollTarget={match.id === scrollTargetId}
-              gender={gender}
-              zebra={index % 2 === 1}
-            />
-          </li>
-        ))}
-      </ul>
+    <div className={cn("overflow-x-auto rounded-xl border border-[#214C9B]/15 bg-white", className)} role="table" aria-label="Calendario de partidos">
+      <div className="min-w-[44rem]">
+        <div
+          className={cn(
+            LIST_ROW_GRID,
+            "sticky top-0 z-10 border-b border-[#214C9B]/15 bg-slate-50/95 px-3 py-2 backdrop-blur-sm",
+          )}
+          role="row"
+        >
+          <span role="columnheader" className="text-left text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
+            Fecha
+          </span>
+          <span role="columnheader" className="text-left text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
+            Hora
+          </span>
+          <span role="columnheader" className="text-left text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
+            Local/visit.
+          </span>
+          <span role="columnheader" className="text-left text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
+            Estadio
+          </span>
+          <span role="columnheader" className="text-right text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
+            Resultado
+          </span>
+          <span role="columnheader" className="text-left text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
+            Rival
+          </span>
+          <span role="columnheader" className="text-right text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
+            Competición
+          </span>
+        </div>
+        <ul role="rowgroup">
+          {sortedMatches.map((match, index) => (
+            <li key={match.id} role="row">
+              <CalendarListRow
+                match={match}
+                scrollTarget={match.id === scrollTargetId}
+                gender={gender}
+                zebra={index % 2 === 1}
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
@@ -111,6 +152,26 @@ function CalendarListRow({
 
       <span className="shrink-0 text-xs font-bold tabular-nums text-slate-600 sm:text-sm">{timeLabel(match)}</span>
 
+      <span
+        className={cn("shrink-0 text-xs font-bold sm:text-sm", match.isHome ? "text-[#214C9B]" : "text-[#981915]")}
+        title={match.isHome ? "Partido en casa" : "Partido fuera"}
+      >
+        {homeAwayLabel(match.isHome)}
+      </span>
+
+      <span className="min-w-0 truncate text-xs font-semibold text-slate-600" title={match.venue}>
+        {match.venue}
+      </span>
+
+      <span
+        className={cn(
+          "text-right text-sm font-extrabold tabular-nums",
+          match.played ? "text-slate-900" : "text-slate-400",
+        )}
+      >
+        {resultLabel(match)}
+      </span>
+
       <span className="flex min-w-0 items-center gap-2">
         <TeamLink gender={gender} teamId={opponentTeamId} teamName={match.opponent} className="shrink-0">
           <OpponentCrest logo={match.opponentLogo} opponent={match.opponent} size="sm" className="text-[#214C9B]" />
@@ -125,27 +186,6 @@ function CalendarListRow({
         </TeamLink>
       </span>
 
-      <span
-        className="flex justify-center text-[#214C9B]"
-        aria-label={match.isHome ? "Partido en casa" : "Partido fuera"}
-        title={match.isHome ? "Local" : "Visitante"}
-      >
-        {match.isHome ? <Home size={16} strokeWidth={2.4} aria-hidden /> : <MapPin size={16} strokeWidth={2.4} aria-hidden />}
-      </span>
-
-      <span className="min-w-0 truncate text-right text-xs font-semibold text-slate-600" title={match.venue}>
-        {match.venue}
-      </span>
-
-      <span
-        className={cn(
-          "text-right text-sm font-extrabold tabular-nums",
-          match.played ? "text-slate-900" : "text-slate-400",
-        )}
-      >
-        {resultLabel(match)}
-      </span>
-
       <span className="flex min-w-0 items-center justify-end gap-1.5">
         <CompetitionLogo competition={match.competition} alt="" size="xs" className="shrink-0" />
         <span className={cn("min-w-0 truncate text-xs font-bold", accent)} title={competitionLabel}>
@@ -154,8 +194,8 @@ function CalendarListRow({
       </span>
 
       <span className="sr-only">
-        {match.opponent}, {competitionLabel}, {match.isHome ? "en casa" : "fuera"}, {match.venue}
-        {match.played ? `, resultado ${resultLabel(match)}` : match.time ? `, ${match.time}` : ""}
+        {match.opponent}, {competitionLabel}, {homeAwayLabel(match.isHome)}, {match.venue}
+        {match.played ? `, resultado ${resultLabel(match)}` : `, ${timeLabel(match)}`}
       </span>
     </>
   );
