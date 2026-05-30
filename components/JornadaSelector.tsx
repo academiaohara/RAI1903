@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type WheelEvent } from "react";
+import { scrollElementHorizontally } from "@/lib/scroll-horizontal";
 import { cn } from "@/lib/utils";
 
 export function JornadaSelector({
@@ -24,7 +25,9 @@ export function JornadaSelector({
     if (!list) return;
 
     const selected = list.querySelector<HTMLButtonElement>(`[data-round="${value}"]`);
-    selected?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    if (selected) {
+      scrollElementHorizontally(list, selected, { behavior: "smooth", align: "center" });
+    }
   }, [value]);
 
   const handleWheel = (event: WheelEvent<HTMLDivElement>) => {
