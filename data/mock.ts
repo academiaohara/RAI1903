@@ -6,6 +6,7 @@ import {
 } from "@/lib/resultados-2526";
 import { PRIMERA_RFEF_RULES, buildPlayoffBracketFromConfig } from "@/lib/rfef-rules";
 import { applyStandingsToTeams } from "@/lib/standings";
+import { buildFilialCalendar, buildFilialSummary, buildSegundaAsturfutbolTable } from "@/lib/segunda-asturfutbol-2526";
 import type {
   AcademyTeam,
   CompetitionId,
@@ -580,7 +581,23 @@ const academyCalendar = (teamId: string, teamName: string, competition: Competit
 ];
 
 export const academyTeams: AcademyTeam[] = [
-  { id: "filial", name: "Filial", coach: "Dani Borrego", category: "Primera Asturfutbol", position: "2º - 19 pts", lastResult: "Real Avilés B 2-0 Llanera B", nextMatch: "Real Avilés B - Roces", standoutPlayers: ["Nando", "Campadal", "Osky"], news: ["Tercera porteria a cero seguida", "Dos juveniles entrenan con el primer equipo"], roster: players.filter((player) => ["nando", "campadal", "osky", "quicala", "carmona"].includes(player.id)).map(({ id, displayName, number, position, age }) => ({ id, displayName, number, position, age })), table: academyTable("filial"), calendar: academyCalendar("filial", "B", "primera-asturfutbol") },
+  {
+    id: "filial",
+    name: "Filial",
+    coach: "Dani Borrego",
+    ...buildFilialSummary(),
+    standoutPlayers: ["Nando", "Campadal", "Osky"],
+    news: [
+      "Campeon de la 2ª Asturfutbol Grupo 1 2025-26 (71 puntos)",
+      "34 jornadas: 21 victorias, 8 empates y 5 derrotas",
+      "Dos juveniles entrenan con el primer equipo",
+    ],
+    roster: players
+      .filter((player) => ["nando", "campadal", "osky", "quicala", "carmona"].includes(player.id))
+      .map(({ id, displayName, number, position, age }) => ({ id, displayName, number, position, age })),
+    table: buildSegundaAsturfutbolTable(),
+    calendar: buildFilialCalendar(),
+  },
   { id: "juvenil-a", name: "Juvenil A", coach: "Borja Fernandez", category: "Liga Nacional Juvenil", position: "1º - 22 pts", lastResult: "Real Avilés 3-1 Verina", nextMatch: "Covadonga - Real Avilés", standoutPlayers: ["Mario Noval", "Leo Paredes", "Osky"], news: ["Cuarta victoria consecutiva", "Debut de dos juveniles con el filial"], roster: [{ id: "mario-noval", displayName: "M. Noval", number: 7, position: "Delantero", age: 17 }, { id: "leo-paredes", displayName: "L. Paredes", number: 10, position: "Centrocampista", age: 18 }, { id: "izan-arias", displayName: "I. Arias", number: 4, position: "Defensa", age: 17 }, { id: "dani-riestra", displayName: "D. Riestra", number: 1, position: "Portero", age: 18 }, { id: "hugo-menendez", displayName: "H. Menendez", number: 9, position: "Delantero", age: 17 }], table: academyTable("juvenil-a"), calendar: academyCalendar("juvenil-a", "Juvenil A", "liga-nacional-juvenil") },
 ];
 

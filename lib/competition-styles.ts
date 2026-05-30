@@ -7,6 +7,7 @@ const competitionBorderClass: Record<CompetitionId, string> = {
   amistoso: "hover:border-slate-500",
   "primera-rfef": "hover:border-emerald-600",
   "primera-asturfutbol": "hover:border-[#214C9B]",
+  "segunda-asturfutbol": "hover:border-[#214C9B]",
   "liga-nacional-juvenil": "hover:border-violet-500",
 };
 

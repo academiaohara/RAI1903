@@ -1,0 +1,2930 @@
+{
+  "competicion": "2ª Asturfútbol Grupo 1",
+  "temporada": "2025-2026",
+  "jornadas": [
+    {
+      "jornada": 1,
+      "partidos": [
+        {
+          "fecha": "2025-09-13",
+          "hora": null,
+          "local": "Camocha",
+          "visitante": "Gozon Club De Futbol",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J1"
+        },
+        {
+          "fecha": "2025-09-14",
+          "hora": null,
+          "local": "Marítimo Racing Club",
+          "visitante": "Navia CF",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "fase": "J1"
+        },
+        {
+          "fecha": "2025-09-14",
+          "hora": null,
+          "local": "Asunción C.F.",
+          "visitante": "C.D. Treviense",
+          "goles_local": 1,
+          "goles_visitante": 4,
+          "fase": "J1"
+        },
+        {
+          "fecha": "2025-09-14",
+          "hora": null,
+          "local": "SD Narcea",
+          "visitante": "CD Praviano B",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "fase": "J1"
+        },
+        {
+          "fecha": "2025-09-14",
+          "hora": null,
+          "local": "Siderúrgico C.F.",
+          "visitante": "Candás CF",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "fase": "J1"
+        },
+        {
+          "fecha": "2025-09-14",
+          "hora": null,
+          "local": "Codema",
+          "visitante": "Vegadeo Club De Fútbol",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J1"
+        },
+        {
+          "fecha": "2025-09-14",
+          "hora": null,
+          "local": "Fabril C.D.",
+          "visitante": "Triple A.Gijón",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J1"
+        },
+        {
+          "fecha": "2025-09-14",
+          "hora": null,
+          "local": "Boal CF",
+          "visitante": "Real Avilés B",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "fase": "J1"
+        },
+        {
+          "fecha": "2025-09-14",
+          "hora": null,
+          "local": "Podes C.F.",
+          "visitante": "Llaranes C.F.",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "fase": "J1"
+        }
+      ]
+    },
+    {
+      "jornada": 2,
+      "partidos": [
+        {
+          "fecha": "2025-09-20",
+          "hora": null,
+          "local": "Gozon Club De Futbol",
+          "visitante": "Siderúrgico C.F.",
+          "goles_local": 3,
+          "goles_visitante": 3,
+          "fase": "J2"
+        },
+        {
+          "fecha": "2025-09-21",
+          "hora": null,
+          "local": "SD Narcea",
+          "visitante": "Fabril C.D.",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "fase": "J2"
+        },
+        {
+          "fecha": "2025-09-21",
+          "hora": null,
+          "local": "Candás CF",
+          "visitante": "Codema",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "fase": "J2"
+        },
+        {
+          "fecha": "2025-09-21",
+          "hora": null,
+          "local": "Real Avilés B",
+          "visitante": "Asunción C.F.",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "fase": "J2"
+        },
+        {
+          "fecha": "2025-09-21",
+          "hora": null,
+          "local": "Triple A.Gijón",
+          "visitante": "Marítimo Racing Club",
+          "goles_local": 1,
+          "goles_visitante": 5,
+          "fase": "J2"
+        },
+        {
+          "fecha": "2025-09-21",
+          "hora": null,
+          "local": "C.D. Treviense",
+          "visitante": "Podes C.F.",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "fase": "J2"
+        },
+        {
+          "fecha": "2025-09-21",
+          "hora": null,
+          "local": "Navia CF",
+          "visitante": "Boal CF",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "fase": "J2"
+        },
+        {
+          "fecha": "2025-09-21",
+          "hora": null,
+          "local": "Vegadeo Club De Fútbol",
+          "visitante": "CD Praviano B",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J2"
+        },
+        {
+          "fecha": "2025-09-21",
+          "hora": null,
+          "local": "Llaranes C.F.",
+          "visitante": "Camocha",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J2"
+        }
+      ]
+    },
+    {
+      "jornada": 3,
+      "partidos": [
+        {
+          "fecha": "2025-09-27",
+          "hora": null,
+          "local": "CD Praviano B",
+          "visitante": "Candás CF",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J3"
+        },
+        {
+          "fecha": "2025-09-28",
+          "hora": null,
+          "local": "Siderúrgico C.F.",
+          "visitante": "Llaranes C.F.",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "fase": "J3"
+        },
+        {
+          "fecha": "2025-09-28",
+          "hora": null,
+          "local": "Asunción C.F.",
+          "visitante": "Navia CF",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "fase": "J3"
+        },
+        {
+          "fecha": "2025-09-28",
+          "hora": null,
+          "local": "Marítimo Racing Club",
+          "visitante": "SD Narcea",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "fase": "J3"
+        },
+        {
+          "fecha": "2025-09-28",
+          "hora": null,
+          "local": "Codema",
+          "visitante": "Gozon Club De Futbol",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "fase": "J3"
+        },
+        {
+          "fecha": "2025-09-28",
+          "hora": null,
+          "local": "Fabril C.D.",
+          "visitante": "Vegadeo Club De Fútbol",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J3"
+        },
+        {
+          "fecha": "2025-09-28",
+          "hora": null,
+          "local": "Boal CF",
+          "visitante": "Triple A.Gijón",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J3"
+        },
+        {
+          "fecha": "2025-09-28",
+          "hora": null,
+          "local": "Podes C.F.",
+          "visitante": "Camocha",
+          "goles_local": 4,
+          "goles_visitante": 3,
+          "fase": "J3"
+        },
+        {
+          "fecha": "2025-09-28",
+          "hora": null,
+          "local": "C.D. Treviense",
+          "visitante": "Real Avilés B",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J3"
+        }
+      ]
+    },
+    {
+      "jornada": 4,
+      "partidos": [
+        {
+          "fecha": "2025-10-04",
+          "hora": null,
+          "local": "Camocha",
+          "visitante": "Siderúrgico C.F.",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J4"
+        },
+        {
+          "fecha": "2025-10-05",
+          "hora": null,
+          "local": "Gozon Club De Futbol",
+          "visitante": "CD Praviano B",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J4"
+        },
+        {
+          "fecha": "2025-10-05",
+          "hora": null,
+          "local": "Vegadeo Club De Fútbol",
+          "visitante": "Marítimo Racing Club",
+          "goles_local": 0,
+          "goles_visitante": 3,
+          "fase": "J4"
+        },
+        {
+          "fecha": "2025-10-05",
+          "hora": null,
+          "local": "Candás CF",
+          "visitante": "Fabril C.D.",
+          "goles_local": 0,
+          "goles_visitante": 4,
+          "fase": "J4"
+        },
+        {
+          "fecha": "2025-10-05",
+          "hora": null,
+          "local": "Real Avilés B",
+          "visitante": "Podes C.F.",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J4"
+        },
+        {
+          "fecha": "2025-10-05",
+          "hora": null,
+          "local": "Navia CF",
+          "visitante": "C.D. Treviense",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J4"
+        },
+        {
+          "fecha": "2025-10-05",
+          "hora": null,
+          "local": "Triple A.Gijón",
+          "visitante": "Asunción C.F.",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J4"
+        },
+        {
+          "fecha": "2025-10-05",
+          "hora": null,
+          "local": "SD Narcea",
+          "visitante": "Boal CF",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J4"
+        },
+        {
+          "fecha": "2025-10-05",
+          "hora": null,
+          "local": "Llaranes C.F.",
+          "visitante": "Codema",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J4"
+        }
+      ]
+    },
+    {
+      "jornada": 5,
+      "partidos": [
+        {
+          "fecha": "2025-10-11",
+          "hora": null,
+          "local": "Real Avilés B",
+          "visitante": "Navia CF",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "fase": "J5"
+        },
+        {
+          "fecha": "2025-10-12",
+          "hora": null,
+          "local": "Fabril C.D.",
+          "visitante": "Gozon Club De Futbol",
+          "goles_local": 2,
+          "goles_visitante": 4,
+          "fase": "J5"
+        },
+        {
+          "fecha": "2025-10-12",
+          "hora": null,
+          "local": "CD Praviano B",
+          "visitante": "Llaranes C.F.",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "fase": "J5"
+        },
+        {
+          "fecha": "2025-10-12",
+          "hora": null,
+          "local": "Codema",
+          "visitante": "Camocha",
+          "goles_local": 3,
+          "goles_visitante": 3,
+          "fase": "J5"
+        },
+        {
+          "fecha": "2025-10-12",
+          "hora": null,
+          "local": "Asunción C.F.",
+          "visitante": "SD Narcea",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "fase": "J5"
+        },
+        {
+          "fecha": "2025-10-12",
+          "hora": null,
+          "local": "Marítimo Racing Club",
+          "visitante": "Candás CF",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "fase": "J5"
+        },
+        {
+          "fecha": "2025-10-12",
+          "hora": null,
+          "local": "Boal CF",
+          "visitante": "Vegadeo Club De Fútbol",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "fase": "J5"
+        },
+        {
+          "fecha": "2025-10-12",
+          "hora": null,
+          "local": "Podes C.F.",
+          "visitante": "Siderúrgico C.F.",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "fase": "J5"
+        },
+        {
+          "fecha": "2025-10-12",
+          "hora": null,
+          "local": "C.D. Treviense",
+          "visitante": "Triple A.Gijón",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J5"
+        }
+      ]
+    },
+    {
+      "jornada": 6,
+      "partidos": [
+        {
+          "fecha": "2025-10-19",
+          "hora": null,
+          "local": "Llaranes C.F.",
+          "visitante": "Fabril C.D.",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J6"
+        },
+        {
+          "fecha": "2025-10-19",
+          "hora": null,
+          "local": "Siderúrgico C.F.",
+          "visitante": "Codema",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "fase": "J6"
+        },
+        {
+          "fecha": "2025-10-19",
+          "hora": null,
+          "local": "Vegadeo Club De Fútbol",
+          "visitante": "Asunción C.F.",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J6"
+        },
+        {
+          "fecha": "2025-10-19",
+          "hora": null,
+          "local": "Gozon Club De Futbol",
+          "visitante": "Marítimo Racing Club",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "fase": "J6"
+        },
+        {
+          "fecha": "2025-10-19",
+          "hora": null,
+          "local": "Camocha",
+          "visitante": "CD Praviano B",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "fase": "J6"
+        },
+        {
+          "fecha": "2025-10-19",
+          "hora": null,
+          "local": "Navia CF",
+          "visitante": "Podes C.F.",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "fase": "J6"
+        },
+        {
+          "fecha": "2025-10-19",
+          "hora": null,
+          "local": "SD Narcea",
+          "visitante": "C.D. Treviense",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "fase": "J6"
+        },
+        {
+          "fecha": "2025-10-19",
+          "hora": null,
+          "local": "Triple A.Gijón",
+          "visitante": "Real Avilés B",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "fase": "J6"
+        },
+        {
+          "fecha": "2025-10-19",
+          "hora": null,
+          "local": "Candás CF",
+          "visitante": "Boal CF",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J6"
+        }
+      ]
+    },
+    {
+      "jornada": 7,
+      "partidos": [
+        {
+          "fecha": "2025-10-25",
+          "hora": null,
+          "local": "C.D. Treviense",
+          "visitante": "Vegadeo Club De Fútbol",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "fase": "J7"
+        },
+        {
+          "fecha": "2025-10-25",
+          "hora": null,
+          "local": "Fabril C.D.",
+          "visitante": "Camocha",
+          "goles_local": 4,
+          "goles_visitante": 5,
+          "fase": "J7"
+        },
+        {
+          "fecha": "2025-10-26",
+          "hora": null,
+          "local": "Navia CF",
+          "visitante": "Triple A.Gijón",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "fase": "J7"
+        },
+        {
+          "fecha": "2025-10-26",
+          "hora": null,
+          "local": "Real Avilés B",
+          "visitante": "SD Narcea",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J7"
+        },
+        {
+          "fecha": "2025-10-26",
+          "hora": null,
+          "local": "CD Praviano B",
+          "visitante": "Siderúrgico C.F.",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "fase": "J7"
+        },
+        {
+          "fecha": "2025-10-26",
+          "hora": null,
+          "local": "Podes C.F.",
+          "visitante": "Codema",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J7"
+        },
+        {
+          "fecha": "2025-10-26",
+          "hora": null,
+          "local": "Asunción C.F.",
+          "visitante": "Candás CF",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "fase": "J7"
+        },
+        {
+          "fecha": "2025-10-26",
+          "hora": null,
+          "local": "Marítimo Racing Club",
+          "visitante": "Llaranes C.F.",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "fase": "J7"
+        },
+        {
+          "fecha": "2025-10-26",
+          "hora": null,
+          "local": "Boal CF",
+          "visitante": "Gozon Club De Futbol",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "fase": "J7"
+        }
+      ]
+    },
+    {
+      "jornada": 8,
+      "partidos": [
+        {
+          "fecha": "2025-11-01",
+          "hora": null,
+          "local": "SD Narcea",
+          "visitante": "Navia CF",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "fase": "J8"
+        },
+        {
+          "fecha": "2025-11-01",
+          "hora": null,
+          "local": "Vegadeo Club De Fútbol",
+          "visitante": "Real Avilés B",
+          "goles_local": 0,
+          "goles_visitante": 4,
+          "fase": "J8"
+        },
+        {
+          "fecha": "2025-11-02",
+          "hora": null,
+          "local": "Llaranes C.F.",
+          "visitante": "Boal CF",
+          "goles_local": 1,
+          "goles_visitante": 4,
+          "fase": "J8"
+        },
+        {
+          "fecha": "2025-11-02",
+          "hora": null,
+          "local": "Gozon Club De Futbol",
+          "visitante": "Asunción C.F.",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "fase": "J8"
+        },
+        {
+          "fecha": "2025-11-02",
+          "hora": null,
+          "local": "Siderúrgico C.F.",
+          "visitante": "Fabril C.D.",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "fase": "J8"
+        },
+        {
+          "fecha": "2025-11-02",
+          "hora": null,
+          "local": "Triple A.Gijón",
+          "visitante": "Podes C.F.",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "fase": "J8"
+        },
+        {
+          "fecha": "2025-11-02",
+          "hora": null,
+          "local": "Candás CF",
+          "visitante": "C.D. Treviense",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "fase": "J8"
+        },
+        {
+          "fecha": "2025-11-02",
+          "hora": null,
+          "local": "Codema",
+          "visitante": "CD Praviano B",
+          "goles_local": 4,
+          "goles_visitante": 2,
+          "fase": "J8"
+        },
+        {
+          "fecha": "2025-11-02",
+          "hora": null,
+          "local": "Camocha",
+          "visitante": "Marítimo Racing Club",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "fase": "J8"
+        }
+      ]
+    },
+    {
+      "jornada": 9,
+      "partidos": [
+        {
+          "fecha": "2025-11-08",
+          "hora": null,
+          "local": "Fabril C.D.",
+          "visitante": "Codema",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "fase": "J9"
+        },
+        {
+          "fecha": "2025-11-09",
+          "hora": null,
+          "local": "Asunción C.F.",
+          "visitante": "Llaranes C.F.",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J9"
+        },
+        {
+          "fecha": "2025-11-09",
+          "hora": null,
+          "local": "Podes C.F.",
+          "visitante": "CD Praviano B",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "fase": "J9"
+        },
+        {
+          "fecha": "2025-11-09",
+          "hora": null,
+          "local": "Marítimo Racing Club",
+          "visitante": "Siderúrgico C.F.",
+          "goles_local": 3,
+          "goles_visitante": 3,
+          "fase": "J9"
+        },
+        {
+          "fecha": "2025-11-09",
+          "hora": null,
+          "local": "Triple A.Gijón",
+          "visitante": "SD Narcea",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "fase": "J9"
+        },
+        {
+          "fecha": "2025-11-09",
+          "hora": null,
+          "local": "Navia CF",
+          "visitante": "Vegadeo Club De Fútbol",
+          "goles_local": 5,
+          "goles_visitante": 3,
+          "fase": "J9"
+        },
+        {
+          "fecha": "2025-11-09",
+          "hora": null,
+          "local": "C.D. Treviense",
+          "visitante": "Gozon Club De Futbol",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "fase": "J9"
+        },
+        {
+          "fecha": "2025-11-09",
+          "hora": null,
+          "local": "Boal CF",
+          "visitante": "Camocha",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J9"
+        },
+        {
+          "fecha": "2025-11-09",
+          "hora": null,
+          "local": "Real Avilés B",
+          "visitante": "Candás CF",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "fase": "J9"
+        }
+      ]
+    },
+    {
+      "jornada": 10,
+      "partidos": [
+        {
+          "fecha": "2025-11-15",
+          "hora": null,
+          "local": "Gozon Club De Futbol",
+          "visitante": "Real Avilés B",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "fase": "J10"
+        },
+        {
+          "fecha": "2025-11-15",
+          "hora": null,
+          "local": "Camocha",
+          "visitante": "Asunción C.F.",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "fase": "J10"
+        },
+        {
+          "fecha": "2025-11-16",
+          "hora": null,
+          "local": "Candás CF",
+          "visitante": "Navia CF",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "fase": "J10"
+        },
+        {
+          "fecha": "2025-11-16",
+          "hora": null,
+          "local": "Llaranes C.F.",
+          "visitante": "C.D. Treviense",
+          "goles_local": 0,
+          "goles_visitante": 4,
+          "fase": "J10"
+        },
+        {
+          "fecha": "2025-11-16",
+          "hora": null,
+          "local": "CD Praviano B",
+          "visitante": "Fabril C.D.",
+          "goles_local": 0,
+          "goles_visitante": 3,
+          "fase": "J10"
+        },
+        {
+          "fecha": "2025-11-16",
+          "hora": null,
+          "local": "SD Narcea",
+          "visitante": "Podes C.F.",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J10"
+        },
+        {
+          "fecha": "2025-11-16",
+          "hora": null,
+          "local": "Vegadeo Club De Fútbol",
+          "visitante": "Triple A.Gijón",
+          "goles_local": 0,
+          "goles_visitante": 3,
+          "fase": "J10"
+        },
+        {
+          "fecha": "2025-11-16",
+          "hora": null,
+          "local": "Codema",
+          "visitante": "Marítimo Racing Club",
+          "goles_local": 4,
+          "goles_visitante": 3,
+          "fase": "J10"
+        },
+        {
+          "fecha": "2025-11-16",
+          "hora": null,
+          "local": "Siderúrgico C.F.",
+          "visitante": "Boal CF",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J10"
+        }
+      ]
+    },
+    {
+      "jornada": 11,
+      "partidos": [
+        {
+          "fecha": "2025-11-23",
+          "hora": null,
+          "local": "Marítimo Racing Club",
+          "visitante": "CD Praviano B",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "fase": "J11"
+        },
+        {
+          "fecha": "2025-11-23",
+          "hora": null,
+          "local": "Triple A.Gijón",
+          "visitante": "Candás CF",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "fase": "J11"
+        },
+        {
+          "fecha": "2025-11-23",
+          "hora": null,
+          "local": "Asunción C.F.",
+          "visitante": "Siderúrgico C.F.",
+          "goles_local": 0,
+          "goles_visitante": 4,
+          "fase": "J11"
+        },
+        {
+          "fecha": "2025-11-23",
+          "hora": null,
+          "local": "SD Narcea",
+          "visitante": "Vegadeo Club De Fútbol",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J11"
+        },
+        {
+          "fecha": "2025-11-23",
+          "hora": null,
+          "local": "Navia CF",
+          "visitante": "Gozon Club De Futbol",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "fase": "J11"
+        },
+        {
+          "fecha": "2025-11-23",
+          "hora": null,
+          "local": "C.D. Treviense",
+          "visitante": "Camocha",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J11"
+        },
+        {
+          "fecha": "2025-11-23",
+          "hora": null,
+          "local": "Boal CF",
+          "visitante": "Codema",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J11"
+        },
+        {
+          "fecha": "2025-11-23",
+          "hora": null,
+          "local": "Podes C.F.",
+          "visitante": "Fabril C.D.",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "fase": "J11"
+        },
+        {
+          "fecha": "2025-11-23",
+          "hora": null,
+          "local": "Real Avilés B",
+          "visitante": "Llaranes C.F.",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J11"
+        }
+      ]
+    },
+    {
+      "jornada": 12,
+      "partidos": [
+        {
+          "fecha": "2025-11-29",
+          "hora": null,
+          "local": "Camocha",
+          "visitante": "Real Avilés B",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J12"
+        },
+        {
+          "fecha": "2025-11-30",
+          "hora": null,
+          "local": "Siderúrgico C.F.",
+          "visitante": "C.D. Treviense",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J12"
+        },
+        {
+          "fecha": "2025-11-30",
+          "hora": null,
+          "local": "Fabril C.D.",
+          "visitante": "Marítimo Racing Club",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "fase": "J12"
+        },
+        {
+          "fecha": "2025-11-30",
+          "hora": null,
+          "local": "Gozon Club De Futbol",
+          "visitante": "Triple A.Gijón",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J12"
+        },
+        {
+          "fecha": "2025-11-30",
+          "hora": null,
+          "local": "Llaranes C.F.",
+          "visitante": "Navia CF",
+          "goles_local": 0,
+          "goles_visitante": 4,
+          "fase": "J12"
+        },
+        {
+          "fecha": "2025-11-30",
+          "hora": null,
+          "local": "Vegadeo Club De Fútbol",
+          "visitante": "Podes C.F.",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "fase": "J12"
+        },
+        {
+          "fecha": "2025-11-30",
+          "hora": null,
+          "local": "Codema",
+          "visitante": "Asunción C.F.",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "fase": "J12"
+        },
+        {
+          "fecha": "2025-11-30",
+          "hora": null,
+          "local": "CD Praviano B",
+          "visitante": "Boal CF",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J12"
+        },
+        {
+          "fecha": "2025-11-30",
+          "hora": null,
+          "local": "Candás CF",
+          "visitante": "SD Narcea",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "fase": "J12"
+        }
+      ]
+    },
+    {
+      "jornada": 13,
+      "partidos": [
+        {
+          "fecha": "2025-12-04",
+          "hora": null,
+          "local": "Real Avilés B",
+          "visitante": "Siderúrgico C.F.",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J13"
+        },
+        {
+          "fecha": "2025-12-06",
+          "hora": null,
+          "local": "Navia CF",
+          "visitante": "Camocha",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J13"
+        },
+        {
+          "fecha": "2025-12-06",
+          "hora": null,
+          "local": "Boal CF",
+          "visitante": "Fabril C.D.",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "fase": "J13"
+        },
+        {
+          "fecha": "2025-12-07",
+          "hora": null,
+          "local": "Asunción C.F.",
+          "visitante": "CD Praviano B",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "fase": "J13"
+        },
+        {
+          "fecha": "2025-12-07",
+          "hora": null,
+          "local": "Triple A.Gijón",
+          "visitante": "Llaranes C.F.",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "fase": "J13"
+        },
+        {
+          "fecha": "2025-12-07",
+          "hora": null,
+          "local": "Vegadeo Club De Fútbol",
+          "visitante": "Candás CF",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "fase": "J13"
+        },
+        {
+          "fecha": "2025-12-07",
+          "hora": null,
+          "local": "SD Narcea",
+          "visitante": "Gozon Club De Futbol",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J13"
+        },
+        {
+          "fecha": "2025-12-07",
+          "hora": null,
+          "local": "Podes C.F.",
+          "visitante": "Marítimo Racing Club",
+          "goles_local": 4,
+          "goles_visitante": 3,
+          "fase": "J13"
+        },
+        {
+          "fecha": "2025-12-08",
+          "hora": null,
+          "local": "C.D. Treviense",
+          "visitante": "Codema",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "fase": "J13"
+        }
+      ]
+    },
+    {
+      "jornada": 14,
+      "partidos": [
+        {
+          "fecha": "2025-12-13",
+          "hora": null,
+          "local": "Gozon Club De Futbol",
+          "visitante": "Vegadeo Club De Fútbol",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "fase": "J14"
+        },
+        {
+          "fecha": "2025-12-14",
+          "hora": null,
+          "local": "Siderúrgico C.F.",
+          "visitante": "Navia CF",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "fase": "J14"
+        },
+        {
+          "fecha": "2025-12-14",
+          "hora": null,
+          "local": "Fabril C.D.",
+          "visitante": "Asunción C.F.",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "fase": "J14"
+        },
+        {
+          "fecha": "2025-12-14",
+          "hora": null,
+          "local": "Marítimo Racing Club",
+          "visitante": "Boal CF",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "fase": "J14"
+        },
+        {
+          "fecha": "2025-12-14",
+          "hora": null,
+          "local": "Codema",
+          "visitante": "Real Avilés B",
+          "goles_local": 3,
+          "goles_visitante": 3,
+          "fase": "J14"
+        },
+        {
+          "fecha": "2025-12-14",
+          "hora": null,
+          "local": "CD Praviano B",
+          "visitante": "C.D. Treviense",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "fase": "J14"
+        },
+        {
+          "fecha": "2025-12-14",
+          "hora": null,
+          "local": "Candás CF",
+          "visitante": "Podes C.F.",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "fase": "J14"
+        },
+        {
+          "fecha": "2025-12-14",
+          "hora": null,
+          "local": "Camocha",
+          "visitante": "Triple A.Gijón",
+          "goles_local": 3,
+          "goles_visitante": 3,
+          "fase": "J14"
+        },
+        {
+          "fecha": "2025-12-14",
+          "hora": null,
+          "local": "Llaranes C.F.",
+          "visitante": "SD Narcea",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J14"
+        }
+      ]
+    },
+    {
+      "jornada": 15,
+      "partidos": [
+        {
+          "fecha": "2025-12-20",
+          "hora": null,
+          "local": "Real Avilés B",
+          "visitante": "CD Praviano B",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "fase": "J15"
+        },
+        {
+          "fecha": "2025-12-21",
+          "hora": null,
+          "local": "Vegadeo Club De Fútbol",
+          "visitante": "Llaranes C.F.",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J15"
+        },
+        {
+          "fecha": "2025-12-21",
+          "hora": null,
+          "local": "Asunción C.F.",
+          "visitante": "Marítimo Racing Club",
+          "goles_local": 2,
+          "goles_visitante": 7,
+          "fase": "J15"
+        },
+        {
+          "fecha": "2025-12-21",
+          "hora": null,
+          "local": "SD Narcea",
+          "visitante": "Camocha",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "fase": "J15"
+        },
+        {
+          "fecha": "2025-12-21",
+          "hora": null,
+          "local": "Navia CF",
+          "visitante": "Codema",
+          "goles_local": 6,
+          "goles_visitante": 1,
+          "fase": "J15"
+        },
+        {
+          "fecha": "2025-12-21",
+          "hora": null,
+          "local": "C.D. Treviense",
+          "visitante": "Fabril C.D.",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "fase": "J15"
+        },
+        {
+          "fecha": "2025-12-21",
+          "hora": null,
+          "local": "Podes C.F.",
+          "visitante": "Boal CF",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "fase": "J15"
+        },
+        {
+          "fecha": "2025-12-21",
+          "hora": null,
+          "local": "Triple A.Gijón",
+          "visitante": "Siderúrgico C.F.",
+          "goles_local": 6,
+          "goles_visitante": 1,
+          "fase": "J15"
+        },
+        {
+          "fecha": "2025-12-21",
+          "hora": null,
+          "local": "Candás CF",
+          "visitante": "Gozon Club De Futbol",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "fase": "J15"
+        }
+      ]
+    },
+    {
+      "jornada": 16,
+      "partidos": [
+        {
+          "fecha": "2026-01-10",
+          "hora": null,
+          "local": "Podes C.F.",
+          "visitante": "Gozon Club De Futbol",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "fase": "J16"
+        },
+        {
+          "fecha": "2026-01-11",
+          "hora": null,
+          "local": "Llaranes C.F.",
+          "visitante": "Candás CF",
+          "goles_local": 0,
+          "goles_visitante": 6,
+          "fase": "J16"
+        },
+        {
+          "fecha": "2026-01-11",
+          "hora": null,
+          "local": "CD Praviano B",
+          "visitante": "Navia CF",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "fase": "J16"
+        },
+        {
+          "fecha": "2026-01-11",
+          "hora": null,
+          "local": "Fabril C.D.",
+          "visitante": "Real Avilés B",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "fase": "J16"
+        },
+        {
+          "fecha": "2026-01-11",
+          "hora": null,
+          "local": "Marítimo Racing Club",
+          "visitante": "C.D. Treviense",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J16"
+        },
+        {
+          "fecha": "2026-01-11",
+          "hora": null,
+          "local": "Camocha",
+          "visitante": "Vegadeo Club De Fútbol",
+          "goles_local": 3,
+          "goles_visitante": 3,
+          "fase": "J16"
+        },
+        {
+          "fecha": "2026-01-11",
+          "hora": null,
+          "local": "Codema",
+          "visitante": "Triple A.Gijón",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "fase": "J16"
+        },
+        {
+          "fecha": "2026-01-11",
+          "hora": null,
+          "local": "Boal CF",
+          "visitante": "Asunción C.F.",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J16"
+        },
+        {
+          "fecha": "2026-01-11",
+          "hora": null,
+          "local": "Siderúrgico C.F.",
+          "visitante": "SD Narcea",
+          "goles_local": 1,
+          "goles_visitante": 4,
+          "fase": "J16"
+        }
+      ]
+    },
+    {
+      "jornada": 17,
+      "partidos": [
+        {
+          "fecha": "2026-01-17",
+          "hora": null,
+          "local": "Gozon Club De Futbol",
+          "visitante": "Llaranes C.F.",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "fase": "J17"
+        },
+        {
+          "fecha": "2026-01-18",
+          "hora": null,
+          "local": "Asunción C.F.",
+          "visitante": "Podes C.F.",
+          "goles_local": 4,
+          "goles_visitante": 3,
+          "fase": "J17"
+        },
+        {
+          "fecha": "2026-01-18",
+          "hora": null,
+          "local": "Triple A.Gijón",
+          "visitante": "CD Praviano B",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "fase": "J17"
+        },
+        {
+          "fecha": "2026-01-18",
+          "hora": null,
+          "local": "Vegadeo Club De Fútbol",
+          "visitante": "Siderúrgico C.F.",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "fase": "J17"
+        },
+        {
+          "fecha": "2026-01-18",
+          "hora": null,
+          "local": "Navia CF",
+          "visitante": "Fabril C.D.",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "fase": "J17"
+        },
+        {
+          "fecha": "2026-01-18",
+          "hora": null,
+          "local": "Candás CF",
+          "visitante": "Camocha",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J17"
+        },
+        {
+          "fecha": "2026-01-18",
+          "hora": null,
+          "local": "SD Narcea",
+          "visitante": "Codema",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "fase": "J17"
+        },
+        {
+          "fecha": "2026-01-18",
+          "hora": null,
+          "local": "C.D. Treviense",
+          "visitante": "Boal CF",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J17"
+        },
+        {
+          "fecha": "2026-01-18",
+          "hora": null,
+          "local": "Real Avilés B",
+          "visitante": "Marítimo Racing Club",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "fase": "J17"
+        }
+      ]
+    },
+    {
+      "jornada": 18,
+      "partidos": [
+        {
+          "fecha": "2026-01-24",
+          "hora": null,
+          "local": "Gozon Club De Futbol",
+          "visitante": "Camocha",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "fase": "J18"
+        },
+        {
+          "fecha": "2026-01-24",
+          "hora": null,
+          "local": "CD Praviano B",
+          "visitante": "SD Narcea",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "fase": "J18"
+        },
+        {
+          "fecha": "2026-01-25",
+          "hora": null,
+          "local": "Candás CF",
+          "visitante": "Siderúrgico C.F.",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "fase": "J18"
+        },
+        {
+          "fecha": "2026-01-25",
+          "hora": null,
+          "local": "Llaranes C.F.",
+          "visitante": "Podes C.F.",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J18"
+        },
+        {
+          "fecha": "2026-01-25",
+          "hora": null,
+          "local": "Triple A.Gijón",
+          "visitante": "Fabril C.D.",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "fase": "J18"
+        },
+        {
+          "fecha": "2026-01-25",
+          "hora": null,
+          "local": "C.D. Treviense",
+          "visitante": "Asunción C.F.",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "fase": "J18"
+        },
+        {
+          "fecha": "2026-01-25",
+          "hora": null,
+          "local": "Navia CF",
+          "visitante": "Marítimo Racing Club",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "fase": "J18"
+        },
+        {
+          "fecha": "2026-01-25",
+          "hora": null,
+          "local": "Vegadeo Club De Fútbol",
+          "visitante": "Codema",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J18"
+        },
+        {
+          "fecha": "2026-01-25",
+          "hora": null,
+          "local": "Real Avilés B",
+          "visitante": "Boal CF",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J18"
+        }
+      ]
+    },
+    {
+      "jornada": 19,
+      "partidos": [
+        {
+          "fecha": "2026-01-31",
+          "hora": null,
+          "local": "Fabril C.D.",
+          "visitante": "SD Narcea",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "fase": "J19"
+        },
+        {
+          "fecha": "2026-02-01",
+          "hora": null,
+          "local": "Siderúrgico C.F.",
+          "visitante": "Gozon Club De Futbol",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "fase": "J19"
+        },
+        {
+          "fecha": "2026-02-01",
+          "hora": null,
+          "local": "Asunción C.F.",
+          "visitante": "Real Avilés B",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "fase": "J19"
+        },
+        {
+          "fecha": "2026-02-01",
+          "hora": null,
+          "local": "Codema",
+          "visitante": "Candás CF",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J19"
+        },
+        {
+          "fecha": "2026-02-01",
+          "hora": null,
+          "local": "Podes C.F.",
+          "visitante": "C.D. Treviense",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "fase": "J19"
+        },
+        {
+          "fecha": "2026-02-01",
+          "hora": null,
+          "local": "Camocha",
+          "visitante": "Llaranes C.F.",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "fase": "J19"
+        },
+        {
+          "fecha": "2026-02-01",
+          "hora": null,
+          "local": "Boal CF",
+          "visitante": "Navia CF",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J19"
+        },
+        {
+          "fecha": "2026-02-01",
+          "hora": null,
+          "local": "Marítimo Racing Club",
+          "visitante": "Triple A.Gijón",
+          "goles_local": 3,
+          "goles_visitante": 3,
+          "fase": "J19"
+        },
+        {
+          "fecha": "2026-02-01",
+          "hora": null,
+          "local": "CD Praviano B",
+          "visitante": "Vegadeo Club De Fútbol",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J19"
+        }
+      ]
+    },
+    {
+      "jornada": 20,
+      "partidos": [
+        {
+          "fecha": "2026-02-07",
+          "hora": null,
+          "local": "Gozon Club De Futbol",
+          "visitante": "Codema",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "fase": "J20"
+        },
+        {
+          "fecha": "2026-02-08",
+          "hora": null,
+          "local": "Candás CF",
+          "visitante": "CD Praviano B",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "fase": "J20"
+        },
+        {
+          "fecha": "2026-02-08",
+          "hora": null,
+          "local": "Llaranes C.F.",
+          "visitante": "Siderúrgico C.F.",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J20"
+        },
+        {
+          "fecha": "2026-02-08",
+          "hora": null,
+          "local": "Navia CF",
+          "visitante": "Asunción C.F.",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "fase": "J20"
+        },
+        {
+          "fecha": "2026-02-08",
+          "hora": null,
+          "local": "Triple A.Gijón",
+          "visitante": "Boal CF",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "fase": "J20"
+        },
+        {
+          "fecha": "2026-02-08",
+          "hora": null,
+          "local": "SD Narcea",
+          "visitante": "Marítimo Racing Club",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J20"
+        },
+        {
+          "fecha": "2026-02-08",
+          "hora": null,
+          "local": "Vegadeo Club De Fútbol",
+          "visitante": "Fabril C.D.",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J20"
+        },
+        {
+          "fecha": "2026-02-08",
+          "hora": null,
+          "local": "Real Avilés B",
+          "visitante": "C.D. Treviense",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J20"
+        },
+        {
+          "fecha": "2026-02-08",
+          "hora": null,
+          "local": "Camocha",
+          "visitante": "Podes C.F.",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "fase": "J20"
+        }
+      ]
+    },
+    {
+      "jornada": 21,
+      "partidos": [
+        {
+          "fecha": "2026-02-14",
+          "hora": null,
+          "local": "Codema",
+          "visitante": "Llaranes C.F.",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "fase": "J21"
+        },
+        {
+          "fecha": "2026-02-14",
+          "hora": null,
+          "local": "CD Praviano B",
+          "visitante": "Gozon Club De Futbol",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J21"
+        },
+        {
+          "fecha": "2026-02-14",
+          "hora": null,
+          "local": "Siderúrgico C.F.",
+          "visitante": "Camocha",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J21"
+        },
+        {
+          "fecha": "2026-02-15",
+          "hora": null,
+          "local": "Fabril C.D.",
+          "visitante": "Candás CF",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J21"
+        },
+        {
+          "fecha": "2026-02-15",
+          "hora": null,
+          "local": "Asunción C.F.",
+          "visitante": "Triple A.Gijón",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "fase": "J21"
+        },
+        {
+          "fecha": "2026-02-15",
+          "hora": null,
+          "local": "Marítimo Racing Club",
+          "visitante": "Vegadeo Club De Fútbol",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "fase": "J21"
+        },
+        {
+          "fecha": "2026-02-15",
+          "hora": null,
+          "local": "C.D. Treviense",
+          "visitante": "Navia CF",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J21"
+        },
+        {
+          "fecha": "2026-02-15",
+          "hora": null,
+          "local": "Boal CF",
+          "visitante": "SD Narcea",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "fase": "J21"
+        },
+        {
+          "fecha": "2026-02-15",
+          "hora": null,
+          "local": "Podes C.F.",
+          "visitante": "Real Avilés B",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "fase": "J21"
+        }
+      ]
+    },
+    {
+      "jornada": 22,
+      "partidos": [
+        {
+          "fecha": "2026-02-21",
+          "hora": null,
+          "local": "Gozon Club De Futbol",
+          "visitante": "Fabril C.D.",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J22"
+        },
+        {
+          "fecha": "2026-02-21",
+          "hora": null,
+          "local": "Camocha",
+          "visitante": "Codema",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "fase": "J22"
+        },
+        {
+          "fecha": "2026-02-22",
+          "hora": null,
+          "local": "Siderúrgico C.F.",
+          "visitante": "Podes C.F.",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "fase": "J22"
+        },
+        {
+          "fecha": "2026-02-22",
+          "hora": null,
+          "local": "Llaranes C.F.",
+          "visitante": "CD Praviano B",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "fase": "J22"
+        },
+        {
+          "fecha": "2026-02-22",
+          "hora": null,
+          "local": "Triple A.Gijón",
+          "visitante": "C.D. Treviense",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J22"
+        },
+        {
+          "fecha": "2026-02-22",
+          "hora": null,
+          "local": "Vegadeo Club De Fútbol",
+          "visitante": "Boal CF",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J22"
+        },
+        {
+          "fecha": "2026-02-22",
+          "hora": null,
+          "local": "Navia CF",
+          "visitante": "Real Avilés B",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "fase": "J22"
+        },
+        {
+          "fecha": "2026-02-22",
+          "hora": null,
+          "local": "SD Narcea",
+          "visitante": "Asunción C.F.",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "fase": "J22"
+        },
+        {
+          "fecha": "2026-02-22",
+          "hora": null,
+          "local": "Candás CF",
+          "visitante": "Marítimo Racing Club",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "fase": "J22"
+        }
+      ]
+    },
+    {
+      "jornada": 23,
+      "partidos": [
+        {
+          "fecha": "2026-03-01",
+          "hora": null,
+          "local": "Marítimo Racing Club",
+          "visitante": "Gozon Club De Futbol",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "fase": "J23"
+        },
+        {
+          "fecha": "2026-03-01",
+          "hora": null,
+          "local": "Fabril C.D.",
+          "visitante": "Llaranes C.F.",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "fase": "J23"
+        },
+        {
+          "fecha": "2026-03-01",
+          "hora": null,
+          "local": "CD Praviano B",
+          "visitante": "Camocha",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J23"
+        },
+        {
+          "fecha": "2026-03-01",
+          "hora": null,
+          "local": "Asunción C.F.",
+          "visitante": "Vegadeo Club De Fútbol",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J23"
+        },
+        {
+          "fecha": "2026-03-01",
+          "hora": null,
+          "local": "Codema",
+          "visitante": "Siderúrgico C.F.",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "fase": "J23"
+        },
+        {
+          "fecha": "2026-03-01",
+          "hora": null,
+          "local": "Podes C.F.",
+          "visitante": "Navia CF",
+          "goles_local": 0,
+          "goles_visitante": 4,
+          "fase": "J23"
+        },
+        {
+          "fecha": "2026-03-01",
+          "hora": null,
+          "local": "Real Avilés B",
+          "visitante": "Triple A.Gijón",
+          "goles_local": 5,
+          "goles_visitante": 0,
+          "fase": "J23"
+        },
+        {
+          "fecha": "2026-03-01",
+          "hora": null,
+          "local": "C.D. Treviense",
+          "visitante": "SD Narcea",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J23"
+        },
+        {
+          "fecha": "2026-03-01",
+          "hora": null,
+          "local": "Boal CF",
+          "visitante": "Candás CF",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "fase": "J23"
+        }
+      ]
+    },
+    {
+      "jornada": 24,
+      "partidos": [
+        {
+          "fecha": "2026-03-07",
+          "hora": null,
+          "local": "Gozon Club De Futbol",
+          "visitante": "Boal CF",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J24"
+        },
+        {
+          "fecha": "2026-03-08",
+          "hora": null,
+          "local": "Siderúrgico C.F.",
+          "visitante": "CD Praviano B",
+          "goles_local": 1,
+          "goles_visitante": 4,
+          "fase": "J24"
+        },
+        {
+          "fecha": "2026-03-08",
+          "hora": null,
+          "local": "Candás CF",
+          "visitante": "Asunción C.F.",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J24"
+        },
+        {
+          "fecha": "2026-03-08",
+          "hora": null,
+          "local": "Llaranes C.F.",
+          "visitante": "Marítimo Racing Club",
+          "goles_local": 0,
+          "goles_visitante": 3,
+          "fase": "J24"
+        },
+        {
+          "fecha": "2026-03-08",
+          "hora": null,
+          "local": "Triple A.Gijón",
+          "visitante": "Navia CF",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J24"
+        },
+        {
+          "fecha": "2026-03-08",
+          "hora": null,
+          "local": "Codema",
+          "visitante": "Podes C.F.",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "fase": "J24"
+        },
+        {
+          "fecha": "2026-03-08",
+          "hora": null,
+          "local": "Vegadeo Club De Fútbol",
+          "visitante": "C.D. Treviense",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J24"
+        },
+        {
+          "fecha": "2026-03-08",
+          "hora": null,
+          "local": "SD Narcea",
+          "visitante": "Real Avilés B",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "fase": "J24"
+        },
+        {
+          "fecha": "2026-03-08",
+          "hora": null,
+          "local": "Camocha",
+          "visitante": "Fabril C.D.",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J24"
+        }
+      ]
+    },
+    {
+      "jornada": 25,
+      "partidos": [
+        {
+          "fecha": "2026-03-14",
+          "hora": null,
+          "local": "CD Praviano B",
+          "visitante": "Codema",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "fase": "J25"
+        },
+        {
+          "fecha": "2026-03-15",
+          "hora": null,
+          "local": "Asunción C.F.",
+          "visitante": "Gozon Club De Futbol",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J25"
+        },
+        {
+          "fecha": "2026-03-15",
+          "hora": null,
+          "local": "Real Avilés B",
+          "visitante": "Vegadeo Club De Fútbol",
+          "goles_local": 5,
+          "goles_visitante": 0,
+          "fase": "J25"
+        },
+        {
+          "fecha": "2026-03-15",
+          "hora": null,
+          "local": "Podes C.F.",
+          "visitante": "Triple A.Gijón",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "fase": "J25"
+        },
+        {
+          "fecha": "2026-03-15",
+          "hora": null,
+          "local": "Navia CF",
+          "visitante": "SD Narcea",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "fase": "J25"
+        },
+        {
+          "fecha": "2026-03-15",
+          "hora": null,
+          "local": "C.D. Treviense",
+          "visitante": "Candás CF",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "fase": "J25"
+        },
+        {
+          "fecha": "2026-03-15",
+          "hora": null,
+          "local": "Boal CF",
+          "visitante": "Llaranes C.F.",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J25"
+        },
+        {
+          "fecha": "2026-03-15",
+          "hora": null,
+          "local": "Marítimo Racing Club",
+          "visitante": "Camocha",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "fase": "J25"
+        },
+        {
+          "fecha": "2026-03-15",
+          "hora": null,
+          "local": "Fabril C.D.",
+          "visitante": "Siderúrgico C.F.",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "fase": "J25"
+        }
+      ]
+    },
+    {
+      "jornada": 26,
+      "partidos": [
+        {
+          "fecha": "2026-03-21",
+          "hora": null,
+          "local": "Gozon Club De Futbol",
+          "visitante": "C.D. Treviense",
+          "goles_local": 4,
+          "goles_visitante": 2,
+          "fase": "J26"
+        },
+        {
+          "fecha": "2026-03-22",
+          "hora": null,
+          "local": "CD Praviano B",
+          "visitante": "Podes C.F.",
+          "goles_local": 0,
+          "goles_visitante": 4,
+          "fase": "J26"
+        },
+        {
+          "fecha": "2026-03-22",
+          "hora": null,
+          "local": "Candás CF",
+          "visitante": "Real Avilés B",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "fase": "J26"
+        },
+        {
+          "fecha": "2026-03-22",
+          "hora": null,
+          "local": "Llaranes C.F.",
+          "visitante": "Asunción C.F.",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "fase": "J26"
+        },
+        {
+          "fecha": "2026-03-22",
+          "hora": null,
+          "local": "Codema",
+          "visitante": "Fabril C.D.",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J26"
+        },
+        {
+          "fecha": "2026-03-22",
+          "hora": null,
+          "local": "SD Narcea",
+          "visitante": "Triple A.Gijón",
+          "goles_local": 3,
+          "goles_visitante": 3,
+          "fase": "J26"
+        },
+        {
+          "fecha": "2026-03-22",
+          "hora": null,
+          "local": "Vegadeo Club De Fútbol",
+          "visitante": "Navia CF",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "fase": "J26"
+        },
+        {
+          "fecha": "2026-03-22",
+          "hora": null,
+          "local": "Siderúrgico C.F.",
+          "visitante": "Marítimo Racing Club",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "fase": "J26"
+        },
+        {
+          "fecha": "2026-03-22",
+          "hora": null,
+          "local": "Camocha",
+          "visitante": "Boal CF",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "fase": "J26"
+        }
+      ]
+    },
+    {
+      "jornada": 27,
+      "partidos": [
+        {
+          "fecha": "2026-03-28",
+          "hora": null,
+          "local": "Real Avilés B",
+          "visitante": "Gozon Club De Futbol",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J27"
+        },
+        {
+          "fecha": "2026-03-29",
+          "hora": null,
+          "local": "Triple A.Gijón",
+          "visitante": "Vegadeo Club De Fútbol",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "fase": "J27"
+        },
+        {
+          "fecha": "2026-03-29",
+          "hora": null,
+          "local": "Asunción C.F.",
+          "visitante": "Camocha",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J27"
+        },
+        {
+          "fecha": "2026-03-29",
+          "hora": null,
+          "local": "Fabril C.D.",
+          "visitante": "CD Praviano B",
+          "goles_local": 4,
+          "goles_visitante": 3,
+          "fase": "J27"
+        },
+        {
+          "fecha": "2026-03-29",
+          "hora": null,
+          "local": "Podes C.F.",
+          "visitante": "SD Narcea",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J27"
+        },
+        {
+          "fecha": "2026-03-29",
+          "hora": null,
+          "local": "Navia CF",
+          "visitante": "Candás CF",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J27"
+        },
+        {
+          "fecha": "2026-03-29",
+          "hora": null,
+          "local": "C.D. Treviense",
+          "visitante": "Llaranes C.F.",
+          "goles_local": 2,
+          "goles_visitante": 4,
+          "fase": "J27"
+        },
+        {
+          "fecha": "2026-03-29",
+          "hora": null,
+          "local": "Boal CF",
+          "visitante": "Siderúrgico C.F.",
+          "goles_local": 0,
+          "goles_visitante": 3,
+          "fase": "J27"
+        },
+        {
+          "fecha": "2026-03-29",
+          "hora": null,
+          "local": "Marítimo Racing Club",
+          "visitante": "Codema",
+          "goles_local": 5,
+          "goles_visitante": 1,
+          "fase": "J27"
+        }
+      ]
+    },
+    {
+      "jornada": 28,
+      "partidos": [
+        {
+          "fecha": "2026-04-02",
+          "hora": null,
+          "local": "Fabril C.D.",
+          "visitante": "Podes C.F.",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J28"
+        },
+        {
+          "fecha": "2026-04-03",
+          "hora": null,
+          "local": "Vegadeo Club De Fútbol",
+          "visitante": "SD Narcea",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "fase": "J28"
+        },
+        {
+          "fecha": "2026-04-04",
+          "hora": null,
+          "local": "Candás CF",
+          "visitante": "Triple A.Gijón",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "fase": "J28"
+        },
+        {
+          "fecha": "2026-04-05",
+          "hora": null,
+          "local": "CD Praviano B",
+          "visitante": "Marítimo Racing Club",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "fase": "J28"
+        },
+        {
+          "fecha": "2026-04-05",
+          "hora": null,
+          "local": "Llaranes C.F.",
+          "visitante": "Real Avilés B",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "fase": "J28"
+        },
+        {
+          "fecha": "2026-04-05",
+          "hora": null,
+          "local": "Siderúrgico C.F.",
+          "visitante": "Asunción C.F.",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "fase": "J28"
+        },
+        {
+          "fecha": "2026-04-05",
+          "hora": null,
+          "local": "Codema",
+          "visitante": "Boal CF",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "fase": "J28"
+        },
+        {
+          "fecha": "2026-04-05",
+          "hora": null,
+          "local": "Gozon Club De Futbol",
+          "visitante": "Navia CF",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "fase": "J28"
+        },
+        {
+          "fecha": "2026-04-05",
+          "hora": null,
+          "local": "Camocha",
+          "visitante": "C.D. Treviense",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "fase": "J28"
+        }
+      ]
+    },
+    {
+      "jornada": 29,
+      "partidos": [
+        {
+          "fecha": "2026-04-12",
+          "hora": null,
+          "local": "Marítimo Racing Club",
+          "visitante": "Fabril C.D.",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "fase": "J29"
+        },
+        {
+          "fecha": "2026-04-12",
+          "hora": null,
+          "local": "Asunción C.F.",
+          "visitante": "Codema",
+          "goles_local": 3,
+          "goles_visitante": 4,
+          "fase": "J29"
+        },
+        {
+          "fecha": "2026-04-12",
+          "hora": null,
+          "local": "Podes C.F.",
+          "visitante": "Vegadeo Club De Fútbol",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "fase": "J29"
+        },
+        {
+          "fecha": "2026-04-12",
+          "hora": null,
+          "local": "SD Narcea",
+          "visitante": "Candás CF",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "fase": "J29"
+        },
+        {
+          "fecha": "2026-04-12",
+          "hora": null,
+          "local": "Navia CF",
+          "visitante": "Llaranes C.F.",
+          "goles_local": 5,
+          "goles_visitante": 1,
+          "fase": "J29"
+        },
+        {
+          "fecha": "2026-04-12",
+          "hora": null,
+          "local": "Real Avilés B",
+          "visitante": "Camocha",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J29"
+        },
+        {
+          "fecha": "2026-04-12",
+          "hora": null,
+          "local": "C.D. Treviense",
+          "visitante": "Siderúrgico C.F.",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "fase": "J29"
+        },
+        {
+          "fecha": "2026-04-12",
+          "hora": null,
+          "local": "Boal CF",
+          "visitante": "CD Praviano B",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "fase": "J29"
+        },
+        {
+          "fecha": "2026-04-12",
+          "hora": null,
+          "local": "Triple A.Gijón",
+          "visitante": "Gozon Club De Futbol",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J29"
+        }
+      ]
+    },
+    {
+      "jornada": 30,
+      "partidos": [
+        {
+          "fecha": "2026-04-18",
+          "hora": null,
+          "local": "Gozon Club De Futbol",
+          "visitante": "SD Narcea",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J30"
+        },
+        {
+          "fecha": "2026-04-18",
+          "hora": null,
+          "local": "Fabril C.D.",
+          "visitante": "Boal CF",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "fase": "J30"
+        },
+        {
+          "fecha": "2026-04-19",
+          "hora": null,
+          "local": "Candás CF",
+          "visitante": "Vegadeo Club De Fútbol",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "fase": "J30"
+        },
+        {
+          "fecha": "2026-04-19",
+          "hora": null,
+          "local": "Llaranes C.F.",
+          "visitante": "Triple A.Gijón",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "fase": "J30"
+        },
+        {
+          "fecha": "2026-04-19",
+          "hora": null,
+          "local": "Codema",
+          "visitante": "C.D. Treviense",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "fase": "J30"
+        },
+        {
+          "fecha": "2026-04-19",
+          "hora": null,
+          "local": "Siderúrgico C.F.",
+          "visitante": "Real Avilés B",
+          "goles_local": 2,
+          "goles_visitante": 4,
+          "fase": "J30"
+        },
+        {
+          "fecha": "2026-04-19",
+          "hora": null,
+          "local": "CD Praviano B",
+          "visitante": "Asunción C.F.",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J30"
+        },
+        {
+          "fecha": "2026-04-19",
+          "hora": null,
+          "local": "Marítimo Racing Club",
+          "visitante": "Podes C.F.",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "fase": "J30"
+        },
+        {
+          "fecha": "2026-04-19",
+          "hora": null,
+          "local": "Camocha",
+          "visitante": "Navia CF",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J30"
+        }
+      ]
+    },
+    {
+      "jornada": 31,
+      "partidos": [
+        {
+          "fecha": "2026-04-25",
+          "hora": null,
+          "local": "Real Avilés B",
+          "visitante": "Codema",
+          "goles_local": 8,
+          "goles_visitante": 0,
+          "fase": "J31"
+        },
+        {
+          "fecha": "2026-04-26",
+          "hora": null,
+          "local": "SD Narcea",
+          "visitante": "Llaranes C.F.",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "fase": "J31"
+        },
+        {
+          "fecha": "2026-04-26",
+          "hora": null,
+          "local": "Asunción C.F.",
+          "visitante": "Fabril C.D.",
+          "goles_local": 4,
+          "goles_visitante": 2,
+          "fase": "J31"
+        },
+        {
+          "fecha": "2026-04-26",
+          "hora": null,
+          "local": "Podes C.F.",
+          "visitante": "Candás CF",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J31"
+        },
+        {
+          "fecha": "2026-04-26",
+          "hora": null,
+          "local": "Triple A.Gijón",
+          "visitante": "Camocha",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J31"
+        },
+        {
+          "fecha": "2026-04-26",
+          "hora": null,
+          "local": "Navia CF",
+          "visitante": "Siderúrgico C.F.",
+          "goles_local": 4,
+          "goles_visitante": 3,
+          "fase": "J31"
+        },
+        {
+          "fecha": "2026-04-26",
+          "hora": null,
+          "local": "C.D. Treviense",
+          "visitante": "CD Praviano B",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "fase": "J31"
+        },
+        {
+          "fecha": "2026-04-26",
+          "hora": null,
+          "local": "Boal CF",
+          "visitante": "Marítimo Racing Club",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "fase": "J31"
+        },
+        {
+          "fecha": "2026-04-26",
+          "hora": null,
+          "local": "Vegadeo Club De Fútbol",
+          "visitante": "Gozon Club De Futbol",
+          "goles_local": 0,
+          "goles_visitante": 3,
+          "fase": "J31"
+        }
+      ]
+    },
+    {
+      "jornada": 32,
+      "partidos": [
+        {
+          "fecha": "2026-05-01",
+          "hora": null,
+          "local": "Gozon Club De Futbol",
+          "visitante": "Candás CF",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "fase": "J32"
+        },
+        {
+          "fecha": "2026-05-02",
+          "hora": null,
+          "local": "Camocha",
+          "visitante": "SD Narcea",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "fase": "J32"
+        },
+        {
+          "fecha": "2026-05-03",
+          "hora": null,
+          "local": "Fabril C.D.",
+          "visitante": "C.D. Treviense",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J32"
+        },
+        {
+          "fecha": "2026-05-03",
+          "hora": null,
+          "local": "Llaranes C.F.",
+          "visitante": "Vegadeo Club De Fútbol",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J32"
+        },
+        {
+          "fecha": "2026-05-03",
+          "hora": null,
+          "local": "CD Praviano B",
+          "visitante": "Real Avilés B",
+          "goles_local": 1,
+          "goles_visitante": 5,
+          "fase": "J32"
+        },
+        {
+          "fecha": "2026-05-03",
+          "hora": null,
+          "local": "Marítimo Racing Club",
+          "visitante": "Asunción C.F.",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J32"
+        },
+        {
+          "fecha": "2026-05-03",
+          "hora": null,
+          "local": "Siderúrgico C.F.",
+          "visitante": "Triple A.Gijón",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J32"
+        },
+        {
+          "fecha": "2026-05-03",
+          "hora": null,
+          "local": "Boal CF",
+          "visitante": "Podes C.F.",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "fase": "J32"
+        },
+        {
+          "fecha": "2026-05-03",
+          "hora": null,
+          "local": "Codema",
+          "visitante": "Navia CF",
+          "goles_local": 3,
+          "goles_visitante": 4,
+          "fase": "J32"
+        }
+      ]
+    },
+    {
+      "jornada": 33,
+      "partidos": [
+        {
+          "fecha": "2026-05-09",
+          "hora": null,
+          "local": "Real Avilés B",
+          "visitante": "Fabril C.D.",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J33"
+        },
+        {
+          "fecha": "2026-05-10",
+          "hora": null,
+          "local": "Candás CF",
+          "visitante": "Llaranes C.F.",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J33"
+        },
+        {
+          "fecha": "2026-05-10",
+          "hora": null,
+          "local": "Asunción C.F.",
+          "visitante": "Boal CF",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "fase": "J33"
+        },
+        {
+          "fecha": "2026-05-10",
+          "hora": null,
+          "local": "Gozon Club De Futbol",
+          "visitante": "Podes C.F.",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J33"
+        },
+        {
+          "fecha": "2026-05-10",
+          "hora": null,
+          "local": "SD Narcea",
+          "visitante": "Siderúrgico C.F.",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "fase": "J33"
+        },
+        {
+          "fecha": "2026-05-10",
+          "hora": null,
+          "local": "Navia CF",
+          "visitante": "CD Praviano B",
+          "goles_local": 5,
+          "goles_visitante": 1,
+          "fase": "J33"
+        },
+        {
+          "fecha": "2026-05-10",
+          "hora": null,
+          "local": "C.D. Treviense",
+          "visitante": "Marítimo Racing Club",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "fase": "J33"
+        },
+        {
+          "fecha": "2026-05-10",
+          "hora": null,
+          "local": "Vegadeo Club De Fútbol",
+          "visitante": "Camocha",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J33"
+        },
+        {
+          "fecha": "2026-05-10",
+          "hora": null,
+          "local": "Triple A.Gijón",
+          "visitante": "Codema",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "fase": "J33"
+        }
+      ]
+    },
+    {
+      "jornada": 34,
+      "partidos": [
+        {
+          "fecha": "2026-05-16",
+          "hora": null,
+          "local": "CD Praviano B",
+          "visitante": "Triple A.Gijón",
+          "goles_local": 4,
+          "goles_visitante": 4,
+          "fase": "J34"
+        },
+        {
+          "fecha": "2026-05-16",
+          "hora": null,
+          "local": "Marítimo Racing Club",
+          "visitante": "Real Avilés B",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "fase": "J34"
+        },
+        {
+          "fecha": "2026-05-17",
+          "hora": null,
+          "local": "Llaranes C.F.",
+          "visitante": "Gozon Club De Futbol",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "fase": "J34"
+        },
+        {
+          "fecha": "2026-05-17",
+          "hora": null,
+          "local": "Camocha",
+          "visitante": "Candás CF",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "fase": "J34"
+        },
+        {
+          "fecha": "2026-05-17",
+          "hora": null,
+          "local": "Siderúrgico C.F.",
+          "visitante": "Vegadeo Club De Fútbol",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "fase": "J34"
+        },
+        {
+          "fecha": "2026-05-17",
+          "hora": null,
+          "local": "Codema",
+          "visitante": "SD Narcea",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "fase": "J34"
+        },
+        {
+          "fecha": "2026-05-17",
+          "hora": null,
+          "local": "Fabril C.D.",
+          "visitante": "Navia CF",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "fase": "J34"
+        },
+        {
+          "fecha": "2026-05-17",
+          "hora": null,
+          "local": "Podes C.F.",
+          "visitante": "Asunción C.F.",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "fase": "J34"
+        },
+        {
+          "fecha": "2026-05-17",
+          "hora": null,
+          "local": "Boal CF",
+          "visitante": "C.D. Treviense",
+          "goles_local": 0,
+          "goles_visitante": 4,
+          "fase": "J34"
+        }
+      ]
+    }
+  ]
+}

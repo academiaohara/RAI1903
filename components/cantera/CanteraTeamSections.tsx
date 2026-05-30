@@ -4,6 +4,7 @@ import { useState } from "react";
 import { SubsectionFilterNav } from "@/components/SubsectionFilterNav";
 import { LeagueTable } from "@/components/LeagueTable";
 import { MatchCard } from "@/components/MatchCard";
+import { FILIAL_TEAM_ID } from "@/lib/segunda-asturfutbol-2526";
 import type { AcademyTeam } from "@/types";
 
 const sections = [
@@ -20,6 +21,7 @@ type CanteraTeamSectionsProps = {
 
 export function CanteraTeamSections({ team }: CanteraTeamSectionsProps) {
   const [activeSection, setActiveSection] = useState<SectionId>("plantilla");
+  const highlightTeamId = team.id === "filial" ? FILIAL_TEAM_ID : undefined;
 
   return (
     <div className="space-y-5">
@@ -53,12 +55,14 @@ export function CanteraTeamSections({ team }: CanteraTeamSectionsProps) {
       {activeSection === "calendario" && (
         <div className="space-y-3">
           {team.calendar.map((match) => (
-            <MatchCard key={match.id} match={match} compact />
+            <MatchCard key={match.id} match={match} compact highlightTeamId={highlightTeamId} />
           ))}
         </div>
       )}
 
-      {activeSection === "clasificacion" && <LeagueTable teams={team.table} compact />}
+      {activeSection === "clasificacion" && (
+        <LeagueTable teams={team.table} compact highlightTeamId={highlightTeamId} clubHighlightTeamId={highlightTeamId} />
+      )}
     </div>
   );
 }
