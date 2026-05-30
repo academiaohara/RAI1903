@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useHorizontalWheelScroll } from "@/lib/use-horizontal-wheel-scroll";
 import { useCallback, useRef, useState } from "react";
 import { youtubeEmbedUrl, youtubeVideoId } from "@/lib/youtube";
 import type { FanYouTubeVideo } from "@/types";
@@ -21,6 +22,7 @@ export function ZonaMixtaVideoShowcase({ videos }: ZonaMixtaVideoShowcaseProps) 
 
   const [carouselIndex, setCarouselIndex] = useState(0);
   const trackRef = useRef<HTMLDivElement>(null);
+  const handleWheel = useHorizontalWheelScroll();
 
   const scrollToIndex = useCallback(
     (index: number) => {
@@ -86,7 +88,8 @@ export function ZonaMixtaVideoShowcase({ videos }: ZonaMixtaVideoShowcaseProps) 
 
           <div
             ref={trackRef}
-            className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto pb-1"
+            onWheel={handleWheel}
+            className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-1"
           >
             {carouselItems.map((video) => (
               <article
