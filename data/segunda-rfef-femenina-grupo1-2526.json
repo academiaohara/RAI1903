@@ -1,0 +1,1410 @@
+{
+  "jornadas": [
+    {
+      "jornada": 1,
+      "partidos": [
+        {
+          "fecha": "06 SEP 2025",
+          "local": "Athletic Club B Fem",
+          "visitante": "Atlético Villalonga Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "06 SEP 2025",
+          "local": "Eibar B Fem",
+          "visitante": "Racing Fem",
+          "goles_local": 0,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "06 SEP 2025",
+          "local": "Celta Fem",
+          "visitante": "Club Bizkerre Fem",
+          "goles_local": 3,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "06 SEP 2025",
+          "local": "Olímpico de León Fem",
+          "visitante": "Real Sporting Fem",
+          "goles_local": 0,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "06 SEP 2025",
+          "local": "Real Avilés Fem",
+          "visitante": "Burgos CF Fem",
+          "goles_local": 0,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "07 SEP 2025",
+          "local": "Atlético C Fem",
+          "visitante": "R. Sociedad B Fem",
+          "goles_local": 1,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "07 SEP 2025",
+          "local": "Deportivo Abanca B Fem",
+          "visitante": "Madrid CFF B Fem",
+          "goles_local": 2,
+          "goles_visitante": 1
+        }
+      ]
+    },
+    {
+      "jornada": 2,
+      "partidos": [
+        {
+          "fecha": "13 SEP 2025",
+          "local": "Celta Fem",
+          "visitante": "Atlético C Fem",
+          "goles_local": 5,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "14 SEP 2025",
+          "local": "Racing Fem",
+          "visitante": "Atlético Villalonga Fem",
+          "goles_local": 8,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "14 SEP 2025",
+          "local": "Club Bizkerre Fem",
+          "visitante": "Deportivo Abanca B Fem",
+          "goles_local": 0,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "14 SEP 2025",
+          "local": "Real Sporting Fem",
+          "visitante": "Real Avilés Fem",
+          "goles_local": 2,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "14 SEP 2025",
+          "local": "Burgos CF Fem",
+          "visitante": "Olímpico de León Fem",
+          "goles_local": 1,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "14 SEP 2025",
+          "local": "Madrid CFF B Fem",
+          "visitante": "Eibar B Fem",
+          "goles_local": 4,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "14 SEP 2025",
+          "local": "R. Sociedad B Fem",
+          "visitante": "Athletic Club B Fem",
+          "goles_local": 1,
+          "goles_visitante": 2
+        }
+      ]
+    },
+    {
+      "jornada": 3,
+      "partidos": [
+        {
+          "fecha": "20 SEP 2025",
+          "local": "Atlético Villalonga Fem",
+          "visitante": "Real Sporting Fem",
+          "goles_local": 2,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "20 SEP 2025",
+          "local": "Olímpico de León Fem",
+          "visitante": "Celta Fem",
+          "goles_local": 1,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "20 SEP 2025",
+          "local": "Eibar B Fem",
+          "visitante": "Club Bizkerre Fem",
+          "goles_local": 2,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "21 SEP 2025",
+          "local": "Deportivo Abanca B Fem",
+          "visitante": "Atlético C Fem",
+          "goles_local": 4,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "21 SEP 2025",
+          "local": "Real Avilés Fem",
+          "visitante": "R. Sociedad B Fem",
+          "goles_local": 0,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "21 SEP 2025",
+          "local": "Athletic Club B Fem",
+          "visitante": "Madrid CFF B Fem",
+          "goles_local": 3,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "21 SEP 2025",
+          "local": "Burgos CF Fem",
+          "visitante": "Racing Fem",
+          "goles_local": 1,
+          "goles_visitante": 2
+        }
+      ]
+    },
+    {
+      "jornada": 4,
+      "partidos": [
+        {
+          "fecha": "27 SEP 2025",
+          "local": "Club Bizkerre Fem",
+          "visitante": "Burgos CF Fem",
+          "goles_local": 1,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "27 SEP 2025",
+          "local": "Eibar B Fem",
+          "visitante": "Real Sporting Fem",
+          "goles_local": 3,
+          "goles_visitante": 4
+        },
+        {
+          "fecha": "27 SEP 2025",
+          "local": "Real Avilés Fem",
+          "visitante": "Deportivo Abanca B Fem",
+          "goles_local": 0,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "28 SEP 2025",
+          "local": "Celta Fem",
+          "visitante": "Athletic Club B Fem",
+          "goles_local": 3,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "28 SEP 2025",
+          "local": "Atlético C Fem",
+          "visitante": "Racing Fem",
+          "goles_local": 2,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "28 SEP 2025",
+          "local": "R. Sociedad B Fem",
+          "visitante": "Atlético Villalonga Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "28 SEP 2025",
+          "local": "Madrid CFF B Fem",
+          "visitante": "Olímpico de León Fem",
+          "goles_local": 2,
+          "goles_visitante": 1
+        }
+      ]
+    },
+    {
+      "jornada": 5,
+      "partidos": [
+        {
+          "fecha": "04 OCT 2025",
+          "local": "Olímpico de León Fem",
+          "visitante": "Real Avilés Fem",
+          "goles_local": 0,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "04 OCT 2025",
+          "local": "Atlético Villalonga Fem",
+          "visitante": "Madrid CFF B Fem",
+          "goles_local": 0,
+          "goles_visitante": 3
+        },
+        {
+          "fecha": "04 OCT 2025",
+          "local": "Athletic Club B Fem",
+          "visitante": "Atlético C Fem",
+          "goles_local": 3,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "05 OCT 2025",
+          "local": "Racing Fem",
+          "visitante": "Celta Fem",
+          "goles_local": 3,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "05 OCT 2025",
+          "local": "Real Sporting Fem",
+          "visitante": "Club Bizkerre Fem",
+          "goles_local": 2,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "05 OCT 2025",
+          "local": "Burgos CF Fem",
+          "visitante": "Eibar B Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "05 OCT 2025",
+          "local": "Deportivo Abanca B Fem",
+          "visitante": "R. Sociedad B Fem",
+          "goles_local": 1,
+          "goles_visitante": 2
+        }
+      ]
+    },
+    {
+      "jornada": 6,
+      "partidos": [
+        {
+          "fecha": "11 OCT 2025",
+          "local": "Celta Fem",
+          "visitante": "Deportivo Abanca B Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "11 OCT 2025",
+          "local": "Atlético C Fem",
+          "visitante": "Burgos CF Fem",
+          "goles_local": 2,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "11 OCT 2025",
+          "local": "Madrid CFF B Fem",
+          "visitante": "Racing Fem",
+          "goles_local": 0,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "11 OCT 2025",
+          "local": "Club Bizkerre Fem",
+          "visitante": "Olímpico de León Fem",
+          "goles_local": 3,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "11 OCT 2025",
+          "local": "Real Avilés Fem",
+          "visitante": "Athletic Club B Fem",
+          "goles_local": 1,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "12 OCT 2025",
+          "local": "Eibar B Fem",
+          "visitante": "Atlético Villalonga Fem",
+          "goles_local": 2,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "12 OCT 2025",
+          "local": "R. Sociedad B Fem",
+          "visitante": "Real Sporting Fem",
+          "goles_local": 2,
+          "goles_visitante": 0
+        }
+      ]
+    },
+    {
+      "jornada": 7,
+      "partidos": [
+        {
+          "fecha": "18 OCT 2025",
+          "local": "R. Sociedad B Fem",
+          "visitante": "Club Bizkerre Fem",
+          "goles_local": 4,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "18 OCT 2025",
+          "local": "Real Sporting Fem",
+          "visitante": "Burgos CF Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "18 OCT 2025",
+          "local": "Olímpico de León Fem",
+          "visitante": "Atlético C Fem",
+          "goles_local": 0,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "18 OCT 2025",
+          "local": "Atlético Villalonga Fem",
+          "visitante": "Celta Fem",
+          "goles_local": 1,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "19 OCT 2025",
+          "local": "Athletic Club B Fem",
+          "visitante": "Eibar B Fem",
+          "goles_local": 3,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "19 OCT 2025",
+          "local": "Racing Fem",
+          "visitante": "Deportivo Abanca B Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "19 OCT 2025",
+          "local": "Madrid CFF B Fem",
+          "visitante": "Real Avilés Fem",
+          "goles_local": 1,
+          "goles_visitante": 1
+        }
+      ]
+    },
+    {
+      "jornada": 8,
+      "partidos": [
+        {
+          "fecha": "01 NOV 2025",
+          "local": "Celta Fem",
+          "visitante": "R. Sociedad B Fem",
+          "goles_local": 2,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "01 NOV 2025",
+          "local": "Olímpico de León Fem",
+          "visitante": "Atlético Villalonga Fem",
+          "goles_local": 2,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "01 NOV 2025",
+          "local": "Club Bizkerre Fem",
+          "visitante": "Athletic Club B Fem",
+          "goles_local": 2,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "01 NOV 2025",
+          "local": "Real Avilés Fem",
+          "visitante": "Racing Fem",
+          "goles_local": 1,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "02 NOV 2025",
+          "local": "Burgos CF Fem",
+          "visitante": "Madrid CFF B Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "02 NOV 2025",
+          "local": "Deportivo Abanca B Fem",
+          "visitante": "Eibar B Fem",
+          "goles_local": 0,
+          "goles_visitante": 4
+        },
+        {
+          "fecha": "02 NOV 2025",
+          "local": "Atlético C Fem",
+          "visitante": "Real Sporting Fem",
+          "goles_local": 3,
+          "goles_visitante": 0
+        }
+      ]
+    },
+    {
+      "jornada": 9,
+      "partidos": [
+        {
+          "fecha": "08 NOV 2025",
+          "local": "Athletic Club B Fem",
+          "visitante": "Burgos CF Fem",
+          "goles_local": 2,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "08 NOV 2025",
+          "local": "Eibar B Fem",
+          "visitante": "Real Avilés Fem",
+          "goles_local": 3,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "08 NOV 2025",
+          "local": "Real Sporting Fem",
+          "visitante": "Deportivo Abanca B Fem",
+          "goles_local": 0,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "08 NOV 2025",
+          "local": "Atlético Villalonga Fem",
+          "visitante": "Atlético C Fem",
+          "goles_local": 1,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "08 NOV 2025",
+          "local": "R. Sociedad B Fem",
+          "visitante": "Olímpico de León Fem",
+          "goles_local": 5,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "09 NOV 2025",
+          "local": "Racing Fem",
+          "visitante": "Club Bizkerre Fem",
+          "goles_local": 2,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "09 NOV 2025",
+          "local": "Madrid CFF B Fem",
+          "visitante": "Celta Fem",
+          "goles_local": 0,
+          "goles_visitante": 1
+        }
+      ]
+    },
+    {
+      "jornada": 10,
+      "partidos": [
+        {
+          "fecha": "15 NOV 2025",
+          "local": "Olímpico de León Fem",
+          "visitante": "Racing Fem",
+          "goles_local": 1,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "15 NOV 2025",
+          "local": "Atlético C Fem",
+          "visitante": "Eibar B Fem",
+          "goles_local": 0,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "15 NOV 2025",
+          "local": "Club Bizkerre Fem",
+          "visitante": "Atlético Villalonga Fem",
+          "goles_local": 0,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "15 NOV 2025",
+          "local": "Real Sporting Fem",
+          "visitante": "Madrid CFF B Fem",
+          "goles_local": 3,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "15 NOV 2025",
+          "local": "Celta Fem",
+          "visitante": "Real Avilés Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "16 NOV 2025",
+          "local": "Burgos CF Fem",
+          "visitante": "R. Sociedad B Fem",
+          "goles_local": 2,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "16 NOV 2025",
+          "local": "Deportivo Abanca B Fem",
+          "visitante": "Athletic Club B Fem",
+          "goles_local": 1,
+          "goles_visitante": 2
+        }
+      ]
+    },
+    {
+      "jornada": 11,
+      "partidos": [
+        {
+          "fecha": "22 NOV 2025",
+          "local": "Athletic Club B Fem",
+          "visitante": "Real Sporting Fem",
+          "goles_local": 3,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "22 NOV 2025",
+          "local": "Real Avilés Fem",
+          "visitante": "Atlético C Fem",
+          "goles_local": 2,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "22 NOV 2025",
+          "local": "Atlético Villalonga Fem",
+          "visitante": "Burgos CF Fem",
+          "goles_local": 0,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "23 NOV 2025",
+          "local": "Eibar B Fem",
+          "visitante": "Celta Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "23 NOV 2025",
+          "local": "Racing Fem",
+          "visitante": "R. Sociedad B Fem",
+          "goles_local": 3,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "23 NOV 2025",
+          "local": "Madrid CFF B Fem",
+          "visitante": "Club Bizkerre Fem",
+          "goles_local": 2,
+          "goles_visitante": 3
+        },
+        {
+          "fecha": "23 NOV 2025",
+          "local": "Deportivo Abanca B Fem",
+          "visitante": "Olímpico de León Fem",
+          "goles_local": 0,
+          "goles_visitante": 3
+        }
+      ]
+    },
+    {
+      "jornada": 12,
+      "partidos": [
+        {
+          "fecha": "06 DIC 2025",
+          "local": "Real Sporting Fem",
+          "visitante": "Racing Fem",
+          "goles_local": 1,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "06 DIC 2025",
+          "local": "Atlético C Fem",
+          "visitante": "Madrid CFF B Fem",
+          "goles_local": 3,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "06 DIC 2025",
+          "local": "Club Bizkerre Fem",
+          "visitante": "Real Avilés Fem",
+          "goles_local": 5,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "06 DIC 2025",
+          "local": "Olímpico de León Fem",
+          "visitante": "Athletic Club B Fem",
+          "goles_local": 1,
+          "goles_visitante": 4
+        },
+        {
+          "fecha": "06 DIC 2025",
+          "local": "Atlético Villalonga Fem",
+          "visitante": "Deportivo Abanca B Fem",
+          "goles_local": 0,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "07 DIC 2025",
+          "local": "Burgos CF Fem",
+          "visitante": "Celta Fem",
+          "goles_local": 2,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "07 DIC 2025",
+          "local": "R. Sociedad B Fem",
+          "visitante": "Eibar B Fem",
+          "goles_local": 4,
+          "goles_visitante": 1
+        }
+      ]
+    },
+    {
+      "jornada": 13,
+      "partidos": [
+        {
+          "fecha": "13 DIC 2025",
+          "local": "Deportivo Abanca B Fem",
+          "visitante": "Burgos CF Fem",
+          "goles_local": 0,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "13 DIC 2025",
+          "local": "Eibar B Fem",
+          "visitante": "Olímpico de León Fem",
+          "goles_local": 2,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "13 DIC 2025",
+          "local": "Real Avilés Fem",
+          "visitante": "Atlético Villalonga Fem",
+          "goles_local": 3,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "13 DIC 2025",
+          "local": "Celta Fem",
+          "visitante": "Real Sporting Fem",
+          "goles_local": 1,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "14 DIC 2025",
+          "local": "Madrid CFF B Fem",
+          "visitante": "R. Sociedad B Fem",
+          "goles_local": 0,
+          "goles_visitante": 5
+        },
+        {
+          "fecha": "14 DIC 2025",
+          "local": "Racing Fem",
+          "visitante": "Athletic Club B Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "14 DIC 2025",
+          "local": "Club Bizkerre Fem",
+          "visitante": "Atlético C Fem",
+          "goles_local": 1,
+          "goles_visitante": 2
+        }
+      ]
+    },
+    {
+      "jornada": 14,
+      "partidos": [
+        {
+          "fecha": "10 ENE 2026",
+          "local": "Real Sporting Fem",
+          "visitante": "Eibar B Fem",
+          "goles_local": 0,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "10 ENE 2026",
+          "local": "Burgos CF Fem",
+          "visitante": "Club Bizkerre Fem",
+          "goles_local": 2,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "10 ENE 2026",
+          "local": "Atlético Villalonga Fem",
+          "visitante": "Racing Fem",
+          "goles_local": 2,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "10 ENE 2026",
+          "local": "R. Sociedad B Fem",
+          "visitante": "Real Avilés Fem",
+          "goles_local": 2,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "11 ENE 2026",
+          "local": "Atlético C Fem",
+          "visitante": "Deportivo Abanca B Fem",
+          "goles_local": 0,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "11 ENE 2026",
+          "local": "Athletic Club B Fem",
+          "visitante": "Celta Fem",
+          "goles_local": 2,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "11 ENE 2026",
+          "local": "Olímpico de León Fem",
+          "visitante": "Madrid CFF B Fem",
+          "goles_local": 0,
+          "goles_visitante": 3
+        }
+      ]
+    },
+    {
+      "jornada": 15,
+      "partidos": [
+        {
+          "fecha": "17 ENE 2026",
+          "local": "Real Sporting Fem",
+          "visitante": "R. Sociedad B Fem",
+          "goles_local": 0,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "17 ENE 2026",
+          "local": "Celta Fem",
+          "visitante": "Olímpico de León Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "17 ENE 2026",
+          "local": "Athletic Club B Fem",
+          "visitante": "Real Avilés Fem",
+          "goles_local": 4,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "17 ENE 2026",
+          "local": "Deportivo Abanca B Fem",
+          "visitante": "Club Bizkerre Fem",
+          "goles_local": 1,
+          "goles_visitante": 6
+        },
+        {
+          "fecha": "17 ENE 2026",
+          "local": "Madrid CFF B Fem",
+          "visitante": "Atlético Villalonga Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "18 ENE 2026",
+          "local": "Eibar B Fem",
+          "visitante": "Burgos CF Fem",
+          "goles_local": 2,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "18 ENE 2026",
+          "local": "Racing Fem",
+          "visitante": "Atlético C Fem",
+          "goles_local": 6,
+          "goles_visitante": 1
+        }
+      ]
+    },
+    {
+      "jornada": 16,
+      "partidos": [
+        {
+          "fecha": "31 ENE 2026",
+          "local": "Atlético C Fem",
+          "visitante": "Celta Fem",
+          "goles_local": 1,
+          "goles_visitante": 3
+        },
+        {
+          "fecha": "31 ENE 2026",
+          "local": "Club Bizkerre Fem",
+          "visitante": "Eibar B Fem",
+          "goles_local": 0,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "31 ENE 2026",
+          "local": "Real Avilés Fem",
+          "visitante": "Olímpico de León Fem",
+          "goles_local": 1,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "31 ENE 2026",
+          "local": "Atlético Villalonga Fem",
+          "visitante": "Athletic Club B Fem",
+          "goles_local": 1,
+          "goles_visitante": 3
+        },
+        {
+          "fecha": "01 FEB 2026",
+          "local": "R. Sociedad B Fem",
+          "visitante": "Deportivo Abanca B Fem",
+          "goles_local": 5,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "01 FEB 2026",
+          "local": "Racing Fem",
+          "visitante": "Madrid CFF B Fem",
+          "goles_local": 1,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "01 FEB 2026",
+          "local": "Burgos CF Fem",
+          "visitante": "Real Sporting Fem",
+          "goles_local": 1,
+          "goles_visitante": 2
+        }
+      ]
+    },
+    {
+      "jornada": 17,
+      "partidos": [
+        {
+          "fecha": "07 FEB 2026",
+          "local": "Deportivo Abanca B Fem",
+          "visitante": "Racing Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "07 FEB 2026",
+          "local": "Real Sporting Fem",
+          "visitante": "Atlético C Fem",
+          "goles_local": 1,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "07 FEB 2026",
+          "local": "Eibar B Fem",
+          "visitante": "Madrid CFF B Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "07 FEB 2026",
+          "local": "Celta Fem",
+          "visitante": "Atlético Villalonga Fem",
+          "goles_local": 1,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "08 FEB 2026",
+          "local": "Athletic Club B Fem",
+          "visitante": "R. Sociedad B Fem",
+          "goles_local": 2,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "08 FEB 2026",
+          "local": "Burgos CF Fem",
+          "visitante": "Real Avilés Fem",
+          "goles_local": 4,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "28 FEB 2026",
+          "local": "Olímpico de León Fem",
+          "visitante": "Club Bizkerre Fem",
+          "goles_local": 0,
+          "goles_visitante": 1
+        }
+      ]
+    },
+    {
+      "jornada": 18,
+      "partidos": [
+        {
+          "fecha": "14 FEB 2026",
+          "local": "Club Bizkerre Fem",
+          "visitante": "Real Sporting Fem",
+          "goles_local": 2,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "14 FEB 2026",
+          "local": "R. Sociedad B Fem",
+          "visitante": "Celta Fem",
+          "goles_local": 1,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "14 FEB 2026",
+          "local": "Real Avilés Fem",
+          "visitante": "Eibar B Fem",
+          "goles_local": 0,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "14 FEB 2026",
+          "local": "Atlético Villalonga Fem",
+          "visitante": "Olímpico de León Fem",
+          "goles_local": 0,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "15 FEB 2026",
+          "local": "Racing Fem",
+          "visitante": "Burgos CF Fem",
+          "goles_local": 2,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "15 FEB 2026",
+          "local": "Atlético C Fem",
+          "visitante": "Athletic Club B Fem",
+          "goles_local": 2,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "15 FEB 2026",
+          "local": "Madrid CFF B Fem",
+          "visitante": "Deportivo Abanca B Fem",
+          "goles_local": 2,
+          "goles_visitante": 2
+        }
+      ]
+    },
+    {
+      "jornada": 19,
+      "partidos": [
+        {
+          "fecha": "21 FEB 2026",
+          "local": "Olímpico de León Fem",
+          "visitante": "R. Sociedad B Fem",
+          "goles_local": 1,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "21 FEB 2026",
+          "local": "Real Sporting Fem",
+          "visitante": "Atlético Villalonga Fem",
+          "goles_local": 2,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "21 FEB 2026",
+          "local": "Celta Fem",
+          "visitante": "Madrid CFF B Fem",
+          "goles_local": 2,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "21 FEB 2026",
+          "local": "Club Bizkerre Fem",
+          "visitante": "Racing Fem",
+          "goles_local": 0,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "21 FEB 2026",
+          "local": "Eibar B Fem",
+          "visitante": "Atlético C Fem",
+          "goles_local": 2,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "22 FEB 2026",
+          "local": "Burgos CF Fem",
+          "visitante": "Athletic Club B Fem",
+          "goles_local": 3,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "22 FEB 2026",
+          "local": "Deportivo Abanca B Fem",
+          "visitante": "Real Avilés Fem",
+          "goles_local": 2,
+          "goles_visitante": 2
+        }
+      ]
+    },
+    {
+      "jornada": 20,
+      "partidos": [
+        {
+          "fecha": "07 MAR 2026",
+          "local": "Athletic Club B Fem",
+          "visitante": "Deportivo Abanca B Fem",
+          "goles_local": 2,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "07 MAR 2026",
+          "local": "Real Avilés Fem",
+          "visitante": "Celta Fem",
+          "goles_local": 1,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "07 MAR 2026",
+          "local": "Atlético Villalonga Fem",
+          "visitante": "Club Bizkerre Fem",
+          "goles_local": 0,
+          "goles_visitante": 4
+        },
+        {
+          "fecha": "08 MAR 2026",
+          "local": "R. Sociedad B Fem",
+          "visitante": "Burgos CF Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "08 MAR 2026",
+          "local": "Racing Fem",
+          "visitante": "Eibar B Fem",
+          "goles_local": 1,
+          "goles_visitante": 3
+        },
+        {
+          "fecha": "08 MAR 2026",
+          "local": "Atlético C Fem",
+          "visitante": "Olímpico de León Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "08 MAR 2026",
+          "local": "Madrid CFF B Fem",
+          "visitante": "Real Sporting Fem",
+          "goles_local": 2,
+          "goles_visitante": 0
+        }
+      ]
+    },
+    {
+      "jornada": 21,
+      "partidos": [
+        {
+          "fecha": "14 MAR 2026",
+          "local": "Eibar B Fem",
+          "visitante": "R. Sociedad B Fem",
+          "goles_local": 0,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "14 MAR 2026",
+          "local": "Club Bizkerre Fem",
+          "visitante": "Madrid CFF B Fem",
+          "goles_local": 2,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "14 MAR 2026",
+          "local": "Olímpico de León Fem",
+          "visitante": "Deportivo Abanca B Fem",
+          "goles_local": 2,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "14 MAR 2026",
+          "local": "Real Sporting Fem",
+          "visitante": "Athletic Club B Fem",
+          "goles_local": 1,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "14 MAR 2026",
+          "local": "Burgos CF Fem",
+          "visitante": "Atlético Villalonga Fem",
+          "goles_local": 2,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "15 MAR 2026",
+          "local": "Celta Fem",
+          "visitante": "Racing Fem",
+          "goles_local": 1,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "15 MAR 2026",
+          "local": "Atlético C Fem",
+          "visitante": "Real Avilés Fem",
+          "goles_local": 0,
+          "goles_visitante": 0
+        }
+      ]
+    },
+    {
+      "jornada": 22,
+      "partidos": [
+        {
+          "fecha": "21 MAR 2026",
+          "local": "Deportivo Abanca B Fem",
+          "visitante": "Celta Fem",
+          "goles_local": 1,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "21 MAR 2026",
+          "local": "Real Avilés Fem",
+          "visitante": "Club Bizkerre Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "21 MAR 2026",
+          "local": "Atlético Villalonga Fem",
+          "visitante": "Eibar B Fem",
+          "goles_local": 1,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "21 MAR 2026",
+          "local": "R. Sociedad B Fem",
+          "visitante": "Atlético C Fem",
+          "goles_local": 2,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "22 MAR 2026",
+          "local": "Racing Fem",
+          "visitante": "Real Sporting Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "22 MAR 2026",
+          "local": "Athletic Club B Fem",
+          "visitante": "Olímpico de León Fem",
+          "goles_local": 3,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "22 MAR 2026",
+          "local": "Madrid CFF B Fem",
+          "visitante": "Burgos CF Fem",
+          "goles_local": 0,
+          "goles_visitante": 1
+        }
+      ]
+    },
+    {
+      "jornada": 23,
+      "partidos": [
+        {
+          "fecha": "28 MAR 2026",
+          "local": "Eibar B Fem",
+          "visitante": "Athletic Club B Fem",
+          "goles_local": 0,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "28 MAR 2026",
+          "local": "Racing Fem",
+          "visitante": "Real Avilés Fem",
+          "goles_local": 2,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "28 MAR 2026",
+          "local": "Madrid CFF B Fem",
+          "visitante": "Atlético C Fem",
+          "goles_local": 2,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "28 MAR 2026",
+          "local": "Club Bizkerre Fem",
+          "visitante": "Celta Fem",
+          "goles_local": 2,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "28 MAR 2026",
+          "local": "Atlético Villalonga Fem",
+          "visitante": "R. Sociedad B Fem",
+          "goles_local": 1,
+          "goles_visitante": 5
+        },
+        {
+          "fecha": "29 MAR 2026",
+          "local": "Burgos CF Fem",
+          "visitante": "Deportivo Abanca B Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "29 MAR 2026",
+          "local": "Real Sporting Fem",
+          "visitante": "Olímpico de León Fem",
+          "goles_local": 3,
+          "goles_visitante": 1
+        }
+      ]
+    },
+    {
+      "jornada": 24,
+      "partidos": [
+        {
+          "fecha": "11 ABR 2026",
+          "local": "Athletic Club B Fem",
+          "visitante": "Racing Fem",
+          "goles_local": 2,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "11 ABR 2026",
+          "local": "Atlético C Fem",
+          "visitante": "Club Bizkerre Fem",
+          "goles_local": 5,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "11 ABR 2026",
+          "local": "Olímpico de León Fem",
+          "visitante": "Burgos CF Fem",
+          "goles_local": 2,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "11 ABR 2026",
+          "local": "Celta Fem",
+          "visitante": "Eibar B Fem",
+          "goles_local": 3,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "11 ABR 2026",
+          "local": "Deportivo Abanca B Fem",
+          "visitante": "Atlético Villalonga Fem",
+          "goles_local": 6,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "12 ABR 2026",
+          "local": "R. Sociedad B Fem",
+          "visitante": "Madrid CFF B Fem",
+          "goles_local": 1,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "12 ABR 2026",
+          "local": "Real Avilés Fem",
+          "visitante": "Real Sporting Fem",
+          "goles_local": 0,
+          "goles_visitante": 0
+        }
+      ]
+    },
+    {
+      "jornada": 25,
+      "partidos": [
+        {
+          "fecha": "18 ABR 2026",
+          "local": "Atlético Villalonga Fem",
+          "visitante": "Real Avilés Fem",
+          "goles_local": 3,
+          "goles_visitante": 4
+        },
+        {
+          "fecha": "19 ABR 2026",
+          "local": "Club Bizkerre Fem",
+          "visitante": "R. Sociedad B Fem",
+          "goles_local": 0,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "19 ABR 2026",
+          "local": "Racing Fem",
+          "visitante": "Olímpico de León Fem",
+          "goles_local": 3,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "19 ABR 2026",
+          "local": "Real Sporting Fem",
+          "visitante": "Celta Fem",
+          "goles_local": 3,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "19 ABR 2026",
+          "local": "Eibar B Fem",
+          "visitante": "Deportivo Abanca B Fem",
+          "goles_local": 0,
+          "goles_visitante": 3
+        },
+        {
+          "fecha": "19 ABR 2026",
+          "local": "Burgos CF Fem",
+          "visitante": "Atlético C Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "19 ABR 2026",
+          "local": "Madrid CFF B Fem",
+          "visitante": "Athletic Club B Fem",
+          "goles_local": 1,
+          "goles_visitante": 2
+        }
+      ]
+    },
+    {
+      "jornada": 26,
+      "partidos": [
+        {
+          "fecha": "25 ABR 2026",
+          "local": "Deportivo Abanca B Fem",
+          "visitante": "Real Sporting Fem",
+          "goles_local": 1,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "25 ABR 2026",
+          "local": "Athletic Club B Fem",
+          "visitante": "Club Bizkerre Fem",
+          "goles_local": 3,
+          "goles_visitante": 2
+        },
+        {
+          "fecha": "25 ABR 2026",
+          "local": "Atlético C Fem",
+          "visitante": "Atlético Villalonga Fem",
+          "goles_local": 4,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "26 ABR 2026",
+          "local": "Real Avilés Fem",
+          "visitante": "Madrid CFF B Fem",
+          "goles_local": 1,
+          "goles_visitante": 0
+        },
+        {
+          "fecha": "26 ABR 2026",
+          "local": "R. Sociedad B Fem",
+          "visitante": "Racing Fem",
+          "goles_local": 6,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "26 ABR 2026",
+          "local": "Celta Fem",
+          "visitante": "Burgos CF Fem",
+          "goles_local": 1,
+          "goles_visitante": 1
+        },
+        {
+          "fecha": "26 ABR 2026",
+          "local": "Olímpico de León Fem",
+          "visitante": "Eibar B Fem",
+          "goles_local": 2,
+          "goles_visitante": 1
+        }
+      ]
+    }
+  ],
+  "competicion": "2ª RFEF Femenina - Grupo I",
+  "temporada": "2025-2026"
+}

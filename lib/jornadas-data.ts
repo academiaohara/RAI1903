@@ -1,4 +1,5 @@
-import { matchdays, matchdaysGrupo2, RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
+import { matchdays, matchdaysFemenino, matchdaysGrupo2, RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
+import { SEGUNDA_RFEF_FEMENINA_LAST_ROUND } from "@/lib/segunda-rfef-femenina-2526";
 import {
   DEFINITIVE_QUALIFYING_LEAGUE_ROUND,
   buildPlayoffBracketThroughLeagueRound,
@@ -183,7 +184,39 @@ function matchdayByRound(matchdaysList: Matchday[], round: number): Matchday | u
  * Los partidos de liga provienen de los JSON de resultados; el playoff de ascenso
  * se genera desde el cuadro RFEF (clasificados definitivos o provisionales por jornada).
  */
+function buildFemeninoJornadasDataset(): JornadasDataset {
+  const raiId = RAI_FEM_TEAM_ID;
+  const currentRound = SEGUNDA_RFEF_FEMENINA_LAST_ROUND;
+  const currentRoundId: JornadaRoundId = `j${currentRound}`;
+
+  const leagueSummaries = [...matchdaysFemenino]
+    .sort((a, b) => a.round - b.round)
+    .map((md) => buildLeagueRoundSummary(md, raiId, currentRound));
+
+  const rounds: JornadaRoundSummary[] = leagueSummaries;
+  const leagueRoundDataCache = new Map<JornadaRoundId, JornadaRoundData>();
+
+  for (const summary of leagueSummaries) {
+    const round = summary.roundNumber!;
+    const matches = matchdayByRound(matchdaysFemenino, round)?.matches ?? [];
+    leagueRoundDataCache.set(summary.id, buildRoundData(summary, matches, [], raiId));
+  }
+
+  return {
+    rounds,
+    currentRoundId,
+    definitiveQualifyingLeagueRound: currentRound,
+    getRound(roundId) {
+      return leagueRoundDataCache.get(roundId) ?? leagueRoundDataCache.get(currentRoundId)!;
+    },
+  };
+}
+
 export function buildJornadasDataset(gender: PrimerEquipoGender): JornadasDataset {
+  if (gender === "femenino") {
+    return buildFemeninoJornadasDataset();
+  }
+
   const raiId = raiTeamId(gender);
   const currentRound = RESULTADOS_2526_LAST_ROUND;
   const currentRoundId: JornadaRoundId = `j${currentRound}`;

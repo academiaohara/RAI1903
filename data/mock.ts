@@ -14,6 +14,12 @@ import {
   getJuvenilAvilesCalendarMatches,
 } from "@/lib/cantera-data";
 import { buildFilialSummary } from "@/lib/segunda-asturfutbol-2526";
+import {
+  RAI_FEM_TEAM_ID,
+  SEGUNDA_RFEF_FEMENINA_DATA,
+  buildMatchdaysSegundaRfefFemenina,
+  buildTeamsSegundaRfefFemenina,
+} from "@/lib/segunda-rfef-femenina-2526";
 import { applyStandingsToTeams } from "@/lib/standings";
 import type {
   AcademyTeam,
@@ -32,9 +38,9 @@ import type {
 } from "@/types";
 
 export const RAI_TEAM_ID = "real-aviles-industrial";
-export const RAI_FEM_TEAM_ID = "real-aviles-industrial-femenino";
+export { RAI_FEM_TEAM_ID };
 export const COMPETITION_NAME = "1ª RFEF - Grupo I";
-export const COMPETITION_NAME_FEM = "Liga Femenina RAI1903";
+export const COMPETITION_NAME_FEM = SEGUNDA_RFEF_FEMENINA_DATA.competicion;
 
 export const competitionSeasons = [
   { id: "2024-25", label: "24/25" },
@@ -69,19 +75,8 @@ const baseTeams: Team[] = [
   { id: "osasuna-promesas", name: "CA Osasuna Promesas", shortName: "Osasuna B", city: "Pamplona", stadium: "Tajonar", coach: "Santi Castillejo", founded: 1967, crestInitials: "OSA", colors: ["#DC2626", "#1D2D50"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
 ];
 
-const baseTeamsFemenino: Team[] = baseTeams.map((team) =>
-  team.id === RAI_TEAM_ID
-    ? {
-        ...team,
-        id: RAI_FEM_TEAM_ID,
-        name: "Real Avilés Industrial Femenino",
-        shortName: "Avilés Fem.",
-        coach: "Laura Menendez",
-      }
-    : { ...team },
-);
-
 export const matchdays = buildMatchdaysFromResultados2526(baseTeams);
+export const matchdaysFemenino = buildMatchdaysSegundaRfefFemenina();
 export const matchdaysGrupo2 = buildMatchdaysGrupo2(baseTeamsGrupo2);
 
 export const copaDelReyMatches: Match[] = [
@@ -119,6 +114,7 @@ export const copaDelReyMatches: Match[] = [
 
 const leagueMatches = matchdays.flatMap((round) => round.matches);
 const leagueMatchesGrupo2 = matchdaysGrupo2.flatMap((round) => round.matches);
+const leagueMatchesFemenino = matchdaysFemenino.flatMap((round) => round.matches);
 
 const rfefTiebreak = PRIMERA_RFEF_RULES.tiebreak;
 const rfefZones = PRIMERA_RFEF_RULES.zones;
@@ -130,7 +126,7 @@ export const teamsGrupo2: Team[] = applyStandingsToTeams(
   rfefZones,
   rfefTiebreak,
 );
-export const teamsFemenino: Team[] = applyStandingsToTeams(baseTeamsFemenino, leagueMatches, rfefZones, rfefTiebreak);
+export const teamsFemenino: Team[] = buildTeamsSegundaRfefFemenina();
 
 export const primeraRfefPlayoffBracket = buildPlayoffBracketFromConfig(
   [
@@ -181,15 +177,22 @@ export const playersFemenino: Player[] = [
   { id: "fem-elena-rios", firstName: "Elena", lastName: "Rios", displayName: "E. Rios", number: 19, position: "Centrocampista", nationality: "España", age: 25, birthDate: "2001-12-30", height: "1,67 m", preferredFoot: "Izquierda", seasonsAtClub: 1, status: "sancionado", rating: 7.15, bio: "Media punta con vision y ultimo pase para activar a las delanteras.", clubHistory: ["Zaragoza CFF B", "Real Avilés Industrial Femenino"], stats: { appearances: 9, goals: 4, assists: 3, minutes: 688, yellowCards: 2, redCards: 0 } },
 ];
 
-const buildMatchArticles = (matches: Match[]): MatchArticle[] => {
-  const avilesMatches = matches.filter((match) => match.homeTeamId === RAI_TEAM_ID || match.awayTeamId === RAI_TEAM_ID);
+const buildMatchArticlesForClub = (
+  matches: Match[],
+  clubTeamId: string,
+  gender: "masculino" | "femenino",
+  idPrefix: string,
+): MatchArticle[] => {
+  const avilesMatches = matches.filter(
+    (match) => match.homeTeamId === clubTeamId || match.awayTeamId === clubTeamId,
+  );
   const finished = avilesMatches.filter((match) => match.status === "finished");
   const scheduled = avilesMatches.filter((match) => match.status === "scheduled").slice(0, 6);
 
   const cronicas: MatchArticle[] = finished.map((match) => ({
-    id: `cronica-${match.id}`,
+    id: `${idPrefix}cronica-${match.id}`,
     matchId: match.id,
-    gender: "masculino",
+    gender,
     type: "cronica",
     title: `Cronica: ${match.homeTeam} ${match.homeScore}-${match.awayScore} ${match.awayTeam}`,
     date: match.date,
@@ -200,23 +203,36 @@ const buildMatchArticles = (matches: Match[]): MatchArticle[] => {
   }));
 
   const previas: MatchArticle[] = scheduled.map((match) => ({
-    id: `previa-${match.id}`,
+    id: `${idPrefix}previa-${match.id}`,
     matchId: match.id,
-    gender: "masculino",
+    gender,
     type: "previa",
     title: `Previa: ${match.homeTeam} vs ${match.awayTeam}`,
     date: match.date,
-    source: "AsturFutbol",
-    excerpt: `Analisis del duelo de la jornada ${match.matchday}: forma reciente, claves tacticas y estado de la plantilla.`,
-    body: [
-      `El Real Avilés Industrial afronta la jornada ${match.matchday} ante ${match.awayTeamId === RAI_TEAM_ID ? match.homeTeam : match.awayTeam}.`,
-      "El cuerpo tecnico llega con la plantilla casi completa y rotaciones pensadas para sostener el ritmo competitivo.",
-      "La clave pasara por dominar los duelos en campo abierto y aprovechar las acciones a balon parado.",
-      "El Roman Suarez Puerta busca otro ambiente exigente para empujar al equipo en un tramo decisivo de la liga.",
-    ],
+    source: gender === "femenino" ? "Futbol Femenino Norte" : "AsturFutbol",
+    excerpt:
+      gender === "femenino"
+        ? `Analisis femenino de la jornada ${match.matchday} con estado de forma y convocatoria.`
+        : `Analisis del duelo de la jornada ${match.matchday}: forma reciente, claves tacticas y estado de la plantilla.`,
+    body:
+      gender === "femenino"
+        ? [
+            `El Avilés Femenino afronta la jornada ${match.matchday} con ambicion de sumar en la parte alta de la tabla.`,
+            "Laura Menendez cuenta con la base titular y rotaciones para mantener la intensidad.",
+            "La clave sera el duelo en bandas y la capacidad de cerrar el partido desde balon parado.",
+          ]
+        : [
+            `El Real Avilés Industrial afronta la jornada ${match.matchday} ante ${match.awayTeamId === clubTeamId ? match.homeTeam : match.awayTeam}.`,
+            "El cuerpo tecnico llega con la plantilla casi completa y rotaciones pensadas para sostener el ritmo competitivo.",
+            "La clave pasara por dominar los duelos en campo abierto y aprovechar las acciones a balon parado.",
+            "El Roman Suarez Puerta busca otro ambiente exigente para empujar al equipo en un tramo decisivo de la liga.",
+          ],
   }));
 
-  const femeninoExtras: MatchArticle[] = [
+  return [...cronicas, ...previas];
+};
+
+const femeninoExtras: MatchArticle[] = [
     {
       id: "cronica-fem-j8",
       matchId: "fem-j8-llanera",
@@ -249,38 +265,11 @@ const buildMatchArticles = (matches: Match[]): MatchArticle[] => {
     },
   ];
 
-  const cronicasFemenino: MatchArticle[] = finished.map((match) => ({
-    id: `cronica-fem-${match.id}`,
-    matchId: match.id,
-    gender: "femenino",
-    type: "cronica",
-    title: `Cronica femenina: ${match.homeTeam} ${match.homeScore}-${match.awayScore} ${match.awayTeam}`,
-    date: match.date,
-    source: "RAI1903",
-    excerpt: "Resumen del bloque femenino con protagonismo de Irene Costa y Claudia Nunez.",
-    body: [],
-  }));
-
-  const previasFemenino: MatchArticle[] = scheduled.map((match) => ({
-    id: `previa-fem-${match.id}`,
-    matchId: match.id,
-    gender: "femenino",
-    type: "previa",
-    title: `Previa femenina: ${match.homeTeam} vs ${match.awayTeam}`,
-    date: match.date,
-    source: "Futbol Femenino Norte",
-    excerpt: `Analisis femenino de la jornada ${match.matchday} con estado de forma y convocatoria.`,
-    body: [
-      `El Avilés Femenino afronta la jornada ${match.matchday} con ambicion de sumar en la parte alta de la tabla.`,
-      "Laura Menendez cuenta con la base titular y rotaciones para mantener la intensidad.",
-      "La clave sera el duelo en bandas y la capacidad de cerrar el partido desde balon parado.",
-    ],
-  }));
-
-  return [...cronicas, ...previas, ...cronicasFemenino, ...previasFemenino, ...femeninoExtras];
-};
-
-export const matchArticles: MatchArticle[] = buildMatchArticles(matchdays.flatMap((matchday) => matchday.matches));
+export const matchArticles: MatchArticle[] = [
+  ...buildMatchArticlesForClub(leagueMatches, RAI_TEAM_ID, "masculino", ""),
+  ...buildMatchArticlesForClub(leagueMatchesFemenino, RAI_FEM_TEAM_ID, "femenino", "fem-"),
+  ...femeninoExtras,
+];
 
 export const newsItems: NewsItem[] = [
   {
