@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { useHorizontalWheelScroll } from "@/lib/use-horizontal-wheel-scroll";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type WheelEvent } from "react";
+import { flushSync } from "react-dom";
 import type { Route } from "next";
 import { TransferFichaCard } from "@/components/fichajes/TransferFichaCard";
 import type { TransferRumor } from "@/types";
@@ -14,10 +16,53 @@ export function TransfersCarousel({ transfers }: TransfersCarouselProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [shouldScroll, setShouldScroll] = useState(false);
+  const [manualScroll, setManualScroll] = useState(false);
   const [tickerDuration, setTickerDuration] = useState("45s");
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
-  const useTicker = shouldScroll && !prefersReducedMotion;
+  const useTicker = shouldScroll && !prefersReducedMotion && !manualScroll;
+  const handleScrollWheel = useHorizontalWheelScroll();
+
+  const resetManualScroll = useCallback(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    track.style.animation = "";
+    track.style.transform = "";
+    track.style.animationPlayState = "";
+    setManualScroll(false);
+  }, []);
+
+  const handleWheel = useCallback(
+    (event: WheelEvent<HTMLDivElement>) => {
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+
+      const container = event.currentTarget;
+      const track = trackRef.current;
+      const canAnimate = shouldScroll && !prefersReducedMotion;
+
+      if (canAnimate && !manualScroll && track) {
+        event.preventDefault();
+
+        const transform = window.getComputedStyle(track).transform;
+        let currentX = 0;
+        if (transform && transform !== "none") {
+          currentX = new DOMMatrixReadOnly(transform).m41;
+        }
+        const nextOffset = Math.max(0, -currentX - event.deltaY);
+
+        track.style.animation = "none";
+        track.style.transform = "none";
+        track.style.animationPlayState = "";
+
+        flushSync(() => setManualScroll(true));
+        container.scrollLeft = nextOffset;
+        return;
+      }
+
+      handleScrollWheel(event);
+    },
+    [handleScrollWheel, manualScroll, prefersReducedMotion, shouldScroll],
+  );
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -73,11 +118,13 @@ export function TransfersCarousel({ transfers }: TransfersCarouselProps) {
 
       <div
         ref={containerRef}
+        onWheel={handleWheel}
+        onMouseLeave={manualScroll ? resetManualScroll : undefined}
         className={`transfers-ticker py-1 ${
           useTicker
             ? "overflow-hidden"
-            : shouldScroll
-              ? "no-scrollbar overflow-x-auto pb-1"
+            : shouldScroll || manualScroll
+              ? "no-scrollbar overflow-x-auto overscroll-x-contain pb-1"
               : "flex justify-start pb-1"
         }`}
       >
