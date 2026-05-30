@@ -154,36 +154,6 @@ export function CanteraSquadTable({ teamId }: CanteraSquadTableProps) {
           );
         })}
       </div>
-
-      {importData.cuerpoTecnico && importData.cuerpoTecnico.length > 0 && (
-        <div className="overflow-hidden rounded-[1.5rem] border border-[#214C9B]/12 bg-white p-4 shadow-[0_16px_40px_rgba(17,24,39,0.05)]">
-          <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">Cuerpo técnico</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[480px] border-collapse text-sm">
-              <thead>
-                <tr className="border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  <th className="px-3 py-2 text-left">Nombre</th>
-                  <th className="px-3 py-2 text-left">Rol</th>
-                  <th className="px-3 py-2 text-center">Partidos</th>
-                  <th className="px-3 py-2 text-center">TA</th>
-                  <th className="px-3 py-2 text-center">TR</th>
-                </tr>
-              </thead>
-              <tbody>
-                {importData.cuerpoTecnico.map((member) => (
-                  <tr key={member.nombre} className="border-b border-slate-50 last:border-0">
-                    <td className="px-3 py-2 font-semibold text-slate-900">{member.nombre}</td>
-                    <td className="px-3 py-2 text-slate-600">{member.rol}</td>
-                    <td className="px-3 py-2 text-center">{member.partidos}</td>
-                    <td className="px-3 py-2 text-center">{member.ta}</td>
-                    <td className="px-3 py-2 text-center">{member.tr}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
