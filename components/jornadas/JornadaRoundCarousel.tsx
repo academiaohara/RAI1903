@@ -3,6 +3,7 @@
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamCrest } from "@/components/TeamCrest";
 import { getJornadaTeam } from "@/lib/jornadas-data";
+import { scrollElementHorizontally } from "@/lib/scroll-horizontal";
 import { cn } from "@/lib/utils";
 import type { JornadaRoundId, JornadaRoundSummary } from "@/types/jornadas";
 import { useEffect, useRef, type WheelEvent } from "react";
@@ -35,7 +36,9 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect }: JornadaRo
     const list = listRef.current;
     if (!list) return;
     const selected = list.querySelector<HTMLButtonElement>(`[data-round-id="${selectedId}"]`);
-    selected?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    if (selected) {
+      scrollElementHorizontally(list, selected, { behavior: "smooth", align: "center" });
+    }
   }, [selectedId]);
 
   const handleWheel = (event: WheelEvent<HTMLDivElement>) => {
