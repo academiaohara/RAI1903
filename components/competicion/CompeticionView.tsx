@@ -17,7 +17,8 @@ import {
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getTeamsForRfefGrupo, type RfefGrupoId } from "@/lib/rfef-grupos";
 import { getPlayedLeagueRounds } from "@/lib/standings";
-import { matchdays, matchdaysGrupo2 } from "@/data/mock";
+import { matchdays, matchdaysFemenino, matchdaysGrupo2 } from "@/data/mock";
+import { FEMENINA_STANDINGS_ZONES } from "@/lib/segunda-rfef-femenina-2526";
 import type { Route } from "next";
 import type { Match } from "@/types";
 
@@ -39,7 +40,11 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
   const [panel, setPanel] = useState<CompeticionPanel>("liga");
   const isMasculino = gender === "masculino";
   const teams = isMasculino ? getTeamsForRfefGrupo(grupo) : getTeamsByGender(gender);
-  const standingsMatchdays = isMasculino && grupo === "2" ? matchdaysGrupo2 : matchdays;
+  const standingsMatchdays = isMasculino
+    ? grupo === "2"
+      ? matchdaysGrupo2
+      : matchdays
+    : matchdaysFemenino;
   const showAvilesSidebar = !isMasculino || grupo === "1";
   const latest = getLatestAvilesMatchesByGender(gender, 5);
   const upcoming = getUpcomingAvilesMatchesByGender(gender, 5);
@@ -106,6 +111,9 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
               compact
               borderlessHeader
               gender={gender}
+              {...(isMasculino
+                ? {}
+                : { zones: FEMENINA_STANDINGS_ZONES, tiebreak: undefined })}
             />
             <div className="grid gap-6">
               {showAvilesSidebar && (
