@@ -8,8 +8,7 @@ import { PRIMERA_RFEF_RULES, buildPlayoffBracketFromConfig } from "@/lib/rfef-ru
 import {
   buildFilialCalendar,
   buildFilialStandings,
-  buildFemeninoCanteraCalendar,
-  buildFemeninoCanteraStandings,
+  buildJuvenilSummary,
   buildJuvenilU19Standings,
   getJuvenilAvilesCalendarMatches,
 } from "@/lib/cantera-data";
@@ -563,11 +562,9 @@ export const transfers: TransferRumor[] = [
 ];
 
 const filialSummary = buildFilialSummary();
+const juvenilSummary = buildJuvenilSummary();
 const juvenilStandings = buildJuvenilU19Standings();
-const juvenilAvilesRow = juvenilStandings.find((team) => team.id === "real-aviles-u19");
 const filialStandings = buildFilialStandings();
-const femeninoStandings = buildFemeninoCanteraStandings();
-const femeninoAvilesRow = femeninoStandings.find((team) => team.id === RAI_FEM_TEAM_ID);
 
 export const academyTeams: AcademyTeam[] = [
   {
@@ -591,10 +588,7 @@ export const academyTeams: AcademyTeam[] = [
     id: "juvenil-a",
     name: "Juvenil A",
     coach: "Borja Fernandez",
-    category: "Liga Nacional Juvenil",
-    position: juvenilAvilesRow ? `${juvenilAvilesRow.position}º - ${juvenilAvilesRow.stats.points} pts` : "—",
-    lastResult: "Real Avilés U19 1-0 Romanón U19",
-    nextMatch: "Real Avilés U19 - Juventud Estadio U19",
+    ...juvenilSummary,
     standoutPlayers: ["Mario Noval", "Leo Paredes", "Osky"],
     news: [],
     roster: [
@@ -606,22 +600,6 @@ export const academyTeams: AcademyTeam[] = [
     ],
     table: juvenilStandings,
     calendar: getJuvenilAvilesCalendarMatches(),
-  },
-  {
-    id: "femenino",
-    name: "Femenino",
-    coach: "Laura Menendez",
-    category: "Liga Femenina RAI1903",
-    position: femeninoAvilesRow ? `${femeninoAvilesRow.position}º - ${femeninoAvilesRow.stats.points} pts` : "—",
-    lastResult: "Real Avilés Femenino 3-1 Covadonga",
-    nextMatch: "Real Avilés Femenino - Oviedo Moderno",
-    standoutPlayers: ["I. Costa", "C. Nunez", "L. Ramos"],
-    news: [],
-    roster: playersFemenino
-      .slice(0, 8)
-      .map(({ id, displayName, number, position, age }) => ({ id, displayName, number, position, age })),
-    table: femeninoStandings,
-    calendar: buildFemeninoCanteraCalendar(),
   },
 ];
 

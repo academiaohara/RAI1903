@@ -14,6 +14,7 @@ type MatchFixtureTeamLinksProps = {
   homeTeamLinkClassName?: string;
   awayTeamLinkClassName?: string;
   scorePillClassName?: string;
+  showCrests?: boolean;
 };
 
 export function MatchFixtureTeamLinks({
@@ -24,7 +25,9 @@ export function MatchFixtureTeamLinks({
   homeTeamLinkClassName,
   awayTeamLinkClassName,
   scorePillClassName,
+  showCrests: showCrestsProp,
 }: MatchFixtureTeamLinksProps) {
+  const showCrests = showCrestsProp ?? gender !== "femenino";
   const avilesHome = match.homeTeamId === highlightTeamId;
   const avilesAway = match.awayTeamId === highlightTeamId;
 
@@ -45,6 +48,7 @@ export function MatchFixtureTeamLinks({
         awayLogo={getTeamCrestById(match.awayTeamId, getTeam(match.awayTeamId)?.crestInitials)}
         awayTeam={match.awayTeam}
         label={scoreLabel}
+        showCrests={showCrests}
         className={cn("pointer-events-none relative z-0", scorePillClassName)}
       />
       <div className="pointer-events-auto relative z-10 min-w-0">

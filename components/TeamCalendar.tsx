@@ -51,8 +51,9 @@ export function TeamCalendar({
   className,
   gender = "masculino",
   listOnly = false,
-  showCrests = true,
+  showCrests: showCrestsProp,
 }: TeamCalendarProps) {
+  const showCrests = showCrestsProp ?? gender !== "femenino";
   const initial = initialViewDate(matches);
   const [viewMode, setViewMode] = useState<CalendarViewMode>(listOnly ? "lista" : "mes");
   const [viewYear, setViewYear] = useState(initial.year);

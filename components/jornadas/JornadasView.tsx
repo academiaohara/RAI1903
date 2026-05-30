@@ -66,6 +66,7 @@ export function JornadasView({ gender }: JornadasViewProps) {
       : `Jornada ${summary.roundNumber}`;
 
   const showPlayoffGuia = gender === "masculino" && summary.kind === "playoff";
+  const showCrests = gender !== "femenino";
 
   return (
     <div className="space-y-6">
@@ -73,6 +74,7 @@ export function JornadasView({ gender }: JornadasViewProps) {
         rounds={dataset.rounds}
         selectedId={selectedRoundId}
         onSelect={handleSelectRound}
+        showCrests={showCrests}
       />
 
       {showPlayoffGuia && <PlayoffAscensoGuia isProvisional={summary.isProvisional} />}
@@ -88,6 +90,7 @@ export function JornadasView({ gender }: JornadasViewProps) {
                 highlighted
                 highlightTeamId={raiTeamId}
                 gender={gender}
+                showCrests={showCrests}
               />
             ))}
           </div>
@@ -118,7 +121,13 @@ export function JornadasView({ gender }: JornadasViewProps) {
             {otherMatches.length > 0 ? (
               <div className="space-y-2">
                 {otherMatches.map((fixture) => (
-                  <JornadaMatchRow key={fixture.id} fixture={fixture} highlightTeamId={raiTeamId} gender={gender} />
+                  <JornadaMatchRow
+                    key={fixture.id}
+                    fixture={fixture}
+                    highlightTeamId={raiTeamId}
+                    gender={gender}
+                    showCrests={showCrests}
+                  />
                 ))}
               </div>
             ) : (

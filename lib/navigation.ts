@@ -73,7 +73,6 @@ export const navItems: NavItem[] = [
     children: [
       { href: "/cantera/filial", label: "Filial", icon: Users },
       { href: "/cantera/juvenil-a", label: "Juvenil A", icon: Medal },
-      { href: "/cantera/femenino", label: "Femenino", icon: Users },
     ],
   },
   {

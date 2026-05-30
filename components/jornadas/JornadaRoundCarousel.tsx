@@ -12,6 +12,7 @@ type JornadaRoundCarouselProps = {
   rounds: JornadaRoundSummary[];
   selectedId: JornadaRoundId;
   onSelect: (roundId: JornadaRoundId) => void;
+  showCrests?: boolean;
 };
 
 const cardBase =
@@ -29,7 +30,7 @@ function cardStateClass(isSelected: boolean, isCurrent: boolean): string {
   return "border-[#214C9B]/15 bg-slate-50 text-slate-800 hover:border-[#214C9B] hover:bg-[#214C9B] hover:text-white";
 }
 
-export function JornadaRoundCarousel({ rounds, selectedId, onSelect }: JornadaRoundCarouselProps) {
+export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests = true }: JornadaRoundCarouselProps) {
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -62,6 +63,16 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect }: JornadaRo
         {rounds.map((round) => {
           const isSelected = round.id === selectedId;
           const opponent = round.opponentTeamId ? getJornadaTeam(round.opponentTeamId) : undefined;
+          const opponentInitials =
+            opponent?.crestInitials ??
+            round.opponentName
+              ?.split(/\s+/)
+              .filter(Boolean)
+              .slice(0, 3)
+              .map((word) => word[0])
+              .join("")
+              .toUpperCase() ??
+            "?";
 
           return (
             <button
@@ -76,8 +87,20 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect }: JornadaRo
               <span className="text-sm font-extrabold leading-none">{round.label}</span>
 
               <div className="flex h-12 w-12 items-center justify-center">
-                {opponent ? (
+                {opponent && showCrests ? (
                   <TeamCrest team={opponent} size="md" className="transition group-hover:brightness-110" />
+                ) : (opponent || round.opponentName) && !showCrests ? (
+                  <span
+                    className={cn(
+                      "flex h-11 w-11 items-center justify-center rounded-full border text-[10px] font-extrabold uppercase",
+                      isSelected
+                        ? "border-white/40 bg-white/15 text-white"
+                        : "border-[#214C9B]/25 bg-white text-[#214C9B] group-hover:border-white/40 group-hover:bg-white/15 group-hover:text-white",
+                    )}
+                    aria-hidden
+                  >
+                    {opponentInitials.slice(0, 3)}
+                  </span>
                 ) : round.kind === "playoff" ? (
                   <span
                     className={cn(
