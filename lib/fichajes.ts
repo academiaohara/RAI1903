@@ -57,6 +57,7 @@ function rosterPlayerToSquadPlayer(player: Player): SquadPlayer {
     peso: "76 kg",
     piernaBuena: player.preferredFoot,
     contratoHasta: `${contractYear}-06-30`,
+    valorMercado: null,
     descripcion: player.bio,
     foto: getSquadPlayerPhoto(player.number),
     partidos: player.stats.appearances,

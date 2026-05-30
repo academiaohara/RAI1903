@@ -15,27 +15,39 @@ import { PositionSection } from "@/components/squad/PositionSection";
 type PlayerTableProps = {
   players: SquadPlayer[];
   onSelect?: (player: SquadPlayer) => void;
+  showMarketValue?: boolean;
 };
 
-const columns = [
-  { label: "Jugador", align: "left" as const },
-  { label: "Pos.", align: "center" as const },
-  { label: "Edad", align: "center" as const },
-  { label: "PJ", align: "center" as const },
-  { label: "G", align: "center" as const },
-  { label: "A", align: "center" as const },
-  { label: "TA", align: "center" as const },
-  { label: "TR", align: "center" as const },
-  { label: "Contrato", align: "center" as const },
-];
+const baseColumns = [
+  { key: "jugador", label: "Jugador", align: "left" as const },
+  { key: "pos", label: "Pos.", align: "center" as const },
+  { key: "edad", label: "Edad", align: "center" as const },
+  { key: "pj", label: "PJ", align: "center" as const },
+  { key: "g", label: "G", align: "center" as const },
+  { key: "a", label: "A", align: "center" as const },
+  { key: "ta", label: "TA", align: "center" as const },
+  { key: "tr", label: "TR", align: "center" as const },
+  { key: "contrato", label: "Contrato", align: "center" as const },
+] as const;
+
+const marketValueColumn = { key: "valor", label: "Valor", align: "center" as const };
 
 const alignClass = {
   left: "text-left",
   center: "text-center",
 };
 
-export function PlayerTable({ players, onSelect }: PlayerTableProps) {
+export function PlayerTable({ players, onSelect, showMarketValue = false }: PlayerTableProps) {
   const grouped = groupPlayersByPosition(players);
+  const columns = showMarketValue
+    ? [
+        baseColumns[0],
+        baseColumns[1],
+        baseColumns[2],
+        marketValueColumn,
+        ...baseColumns.slice(3),
+      ]
+    : [...baseColumns];
 
   return (
     <div className="space-y-10">
@@ -53,6 +65,7 @@ export function PlayerTable({ players, onSelect }: PlayerTableProps) {
                     <col className="w-[11.5rem]" />
                     <col className="w-12" />
                     <col className="w-14" />
+                    {showMarketValue && <col className="w-[5.5rem]" />}
                     <col className="w-12" />
                     <col className="w-12" />
                     <col className="w-12" />
@@ -72,7 +85,13 @@ export function PlayerTable({ players, onSelect }: PlayerTableProps) {
                   </thead>
                   <tbody>
                     {list.map((player, rowIndex) => (
-                      <PlayerRow key={player.id} player={player} onSelect={onSelect} index={rowIndex} />
+                      <PlayerRow
+                        key={player.id}
+                        player={player}
+                        onSelect={onSelect}
+                        index={rowIndex}
+                        showMarketValue={showMarketValue}
+                      />
                     ))}
                   </tbody>
                 </table>
@@ -80,7 +99,13 @@ export function PlayerTable({ players, onSelect }: PlayerTableProps) {
 
               <div className="divide-y divide-slate-100 md:hidden">
                 {list.map((player, rowIndex) => (
-                  <PlayerMobileRow key={player.id} player={player} onSelect={onSelect} index={rowIndex} />
+                  <PlayerMobileRow
+                    key={player.id}
+                    player={player}
+                    onSelect={onSelect}
+                    index={rowIndex}
+                    showMarketValue={showMarketValue}
+                  />
                 ))}
               </div>
             </div>
@@ -95,10 +120,12 @@ function PlayerRow({
   player,
   onSelect,
   index,
+  showMarketValue,
 }: {
   player: SquadPlayer;
   onSelect?: (player: SquadPlayer) => void;
   index: number;
+  showMarketValue: boolean;
 }) {
   const interactive = Boolean(onSelect);
 
@@ -120,6 +147,11 @@ function PlayerRow({
       <td className={`px-4 py-4 tabular-nums text-slate-700 ${alignClass.center}`}>
         {formatPlayerAge(player.edad)}
       </td>
+      {showMarketValue && (
+        <td className={`px-2 py-3 text-[11px] font-bold tabular-nums text-slate-600 ${alignClass.center}`}>
+          {player.valorMercado ?? "—"}
+        </td>
+      )}
       <StatCell value={player.partidos} />
       <StatCell value={player.goles} highlight={player.goles > 0} />
       <StatCell value={player.asistencias} highlight={player.asistencias > 0} />
@@ -136,10 +168,12 @@ function PlayerMobileRow({
   player,
   onSelect,
   index,
+  showMarketValue,
 }: {
   player: SquadPlayer;
   onSelect?: (player: SquadPlayer) => void;
   index: number;
+  showMarketValue: boolean;
 }) {
   const content = (
     <div className="min-w-0 flex-1">
@@ -151,6 +185,9 @@ function PlayerMobileRow({
         {player.rol} · {formatPlayerAgeWithUnit(player.edad)}
       </p>
       <div className="mt-2 flex flex-wrap gap-2 text-xs font-bold text-slate-600">
+        {showMarketValue && player.valorMercado && (
+          <span className="rounded-lg bg-blue-50 px-2 py-1 text-[#214C9B]">{player.valorMercado}</span>
+        )}
         <span className="rounded-lg bg-slate-100 px-2 py-1">PJ {player.partidos}</span>
         <span className="rounded-lg bg-slate-100 px-2 py-1">G {player.goles}</span>
         <span className="rounded-lg bg-slate-100 px-2 py-1">A {player.asistencias}</span>

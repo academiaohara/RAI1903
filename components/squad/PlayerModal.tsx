@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Calendar, MapPin, Ruler, Scale, X } from "lucide-react";
+import { Calendar, MapPin, Ruler, Scale, Star, X } from "lucide-react";
 import type { SquadModalTab, SquadPlayer } from "@/types/squad";
 import {
   formatBirthDate,
@@ -11,6 +11,7 @@ import {
   getPlayerFullName,
 } from "@/lib/squad-utils";
 import { getTransferForPlayer, getTransferKind } from "@/lib/fichajes";
+import { formatFanRating, getPlayerAverageFanRating } from "@/lib/player-ratings";
 import { getPlayerClubAnnouncementNews, getPlayerNews } from "@/lib/player-news";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 import { PlayerStats } from "@/components/squad/PlayerStats";
@@ -34,6 +35,7 @@ type PlayerModalProps = {
 
 function PlayerModalContent({ player, onClose }: { player: SquadPlayer; onClose: () => void }) {
   const [activeTab, setActiveTab] = useState<SquadModalTab>("actualidad");
+  const fanRating = getPlayerAverageFanRating(player.id);
   const playerName = getPlayerFullName(player);
   const transfer = getTransferForPlayer(player.id);
 
@@ -92,6 +94,16 @@ function PlayerModalContent({ player, onClose }: { player: SquadPlayer; onClose:
             </p>
 
             <div className="mt-4 grid grid-cols-2 gap-2 text-left text-xs font-semibold sm:grid-cols-3">
+              {player.valorMercado && <InfoChip label="Valor mercado" value={player.valorMercado} />}
+              <InfoChip
+                icon={Star}
+                label="Valoración media"
+                value={
+                  fanRating
+                    ? `${formatFanRating(fanRating.average)} (${fanRating.count} partido${fanRating.count === 1 ? "" : "s"})`
+                    : "Sin valoraciones"
+                }
+              />
               <InfoChip icon={Calendar} label="Nacimiento" value={formatBirthDate(player.fechaNacimiento)} />
               <InfoChip icon={MapPin} label="Lugar" value={player.lugarNacimiento} />
               <InfoChip icon={Ruler} label="Altura" value={player.altura} />
