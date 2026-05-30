@@ -13,6 +13,7 @@ import { PlayerTable } from "@/components/squad/PlayerTable";
 import { PlayerGrid } from "@/components/squad/PlayerGrid";
 import { PlayerModal } from "@/components/squad/PlayerModal";
 import { StadiumModal } from "@/components/squad/StadiumModal";
+import { StandingsEvolutionChart } from "@/components/squad/StandingsEvolutionChart";
 
 type SquadPageProps = {
   gender: PrimerEquipoGender;
@@ -54,6 +55,7 @@ export function SquadPage({ gender }: SquadPageProps) {
       </AnimatePresence>
 
       {!isFemenino && <PlayerModal player={selected} onClose={() => setSelected(null)} />}
+      {!isFemenino && <StandingsEvolutionChart />}
       <StadiumModal stadium={club.estadioInfo} open={stadiumOpen} onClose={() => setStadiumOpen(false)} />
     </div>
   );
