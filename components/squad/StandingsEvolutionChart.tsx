@@ -87,10 +87,10 @@ export function StandingsEvolutionChart({ teamId = RAI_TEAM_ID, className }: Sta
         </p>
       }
     >
-      <div className="overflow-x-auto">
+      <div className="relative overflow-x-auto">
         <svg
           viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
-          className="h-auto w-full min-w-[320px]"
+          className="relative z-0 h-auto w-full min-w-[320px]"
           role="img"
           aria-label={`Evolución de la posición en liga por jornada. Posición actual ${lastPoint.position} en la jornada ${lastPoint.round}`}
         >
@@ -127,42 +127,6 @@ export function StandingsEvolutionChart({ teamId = RAI_TEAM_ID, className }: Sta
           ))}
 
           <path d={linePath} fill="none" stroke="#214C9B" strokeWidth={3} strokeLinejoin="round" strokeLinecap="round" />
-
-          {hoveredIndex !== null && (
-            <g
-              pointerEvents="none"
-              transform={`translate(${xAt(hoveredIndex)}, ${yAt(points[hoveredIndex].position)})`}
-            >
-              {(() => {
-                const hovered = points[hoveredIndex];
-                const label = formatPointLabel(hovered.round, hovered.position);
-                const tooltipWidth = label.length * 6.8 + 20;
-                const tooltipHeight = 24;
-                const tooltipY = -tooltipHeight - 14;
-
-                return (
-                  <>
-                    <rect
-                      x={-tooltipWidth / 2}
-                      y={tooltipY}
-                      width={tooltipWidth}
-                      height={tooltipHeight}
-                      rx={6}
-                      fill={MAROON}
-                    />
-                    <text
-                      x={0}
-                      y={tooltipY + tooltipHeight / 2 + 4}
-                      textAnchor="middle"
-                      className="fill-white text-[11px] font-extrabold"
-                    >
-                      {label}
-                    </text>
-                  </>
-                );
-              })()}
-            </g>
-          )}
 
           {points.map((point, index) => (
             <g key={point.round}>
@@ -204,6 +168,20 @@ export function StandingsEvolutionChart({ teamId = RAI_TEAM_ID, className }: Sta
             </g>
           ))}
         </svg>
+
+        {hoveredIndex !== null && (
+          <div
+            className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[calc(100%+14px)] whitespace-nowrap rounded-md px-2.5 py-1 text-[11px] font-extrabold text-white"
+            style={{
+              left: `${(xAt(hoveredIndex) / CHART_WIDTH) * 100}%`,
+              top: `${(yAt(points[hoveredIndex].position) / CHART_HEIGHT) * 100}%`,
+              backgroundColor: MAROON,
+            }}
+            role="tooltip"
+          >
+            {formatPointLabel(points[hoveredIndex].round, points[hoveredIndex].position)}
+          </div>
+        )}
       </div>
 
       <ul className="mt-4 flex flex-wrap gap-4 text-[11px] font-bold text-slate-600">
