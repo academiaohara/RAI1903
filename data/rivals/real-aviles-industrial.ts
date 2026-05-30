@@ -6,7 +6,7 @@ export const realAvilesIndustrialSquadImport: RivalSquadImport = {
   entrenador: "Lolo Escobar",
   plantilla: [
     { dorsal: 1, jugador: "Álvaro Fernández", pos: "Portero", edad: 26, pj: 28, g: 0, a: 0, ta: 1, tr: 0, valor: "200 mil €", contrato: 2026 },
-    { dorsal: 13, jugador: "Nando Almodóvar", pos: "Portero", edad: 21, pj: 10, g: 0, a: 0, ta: 0, tr: 0, valor: "50 mil €", contrato: 2026 },
+    { dorsal: 13, jugador: "Nando Almodóvar", pos: "Portero", edad: 22, pj: 11, g: 0, a: 0, ta: 0, tr: 0, valor: "83 mil €", contrato: 2026 },
 
     { dorsal: 12, jugador: "Ricardo Grigore", pos: "Defensa central", edad: 26, pj: 6, g: 0, a: 0, ta: 1, tr: 0, valor: "100 mil €", contrato: 2026 },
     { dorsal: 5, jugador: "Jean-Sylvain Babin", pos: "Defensa central", edad: 39, pj: 38, g: 2, a: 0, ta: 4, tr: 0, valor: "50 mil €", contrato: 2026 },

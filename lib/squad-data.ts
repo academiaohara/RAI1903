@@ -1,4 +1,5 @@
 import { matchdays, players, playersFemenino, teams, teamsFemenino } from "@/data/mock";
+import { applyRealAvilesPlayerOverrides } from "@/data/real-aviles-player-overrides";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import {
   buildClubInfoFromImport,
@@ -181,10 +182,12 @@ function getImportedMasculinoSquad(): SquadPlayer[] | null {
   const imported = getImportedRivalSquad(RAI_TEAM_ID);
   if (!team || !imported) return null;
 
-  return buildSquadFromImport(team, imported).map((player) => ({
+  const squad = buildSquadFromImport(team, imported).map((player) => ({
     ...player,
     foto: getSquadPlayerPhoto(player.dorsal),
   }));
+
+  return applyRealAvilesPlayerOverrides(squad);
 }
 
 export function getSquadPlayers(gender: PrimerEquipoGender): SquadPlayer[] {
