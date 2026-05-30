@@ -57,6 +57,16 @@ export function TenteFirmeSpaceCard({ link, variant = "compact" }: TenteFirmeSpa
         >
           {link.name}
         </h3>
+        {link.description && (
+          <p
+            className={cn(
+              "mt-1 line-clamp-2 text-slate-600",
+              featured ? "text-sm sm:text-base" : "text-xs",
+            )}
+          >
+            {link.description}
+          </p>
+        )}
       </div>
       <ExternalLink
         size={featured ? 20 : 16}
