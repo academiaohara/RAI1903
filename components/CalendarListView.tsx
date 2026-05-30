@@ -133,20 +133,20 @@ function CalendarListRow({
         {match.isHome ? <Home size={16} strokeWidth={2.4} aria-hidden /> : <MapPin size={16} strokeWidth={2.4} aria-hidden />}
       </span>
 
-      <span className="min-w-0 truncate text-xs font-semibold text-slate-600" title={match.venue}>
+      <span className="min-w-0 truncate text-right text-xs font-semibold text-slate-600" title={match.venue}>
         {match.venue}
       </span>
 
       <span
         className={cn(
-          "text-center text-sm font-extrabold tabular-nums",
+          "text-right text-sm font-extrabold tabular-nums",
           match.played ? "text-slate-900" : "text-slate-400",
         )}
       >
         {resultLabel(match)}
       </span>
 
-      <span className="flex min-w-0 items-center gap-1.5">
+      <span className="flex min-w-0 items-center justify-end gap-1.5">
         <CompetitionLogo competition={match.competition} alt="" size="xs" className="shrink-0" />
         <span className={cn("min-w-0 truncate text-xs font-bold", accent)} title={competitionLabel}>
           {competitionLabel}
