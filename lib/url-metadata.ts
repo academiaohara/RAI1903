@@ -125,7 +125,7 @@ export async function fetchUrlMetadata(url: string, init?: RequestInit): Promise
   const response = await fetch(url, {
     ...init,
     headers: {
-      "User-Agent": "Mozilla/5.0 (compatible; RAI1903/1.0; +https://github.com/rai1903fan/rai1903webpage)",
+      "User-Agent": "Mozilla/5.0 (compatible; RAI1903/1.0; +https://github.com/academiaohara/RAI1903)",
       ...init?.headers,
     },
     redirect: "follow",
