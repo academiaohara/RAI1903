@@ -12,7 +12,12 @@ import {
   buildJuvenilU19Standings,
   getJuvenilAvilesCalendarMatches,
 } from "@/lib/cantera-data";
-import { buildJuvenilAcademyRoster, getJuvenilASquadImport } from "@/lib/cantera-squad";
+import {
+  buildFilialAcademyRoster,
+  buildJuvenilAcademyRoster,
+  getFilialBSquadImport,
+  getJuvenilASquadImport,
+} from "@/lib/cantera-squad";
 import { buildFilialSummary } from "@/lib/segunda-asturfutbol-2526";
 import {
   RAI_FEM_TEAM_ID,
@@ -1235,17 +1240,15 @@ export const academyTeams: AcademyTeam[] = [
   {
     id: "filial",
     name: "Filial",
-    coach: "Dani Borrego",
+    coach: getFilialBSquadImport().entrenador,
     ...filialSummary,
-    standoutPlayers: ["Nando", "Campadal", "Osky"],
+    standoutPlayers: ["Frechilla", "Reguero", "Julián", "Prieto", "Mass"],
     news: [
       "Campeon de la 2ª Asturfutbol Grupo 1 2025-26 (71 puntos)",
       "34 jornadas: 21 victorias, 8 empates y 5 derrotas",
-      "Dos juveniles entrenan con el primer equipo",
+      "Media de edad de la plantilla: 25,2 años",
     ],
-    roster: players
-      .filter((player) => ["nando", "campadal", "osky", "quicala", "carmona"].includes(player.id))
-      .map(({ id, displayName, number, position, age }) => ({ id, displayName, number, position, age })),
+    roster: buildFilialAcademyRoster(),
     table: filialStandings,
     calendar: buildFilialCalendar(),
   },

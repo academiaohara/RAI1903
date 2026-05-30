@@ -1,4 +1,6 @@
+import { filialBSquadImport2526 } from "@/data/cantera/filial-b-2526";
 import { juvenilASquadImport2526 } from "@/data/cantera/juvenil-a-2526";
+import type { CanteraTeamId } from "@/lib/cantera-data";
 import type { CanteraSquadImport, CanteraSquadImportPlayer } from "@/types/cantera-squad-import";
 import type { SquadPosition, SquadRoleCode } from "@/types/squad";
 import type { Player } from "@/types";
@@ -41,6 +43,9 @@ function mapCanteraPosition(pos: string): { posicion: SquadPosition; rol: SquadR
   if (normalized.includes("lateral derecho")) {
     return { posicion: "Defensa", rol: "LD" };
   }
+  if (normalized.includes("central")) {
+    return { posicion: "Defensa", rol: "DFC" };
+  }
   if (normalized.includes("defensa")) {
     return { posicion: "Defensa", rol: "DFC" };
   }
@@ -53,6 +58,12 @@ function mapCanteraPosition(pos: string): { posicion: SquadPosition; rol: SquadR
   if (normalized.includes("delantero")) {
     return { posicion: "Delantero", rol: "DC" };
   }
+  if (normalized.includes("interior izquierdo")) {
+    return { posicion: "Centrocampista", rol: "EI" };
+  }
+  if (normalized.includes("media punta")) {
+    return { posicion: "Centrocampista", rol: "MCO" };
+  }
   if (normalized.includes("medio centro") || normalized.includes("mediocentro") || normalized.includes("centrocampista")) {
     return { posicion: "Centrocampista", rol: "MC" };
   }
@@ -60,13 +71,13 @@ function mapCanteraPosition(pos: string): { posicion: SquadPosition; rol: SquadR
   return { posicion: "Centrocampista", rol: "MC" };
 }
 
-function importPlayerToCanteraPlayer(player: CanteraSquadImportPlayer): CanteraSquadPlayer {
+function importPlayerToCanteraPlayer(player: CanteraSquadImportPlayer, idPrefix: string): CanteraSquadPlayer {
   const { nombre, apellido } = parsePlayerName(player.jugador);
   const { posicion, rol } = mapCanteraPosition(player.pos);
 
   return {
     ...player,
-    id: `juvenil-${slugify(player.jugador)}`,
+    id: `${idPrefix}-${slugify(player.jugador)}`,
     nombre,
     apellido,
     posicion,
@@ -75,22 +86,47 @@ function importPlayerToCanteraPlayer(player: CanteraSquadImportPlayer): CanteraS
   };
 }
 
+function toAcademyRosterPlayer(player: CanteraSquadPlayer): Pick<Player, "id" | "displayName" | "number" | "position" | "age"> {
+  const shortName = player.apellido ? `${player.nombre} ${player.apellido.split(" ")[0]}` : player.nombre;
+  return {
+    id: player.id,
+    displayName: shortName,
+    number: player.dorsal ?? 0,
+    position: player.posicion,
+    age: player.edad ?? 0,
+  };
+}
+
 export function getJuvenilASquadImport(): CanteraSquadImport {
   return juvenilASquadImport2526;
 }
 
+export function getFilialBSquadImport(): CanteraSquadImport {
+  return filialBSquadImport2526;
+}
+
+export function getCanteraSquadImport(teamId: CanteraTeamId): CanteraSquadImport {
+  return teamId === "filial" ? filialBSquadImport2526 : juvenilASquadImport2526;
+}
+
 export function getJuvenilASquadPlayers(): CanteraSquadPlayer[] {
-  return juvenilASquadImport2526.plantilla.map(importPlayerToCanteraPlayer);
+  return juvenilASquadImport2526.plantilla.map((player) => importPlayerToCanteraPlayer(player, "juvenil"));
+}
+
+export function getFilialBSquadPlayers(): CanteraSquadPlayer[] {
+  return filialBSquadImport2526.plantilla.map((player) => importPlayerToCanteraPlayer(player, "filial"));
+}
+
+export function getCanteraSquadPlayers(teamId: CanteraTeamId): CanteraSquadPlayer[] {
+  return teamId === "filial" ? getFilialBSquadPlayers() : getJuvenilASquadPlayers();
 }
 
 export function buildJuvenilAcademyRoster(): Array<Pick<Player, "id" | "displayName" | "number" | "position" | "age">> {
-  return getJuvenilASquadPlayers().map((player) => ({
-    id: player.id,
-    displayName: player.apellido ? `${player.nombre} ${player.apellido.split(" ")[0]}` : player.nombre,
-    number: player.dorsal ?? 0,
-    position: player.posicion,
-    age: player.edad ?? 0,
-  }));
+  return getJuvenilASquadPlayers().map(toAcademyRosterPlayer);
+}
+
+export function buildFilialAcademyRoster(): Array<Pick<Player, "id" | "displayName" | "number" | "position" | "age">> {
+  return getFilialBSquadPlayers().map(toAcademyRosterPlayer);
 }
 
 export function formatCanteraGoals(player: CanteraSquadPlayer): string {

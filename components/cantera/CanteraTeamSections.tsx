@@ -61,24 +61,7 @@ export function CanteraTeamSections({ team }: CanteraTeamSectionsProps) {
         <strong className="text-slate-900">Entrenador:</strong> {team.coach}
       </p>
 
-      {activeSection === "plantilla" && (
-        canteraTeamId === "juvenil-a" ? (
-          <CanteraSquadTable />
-        ) : (
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {team.roster.map((player) => (
-              <div key={player.id} className="rounded-2xl border border-[#214C9B]/15 bg-blue-50 p-3">
-                <p className="font-extrabold uppercase text-[#214C9B]">
-                  #{player.number} {player.displayName}
-                </p>
-                <p className="text-sm font-bold text-slate-500">
-                  {player.position} · {player.age} años
-                </p>
-              </div>
-            ))}
-          </div>
-        )
-      )}
+      {activeSection === "plantilla" && <CanteraSquadTable teamId={canteraTeamId} />}
 
       {activeSection === "calendario" && (
         <TeamCalendar matches={calendarMatches} listOnly showCrests={false} />

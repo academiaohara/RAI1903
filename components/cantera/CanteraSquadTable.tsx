@@ -1,10 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
+import type { CanteraTeamId } from "@/lib/cantera-data";
 import {
   formatCanteraGoals,
-  getJuvenilASquadImport,
-  getJuvenilASquadPlayers,
+  getCanteraSquadImport,
+  getCanteraSquadPlayers,
   type CanteraSquadPlayer,
 } from "@/lib/cantera-squad";
 import { SQUAD_POSITIONS, SQUAD_POSITION_LABELS, type SquadPosition } from "@/types/squad";
@@ -38,9 +39,13 @@ function formatDorsal(dorsal: number | null): string {
   return dorsal == null || dorsal === 0 ? "—" : String(dorsal);
 }
 
-export function CanteraSquadTable() {
-  const players = getJuvenilASquadPlayers();
-  const importData = getJuvenilASquadImport();
+type CanteraSquadTableProps = {
+  teamId: CanteraTeamId;
+};
+
+export function CanteraSquadTable({ teamId }: CanteraSquadTableProps) {
+  const players = getCanteraSquadPlayers(teamId);
+  const importData = getCanteraSquadImport(teamId);
   const grouped = groupPlayers(players);
 
   const sections: Array<{ key: string; label: string; list: CanteraSquadPlayer[] }> = [
