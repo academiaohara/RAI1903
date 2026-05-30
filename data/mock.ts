@@ -5,11 +5,18 @@ import {
   RESULTADOS_2526_LAST_ROUND,
 } from "@/lib/resultados-2526";
 import { PRIMERA_RFEF_RULES, buildPlayoffBracketFromConfig } from "@/lib/rfef-rules";
+import {
+  buildFilialCalendar,
+  buildFilialStandings,
+  buildFemeninoCanteraCalendar,
+  buildFemeninoCanteraStandings,
+  buildJuvenilU19Standings,
+  getJuvenilAvilesCalendarMatches,
+} from "@/lib/cantera-data";
+import { buildFilialSummary } from "@/lib/segunda-asturfutbol-2526";
 import { applyStandingsToTeams } from "@/lib/standings";
-import { buildFilialCalendar, buildFilialSummary, buildSegundaAsturfutbolTable } from "@/lib/segunda-asturfutbol-2526";
 import type {
   AcademyTeam,
-  CompetitionId,
   FanMediaLink,
   FanYouTubeVideo,
   Match,
@@ -566,26 +573,19 @@ export const transfers: TransferRumor[] = [
   },
 ];
 
-const academyTable = (teamName: string): Team[] => [
-  { id: `${teamName}-aviles`, name: `Real Avilés ${teamName}`, shortName: "Avilés", city: "Avilés", stadium: "Santo Domingo", coach: "Casa", founded: 1903, crestInitials: "RAI", colors: ["#214C9B", "#FFFFFF"], position: 2, form: ["G", "G", "E", "G", "P"], stats: { played: 9, won: 6, drawn: 1, lost: 2, goalsFor: 19, goalsAgainst: 9, points: 19 } },
-  { id: `${teamName}-oviedo`, name: "Real Oviedo Vetusta", shortName: "Oviedo B", city: "Oviedo", stadium: "El Requexon", coach: "Pablo Lago", founded: 1926, crestInitials: "OVI", colors: ["#214C9B", "#FFFFFF"], position: 1, form: ["G", "E", "G", "G", "G"], stats: { played: 9, won: 6, drawn: 2, lost: 1, goalsFor: 21, goalsAgainst: 8, points: 20 } },
-  { id: `${teamName}-llanera`, name: "UD Llanera", shortName: "Llanera", city: "Llanera", stadium: "Pepe Quimaran", coach: "Adrian Torre", founded: 1981, crestInitials: "LLA", colors: ["#111827", "#F59E0B"], position: 3, form: ["G", "P", "G", "E", "G"], stats: { played: 9, won: 5, drawn: 2, lost: 2, goalsFor: 16, goalsAgainst: 10, points: 17 } },
-  { id: `${teamName}-roces`, name: "TSK Roces", shortName: "Roces", city: "Gijon", stadium: "Covadonga", coach: "Ivan Valdes", founded: 1952, crestInitials: "ROC", colors: ["#DC2626", "#FFFFFF"], position: 4, form: ["E", "G", "P", "G", "E"], stats: { played: 9, won: 4, drawn: 3, lost: 2, goalsFor: 13, goalsAgainst: 11, points: 15 } },
-  { id: `${teamName}-covadonga`, name: "CD Covadonga", shortName: "Covadonga", city: "Oviedo", stadium: "Juan Antonio Alvarez", coach: "Hugo Perez", founded: 1979, crestInitials: "COV", colors: ["#0F172A", "#60A5FA"], position: 5, form: ["P", "G", "E", "G", "P"], stats: { played: 9, won: 4, drawn: 1, lost: 4, goalsFor: 12, goalsAgainst: 14, points: 13 } },
-];
-
-const academyCalendar = (teamId: string, teamName: string, competition: CompetitionId): Match[] => [
-  { id: `${teamId}-j10`, matchday: 10, homeTeamId: `${teamId}-aviles`, awayTeamId: `${teamId}-roces`, homeTeam: `Real Avilés ${teamName}`, awayTeam: "TSK Roces", date: "2026-10-24T10:30:00.000Z", competition, venue: "Santo Domingo", status: "scheduled" },
-  { id: `${teamId}-j11`, matchday: 11, homeTeamId: `${teamId}-covadonga`, awayTeamId: `${teamId}-aviles`, homeTeam: "CD Covadonga", awayTeam: `Real Avilés ${teamName}`, date: "2026-10-31T11:00:00.000Z", competition, venue: "Juan Antonio Alvarez", status: "scheduled" },
-  { id: `${teamId}-j12`, matchday: 12, homeTeamId: `${teamId}-aviles`, awayTeamId: `${teamId}-llanera`, homeTeam: `Real Avilés ${teamName}`, awayTeam: "UD Llanera", date: "2026-11-07T12:00:00.000Z", competition, venue: "Santo Domingo", status: "scheduled" },
-];
+const filialSummary = buildFilialSummary();
+const juvenilStandings = buildJuvenilU19Standings();
+const juvenilAvilesRow = juvenilStandings.find((team) => team.id === "real-aviles-u19");
+const filialStandings = buildFilialStandings();
+const femeninoStandings = buildFemeninoCanteraStandings();
+const femeninoAvilesRow = femeninoStandings.find((team) => team.id === RAI_FEM_TEAM_ID);
 
 export const academyTeams: AcademyTeam[] = [
   {
     id: "filial",
     name: "Filial",
     coach: "Dani Borrego",
-    ...buildFilialSummary(),
+    ...filialSummary,
     standoutPlayers: ["Nando", "Campadal", "Osky"],
     news: [
       "Campeon de la 2ª Asturfutbol Grupo 1 2025-26 (71 puntos)",
@@ -595,10 +595,45 @@ export const academyTeams: AcademyTeam[] = [
     roster: players
       .filter((player) => ["nando", "campadal", "osky", "quicala", "carmona"].includes(player.id))
       .map(({ id, displayName, number, position, age }) => ({ id, displayName, number, position, age })),
-    table: buildSegundaAsturfutbolTable(),
+    table: filialStandings,
     calendar: buildFilialCalendar(),
   },
-  { id: "juvenil-a", name: "Juvenil A", coach: "Borja Fernandez", category: "Liga Nacional Juvenil", position: "1º - 22 pts", lastResult: "Real Avilés 3-1 Verina", nextMatch: "Covadonga - Real Avilés", standoutPlayers: ["Mario Noval", "Leo Paredes", "Osky"], news: ["Cuarta victoria consecutiva", "Debut de dos juveniles con el filial"], roster: [{ id: "mario-noval", displayName: "M. Noval", number: 7, position: "Delantero", age: 17 }, { id: "leo-paredes", displayName: "L. Paredes", number: 10, position: "Centrocampista", age: 18 }, { id: "izan-arias", displayName: "I. Arias", number: 4, position: "Defensa", age: 17 }, { id: "dani-riestra", displayName: "D. Riestra", number: 1, position: "Portero", age: 18 }, { id: "hugo-menendez", displayName: "H. Menendez", number: 9, position: "Delantero", age: 17 }], table: academyTable("juvenil-a"), calendar: academyCalendar("juvenil-a", "Juvenil A", "liga-nacional-juvenil") },
+  {
+    id: "juvenil-a",
+    name: "Juvenil A",
+    coach: "Borja Fernandez",
+    category: "Liga Nacional Juvenil",
+    position: juvenilAvilesRow ? `${juvenilAvilesRow.position}º - ${juvenilAvilesRow.stats.points} pts` : "—",
+    lastResult: "Real Avilés U19 1-0 Romanón U19",
+    nextMatch: "Real Avilés U19 - Juventud Estadio U19",
+    standoutPlayers: ["Mario Noval", "Leo Paredes", "Osky"],
+    news: [],
+    roster: [
+      { id: "mario-noval", displayName: "M. Noval", number: 7, position: "Delantero", age: 17 },
+      { id: "leo-paredes", displayName: "L. Paredes", number: 10, position: "Centrocampista", age: 18 },
+      { id: "izan-arias", displayName: "I. Arias", number: 4, position: "Defensa", age: 17 },
+      { id: "dani-riestra", displayName: "D. Riestra", number: 1, position: "Portero", age: 18 },
+      { id: "hugo-menendez", displayName: "H. Menendez", number: 9, position: "Delantero", age: 17 },
+    ],
+    table: juvenilStandings,
+    calendar: getJuvenilAvilesCalendarMatches(),
+  },
+  {
+    id: "femenino",
+    name: "Femenino",
+    coach: "Laura Menendez",
+    category: "Liga Femenina RAI1903",
+    position: femeninoAvilesRow ? `${femeninoAvilesRow.position}º - ${femeninoAvilesRow.stats.points} pts` : "—",
+    lastResult: "Real Avilés Femenino 3-1 Covadonga",
+    nextMatch: "Real Avilés Femenino - Oviedo Moderno",
+    standoutPlayers: ["I. Costa", "C. Nunez", "L. Ramos"],
+    news: [],
+    roster: playersFemenino
+      .slice(0, 8)
+      .map(({ id, displayName, number, position, age }) => ({ id, displayName, number, position, age })),
+    table: femeninoStandings,
+    calendar: buildFemeninoCanteraCalendar(),
+  },
 ];
 
 export const pressLinks: PressLink[] = [

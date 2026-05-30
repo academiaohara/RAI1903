@@ -1,10 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { SubsectionFilterNav } from "@/components/SubsectionFilterNav";
 import { LeagueTable } from "@/components/LeagueTable";
-import { MatchCard } from "@/components/MatchCard";
-import { FILIAL_TEAM_ID } from "@/lib/segunda-asturfutbol-2526";
+import { TeamCalendar } from "@/components/TeamCalendar";
+import {
+  getCanteraPrimaryAvilesTeamId,
+  isCanteraClubTeam,
+  matchesToCanteraCalendarMatches,
+  type CanteraTeamId,
+} from "@/lib/cantera-data";
 import type { AcademyTeam } from "@/types";
 
 const sections = [
@@ -21,7 +26,13 @@ type CanteraTeamSectionsProps = {
 
 export function CanteraTeamSections({ team }: CanteraTeamSectionsProps) {
   const [activeSection, setActiveSection] = useState<SectionId>("plantilla");
-  const highlightTeamId = team.id === "filial" ? FILIAL_TEAM_ID : undefined;
+  const canteraTeamId = team.id as CanteraTeamId;
+  const avilesTeamId = getCanteraPrimaryAvilesTeamId(canteraTeamId);
+
+  const calendarMatches = useMemo(
+    () => matchesToCanteraCalendarMatches(team.calendar, avilesTeamId),
+    [team.calendar, avilesTeamId],
+  );
 
   return (
     <div className="space-y-5">
@@ -53,15 +64,18 @@ export function CanteraTeamSections({ team }: CanteraTeamSectionsProps) {
       )}
 
       {activeSection === "calendario" && (
-        <div className="space-y-3">
-          {team.calendar.map((match) => (
-            <MatchCard key={match.id} match={match} compact highlightTeamId={highlightTeamId} />
-          ))}
-        </div>
+        <TeamCalendar matches={calendarMatches} listOnly showCrests={false} />
       )}
 
       {activeSection === "clasificacion" && (
-        <LeagueTable teams={team.table} compact highlightTeamId={highlightTeamId} clubHighlightTeamId={highlightTeamId} />
+        <LeagueTable
+          teams={team.table}
+          compact={false}
+          showCrests={false}
+          showLegend={false}
+          highlightTeamId={avilesTeamId}
+          isClubHighlight={(row) => isCanteraClubTeam(canteraTeamId, row.id, row.name)}
+        />
       )}
     </div>
   );

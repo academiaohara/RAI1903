@@ -1,0 +1,2624 @@
+{
+  "competicion": "U19",
+  "temporada": "2025-2026",
+  "jornadas": [
+    {
+      "jornada": 1,
+      "partidos": [
+        {
+          "fecha": "2025-09-13",
+          "local": "Real Oviedo U19 B",
+          "visitante": "Juventud Estadio U19",
+          "goles_local": 4,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-13",
+          "local": "Real Avilés U19",
+          "visitante": "Veriña CF U19",
+          "goles_local": 5,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-13",
+          "local": "CD Covadonga U19",
+          "visitante": "UP Langreo U19",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-13",
+          "local": "Caudal Deportivo U19",
+          "visitante": "CD Llanes U19",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-13",
+          "local": "CD Arenal U19",
+          "visitante": "UD Llanera U19",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-13",
+          "local": "Colegio Inmaculada U19",
+          "visitante": "At. Avilés A U19",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-13",
+          "local": "Romanón U19",
+          "visitante": "Mosconia U19",
+          "goles_local": 5,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-14",
+          "local": "SD Llano 2000 U19",
+          "visitante": "Astur CF U19",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-14",
+          "local": "Grujoan U19",
+          "visitante": "Real Sporting U19 B",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 2,
+      "partidos": [
+        {
+          "fecha": "2025-09-20",
+          "local": "UP Langreo U19",
+          "visitante": "Caudal Deportivo U19",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-20",
+          "local": "At. Avilés A U19",
+          "visitante": "Real Avilés U19",
+          "goles_local": 0,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-20",
+          "local": "CD Llanes U19",
+          "visitante": "CD Arenal U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-20",
+          "local": "Juventud Estadio U19",
+          "visitante": "Romanón U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-20",
+          "local": "Veriña CF U19",
+          "visitante": "Real Oviedo U19 B",
+          "goles_local": 0,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-20",
+          "local": "Mosconia U19",
+          "visitante": "CD Covadonga U19",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-20",
+          "local": "Astur CF U19",
+          "visitante": "Colegio Inmaculada U19",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-21",
+          "local": "Real Sporting U19 B",
+          "visitante": "SD Llano 2000 U19",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-21",
+          "local": "UD Llanera U19",
+          "visitante": "Grujoan U19",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 3,
+      "partidos": [
+        {
+          "fecha": "2025-09-27",
+          "local": "Real Oviedo U19 B",
+          "visitante": "At. Avilés A U19",
+          "goles_local": 2,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-27",
+          "local": "Caudal Deportivo U19",
+          "visitante": "CD Arenal U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-27",
+          "local": "UP Langreo U19",
+          "visitante": "Mosconia U19",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-27",
+          "local": "CD Covadonga U19",
+          "visitante": "Juventud Estadio U19",
+          "goles_local": 1,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-27",
+          "local": "SD Llano 2000 U19",
+          "visitante": "UD Llanera U19",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-27",
+          "local": "Romanón U19",
+          "visitante": "Veriña CF U19",
+          "goles_local": 2,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-28",
+          "local": "Colegio Inmaculada U19",
+          "visitante": "Real Sporting U19 B",
+          "goles_local": 3,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-28",
+          "local": "Real Avilés U19",
+          "visitante": "Astur CF U19",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-09-28",
+          "local": "Grujoan U19",
+          "visitante": "CD Llanes U19",
+          "goles_local": 3,
+          "goles_visitante": 5,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 4,
+      "partidos": [
+        {
+          "fecha": "2025-10-04",
+          "local": "UD Llanera U19",
+          "visitante": "Colegio Inmaculada U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-04",
+          "local": "At. Avilés A U19",
+          "visitante": "Romanón U19",
+          "goles_local": 3,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-04",
+          "local": "CD Arenal U19",
+          "visitante": "Grujoan U19",
+          "goles_local": 0,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-04",
+          "local": "Real Sporting U19 B",
+          "visitante": "Real Avilés U19",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-04",
+          "local": "CD Llanes U19",
+          "visitante": "SD Llano 2000 U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-04",
+          "local": "Mosconia U19",
+          "visitante": "Caudal Deportivo U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-04",
+          "local": "Veriña CF U19",
+          "visitante": "CD Covadonga U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-04",
+          "local": "Astur CF U19",
+          "visitante": "Real Oviedo U19 B",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-05",
+          "local": "Juventud Estadio U19",
+          "visitante": "UP Langreo U19",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 5,
+      "partidos": [
+        {
+          "fecha": "2025-10-11",
+          "local": "UP Langreo U19",
+          "visitante": "Veriña CF U19",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-11",
+          "local": "Real Oviedo U19 B",
+          "visitante": "Real Sporting U19 B",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-11",
+          "local": "SD Llano 2000 U19",
+          "visitante": "CD Arenal U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-11",
+          "local": "Colegio Inmaculada U19",
+          "visitante": "CD Llanes U19",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-11",
+          "local": "Caudal Deportivo U19",
+          "visitante": "Grujoan U19",
+          "goles_local": 2,
+          "goles_visitante": 5,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-11",
+          "local": "Mosconia U19",
+          "visitante": "Juventud Estadio U19",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-11",
+          "local": "Romanón U19",
+          "visitante": "Astur CF U19",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-12",
+          "local": "CD Covadonga U19",
+          "visitante": "At. Avilés A U19",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-12",
+          "local": "Real Avilés U19",
+          "visitante": "UD Llanera U19",
+          "goles_local": 5,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 6,
+      "partidos": [
+        {
+          "fecha": "2025-10-18",
+          "local": "At. Avilés A U19",
+          "visitante": "UP Langreo U19",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-18",
+          "local": "CD Arenal U19",
+          "visitante": "Colegio Inmaculada U19",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-18",
+          "local": "Juventud Estadio U19",
+          "visitante": "Caudal Deportivo U19",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-18",
+          "local": "Veriña CF U19",
+          "visitante": "Mosconia U19",
+          "goles_local": 3,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-18",
+          "local": "Astur CF U19",
+          "visitante": "CD Covadonga U19",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-19",
+          "local": "Real Sporting U19 B",
+          "visitante": "Romanón U19",
+          "goles_local": 5,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-19",
+          "local": "CD Llanes U19",
+          "visitante": "Real Avilés U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-19",
+          "local": "UD Llanera U19",
+          "visitante": "Real Oviedo U19 B",
+          "goles_local": 1,
+          "goles_visitante": 8,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-19",
+          "local": "Grujoan U19",
+          "visitante": "SD Llano 2000 U19",
+          "goles_local": 3,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 7,
+      "partidos": [
+        {
+          "fecha": "2025-10-25",
+          "local": "Real Oviedo U19 B",
+          "visitante": "CD Llanes U19",
+          "goles_local": 7,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-25",
+          "local": "UP Langreo U19",
+          "visitante": "Astur CF U19",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-25",
+          "local": "Real Avilés U19",
+          "visitante": "CD Arenal U19",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-25",
+          "local": "Colegio Inmaculada U19",
+          "visitante": "Grujoan U19",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-25",
+          "local": "Caudal Deportivo U19",
+          "visitante": "SD Llano 2000 U19",
+          "goles_local": 0,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-25",
+          "local": "Mosconia U19",
+          "visitante": "At. Avilés A U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-25",
+          "local": "Romanón U19",
+          "visitante": "UD Llanera U19",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-25",
+          "local": "CD Covadonga U19",
+          "visitante": "Real Sporting U19 B",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-10-26",
+          "local": "Juventud Estadio U19",
+          "visitante": "Veriña CF U19",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 8,
+      "partidos": [
+        {
+          "fecha": "2025-11-01",
+          "local": "Real Sporting U19 B",
+          "visitante": "UP Langreo U19",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-01",
+          "local": "CD Arenal U19",
+          "visitante": "Real Oviedo U19 B",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-01",
+          "local": "SD Llano 2000 U19",
+          "visitante": "Colegio Inmaculada U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-01",
+          "local": "CD Llanes U19",
+          "visitante": "Romanón U19",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-01",
+          "local": "At. Avilés A U19",
+          "visitante": "Juventud Estadio U19",
+          "goles_local": 1,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-01",
+          "local": "Veriña CF U19",
+          "visitante": "Caudal Deportivo U19",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-02",
+          "local": "Astur CF U19",
+          "visitante": "Mosconia U19",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-02",
+          "local": "UD Llanera U19",
+          "visitante": "CD Covadonga U19",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-02",
+          "local": "Grujoan U19",
+          "visitante": "Real Avilés U19",
+          "goles_local": 0,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 9,
+      "partidos": [
+        {
+          "fecha": "2025-11-08",
+          "local": "Real Oviedo U19 B",
+          "visitante": "Grujoan U19",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-08",
+          "local": "Real Avilés U19",
+          "visitante": "SD Llano 2000 U19",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-08",
+          "local": "Juventud Estadio U19",
+          "visitante": "Astur CF U19",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-08",
+          "local": "Veriña CF U19",
+          "visitante": "At. Avilés A U19",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-08",
+          "local": "Romanón U19",
+          "visitante": "CD Arenal U19",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-08",
+          "local": "UP Langreo U19",
+          "visitante": "UD Llanera U19",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-08",
+          "local": "Mosconia U19",
+          "visitante": "Real Sporting U19 B",
+          "goles_local": 2,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-08",
+          "local": "Caudal Deportivo U19",
+          "visitante": "Colegio Inmaculada U19",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-08",
+          "local": "CD Covadonga U19",
+          "visitante": "CD Llanes U19",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 10,
+      "partidos": [
+        {
+          "fecha": "2025-11-15",
+          "local": "Real Sporting U19 B",
+          "visitante": "Juventud Estadio U19",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-15",
+          "local": "UD Llanera U19",
+          "visitante": "Mosconia U19",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-15",
+          "local": "Colegio Inmaculada U19",
+          "visitante": "Real Avilés U19",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-15",
+          "local": "At. Avilés A U19",
+          "visitante": "Caudal Deportivo U19",
+          "goles_local": 0,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-15",
+          "local": "CD Arenal U19",
+          "visitante": "CD Covadonga U19",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-15",
+          "local": "SD Llano 2000 U19",
+          "visitante": "Real Oviedo U19 B",
+          "goles_local": 2,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-15",
+          "local": "CD Llanes U19",
+          "visitante": "UP Langreo U19",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-16",
+          "local": "Astur CF U19",
+          "visitante": "Veriña CF U19",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-16",
+          "local": "Grujoan U19",
+          "visitante": "Romanón U19",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 11,
+      "partidos": [
+        {
+          "fecha": "2025-11-22",
+          "local": "Real Oviedo U19 B",
+          "visitante": "Colegio Inmaculada U19",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-22",
+          "local": "Caudal Deportivo U19",
+          "visitante": "Real Avilés U19",
+          "goles_local": 1,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-22",
+          "local": "CD Covadonga U19",
+          "visitante": "Grujoan U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-22",
+          "local": "At. Avilés A U19",
+          "visitante": "Astur CF U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-22",
+          "local": "Juventud Estadio U19",
+          "visitante": "UD Llanera U19",
+          "goles_local": 5,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-22",
+          "local": "Mosconia U19",
+          "visitante": "CD Llanes U19",
+          "goles_local": 5,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-22",
+          "local": "UP Langreo U19",
+          "visitante": "CD Arenal U19",
+          "goles_local": 5,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-22",
+          "local": "Romanón U19",
+          "visitante": "SD Llano 2000 U19",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-23",
+          "local": "Veriña CF U19",
+          "visitante": "Real Sporting U19 B",
+          "goles_local": 2,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 12,
+      "partidos": [
+        {
+          "fecha": "2025-11-29",
+          "local": "Colegio Inmaculada U19",
+          "visitante": "Romanón U19",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-29",
+          "local": "Real Avilés U19",
+          "visitante": "Real Oviedo U19 B",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-29",
+          "local": "CD Arenal U19",
+          "visitante": "Mosconia U19",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-29",
+          "local": "CD Llanes U19",
+          "visitante": "Juventud Estadio U19",
+          "goles_local": 2,
+          "goles_visitante": 5,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-30",
+          "local": "Real Sporting U19 B",
+          "visitante": "At. Avilés A U19",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-30",
+          "local": "Astur CF U19",
+          "visitante": "Caudal Deportivo U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-30",
+          "local": "SD Llano 2000 U19",
+          "visitante": "CD Covadonga U19",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-30",
+          "local": "UD Llanera U19",
+          "visitante": "Veriña CF U19",
+          "goles_local": 2,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-11-30",
+          "local": "Grujoan U19",
+          "visitante": "UP Langreo U19",
+          "goles_local": 3,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 13,
+      "partidos": [
+        {
+          "fecha": "2025-12-06",
+          "local": "Caudal Deportivo U19",
+          "visitante": "Real Oviedo U19 B",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-06",
+          "local": "At. Avilés A U19",
+          "visitante": "UD Llanera U19",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-06",
+          "local": "Juventud Estadio U19",
+          "visitante": "CD Arenal U19",
+          "goles_local": 5,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-06",
+          "local": "Mosconia U19",
+          "visitante": "Grujoan U19",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-06",
+          "local": "UP Langreo U19",
+          "visitante": "SD Llano 2000 U19",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-06",
+          "local": "Romanón U19",
+          "visitante": "Real Avilés U19",
+          "goles_local": 0,
+          "goles_visitante": 5,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-06",
+          "local": "Veriña CF U19",
+          "visitante": "CD Llanes U19",
+          "goles_local": 4,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-06",
+          "local": "CD Covadonga U19",
+          "visitante": "Colegio Inmaculada U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-07",
+          "local": "Astur CF U19",
+          "visitante": "Real Sporting U19 B",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 14,
+      "partidos": [
+        {
+          "fecha": "2025-12-13",
+          "local": "Real Oviedo U19 B",
+          "visitante": "Romanón U19",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-13",
+          "local": "UD Llanera U19",
+          "visitante": "Astur CF U19",
+          "goles_local": 0,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-13",
+          "local": "CD Arenal U19",
+          "visitante": "Veriña CF U19",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-13",
+          "local": "CD Llanes U19",
+          "visitante": "At. Avilés A U19",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-13",
+          "local": "Real Avilés U19",
+          "visitante": "CD Covadonga U19",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-13",
+          "local": "SD Llano 2000 U19",
+          "visitante": "Mosconia U19",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-14",
+          "local": "Real Sporting U19 B",
+          "visitante": "Caudal Deportivo U19",
+          "goles_local": 5,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-14",
+          "local": "Colegio Inmaculada U19",
+          "visitante": "UP Langreo U19",
+          "goles_local": 0,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-14",
+          "local": "Grujoan U19",
+          "visitante": "Juventud Estadio U19",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 15,
+      "partidos": [
+        {
+          "fecha": "2025-12-20",
+          "local": "Real Sporting U19 B",
+          "visitante": "UD Llanera U19",
+          "goles_local": 9,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-20",
+          "local": "At. Avilés A U19",
+          "visitante": "CD Arenal U19",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-20",
+          "local": "Juventud Estadio U19",
+          "visitante": "SD Llano 2000 U19",
+          "goles_local": 6,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-20",
+          "local": "Caudal Deportivo U19",
+          "visitante": "Romanón U19",
+          "goles_local": 4,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-20",
+          "local": "Mosconia U19",
+          "visitante": "Colegio Inmaculada U19",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-20",
+          "local": "CD Covadonga U19",
+          "visitante": "Real Oviedo U19 B",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-20",
+          "local": "Veriña CF U19",
+          "visitante": "Grujoan U19",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-21",
+          "local": "Astur CF U19",
+          "visitante": "CD Llanes U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2025-12-21",
+          "local": "UP Langreo U19",
+          "visitante": "Real Avilés U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 16,
+      "partidos": [
+        {
+          "fecha": "2026-01-10",
+          "local": "Real Oviedo U19 B",
+          "visitante": "UP Langreo U19",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-10",
+          "local": "Colegio Inmaculada U19",
+          "visitante": "Juventud Estadio U19",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-10",
+          "local": "Real Avilés U19",
+          "visitante": "Mosconia U19",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-10",
+          "local": "Caudal Deportivo U19",
+          "visitante": "UD Llanera U19",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-10",
+          "local": "CD Arenal U19",
+          "visitante": "Astur CF U19",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-10",
+          "local": "SD Llano 2000 U19",
+          "visitante": "Veriña CF U19",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-10",
+          "local": "CD Llanes U19",
+          "visitante": "Real Sporting U19 B",
+          "goles_local": 3,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-10",
+          "local": "Romanón U19",
+          "visitante": "CD Covadonga U19",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-11",
+          "local": "Grujoan U19",
+          "visitante": "At. Avilés A U19",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 17,
+      "partidos": [
+        {
+          "fecha": "2026-01-17",
+          "local": "UD Llanera U19",
+          "visitante": "CD Llanes U19",
+          "goles_local": 4,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-17",
+          "local": "At. Avilés A U19",
+          "visitante": "SD Llano 2000 U19",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-17",
+          "local": "Mosconia U19",
+          "visitante": "Real Oviedo U19 B",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-17",
+          "local": "UP Langreo U19",
+          "visitante": "Romanón U19",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-17",
+          "local": "Juventud Estadio U19",
+          "visitante": "Real Avilés U19",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-17",
+          "local": "CD Covadonga U19",
+          "visitante": "Caudal Deportivo U19",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-18",
+          "local": "Real Sporting U19 B",
+          "visitante": "CD Arenal U19",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-18",
+          "local": "Astur CF U19",
+          "visitante": "Grujoan U19",
+          "goles_local": 5,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-18",
+          "local": "Veriña CF U19",
+          "visitante": "Colegio Inmaculada U19",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 18,
+      "partidos": [
+        {
+          "fecha": "2026-01-23",
+          "local": "UP Langreo U19",
+          "visitante": "CD Covadonga U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-24",
+          "local": "Real Sporting U19 B",
+          "visitante": "Grujoan U19",
+          "goles_local": 5,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-24",
+          "local": "At. Avilés A U19",
+          "visitante": "Colegio Inmaculada U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-24",
+          "local": "Mosconia U19",
+          "visitante": "Romanón U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-24",
+          "local": "CD Llanes U19",
+          "visitante": "Caudal Deportivo U19",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-24",
+          "local": "Juventud Estadio U19",
+          "visitante": "Real Oviedo U19 B",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-25",
+          "local": "Astur CF U19",
+          "visitante": "SD Llano 2000 U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-25",
+          "local": "Veriña CF U19",
+          "visitante": "Real Avilés U19",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-25",
+          "local": "UD Llanera U19",
+          "visitante": "CD Arenal U19",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 19,
+      "partidos": [
+        {
+          "fecha": "2026-01-31",
+          "local": "Caudal Deportivo U19",
+          "visitante": "UP Langreo U19",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-31",
+          "local": "CD Arenal U19",
+          "visitante": "CD Llanes U19",
+          "goles_local": 2,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-31",
+          "local": "Real Avilés U19",
+          "visitante": "At. Avilés A U19",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-31",
+          "local": "Romanón U19",
+          "visitante": "Juventud Estadio U19",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-01-31",
+          "local": "CD Covadonga U19",
+          "visitante": "Mosconia U19",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-01",
+          "local": "Real Oviedo U19 B",
+          "visitante": "Veriña CF U19",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-01",
+          "local": "SD Llano 2000 U19",
+          "visitante": "Real Sporting U19 B",
+          "goles_local": 4,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-01",
+          "local": "Colegio Inmaculada U19",
+          "visitante": "Astur CF U19",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-01",
+          "local": "Grujoan U19",
+          "visitante": "UD Llanera U19",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 20,
+      "partidos": [
+        {
+          "fecha": "2026-02-07",
+          "local": "Veriña CF U19",
+          "visitante": "Romanón U19",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-07",
+          "local": "At. Avilés A U19",
+          "visitante": "Real Oviedo U19 B",
+          "goles_local": 0,
+          "goles_visitante": 5,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-07",
+          "local": "Real Sporting U19 B",
+          "visitante": "Colegio Inmaculada U19",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-07",
+          "local": "UD Llanera U19",
+          "visitante": "SD Llano 2000 U19",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-07",
+          "local": "Mosconia U19",
+          "visitante": "UP Langreo U19",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-07",
+          "local": "CD Arenal U19",
+          "visitante": "Caudal Deportivo U19",
+          "goles_local": 3,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-07",
+          "local": "CD Llanes U19",
+          "visitante": "Grujoan U19",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-08",
+          "local": "Astur CF U19",
+          "visitante": "Real Avilés U19",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-08",
+          "local": "Juventud Estadio U19",
+          "visitante": "CD Covadonga U19",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 21,
+      "partidos": [
+        {
+          "fecha": "2026-02-13",
+          "local": "UP Langreo U19",
+          "visitante": "Juventud Estadio U19",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-14",
+          "local": "Real Oviedo U19 B",
+          "visitante": "Astur CF U19",
+          "goles_local": 3,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-14",
+          "local": "Caudal Deportivo U19",
+          "visitante": "Mosconia U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-14",
+          "local": "Colegio Inmaculada U19",
+          "visitante": "UD Llanera U19",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-14",
+          "local": "CD Covadonga U19",
+          "visitante": "Veriña CF U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-14",
+          "local": "Real Avilés U19",
+          "visitante": "Real Sporting U19 B",
+          "goles_local": 4,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-14",
+          "local": "Romanón U19",
+          "visitante": "At. Avilés A U19",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-15",
+          "local": "SD Llano 2000 U19",
+          "visitante": "CD Llanes U19",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-15",
+          "local": "Grujoan U19",
+          "visitante": "CD Arenal U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 22,
+      "partidos": [
+        {
+          "fecha": "2026-02-21",
+          "local": "At. Avilés A U19",
+          "visitante": "CD Covadonga U19",
+          "goles_local": 0,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-21",
+          "local": "Real Sporting U19 B",
+          "visitante": "Real Oviedo U19 B",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-21",
+          "local": "CD Arenal U19",
+          "visitante": "SD Llano 2000 U19",
+          "goles_local": 1,
+          "goles_visitante": 5,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-21",
+          "local": "Juventud Estadio U19",
+          "visitante": "Mosconia U19",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-21",
+          "local": "CD Llanes U19",
+          "visitante": "Colegio Inmaculada U19",
+          "goles_local": 3,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-21",
+          "local": "Grujoan U19",
+          "visitante": "Caudal Deportivo U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-22",
+          "local": "Veriña CF U19",
+          "visitante": "UP Langreo U19",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-22",
+          "local": "Astur CF U19",
+          "visitante": "Romanón U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-22",
+          "local": "UD Llanera U19",
+          "visitante": "Real Avilés U19",
+          "goles_local": 1,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 23,
+      "partidos": [
+        {
+          "fecha": "2026-02-28",
+          "local": "UP Langreo U19",
+          "visitante": "At. Avilés A U19",
+          "goles_local": 5,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-28",
+          "local": "Real Oviedo U19 B",
+          "visitante": "UD Llanera U19",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-28",
+          "local": "Caudal Deportivo U19",
+          "visitante": "Juventud Estadio U19",
+          "goles_local": 1,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-28",
+          "local": "Real Avilés U19",
+          "visitante": "CD Llanes U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-28",
+          "local": "Mosconia U19",
+          "visitante": "Veriña CF U19",
+          "goles_local": 4,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-28",
+          "local": "SD Llano 2000 U19",
+          "visitante": "Grujoan U19",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-28",
+          "local": "Colegio Inmaculada U19",
+          "visitante": "CD Arenal U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-02-28",
+          "local": "Romanón U19",
+          "visitante": "Real Sporting U19 B",
+          "goles_local": 0,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-01",
+          "local": "CD Covadonga U19",
+          "visitante": "Astur CF U19",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 24,
+      "partidos": [
+        {
+          "fecha": "2026-03-07",
+          "local": "SD Llano 2000 U19",
+          "visitante": "Caudal Deportivo U19",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-07",
+          "local": "CD Arenal U19",
+          "visitante": "Real Avilés U19",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-07",
+          "local": "CD Llanes U19",
+          "visitante": "Real Oviedo U19 B",
+          "goles_local": 3,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-07",
+          "local": "At. Avilés A U19",
+          "visitante": "Mosconia U19",
+          "goles_local": 1,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-08",
+          "local": "Astur CF U19",
+          "visitante": "UP Langreo U19",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-08",
+          "local": "Veriña CF U19",
+          "visitante": "Juventud Estadio U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-08",
+          "local": "Real Sporting U19 B",
+          "visitante": "CD Covadonga U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-08",
+          "local": "UD Llanera U19",
+          "visitante": "Romanón U19",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-08",
+          "local": "Grujoan U19",
+          "visitante": "Colegio Inmaculada U19",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 25,
+      "partidos": [
+        {
+          "fecha": "2026-03-14",
+          "local": "Colegio Inmaculada U19",
+          "visitante": "SD Llano 2000 U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-14",
+          "local": "Caudal Deportivo U19",
+          "visitante": "Veriña CF U19",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-14",
+          "local": "Juventud Estadio U19",
+          "visitante": "At. Avilés A U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-14",
+          "local": "Real Avilés U19",
+          "visitante": "Grujoan U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-14",
+          "local": "Mosconia U19",
+          "visitante": "Astur CF U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-14",
+          "local": "UP Langreo U19",
+          "visitante": "Real Sporting U19 B",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-14",
+          "local": "Romanón U19",
+          "visitante": "CD Llanes U19",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-14",
+          "local": "CD Covadonga U19",
+          "visitante": "UD Llanera U19",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-15",
+          "local": "Real Oviedo U19 B",
+          "visitante": "CD Arenal U19",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 26,
+      "partidos": [
+        {
+          "fecha": "2026-03-21",
+          "local": "UD Llanera U19",
+          "visitante": "UP Langreo U19",
+          "goles_local": 2,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-21",
+          "local": "CD Arenal U19",
+          "visitante": "Romanón U19",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-21",
+          "local": "CD Llanes U19",
+          "visitante": "CD Covadonga U19",
+          "goles_local": 3,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-21",
+          "local": "At. Avilés A U19",
+          "visitante": "Veriña CF U19",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-22",
+          "local": "Real Sporting U19 B",
+          "visitante": "Mosconia U19",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-22",
+          "local": "Astur CF U19",
+          "visitante": "Juventud Estadio U19",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-22",
+          "local": "SD Llano 2000 U19",
+          "visitante": "Real Avilés U19",
+          "goles_local": 0,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-22",
+          "local": "Colegio Inmaculada U19",
+          "visitante": "Caudal Deportivo U19",
+          "goles_local": 2,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-03-22",
+          "local": "Grujoan U19",
+          "visitante": "Real Oviedo U19 B",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 27,
+      "partidos": [
+        {
+          "fecha": "2026-04-11",
+          "local": "Caudal Deportivo U19",
+          "visitante": "At. Avilés A U19",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-11",
+          "local": "Mosconia U19",
+          "visitante": "UD Llanera U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-11",
+          "local": "Real Avilés U19",
+          "visitante": "Colegio Inmaculada U19",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-11",
+          "local": "UP Langreo U19",
+          "visitante": "CD Llanes U19",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-12",
+          "local": "Real Oviedo U19 B",
+          "visitante": "SD Llano 2000 U19",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-12",
+          "local": "Veriña CF U19",
+          "visitante": "Astur CF U19",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-12",
+          "local": "Juventud Estadio U19",
+          "visitante": "Real Sporting U19 B",
+          "goles_local": 3,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-12",
+          "local": "CD Covadonga U19",
+          "visitante": "CD Arenal U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-12",
+          "local": "Romanón U19",
+          "visitante": "Grujoan U19",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 28,
+      "partidos": [
+        {
+          "fecha": "2026-04-18",
+          "local": "CD Arenal U19",
+          "visitante": "UP Langreo U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-18",
+          "local": "SD Llano 2000 U19",
+          "visitante": "Romanón U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-18",
+          "local": "CD Llanes U19",
+          "visitante": "Mosconia U19",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-18",
+          "local": "Colegio Inmaculada U19",
+          "visitante": "Real Oviedo U19 B",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-18",
+          "local": "Real Avilés U19",
+          "visitante": "Caudal Deportivo U19",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-18",
+          "local": "Grujoan U19",
+          "visitante": "CD Covadonga U19",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-19",
+          "local": "Real Sporting U19 B",
+          "visitante": "Veriña CF U19",
+          "goles_local": 4,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-19",
+          "local": "Astur CF U19",
+          "visitante": "At. Avilés A U19",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-19",
+          "local": "UD Llanera U19",
+          "visitante": "Juventud Estadio U19",
+          "goles_local": 1,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 29,
+      "partidos": [
+        {
+          "fecha": "2026-04-25",
+          "local": "Caudal Deportivo U19",
+          "visitante": "Astur CF U19",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-25",
+          "local": "At. Avilés A U19",
+          "visitante": "Real Sporting U19 B",
+          "goles_local": 0,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-25",
+          "local": "Juventud Estadio U19",
+          "visitante": "CD Llanes U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-25",
+          "local": "Mosconia U19",
+          "visitante": "CD Arenal U19",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-25",
+          "local": "Veriña CF U19",
+          "visitante": "UD Llanera U19",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-25",
+          "local": "Romanón U19",
+          "visitante": "Colegio Inmaculada U19",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-25",
+          "local": "CD Covadonga U19",
+          "visitante": "SD Llano 2000 U19",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-26",
+          "local": "Real Oviedo U19 B",
+          "visitante": "Real Avilés U19",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-04-26",
+          "local": "UP Langreo U19",
+          "visitante": "Grujoan U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 30,
+      "partidos": [
+        {
+          "fecha": "2026-05-01",
+          "local": "Real Oviedo U19 B",
+          "visitante": "Caudal Deportivo U19",
+          "goles_local": 5,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-01",
+          "local": "Real Sporting U19 B",
+          "visitante": "Astur CF U19",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-02",
+          "local": "CD Arenal U19",
+          "visitante": "Juventud Estadio U19",
+          "goles_local": 1,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-02",
+          "local": "Real Avilés U19",
+          "visitante": "Romanón U19",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-02",
+          "local": "Colegio Inmaculada U19",
+          "visitante": "CD Covadonga U19",
+          "goles_local": 1,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-02",
+          "local": "CD Llanes U19",
+          "visitante": "Veriña CF U19",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-02",
+          "local": "Grujoan U19",
+          "visitante": "Mosconia U19",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-03",
+          "local": "SD Llano 2000 U19",
+          "visitante": "UP Langreo U19",
+          "goles_local": 5,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-03",
+          "local": "UD Llanera U19",
+          "visitante": "At. Avilés A U19",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 31,
+      "partidos": [
+        {
+          "fecha": "2026-05-09",
+          "local": "At. Avilés A U19",
+          "visitante": "CD Llanes U19",
+          "goles_local": 2,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-09",
+          "local": "Juventud Estadio U19",
+          "visitante": "Grujoan U19",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-09",
+          "local": "UP Langreo U19",
+          "visitante": "Colegio Inmaculada U19",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-09",
+          "local": "Caudal Deportivo U19",
+          "visitante": "Real Sporting U19 B",
+          "goles_local": 0,
+          "goles_visitante": 5,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-09",
+          "local": "Romanón U19",
+          "visitante": "Real Oviedo U19 B",
+          "goles_local": 0,
+          "goles_visitante": 5,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-09",
+          "local": "Mosconia U19",
+          "visitante": "SD Llano 2000 U19",
+          "goles_local": 0,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-10",
+          "local": "Astur CF U19",
+          "visitante": "UD Llanera U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-10",
+          "local": "Veriña CF U19",
+          "visitante": "CD Arenal U19",
+          "goles_local": 3,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-10",
+          "local": "CD Covadonga U19",
+          "visitante": "Real Avilés U19",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 32,
+      "partidos": [
+        {
+          "fecha": "2026-05-16",
+          "local": "Real Oviedo U19 B",
+          "visitante": "CD Covadonga U19",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-16",
+          "local": "CD Arenal U19",
+          "visitante": "At. Avilés A U19",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-16",
+          "local": "Real Avilés U19",
+          "visitante": "UP Langreo U19",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-16",
+          "local": "CD Llanes U19",
+          "visitante": "Astur CF U19",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-16",
+          "local": "SD Llano 2000 U19",
+          "visitante": "Juventud Estadio U19",
+          "goles_local": 1,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-16",
+          "local": "Colegio Inmaculada U19",
+          "visitante": "Mosconia U19",
+          "goles_local": 4,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-16",
+          "local": "Grujoan U19",
+          "visitante": "Veriña CF U19",
+          "goles_local": 0,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-16",
+          "local": "Romanón U19",
+          "visitante": "Caudal Deportivo U19",
+          "goles_local": 0,
+          "goles_visitante": 1,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-17",
+          "local": "UD Llanera U19",
+          "visitante": "Real Sporting U19 B",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 33,
+      "partidos": [
+        {
+          "fecha": "2026-05-23",
+          "local": "UD Llanera U19",
+          "visitante": "Caudal Deportivo U19",
+          "goles_local": 0,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-23",
+          "local": "Real Sporting U19 B",
+          "visitante": "CD Llanes U19",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-23",
+          "local": "At. Avilés A U19",
+          "visitante": "Grujoan U19",
+          "goles_local": 2,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-23",
+          "local": "Mosconia U19",
+          "visitante": "Real Avilés U19",
+          "goles_local": 3,
+          "goles_visitante": 4,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-23",
+          "local": "UP Langreo U19",
+          "visitante": "Real Oviedo U19 B",
+          "goles_local": 1,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-23",
+          "local": "CD Covadonga U19",
+          "visitante": "Romanón U19",
+          "goles_local": 2,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-23",
+          "local": "Astur CF U19",
+          "visitante": "CD Arenal U19",
+          "goles_local": 3,
+          "goles_visitante": 0,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-23",
+          "local": "Veriña CF U19",
+          "visitante": "SD Llano 2000 U19",
+          "goles_local": 2,
+          "goles_visitante": 3,
+          "estado": "finalizado"
+        },
+        {
+          "fecha": "2026-05-24",
+          "local": "Juventud Estadio U19",
+          "visitante": "Colegio Inmaculada U19",
+          "goles_local": 3,
+          "goles_visitante": 2,
+          "estado": "finalizado"
+        }
+      ]
+    },
+    {
+      "jornada": 34,
+      "partidos": [
+        {
+          "fecha": "2026-05-30",
+          "local": "Caudal Deportivo U19",
+          "visitante": "CD Covadonga U19",
+          "goles_local": null,
+          "goles_visitante": null,
+          "estado": "pendiente"
+        },
+        {
+          "fecha": "2026-05-30",
+          "local": "CD Arenal U19",
+          "visitante": "Real Sporting U19 B",
+          "goles_local": null,
+          "goles_visitante": null,
+          "estado": "pendiente"
+        },
+        {
+          "fecha": "2026-05-30",
+          "local": "Romanón U19",
+          "visitante": "UP Langreo U19",
+          "goles_local": null,
+          "goles_visitante": null,
+          "estado": "pendiente"
+        },
+        {
+          "fecha": "2026-05-30",
+          "local": "CD Llanes U19",
+          "visitante": "UD Llanera U19",
+          "goles_local": null,
+          "goles_visitante": null,
+          "estado": "pendiente"
+        },
+        {
+          "fecha": "2026-05-30",
+          "local": "SD Llano 2000 U19",
+          "visitante": "At. Avilés A U19",
+          "goles_local": null,
+          "goles_visitante": null,
+          "estado": "pendiente"
+        },
+        {
+          "fecha": "2026-05-30",
+          "local": "Colegio Inmaculada U19",
+          "visitante": "Veriña CF U19",
+          "goles_local": null,
+          "goles_visitante": null,
+          "estado": "pendiente"
+        },
+        {
+          "fecha": "2026-05-30",
+          "local": "Real Avilés U19",
+          "visitante": "Juventud Estadio U19",
+          "goles_local": null,
+          "goles_visitante": null,
+          "estado": "pendiente"
+        },
+        {
+          "fecha": "2026-05-30",
+          "local": "Real Oviedo U19 B",
+          "visitante": "Mosconia U19",
+          "goles_local": null,
+          "goles_visitante": null,
+          "estado": "pendiente"
+        },
+        {
+          "fecha": "2026-05-31",
+          "local": "Grujoan U19",
+          "visitante": "Astur CF U19",
+          "goles_local": null,
+          "goles_visitante": null,
+          "estado": "pendiente"
+        }
+      ]
+    }
+  ]
+}

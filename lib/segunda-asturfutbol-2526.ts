@@ -1,7 +1,8 @@
 import resultados from "@/data/segunda-asturfutbol-grupo1-2526.json";
 import type { FormCode, Match, Team } from "@/types";
 
-export const FILIAL_TEAM_ID = "real-aviles-b";
+/** Id alineado con `lib/cantera-data` para resaltado en tabla y calendario. */
+export const FILIAL_TEAM_ID = "filial-real-aviles-b";
 export const FILIAL_COMPETITION_ID = "segunda-asturfutbol" as const;
 
 type ResultadosPartido = {
@@ -29,7 +30,7 @@ export const SEGUNDA_ASTURFUTBOL_DATA = resultados as ResultadosSegundaAsturfutb
 
 /** Maps official AsturFutbol names to internal team ids. */
 export const TEAM_NAME_TO_ID: Record<string, string> = {
-  "Real Avilés B": "real-aviles-b",
+  "Real Avilés B": "filial-real-aviles-b",
   "C.D. Treviense": "cd-treviense",
   "Navia CF": "navia-cf",
   "Gozon Club De Futbol": "gozon-cf",
@@ -60,7 +61,7 @@ type TeamSeed = {
 };
 
 const TEAM_SEEDS: TeamSeed[] = [
-  { id: "real-aviles-b", name: "Real Avilés B", shortName: "Avilés B", city: "Avilés", stadium: "Muro de Zaro", crestInitials: "RAB", colors: ["#214C9B", "#FFFFFF"] },
+  { id: "filial-real-aviles-b", name: "Real Avilés B", shortName: "Avilés B", city: "Avilés", stadium: "Muro de Zaro", crestInitials: "RAB", colors: ["#214C9B", "#FFFFFF"] },
   { id: "cd-treviense", name: "C.D. Treviense", shortName: "Treviense", city: "Trevías", stadium: "El Pando", crestInitials: "TRE", colors: ["#166534", "#FFFFFF"] },
   { id: "navia-cf", name: "Navia CF", shortName: "Navia", city: "Navia", stadium: "Tabiella", crestInitials: "NAV", colors: ["#DC2626", "#FFFFFF"] },
   { id: "gozon-cf", name: "Gozón CF", shortName: "Gozón", city: "Gozón", stadium: "La Montaña", crestInitials: "GOZ", colors: ["#1D4ED8", "#FACC15"] },
@@ -214,7 +215,7 @@ function buildMatch(partido: ResultadosPartido, round: number): Match {
   };
 }
 
-export function buildFilialCalendar(data: ResultadosSegundaAsturfutbol = SEGUNDA_ASTURFUTBOL_DATA): Match[] {
+export function buildSegundaAsturfutbolFilialCalendar(data: ResultadosSegundaAsturfutbol = SEGUNDA_ASTURFUTBOL_DATA): Match[] {
   const matches: Match[] = [];
 
   for (const jornada of [...data.jornadas].sort((a, b) => a.jornada - b.jornada)) {
@@ -239,7 +240,7 @@ function formatResultLine(match: Match): string {
 export function buildFilialSummary(data: ResultadosSegundaAsturfutbol = SEGUNDA_ASTURFUTBOL_DATA) {
   const table = buildSegundaAsturfutbolTable(data);
   const filial = table.find((team) => team.id === FILIAL_TEAM_ID);
-  const calendar = buildFilialCalendar(data);
+  const calendar = buildSegundaAsturfutbolFilialCalendar(data);
   const lastMatch = calendar.at(-1);
 
   return {
