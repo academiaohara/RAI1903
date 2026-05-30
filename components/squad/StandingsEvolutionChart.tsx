@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Card } from "@/components/Card";
 import { matchdays, RAI_TEAM_ID, teams } from "@/data/mock";
 import { getTeamStandingsEvolution } from "@/lib/standings-evolution";
@@ -9,13 +9,19 @@ import { PRIMERA_RFEF_STANDINGS_ZONES } from "@/lib/rfef-rules";
 const CHART_WIDTH = 800;
 const CHART_HEIGHT = 280;
 const PAD = { top: 28, right: 24, bottom: 40, left: 44 };
+const MAROON = "#981915";
 
 type StandingsEvolutionChartProps = {
   teamId?: string;
   className?: string;
 };
 
+function formatPointLabel(round: number, position: number) {
+  return `J${round} · ${position}º`;
+}
+
 export function StandingsEvolutionChart({ teamId = RAI_TEAM_ID, className }: StandingsEvolutionChartProps) {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const points = useMemo(() => getTeamStandingsEvolution(teamId, teams, matchdays), [teamId]);
   const teamCount = teams.length;
   const zones = PRIMERA_RFEF_STANDINGS_ZONES;
@@ -122,15 +128,76 @@ export function StandingsEvolutionChart({ teamId = RAI_TEAM_ID, className }: Sta
 
           <path d={linePath} fill="none" stroke="#214C9B" strokeWidth={3} strokeLinejoin="round" strokeLinecap="round" />
 
+          {hoveredIndex !== null && (
+            <g
+              pointerEvents="none"
+              transform={`translate(${xAt(hoveredIndex)}, ${yAt(points[hoveredIndex].position)})`}
+            >
+              {(() => {
+                const hovered = points[hoveredIndex];
+                const label = formatPointLabel(hovered.round, hovered.position);
+                const tooltipWidth = label.length * 6.8 + 20;
+                const tooltipHeight = 24;
+                const tooltipY = -tooltipHeight - 14;
+
+                return (
+                  <>
+                    <rect
+                      x={-tooltipWidth / 2}
+                      y={tooltipY}
+                      width={tooltipWidth}
+                      height={tooltipHeight}
+                      rx={6}
+                      fill={MAROON}
+                    />
+                    <text
+                      x={0}
+                      y={tooltipY + tooltipHeight / 2 + 4}
+                      textAnchor="middle"
+                      className="fill-white text-[11px] font-extrabold"
+                    >
+                      {label}
+                    </text>
+                  </>
+                );
+              })()}
+            </g>
+          )}
+
           {points.map((point, index) => (
             <g key={point.round}>
-              <circle cx={xAt(index)} cy={yAt(point.position)} r={5} fill="#214C9B" />
-              <circle cx={xAt(index)} cy={yAt(point.position)} r={8} fill="#214C9B" fillOpacity={0.15} />
+              <circle
+                cx={xAt(index)}
+                cy={yAt(point.position)}
+                r={14}
+                fill="transparent"
+                className="cursor-pointer"
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                aria-label={formatPointLabel(point.round, point.position)}
+              />
+              <circle
+                cx={xAt(index)}
+                cy={yAt(point.position)}
+                r={5}
+                fill="#214C9B"
+                pointerEvents="none"
+                className={hoveredIndex === index ? "opacity-100" : undefined}
+              />
+              <circle
+                cx={xAt(index)}
+                cy={yAt(point.position)}
+                r={8}
+                fill="#214C9B"
+                fillOpacity={hoveredIndex === index ? 0.3 : 0.15}
+                pointerEvents="none"
+              />
               <text
                 x={xAt(index)}
                 y={CHART_HEIGHT - 12}
                 textAnchor="middle"
                 className="fill-slate-500 text-[10px] font-bold"
+                pointerEvents="none"
               >
                 J{point.round}
               </text>
