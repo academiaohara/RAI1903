@@ -33,10 +33,11 @@ export function LeagueTable({
   highlightTeamId = RAI_TEAM_ID,
   clubHighlightTeamId,
   isClubHighlight,
-  showCrests = true,
+  showCrests: showCrestsProp,
   showLegend = true,
   gender = "masculino",
 }: LeagueTableProps) {
+  const showCrests = showCrestsProp ?? gender !== "femenino";
   const visibleRows = [...teams].sort((a, b) => a.position - b.position);
 
   return (

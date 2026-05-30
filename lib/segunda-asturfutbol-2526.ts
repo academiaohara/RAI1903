@@ -215,6 +215,14 @@ function buildMatch(partido: ResultadosPartido, round: number): Match {
   };
 }
 
+export function buildSegundaAsturfutbolAllMatches(
+  data: ResultadosSegundaAsturfutbol = SEGUNDA_ASTURFUTBOL_DATA,
+): Match[] {
+  return [...data.jornadas]
+    .sort((a, b) => a.jornada - b.jornada)
+    .flatMap((jornada) => jornada.partidos.map((partido) => buildMatch(partido, jornada.jornada)));
+}
+
 export function buildSegundaAsturfutbolFilialCalendar(data: ResultadosSegundaAsturfutbol = SEGUNDA_ASTURFUTBOL_DATA): Match[] {
   const matches: Match[] = [];
 

@@ -6,7 +6,7 @@ import {
 import { computeStandings, extractLeagueMatches } from "@/lib/standings";
 import type { CalendarMatch, FormCode, Match, Team } from "@/types";
 
-export type CanteraTeamId = "filial" | "juvenil-a" | "femenino";
+export type CanteraTeamId = "filial" | "juvenil-a";
 
 type RawPartido = {
   fecha: string;
@@ -215,13 +215,11 @@ export function matchesToCanteraCalendarMatches(matches: Match[], avilesTeamId: 
 
 export function getCanteraClubHighlightTeamIds(teamId: CanteraTeamId): string[] {
   if (teamId === "juvenil-a") return getJuvenilAvilesTeamIds();
-  if (teamId === "femenino") return ["real-aviles-industrial-femenino"];
   return ["filial-real-aviles-b"];
 }
 
 export function getCanteraPrimaryAvilesTeamId(teamId: CanteraTeamId): string {
   if (teamId === "juvenil-a") return slugifyCanteraTeamName("Real Avilés U19");
-  if (teamId === "femenino") return "real-aviles-industrial-femenino";
   return "filial-real-aviles-b";
 }
 
@@ -231,145 +229,47 @@ export function isCanteraClubTeam(teamId: CanteraTeamId, rowTeamId: string, team
   return teamName ? isAvilesCanteraTeamName(teamName) : false;
 }
 
-const FEMENINO_TEAM_NAMES = [
-  "Real Avilés Industrial Femenino",
-  "CD Orientación Marítima",
-  "Oviedo Moderno",
-  "Sporting de Gijón Femenino B",
-  "CD Covadonga Femenino",
-  "UD Llanera Femenino",
-  "CD Tuilla Femenino",
-  "Mosconia CF Femenino",
-  "Caudal Deportivo Femenino",
-  "UP Langreo Femenino",
-  "CD Llanes Femenino",
-  "SD Llano 2000 Femenino",
-  "CD Arenal Femenino",
-  "Romanón CF Femenino",
-  "Veriña CF Femenino",
-  "Juventud Estadio Femenino",
-  "Colegio Inmaculada Femenino",
-  "Astur CF Femenino",
-  "Real Oviedo Femenino B",
-  "At. Avilés Femenino",
-] as const;
+function formatJuvenilAvilesResultLine(match: Match): string {
+  const avilesId = slugifyCanteraTeamName("Real Avilés U19");
+  if (match.homeTeamId === avilesId) {
+    return `Real Avilés U19 ${match.homeScore}-${match.awayScore} ${match.awayTeam}`;
+  }
+  return `${match.homeTeam} ${match.homeScore}-${match.awayScore} Real Avilés U19`;
+}
 
-const MOCK_STANDINGS_STATS: Array<{
-  played: number;
-  won: number;
-  drawn: number;
-  lost: number;
-  goalsFor: number;
-  goalsAgainst: number;
-  points: number;
-  form: FormCode[];
-}> = [
-  { played: 26, won: 18, drawn: 4, lost: 4, goalsFor: 52, goalsAgainst: 22, points: 58, form: ["G", "G", "E", "G", "G"] },
-  { played: 26, won: 17, drawn: 5, lost: 4, goalsFor: 48, goalsAgainst: 24, points: 56, form: ["G", "G", "G", "E", "G"] },
-  { played: 26, won: 15, drawn: 6, lost: 5, goalsFor: 44, goalsAgainst: 28, points: 51, form: ["G", "E", "G", "P", "G"] },
-  { played: 26, won: 14, drawn: 5, lost: 7, goalsFor: 40, goalsAgainst: 30, points: 47, form: ["G", "P", "G", "G", "E"] },
-  { played: 26, won: 13, drawn: 6, lost: 7, goalsFor: 38, goalsAgainst: 31, points: 45, form: ["E", "G", "G", "P", "G"] },
-  { played: 26, won: 12, drawn: 7, lost: 7, goalsFor: 36, goalsAgainst: 32, points: 43, form: ["E", "G", "E", "G", "P"] },
-  { played: 26, won: 11, drawn: 8, lost: 7, goalsFor: 35, goalsAgainst: 33, points: 41, form: ["E", "E", "G", "G", "P"] },
-  { played: 26, won: 11, drawn: 6, lost: 9, goalsFor: 34, goalsAgainst: 35, points: 39, form: ["P", "G", "E", "G", "P"] },
-  { played: 26, won: 10, drawn: 8, lost: 8, goalsFor: 33, goalsAgainst: 34, points: 38, form: ["E", "P", "G", "E", "G"] },
-  { played: 26, won: 10, drawn: 6, lost: 10, goalsFor: 32, goalsAgainst: 36, points: 36, form: ["P", "G", "P", "G", "E"] },
-  { played: 26, won: 9, drawn: 8, lost: 9, goalsFor: 30, goalsAgainst: 35, points: 35, form: ["E", "P", "G", "E", "P"] },
-  { played: 26, won: 9, drawn: 7, lost: 10, goalsFor: 29, goalsAgainst: 36, points: 34, form: ["P", "E", "G", "P", "G"] },
-  { played: 26, won: 8, drawn: 9, lost: 9, goalsFor: 28, goalsAgainst: 37, points: 33, form: ["E", "E", "P", "G", "P"] },
-  { played: 26, won: 8, drawn: 8, lost: 10, goalsFor: 27, goalsAgainst: 38, points: 32, form: ["P", "E", "P", "G", "E"] },
-  { played: 26, won: 7, drawn: 9, lost: 10, goalsFor: 26, goalsAgainst: 39, points: 30, form: ["E", "P", "E", "P", "G"] },
-  { played: 26, won: 7, drawn: 7, lost: 12, goalsFor: 25, goalsAgainst: 40, points: 28, form: ["P", "P", "G", "E", "P"] },
-  { played: 26, won: 6, drawn: 8, lost: 12, goalsFor: 24, goalsAgainst: 42, points: 26, form: ["P", "E", "P", "P", "G"] },
-  { played: 26, won: 5, drawn: 9, lost: 12, goalsFor: 22, goalsAgainst: 44, points: 24, form: ["E", "P", "P", "E", "P"] },
-  { played: 26, won: 4, drawn: 8, lost: 14, goalsFor: 20, goalsAgainst: 46, points: 20, form: ["P", "P", "E", "P", "P"] },
-  { played: 26, won: 3, drawn: 7, lost: 16, goalsFor: 18, goalsAgainst: 50, points: 16, form: ["P", "P", "P", "E", "P"] },
-];
+export function buildJuvenilSummary() {
+  const standings = buildJuvenilU19Standings();
+  const avilesId = slugifyCanteraTeamName("Real Avilés U19");
+  const aviles = standings.find((team) => team.id === avilesId);
+  const calendar = getJuvenilAvilesCalendarMatches();
+  const finished = calendar.filter((m) => m.status === "finished");
+  const lastMatch = finished.at(-1);
+  const nextMatch = calendar.find((m) => m.status === "scheduled");
 
-function buildMockTwentyTeamStandings(teamNames: readonly string[], avilesName: string, avilesPosition = 2): Team[] {
-  const rest = teamNames.filter((name) => name !== avilesName);
-  const orderedNames = [...rest];
-  orderedNames.splice(Math.max(0, avilesPosition - 1), 0, avilesName);
-
-  return orderedNames.map((name, index) => {
-    const stats = MOCK_STANDINGS_STATS[index] ?? MOCK_STANDINGS_STATS[MOCK_STANDINGS_STATS.length - 1];
-    const id =
-      name === "Real Avilés B"
-        ? "filial-real-aviles-b"
-        : name === "Real Avilés Industrial Femenino"
-          ? "real-aviles-industrial-femenino"
-          : slugifyCanteraTeamName(name);
-
-    return {
-      ...baseTeamFromName(name, index + 1),
-      id,
-      position: index + 1,
-      form: stats.form,
-      stats: {
-        played: stats.played,
-        won: stats.won,
-        drawn: stats.drawn,
-        lost: stats.lost,
-        goalsFor: stats.goalsFor,
-        goalsAgainst: stats.goalsAgainst,
-        points: stats.points,
-      },
-    };
-  });
+  return {
+    category: "Liga Nacional Juvenil",
+    position: aviles ? `${aviles.position}º - ${aviles.stats.points} pts` : "—",
+    lastResult: lastMatch ? formatJuvenilAvilesResultLine(lastMatch) : "—",
+    nextMatch: nextMatch
+      ? `${nextMatch.homeTeam} - ${nextMatch.awayTeam}`
+      : "Temporada 2025-26 finalizada",
+  };
 }
 
 export function buildFilialStandings(): Team[] {
   return buildSegundaAsturfutbolTable();
 }
 
-export function buildFemeninoCanteraStandings(): Team[] {
-  return buildMockTwentyTeamStandings(FEMENINO_TEAM_NAMES, "Real Avilés Industrial Femenino", 1);
-}
-
 export function buildFilialCalendar(): Match[] {
   return buildSegundaAsturfutbolFilialCalendar();
 }
 
-export function buildFemeninoCanteraCalendar(): Match[] {
-  const avilesId = "real-aviles-industrial-femenino";
-  return [
-    {
-      id: "fem-cantera-j12",
-      matchday: 12,
-      homeTeamId: avilesId,
-      awayTeamId: "fem-cantera-oviedo-moderno",
-      homeTeam: "Real Avilés Industrial Femenino",
-      awayTeam: "Oviedo Moderno",
-      date: "2026-04-12T10:00:00.000Z",
-      competition: "liga-femenina",
-      venue: "Muro de Zaro",
-      status: "scheduled",
-    },
-    {
-      id: "fem-cantera-j11",
-      matchday: 11,
-      homeTeamId: "fem-cantera-cd-covadonga-femenino",
-      awayTeamId: avilesId,
-      homeTeam: "CD Covadonga Femenino",
-      awayTeam: "Real Avilés Industrial Femenino",
-      date: "2026-04-05T11:30:00.000Z",
-      competition: "liga-femenina",
-      venue: "Juan Antonio Alvarez",
-      status: "finished",
-      homeScore: 1,
-      awayScore: 3,
-    },
-  ];
-}
-
 export function getCanteraStandings(teamId: CanteraTeamId): Team[] {
   if (teamId === "juvenil-a") return buildJuvenilU19Standings();
-  if (teamId === "femenino") return buildFemeninoCanteraStandings();
   return buildFilialStandings();
 }
 
 export function getCanteraCalendar(teamId: CanteraTeamId): Match[] {
   if (teamId === "juvenil-a") return getJuvenilAvilesCalendarMatches();
-  if (teamId === "femenino") return buildFemeninoCanteraCalendar();
   return buildFilialCalendar();
 }

@@ -1,17 +1,11 @@
-import { TeamCrest } from "@/components/TeamCrest";
-import { TeamLink } from "@/components/TeamLink";
-import { getJornadaTeam } from "@/lib/jornadas-data";
-import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { formatMatchDate } from "@/lib/utils";
 import type { JornadaFixture } from "@/types/jornadas";
 import { cn } from "@/lib/utils";
 
-type JornadaMatchRowProps = {
+type CanteraJornadaMatchRowProps = {
   fixture: JornadaFixture;
   highlighted?: boolean;
   highlightTeamId?: string;
-  gender?: PrimerEquipoGender;
-  showCrests?: boolean;
 };
 
 function scoreOrTime(fixture: JornadaFixture): string {
@@ -22,16 +16,11 @@ function scoreOrTime(fixture: JornadaFixture): string {
   return formatMatchDate(fixture.date).split(",").pop()?.trim() ?? "—";
 }
 
-export function JornadaMatchRow({
+export function CanteraJornadaMatchRow({
   fixture,
   highlighted = false,
   highlightTeamId,
-  gender = "masculino",
-  showCrests: showCrestsProp,
-}: JornadaMatchRowProps) {
-  const showCrests = showCrestsProp ?? gender !== "femenino";
-  const home = getJornadaTeam(fixture.homeTeamId);
-  const away = getJornadaTeam(fixture.awayTeamId);
+}: CanteraJornadaMatchRowProps) {
   const highlightHome = Boolean(highlightTeamId && fixture.homeTeamId === highlightTeamId);
   const highlightAway = Boolean(highlightTeamId && fixture.awayTeamId === highlightTeamId);
 
@@ -50,16 +39,7 @@ export function JornadaMatchRow({
           : "border-[#214C9B]/12 bg-slate-50/80",
       )}
     >
-      <div className="flex min-w-0 items-center gap-2">
-        {home && showCrests ? (
-          <TeamLink gender={gender} teamId={fixture.homeTeamId} teamName={fixture.homeTeamName} className="shrink-0">
-            <TeamCrest team={home} size="sm" className="shrink-0" />
-          </TeamLink>
-        ) : null}
-        <TeamLink gender={gender} teamId={fixture.homeTeamId} teamName={fixture.homeTeamName} className={nameClass(highlightHome)}>
-          {fixture.homeTeamName}
-        </TeamLink>
-      </div>
+      <p className={cn(nameClass(highlightHome), "text-left")}>{fixture.homeTeamName}</p>
 
       <div
         className={cn(
@@ -70,21 +50,7 @@ export function JornadaMatchRow({
         {scoreOrTime(fixture)}
       </div>
 
-      <div className="flex min-w-0 items-center justify-end gap-2">
-        <TeamLink
-          gender={gender}
-          teamId={fixture.awayTeamId}
-          teamName={fixture.awayTeamName}
-          className={cn(nameClass(highlightAway), "text-right")}
-        >
-          {fixture.awayTeamName}
-        </TeamLink>
-        {away && showCrests ? (
-          <TeamLink gender={gender} teamId={fixture.awayTeamId} teamName={fixture.awayTeamName} className="shrink-0">
-            <TeamCrest team={away} size="sm" className="shrink-0" />
-          </TeamLink>
-        ) : null}
-      </div>
+      <p className={cn(nameClass(highlightAway), "text-right")}>{fixture.awayTeamName}</p>
     </article>
   );
 }
