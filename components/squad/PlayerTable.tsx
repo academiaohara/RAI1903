@@ -40,13 +40,7 @@ const alignClass = {
 export function PlayerTable({ players, onSelect, showMarketValue = false }: PlayerTableProps) {
   const grouped = groupPlayersByPosition(players);
   const columns = showMarketValue
-    ? [
-        baseColumns[0],
-        baseColumns[1],
-        baseColumns[2],
-        marketValueColumn,
-        ...baseColumns.slice(3),
-      ]
+    ? [...baseColumns.slice(0, -1), marketValueColumn, baseColumns[baseColumns.length - 1]]
     : [...baseColumns];
 
   return (
@@ -65,12 +59,12 @@ export function PlayerTable({ players, onSelect, showMarketValue = false }: Play
                     <col className="w-[11.5rem]" />
                     <col className="w-12" />
                     <col className="w-14" />
-                    {showMarketValue && <col className="w-[5.5rem]" />}
                     <col className="w-12" />
                     <col className="w-12" />
                     <col className="w-12" />
                     <col className="w-12" />
                     <col className="w-12" />
+                    {showMarketValue && <col className="w-[4.25rem]" />}
                     <col className="w-16" />
                   </colgroup>
                   <thead>
@@ -147,16 +141,16 @@ function PlayerRow({
       <td className={`px-4 py-4 tabular-nums text-slate-700 ${alignClass.center}`}>
         {formatPlayerAge(player.edad)}
       </td>
-      {showMarketValue && (
-        <td className={`px-2 py-3 text-[11px] font-bold tabular-nums text-slate-600 ${alignClass.center}`}>
-          {player.valorMercado ?? "—"}
-        </td>
-      )}
       <StatCell value={player.partidos} />
       <StatCell value={player.goles} highlight={player.goles > 0} />
       <StatCell value={player.asistencias} highlight={player.asistencias > 0} />
       <StatCell value={player.amarillas} warn={player.amarillas > 0} />
       <StatCell value={player.rojas} warn={player.rojas > 0} />
+      {showMarketValue && (
+        <td className={`px-1.5 py-3 text-[10px] font-bold leading-tight tabular-nums text-slate-600 ${alignClass.center}`}>
+          {player.valorMercado ?? "—"}
+        </td>
+      )}
       <td className={`px-4 py-4 text-xs font-bold tabular-nums text-slate-500 ${alignClass.center}`}>
         {formatContractDate(player.contratoHasta)}
       </td>
