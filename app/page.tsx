@@ -7,7 +7,7 @@ import { MatchCard } from "@/components/MatchCard";
 import { TransfersCarousel } from "@/components/fichajes/TransfersCarousel";
 import { NewsNavButton } from "@/components/NewsNavButton";
 import { NewsTicker } from "@/components/NewsTicker";
-import { getFeaturedTransfers, getLoanTransfers } from "@/lib/fichajes";
+import { getAllCarouselTransfers } from "@/lib/fichajes";
 import { MatchScoreCenter } from "@/components/MatchScoreCenter";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { PageHero } from "@/components/PageHero";
@@ -30,8 +30,7 @@ export default function HomePage() {
   const upcomingMatches = getUpcomingAvilesMatches();
   const latestCronica = latestMatch ? getCronicaForMatch(latestMatch.id) : undefined;
   const nextPrevia = nextMatch ? getPreviaForMatch(nextMatch.id) : undefined;
-  const featuredTransfers = getFeaturedTransfers();
-  const loanTransfers = getLoanTransfers();
+  const carouselTransfers = getAllCarouselTransfers();
   const statHighlights = [
     { label: "Mas goles", player: [...players].sort((a, b) => b.stats.goals - a.stats.goals)[0], valueKey: "goals", suffix: "goles" },
     { label: "Mas asistencias", player: [...players].sort((a, b) => b.stats.assists - a.stats.assists)[0], valueKey: "assists", suffix: "asist." },
@@ -76,10 +75,10 @@ export default function HomePage() {
         <NewsTicker items={newsItems} />
       </Card>
 
-      {(featuredTransfers.length > 0 || loanTransfers.length > 0) && (
+      {carouselTransfers.length > 0 && (
         <div id="fichajes">
           <Card eyebrow="Mercado" title="Fichajes y renovaciones">
-            <TransfersCarousel mercadoTransfers={featuredTransfers} loanTransfers={loanTransfers} />
+            <TransfersCarousel />
           </Card>
         </div>
       )}

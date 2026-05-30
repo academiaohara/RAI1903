@@ -142,23 +142,65 @@ export function getSquadPlayerForTransfer(transfer: TransferRumor): SquadPlayer 
   return undefined;
 }
 
-/** Altas oficiales y renovaciones para carrusel de inicio (sin cesiones). */
-export function getFeaturedTransfers(): TransferRumor[] {
-  return transfers
-    .filter(
-      (transfer) =>
-        (transfer.category === "Altas" || transfer.category === "Renovaciones") &&
-        transfer.status === "Oficial" &&
-        !isLoanTransfer(transfer),
-    )
-    .sort((a, b) => b.date.localeCompare(a.date));
+export type TransferCarouselMode = "todos" | "fichajes" | "renovaciones" | "cesiones";
+
+function sortTransfersByDate(items: TransferRumor[]): TransferRumor[] {
+  return [...items].sort((a, b) => b.date.localeCompare(a.date));
+}
+
+function isOfficialMarketTransfer(transfer: TransferRumor): boolean {
+  return (
+    (transfer.category === "Altas" || transfer.category === "Renovaciones") && transfer.status === "Oficial"
+  );
+}
+
+/** Todos los movimientos oficiales del carrusel de inicio (altas, renovaciones y cesiones). */
+export function getAllCarouselTransfers(): TransferRumor[] {
+  return sortTransfersByDate(transfers.filter(isOfficialMarketTransfer));
+}
+
+/** Altas oficiales en propiedad (agente libre u otro), sin cesiones. */
+export function getSigningCarouselTransfers(): TransferRumor[] {
+  return sortTransfersByDate(
+    transfers.filter(
+      (transfer) => transfer.category === "Altas" && transfer.status === "Oficial" && !isLoanTransfer(transfer),
+    ),
+  );
+}
+
+/** Renovaciones oficiales del carrusel de inicio. */
+export function getRenewalCarouselTransfers(): TransferRumor[] {
+  return sortTransfersByDate(
+    transfers.filter((transfer) => transfer.category === "Renovaciones" && transfer.status === "Oficial"),
+  );
 }
 
 /** Jugadores cedidos al club en la temporada 25/26. */
 export function getLoanTransfers(): TransferRumor[] {
-  return transfers
-    .filter((transfer) => isLoanTransfer(transfer) && transfer.status === "Oficial")
-    .sort((a, b) => b.date.localeCompare(a.date));
+  return sortTransfersByDate(
+    transfers.filter((transfer) => isLoanTransfer(transfer) && transfer.status === "Oficial"),
+  );
+}
+
+export function getCarouselTransfersByMode(mode: TransferCarouselMode): TransferRumor[] {
+  switch (mode) {
+    case "todos":
+      return getAllCarouselTransfers();
+    case "fichajes":
+      return getSigningCarouselTransfers();
+    case "renovaciones":
+      return getRenewalCarouselTransfers();
+    case "cesiones":
+      return getLoanTransfers();
+  }
+}
+
+/** Altas oficiales y renovaciones para carrusel de inicio (sin cesiones). */
+export function getFeaturedTransfers(): TransferRumor[] {
+  return sortTransfersByDate([
+    ...getSigningCarouselTransfers(),
+    ...getRenewalCarouselTransfers(),
+  ]);
 }
 
 /** Todas las altas oficiales de la temporada 25/26. */
