@@ -127,23 +127,22 @@ export function getSquadPlayerForTransfer(transfer: TransferRumor): SquadPlayer 
   return undefined;
 }
 
-/** Fichajes y renovaciones destacados para el carrusel de inicio. */
+/** Altas oficiales y renovaciones para carrusel de inicio y pagina de fichajes. */
 export function getFeaturedTransfers(): TransferRumor[] {
-  const order = ["t9", "t3", "t4", "t6", "t8"];
-  const featured = transfers.filter(
-    (transfer) =>
-      (transfer.category === "Altas" || transfer.category === "Renovaciones") &&
-      transfer.status === "Oficial",
-  );
+  return transfers
+    .filter(
+      (transfer) =>
+        (transfer.category === "Altas" || transfer.category === "Renovaciones") &&
+        transfer.status === "Oficial",
+    )
+    .sort((a, b) => b.date.localeCompare(a.date));
+}
 
-  return featured.sort((a, b) => {
-    const ai = order.indexOf(a.id);
-    const bi = order.indexOf(b.id);
-    if (ai === -1 && bi === -1) return b.date.localeCompare(a.date);
-    if (ai === -1) return 1;
-    if (bi === -1) return -1;
-    return ai - bi;
-  });
+/** Todas las altas oficiales de la temporada 25/26. */
+export function getOfficialAltas(): TransferRumor[] {
+  return transfers
+    .filter((transfer) => transfer.category === "Altas" && transfer.status === "Oficial")
+    .sort((a, b) => b.date.localeCompare(a.date));
 }
 
 export function getTransferForPlayer(playerId: string): TransferRumor | undefined {
