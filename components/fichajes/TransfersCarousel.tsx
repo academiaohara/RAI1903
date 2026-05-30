@@ -7,40 +7,44 @@ import {
   useSmoothHorizontalWheelScroll,
 } from "@/lib/use-horizontal-wheel-scroll";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
+import {
+  getAllCarouselTransfers,
+  getCarouselTransfersByMode,
+  getLoanTransfers,
+  getRenewalCarouselTransfers,
+  getSigningCarouselTransfers,
+  type TransferCarouselMode,
+} from "@/lib/fichajes";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import type { Route } from "next";
 import { TransferFichaCard } from "@/components/fichajes/TransferFichaCard";
-import type { TransferRumor } from "@/types";
-
-type TransferCarouselMode = "mercado" | "cesiones";
 
 const MODE_OPTIONS = [
-  { id: "mercado" as const, label: "Fichajes y renovaciones" },
+  { id: "todos" as const, label: "Todos" },
+  { id: "fichajes" as const, label: "Fichajes" },
+  { id: "renovaciones" as const, label: "Renovaciones" },
   { id: "cesiones" as const, label: "Cesiones" },
 ];
 
-type TransfersCarouselProps = {
-  mercadoTransfers: TransferRumor[];
-  loanTransfers: TransferRumor[];
-};
-
-export function TransfersCarousel({ mercadoTransfers, loanTransfers }: TransfersCarouselProps) {
-  const hasMercado = mercadoTransfers.length > 0;
-  const hasCesiones = loanTransfers.length > 0;
-
-  const visibleModes = useMemo(
-    () => MODE_OPTIONS.filter((option) => (option.id === "cesiones" ? hasCesiones : hasMercado)),
-    [hasCesiones, hasMercado],
+export function TransfersCarousel() {
+  const transfersByMode = useMemo(
+    () => ({
+      todos: getAllCarouselTransfers(),
+      fichajes: getSigningCarouselTransfers(),
+      renovaciones: getRenewalCarouselTransfers(),
+      cesiones: getLoanTransfers(),
+    }),
+    [],
   );
 
-  const [mode, setMode] = useState<TransferCarouselMode>("mercado");
+  const hasCarousel = transfersByMode.todos.length > 0;
 
-  const activeMode = visibleModes.some((option) => option.id === mode)
-    ? mode
-    : (visibleModes[0]?.id ?? "mercado");
+  const [mode, setMode] = useState<TransferCarouselMode>("todos");
 
-  const transfers = activeMode === "cesiones" ? loanTransfers : mercadoTransfers;
+  const activeMode = mode;
+
+  const transfers = getCarouselTransfersByMode(activeMode);
   const useTicker = transfers.length > 1;
   const loop = useTicker ? [...transfers, ...transfers] : transfers;
 
@@ -147,7 +151,7 @@ export function TransfersCarousel({ mercadoTransfers, loanTransfers }: Transfers
     resetManualScroll();
   }, [activeMode, resetManualScroll]);
 
-  if (!hasMercado && !hasCesiones) return null;
+  if (!hasCarousel) return null;
   if (transfers.length === 0) return null;
 
   return (
@@ -162,14 +166,13 @@ export function TransfersCarousel({ mercadoTransfers, loanTransfers }: Transfers
         </Link>
       </div>
 
-      {visibleModes.length > 1 && (
-        <QuinielaViewToggle
-          value={activeMode}
-          onChange={handleModeChange}
-          options={visibleModes}
-          layoutId="transfers-carousel-mode"
-        />
-      )}
+      <QuinielaViewToggle
+        value={activeMode}
+        onChange={handleModeChange}
+        options={MODE_OPTIONS}
+        layoutId="transfers-carousel-mode"
+        className="text-[10px] sm:text-xs"
+      />
 
       <div
         ref={containerRef}
