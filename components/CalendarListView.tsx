@@ -65,35 +65,6 @@ export function CalendarListView({ matches, className, gender = "masculino" }: C
   return (
     <div className={cn("overflow-x-auto rounded-xl border border-[#214C9B]/15 bg-white", className)} role="table" aria-label="Calendario de partidos">
       <div className="min-w-[44rem]">
-        <div
-          className={cn(
-            LIST_ROW_GRID,
-            "sticky top-0 z-10 border-b border-[#214C9B]/15 bg-slate-50/95 px-3 py-2 backdrop-blur-sm",
-          )}
-          role="row"
-        >
-          <span role="columnheader" className="text-left text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
-            Fecha
-          </span>
-          <span role="columnheader" className="text-left text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
-            Hora
-          </span>
-          <span role="columnheader" className="text-left text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
-            Local/visit.
-          </span>
-          <span role="columnheader" className="text-left text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
-            Estadio
-          </span>
-          <span role="columnheader" className="text-right text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
-            Resultado
-          </span>
-          <span role="columnheader" className="text-left text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
-            Rival
-          </span>
-          <span role="columnheader" className="text-right text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
-            Competición
-          </span>
-        </div>
         <ul role="rowgroup">
           {sortedMatches.map((match, index) => (
             <li key={match.id} role="row">
