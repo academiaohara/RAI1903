@@ -38,6 +38,10 @@ const cronicaCardHoverClass = cn(
   "has-[a.cronica-overlay:hover]:border-[#214C9B]",
   "has-[a.cronica-overlay:hover]:bg-[#214C9B]",
   "has-[a.cronica-overlay:hover]:shadow-[0_10px_24px_rgba(33,76,155,0.22)]",
+  "has-[a.cronica-overlay:hover]:[&_.recent-card-competicion]:!text-white",
+  "has-[a.cronica-overlay:hover]:[&_.recent-card-competicion]:decoration-transparent",
+  "has-[a.cronica-overlay:hover]:[&_.recent-card-competicion_img]:brightness-0",
+  "has-[a.cronica-overlay:hover]:[&_.recent-card-competicion_img]:invert",
 );
 
 const cronicaContentHoverClass = "group-has-[a.cronica-overlay:hover]/card:text-white";
@@ -77,11 +81,9 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
           <Link
             href={competicionHref}
             className={cn(
-              "pointer-events-auto relative z-10 inline-flex max-w-[58%] shrink-0 items-center justify-end gap-1.5 text-right text-[11px] font-bold uppercase leading-none tracking-[0.06em] text-[#981915]",
+              "recent-card-competicion pointer-events-auto relative z-10 inline-flex max-w-[58%] shrink-0 items-center justify-end gap-1.5 text-right text-[11px] font-bold uppercase leading-none tracking-[0.06em] text-[#981915] transition-colors duration-200",
               secondaryLinkHoverClass,
               "hover:translate-x-0.5",
-              "group-has-[a.cronica-overlay:hover]/card:text-white/90 group-has-[a.cronica-overlay:hover]/card:decoration-transparent",
-              "group-has-[a.cronica-overlay:hover]/card:[&_img]:brightness-0 group-has-[a.cronica-overlay:hover]/card:[&_img]:invert",
             )}
             aria-label={`Ver competición: ${competitionLabel}`}
           >
@@ -89,7 +91,7 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
             <span>{matchFixtureMeta(match)}</span>
           </Link>
         </div>
-        <div className="pointer-events-auto relative z-10">
+        <div className="relative z-[1]">
           <MatchFixtureTeamLinks
             match={match}
             gender={gender}
@@ -105,7 +107,7 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
             )}
           />
         </div>
-        <p className={cn("mt-2 text-xs font-bold text-slate-600 transition-colors duration-200", cronicaContentHoverClass)}>
+        <p className={cn("mt-2 text-xs font-bold text-slate-600 transition-colors duration-200", cronicaContentHoverClass, "group-has-[a.cronica-overlay:hover]/card:!text-white")}>
           {formatMatchDate(match.date)} · Leer la cronica
         </p>
       </div>
