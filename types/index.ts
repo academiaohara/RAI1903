@@ -126,7 +126,7 @@ export type NewsCategory = "Fichajes" | "Lesionados" | "Rumores" | "Renovaciones
 export type TransferStatus = "Interes" | "Negociacion" | "Cercano" | "Oficial" | "Descartado";
 export type TransferCategory = "Rumores" | "Altas" | "Bajas" | "Renovaciones";
 
-export type TransferKind = "fichaje" | "renovacion";
+export type TransferKind = "fichaje" | "renovacion" | "cesion";
 
 export type TransferRumor = {
   id: string;

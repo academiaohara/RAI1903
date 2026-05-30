@@ -48,6 +48,13 @@ const toneByKind = {
     pill: "bg-blue-50 text-[#214C9B]",
     announcement: "renovacion" as const,
   },
+  cesion: {
+    hero: "from-amber-800 via-amber-700 to-amber-600",
+    chip: "border-white/25 bg-white/10",
+    accent: "text-amber-200",
+    pill: "bg-amber-50 text-amber-800",
+    announcement: "fichaje" as const,
+  },
 } as const;
 
 type TransferDetailViewProps = {
@@ -174,7 +181,9 @@ export function TransferDetailView({ transfer, player }: TransferDetailViewProps
 
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge tone={kind === "fichaje" ? "red" : "blue"}>{getTransferKindLabel(kind)}</Badge>
+                    <Badge tone={kind === "fichaje" ? "red" : kind === "cesion" ? "amber" : "blue"}>
+                      {getTransferKindLabel(kind)}
+                    </Badge>
                     <Badge tone="slate">{transfer.source}</Badge>
                   </div>
                   <p className="mt-4 text-sm leading-7 text-slate-600">{transfer.analysis}</p>

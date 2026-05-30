@@ -1,46 +1,90 @@
 "use client";
 
 import Link from "next/link";
-import { useHorizontalWheelScroll } from "@/lib/use-horizontal-wheel-scroll";
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type WheelEvent } from "react";
+import {
+  useHorizontalWheelScroll,
+  useHorizontalWheelScrollListener,
+  useSmoothHorizontalWheelScroll,
+} from "@/lib/use-horizontal-wheel-scroll";
+import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import type { Route } from "next";
 import { TransferFichaCard } from "@/components/fichajes/TransferFichaCard";
 import type { TransferRumor } from "@/types";
 
+type TransferCarouselMode = "mercado" | "cesiones";
+
+const MODE_OPTIONS = [
+  { id: "mercado" as const, label: "Fichajes y renovaciones" },
+  { id: "cesiones" as const, label: "Cesiones" },
+];
+
 type TransfersCarouselProps = {
-  transfers: TransferRumor[];
+  mercadoTransfers: TransferRumor[];
+  loanTransfers: TransferRumor[];
 };
 
-export function TransfersCarousel({ transfers }: TransfersCarouselProps) {
+export function TransfersCarousel({ mercadoTransfers, loanTransfers }: TransfersCarouselProps) {
+  const hasMercado = mercadoTransfers.length > 0;
+  const hasCesiones = loanTransfers.length > 0;
+
+  const visibleModes = useMemo(
+    () => MODE_OPTIONS.filter((option) => (option.id === "cesiones" ? hasCesiones : hasMercado)),
+    [hasCesiones, hasMercado],
+  );
+
+  const [mode, setMode] = useState<TransferCarouselMode>("mercado");
+
+  const activeMode = visibleModes.some((option) => option.id === mode)
+    ? mode
+    : (visibleModes[0]?.id ?? "mercado");
+
+  const transfers = activeMode === "cesiones" ? loanTransfers : mercadoTransfers;
+  const useTicker = transfers.length > 1;
+  const loop = useTicker ? [...transfers, ...transfers] : transfers;
+
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const [shouldScroll, setShouldScroll] = useState(false);
   const [manualScroll, setManualScroll] = useState(false);
-  const [tickerDuration, setTickerDuration] = useState("45s");
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
-  const useTicker = shouldScroll && !prefersReducedMotion && !manualScroll;
-  const handleScrollWheel = useHorizontalWheelScroll();
+  const getLoopWidth = useCallback(() => {
+    const track = trackRef.current;
+    if (!track || !useTicker) return 0;
+    return track.scrollWidth / 2;
+  }, [useTicker]);
+
+  const handleScrollWheel = useHorizontalWheelScroll({
+    blockPageScroll: true,
+    smooth: true,
+    getLoopWidth: useTicker ? getLoopWidth : undefined,
+  });
+  const smoothScroll = useSmoothHorizontalWheelScroll(useTicker ? getLoopWidth : undefined);
 
   const resetManualScroll = useCallback(() => {
+    const container = containerRef.current;
     const track = trackRef.current;
     if (!track) return;
+
+    smoothScroll.cancel();
+    if (container) {
+      container.scrollLeft = 0;
+    }
+
     track.style.animation = "";
     track.style.transform = "";
     track.style.animationPlayState = "";
     setManualScroll(false);
-  }, []);
+  }, [smoothScroll]);
 
   const handleWheel = useCallback(
-    (event: WheelEvent<HTMLDivElement>) => {
+    (event: WheelEvent) => {
       if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
 
-      const container = event.currentTarget;
+      const container = event.currentTarget as HTMLDivElement;
       const track = trackRef.current;
-      const canAnimate = shouldScroll && !prefersReducedMotion;
 
-      if (canAnimate && !manualScroll && track) {
+      if (useTicker && !manualScroll && track) {
         event.preventDefault();
 
         const transform = window.getComputedStyle(track).transform;
@@ -48,65 +92,67 @@ export function TransfersCarousel({ transfers }: TransfersCarouselProps) {
         if (transform && transform !== "none") {
           currentX = new DOMMatrixReadOnly(transform).m41;
         }
-        const nextOffset = Math.max(0, -currentX - event.deltaY);
+        const loopWidth = track.scrollWidth / 2;
+        let nextOffset = Math.max(0, -currentX - event.deltaY);
+        if (loopWidth > 0) {
+          nextOffset %= loopWidth;
+        }
 
         track.style.animation = "none";
         track.style.transform = "none";
         track.style.animationPlayState = "";
 
         flushSync(() => setManualScroll(true));
-        container.scrollLeft = nextOffset;
+        smoothScroll.setOffset(container, nextOffset);
         return;
       }
 
       handleScrollWheel(event);
     },
-    [handleScrollWheel, manualScroll, prefersReducedMotion, shouldScroll],
+    [handleScrollWheel, manualScroll, smoothScroll, useTicker],
   );
 
-  useEffect(() => {
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => setPrefersReducedMotion(media.matches);
-    sync();
-    media.addEventListener("change", sync);
-    return () => media.removeEventListener("change", sync);
-  }, []);
-
-  const measureOverflow = useCallback(() => {
-    const container = containerRef.current;
-    const track = trackRef.current;
-    if (!container || !track || transfers.length === 0) return;
-
-    const singleWidth =
-      track.children.length > transfers.length ? track.scrollWidth / 2 : track.scrollWidth;
-    const overflows = singleWidth > container.clientWidth + 1;
-
-    setShouldScroll((prev) => (prev === overflows ? prev : overflows));
-    if (overflows) {
-      const seconds = Math.max(35, Math.round(singleWidth / 22));
-      setTickerDuration(`${seconds}s`);
-    }
-  }, [transfers.length]);
+  useHorizontalWheelScrollListener(containerRef, handleWheel);
 
   useEffect(() => {
-    measureOverflow();
+    if (!manualScroll || !useTicker) return;
+
     const container = containerRef.current;
     const track = trackRef.current;
     if (!container || !track) return;
 
-    const observer = new ResizeObserver(measureOverflow);
-    observer.observe(container);
-    observer.observe(track);
-    return () => observer.disconnect();
-  }, [measureOverflow, transfers, shouldScroll]);
+    const onScroll = () => {
+      const loopWidth = track.scrollWidth / 2;
+      if (loopWidth <= 0) return;
 
+      if (container.scrollLeft >= loopWidth) {
+        container.scrollLeft -= loopWidth;
+        smoothScroll.syncTarget(container);
+      }
+    };
+
+    container.addEventListener("scroll", onScroll, { passive: true });
+    return () => container.removeEventListener("scroll", onScroll);
+  }, [manualScroll, smoothScroll, useTicker]);
+
+  const handleModeChange = useCallback(
+    (nextMode: TransferCarouselMode) => {
+      setMode(nextMode);
+      resetManualScroll();
+    },
+    [resetManualScroll],
+  );
+
+  useEffect(() => {
+    resetManualScroll();
+  }, [activeMode, resetManualScroll]);
+
+  if (!hasMercado && !hasCesiones) return null;
   if (transfers.length === 0) return null;
-
-  const loop = useTicker ? [...transfers, ...transfers] : transfers;
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm font-bold uppercase text-[#214C9B]">Mercado blanquiazul</p>
         <Link
           href={"/fichajes" as Route}
@@ -116,30 +162,29 @@ export function TransfersCarousel({ transfers }: TransfersCarouselProps) {
         </Link>
       </div>
 
+      {visibleModes.length > 1 && (
+        <QuinielaViewToggle
+          value={activeMode}
+          onChange={handleModeChange}
+          options={visibleModes}
+          layoutId="transfers-carousel-mode"
+        />
+      )}
+
       <div
         ref={containerRef}
-        onWheel={handleWheel}
         onMouseLeave={manualScroll ? resetManualScroll : undefined}
-        className={`transfers-ticker py-1 ${
+        className={`py-1${
           useTicker
-            ? "overflow-hidden"
-            : shouldScroll || manualScroll
-              ? "no-scrollbar overflow-x-auto overscroll-x-contain pb-1"
-              : "flex justify-start pb-1"
+            ? manualScroll
+              ? " no-scrollbar overflow-x-auto overscroll-x-contain overscroll-y-none"
+              : " news-ticker overflow-hidden overscroll-y-none"
+            : " no-scrollbar overflow-x-auto overscroll-x-contain overscroll-y-none"
         }`}
       >
         <div
           ref={trackRef}
-          className={
-            useTicker
-              ? "transfers-ticker-track flex w-max gap-4"
-              : `flex w-max gap-4${shouldScroll ? " snap-x snap-mandatory" : ""}`
-          }
-          style={
-            useTicker
-              ? ({ "--transfers-ticker-duration": tickerDuration } as CSSProperties)
-              : undefined
-          }
+          className={`flex w-max gap-4${useTicker && !manualScroll ? " news-ticker-track" : ""}`}
         >
           {loop.map((transfer, index) => (
             <TransferFichaCard
@@ -151,7 +196,10 @@ export function TransfersCarousel({ transfers }: TransfersCarouselProps) {
         </div>
       </div>
 
-      <Link href={"/fichajes" as Route} className="text-xs font-bold uppercase tracking-wide text-[#981915] transition hover:underline sm:hidden">
+      <Link
+        href={"/fichajes" as Route}
+        className="text-xs font-bold uppercase tracking-wide text-[#981915] transition hover:underline sm:hidden"
+      >
         Ver todos los fichajes
       </Link>
     </div>

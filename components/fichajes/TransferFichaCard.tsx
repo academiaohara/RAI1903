@@ -27,6 +27,15 @@ const toneStyles = {
     hoverShadow: "group-hover:shadow-[0_16px_36px_rgba(33,76,155,0.2)]",
     dorsal: "text-[#214C9B]",
   },
+  cesion: {
+    border: "border-amber-600",
+    footer: "bg-amber-600",
+    badge: "bg-amber-600 text-white",
+    gradient: "from-amber-50 via-yellow-50/90 to-white",
+    shadow: "shadow-[0_10px_28px_rgba(217,119,6,0.12)]",
+    hoverShadow: "group-hover:shadow-[0_16px_36px_rgba(217,119,6,0.2)]",
+    dorsal: "text-amber-700",
+  },
 } as const;
 
 type TransferFichaCardProps = {
