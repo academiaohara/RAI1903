@@ -105,7 +105,7 @@ export function TransferDetailView({ transfer, player }: TransferDetailViewProps
             </div>
             <h1 className="mt-3 text-3xl font-extrabold uppercase tracking-tight sm:text-4xl">{displayName}</h1>
             <p className="mt-2 text-sm font-semibold text-white/85">
-              {transfer.position} · {transfer.age} anos · {flag} {player?.nacionalidad ?? "Espana"}
+              {transfer.position} · {transfer.age} años · {flag} {player?.nacionalidad ?? "España"}
             </p>
 
             <div className="mt-4 grid grid-cols-1 gap-2 text-left text-xs font-semibold sm:grid-cols-2">

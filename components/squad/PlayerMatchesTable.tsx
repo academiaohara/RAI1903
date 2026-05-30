@@ -56,7 +56,7 @@ export function PlayerMatchesTable({ player }: { player: SquadPlayer }) {
           <table className="w-full min-w-[680px] border-collapse text-left text-sm">
             <thead>
               <tr className="bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                {["Fecha", "Rival", "Competicion", "Min", "G", "A", "TA", "TR"].map((col) => (
+                {["Fecha", "Rival", "Competición", "Min", "G", "A", "TA", "TR"].map((col) => (
                   <th key={col} className="px-4 py-3">
                     {col}
                   </th>

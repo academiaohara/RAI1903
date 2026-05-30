@@ -328,7 +328,7 @@ export function getMatchForArticle(article: MatchArticle): Match | null {
     matchday: 8,
     homeTeamId: "real-aviles-industrial-femenino",
     awayTeamId: "llanera",
-    homeTeam: "Real Aviles Industrial Femenino",
+    homeTeam: "Real Avilés Industrial Femenino",
     awayTeam: "UD Llanera",
     date: article.date,
     competition: "liga-femenina",

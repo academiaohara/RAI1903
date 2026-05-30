@@ -14,7 +14,7 @@ import type { PlayerCareerRecord, PlayerMatchRecord, SquadClubInfo, SquadPlayer 
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 
 const BIRTH_PLACES = [
-  "Aviles",
+  "Avilés",
   "Gijon",
   "Oviedo",
   "Langreo",
@@ -193,7 +193,7 @@ export function getSquadPlayers(gender: PrimerEquipoGender): SquadPlayer[] {
   }
 
   const source = gender === "femenino" ? playersFemenino : players;
-  const clubName = gender === "femenino" ? "Real Aviles Industrial Femenino" : "Real Aviles Industrial";
+  const clubName = gender === "femenino" ? "Real Avilés Industrial Femenino" : "Real Avilés Industrial";
   return source.map((player) => toSquadPlayer(player, clubName, gender));
 }
 
@@ -227,10 +227,10 @@ export function getSquadClubInfo(gender: PrimerEquipoGender): SquadClubInfo {
   };
 
   const stadiumName = team?.stadium ?? "Roman Suarez Puerta";
-  const city = team?.city ?? "Aviles";
+  const city = team?.city ?? "Avilés";
 
   return {
-    nombre: team?.name ?? "Real Aviles Industrial",
+    nombre: team?.name ?? "Real Avilés Industrial",
     temporada: "2025/26",
     estadio: stadiumName,
     estadioInfo: {

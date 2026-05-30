@@ -16,7 +16,7 @@ export function GuiaLiga({ gender, teams, grupo }: GuiaLigaProps) {
   const sorted = [...teams].sort((a, b) => a.position - b.position);
 
   return (
-    <Card eyebrow="Competicion" title="Guia de la liga" borderlessHeader>
+    <Card eyebrow="Competición" title="Guia de la liga" borderlessHeader>
       <p className="mb-5 text-sm font-bold text-slate-600">
         {grupo === "1"
           ? "Los 20 equipos del grupo, con el Real Avilés. Pulsa un escudo para ver la ficha del club."

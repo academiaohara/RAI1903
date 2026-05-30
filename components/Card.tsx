@@ -8,7 +8,7 @@ type CardProps = {
   children: ReactNode;
   className?: string;
   dense?: boolean;
-  /** Sin borde inferior en la cabecera (p. ej. seccion Competicion). */
+  /** Sin borde inferior en la cabecera (p. ej. seccion Competición). */
   borderlessHeader?: boolean;
 };
 

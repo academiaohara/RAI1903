@@ -17,7 +17,6 @@ export function getPlayerInitials(player: SquadPlayer): string {
 }
 
 const NATIONALITY_FLAGS: Record<string, string> = {
-  Espana: "🇪🇸",
   España: "🇪🇸",
   Portugal: "🇵🇹",
   Francia: "🇫🇷",
@@ -36,7 +35,6 @@ export function getNationalityFlag(nacionalidad: string): string {
 }
 
 const NATIONALITY_ISO: Record<string, string> = {
-  Espana: "es",
   España: "es",
   Portugal: "pt",
   Francia: "fr",
@@ -122,7 +120,7 @@ export function formatPlayerAge(edad: number): string {
 }
 
 export function formatPlayerAgeWithUnit(edad: number): string {
-  return edad > 0 ? `${edad} anos` : "—";
+  return edad > 0 ? `${edad} años` : "—";
 }
 
 export function formatBirthDate(isoDate: string): string {
