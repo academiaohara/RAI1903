@@ -11,6 +11,8 @@ export type Player = {
   number: number;
   position: PlayerPosition;
   nationality: string;
+  /** Lugar de nacimiento cuando consta en la ficha oficial. */
+  birthPlace?: string;
   age: number;
   birthDate: string;
   height: string;
