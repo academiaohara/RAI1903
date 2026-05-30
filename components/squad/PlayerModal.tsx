@@ -48,7 +48,9 @@ function PlayerModalContent({ player, onClose }: { player: SquadPlayer; onClose:
       excludeNewsId: announcementNews?.id,
       playerName,
     });
-    const tone = transfer ? (getTransferKind(transfer) === "renovacion" ? "renovacion" : "fichaje") : "default";
+    const kind = transfer ? getTransferKind(transfer) : null;
+    const tone =
+      kind === "renovacion" ? "renovacion" : kind === "cesion" ? "fichaje" : kind === "fichaje" ? "fichaje" : "default";
 
     return {
       clubAnnouncementNews: announcementNews,

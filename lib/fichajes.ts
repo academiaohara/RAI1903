@@ -12,6 +12,18 @@ import type { SquadPlayer } from "@/types/squad";
 
 const RAI_CLUB = "Real Avilés Industrial";
 
+/** Altas en calidad de cedidos (carrusel de cesiones en inicio). */
+export const LOAN_TRANSFER_IDS = new Set([
+  "t-alt-eze",
+  "t-alt-uzkudun",
+  "t-alt-nando",
+  "t-alt-ortega",
+]);
+
+export function isLoanTransfer(transfer: TransferRumor): boolean {
+  return LOAN_TRANSFER_IDS.has(transfer.id);
+}
+
 function normalizeName(value: string): string {
   return value
     .normalize("NFD")
@@ -78,12 +90,15 @@ function rosterPlayerToSquadPlayer(player: Player): SquadPlayer {
 }
 
 export function getTransferKind(transfer: TransferRumor): TransferKind {
+  if (isLoanTransfer(transfer)) return "cesion";
   if (transfer.category === "Renovaciones") return "renovacion";
   return "fichaje";
 }
 
 export function getTransferKindLabel(kind: TransferKind): string {
-  return kind === "renovacion" ? "Renovacion" : "Fichaje";
+  if (kind === "renovacion") return "Renovacion";
+  if (kind === "cesion") return "Cesion";
+  return "Fichaje";
 }
 
 export function getTransferById(id: string): TransferRumor | undefined {
@@ -127,14 +142,22 @@ export function getSquadPlayerForTransfer(transfer: TransferRumor): SquadPlayer 
   return undefined;
 }
 
-/** Altas oficiales y renovaciones para carrusel de inicio y pagina de fichajes. */
+/** Altas oficiales y renovaciones para carrusel de inicio (sin cesiones). */
 export function getFeaturedTransfers(): TransferRumor[] {
   return transfers
     .filter(
       (transfer) =>
         (transfer.category === "Altas" || transfer.category === "Renovaciones") &&
-        transfer.status === "Oficial",
+        transfer.status === "Oficial" &&
+        !isLoanTransfer(transfer),
     )
+    .sort((a, b) => b.date.localeCompare(a.date));
+}
+
+/** Jugadores cedidos al club en la temporada 25/26. */
+export function getLoanTransfers(): TransferRumor[] {
+  return transfers
+    .filter((transfer) => isLoanTransfer(transfer) && transfer.status === "Oficial")
     .sort((a, b) => b.date.localeCompare(a.date));
 }
 
