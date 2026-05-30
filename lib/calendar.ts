@@ -1,5 +1,4 @@
-import { RAI_TEAM_ID } from "@/data/mock";
-import { getTeamMatches, getTeamsByGender } from "@/lib/fixtures";
+import { getAvilesMatchesByGender, getRaiTeamId, getTeamsByGender } from "@/lib/fixtures";
 import { getTeamCrest } from "@/lib/team-crests";
 import { getCronicaForMatch, getPreviaForMatch } from "@/lib/match-articles";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -31,7 +30,8 @@ function avilesResult(match: Match, raiId: string): string | null {
 }
 
 export function matchToCalendarMatch(match: Match, gender: PrimerEquipoGender): CalendarMatch {
-  const avilesHome = match.homeTeamId === RAI_TEAM_ID;
+  const raiId = getRaiTeamId(gender);
+  const avilesHome = match.homeTeamId === raiId;
   const rivalId = avilesHome ? match.awayTeamId : match.homeTeamId;
   const rival = getTeamsByGender(gender).find((team) => team.id === rivalId);
   const cronica = getCronicaForMatch(match.id, gender);
@@ -55,7 +55,7 @@ export function matchToCalendarMatch(match: Match, gender: PrimerEquipoGender): 
     isHome: avilesHome,
     time: played ? null : hasTime ? formatKickoffTime(match.date) : null,
     played,
-    result: avilesResult(match, RAI_TEAM_ID),
+    result: avilesResult(match, raiId),
     homeScore: match.homeScore,
     awayScore: match.awayScore,
     chronicleUrl: cronica ? (`${primerEquipoBase(gender)}/cronicas/${cronica.id}` as Route) : null,
@@ -64,7 +64,7 @@ export function matchToCalendarMatch(match: Match, gender: PrimerEquipoGender): 
 }
 
 export function getCalendarMatchesByGender(gender: PrimerEquipoGender): CalendarMatch[] {
-  return getTeamMatches(RAI_TEAM_ID)
+  return getAvilesMatchesByGender(gender)
     .map((match) => matchToCalendarMatch(match, gender))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }

@@ -12,13 +12,14 @@ const COPA_ROUND_BY_MATCHDAY: Record<number, string> = {
   12: "Octavos",
 };
 
-export const LEAGUE_COMPETITION_IDS = ["liga-raij903", "primera-rfef"] as const;
+export const LEAGUE_COMPETITION_IDS = ["liga-raij903", "primera-rfef", "liga-femenina"] as const;
 
 export type LeagueCompetitionId = (typeof LEAGUE_COMPETITION_IDS)[number];
 
 const LEAGUE_COMPETITION_LABELS: Record<LeagueCompetitionId, string> = {
   "liga-raij903": "1ª RFEF - Grupo I",
   "primera-rfef": "1ª RFEF",
+  "liga-femenina": "2ª RFEF Femenina - Grupo I",
 };
 
 export function leagueCompetitionLabel(id: LeagueCompetitionId): string {
@@ -38,7 +39,7 @@ export function matchCompetitionShortLabel(match: FixtureMetaSource): string {
   if (match.competition === "primera-rfef") return "1ª RFEF";
   if (match.competition === "liga-raij903") return "Liga";
   if (match.competition === "amistoso") return "Amistoso";
-  if (match.competition === "liga-femenina") return "Liga Fem.";
+  if (match.competition === "liga-femenina") return "2ª RFEF Fem.";
   if (match.competition === "primera-asturfutbol") return "Primera Asturfutbol";
   if (match.competition === "segunda-asturfutbol") return "2ª Asturfutbol";
   if (match.competition === "liga-nacional-juvenil") return "Liga Nacional Juvenil";

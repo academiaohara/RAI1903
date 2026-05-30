@@ -1,9 +1,20 @@
-import { copaDelReyMatches, matchdays, RAI_FEM_TEAM_ID, RAI_TEAM_ID, teams, teamsFemenino, teamsGrupo2 } from "@/data/mock";
+import {
+  copaDelReyMatches,
+  matchdays,
+  matchdaysFemenino,
+  RAI_FEM_TEAM_ID,
+  RAI_TEAM_ID,
+  teams,
+  teamsFemenino,
+  teamsGrupo2,
+} from "@/data/mock";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Match, ResultCode, Team } from "@/types";
 
 export const getTeam = (teamId: string): Team | undefined =>
-  teams.find((team) => team.id === teamId) ?? teamsGrupo2.find((team) => team.id === teamId);
+  teams.find((team) => team.id === teamId) ??
+  teamsGrupo2.find((team) => team.id === teamId) ??
+  teamsFemenino.find((team) => team.id === teamId);
 
 export const getTeamByGender = (teamId: string, gender: PrimerEquipoGender): Team | undefined => {
   if (gender === "femenino") {
@@ -15,29 +26,42 @@ export const getTeamByGender = (teamId: string, gender: PrimerEquipoGender): Tea
 export const getAllTeamsForGender = (gender: PrimerEquipoGender): Team[] =>
   gender === "femenino" ? teamsFemenino : [...teams, ...teamsGrupo2];
 
-export const getAvilesMatches = (): Match[] =>
-  [...matchdays.flatMap((matchday) => matchday.matches), ...copaDelReyMatches].filter(
-    (match) => match.homeTeamId === RAI_TEAM_ID || match.awayTeamId === RAI_TEAM_ID,
-  );
+function leagueMatchesForGender(gender: PrimerEquipoGender): Match[] {
+  if (gender === "femenino") {
+    return matchdaysFemenino.flatMap((matchday) => matchday.matches);
+  }
+  return matchdays.flatMap((matchday) => matchday.matches);
+}
+
+export const getAvilesMatchesByGender = (gender: PrimerEquipoGender): Match[] => {
+  const raiId = getRaiTeamId(gender);
+  const source =
+    gender === "femenino"
+      ? leagueMatchesForGender(gender)
+      : [...leagueMatchesForGender(gender), ...copaDelReyMatches];
+  return source.filter((match) => match.homeTeamId === raiId || match.awayTeamId === raiId);
+};
+
+export const getAvilesMatches = (): Match[] => getAvilesMatchesByGender("masculino");
 
 export const getLatestAvilesMatches = (limit = 5): Match[] =>
-  getAvilesMatches()
-    .filter((match) => match.status === "finished")
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, limit);
+  getLatestAvilesMatchesByGender("masculino", limit);
 
 export const getUpcomingAvilesMatches = (limit = 5): Match[] =>
-  getAvilesMatches()
-    .filter((match) => match.status === "scheduled")
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    .slice(0, limit);
+  getUpcomingAvilesMatchesByGender("masculino", limit);
 
 export const getNextAvilesMatch = (): Match | undefined => getUpcomingAvilesMatches(1)[0];
 
-export const getTeamMatches = (teamId: string): Match[] =>
-  [...matchdays.flatMap((matchday) => matchday.matches), ...copaDelReyMatches].filter(
+export const getTeamMatches = (teamId: string): Match[] => {
+  const masculino = [...matchdays.flatMap((matchday) => matchday.matches), ...copaDelReyMatches].filter(
     (match) => match.homeTeamId === teamId || match.awayTeamId === teamId,
   );
+  if (masculino.length > 0) return masculino;
+
+  return matchdaysFemenino
+    .flatMap((matchday) => matchday.matches)
+    .filter((match) => match.homeTeamId === teamId || match.awayTeamId === teamId);
+};
 
 export const getCopaDelReyMatchesByGender = (gender: PrimerEquipoGender): Match[] =>
   gender === "masculino"
@@ -53,10 +77,10 @@ export const getRaiTeamId = (gender: PrimerEquipoGender = "masculino") => teamId
 
 export const getTeamsByGender = (gender: PrimerEquipoGender): Team[] => (gender === "femenino" ? teamsFemenino : teams);
 
-export function getAvilesMatchResult(match: Match): ResultCode | null {
+export function getAvilesMatchResult(match: Match, gender: PrimerEquipoGender = "masculino"): ResultCode | null {
   if (match.status !== "finished" || match.homeScore === undefined || match.awayScore === undefined) return null;
 
-  const raiId = RAI_TEAM_ID;
+  const raiId = getRaiTeamId(gender);
   const avilesHome = match.homeTeamId === raiId;
   const avilesAway = match.awayTeamId === raiId;
   if (!avilesHome && !avilesAway) return null;
@@ -68,12 +92,23 @@ export function getAvilesMatchResult(match: Match): ResultCode | null {
   return "D";
 }
 
-export const getLatestAvilesMatchesByGender = (_gender: PrimerEquipoGender, limit = 5): Match[] => getLatestAvilesMatches(limit);
+export const getLatestAvilesMatchesByGender = (gender: PrimerEquipoGender, limit = 5): Match[] =>
+  getAvilesMatchesByGender(gender)
+    .filter((match) => match.status === "finished")
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, limit);
 
-export const getUpcomingAvilesMatchesByGender = (_gender: PrimerEquipoGender, limit = 5): Match[] => getUpcomingAvilesMatches(limit);
+export const getUpcomingAvilesMatchesByGender = (gender: PrimerEquipoGender, limit = 5): Match[] =>
+  getAvilesMatchesByGender(gender)
+    .filter((match) => match.status === "scheduled")
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .slice(0, limit);
 
-export const getNextAvilesMatchByGender = (gender: PrimerEquipoGender): Match | undefined => getUpcomingAvilesMatchesByGender(gender, 1)[0];
+export const getNextAvilesMatchByGender = (gender: PrimerEquipoGender): Match | undefined =>
+  getUpcomingAvilesMatchesByGender(gender, 1)[0];
 
 export function getMatchById(matchId: string): Match | undefined {
-  return matchdays.flatMap((round) => round.matches).find((match) => match.id === matchId);
+  return [...matchdays.flatMap((round) => round.matches), ...matchdaysFemenino.flatMap((round) => round.matches)].find(
+    (match) => match.id === matchId,
+  );
 }

@@ -41,4 +41,6 @@ export const ESCUDO_PATHS: Record<string, string> = {
   "villarreal-b": "/escudos/villarreal-b.png",
   "zamora": "/escudos/zamora.png",
   "real-aviles-industrial-femenino": "/escudos/real-aviles-industrial.png",
+  "fem-athletic-club-b": "/escudos/athletic-bilbao-b.png",
+  "fem-celta": "/escudos/celta-fortuna.png",
 };
