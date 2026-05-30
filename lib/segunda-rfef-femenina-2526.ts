@@ -216,7 +216,7 @@ const TEAM_SEEDS: TeamSeed[] = [
 
 const teamSeedById = new Map(TEAM_SEEDS.map((team) => [team.id, team]));
 
-const FEMENINA_STANDINGS_ZONES = {
+export const FEMENINA_STANDINGS_ZONES = {
   promotion: 1,
   playoff: 0,
   relegation: 1,

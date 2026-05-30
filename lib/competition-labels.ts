@@ -12,7 +12,12 @@ const COPA_ROUND_BY_MATCHDAY: Record<number, string> = {
   12: "Octavos",
 };
 
-export const LEAGUE_COMPETITION_IDS = ["liga-raij903", "primera-rfef", "liga-femenina"] as const;
+export const LEAGUE_COMPETITION_IDS = [
+  "liga-raij903",
+  "primera-rfef",
+  "liga-femenina",
+  "liga-nacional-juvenil",
+] as const;
 
 export type LeagueCompetitionId = (typeof LEAGUE_COMPETITION_IDS)[number];
 
@@ -20,6 +25,7 @@ const LEAGUE_COMPETITION_LABELS: Record<LeagueCompetitionId, string> = {
   "liga-raij903": "1ª RFEF - Grupo I",
   "primera-rfef": "1ª RFEF",
   "liga-femenina": "2ª RFEF Femenina - Grupo I",
+  "liga-nacional-juvenil": "Liga Nacional Juvenil",
 };
 
 export function leagueCompetitionLabel(id: LeagueCompetitionId): string {
