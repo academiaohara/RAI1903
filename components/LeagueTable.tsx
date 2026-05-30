@@ -20,6 +20,9 @@ type LeagueTableProps = {
   highlightTeamId?: string;
   /** With highlightTeamId: club row (Avilés) blue, viewed team granate. */
   clubHighlightTeamId?: string;
+  /** When set, any matching row uses the club (blue) highlight. */
+  isClubHighlight?: (team: Team) => boolean;
+  showCrests?: boolean;
   showLegend?: boolean;
   gender?: PrimerEquipoGender;
 };
@@ -29,6 +32,8 @@ export function LeagueTable({
   compact = false,
   highlightTeamId = RAI_TEAM_ID,
   clubHighlightTeamId,
+  isClubHighlight,
+  showCrests = true,
   showLegend = true,
   gender = "masculino",
 }: LeagueTableProps) {
@@ -66,9 +71,11 @@ export function LeagueTable({
           <tbody className="divide-y divide-slate-100">
             {visibleRows.map((team) => {
               const diff = team.stats.goalsFor - team.stats.goalsAgainst;
-              const rowHighlight = clubHighlightTeamId
-                ? getStandingsRowHighlight(team.id, highlightTeamId, clubHighlightTeamId)
-                : team.id === highlightTeamId;
+              const rowHighlight = isClubHighlight?.(team)
+                ? ("club" as const)
+                : clubHighlightTeamId
+                  ? getStandingsRowHighlight(team.id, highlightTeamId, clubHighlightTeamId)
+                  : team.id === highlightTeamId;
               const highlighted = isStandingsRowHighlighted(rowHighlight);
               const rowClassName = getStandingsHighlightRowClass(rowHighlight);
               const highlightCellClassName = getStandingsHighlightCellClass(rowHighlight);
@@ -82,7 +89,7 @@ export function LeagueTable({
               const teamLinkable = canLinkEquipoLiga(gender, team.id);
               const teamCellContent = (
                 <>
-                  <TeamCrest team={team} size="sm" className="shrink-0" />
+                  {showCrests ? <TeamCrest team={team} size="sm" className="shrink-0" /> : null}
                   <span className="max-w-[4.5rem] truncate font-bold group-hover/team:underline group-hover/team:decoration-[#214C9B]/40 group-hover/team:underline-offset-2 sm:max-w-none md:max-w-none">
                     <span className="md:hidden">{team.shortName}</span>
                     <span className="hidden md:inline">{teamLabel}</span>

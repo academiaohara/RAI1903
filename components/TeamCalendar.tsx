@@ -16,6 +16,9 @@ type TeamCalendarProps = {
   matches: CalendarMatch[];
   className?: string;
   gender?: PrimerEquipoGender;
+  /** When true, only the list view is shown (no month toggle). */
+  listOnly?: boolean;
+  showCrests?: boolean;
 };
 
 const TODAY_DAY_CLASS = "inline-flex min-w-[1.75rem] items-center justify-center rounded-lg bg-[#214C9B] px-2 py-0.5 text-sm font-extrabold text-white";
@@ -43,9 +46,15 @@ function initialViewDate(matches: CalendarMatch[]): { year: number; month: numbe
   return { year: first.getUTCFullYear(), month: first.getUTCMonth() };
 }
 
-export function TeamCalendar({ matches, className, gender = "masculino" }: TeamCalendarProps) {
+export function TeamCalendar({
+  matches,
+  className,
+  gender = "masculino",
+  listOnly = false,
+  showCrests = true,
+}: TeamCalendarProps) {
   const initial = initialViewDate(matches);
-  const [viewMode, setViewMode] = useState<CalendarViewMode>("mes");
+  const [viewMode, setViewMode] = useState<CalendarViewMode>(listOnly ? "lista" : "mes");
   const [viewYear, setViewYear] = useState(initial.year);
   const [viewMonth, setViewMonth] = useState(initial.month);
 
@@ -75,7 +84,7 @@ export function TeamCalendar({ matches, className, gender = "masculino" }: TeamC
 
   return (
     <div className={cn("space-y-4", className)}>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className={cn("flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between", listOnly && "hidden")}>
         <CalendarViewToggle value={viewMode} onChange={setViewMode} />
         {viewMode === "mes" && (
           <div className="flex items-center justify-center gap-1 sm:gap-2 sm:justify-end" role="group" aria-label="Navegación del calendario">
@@ -106,7 +115,7 @@ export function TeamCalendar({ matches, className, gender = "masculino" }: TeamC
       </div>
 
       {viewMode === "lista" ? (
-        <CalendarListView key="lista" matches={matches} gender={gender} />
+        <CalendarListView key="lista" matches={matches} gender={gender} showCrests={showCrests} />
       ) : (
         <>
           <div className="hidden lg:block">

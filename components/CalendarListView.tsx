@@ -17,6 +17,7 @@ type CalendarListViewProps = {
   matches: CalendarMatch[];
   className?: string;
   gender?: PrimerEquipoGender;
+  showCrests?: boolean;
 };
 
 const LIST_ROW_GRID =
@@ -55,7 +56,7 @@ function homeAwayLabel(isHome: boolean): string {
   return isHome ? "Local" : "Visitante";
 }
 
-export function CalendarListView({ matches, className, gender = "masculino" }: CalendarListViewProps) {
+export function CalendarListView({ matches, className, gender = "masculino", showCrests = true }: CalendarListViewProps) {
   const sortedMatches = useMemo(
     () => [...matches].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
     [matches],
@@ -73,6 +74,7 @@ export function CalendarListView({ matches, className, gender = "masculino" }: C
                 scrollTarget={match.id === scrollTargetId}
                 gender={gender}
                 zebra={index % 2 === 1}
+                showCrests={showCrests}
               />
             </li>
           ))}
@@ -87,11 +89,13 @@ function CalendarListRow({
   scrollTarget,
   gender,
   zebra,
+  showCrests,
 }: {
   match: CalendarMatch;
   scrollTarget: boolean;
   gender: PrimerEquipoGender;
   zebra: boolean;
+  showCrests: boolean;
 }) {
   const href = match.played ? match.chronicleUrl : match.previaUrl;
   const opponentTeamId = match.isHome ? match.awayTeamId : match.homeTeamId;
@@ -144,17 +148,23 @@ function CalendarListRow({
       </span>
 
       <span className="flex min-w-0 items-center gap-2">
-        <TeamLink gender={gender} teamId={opponentTeamId} teamName={match.opponent} className="shrink-0">
-          <OpponentCrest logo={match.opponentLogo} opponent={match.opponent} size="sm" className="text-[#214C9B]" />
-        </TeamLink>
-        <TeamLink
-          gender={gender}
-          teamId={opponentTeamId}
-          teamName={match.opponent}
-          className="min-w-0 truncate text-sm font-extrabold text-[#214C9B] hover:underline"
-        >
-          {match.opponent}
-        </TeamLink>
+        {showCrests ? (
+          <TeamLink gender={gender} teamId={opponentTeamId} teamName={match.opponent} className="shrink-0">
+            <OpponentCrest logo={match.opponentLogo} opponent={match.opponent} size="sm" className="text-[#214C9B]" />
+          </TeamLink>
+        ) : null}
+        {showCrests ? (
+          <TeamLink
+            gender={gender}
+            teamId={opponentTeamId}
+            teamName={match.opponent}
+            className="min-w-0 truncate text-sm font-extrabold text-[#214C9B] hover:underline"
+          >
+            {match.opponent}
+          </TeamLink>
+        ) : (
+          <span className="min-w-0 truncate text-sm font-extrabold text-[#214C9B]">{match.opponent}</span>
+        )}
       </span>
 
       <span className="flex min-w-0 items-center justify-end gap-1.5">
