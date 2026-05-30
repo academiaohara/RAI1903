@@ -3,6 +3,7 @@ import { MatchTeamLink } from "@/components/TeamLink";
 import { getTeam } from "@/lib/fixtures";
 import { getTeamCrestById } from "@/lib/team-crests";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import { cn } from "@/lib/utils";
 import type { Match } from "@/types";
 
 type MatchFixtureTeamLinksProps = {
@@ -29,29 +30,33 @@ export function MatchFixtureTeamLinks({
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
-      <MatchTeamLink
-        gender={gender}
-        teamId={match.homeTeamId}
-        teamName={match.homeTeam}
-        highlighted={avilesHome}
-        className={homeTeamLinkClassName}
-      />
+      <div className="pointer-events-auto relative z-10 min-w-0">
+        <MatchTeamLink
+          gender={gender}
+          teamId={match.homeTeamId}
+          teamName={match.homeTeam}
+          highlighted={avilesHome}
+          className={homeTeamLinkClassName}
+        />
+      </div>
       <MatchFixtureScorePill
         homeLogo={getTeamCrestById(match.homeTeamId, getTeam(match.homeTeamId)?.crestInitials)}
         homeTeam={match.homeTeam}
         awayLogo={getTeamCrestById(match.awayTeamId, getTeam(match.awayTeamId)?.crestInitials)}
         awayTeam={match.awayTeam}
         label={scoreLabel}
-        className={scorePillClassName}
+        className={cn("pointer-events-none relative z-0", scorePillClassName)}
       />
-      <MatchTeamLink
-        gender={gender}
-        teamId={match.awayTeamId}
-        teamName={match.awayTeam}
-        highlighted={avilesAway}
-        align="right"
-        className={awayTeamLinkClassName}
-      />
+      <div className="pointer-events-auto relative z-10 min-w-0">
+        <MatchTeamLink
+          gender={gender}
+          teamId={match.awayTeamId}
+          teamName={match.awayTeam}
+          highlighted={avilesAway}
+          align="right"
+          className={awayTeamLinkClassName}
+        />
+      </div>
     </div>
   );
 }
