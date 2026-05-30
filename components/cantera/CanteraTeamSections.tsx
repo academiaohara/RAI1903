@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { CanteraJornadasView } from "@/components/cantera/CanteraJornadasView";
+import { CanteraSquadTable } from "@/components/cantera/CanteraSquadTable";
 import { SubsectionFilterNav } from "@/components/SubsectionFilterNav";
 import { LeagueTable } from "@/components/LeagueTable";
 import { TeamCalendar } from "@/components/TeamCalendar";
@@ -61,18 +62,22 @@ export function CanteraTeamSections({ team }: CanteraTeamSectionsProps) {
       </p>
 
       {activeSection === "plantilla" && (
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {team.roster.map((player) => (
-            <div key={player.id} className="rounded-2xl border border-[#214C9B]/15 bg-blue-50 p-3">
-              <p className="font-extrabold uppercase text-[#214C9B]">
-                #{player.number} {player.displayName}
-              </p>
-              <p className="text-sm font-bold text-slate-500">
-                {player.position} · {player.age} años
-              </p>
-            </div>
-          ))}
-        </div>
+        canteraTeamId === "juvenil-a" ? (
+          <CanteraSquadTable />
+        ) : (
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {team.roster.map((player) => (
+              <div key={player.id} className="rounded-2xl border border-[#214C9B]/15 bg-blue-50 p-3">
+                <p className="font-extrabold uppercase text-[#214C9B]">
+                  #{player.number} {player.displayName}
+                </p>
+                <p className="text-sm font-bold text-slate-500">
+                  {player.position} · {player.age} años
+                </p>
+              </div>
+            ))}
+          </div>
+        )
       )}
 
       {activeSection === "calendario" && (

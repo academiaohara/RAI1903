@@ -12,6 +12,7 @@ import {
   buildJuvenilU19Standings,
   getJuvenilAvilesCalendarMatches,
 } from "@/lib/cantera-data";
+import { buildJuvenilAcademyRoster, getJuvenilASquadImport } from "@/lib/cantera-squad";
 import { buildFilialSummary } from "@/lib/segunda-asturfutbol-2526";
 import {
   RAI_FEM_TEAM_ID,
@@ -786,17 +787,11 @@ export const academyTeams: AcademyTeam[] = [
   {
     id: "juvenil-a",
     name: "Juvenil A",
-    coach: "Borja Fernandez",
+    coach: getJuvenilASquadImport().entrenador,
     ...juvenilSummary,
-    standoutPlayers: ["Mario Noval", "Leo Paredes", "Osky"],
+    standoutPlayers: ["Geni Jr.", "Dani Frechilla", "Nacho Puente"],
     news: [],
-    roster: [
-      { id: "mario-noval", displayName: "M. Noval", number: 7, position: "Delantero", age: 17 },
-      { id: "leo-paredes", displayName: "L. Paredes", number: 10, position: "Centrocampista", age: 18 },
-      { id: "izan-arias", displayName: "I. Arias", number: 4, position: "Defensa", age: 17 },
-      { id: "dani-riestra", displayName: "D. Riestra", number: 1, position: "Portero", age: 18 },
-      { id: "hugo-menendez", displayName: "H. Menendez", number: 9, position: "Delantero", age: 17 },
-    ],
+    roster: buildJuvenilAcademyRoster(),
     table: juvenilStandings,
     calendar: getJuvenilAvilesCalendarMatches(),
   },
