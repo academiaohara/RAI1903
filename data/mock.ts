@@ -1363,22 +1363,22 @@ const RAI_SPOTIFY_PODCAST = "https://open.spotify.com/show/5kHriw0nbuCDhY5qtLHuQ
 export const fanZonaMixtaVideos: FanYouTubeVideo[] = [
   {
     id: "zona-mixta-v1",
-    title: "Zona Mixta",
+    title: "📽️ Ƶσɳα ᙏιχ𝜏α | Programa 4.37",
     url: "https://youtu.be/cFMjxc7ifGA",
   },
   {
     id: "zona-mixta-v2",
-    title: "Zona Mixta",
+    title: "📽️ Ƶσɳα ᙏιχ𝜏α | Programa 4.36",
     url: "https://youtu.be/E3G45yeP17k",
   },
   {
     id: "zona-mixta-v3",
-    title: "Zona Mixta",
+    title: "📽️ Ƶσɳα ᙏιχ𝜏α | Programa 4.35",
     url: "https://youtu.be/1C8YDs_y75w",
   },
   {
     id: "zona-mixta-v4",
-    title: "Zona Mixta",
+    title: "📽️ Ƶσɳα ᙏιχ𝜏α | Programa 4.34",
     url: "https://youtu.be/_gb5fS8lIbE",
   },
 ];
@@ -1404,20 +1404,60 @@ export const fanZonaMixta: FanMediaLink[] = [
 
 /** Previas oficiales antes de cada partido (el ultimo se muestra destacado). */
 export const fanPreviaVideos: FanYouTubeVideo[] = [
-  { id: "previa-v1", title: "Previa", url: "https://youtu.be/57y06JKzZa8" },
-  { id: "previa-v2", title: "Previa", url: "https://youtu.be/w7Ayjxe76aA" },
-  { id: "previa-v3", title: "Previa", url: "https://youtu.be/7QoTrVnOUmw" },
-  { id: "previa-v4", title: "Previa", url: "https://youtu.be/Y4MobJJerF4" },
-  { id: "previa-v5", title: "Previa", url: "https://youtu.be/Wd8uN3Z5J3U" },
+  {
+    id: "previa-v1",
+    title: "🎙️ La 𝗽𝗿𝗲𝘃𝗶𝗮 con Lolo Escobar (Pontevedra CF)",
+    url: "https://youtu.be/57y06JKzZa8",
+  },
+  {
+    id: "previa-v2",
+    title: "🎙️ La 𝗽𝗿𝗲𝘃𝗶𝗮 con Lolo Escobar (Barakaldo CF)",
+    url: "https://youtu.be/w7Ayjxe76aA",
+  },
+  {
+    id: "previa-v3",
+    title: "🎙️ La 𝗽𝗿𝗲𝘃𝗶𝗮 con Cayarga",
+    url: "https://youtu.be/7QoTrVnOUmw",
+  },
+  {
+    id: "previa-v4",
+    title: "🎙️ La 𝗽𝗿𝗲𝘃𝗶𝗮 con Lolo Escobar (SD Ponferradina)",
+    url: "https://youtu.be/Y4MobJJerF4",
+  },
+  {
+    id: "previa-v5",
+    title: "🎙️ La 𝗽𝗿𝗲𝘃𝗶𝗮 con Lolo Escobar (CD Guadalajara)",
+    url: "https://youtu.be/Wd8uN3Z5J3U",
+  },
 ];
 
 /** Ruedas de prensa (RDP) del cuerpo tecnico (el ultimo se muestra destacado). */
 export const fanRdpVideos: FanYouTubeVideo[] = [
-  { id: "rdp-v1", title: "RDP", url: "https://youtu.be/UoOSohza1kE" },
-  { id: "rdp-v2", title: "RDP", url: "https://youtu.be/tFKmZC99qSs" },
-  { id: "rdp-v3", title: "RDP", url: "https://youtu.be/Kxuks6EiBdg" },
-  { id: "rdp-v4", title: "RDP", url: "https://youtu.be/V7TtRlBDveE" },
-  { id: "rdp-v5", title: "RDP", url: "https://youtu.be/eCeLvze6axY" },
+  {
+    id: "rdp-v1",
+    title: "🎙️RDP | Lolo Escobar (Pontevedra CF)",
+    url: "https://youtu.be/UoOSohza1kE",
+  },
+  {
+    id: "rdp-v2",
+    title: "🎙️RDP | Lolo Escobar (Barakaldo CF)",
+    url: "https://youtu.be/tFKmZC99qSs",
+  },
+  {
+    id: "rdp-v3",
+    title: "🎙️RDP | Lolo Escobar (SD Ponferradina)",
+    url: "https://youtu.be/Kxuks6EiBdg",
+  },
+  {
+    id: "rdp-v4",
+    title: "🎙️RDP | Lolo Escobar (CD Guadalajara)",
+    url: "https://youtu.be/V7TtRlBDveE",
+  },
+  {
+    id: "rdp-v5",
+    title: "🎙️RDP | Lolo Escobar (Racing Ferrol)",
+    url: "https://youtu.be/eCeLvze6axY",
+  },
 ];
 
 /** Contenido de aficion y peñas: tertulias y directos en X Spaces (orden: mas reciente primero). */
