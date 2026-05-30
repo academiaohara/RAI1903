@@ -59,24 +59,26 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
   return (
     <div className="space-y-6">
       {isMasculino && (
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
             <QuinielaViewToggle
               value={panel}
               onChange={setPanel}
               options={COMPETICION_OPTIONS}
               layoutId="competicion-panel-toggle"
-              className="w-full sm:max-w-sm"
+              className="w-full sm:max-w-sm sm:shrink-0"
             />
-            <p className="text-sm font-bold text-slate-600">
-              {panel === "liga"
-                ? grupo === "1"
-                  ? "1ª RFEF - Grupo I (Real Avilés)"
-                  : "1ª RFEF - Grupo II"
-                : "Copa del Rey 2025/26"}
-            </p>
+            {panel === "liga" && (
+              <GrupoSwitcher value={grupo} onChange={setGrupo} className="w-fit shrink-0 self-start sm:self-auto" />
+            )}
           </div>
-          {panel === "liga" && <GrupoSwitcher value={grupo} onChange={setGrupo} />}
+          <p className="text-sm font-bold text-slate-600">
+            {panel === "liga"
+              ? grupo === "1"
+                ? "1ª RFEF - Grupo I (Real Avilés)"
+                : "1ª RFEF - Grupo II"
+              : "Copa del Rey 2025/26"}
+          </p>
         </div>
       )}
 
