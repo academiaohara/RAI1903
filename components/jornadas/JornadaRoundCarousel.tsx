@@ -15,8 +15,12 @@ type JornadaRoundCarouselProps = {
   showCrests?: boolean;
 };
 
-const cardBase =
-  "group flex h-[7.25rem] w-[4.75rem] shrink-0 flex-col items-center justify-between rounded-2xl border px-2 py-2.5 text-center transition sm:h-[7.75rem] sm:w-[5.25rem]";
+function cardBaseClass(showCrests: boolean): string {
+  if (showCrests) {
+    return "group flex h-[7.25rem] w-[4.75rem] shrink-0 flex-col items-center justify-between rounded-2xl border px-2 py-2.5 text-center transition sm:h-[7.75rem] sm:w-[5.25rem]";
+  }
+  return "group flex h-auto w-[4.25rem] shrink-0 flex-col items-center justify-center gap-1.5 rounded-2xl border px-2 py-3 text-center transition sm:w-[4.75rem]";
+}
 
 function cardStateClass(isSelected: boolean, isCurrent: boolean): string {
   if (isSelected) {
@@ -63,16 +67,6 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests 
         {rounds.map((round) => {
           const isSelected = round.id === selectedId;
           const opponent = round.opponentTeamId ? getJornadaTeam(round.opponentTeamId) : undefined;
-          const opponentInitials =
-            opponent?.crestInitials ??
-            round.opponentName
-              ?.split(/\s+/)
-              .filter(Boolean)
-              .slice(0, 3)
-              .map((word) => word[0])
-              .join("")
-              .toUpperCase() ??
-            "?";
 
           return (
             <button
@@ -82,46 +76,36 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests 
               aria-selected={isSelected}
               data-round-id={round.id}
               onClick={() => onSelect(round.id)}
-              className={cn(cardBase, cardStateClass(isSelected, round.isCurrent))}
+              className={cn(cardBaseClass(showCrests), cardStateClass(isSelected, round.isCurrent))}
             >
               <span className="text-sm font-extrabold leading-none">{round.label}</span>
 
-              <div className="flex h-12 w-12 items-center justify-center">
-                {opponent && showCrests ? (
-                  <TeamCrest team={opponent} size="md" className="transition group-hover:brightness-110" />
-                ) : (opponent || round.opponentName) && !showCrests ? (
-                  <span
-                    className={cn(
-                      "flex h-11 w-11 items-center justify-center rounded-full border text-[10px] font-extrabold uppercase",
-                      isSelected
-                        ? "border-white/40 bg-white/15 text-white"
-                        : "border-[#214C9B]/25 bg-white text-[#214C9B] group-hover:border-white/40 group-hover:bg-white/15 group-hover:text-white",
-                    )}
-                    aria-hidden
-                  >
-                    {opponentInitials.slice(0, 3)}
-                  </span>
-                ) : round.kind === "playoff" ? (
-                  <span
-                    className={cn(
-                      "flex h-11 w-11 items-center justify-center rounded-full border text-[11px] font-extrabold uppercase",
-                      isSelected
-                        ? "border-white/40 bg-white/15 text-white"
-                        : "border-[#214C9B]/25 bg-white text-[#214C9B] group-hover:border-white/40 group-hover:bg-white/15 group-hover:text-white",
-                    )}
-                    aria-hidden
-                  >
-                    PO
-                  </span>
-                ) : (
-                  <OpponentCrest
-                    logo="?"
-                    opponent="Por determinar"
-                    size="md"
-                    className="opacity-60"
-                  />
-                )}
-              </div>
+              {showCrests ? (
+                <div className="flex h-12 w-12 items-center justify-center">
+                  {opponent ? (
+                    <TeamCrest team={opponent} size="md" className="transition group-hover:brightness-110" />
+                  ) : round.kind === "playoff" ? (
+                    <span
+                      className={cn(
+                        "flex h-11 w-11 items-center justify-center rounded-full border text-[11px] font-extrabold uppercase",
+                        isSelected
+                          ? "border-white/40 bg-white/15 text-white"
+                          : "border-[#214C9B]/25 bg-white text-[#214C9B] group-hover:border-white/40 group-hover:bg-white/15 group-hover:text-white",
+                      )}
+                      aria-hidden
+                    >
+                      PO
+                    </span>
+                  ) : (
+                    <OpponentCrest
+                      logo="?"
+                      opponent="Por determinar"
+                      size="md"
+                      className="opacity-60"
+                    />
+                  )}
+                </div>
+              ) : null}
 
               <span className="text-[10px] font-bold uppercase leading-tight tracking-wide opacity-90">
                 {round.shortDate}
