@@ -101,6 +101,11 @@ export function NewsTicker({ items }: { items: NewsItem[] }) {
               <h3 className="news-ticker-title mt-1 line-clamp-3 text-sm font-extrabold uppercase leading-snug text-[#214C9B]">
                 {item.title}
               </h3>
+              {item.excerpt ? (
+                <p className="news-ticker-excerpt mt-1 line-clamp-2 text-[11px] leading-snug text-slate-600 sm:mt-1.5 sm:text-xs sm:leading-5">
+                  {item.excerpt}
+                </p>
+              ) : null}
             </div>
           </a>
         ))}
