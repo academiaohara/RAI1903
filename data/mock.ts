@@ -13,6 +13,7 @@ import {
   buildJuvenilU19Standings,
   getJuvenilAvilesCalendarMatches,
 } from "@/lib/cantera-data";
+import { buildFilialSummary } from "@/lib/segunda-asturfutbol-2526";
 import { applyStandingsToTeams } from "@/lib/standings";
 import type {
   AcademyTeam,
@@ -572,10 +573,10 @@ export const transfers: TransferRumor[] = [
   },
 ];
 
+const filialSummary = buildFilialSummary();
 const juvenilStandings = buildJuvenilU19Standings();
 const juvenilAvilesRow = juvenilStandings.find((team) => team.id === "real-aviles-u19");
 const filialStandings = buildFilialStandings();
-const filialAvilesRow = filialStandings.find((team) => team.id === "filial-real-aviles-b");
 const femeninoStandings = buildFemeninoCanteraStandings();
 const femeninoAvilesRow = femeninoStandings.find((team) => team.id === RAI_FEM_TEAM_ID);
 
@@ -584,12 +585,13 @@ export const academyTeams: AcademyTeam[] = [
     id: "filial",
     name: "Filial",
     coach: "Dani Borrego",
-    category: "Primera Asturfutbol",
-    position: filialAvilesRow ? `${filialAvilesRow.position}º - ${filialAvilesRow.stats.points} pts` : "—",
-    lastResult: "Real Avilés B 2-0 Llanera B",
-    nextMatch: "Real Avilés B - Roces",
+    ...filialSummary,
     standoutPlayers: ["Nando", "Campadal", "Osky"],
-    news: [],
+    news: [
+      "Campeon de la 2ª Asturfutbol Grupo 1 2025-26 (71 puntos)",
+      "34 jornadas: 21 victorias, 8 empates y 5 derrotas",
+      "Dos juveniles entrenan con el primer equipo",
+    ],
     roster: players
       .filter((player) => ["nando", "campadal", "osky", "quicala", "carmona"].includes(player.id))
       .map(({ id, displayName, number, position, age }) => ({ id, displayName, number, position, age })),

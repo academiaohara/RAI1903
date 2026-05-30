@@ -40,6 +40,7 @@ export function matchCompetitionShortLabel(match: FixtureMetaSource): string {
   if (match.competition === "amistoso") return "Amistoso";
   if (match.competition === "liga-femenina") return "Liga Fem.";
   if (match.competition === "primera-asturfutbol") return "Primera Asturfutbol";
+  if (match.competition === "segunda-asturfutbol") return "2ª Asturfutbol";
   if (match.competition === "liga-nacional-juvenil") return "Liga Nacional Juvenil";
   return match.competition;
 }

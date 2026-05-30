@@ -71,6 +71,7 @@ export type CompetitionId =
   | "amistoso"
   | "liga-femenina"
   | "primera-asturfutbol"
+  | "segunda-asturfutbol"
   | "liga-nacional-juvenil";
 
 export type MatchStatus = "scheduled" | "finished";

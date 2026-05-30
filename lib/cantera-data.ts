@@ -1,4 +1,8 @@
 import juvenilU19 from "@/data/cantera-juvenil-u19-2526.json";
+import {
+  buildSegundaAsturfutbolFilialCalendar,
+  buildSegundaAsturfutbolTable,
+} from "@/lib/segunda-asturfutbol-2526";
 import { computeStandings, extractLeagueMatches } from "@/lib/standings";
 import type { CalendarMatch, FormCode, Match, Team } from "@/types";
 
@@ -227,30 +231,6 @@ export function isCanteraClubTeam(teamId: CanteraTeamId, rowTeamId: string, team
   return teamName ? isAvilesCanteraTeamName(teamName) : false;
 }
 
-/** Primera Asturfutbol / Liga Femenina — 20 equipos de referencia. */
-const FILIAL_TEAM_NAMES = [
-  "Real Oviedo Vetusta",
-  "Real Avilés B",
-  "UD Llanera B",
-  "TSK Roces",
-  "CD Covadonga B",
-  "CD Tuilla",
-  "Mosconia CF",
-  "Caudal Deportivo",
-  "UP Langreo",
-  "CD Llanes",
-  "Grujoan CF",
-  "SD Llano 2000",
-  "CD Arenal",
-  "Romanón CF",
-  "Veriña CF",
-  "Juventud Estadio",
-  "Colegio Inmaculada",
-  "Astur CF",
-  "Real Sporting B",
-  "At. Avilés CF",
-] as const;
-
 const FEMENINO_TEAM_NAMES = [
   "Real Avilés Industrial Femenino",
   "CD Orientación Marítima",
@@ -339,7 +319,7 @@ function buildMockTwentyTeamStandings(teamNames: readonly string[], avilesName: 
 }
 
 export function buildFilialStandings(): Team[] {
-  return buildMockTwentyTeamStandings(FILIAL_TEAM_NAMES, "Real Avilés B", 2);
+  return buildSegundaAsturfutbolTable();
 }
 
 export function buildFemeninoCanteraStandings(): Team[] {
@@ -347,47 +327,7 @@ export function buildFemeninoCanteraStandings(): Team[] {
 }
 
 export function buildFilialCalendar(): Match[] {
-  const avilesId = "filial-real-aviles-b";
-  return [
-    {
-      id: "filial-j27",
-      matchday: 27,
-      homeTeamId: avilesId,
-      awayTeamId: "filial-tsk-roces",
-      homeTeam: "Real Avilés B",
-      awayTeam: "TSK Roces",
-      date: "2026-04-12T10:30:00.000Z",
-      competition: "primera-asturfutbol",
-      venue: "Muro de Zaro",
-      status: "scheduled",
-    },
-    {
-      id: "filial-j28",
-      matchday: 28,
-      homeTeamId: "filial-cd-covadonga-b",
-      awayTeamId: avilesId,
-      homeTeam: "CD Covadonga B",
-      awayTeam: "Real Avilés B",
-      date: "2026-04-19T11:00:00.000Z",
-      competition: "primera-asturfutbol",
-      venue: "Juan Antonio Alvarez",
-      status: "scheduled",
-    },
-    {
-      id: "filial-j26",
-      matchday: 26,
-      homeTeamId: avilesId,
-      awayTeamId: "filial-ud-llanera-b",
-      homeTeam: "Real Avilés B",
-      awayTeam: "UD Llanera B",
-      date: "2026-04-05T12:00:00.000Z",
-      competition: "primera-asturfutbol",
-      venue: "Muro de Zaro",
-      status: "finished",
-      homeScore: 2,
-      awayScore: 0,
-    },
-  ];
+  return buildSegundaAsturfutbolFilialCalendar();
 }
 
 export function buildFemeninoCanteraCalendar(): Match[] {
