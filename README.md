@@ -1,6 +1,6 @@
 # RAI1903
 
-Plataforma frontend no oficial sobre el Real Aviles Industrial, construida con Next.js App Router, TypeScript y Tailwind CSS.
+Plataforma frontend no oficial sobre el Real Avilés Industrial, construida con Next.js App Router, TypeScript y Tailwind CSS.
 
 ## Scripts
 

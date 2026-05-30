@@ -10,7 +10,7 @@ import { getSquadPlayerPhoto } from "@/lib/squad-photos";
 import type { NewsItem, Player, TransferKind, TransferRumor } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
 
-const RAI_CLUB = "Real Aviles Industrial";
+const RAI_CLUB = "Real Avilés Industrial";
 
 function normalizeName(value: string): string {
   return value
@@ -51,7 +51,7 @@ function rosterPlayerToSquadPlayer(player: Player): SquadPlayer {
     estado: player.status,
     edad: player.age,
     fechaNacimiento: player.birthDate,
-    lugarNacimiento: "Aviles",
+    lugarNacimiento: "Avilés",
     nacionalidad: player.nationality,
     altura: player.height,
     peso: "76 kg",

@@ -26,7 +26,7 @@ export default function NoticiasClubPage() {
 
   return (
     <div className="space-y-6">
-      <PageHero eyebrow="Noticias" title="Club" description="Comunicados y actualidad oficial del Real Aviles Industrial." />
+      <PageHero eyebrow="Noticias" title="Club" description="Comunicados y actualidad oficial del Real Avilés Industrial." />
 
       <div className="space-y-4">
         <input

@@ -45,7 +45,7 @@ export function PlayerActualidadSection({
             <p className="text-sm leading-7 text-slate-700">{clubAnnouncement.text}</p>
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
               <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                Real Aviles Industrial
+                Real Avilés Industrial
                 {clubAnnouncement.date ? ` · ${formatDate(clubAnnouncement.date)}` : ""}
               </p>
               {clubAnnouncement.newsItem && (

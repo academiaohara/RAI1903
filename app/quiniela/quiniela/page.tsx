@@ -73,7 +73,7 @@ export default function MiQuinielaPage() {
 
   const handleSave = () => {
     if (!isMatchdayComplete(selectedMatchday, predictions)) {
-      window.alert("Completa los 10 partidos (signo 1-X-2 y porra del Aviles si aplica) antes de guardar.");
+      window.alert("Completa los 10 partidos (signo 1-X-2 y porra del Avilés si aplica) antes de guardar.");
       return;
     }
     savePredictions(predictions);

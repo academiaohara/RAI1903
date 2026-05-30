@@ -39,7 +39,7 @@ export type CompetitionSeasonId = (typeof competitionSeasons)[number]["id"];
 export const DEFAULT_COMPETITION_SEASON_ID: CompetitionSeasonId = "2025-26";
 
 const baseTeams: Team[] = [
-  { id: RAI_TEAM_ID, name: "Real Avilés Industrial", shortName: "Real Avilés Industrial", city: "Aviles", stadium: "Roman Suarez Puerta", coach: "Lolo Escobar", founded: 1903, crestInitials: "RAI", colors: ["#214C9B", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
+  { id: RAI_TEAM_ID, name: "Real Avilés Industrial", shortName: "Real Avilés Industrial", city: "Avilés", stadium: "Roman Suarez Puerta", coach: "Lolo Escobar", founded: 1903, crestInitials: "RAI", colors: ["#214C9B", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
   { id: "ferrol", name: "Racing Club Ferrol", shortName: "Ferrol", city: "Ferrol", stadium: "Municipal da Malata", coach: "Guillermo Fernández", founded: 1919, crestInitials: "FER", colors: ["#166534", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
   { id: "lugo", name: "CD Lugo", shortName: "Lugo", city: "Lugo", stadium: "Anxo Carro", coach: "Álex Ortiz", founded: 1953, crestInitials: "LUG", colors: ["#DC2626", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
   { id: "pontevedra", name: "Pontevedra CF", shortName: "Pontevedra", city: "Pontevedra", stadium: "Municipal de Pasarón", coach: "Rubén Domínguez", founded: 1941, crestInitials: "PON", colors: ["#7A1435", "#FFFFFF"], position: 0, form: [], stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 } },
@@ -66,8 +66,8 @@ const baseTeamsFemenino: Team[] = baseTeams.map((team) =>
     ? {
         ...team,
         id: RAI_FEM_TEAM_ID,
-        name: "Real Aviles Industrial Femenino",
-        shortName: "Aviles Fem.",
+        name: "Real Avilés Industrial Femenino",
+        shortName: "Avilés Fem.",
         coach: "Laura Menendez",
       }
     : { ...team },
@@ -83,7 +83,7 @@ export const copaDelReyMatches: Match[] = [
     homeTeamId: "covadonga",
     awayTeamId: RAI_TEAM_ID,
     homeTeam: "CD Covadonga",
-    awayTeam: "Real Aviles Industrial",
+    awayTeam: "Real Avilés Industrial",
     date: "2025-10-29T19:00:00.000Z",
     competition: "copa-rey",
     competitionStage: "Primera eliminatoria",
@@ -97,7 +97,7 @@ export const copaDelReyMatches: Match[] = [
     matchday: 2,
     homeTeamId: RAI_TEAM_ID,
     awayTeamId: "burgos",
-    homeTeam: "Real Aviles Industrial",
+    homeTeam: "Real Avilés Industrial",
     awayTeam: "Burgos CF",
     date: "2025-12-03T20:00:00.000Z",
     competition: "copa-rey",
@@ -136,41 +136,41 @@ export const primeraRfefPlayoffBracket = buildPlayoffBracketFromConfig(
 );
 
 export const players: Player[] = [
-  { id: "alvaro-fernandez", firstName: "Alvaro", lastName: "Fernandez", displayName: "A. Fernandez", number: 1, position: "Portero", nationality: "Espana", age: 28, birthDate: "1998-04-12", height: "1,88 m", preferredFoot: "Derecha", seasonsAtClub: 2, status: "titular", rating: 7.2, bio: "Portero titular de la temporada 25/26, seguro bajo palos y fuerte en el juego aereo.", clubHistory: ["Marino de Luanco", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "guzman", firstName: "Guzman", lastName: "", displayName: "Guzman", number: 2, position: "Defensa", nationality: "Espana", age: 26, birthDate: "2000-07-08", height: "1,78 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "titular", rating: 7.0, bio: "Lateral derecho con buen recorrido y aporte ofensivo por la banda.", clubHistory: ["UP Langreo", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "victor", firstName: "Victor", lastName: "", displayName: "Victor", number: 3, position: "Defensa", nationality: "Espana", age: 27, birthDate: "1999-02-19", height: "1,84 m", preferredFoot: "Izquierda", seasonsAtClub: 1, status: "lesionado", rating: 7.05, bio: "Defensa zurdo con salida limpia y solidez en el uno contra uno.", clubHistory: ["CD Lealtad", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "babin", firstName: "Babin", lastName: "", displayName: "Babin", number: 5, position: "Defensa", nationality: "Espana", age: 29, birthDate: "1997-11-03", height: "1,86 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "titular", rating: 7.1, bio: "Central contundente, referencia en balon parado defensivo y salida de balon.", clubHistory: ["CD Covadonga", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "edu-cortina", firstName: "Edu", lastName: "Cortina", displayName: "E. Cortina", number: 6, position: "Centrocampista", nationality: "Espana", age: 28, birthDate: "1998-06-14", height: "1,80 m", preferredFoot: "Derecha", seasonsAtClub: 3, status: "titular", rating: 7.35, bio: "Mediocentro de contencion, orden y primer pase para activar al equipo.", clubHistory: ["Caudal Deportivo", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "luis-alcalde", firstName: "Luis", lastName: "Alcalde", displayName: "L. Alcalde", number: 7, position: "Centrocampista", nationality: "Espana", age: 25, birthDate: "2001-09-25", height: "1,77 m", preferredFoot: "Derecha", seasonsAtClub: 2, status: "titular", rating: 7.15, bio: "Interior con llegada al area y capacidad para romper lineas en conduccion.", clubHistory: ["Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "kevin-bautista", firstName: "Kevin", lastName: "Bautista", displayName: "K. Bautista", number: 8, position: "Centrocampista", nationality: "Espana", age: 24, birthDate: "2002-03-11", height: "1,76 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "nuevo fichaje", rating: 7.08, bio: "Futbolista dinamico entre lineas, buen ritmo y presion tras perdida.", clubHistory: ["Bergantinos FC", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "jose-santamaria", firstName: "Jose", lastName: "Santamaria", displayName: "J. Santamaria", number: 9, position: "Delantero", nationality: "Espana", age: 27, birthDate: "1999-12-05", height: "1,81 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "titular", rating: 7.4, bio: "Referencia ofensiva de la temporada, movimiento en area y finalizacion.", clubHistory: ["SD Compostela", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "javi-cueto", firstName: "Javi", lastName: "Cueto", displayName: "J. Cueto", number: 10, position: "Centrocampista", nationality: "Espana", age: 26, birthDate: "2000-08-22", height: "1,74 m", preferredFoot: "Izquierda", seasonsAtClub: 2, status: "titular", rating: 7.45, bio: "Media punta creativa, ultimo pase y vision para desequilibrar.", clubHistory: ["Real Oviedo Vetusta", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "raul-rubio", firstName: "Raul", lastName: "Rubio", displayName: "R. Rubio", number: 11, position: "Delantero", nationality: "Espana", age: 23, birthDate: "2003-05-17", height: "1,79 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "titular", rating: 7.12, bio: "Extremo rapido con desborde y centros al area rival.", clubHistory: ["Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "grigore", firstName: "Grigore", lastName: "", displayName: "Grigore", number: 12, position: "Defensa", nationality: "Rumania", age: 30, birthDate: "1996-01-30", height: "1,87 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "titular", rating: 7.05, bio: "Central experimentado, fuerte en marca y juego aereo.", clubHistory: ["CF Fuenlabrada", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "nando", firstName: "Nando", lastName: "", displayName: "Nando", number: 13, position: "Portero", nationality: "Espana", age: 22, birthDate: "2004-10-02", height: "1,89 m", preferredFoot: "Derecha", seasonsAtClub: 5, status: "cantera", rating: 6.75, bio: "Portero suplente formado en la cantera blanquiazul.", clubHistory: ["Real Aviles Juvenil", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "cayarga", firstName: "Cayarga", lastName: "", displayName: "Cayarga", number: 14, position: "Defensa", nationality: "Espana", age: 25, birthDate: "2001-04-18", height: "1,82 m", preferredFoot: "Izquierda", seasonsAtClub: 1, status: "suplente", rating: 6.85, bio: "Lateral izquierdo util para rotaciones y cierre de partidos.", clubHistory: ["CD Colunga", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "chukwuma-eze", firstName: "Chukwuma", lastName: "Eze", displayName: "C. Eze", number: 15, position: "Delantero", nationality: "Nigeria", age: 24, birthDate: "2002-06-28", height: "1,83 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "nuevo fichaje", rating: 7.0, bio: "Delantero potente, buen juego de espaldas y presencia en area.", clubHistory: ["Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "adri-gomez", firstName: "Adri", lastName: "Gomez", displayName: "A. Gomez", number: 16, position: "Delantero", nationality: "Espana", age: 26, birthDate: "2000-03-09", height: "1,78 m", preferredFoot: "Izquierda", seasonsAtClub: 2, status: "suplente", rating: 6.9, bio: "Atacante de banda con desborde y llegada al segundo palo.", clubHistory: ["CD Mosconia", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "quicala", firstName: "Quicala", lastName: "", displayName: "Quicala", number: 17, position: "Centrocampista", nationality: "Espana", age: 21, birthDate: "2005-11-14", height: "1,75 m", preferredFoot: "Derecha", seasonsAtClub: 4, status: "cantera", rating: 6.88, bio: "Joven centrocampista con proyeccion y buen golpeo desde media distancia.", clubHistory: ["Real Aviles Juvenil", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "gete", firstName: "Gete", lastName: "", displayName: "Gete", number: 18, position: "Defensa", nationality: "Espana", age: 31, birthDate: "1995-02-20", height: "1,83 m", preferredFoot: "Derecha", seasonsAtClub: 3, status: "titular", rating: 7.0, bio: "Defensa polivalente con experiencia en segunda federacion.", clubHistory: ["Caudal Deportivo", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "natalio", firstName: "Natalio", lastName: "", displayName: "Natalio", number: 19, position: "Delantero", nationality: "Espana", age: 29, birthDate: "1997-07-07", height: "1,80 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "suplente", rating: 6.95, bio: "Delantero veterano con olfato goleador y juego de espaldas.", clubHistory: ["CD Guijuelo", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "campadal", firstName: "Campadal", lastName: "", displayName: "Campadal", number: 20, position: "Centrocampista", nationality: "Espana", age: 22, birthDate: "2004-01-16", height: "1,76 m", preferredFoot: "Derecha", seasonsAtClub: 6, status: "cantera", rating: 6.82, bio: "Mediocampista de cantera con energia y buena presion sin balon.", clubHistory: ["Real Aviles Juvenil", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "uzkudun", firstName: "Uzkudun", lastName: "", displayName: "Uzkudun", number: 21, position: "Defensa", nationality: "Espana", age: 28, birthDate: "1998-10-11", height: "1,85 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "titular", rating: 7.08, bio: "Central zurdo con buen juego aereo y salida de balon.", clubHistory: ["SD Compostela", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "isi-ros", firstName: "Isi", lastName: "Ros", displayName: "I. Ros", number: 22, position: "Delantero", nationality: "Espana", age: 24, birthDate: "2002-08-30", height: "1,77 m", preferredFoot: "Izquierda", seasonsAtClub: 1, status: "suplente", rating: 6.92, bio: "Extremo zurdo con regate y capacidad para generar superioridad.", clubHistory: ["Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "rivera", firstName: "Rivera", lastName: "", displayName: "Rivera", number: 23, position: "Centrocampista", nationality: "Espana", age: 27, birthDate: "1999-05-23", height: "1,79 m", preferredFoot: "Derecha", seasonsAtClub: 2, status: "sancionado", rating: 7.18, bio: "Centrocampista de transicion, conduccion y pase entre lineas.", clubHistory: ["UP Langreo", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "carmona", firstName: "Carmona", lastName: "", displayName: "Carmona", number: 24, position: "Defensa", nationality: "Espana", age: 23, birthDate: "2003-12-01", height: "1,80 m", preferredFoot: "Derecha", seasonsAtClub: 3, status: "cantera", rating: 6.8, bio: "Defensa joven con margen de mejora y versatilidad en el eje.", clubHistory: ["Real Aviles Juvenil", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
-  { id: "osky", firstName: "Osky", lastName: "", displayName: "Osky", number: 26, position: "Delantero", nationality: "Espana", age: 20, birthDate: "2006-02-08", height: "1,74 m", preferredFoot: "Derecha", seasonsAtClub: 7, status: "cantera", rating: 6.78, bio: "Joven atacante de la cantera con velocidad y descaro en el ultimo tercio.", clubHistory: ["Real Aviles Cadete", "Real Aviles Juvenil", "Real Aviles Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "alvaro-fernandez", firstName: "Alvaro", lastName: "Fernandez", displayName: "A. Fernandez", number: 1, position: "Portero", nationality: "España", age: 28, birthDate: "1998-04-12", height: "1,88 m", preferredFoot: "Derecha", seasonsAtClub: 2, status: "titular", rating: 7.2, bio: "Portero titular de la temporada 25/26, seguro bajo palos y fuerte en el juego aereo.", clubHistory: ["Marino de Luanco", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "guzman", firstName: "Guzman", lastName: "", displayName: "Guzman", number: 2, position: "Defensa", nationality: "España", age: 26, birthDate: "2000-07-08", height: "1,78 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "titular", rating: 7.0, bio: "Lateral derecho con buen recorrido y aporte ofensivo por la banda.", clubHistory: ["UP Langreo", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "victor", firstName: "Victor", lastName: "", displayName: "Victor", number: 3, position: "Defensa", nationality: "España", age: 27, birthDate: "1999-02-19", height: "1,84 m", preferredFoot: "Izquierda", seasonsAtClub: 1, status: "lesionado", rating: 7.05, bio: "Defensa zurdo con salida limpia y solidez en el uno contra uno.", clubHistory: ["CD Lealtad", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "babin", firstName: "Babin", lastName: "", displayName: "Babin", number: 5, position: "Defensa", nationality: "España", age: 29, birthDate: "1997-11-03", height: "1,86 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "titular", rating: 7.1, bio: "Central contundente, referencia en balon parado defensivo y salida de balon.", clubHistory: ["CD Covadonga", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "edu-cortina", firstName: "Edu", lastName: "Cortina", displayName: "E. Cortina", number: 6, position: "Centrocampista", nationality: "España", age: 28, birthDate: "1998-06-14", height: "1,80 m", preferredFoot: "Derecha", seasonsAtClub: 3, status: "titular", rating: 7.35, bio: "Mediocentro de contencion, orden y primer pase para activar al equipo.", clubHistory: ["Caudal Deportivo", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "luis-alcalde", firstName: "Luis", lastName: "Alcalde", displayName: "L. Alcalde", number: 7, position: "Centrocampista", nationality: "España", age: 25, birthDate: "2001-09-25", height: "1,77 m", preferredFoot: "Derecha", seasonsAtClub: 2, status: "titular", rating: 7.15, bio: "Interior con llegada al area y capacidad para romper lineas en conduccion.", clubHistory: ["Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "kevin-bautista", firstName: "Kevin", lastName: "Bautista", displayName: "K. Bautista", number: 8, position: "Centrocampista", nationality: "España", age: 24, birthDate: "2002-03-11", height: "1,76 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "nuevo fichaje", rating: 7.08, bio: "Futbolista dinamico entre lineas, buen ritmo y presion tras perdida.", clubHistory: ["Bergantinos FC", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "jose-santamaria", firstName: "Jose", lastName: "Santamaria", displayName: "J. Santamaria", number: 9, position: "Delantero", nationality: "España", age: 27, birthDate: "1999-12-05", height: "1,81 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "titular", rating: 7.4, bio: "Referencia ofensiva de la temporada, movimiento en area y finalizacion.", clubHistory: ["SD Compostela", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "javi-cueto", firstName: "Javi", lastName: "Cueto", displayName: "J. Cueto", number: 10, position: "Centrocampista", nationality: "España", age: 26, birthDate: "2000-08-22", height: "1,74 m", preferredFoot: "Izquierda", seasonsAtClub: 2, status: "titular", rating: 7.45, bio: "Media punta creativa, ultimo pase y vision para desequilibrar.", clubHistory: ["Real Oviedo Vetusta", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "raul-rubio", firstName: "Raul", lastName: "Rubio", displayName: "R. Rubio", number: 11, position: "Delantero", nationality: "España", age: 23, birthDate: "2003-05-17", height: "1,79 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "titular", rating: 7.12, bio: "Extremo rapido con desborde y centros al area rival.", clubHistory: ["Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "grigore", firstName: "Grigore", lastName: "", displayName: "Grigore", number: 12, position: "Defensa", nationality: "Rumania", age: 30, birthDate: "1996-01-30", height: "1,87 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "titular", rating: 7.05, bio: "Central experimentado, fuerte en marca y juego aereo.", clubHistory: ["CF Fuenlabrada", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "nando", firstName: "Nando", lastName: "", displayName: "Nando", number: 13, position: "Portero", nationality: "España", age: 22, birthDate: "2004-10-02", height: "1,89 m", preferredFoot: "Derecha", seasonsAtClub: 5, status: "cantera", rating: 6.75, bio: "Portero suplente formado en la cantera blanquiazul.", clubHistory: ["Real Avilés Juvenil", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "cayarga", firstName: "Cayarga", lastName: "", displayName: "Cayarga", number: 14, position: "Defensa", nationality: "España", age: 25, birthDate: "2001-04-18", height: "1,82 m", preferredFoot: "Izquierda", seasonsAtClub: 1, status: "suplente", rating: 6.85, bio: "Lateral izquierdo util para rotaciones y cierre de partidos.", clubHistory: ["CD Colunga", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "chukwuma-eze", firstName: "Chukwuma", lastName: "Eze", displayName: "C. Eze", number: 15, position: "Delantero", nationality: "Nigeria", age: 24, birthDate: "2002-06-28", height: "1,83 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "nuevo fichaje", rating: 7.0, bio: "Delantero potente, buen juego de espaldas y presencia en area.", clubHistory: ["Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "adri-gomez", firstName: "Adri", lastName: "Gomez", displayName: "A. Gomez", number: 16, position: "Delantero", nationality: "España", age: 26, birthDate: "2000-03-09", height: "1,78 m", preferredFoot: "Izquierda", seasonsAtClub: 2, status: "suplente", rating: 6.9, bio: "Atacante de banda con desborde y llegada al segundo palo.", clubHistory: ["CD Mosconia", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "quicala", firstName: "Quicala", lastName: "", displayName: "Quicala", number: 17, position: "Centrocampista", nationality: "España", age: 21, birthDate: "2005-11-14", height: "1,75 m", preferredFoot: "Derecha", seasonsAtClub: 4, status: "cantera", rating: 6.88, bio: "Joven centrocampista con proyeccion y buen golpeo desde media distancia.", clubHistory: ["Real Avilés Juvenil", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "gete", firstName: "Gete", lastName: "", displayName: "Gete", number: 18, position: "Defensa", nationality: "España", age: 31, birthDate: "1995-02-20", height: "1,83 m", preferredFoot: "Derecha", seasonsAtClub: 3, status: "titular", rating: 7.0, bio: "Defensa polivalente con experiencia en segunda federacion.", clubHistory: ["Caudal Deportivo", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "natalio", firstName: "Natalio", lastName: "", displayName: "Natalio", number: 19, position: "Delantero", nationality: "España", age: 29, birthDate: "1997-07-07", height: "1,80 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "suplente", rating: 6.95, bio: "Delantero veterano con olfato goleador y juego de espaldas.", clubHistory: ["CD Guijuelo", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "campadal", firstName: "Campadal", lastName: "", displayName: "Campadal", number: 20, position: "Centrocampista", nationality: "España", age: 22, birthDate: "2004-01-16", height: "1,76 m", preferredFoot: "Derecha", seasonsAtClub: 6, status: "cantera", rating: 6.82, bio: "Mediocampista de cantera con energia y buena presion sin balon.", clubHistory: ["Real Avilés Juvenil", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "uzkudun", firstName: "Uzkudun", lastName: "", displayName: "Uzkudun", number: 21, position: "Defensa", nationality: "España", age: 28, birthDate: "1998-10-11", height: "1,85 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "titular", rating: 7.08, bio: "Central zurdo con buen juego aereo y salida de balon.", clubHistory: ["SD Compostela", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "isi-ros", firstName: "Isi", lastName: "Ros", displayName: "I. Ros", number: 22, position: "Delantero", nationality: "España", age: 24, birthDate: "2002-08-30", height: "1,77 m", preferredFoot: "Izquierda", seasonsAtClub: 1, status: "suplente", rating: 6.92, bio: "Extremo zurdo con regate y capacidad para generar superioridad.", clubHistory: ["Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "rivera", firstName: "Rivera", lastName: "", displayName: "Rivera", number: 23, position: "Centrocampista", nationality: "España", age: 27, birthDate: "1999-05-23", height: "1,79 m", preferredFoot: "Derecha", seasonsAtClub: 2, status: "sancionado", rating: 7.18, bio: "Centrocampista de transicion, conduccion y pase entre lineas.", clubHistory: ["UP Langreo", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "carmona", firstName: "Carmona", lastName: "", displayName: "Carmona", number: 24, position: "Defensa", nationality: "España", age: 23, birthDate: "2003-12-01", height: "1,80 m", preferredFoot: "Derecha", seasonsAtClub: 3, status: "cantera", rating: 6.8, bio: "Defensa joven con margen de mejora y versatilidad en el eje.", clubHistory: ["Real Avilés Juvenil", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
+  { id: "osky", firstName: "Osky", lastName: "", displayName: "Osky", number: 26, position: "Delantero", nationality: "España", age: 20, birthDate: "2006-02-08", height: "1,74 m", preferredFoot: "Derecha", seasonsAtClub: 7, status: "cantera", rating: 6.78, bio: "Joven atacante de la cantera con velocidad y descaro en el ultimo tercio.", clubHistory: ["Real Avilés Cadete", "Real Avilés Juvenil", "Real Avilés Industrial"], stats: { appearances: 0, goals: 0, assists: 0, minutes: 0, yellowCards: 0, redCards: 0 } },
 ];
 
 export const playersFemenino: Player[] = [
-  { id: "fem-lucia-ramos", firstName: "Lucia", lastName: "Ramos", displayName: "L. Ramos", number: 1, position: "Portero", nationality: "Espana", age: 27, birthDate: "1999-04-12", height: "1,74 m", preferredFoot: "Derecha", seasonsAtClub: 4, status: "titular", rating: 7.32, bio: "Portera referente del bloque femenino, fuerte en uno contra uno y salida de balon.", clubHistory: ["Sporting de Gijon Femenino", "Real Aviles Industrial Femenino"], stats: { appearances: 9, goals: 0, assists: 0, minutes: 810, yellowCards: 0, redCards: 0 } },
-  { id: "fem-sara-perez", firstName: "Sara", lastName: "Perez", displayName: "S. Perez", number: 3, position: "Defensa", nationality: "Espana", age: 24, birthDate: "2002-08-03", height: "1,69 m", preferredFoot: "Izquierda", seasonsAtClub: 2, status: "lesionado", rating: 7.08, bio: "Central rapida y agresiva en marca, lider del eje defensivo.", clubHistory: ["Oviedo Moderno", "Real Aviles Industrial Femenino"], stats: { appearances: 9, goals: 1, assists: 0, minutes: 801, yellowCards: 2, redCards: 0 } },
-  { id: "fem-claudia-nunez", firstName: "Claudia", lastName: "Nunez", displayName: "C. Nunez", number: 6, position: "Centrocampista", nationality: "Espana", age: 26, birthDate: "2000-11-19", height: "1,66 m", preferredFoot: "Derecha", seasonsAtClub: 3, status: "titular", rating: 7.44, bio: "Mediocentro con gran volumen de juego y capacidad para romper presion.", clubHistory: ["Real Aviles Industrial Femenino"], stats: { appearances: 9, goals: 2, assists: 4, minutes: 790, yellowCards: 3, redCards: 0 } },
-  { id: "fem-irene-costa", firstName: "Irene", lastName: "Costa", displayName: "I. Costa", number: 9, position: "Delantero", nationality: "Espana", age: 23, birthDate: "2003-01-27", height: "1,71 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "titular", rating: 7.61, bio: "Delantera goleadora, fuerte en el juego aereo y en la finalizacion rapida.", clubHistory: ["CD Orientacion Maritima", "Real Aviles Industrial Femenino"], stats: { appearances: 9, goals: 8, assists: 2, minutes: 742, yellowCards: 1, redCards: 0 } },
-  { id: "fem-noa-garcia", firstName: "Noa", lastName: "Garcia", displayName: "N. Garcia", number: 11, position: "Delantero", nationality: "Espana", age: 21, birthDate: "2005-06-15", height: "1,68 m", preferredFoot: "Izquierda", seasonsAtClub: 5, status: "cantera", rating: 7.02, bio: "Extrema zurda con desborde y llegada constante al segundo palo.", clubHistory: ["Real Aviles Cadete Femenino", "Real Aviles Industrial Femenino"], stats: { appearances: 8, goals: 3, assists: 5, minutes: 655, yellowCards: 1, redCards: 0 } },
-  { id: "fem-marta-diaz", firstName: "Marta", lastName: "Diaz", displayName: "M. Diaz", number: 14, position: "Defensa", nationality: "Espana", age: 29, birthDate: "1997-09-08", height: "1,72 m", preferredFoot: "Derecha", seasonsAtClub: 2, status: "titular", rating: 6.98, bio: "Lateral derecha con proyeccion y centros al area rival.", clubHistory: ["UD Santa Teresa", "Real Aviles Industrial Femenino"], stats: { appearances: 8, goals: 0, assists: 3, minutes: 710, yellowCards: 2, redCards: 0 } },
-  { id: "fem-alba-torre", firstName: "Alba", lastName: "Torre", displayName: "A. Torre", number: 17, position: "Centrocampista", nationality: "Espana", age: 20, birthDate: "2006-03-22", height: "1,65 m", preferredFoot: "Ambidiestro", seasonsAtClub: 6, status: "cantera", rating: 6.88, bio: "Interior joven con buen golpeo desde media distancia.", clubHistory: ["Real Aviles Juvenil Femenino", "Real Aviles Industrial Femenino"], stats: { appearances: 7, goals: 1, assists: 2, minutes: 402, yellowCards: 0, redCards: 0 } },
-  { id: "fem-elena-rios", firstName: "Elena", lastName: "Rios", displayName: "E. Rios", number: 19, position: "Centrocampista", nationality: "Espana", age: 25, birthDate: "2001-12-30", height: "1,67 m", preferredFoot: "Izquierda", seasonsAtClub: 1, status: "sancionado", rating: 7.15, bio: "Media punta con vision y ultimo pase para activar a las delanteras.", clubHistory: ["Zaragoza CFF B", "Real Aviles Industrial Femenino"], stats: { appearances: 9, goals: 4, assists: 3, minutes: 688, yellowCards: 2, redCards: 0 } },
+  { id: "fem-lucia-ramos", firstName: "Lucia", lastName: "Ramos", displayName: "L. Ramos", number: 1, position: "Portero", nationality: "España", age: 27, birthDate: "1999-04-12", height: "1,74 m", preferredFoot: "Derecha", seasonsAtClub: 4, status: "titular", rating: 7.32, bio: "Portera referente del bloque femenino, fuerte en uno contra uno y salida de balon.", clubHistory: ["Sporting de Gijon Femenino", "Real Avilés Industrial Femenino"], stats: { appearances: 9, goals: 0, assists: 0, minutes: 810, yellowCards: 0, redCards: 0 } },
+  { id: "fem-sara-perez", firstName: "Sara", lastName: "Perez", displayName: "S. Perez", number: 3, position: "Defensa", nationality: "España", age: 24, birthDate: "2002-08-03", height: "1,69 m", preferredFoot: "Izquierda", seasonsAtClub: 2, status: "lesionado", rating: 7.08, bio: "Central rapida y agresiva en marca, lider del eje defensivo.", clubHistory: ["Oviedo Moderno", "Real Avilés Industrial Femenino"], stats: { appearances: 9, goals: 1, assists: 0, minutes: 801, yellowCards: 2, redCards: 0 } },
+  { id: "fem-claudia-nunez", firstName: "Claudia", lastName: "Nunez", displayName: "C. Nunez", number: 6, position: "Centrocampista", nationality: "España", age: 26, birthDate: "2000-11-19", height: "1,66 m", preferredFoot: "Derecha", seasonsAtClub: 3, status: "titular", rating: 7.44, bio: "Mediocentro con gran volumen de juego y capacidad para romper presion.", clubHistory: ["Real Avilés Industrial Femenino"], stats: { appearances: 9, goals: 2, assists: 4, minutes: 790, yellowCards: 3, redCards: 0 } },
+  { id: "fem-irene-costa", firstName: "Irene", lastName: "Costa", displayName: "I. Costa", number: 9, position: "Delantero", nationality: "España", age: 23, birthDate: "2003-01-27", height: "1,71 m", preferredFoot: "Derecha", seasonsAtClub: 1, status: "titular", rating: 7.61, bio: "Delantera goleadora, fuerte en el juego aereo y en la finalizacion rapida.", clubHistory: ["CD Orientacion Maritima", "Real Avilés Industrial Femenino"], stats: { appearances: 9, goals: 8, assists: 2, minutes: 742, yellowCards: 1, redCards: 0 } },
+  { id: "fem-noa-garcia", firstName: "Noa", lastName: "Garcia", displayName: "N. Garcia", number: 11, position: "Delantero", nationality: "España", age: 21, birthDate: "2005-06-15", height: "1,68 m", preferredFoot: "Izquierda", seasonsAtClub: 5, status: "cantera", rating: 7.02, bio: "Extrema zurda con desborde y llegada constante al segundo palo.", clubHistory: ["Real Avilés Cadete Femenino", "Real Avilés Industrial Femenino"], stats: { appearances: 8, goals: 3, assists: 5, minutes: 655, yellowCards: 1, redCards: 0 } },
+  { id: "fem-marta-diaz", firstName: "Marta", lastName: "Diaz", displayName: "M. Diaz", number: 14, position: "Defensa", nationality: "España", age: 29, birthDate: "1997-09-08", height: "1,72 m", preferredFoot: "Derecha", seasonsAtClub: 2, status: "titular", rating: 6.98, bio: "Lateral derecha con proyeccion y centros al area rival.", clubHistory: ["UD Santa Teresa", "Real Avilés Industrial Femenino"], stats: { appearances: 8, goals: 0, assists: 3, minutes: 710, yellowCards: 2, redCards: 0 } },
+  { id: "fem-alba-torre", firstName: "Alba", lastName: "Torre", displayName: "A. Torre", number: 17, position: "Centrocampista", nationality: "España", age: 20, birthDate: "2006-03-22", height: "1,65 m", preferredFoot: "Ambidiestro", seasonsAtClub: 6, status: "cantera", rating: 6.88, bio: "Interior joven con buen golpeo desde media distancia.", clubHistory: ["Real Avilés Juvenil Femenino", "Real Avilés Industrial Femenino"], stats: { appearances: 7, goals: 1, assists: 2, minutes: 402, yellowCards: 0, redCards: 0 } },
+  { id: "fem-elena-rios", firstName: "Elena", lastName: "Rios", displayName: "E. Rios", number: 19, position: "Centrocampista", nationality: "España", age: 25, birthDate: "2001-12-30", height: "1,67 m", preferredFoot: "Izquierda", seasonsAtClub: 1, status: "sancionado", rating: 7.15, bio: "Media punta con vision y ultimo pase para activar a las delanteras.", clubHistory: ["Zaragoza CFF B", "Real Avilés Industrial Femenino"], stats: { appearances: 9, goals: 4, assists: 3, minutes: 688, yellowCards: 2, redCards: 0 } },
 ];
 
 const buildMatchArticles = (matches: Match[]): MatchArticle[] => {
@@ -201,7 +201,7 @@ const buildMatchArticles = (matches: Match[]): MatchArticle[] => {
     source: "AsturFutbol",
     excerpt: `Analisis del duelo de la jornada ${match.matchday}: forma reciente, claves tacticas y estado de la plantilla.`,
     body: [
-      `El Real Aviles Industrial afronta la jornada ${match.matchday} ante ${match.awayTeamId === RAI_TEAM_ID ? match.homeTeam : match.awayTeam}.`,
+      `El Real Avilés Industrial afronta la jornada ${match.matchday} ante ${match.awayTeamId === RAI_TEAM_ID ? match.homeTeam : match.awayTeam}.`,
       "El cuerpo tecnico llega con la plantilla casi completa y rotaciones pensadas para sostener el ritmo competitivo.",
       "La clave pasara por dominar los duelos en campo abierto y aprovechar las acciones a balon parado.",
       "El Roman Suarez Puerta busca otro ambiente exigente para empujar al equipo en un tramo decisivo de la liga.",
@@ -214,14 +214,14 @@ const buildMatchArticles = (matches: Match[]): MatchArticle[] => {
       matchId: "fem-j8-llanera",
       gender: "femenino",
       type: "cronica",
-      title: "Cronica: Aviles Femenino 3-1 Llanera",
+      title: "Cronica: Avilés Femenino 3-1 Llanera",
       date: "2026-10-12T11:00:00.000Z",
       source: "RAI1903",
       excerpt: "Victoria contundente con hat-trick parcial de Irene Costa y gran actitud colectiva.",
       body: [
-        "El bloque femenino firm? un partido completo desde el inicio, con Claudia Nunez mandando en el centro del campo.",
-        "Irene Costa resolvi? con frialdad tres ocasiones claras y el equipo mantuvo la porteria segura en los tramos finales.",
-        "Laura Menendez destac? la madurez del grupo y la proyeccion de las jugadoras de cantera.",
+        "El bloque femenino firmó un partido completo desde el inicio, con Claudia Nunez mandando en el centro del campo.",
+        "Irene Costa resolvió con frialdad tres ocasiones claras y el equipo mantuvo la porteria segura en los tramos finales.",
+        "Laura Menendez destacó la madurez del grupo y la proyeccion de las jugadoras de cantera.",
       ],
     },
     {
@@ -229,13 +229,13 @@ const buildMatchArticles = (matches: Match[]): MatchArticle[] => {
       matchId: "fem-j10-covadonga",
       gender: "femenino",
       type: "previa",
-      title: "Previa: Covadonga vs Aviles Femenino",
+      title: "Previa: Covadonga vs Avilés Femenino",
       date: "2026-10-26T11:30:00.000Z",
       source: "Futbol Femenino Norte",
-      excerpt: "Duelo directo por el liderato con dos estilos de presi?n alta y transici?n r?pida.",
+      excerpt: "Duelo directo por el liderato con dos estilos de presión alta y transición rápida.",
       body: [
-        "El Aviles Femenino viaja con la segunda posicion asegurada y la ambici?n de recuperar el liderato.",
-        "Se espera rotaci?n m?nima en defensa y mayor protagonismo de Noa Garcia por la banda izquierda.",
+        "El Avilés Femenino viaja con la segunda posicion asegurada y la ambición de recuperar el liderato.",
+        "Se espera rotación mínima en defensa y mayor protagonismo de Noa Garcia por la banda izquierda.",
         "El partido puede decidirse en los primeros quince minutos de cada parte.",
       ],
     },
@@ -263,7 +263,7 @@ const buildMatchArticles = (matches: Match[]): MatchArticle[] => {
     source: "Futbol Femenino Norte",
     excerpt: `Analisis femenino de la jornada ${match.matchday} con estado de forma y convocatoria.`,
     body: [
-      `El Aviles Femenino afronta la jornada ${match.matchday} con ambicion de sumar en la parte alta de la tabla.`,
+      `El Avilés Femenino afronta la jornada ${match.matchday} con ambicion de sumar en la parte alta de la tabla.`,
       "Laura Menendez cuenta con la base titular y rotaciones para mantener la intensidad.",
       "La clave sera el duelo en bandas y la capacidad de cerrar el partido desde balon parado.",
     ],
@@ -469,8 +469,8 @@ export const newsItems: NewsItem[] = [
 ];
 
 export const transfers: TransferRumor[] = [
-  { id: "t1", playerName: "Iker Vieites", position: "Defensa", age: 22, category: "Rumores", status: "Negociacion", probability: 62, source: "Mercado Norte", date: "2026-10-20", originClub: "Coruxo FC", destinationClub: "Real Aviles Industrial", rating: 4, analysis: "Perfil sub-23 para doblar el lateral, con margen fisico y buen centro lateral." },
-  { id: "t2", playerName: "Bruno Santamaria", position: "Delantero", age: 27, category: "Rumores", status: "Interes", probability: 38, source: "AsturFutbol", date: "2026-10-18", originClub: "CD Guijuelo", destinationClub: "Real Aviles Industrial", rating: 3, analysis: "Delantero movil que encajaria como complemento de Santamaria, aunque el coste salarial es alto." },
+  { id: "t1", playerName: "Iker Vieites", position: "Defensa", age: 22, category: "Rumores", status: "Negociacion", probability: 62, source: "Mercado Norte", date: "2026-10-20", originClub: "Coruxo FC", destinationClub: "Real Avilés Industrial", rating: 4, analysis: "Perfil sub-23 para doblar el lateral, con margen fisico y buen centro lateral." },
+  { id: "t2", playerName: "Bruno Santamaria", position: "Delantero", age: 27, category: "Rumores", status: "Interes", probability: 38, source: "AsturFutbol", date: "2026-10-18", originClub: "CD Guijuelo", destinationClub: "Real Avilés Industrial", rating: 3, analysis: "Delantero movil que encajaria como complemento de Santamaria, aunque el coste salarial es alto." },
   {
     id: "t3",
     playerId: "kevin-bautista",
@@ -483,11 +483,11 @@ export const transfers: TransferRumor[] = [
     source: "Club",
     date: "2026-07-10",
     originClub: "RC Celta Fortuna",
-    destinationClub: "Real Aviles Industrial",
+    destinationClub: "Real Avilés Industrial",
     rating: 4,
     analysis: "Fichaje de energia y conduccion para subir el techo creativo de la medular.",
     clubAnnouncement:
-      "El Real Aviles Industrial hace oficial la incorporacion de Mateo Rios, centrocampista de 23 anos procedente del RC Celta Fortuna. Firma por dos temporadas y se incorpora a la pretemporada con dorsal 8.",
+      "El Real Avilés Industrial hace oficial la incorporacion de Mateo Rios, centrocampista de 23 años procedente del RC Celta Fortuna. Firma por dos temporadas y se incorpora a la pretemporada con dorsal 8.",
   },
   {
     id: "t4",
@@ -501,11 +501,11 @@ export const transfers: TransferRumor[] = [
     source: "Club",
     date: "2026-07-18",
     originClub: "Bergantinos FC",
-    destinationClub: "Real Aviles Industrial",
+    destinationClub: "Real Avilés Industrial",
     rating: 4,
     analysis: "Aporta juego entre lineas, trabajo sin balon y alternativas para jugar con dos puntas.",
     clubAnnouncement:
-      "Samuel Rodriguez se convierte en nuevo jugador del Real Aviles Industrial. El delantero asturiano llega desde el Bergantinos FC para reforzar la zona de ataque blanquiazul.",
+      "Samuel Rodriguez se convierte en nuevo jugador del Real Avilés Industrial. El delantero asturiano llega desde el Bergantinos FC para reforzar la zona de ataque blanquiazul.",
   },
   {
     id: "t9",
@@ -519,13 +519,13 @@ export const transfers: TransferRumor[] = [
     source: "Club",
     date: "2026-07-05",
     originClub: "UD Llanera",
-    destinationClub: "Real Aviles Industrial",
+    destinationClub: "Real Avilés Industrial",
     rating: 4,
     analysis: "Central contundente que refuerza el eje defensivo con experiencia en Segunda RFEF.",
     clubAnnouncement:
-      "Marcos Alvarez firma por el Real Aviles Industrial tras su paso por el UD Llanera. Central de 28 anos que aporta solidez y liderazgo en la zaga.",
+      "Marcos Alvarez firma por el Real Avilés Industrial tras su paso por el UD Llanera. Central de 28 años que aporta solidez y liderazgo en la zaga.",
   },
-  { id: "t5", playerName: "Hugo Carballo", position: "Portero", age: 24, category: "Bajas", status: "Oficial", probability: 100, source: "Club", date: "2026-07-02", originClub: "Real Aviles Industrial", destinationClub: "UP Langreo", rating: 3, analysis: "Salida logica tras perder protagonismo; libera una ficha senior y minutos para Nando." },
+  { id: "t5", playerName: "Hugo Carballo", position: "Portero", age: 24, category: "Bajas", status: "Oficial", probability: 100, source: "Club", date: "2026-07-02", originClub: "Real Avilés Industrial", destinationClub: "UP Langreo", rating: 3, analysis: "Salida logica tras perder protagonismo; libera una ficha senior y minutos para Nando." },
   {
     id: "t6",
     playerId: "javi-cueto",
@@ -537,14 +537,14 @@ export const transfers: TransferRumor[] = [
     probability: 100,
     source: "Club",
     date: "2026-10-12",
-    originClub: "Real Aviles Industrial",
-    destinationClub: "Real Aviles Industrial",
+    originClub: "Real Avilés Industrial",
+    destinationClub: "Real Avilés Industrial",
     rating: 5,
     analysis: "Pieza diferencial entre lineas; retenerlo seria un mensaje competitivo para el proyecto.",
     clubAnnouncement:
-      "Javi Cueto renueva su contrato con el Real Aviles Industrial hasta 2027. El club blinda a uno de sus referentes creativos en la medular.",
+      "Javi Cueto renueva su contrato con el Real Avilés Industrial hasta 2027. El club blinda a uno de sus referentes creativos en la medular.",
   },
-  { id: "t7", playerName: "Adri Gomez", position: "Delantero", age: 26, category: "Bajas", status: "Descartado", probability: 8, source: "RAI1903", date: "2026-10-07", originClub: "Real Aviles Industrial", destinationClub: "CD Lealtad", rating: 2, analysis: "El cuerpo tecnico valora su continuidad segun el plan de rotaciones ofensivas." },
+  { id: "t7", playerName: "Adri Gomez", position: "Delantero", age: 26, category: "Bajas", status: "Descartado", probability: 8, source: "RAI1903", date: "2026-10-07", originClub: "Real Avilés Industrial", destinationClub: "CD Lealtad", rating: 2, analysis: "El cuerpo tecnico valora su continuidad segun el plan de rotaciones ofensivas." },
   {
     id: "t8",
     playerId: "edu-cortina",
@@ -556,17 +556,17 @@ export const transfers: TransferRumor[] = [
     probability: 100,
     source: "Club",
     date: "2026-10-15",
-    originClub: "Real Aviles Industrial",
-    destinationClub: "Real Aviles Industrial",
+    originClub: "Real Avilés Industrial",
+    destinationClub: "Real Avilés Industrial",
     rating: 5,
     analysis: "El equilibrio del equipo pasa por su continuidad; prioridad alta en la direccion deportiva.",
     clubAnnouncement:
-      "Edu Cortina amplia su vinculacion con el Real Aviles Industrial. El mediocentro capitanea el eje del equipo y seguira liderando la medular la proxima campana.",
+      "Edu Cortina amplia su vinculacion con el Real Avilés Industrial. El mediocentro capitanea el eje del equipo y seguira liderando la medular la proxima campana.",
   },
 ];
 
 const academyTable = (teamName: string): Team[] => [
-  { id: `${teamName}-aviles`, name: `Real Aviles ${teamName}`, shortName: "Aviles", city: "Aviles", stadium: "Santo Domingo", coach: "Casa", founded: 1903, crestInitials: "RAI", colors: ["#214C9B", "#FFFFFF"], position: 2, form: ["G", "G", "E", "G", "P"], stats: { played: 9, won: 6, drawn: 1, lost: 2, goalsFor: 19, goalsAgainst: 9, points: 19 } },
+  { id: `${teamName}-aviles`, name: `Real Avilés ${teamName}`, shortName: "Avilés", city: "Avilés", stadium: "Santo Domingo", coach: "Casa", founded: 1903, crestInitials: "RAI", colors: ["#214C9B", "#FFFFFF"], position: 2, form: ["G", "G", "E", "G", "P"], stats: { played: 9, won: 6, drawn: 1, lost: 2, goalsFor: 19, goalsAgainst: 9, points: 19 } },
   { id: `${teamName}-oviedo`, name: "Real Oviedo Vetusta", shortName: "Oviedo B", city: "Oviedo", stadium: "El Requexon", coach: "Pablo Lago", founded: 1926, crestInitials: "OVI", colors: ["#214C9B", "#FFFFFF"], position: 1, form: ["G", "E", "G", "G", "G"], stats: { played: 9, won: 6, drawn: 2, lost: 1, goalsFor: 21, goalsAgainst: 8, points: 20 } },
   { id: `${teamName}-llanera`, name: "UD Llanera", shortName: "Llanera", city: "Llanera", stadium: "Pepe Quimaran", coach: "Adrian Torre", founded: 1981, crestInitials: "LLA", colors: ["#111827", "#F59E0B"], position: 3, form: ["G", "P", "G", "E", "G"], stats: { played: 9, won: 5, drawn: 2, lost: 2, goalsFor: 16, goalsAgainst: 10, points: 17 } },
   { id: `${teamName}-roces`, name: "TSK Roces", shortName: "Roces", city: "Gijon", stadium: "Covadonga", coach: "Ivan Valdes", founded: 1952, crestInitials: "ROC", colors: ["#DC2626", "#FFFFFF"], position: 4, form: ["E", "G", "P", "G", "E"], stats: { played: 9, won: 4, drawn: 3, lost: 2, goalsFor: 13, goalsAgainst: 11, points: 15 } },
@@ -574,19 +574,19 @@ const academyTable = (teamName: string): Team[] => [
 ];
 
 const academyCalendar = (teamId: string, teamName: string, competition: CompetitionId): Match[] => [
-  { id: `${teamId}-j10`, matchday: 10, homeTeamId: `${teamId}-aviles`, awayTeamId: `${teamId}-roces`, homeTeam: `Real Aviles ${teamName}`, awayTeam: "TSK Roces", date: "2026-10-24T10:30:00.000Z", competition, venue: "Santo Domingo", status: "scheduled" },
-  { id: `${teamId}-j11`, matchday: 11, homeTeamId: `${teamId}-covadonga`, awayTeamId: `${teamId}-aviles`, homeTeam: "CD Covadonga", awayTeam: `Real Aviles ${teamName}`, date: "2026-10-31T11:00:00.000Z", competition, venue: "Juan Antonio Alvarez", status: "scheduled" },
-  { id: `${teamId}-j12`, matchday: 12, homeTeamId: `${teamId}-aviles`, awayTeamId: `${teamId}-llanera`, homeTeam: `Real Aviles ${teamName}`, awayTeam: "UD Llanera", date: "2026-11-07T12:00:00.000Z", competition, venue: "Santo Domingo", status: "scheduled" },
+  { id: `${teamId}-j10`, matchday: 10, homeTeamId: `${teamId}-aviles`, awayTeamId: `${teamId}-roces`, homeTeam: `Real Avilés ${teamName}`, awayTeam: "TSK Roces", date: "2026-10-24T10:30:00.000Z", competition, venue: "Santo Domingo", status: "scheduled" },
+  { id: `${teamId}-j11`, matchday: 11, homeTeamId: `${teamId}-covadonga`, awayTeamId: `${teamId}-aviles`, homeTeam: "CD Covadonga", awayTeam: `Real Avilés ${teamName}`, date: "2026-10-31T11:00:00.000Z", competition, venue: "Juan Antonio Alvarez", status: "scheduled" },
+  { id: `${teamId}-j12`, matchday: 12, homeTeamId: `${teamId}-aviles`, awayTeamId: `${teamId}-llanera`, homeTeam: `Real Avilés ${teamName}`, awayTeam: "UD Llanera", date: "2026-11-07T12:00:00.000Z", competition, venue: "Santo Domingo", status: "scheduled" },
 ];
 
 export const academyTeams: AcademyTeam[] = [
-  { id: "filial", name: "Filial", coach: "Dani Borrego", category: "Primera Asturfutbol", position: "2? - 19 pts", lastResult: "Real Aviles B 2-0 Llanera B", nextMatch: "Real Aviles B - Roces", standoutPlayers: ["Nando", "Campadal", "Osky"], news: ["Tercera porteria a cero seguida", "Dos juveniles entrenan con el primer equipo"], roster: players.filter((player) => ["nando", "campadal", "osky", "quicala", "carmona"].includes(player.id)).map(({ id, displayName, number, position, age }) => ({ id, displayName, number, position, age })), table: academyTable("filial"), calendar: academyCalendar("filial", "B", "primera-asturfutbol") },
-  { id: "juvenil-a", name: "Juvenil A", coach: "Borja Fernandez", category: "Liga Nacional Juvenil", position: "1? - 22 pts", lastResult: "Real Aviles 3-1 Verina", nextMatch: "Covadonga - Real Aviles", standoutPlayers: ["Mario Noval", "Leo Paredes", "Osky"], news: ["Cuarta victoria consecutiva", "Debut de dos juveniles con el filial"], roster: [{ id: "mario-noval", displayName: "M. Noval", number: 7, position: "Delantero", age: 17 }, { id: "leo-paredes", displayName: "L. Paredes", number: 10, position: "Centrocampista", age: 18 }, { id: "izan-arias", displayName: "I. Arias", number: 4, position: "Defensa", age: 17 }, { id: "dani-riestra", displayName: "D. Riestra", number: 1, position: "Portero", age: 18 }, { id: "hugo-menendez", displayName: "H. Menendez", number: 9, position: "Delantero", age: 17 }], table: academyTable("juvenil-a"), calendar: academyCalendar("juvenil-a", "Juvenil A", "liga-nacional-juvenil") },
+  { id: "filial", name: "Filial", coach: "Dani Borrego", category: "Primera Asturfutbol", position: "2º - 19 pts", lastResult: "Real Avilés B 2-0 Llanera B", nextMatch: "Real Avilés B - Roces", standoutPlayers: ["Nando", "Campadal", "Osky"], news: ["Tercera porteria a cero seguida", "Dos juveniles entrenan con el primer equipo"], roster: players.filter((player) => ["nando", "campadal", "osky", "quicala", "carmona"].includes(player.id)).map(({ id, displayName, number, position, age }) => ({ id, displayName, number, position, age })), table: academyTable("filial"), calendar: academyCalendar("filial", "B", "primera-asturfutbol") },
+  { id: "juvenil-a", name: "Juvenil A", coach: "Borja Fernandez", category: "Liga Nacional Juvenil", position: "1º - 22 pts", lastResult: "Real Avilés 3-1 Verina", nextMatch: "Covadonga - Real Avilés", standoutPlayers: ["Mario Noval", "Leo Paredes", "Osky"], news: ["Cuarta victoria consecutiva", "Debut de dos juveniles con el filial"], roster: [{ id: "mario-noval", displayName: "M. Noval", number: 7, position: "Delantero", age: 17 }, { id: "leo-paredes", displayName: "L. Paredes", number: 10, position: "Centrocampista", age: 18 }, { id: "izan-arias", displayName: "I. Arias", number: 4, position: "Defensa", age: 17 }, { id: "dani-riestra", displayName: "D. Riestra", number: 1, position: "Portero", age: 18 }, { id: "hugo-menendez", displayName: "H. Menendez", number: 9, position: "Delantero", age: 17 }], table: academyTable("juvenil-a"), calendar: academyCalendar("juvenil-a", "Juvenil A", "liga-nacional-juvenil") },
 ];
 
 export const pressLinks: PressLink[] = [
-  { id: "la-voz", name: "La Voz de Aviles", outlet: "Prensa local", url: "https://example.com/la-voz-aviles", description: "Seguimiento diario del club, entrevistas y piezas de ciudad." },
-  { id: "el-comercio", name: "El Comercio", outlet: "Prensa regional", url: "https://example.com/el-comercio-aviles", description: "Cronicas, previas y contexto del futbol asturiano." },
+  { id: "la-voz", name: "La Voz de Avilés", outlet: "Prensa local", url: "https://example.com/la-voz-aviles", description: "Seguimiento diario del club, entrevistas y piezas de ciudad." },
+  { id: "el-comercio", name: "El Comercio", outlet: "Prensa regional", url: "https://example.com/el-comercio-aviles", description: "Crónicas, previas y contexto del futbol asturiano." },
   { id: "radio-marca", name: "Radio Marca Asturias", outlet: "Radio", url: "https://example.com/radio-marca-asturias", description: "Audios, tertulias y actualidad de la categoria." },
   { id: "asturfutbol", name: "AsturFutbol", outlet: "Digital", url: "https://example.com/asturfutbol", description: "Calendarios, rivales y mercado de futbol modesto." },
 ];
@@ -678,7 +678,7 @@ export const matchdayResult = {
 const RAI_YOUTUBE_CHANNEL = "https://www.youtube.com/channel/UCqnlVJmxk-zGSSNCb9noziw";
 const RAI_SPOTIFY_PODCAST = "https://open.spotify.com/show/5kHriw0nbuCDhY5qtLHuQC";
 
-/** Episodios recientes de Zona Mixta en YouTube (el ?ltimo se muestra destacado). */
+/** Episodios recientes de Zona Mixta en YouTube (el último se muestra destacado). */
 export const fanZonaMixtaVideos: FanYouTubeVideo[] = [
   {
     id: "zona-mixta-v1",
@@ -709,7 +709,7 @@ export const fanZonaMixta: FanMediaLink[] = [
     name: "Zona Mixta",
     platform: "youtube",
     url: RAI_YOUTUBE_CHANNEL,
-    description: "Entrevistas con directivos, entrenadores y jugadores. Presentado por Jorge Quir?s.",
+    description: "Entrevistas con directivos, entrenadores y jugadores. Presentado por Jorge Quirós.",
     schedule: "Semanal",
   },
   {
@@ -739,18 +739,18 @@ export const fanRdpVideos: FanYouTubeVideo[] = [
   { id: "rdp-v5", title: "RDP", url: "https://youtu.be/eCeLvze6axY" },
 ];
 
-/** Contenido de aficion y pe?as: tertulias y directos en X Spaces. */
+/** Contenido de aficion y peñas: tertulias y directos en X Spaces. */
 export const fanTenteFirme: FanMediaLink[] = [
   {
     id: "tente-firme-space-1",
-    name: "Tente firme ? Space I",
+    name: "Tente firme · Space I",
     platform: "twitter",
     url: "https://x.com/i/spaces/1vKpPPNBdVXKE",
     description: "Tertulia o directo de aficion grabado en X Spaces.",
   },
   {
     id: "tente-firme-space-2",
-    name: "Tente firme ? Space II",
+    name: "Tente firme · Space II",
     platform: "twitter",
     url: "https://x.com/i/spaces/1kKzDMRrDYNJv",
     description: "Tertulia o directo de aficion grabado en X Spaces.",

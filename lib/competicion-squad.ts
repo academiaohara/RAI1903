@@ -60,7 +60,7 @@ function rivalToSquadPlayer(player: RivalPlayer, team: Team, index: number): Squ
     edad: age,
     fechaNacimiento: `${birthYear}-06-15`,
     lugarNacimiento: team.city,
-    nacionalidad: "Espana",
+    nacionalidad: "España",
     altura: "1,78 m",
     peso: "76 kg",
     piernaBuena: seed % 5 === 0 ? "Izquierda" : "Derecha",

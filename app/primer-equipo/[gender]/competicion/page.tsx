@@ -10,7 +10,7 @@ export default async function PrimerEquipoCompeticionPage({ params }: { params: 
   return (
     <>
       <PrimerEquipoPageHero
-        title="Competicion"
+        title="Competición"
         description={`Guia de la liga, clasificacion completa, resultados y fichas de rivales de ${genderLabels[gender].club}.`}
       />
 

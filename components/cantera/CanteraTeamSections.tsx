@@ -43,7 +43,7 @@ export function CanteraTeamSections({ team }: CanteraTeamSectionsProps) {
                 #{player.number} {player.displayName}
               </p>
               <p className="text-sm font-bold text-slate-500">
-                {player.position} · {player.age} anos
+                {player.position} · {player.age} años
               </p>
             </div>
           ))}

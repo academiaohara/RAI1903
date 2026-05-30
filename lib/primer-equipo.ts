@@ -3,8 +3,8 @@ export const PRIMER_EQUIPO_GENDERS = ["masculino", "femenino"] as const;
 export type PrimerEquipoGender = (typeof PRIMER_EQUIPO_GENDERS)[number];
 
 export const genderLabels: Record<PrimerEquipoGender, { title: string; short: string; club: string }> = {
-  masculino: { title: "Masculino", short: "Masc.", club: "Real Aviles Industrial" },
-  femenino: { title: "Femenino", short: "Fem.", club: "Real Aviles Industrial Femenino" },
+  masculino: { title: "Masculino", short: "Masc.", club: "Real Avilés Industrial" },
+  femenino: { title: "Femenino", short: "Fem.", club: "Real Avilés Industrial Femenino" },
 };
 
 export function isPrimerEquipoGender(value: string): value is PrimerEquipoGender {
@@ -32,10 +32,10 @@ export function getPrimerEquipoTabs(gender: PrimerEquipoGender) {
   return [
     { href: `${base}/plantilla`, label: "Plantilla" },
     { href: `${base}/noticias`, label: "Noticias" },
-    { href: `${base}/competicion`, label: "Competicion" },
+    { href: `${base}/competicion`, label: "Competición" },
     { href: `${base}/jornadas`, label: "Jornadas" },
     { href: `${base}/calendario`, label: "Calendario" },
-    { href: `${base}/cronicas`, label: "Cronicas" },
+    { href: `${base}/cronicas`, label: "Crónicas" },
     { href: `${base}/previas`, label: "Previas" },
   ];
 }

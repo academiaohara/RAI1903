@@ -4,8 +4,8 @@ import { Header } from "@/components/Header";
 import { bebasNeue } from "@/lib/fonts";
 
 export const metadata: Metadata = {
-  title: "RAI1903 | Real Aviles Industrial",
-  description: "Plataforma no oficial blanquiazul sobre el Real Aviles Industrial.",
+  title: "RAI1903 | Real Avilés Industrial",
+  description: "Plataforma no oficial blanquiazul sobre el Real Avilés Industrial.",
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
     shortcut: "/favicon.svg",

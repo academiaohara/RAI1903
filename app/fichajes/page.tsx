@@ -12,7 +12,7 @@ export default function FichajesPage() {
       <PageHero
         eyebrow="Mercado"
         title="Fichajes y renovaciones"
-        description="Altas oficiales y renovaciones del Real Aviles Industrial. Pulsa una ficha para ver comunicado, noticias del jugador y datos."
+        description="Altas oficiales y renovaciones del Real Avilés Industrial. Pulsa una ficha para ver comunicado, noticias del jugador y datos."
       />
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {featured.map((transfer, index) => (
