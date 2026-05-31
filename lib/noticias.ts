@@ -2,7 +2,7 @@ import type { Route } from "next";
 import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { NewsChannel, NewsItem, NewsTag } from "@/types";
 
-const newsTagLabels: Record<NewsTag, string> = {
+export const newsTagLabels: Record<NewsTag, string> = {
   partido: "Partido",
   fichajes: "Fichajes",
   cantera: "Cantera",

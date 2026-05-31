@@ -66,7 +66,7 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
       : FINISHED_TABS_BASE.filter((tab) => tab.id !== "valoraciones");
   }, [isFinished, isPreviaArticle, showRatings]);
 
-  const showArticleBody = article?.type === "previa" || article?.type === "cronica";
+  const showArticleBody = article?.type === "previa";
   const showClubNews = article && (article.type === "cronica" || article.type === "previa");
 
   const previaPanel = (
@@ -102,7 +102,6 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
         </div>
       ) : (
         <>
-          {showArticleBody && article?.type === "cronica" && <MatchArticleInlineBlock article={article} />}
           {showClubNews &&
             (editMode ? (
               <MatchArticleNewsLinker article={article} newsItems={newsItems} />

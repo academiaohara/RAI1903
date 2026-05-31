@@ -807,7 +807,6 @@ const buildMatchArticlesForClub = (
     source: "RAI1903",
     excerpt: `Resumen de la jornada ${match.matchday} con lectura tactica, protagonistas y sensaciones del vestuario blanquiazul.`,
     body: [],
-    clubNewsId: "club-somos-primera-rfef",
   }));
 
   const previas: MatchArticle[] = scheduled.map((match) => ({
