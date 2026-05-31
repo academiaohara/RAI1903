@@ -46,7 +46,8 @@ export function primerEquipoPathForGender(pathname: string, gender: PrimerEquipo
   const section = segments[0];
 
   if (section && PRIMER_EQUIPO_SECTIONS.includes(section as PrimerEquipoSection)) {
-    return `${primerEquipoBase(gender)}/${section}`;
+    const subPath = section === "cronicas" && segments[1] === "resumenes" ? "/cronicas/resumenes" : `/${section}`;
+    return `${primerEquipoBase(gender)}${subPath}`;
   }
 
   return `${primerEquipoBase(gender)}/plantilla`;

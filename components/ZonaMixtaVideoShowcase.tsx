@@ -8,6 +8,7 @@ import {
   newFanVideo,
   sortFanVideosByDate,
 } from "@/lib/fan-videos";
+import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { useHorizontalCarousel } from "@/lib/use-horizontal-carousel";
 import { useHorizontalWheelScroll } from "@/lib/use-horizontal-wheel-scroll";
 import { youtubeEmbedUrl, youtubeVideoId } from "@/lib/youtube";
@@ -17,6 +18,10 @@ import type { FanYouTubeVideo } from "@/types";
 type ZonaMixtaVideoShowcaseProps = {
   section: ContenidoFanSlug;
   videos: FanYouTubeVideo[];
+  /** Alcance por equipo en crónicas (masculino/femenino); omitir en contenido fan global. */
+  gender?: PrimerEquipoGender;
+  featuredLabel?: string;
+  carouselLabel?: string;
 };
 
 function resolveVideo(video: FanYouTubeVideo) {
@@ -28,9 +33,15 @@ function resolveVideo(video: FanYouTubeVideo) {
 const fieldClassName =
   "w-full rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm outline-none focus:border-[#214C9B]";
 
-export function ZonaMixtaVideoShowcase({ section, videos }: ZonaMixtaVideoShowcaseProps) {
+export function ZonaMixtaVideoShowcase({
+  section,
+  videos,
+  gender,
+  featuredLabel = "Último episodio",
+  carouselLabel = "Más episodios",
+}: ZonaMixtaVideoShowcaseProps) {
   const { editMode, getValue, saveValue, getOverride, clearValue } = useInlineEditing();
-  const storageKey = fanVideosStorageKey(section);
+  const storageKey = fanVideosStorageKey(section, gender);
   const hasCustomList = getOverride<FanYouTubeVideo[]>(storageKey) !== undefined;
   const currentVideos = getValue(storageKey, videos);
   const sorted = sortFanVideosByDate(currentVideos);
@@ -221,7 +232,7 @@ export function ZonaMixtaVideoShowcase({ section, videos }: ZonaMixtaVideoShowca
               />
             </div>
             <div className="border-t border-white/10 bg-[#0f1f3d] px-5 py-4">
-              <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">Último episodio</p>
+              <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">{featuredLabel}</p>
               {featured.date && (
                 <time dateTime={featured.date} className="mt-1 block text-xs font-semibold text-white/70">
                   {featured.date}
@@ -234,7 +245,7 @@ export function ZonaMixtaVideoShowcase({ section, videos }: ZonaMixtaVideoShowca
           {carouselCount > 0 && (
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-bold uppercase text-[#214C9B]">Más episodios</p>
+                <p className="text-sm font-bold uppercase text-[#214C9B]">{carouselLabel}</p>
                 {carouselCount > 1 && (
                   <div className="flex gap-2">
                     <button

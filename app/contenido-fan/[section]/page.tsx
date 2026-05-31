@@ -25,7 +25,14 @@ export default async function ContenidoFanSectionPage({ params }: { params: Prom
         {isTenteFirme ? (
           <TenteFirmeShowcase section={section} spaces={config.links} videos={config.videos} />
         ) : (
-          config.videos && <ZonaMixtaVideoShowcase section={section} videos={config.videos} />
+          config.videos && (
+            <ZonaMixtaVideoShowcase
+              section={section}
+              videos={config.videos}
+              featuredLabel={section === "resumenes" ? "Último resumen" : undefined}
+              carouselLabel={section === "resumenes" ? "Más resúmenes" : undefined}
+            />
+          )
         )}
       </Card>
     </div>

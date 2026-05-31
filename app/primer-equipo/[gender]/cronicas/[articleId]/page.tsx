@@ -13,6 +13,7 @@ export default async function MatchArticleDetailPage({
   const { gender, articleId } = await params;
   const article = getMatchArticleById(articleId);
 
+  if (articleId === "resumenes") notFound();
   if (!article || article.gender !== gender) notFound();
   if (article.type !== "cronica" && article.type !== "previa") notFound();
 

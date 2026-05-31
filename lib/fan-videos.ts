@@ -1,8 +1,10 @@
 import type { ContenidoFanSlug } from "@/lib/contenido-fan";
+import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { FanYouTubeVideo } from "@/types";
 
 /** Clave CMS para la lista completa de vídeos de una sección. */
-export function fanVideosStorageKey(section: ContenidoFanSlug): string {
+export function fanVideosStorageKey(section: ContenidoFanSlug, gender?: PrimerEquipoGender): string {
+  if (gender) return `primer-equipo:${gender}:contenido-fan:${section}:videos`;
   return `contenido-fan:${section}:videos`;
 }
 

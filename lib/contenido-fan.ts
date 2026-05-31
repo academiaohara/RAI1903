@@ -1,7 +1,14 @@
 import type { FanMediaLink, FanYouTubeVideo } from "@/types";
-import { fanPreviaVideos, fanRdpVideos, fanTenteFirme, fanTenteFirmeVideos, fanZonaMixtaVideos } from "@/data/mock";
+import {
+  fanPreviaVideos,
+  fanRdpVideos,
+  fanResumenesVideos,
+  fanTenteFirme,
+  fanTenteFirmeVideos,
+  fanZonaMixtaVideos,
+} from "@/data/mock";
 
-export const CONTENIDO_FAN_SLUGS = ["zona-mixta", "previa", "rdp", "tente-firme"] as const;
+export const CONTENIDO_FAN_SLUGS = ["zona-mixta", "previa", "rdp", "resumenes", "tente-firme"] as const;
 
 export type ContenidoFanSlug = (typeof CONTENIDO_FAN_SLUGS)[number];
 
@@ -50,6 +57,16 @@ export const contenidoFanSections: Record<ContenidoFanSlug, ContenidoFanSectionC
     links: [],
     videos: fanRdpVideos,
   },
+  resumenes: {
+    slug: "resumenes",
+    label: "Resúmenes",
+    heroTitle: "Resúmenes de liga",
+    heroDescription:
+      "Vídeos resumen oficiales de los partidos de liga del Real Avilés Industrial: los goles y las jugadas clave de cada jornada.",
+    cardIntro: "El último resumen se reproduce arriba; el resto aparece en el carrusel inferior.",
+    links: [],
+    videos: fanResumenesVideos,
+  },
   "tente-firme": {
     slug: "tente-firme",
     label: "Tente firme",
@@ -69,6 +86,7 @@ export function getContenidoFanTabs() {
     { href: "/contenido-fan/zona-mixta", label: "Zona Mixta" },
     { href: "/contenido-fan/previa", label: "Previa" },
     { href: "/contenido-fan/rdp", label: "RDP" },
+    { href: "/contenido-fan/resumenes", label: "Resúmenes" },
     { href: "/contenido-fan/tente-firme", label: "Tente firme" },
   ];
 }

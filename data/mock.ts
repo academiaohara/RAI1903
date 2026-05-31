@@ -1569,6 +1569,14 @@ export const fanRdpVideos: FanYouTubeVideo[] = [
   },
 ];
 
+/** Resúmenes oficiales de partidos de liga del primer equipo masculino (editables en línea). */
+export const fanResumenesVideos: FanYouTubeVideo[] = [];
+
+export const fanResumenesVideosByGender: Record<"masculino" | "femenino", FanYouTubeVideo[]> = {
+  masculino: fanResumenesVideos,
+  femenino: [],
+};
+
 /** Contenido de aficion y peñas: tertulias y directos en X Spaces (orden: mas reciente primero). */
 export const fanTenteFirme: FanMediaLink[] = [
   {
