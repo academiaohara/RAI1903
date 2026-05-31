@@ -82,8 +82,6 @@ export function MatchEventsPanel({
     updateEvents(currentEvents.filter((event) => event.id !== id));
   };
 
-  const goals = currentEvents.filter((event) => event.type === "goal");
-
   return (
     <section className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -99,20 +97,6 @@ export function MatchEventsPanel({
           </button>
         )}
       </div>
-
-      {goals.length > 0 && (
-        <div className="rounded-2xl border border-[#214C9B]/15 bg-slate-50/80 p-4">
-          <p className="text-xs font-extrabold uppercase tracking-normal text-slate-500">Goleadores</p>
-          <ul className="mt-2 space-y-1.5 text-sm font-semibold text-slate-800">
-            {goals.map((event) => (
-              <li key={`scorer-${event.id}`}>
-                <span className="tabular-nums text-[#214C9B]">{event.minute}&apos;</span>{" "}
-                {event.player || "Sin nombre"} · {event.team === "home" ? homeLabel : awayLabel}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       {currentEvents.length === 0 ? (
         <p className="text-sm text-slate-500">No hay eventos registrados para este partido.</p>
