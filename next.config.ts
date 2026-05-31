@@ -28,6 +28,7 @@ const nextConfig: NextConfig = {
       { source: "/primer-equipo/femenino/previas", destination: "/primer-equipo/femenino/plantilla", permanent: false },
       { source: "/primer-equipo/femenino/cronicas", destination: "/primer-equipo/femenino/plantilla", permanent: false },
       { source: "/primer-equipo/femenino/cronicas/:articleId", destination: "/primer-equipo/femenino/plantilla", permanent: false },
+      { source: "/primer-equipo/femenino/cronicas/resumenes", destination: "/primer-equipo/femenino/plantilla", permanent: false },
       { source: "/primer-equipo/masculino/previas/:articleId", destination: "/primer-equipo/masculino/cronicas/:articleId", permanent: false },
       { source: "/primer-equipo/femenino/previas/:articleId", destination: "/primer-equipo/femenino/plantilla", permanent: false },
       { source: "/prensa", destination: "/noticias/club", permanent: false },

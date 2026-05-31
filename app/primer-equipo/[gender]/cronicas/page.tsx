@@ -25,7 +25,7 @@ export default async function CronicasPage({ params }: { params: Promise<{ gende
     <>
       <PrimerEquipoPageHero
         title="Crónicas"
-        description="Resúmenes de partidos disputados y previas de los encuentros por jugar."
+        description="Crónicas de partidos disputados y previas de los encuentros por jugar."
       />
 
       <Card>
