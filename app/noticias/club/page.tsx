@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AddNewsPanel } from "@/components/editor/AddNewsPanel";
 import { NewsCard } from "@/components/NewsCard";
 import { PageHero } from "@/components/PageHero";
+import { Pagination } from "@/components/Pagination";
+import { usePagination } from "@/hooks/usePagination";
 import { fetchPublishedNewsItems } from "@/lib/cms/news";
 import { newsByChannel } from "@/lib/noticias";
 import type { NewsItem, NewsTag } from "@/types";
@@ -34,6 +36,8 @@ export default function NoticiasClubPage() {
     [clubNews, query, tag],
   );
 
+  const pagination = usePagination(filtered);
+
   return (
     <div className="space-y-6">
       <PageHero eyebrow="Noticias" title="Club" description="Comunicados y actualidad oficial del Real Avilés Industrial." />
@@ -61,10 +65,27 @@ export default function NoticiasClubPage() {
       <AddNewsPanel defaultChannel="club" onCreated={loadNews} />
 
       <div className="grid gap-3 sm:gap-4">
-        {filtered.map((item) => (
+        {pagination.paginatedItems.map((item) => (
           <NewsCard key={item.id} item={item} onUpdated={loadNews} />
         ))}
       </div>
+
+      <Pagination
+        pageSize={pagination.pageSize}
+        pageSizes={pagination.pageSizes}
+        totalItems={pagination.totalItems}
+        rangeStart={pagination.rangeStart}
+        rangeEnd={pagination.rangeEnd}
+        canGoFirst={pagination.canGoFirst}
+        canGoPrevious={pagination.canGoPrevious}
+        canGoNext={pagination.canGoNext}
+        canGoLast={pagination.canGoLast}
+        onPageSizeChange={pagination.setPageSize}
+        onFirst={pagination.goToFirst}
+        onPrevious={pagination.goToPrevious}
+        onNext={pagination.goToNext}
+        onLast={pagination.goToLast}
+      />
     </div>
   );
 }
