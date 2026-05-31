@@ -67,9 +67,6 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
                 events={resolvedDetail.events}
                 homeLabel={resolvedDetail.match.homeTeam}
                 awayLabel={resolvedDetail.match.awayTeam}
-                gender={resolvedDetail.gender}
-                homeTeamId={resolvedDetail.match.homeTeamId}
-                awayTeamId={resolvedDetail.match.awayTeamId}
               />
             )}
             {activeTab === "stats" && (

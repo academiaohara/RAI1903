@@ -2,10 +2,8 @@
 
 import { ArrowDownRight, ArrowUpLeft, Footprints, Plus, Trash2 } from "lucide-react";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
-import { MatchEventPlayerAvatar } from "@/components/match-center/MatchEventPlayerAvatar";
 import { createMatchEventId, matchEventTypeLabels } from "@/lib/match-events";
-import { getRaiTeamId } from "@/lib/fixtures";
-import type { MatchEvent, MatchEventType, PrimerEquipoGender } from "@/types";
+import type { MatchEvent, MatchEventType } from "@/types";
 import { useMatchDetailStorageKeys } from "@/components/match-center/useMatchDetailOverrides";
 
 const eventTypes: MatchEventType[] = ["goal", "goal_disallowed", "yellow", "red", "substitution"];
@@ -32,19 +30,8 @@ function GoalBallIcon() {
   return <span className="shrink-0 text-sm leading-none" aria-hidden>⚽</span>;
 }
 
-function EventTimelineRow({
-  event,
-  gender,
-  isHomeRai,
-  isAwayRai,
-}: {
-  event: MatchEvent;
-  gender: PrimerEquipoGender;
-  isHomeRai: boolean;
-  isAwayRai: boolean;
-}) {
+function EventTimelineRow({ event }: { event: MatchEvent }) {
   const isHome = event.team === "home";
-  const lookupSquad = isHome ? isHomeRai : isAwayRai;
   const minuteLabel = formatMatchMinute(event.minute);
   const playerName = event.player || "Sin nombre";
 
@@ -55,7 +42,6 @@ function EventTimelineRow({
       <>
         {isHome ? (
           <>
-            <MatchEventPlayerAvatar playerName={playerName} gender={gender} lookupSquad={lookupSquad} />
             <div className="min-w-0 text-left">
               <p className="truncate text-sm font-medium text-[#333333]">{playerName}</p>
               {event.detail && event.type === "goal" && (
@@ -81,7 +67,6 @@ function EventTimelineRow({
                 </p>
               )}
             </div>
-            <MatchEventPlayerAvatar playerName={playerName} gender={gender} lookupSquad={lookupSquad} />
           </>
         )}
       </>
@@ -110,7 +95,6 @@ function EventTimelineRow({
       <li className="flex border-t border-[#eeeeee] first:border-t-0">
         {isHome ? (
           <div className="flex w-1/2 items-center gap-2 px-3 py-3">
-            <MatchEventPlayerAvatar playerName={playerName} gender={gender} lookupSquad={lookupSquad} />
             <p className="truncate text-sm font-medium text-[#333333]">{playerName}</p>
             {card}
             {minuteEl}
@@ -125,7 +109,6 @@ function EventTimelineRow({
             {minuteEl}
             {card}
             <p className="truncate text-sm font-medium text-[#333333]">{playerName}</p>
-            <MatchEventPlayerAvatar playerName={playerName} gender={gender} lookupSquad={lookupSquad} />
           </div>
         )}
       </li>
@@ -139,7 +122,6 @@ function EventTimelineRow({
       <li className="flex border-t border-[#eeeeee] first:border-t-0">
         {isHome ? (
           <div className="flex w-1/2 items-center gap-2 px-3 py-3">
-            <MatchEventPlayerAvatar playerName={playerName} gender={gender} lookupSquad={lookupSquad} />
             <div className="min-w-0 text-left">
               <p className="truncate text-sm font-semibold text-[#333333]">{playerName}</p>
               {playerOut && <p className="truncate text-xs text-[#888888]">{playerOut}</p>}
@@ -160,7 +142,6 @@ function EventTimelineRow({
               <p className="truncate text-sm font-semibold text-[#333333]">{playerName}</p>
               {playerOut && <p className="truncate text-xs text-[#888888]">{playerOut}</p>}
             </div>
-            <MatchEventPlayerAvatar playerName={playerName} gender={gender} lookupSquad={lookupSquad} />
           </div>
         )}
       </li>
@@ -173,15 +154,9 @@ function EventTimelineRow({
 function EventSection({
   title,
   events,
-  gender,
-  isHomeRai,
-  isAwayRai,
 }: {
   title: string;
   events: MatchEvent[];
-  gender: PrimerEquipoGender;
-  isHomeRai: boolean;
-  isAwayRai: boolean;
 }) {
   if (events.length === 0) return null;
 
@@ -192,13 +167,7 @@ function EventSection({
       </div>
       <ol>
         {events.map((event) => (
-          <EventTimelineRow
-            key={event.id}
-            event={event}
-            gender={gender}
-            isHomeRai={isHomeRai}
-            isAwayRai={isAwayRai}
-          />
+          <EventTimelineRow key={event.id} event={event} />
         ))}
       </ol>
     </div>
@@ -210,24 +179,15 @@ export function MatchEventsPanel({
   events,
   homeLabel,
   awayLabel,
-  gender,
-  homeTeamId,
-  awayTeamId,
 }: {
   matchId: string;
   events: MatchEvent[];
   homeLabel: string;
   awayLabel: string;
-  gender: PrimerEquipoGender;
-  homeTeamId: string;
-  awayTeamId: string;
 }) {
   const { editMode, getValue, saveValue } = useInlineEditing();
   const keys = useMatchDetailStorageKeys(matchId);
   const currentEvents = getValue(keys.events, events);
-  const raiId = getRaiTeamId(gender);
-  const isHomeRai = homeTeamId === raiId;
-  const isAwayRai = awayTeamId === raiId;
 
   const updateEvents = (next: MatchEvent[]) => {
     saveValue(keys.events, next);
@@ -356,15 +316,9 @@ export function MatchEventsPanel({
         <p className="text-sm text-slate-500">No hay eventos registrados para este partido.</p>
       ) : (
         <div className="space-y-6">
-          <EventSection title="Goles" events={goals} gender={gender} isHomeRai={isHomeRai} isAwayRai={isAwayRai} />
-          <EventSection title="Tarjetas" events={cards} gender={gender} isHomeRai={isHomeRai} isAwayRai={isAwayRai} />
-          <EventSection
-            title="Sustituciones"
-            events={substitutions}
-            gender={gender}
-            isHomeRai={isHomeRai}
-            isAwayRai={isAwayRai}
-          />
+          <EventSection title="Goles" events={goals} />
+          <EventSection title="Tarjetas" events={cards} />
+          <EventSection title="Sustituciones" events={substitutions} />
         </div>
       )}
     </section>
