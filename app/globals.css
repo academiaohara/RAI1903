@@ -302,17 +302,20 @@ a {
 .player-ficha-name {
   background: #2e67c7;
   bottom: 0;
+  box-sizing: border-box;
   color: #fff;
+  display: -webkit-box;
   flex-shrink: 0;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  height: 20px;
-  line-height: 20px;
+  line-height: 1.15;
+  min-height: 20px;
   overflow: hidden;
+  padding: 2px 3px;
   position: absolute;
   text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   width: 100%;
 }
 

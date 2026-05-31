@@ -123,7 +123,7 @@ function PlayerFichaCard({
         </div>
 
         <div className="rounded-br-[0.65rem] bg-[#214C9B] px-2 py-1.5">
-          <p className="truncate text-center text-[11px] font-bold leading-tight text-white sm:text-xs">{displayName}</p>
+          <p className="line-clamp-2 text-center text-[11px] font-bold leading-tight text-white sm:text-xs">{displayName}</p>
         </div>
       </article>
     </motion.button>
