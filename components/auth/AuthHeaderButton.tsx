@@ -1,12 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
-import { LogIn, LogOut, Pencil } from "lucide-react";
+import { LogIn, LogOut } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { isEditorSession } from "@/lib/auth/editor";
 import { signInWithX } from "@/lib/auth/sign-in-with-x";
 import { getUserAvatarUrl } from "@/lib/auth/user-display";
 import { createClient } from "@/lib/supabase/client";
@@ -18,7 +16,6 @@ export function AuthHeaderButton({ className }: { className?: string }) {
   const pathname = usePathname();
   const configured = isSupabaseConfigured();
   const [user, setUser] = useState<User | null>(null);
-  const [isEditor, setIsEditor] = useState(false);
   const [ready, setReady] = useState(!configured);
   const [menuOpen, setMenuOpen] = useState(false);
   const [signingIn, setSigningIn] = useState(false);
@@ -29,18 +26,17 @@ export function AuthHeaderButton({ className }: { className?: string }) {
 
     const supabase = createClient();
 
-    const syncUser = async (next: User | null) => {
+    const syncUser = (next: User | null) => {
       setUser(next);
-      setIsEditor(next ? await isEditorSession(next) : false);
       setReady(true);
     };
 
-    void supabase.auth.getUser().then(({ data }) => void syncUser(data.user));
+    void supabase.auth.getUser().then(({ data }) => syncUser(data.user));
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      void syncUser(session?.user ?? null);
+      syncUser(session?.user ?? null);
     });
 
     return () => subscription.unsubscribe();
@@ -127,16 +123,6 @@ export function AuthHeaderButton({ className }: { className?: string }) {
 
       {menuOpen ? (
         <div className="absolute right-0 top-full z-50 mt-2 min-w-[10rem] overflow-hidden rounded-xl border border-[#214C9B]/20 bg-white py-1 shadow-lg">
-          {isEditor ? (
-            <Link
-              href="/editor"
-              className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-[#214C9B] hover:bg-blue-50"
-              onClick={() => setMenuOpen(false)}
-            >
-              <Pencil size={16} aria-hidden />
-              Editor
-            </Link>
-          ) : null}
           <button
             type="button"
             onClick={() => void signOut()}
