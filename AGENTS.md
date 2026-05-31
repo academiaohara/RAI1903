@@ -21,7 +21,7 @@ npm run build      # Next.js production build
 ### Key notes
 
 - No test framework is configured (no Jest, Vitest, or Playwright). Validation relies on lint, typecheck, and manual browser testing.
-- No environment variables are needed — the app runs entirely on mock data.
+- Mock data covers most of the site. **Supabase** (optional) uses `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` — copy `.env.example` to `.env.local` locally, or set the same vars in Vercel. See `lib/supabase/`.
 - The dev server uses Turbopack for fast refresh.
 - Browser state (Quiniela predictions) persists via `localStorage` only.
 - Package manager is **npm** (lockfile: `package-lock.json`).
