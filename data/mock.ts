@@ -1527,26 +1527,31 @@ export const fanPreviaVideos: FanYouTubeVideo[] = [
     id: "previa-v1",
     title: "🎙️ La 𝗽𝗿𝗲𝘃𝗶𝗮 con Lolo Escobar (Pontevedra CF)",
     url: "https://youtu.be/57y06JKzZa8",
+    date: "30/05/2026",
   },
   {
     id: "previa-v2",
     title: "🎙️ La 𝗽𝗿𝗲𝘃𝗶𝗮 con Lolo Escobar (Barakaldo CF)",
     url: "https://youtu.be/w7Ayjxe76aA",
+    date: "23/05/2026",
   },
   {
     id: "previa-v3",
     title: "🎙️ La 𝗽𝗿𝗲𝘃𝗶𝗮 con Cayarga",
     url: "https://youtu.be/7QoTrVnOUmw",
+    date: "16/05/2026",
   },
   {
     id: "previa-v4",
     title: "🎙️ La 𝗽𝗿𝗲𝘃𝗶𝗮 con Lolo Escobar (SD Ponferradina)",
     url: "https://youtu.be/Y4MobJJerF4",
+    date: "09/05/2026",
   },
   {
     id: "previa-v5",
     title: "🎙️ La 𝗽𝗿𝗲𝘃𝗶𝗮 con Lolo Escobar (CD Guadalajara)",
     url: "https://youtu.be/Wd8uN3Z5J3U",
+    date: "02/05/2026",
   },
 ];
 

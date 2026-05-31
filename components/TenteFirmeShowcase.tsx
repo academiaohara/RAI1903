@@ -2,15 +2,21 @@
 
 import { TenteFirmeSpaceCard } from "@/components/TenteFirmeSpaceCard";
 import { ZonaMixtaVideoShowcase } from "@/components/ZonaMixtaVideoShowcase";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import type { ContenidoFanSlug } from "@/lib/contenido-fan";
 import type { FanMediaLink, FanYouTubeVideo } from "@/types";
 
 type TenteFirmeShowcaseProps = {
+  section: ContenidoFanSlug;
   spaces: FanMediaLink[];
   videos?: FanYouTubeVideo[];
 };
 
-export function TenteFirmeShowcase({ spaces, videos = [] }: TenteFirmeShowcaseProps) {
-  if (spaces.length === 0 && videos.length === 0) return null;
+export function TenteFirmeShowcase({ section, spaces, videos = [] }: TenteFirmeShowcaseProps) {
+  const { editMode } = useInlineEditing();
+  const showYoutube = videos.length > 0 || editMode;
+
+  if (spaces.length === 0 && !showYoutube) return null;
 
   return (
     <div className="space-y-10">
@@ -27,10 +33,10 @@ export function TenteFirmeShowcase({ spaces, videos = [] }: TenteFirmeShowcasePr
         </section>
       )}
 
-      {videos.length > 0 && (
+      {showYoutube && (
         <section className="space-y-5">
           <p className="text-sm font-bold uppercase text-[#214C9B]">YouTube</p>
-          <ZonaMixtaVideoShowcase videos={videos} />
+          <ZonaMixtaVideoShowcase section={section} videos={videos} />
         </section>
       )}
     </div>

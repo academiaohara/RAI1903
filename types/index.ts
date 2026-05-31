@@ -235,6 +235,8 @@ export type FanYouTubeVideo = {
   id: string;
   title: string;
   url: string;
+  /** Fecha del vídeo (p. ej. "26/05/2026"). */
+  date?: string;
 };
 
 export type PrimerEquipoGender = "masculino" | "femenino";
