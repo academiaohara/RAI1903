@@ -1,4 +1,4 @@
-import { fanPreviaVideos, fanRdpVideos, newsItems, players, playersFemenino } from "@/data/mock";
+import { fanPreviaVideos, fanRdpVideos, players, playersFemenino } from "@/data/mock";
 import { matchCompetitionShortLabel } from "@/lib/competition-labels";
 import { getMatchById, getRaiTeamId, getTeamMatches } from "@/lib/fixtures";
 import { youtubeVideoId } from "@/lib/youtube";
@@ -10,7 +10,6 @@ import type {
   MatchDetail,
   MatchLineup,
   MatchVideo,
-  NewsItem,
   PrimerEquipoGender,
   RecentFormMatch,
 } from "@/types";
@@ -84,25 +83,6 @@ function pickVideo(videos: { id: string; title: string; url: string }[], seed: n
   return { ...video, label };
 }
 
-function pickNewsForMatch(match: Match, type: "previa" | "cronica" | "press"): NewsItem[] {
-  const tag = type === "press" ? undefined : type;
-  const filtered = newsItems.filter((item) => {
-    if (tag && !item.tags.includes(tag)) return false;
-    if (type === "press" && item.channel === "club") return item.tags.includes("cronica") || item.tags.includes("partido");
-    if (type === "press" && item.channel !== "prensa" && !item.tags.includes("cronica")) return false;
-    return true;
-  });
-
-  const seed = hashSeed(match.id + type);
-  const count = type === "press" ? 8 : 6;
-  const picked: NewsItem[] = [];
-  for (let index = 0; index < count; index += 1) {
-    const item = filtered[Math.floor(seeded(seed, index + 40) * filtered.length)];
-    if (item && !picked.some((existing) => existing.id === item.id)) picked.push(item);
-  }
-  return picked;
-}
-
 export function buildMatchDetail(match: Match, gender: PrimerEquipoGender): MatchDetail {
   const seed = hashSeed(`${match.id}-${gender}`);
 
@@ -143,8 +123,6 @@ export function buildMatchDetail(match: Match, gender: PrimerEquipoGender): Matc
     },
     rdpPrevia: pickVideo(fanPreviaVideos, seed, "RDP Previa"),
     rdpPostpartido: match.status === "finished" ? pickVideo(fanRdpVideos, seed + 3, "RDP Postpartido") : null,
-    pressNews: pickNewsForMatch(match, "previa"),
-    chronicleNews: pickNewsForMatch(match, "press"),
   };
 }
 
