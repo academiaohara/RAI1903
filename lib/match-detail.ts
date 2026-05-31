@@ -1,8 +1,6 @@
 import { fanPreviaVideos, fanRdpVideos, newsItems, players, playersFemenino } from "@/data/mock";
 import { matchCompetitionShortLabel } from "@/lib/competition-labels";
 import { getMatchById, getRaiTeamId, getTeamMatches } from "@/lib/fixtures";
-import { getSquadPlayers } from "@/lib/squad-data";
-import { getPlayerFullName } from "@/lib/squad-utils";
 import { youtubeVideoId } from "@/lib/youtube";
 import type {
   FormCode,
@@ -65,24 +63,6 @@ function toRecentFormMatch(teamId: string, match: Match): RecentFormMatch {
   };
 }
 
-function buildLineup(gender: PrimerEquipoGender, isAviles: boolean): MatchLineup {
-  if (!isAviles) return EMPTY_LINEUP;
-
-  const squad = getSquadPlayers(gender);
-  const titulares = squad
-    .filter((player) => player.estado === "titular" || player.estado === "nuevo fichaje")
-    .slice(0, 11);
-  const bench = squad.filter((player) => player.estado === "suplente" || player.estado === "cantera").slice(0, 7);
-
-  if (titulares.length === 0) return EMPTY_LINEUP;
-
-  return {
-    formation: "",
-    starters: titulares.map((player) => ({ number: player.dorsal, name: getPlayerFullName(player) })),
-    bench: bench.map((player) => ({ number: player.dorsal, name: getPlayerFullName(player) })),
-  };
-}
-
 function buildAvailability(teamId: string, gender: PrimerEquipoGender): MatchAvailabilityPlayer[] {
   const raiId = getRaiTeamId(gender);
   if (teamId !== raiId) return [];
@@ -125,7 +105,6 @@ function pickNewsForMatch(match: Match, type: "previa" | "cronica" | "press"): N
 
 export function buildMatchDetail(match: Match, gender: PrimerEquipoGender): MatchDetail {
   const seed = hashSeed(`${match.id}-${gender}`);
-  const raiId = getRaiTeamId(gender);
 
   const homeRecent = getTeamMatches(match.homeTeamId)
     .filter((item) => item.status === "finished" && item.id !== match.id)
@@ -139,8 +118,8 @@ export function buildMatchDetail(match: Match, gender: PrimerEquipoGender): Matc
     .slice(0, 5)
     .map((item) => toRecentFormMatch(match.awayTeamId, item));
 
-  const homeLineup = buildLineup(gender, match.homeTeamId === raiId);
-  const awayLineup = buildLineup(gender, match.awayTeamId === raiId);
+  const homeLineup = EMPTY_LINEUP;
+  const awayLineup = EMPTY_LINEUP;
 
   return {
     match,
