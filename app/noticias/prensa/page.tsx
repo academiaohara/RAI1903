@@ -79,7 +79,7 @@ export default function NoticiasPrensaPage() {
 
       <div className="grid gap-3 sm:gap-4">
         {filtered.map((item) => (
-          <NewsCard key={item.id} item={item} />
+          <NewsCard key={item.id} item={item} onUpdated={loadNews} />
         ))}
       </div>
 

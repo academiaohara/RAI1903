@@ -1,11 +1,14 @@
 "use client";
 
-import { ArrowLeftRight, Newspaper } from "lucide-react";
+import { ArrowLeftRight, Newspaper, Pencil } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useState } from "react";
 import { Badge } from "@/components/Badge";
+import { NewsEditorForm } from "@/components/editor/NewsEditorForm";
 import { EditableText } from "@/components/inline-editing/EditableText";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { NewsMedia } from "@/components/NewsMedia";
+import { updateNewsItem } from "@/lib/cms/news";
 import { newsCategoryBadge } from "@/lib/noticias";
 import { formatDate } from "@/lib/utils";
 import type { NewsItem } from "@/types";
@@ -15,10 +18,36 @@ const categoryIcons: Record<string, LucideIcon> = {
   noticia: Newspaper,
 };
 
-export function NewsCard({ item }: { item: NewsItem }) {
+type NewsCardProps = {
+  item: NewsItem;
+  onUpdated?: () => void;
+};
+
+export function NewsCard({ item, onUpdated }: NewsCardProps) {
   const category = newsCategoryBadge(item);
   const CategoryIcon = categoryIcons[category.key] ?? Newspaper;
-  const { editMode } = useInlineEditing();
+  const { editMode, canEdit } = useInlineEditing();
+  const [editing, setEditing] = useState(false);
+
+  if (editing && canEdit && editMode) {
+    return (
+      <NewsEditorForm
+        heading="Editar noticia"
+        newsId={item.id}
+        defaultChannel={item.channel}
+        initialItem={item}
+        onCancel={() => setEditing(false)}
+        onSave={async (updated) => {
+          const result = await updateNewsItem(updated);
+          if (result.ok) {
+            setEditing(false);
+            onUpdated?.();
+          }
+          return result;
+        }}
+      />
+    );
+  }
 
   const content = (
     <>
@@ -56,9 +85,26 @@ export function NewsCard({ item }: { item: NewsItem }) {
     </>
   );
 
+  const editButton =
+    canEdit && editMode ? (
+      <button
+        type="button"
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          setEditing(true);
+        }}
+        className="absolute right-2 top-2 z-10 inline-flex size-9 items-center justify-center rounded-xl border border-[#214C9B]/25 bg-white text-[#214C9B] shadow-sm transition hover:border-[#214C9B] hover:bg-blue-50"
+        aria-label="Editar noticia"
+      >
+        <Pencil className="size-4" aria-hidden />
+      </button>
+    ) : null;
+
   if (editMode) {
     return (
-      <article className="news-card-item group flex min-h-[4.25rem] overflow-hidden rounded-xl border border-[#214C9B] bg-white sm:min-h-[8.5rem]">
+      <article className="news-card-item group relative flex min-h-[4.25rem] overflow-hidden rounded-xl border border-[#214C9B] bg-white sm:min-h-[8.5rem]">
+        {editButton}
         {content}
       </article>
     );
@@ -69,7 +115,7 @@ export function NewsCard({ item }: { item: NewsItem }) {
       href={item.url}
       target="_blank"
       rel="noreferrer"
-      className="news-card-item group flex min-h-[4.25rem] overflow-hidden rounded-xl border border-[#214C9B] bg-white sm:min-h-[8.5rem]"
+      className="news-card-item group relative flex min-h-[4.25rem] overflow-hidden rounded-xl border border-[#214C9B] bg-white sm:min-h-[8.5rem]"
     >
       {content}
     </a>

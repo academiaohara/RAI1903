@@ -105,6 +105,10 @@ export function newsItemToRow(item: NewsItem): Omit<CmsNewsRow, "published"> & {
   };
 }
 
+export async function updateNewsItem(item: NewsItem): Promise<{ ok: boolean; error?: string }> {
+  return insertNewsItem(item);
+}
+
 export async function insertNewsItem(item: NewsItem): Promise<{ ok: boolean; error?: string }> {
   if (!isSupabaseConfigured()) {
     const existing = readLocalNewsItems();
