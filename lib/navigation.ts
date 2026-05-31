@@ -61,7 +61,6 @@ export const navItems: NavItem[] = [
       { href: "/primer-equipo/femenino/competicion", label: "Competición", icon: Trophy },
       { href: "/primer-equipo/femenino/jornadas", label: "Jornadas", icon: Columns3 },
       { href: "/primer-equipo/femenino/calendario", label: "Calendario", icon: CalendarDays },
-      { href: "/primer-equipo/femenino/cronicas", label: "Crónicas", icon: FileText },
       { href: "/primer-equipo/femenino/noticias", label: "Noticias", icon: Newspaper },
     ],
   },

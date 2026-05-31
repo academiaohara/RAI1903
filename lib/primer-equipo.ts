@@ -26,9 +26,13 @@ export const PRIMER_EQUIPO_SECTIONS = [
 
 export type PrimerEquipoSection = (typeof PRIMER_EQUIPO_SECTIONS)[number];
 
+export function primerEquipoHasCronicas(gender: PrimerEquipoGender) {
+  return gender === "masculino";
+}
+
 export function getPrimerEquipoTabs(gender: PrimerEquipoGender) {
   const base = primerEquipoBase(gender);
-  return [
+  const tabs = [
     { href: `${base}/plantilla`, label: "Plantilla" },
     { href: `${base}/noticias`, label: "Noticias" },
     { href: `${base}/competicion`, label: "Competición" },
@@ -36,6 +40,7 @@ export function getPrimerEquipoTabs(gender: PrimerEquipoGender) {
     { href: `${base}/calendario`, label: "Calendario" },
     { href: `${base}/cronicas`, label: "Crónicas" },
   ];
+  return primerEquipoHasCronicas(gender) ? tabs : tabs.filter((tab) => !tab.href.endsWith("/cronicas"));
 }
 
 /** Keeps the current subsection when switching between masculino and femenino. */
@@ -45,8 +50,13 @@ export function primerEquipoPathForGender(pathname: string, gender: PrimerEquipo
   const segments = rest.split("/").filter(Boolean);
   const section = segments[0];
 
-  if (section && PRIMER_EQUIPO_SECTIONS.includes(section as PrimerEquipoSection)) {
-    const subPath = section === "cronicas" && segments[1] === "resumenes" ? "/cronicas/resumenes" : `/${section}`;
+  if (
+    section &&
+    PRIMER_EQUIPO_SECTIONS.includes(section as PrimerEquipoSection) &&
+    (section !== "cronicas" || primerEquipoHasCronicas(gender))
+  ) {
+    const subPath =
+      section === "cronicas" && segments[1] === "resumenes" ? "/cronicas/resumenes" : `/${section}`;
     return `${primerEquipoBase(gender)}${subPath}`;
   }
 

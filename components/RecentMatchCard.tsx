@@ -7,7 +7,7 @@ import { getCronicaForMatch } from "@/lib/match-articles";
 import { getAvilesMatchResult } from "@/lib/fixtures";
 import { matchFixtureCardClassName } from "@/lib/match-card-styles";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
-import { primerEquipoBase } from "@/lib/primer-equipo";
+import { primerEquipoBase, primerEquipoHasCronicas } from "@/lib/primer-equipo";
 import { cn, formatMatchDate } from "@/lib/utils";
 import type { Match } from "@/types";
 import type { Route } from "next";
@@ -49,7 +49,14 @@ const cronicaContentHoverClass = "group-has-[a.cronica-overlay:hover]/card:text-
 export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCardProps) {
   const result = getAvilesMatchResult(match);
   const cronica = getCronicaForMatch(match.id, gender);
-  const cronicaHref = (cronica ? `${primerEquipoBase(gender)}/cronicas/${cronica.id}` : `${primerEquipoBase(gender)}/cronicas`) as Route;
+  const hasCronicas = primerEquipoHasCronicas(gender);
+  const cronicaHref = (
+    hasCronicas
+      ? cronica
+        ? `${primerEquipoBase(gender)}/cronicas/${cronica.id}`
+        : `${primerEquipoBase(gender)}/cronicas`
+      : `${primerEquipoBase(gender)}/calendario`
+  ) as Route;
   const competicionHref = `${primerEquipoBase(gender)}/competicion` as Route;
   const scoreLabel = `${match.homeScore} - ${match.awayScore}`;
   const competitionLabel = matchCompetitionShortLabel(match);
@@ -65,7 +72,11 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
       <Link
         href={cronicaHref}
         className="cronica-overlay absolute inset-0 z-0 rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#214C9B]"
-        aria-label={`Crónica: ${match.homeTeam} ${scoreLabel} ${match.awayTeam}`}
+        aria-label={
+          hasCronicas
+            ? `Crónica: ${match.homeTeam} ${scoreLabel} ${match.awayTeam}`
+            : `Calendario: ${match.homeTeam} ${scoreLabel} ${match.awayTeam}`
+        }
       />
       <div className="relative z-[1] pointer-events-none">
         <div className="mb-1 flex items-center justify-between gap-2">
@@ -108,7 +119,8 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
           />
         </div>
         <p className={cn("mt-2 text-xs font-bold text-slate-600 transition-colors duration-200", cronicaContentHoverClass, "group-has-[a.cronica-overlay:hover]/card:!text-white")}>
-          {formatMatchDate(match.date)} · Leer la cronica
+          {formatMatchDate(match.date)}
+          {hasCronicas ? " · Leer la cronica" : ""}
         </p>
       </div>
     </article>

@@ -1,11 +1,16 @@
+import type { Route } from "next";
+import { redirect } from "next/navigation";
 import { Card } from "@/components/Card";
 import { PrimerEquipoPageHero } from "@/components/PrimerEquipoPageHero";
 import { ZonaMixtaVideoShowcase } from "@/components/ZonaMixtaVideoShowcase";
 import { getFanResumenesVideos } from "@/lib/cronicas";
-import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
+import { genderLabels, primerEquipoBase, primerEquipoHasCronicas, type PrimerEquipoGender } from "@/lib/primer-equipo";
 
 export default async function CronicasResumenesPage({ params }: { params: Promise<{ gender: PrimerEquipoGender }> }) {
   const { gender } = await params;
+  if (!primerEquipoHasCronicas(gender)) {
+    redirect(`${primerEquipoBase(gender)}/plantilla` as Route);
+  }
   const videos = getFanResumenesVideos(gender);
 
   return (

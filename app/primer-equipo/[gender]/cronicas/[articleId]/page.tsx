@@ -1,9 +1,9 @@
-import { notFound } from "next/navigation";
+import type { Route } from "next";
+import { notFound, redirect } from "next/navigation";
 import { MatchCenter } from "@/components/match-center/MatchCenter";
 import { getMatchDetailForArticle } from "@/lib/match-detail";
 import { getMatchArticleById } from "@/lib/match-articles";
-import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
-import type { Route } from "next";
+import { primerEquipoBase, primerEquipoHasCronicas, type PrimerEquipoGender } from "@/lib/primer-equipo";
 
 export default async function MatchArticleDetailPage({
   params,
@@ -11,6 +11,9 @@ export default async function MatchArticleDetailPage({
   params: Promise<{ gender: PrimerEquipoGender; articleId: string }>;
 }) {
   const { gender, articleId } = await params;
+  if (!primerEquipoHasCronicas(gender)) {
+    redirect(`${primerEquipoBase(gender)}/plantilla` as Route);
+  }
   const article = getMatchArticleById(articleId);
 
   if (articleId === "resumenes") notFound();
