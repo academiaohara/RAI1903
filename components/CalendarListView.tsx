@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { OpponentCrest } from "@/components/OpponentCrest";
@@ -110,6 +110,7 @@ function CalendarListRow({
   showCrests: boolean;
   showVenue: boolean;
 }) {
+  const router = useRouter();
   const href = match.played ? match.chronicleUrl : match.previaUrl;
   const opponentTeamId = match.isHome ? match.awayTeamId : match.homeTeamId;
   const date = new Date(match.date);
@@ -122,12 +123,19 @@ function CalendarListRow({
 
   const rowClassName = cn(
     showVenue ? LIST_ROW_GRID_WITH_VENUE : LIST_ROW_GRID_WITHOUT_VENUE,
-    "border-b border-[#214C9B]/8 px-3 py-2.5 text-sm transition last:border-b-0",
+    "relative border-b border-[#214C9B]/8 px-3 py-2.5 text-sm transition last:border-b-0",
     zebra ? "bg-slate-50/80" : "bg-white",
     scrollTarget && "bg-blue-50/90 ring-1 ring-inset ring-[#214C9B]/25",
     today && !scrollTarget && "bg-[#214C9B]/[0.06]",
-    href && "hover:bg-[#214C9B]/10",
+    href && "cursor-pointer hover:bg-[#214C9B]/10",
   );
+
+  const openMatchArticle = () => {
+    if (!href) return;
+    router.push(href as Route);
+  };
+
+  const clickableCellClass = href ? "cursor-pointer" : undefined;
 
   const content = (
     <>
@@ -136,22 +144,38 @@ function CalendarListRow({
         className={cn(
           "shrink-0 truncate text-xs font-bold capitalize tabular-nums sm:text-sm",
           today ? "font-extrabold text-[#214C9B]" : "text-slate-700",
+          clickableCellClass,
         )}
+        onClick={openMatchArticle}
       >
         {formatListMatchDate(match.date)}
       </time>
 
-      <span className="shrink-0 text-xs font-bold tabular-nums text-slate-600 sm:text-sm">{timeLabel(match)}</span>
+      <span
+        className={cn("shrink-0 text-xs font-bold tabular-nums text-slate-600 sm:text-sm", clickableCellClass)}
+        onClick={openMatchArticle}
+      >
+        {timeLabel(match)}
+      </span>
 
       <span
-        className={cn("shrink-0 text-xs font-bold sm:text-sm", match.isHome ? "text-[#214C9B]" : "text-[#981915]")}
+        className={cn(
+          "shrink-0 text-xs font-bold sm:text-sm",
+          match.isHome ? "text-[#214C9B]" : "text-[#981915]",
+          clickableCellClass,
+        )}
         title={match.isHome ? "Partido en casa" : "Partido fuera"}
+        onClick={openMatchArticle}
       >
         {homeAwayLabel(match.isHome)}
       </span>
 
       {showVenue ? (
-        <span className="min-w-0 truncate text-xs font-semibold text-slate-600" title={match.venue}>
+        <span
+          className={cn("min-w-0 truncate text-xs font-semibold text-slate-600", clickableCellClass)}
+          title={match.venue}
+          onClick={openMatchArticle}
+        >
           {match.venue}
         </span>
       ) : null}
@@ -160,7 +184,9 @@ function CalendarListRow({
         className={cn(
           "text-right text-sm font-extrabold tabular-nums",
           match.played ? "text-slate-900" : "text-slate-400",
+          clickableCellClass,
         )}
+        onClick={openMatchArticle}
       >
         {resultLabel(match)}
       </span>
@@ -181,11 +207,13 @@ function CalendarListRow({
             {match.opponent}
           </TeamLink>
         ) : (
-          <span className="min-w-0 truncate text-sm font-extrabold text-[#214C9B]">{match.opponent}</span>
+          <span className={cn("min-w-0 truncate text-sm font-extrabold text-[#214C9B]", clickableCellClass)} onClick={openMatchArticle}>
+            {match.opponent}
+          </span>
         )}
       </span>
 
-      <span className="flex min-w-0 items-center justify-end gap-1.5">
+      <span className={cn("flex min-w-0 items-center justify-end gap-1.5", clickableCellClass)} onClick={openMatchArticle}>
         <CompetitionLogo competition={match.competition} alt="" size="xs" className="shrink-0" />
         <span className={cn("min-w-0 truncate text-xs font-bold", accent)} title={competitionLabel}>
           {competitionLabel}
@@ -200,21 +228,12 @@ function CalendarListRow({
     </>
   );
 
-  if (href) {
-    return (
-      <Link
-        id={`cal-list-match-${match.id}`}
-        href={href as Route}
-        className={cn(rowClassName, "no-underline")}
-        aria-label={`${match.opponent}, ${match.played ? "cronica" : "previa"}`}
-      >
-        {content}
-      </Link>
-    );
-  }
-
   return (
-    <article id={`cal-list-match-${match.id}`} className={rowClassName}>
+    <article
+      id={`cal-list-match-${match.id}`}
+      className={rowClassName}
+      aria-label={href ? `${match.opponent}, ${match.played ? "crónica" : "previa"}` : undefined}
+    >
       {content}
     </article>
   );
