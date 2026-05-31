@@ -1,21 +1,31 @@
 "use client";
 
-import { use, useMemo, useState } from "react";
+import { use, useCallback, useEffect, useMemo, useState } from "react";
 import { NewsCard } from "@/components/NewsCard";
 import { Pagination } from "@/components/Pagination";
 import { PrimerEquipoPageHero } from "@/components/PrimerEquipoPageHero";
 import { usePagination } from "@/hooks/usePagination";
-import { newsItems } from "@/data/mock";
+import { fetchPublishedNewsItems } from "@/lib/cms/news";
 import { newsForTeam } from "@/lib/noticias";
 import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
-import type { NewsTag } from "@/types";
+import type { NewsItem, NewsTag } from "@/types";
 
 const tags: Array<NewsTag | "todas"> = ["todas", "partido", "fichajes", "cantera", "previa", "cronica", "club", "lesionados", "rumores", "renovaciones", "entrevistas", "otros"];
 
 export default function PrimerEquipoNoticiasPage({ params }: { params: Promise<{ gender: string }> }) {
   const { gender } = use(params) as { gender: PrimerEquipoGender };
   const [tag, setTag] = useState<NewsTag | "todas">("todas");
-  const teamNews = newsForTeam(newsItems, gender);
+  const [allNews, setAllNews] = useState<NewsItem[]>([]);
+
+  const loadNews = useCallback(() => {
+    void fetchPublishedNewsItems().then(setAllNews);
+  }, []);
+
+  useEffect(() => {
+    loadNews();
+  }, [loadNews]);
+
+  const teamNews = useMemo(() => newsForTeam(allNews, gender), [allNews, gender]);
 
   const filtered = useMemo(
     () => teamNews.filter((item) => tag === "todas" || item.tags.includes(tag)),
@@ -46,7 +56,7 @@ export default function PrimerEquipoNoticiasPage({ params }: { params: Promise<{
 
       <div className="grid gap-3 sm:gap-4">
         {pagination.paginatedItems.length > 0 ? (
-          pagination.paginatedItems.map((item) => <NewsCard key={item.id} item={item} />)
+          pagination.paginatedItems.map((item) => <NewsCard key={item.id} item={item} onUpdated={loadNews} />)
         ) : (
           <p className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm font-bold text-slate-500">
             Sin noticias en esta categoria para {genderLabels[gender].title.toLowerCase()}.

@@ -914,6 +914,7 @@ export const newsItems: NewsItem[] = [
     url: "https://www.lne.es/real-aviles/2026/05/27/habla-arquitecto-salvacion-aviles-hemos-130694553.html",
     imageUrl: "https://estaticos-cdn.prensaiberica.es/clip/67bbd9de-dd19-4cb6-a5d7-647041f04846_16-9-aspect-ratio_default_0.jpg",
     tags: ["entrevistas", "partido"],
+    teams: ["masculino"],
   },
   {
     id: "lne-dia-oposiciones",
@@ -925,6 +926,7 @@ export const newsItems: NewsItem[] = [
     url: "https://www.lne.es/real-aviles/2026/05/26/dia-oposiciones-minuto-minuto-130677391.html",
     imageUrl: "https://estaticos-cdn.prensaiberica.es/clip/8b12064c-f782-4270-9e69-b36d0809f276_16-9-discover-aspect-ratio_default_0_x1226y471.jpg",
     tags: ["partido", "cronica"],
+    teams: ["masculino"],
   },
   {
     id: "lne-reconstruccion-contratos",
@@ -948,6 +950,7 @@ export const newsItems: NewsItem[] = [
     url: "https://www.lne.es/real-aviles/2026/05/25/diego-baeza-marca-hoja-ruta-130641895.html",
     imageUrl: "https://estaticos-cdn.prensaiberica.es/clip/c27add04-e4e4-469a-9e21-55e97d3888d7_16-9-discover-aspect-ratio_default_0_x876y536.jpg",
     tags: ["entrevistas", "club"],
+    teams: ["masculino"],
   },
   {
     id: "comercio-presidente-linares",
@@ -959,6 +962,7 @@ export const newsItems: NewsItem[] = [
     url: "https://www.elcomercio.es/real-aviles/presidente-real-aviles-pasa-revista-voz-linares-20260526230134-nt.html",
     imageUrl: "https://s2.ppllstatics.com/elcomercio/www/multimedia/2026/05/26/diego-baeza-RH7YgRA6I4o0iam3Hhw0fuJ-1200x840@El%20Comercio.jpg",
     tags: ["entrevistas", "club"],
+    teams: ["masculino"],
   },
   {
     id: "comercio-temporada-sufrida",
@@ -971,6 +975,7 @@ export const newsItems: NewsItem[] = [
     imageUrl: "https://s3.ppllstatics.com/elcomercio/www/multimedia/2026/05/25/real-aviles-RVWTNB5sx6ufOMja1MJoorM-1200x840@El%20Comercio.jpg",
     tags: ["cronica", "partido"],
     playerIds: ["kevin-bautista"],
+    teams: ["masculino"],
   },
   {
     id: "comercio-verano-trabajo",
@@ -982,6 +987,7 @@ export const newsItems: NewsItem[] = [
     url: "https://www.elcomercio.es/real-aviles/real-aviles-temporada-verano-trabajo-plantilla-entrenador-20260524194126-nt.html",
     imageUrl: "https://s3.ppllstatics.com/elcomercio/www/multimedia/2026/05/24/comida-aviles-RIgCXeRGWKwu2UXj5TjriDP-1200x840@El%20Comercio.jpg",
     tags: ["club", "fichajes"],
+    teams: ["masculino"],
   },
   {
     id: "comercio-primera-federacion",
@@ -993,6 +999,7 @@ export const newsItems: NewsItem[] = [
     url: "https://www.elcomercio.es/real-aviles/real-aviles-queda-primera-federacion-20260523223401-nt.html",
     imageUrl: "https://s2.ppllstatics.com/elcomercio/www/multimedia/2026/05/23/cronica-digital-RuaQYDoT3fqFlEjveYkL9qO-1200x840@El%20Comercio.jpg",
     tags: ["partido", "club"],
+    teams: ["masculino"],
   },
   {
     id: "rtpa-permanencia-pasaron",
@@ -1004,6 +1011,7 @@ export const newsItems: NewsItem[] = [
     url: "https://www.rtpa.es/noticias-deportes/2026-05-23/El-Real-Aviles-Industrial-se-juega-la-permanencia-en-Pasaron_111779544812.html",
     imageUrl: "https://www.rtpa.es/fotos//26/04/20260417203904_RTPA7986186.webp",
     tags: ["previa", "partido"],
+    teams: ["masculino"],
   },
   {
     id: "rtpa-linares-continuidad",
@@ -1015,6 +1023,7 @@ export const newsItems: NewsItem[] = [
     url: "https://www.rtpa.es/noticias-deportes/2026-05-27/El-Real-Aviles-Industrial-debe-negociar-la-continuidad-de-Miguel-Linares_111779890820.html",
     imageUrl: "https://www.rtpa.es/fotos//26/05/20260527164228_RTPA8154117.webp",
     tags: ["renovaciones", "entrevistas"],
+    teams: ["masculino"],
   },
   {
     id: "club-somos-primera-rfef",
@@ -1037,6 +1046,7 @@ export const newsItems: NewsItem[] = [
     excerpt: "El club prepara el partido decisivo por la permanencia con la mirada puesta en Pasarón.",
     url: "https://www.realavilesindustrial1903.com/a-90-minutos/",
     tags: ["previa", "partido"],
+    teams: ["masculino"],
   },
   {
     id: "club-a-por-la-permanencia",
@@ -1047,6 +1057,7 @@ export const newsItems: NewsItem[] = [
     excerpt: "Nota oficial de cara al tramo final de la temporada con la salvación como objetivo.",
     url: "https://www.realavilesindustrial1903.com/a-por-la-permanencia/",
     tags: ["previa", "partido"],
+    teams: ["masculino"],
   },
   {
     id: "club-queda-una-bala",
