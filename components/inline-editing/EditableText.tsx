@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 
@@ -25,14 +24,8 @@ export function EditableText({
 }: EditableTextProps) {
   const { editMode, getValue, saveValue } = useInlineEditing();
   const current = getValue(storageKey, value);
-  const [draft, setDraft] = useState(current);
-
-  useEffect(() => {
-    setDraft(current);
-  }, [current]);
 
   const save = (next: string) => {
-    setDraft(next);
     saveValue(storageKey, next);
   };
 
@@ -48,7 +41,7 @@ export function EditableText({
   if (multiline) {
     return (
       <textarea
-        value={draft}
+        value={current}
         onChange={(event) => save(event.target.value)}
         placeholder={placeholder}
         aria-label={ariaLabel}
@@ -59,7 +52,7 @@ export function EditableText({
 
   return (
     <input
-      value={draft}
+      value={current}
       onChange={(event) => save(event.target.value)}
       placeholder={placeholder}
       aria-label={ariaLabel}

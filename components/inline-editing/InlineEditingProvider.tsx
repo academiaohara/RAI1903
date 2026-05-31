@@ -55,8 +55,10 @@ export function InlineEditingProvider({ children }: { children: React.ReactNode 
   const [overrides, setOverrides] = useState<InlineOverrides>({});
 
   useEffect(() => {
-    setOverrides(readOverrides());
-    setEditModeState(window.localStorage.getItem(MODE_KEY) === "1");
+    queueMicrotask(() => {
+      setOverrides(readOverrides());
+      setEditModeState(window.localStorage.getItem(MODE_KEY) === "1");
+    });
   }, []);
 
   useEffect(() => {
