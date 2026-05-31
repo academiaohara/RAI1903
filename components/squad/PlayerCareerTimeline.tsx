@@ -8,7 +8,7 @@ export function PlayerCareerTimeline({ player }: { player: SquadPlayer }) {
 
   return (
     <div className="relative space-y-0">
-      <div className="absolute bottom-2 left-[1.125rem] top-2 w-px bg-gradient-to-b from-[#214C9B] via-[#214C9B]/30 to-transparent" />
+      <div className="absolute bottom-2 left-[calc(3rem-2.125rem+0.4375rem)] top-2 w-px -translate-x-1/2 bg-gradient-to-b from-[#214C9B] via-[#214C9B]/30 to-transparent" />
 
       {career.map((entry, index) => (
         <motion.div

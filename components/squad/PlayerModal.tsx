@@ -68,7 +68,7 @@ function PlayerModalContent({ player, onClose }: { player: SquadPlayer; onClose:
       onClick={(event) => event.stopPropagation()}
       className="flex max-h-[94vh] w-full max-w-5xl flex-col overflow-hidden rounded-t-[2rem] border border-[#214C9B]/20 bg-white shadow-2xl sm:rounded-[2rem]"
     >
-      <div className="relative overflow-hidden bg-gradient-to-br from-[#0f2347] via-[#173a78] to-[#214C9B] px-5 pb-6 pt-5 text-white sm:px-8 sm:pb-8 sm:pt-6">
+      <div className="relative z-20 shrink-0 overflow-hidden bg-gradient-to-br from-[#0f2347] via-[#173a78] to-[#214C9B] px-5 pb-6 pt-5 text-white sm:px-8 sm:pb-8 sm:pt-6">
         <button
           type="button"
           onClick={onClose}
@@ -117,7 +117,7 @@ function PlayerModalContent({ player, onClose }: { player: SquadPlayer; onClose:
         </div>
       </div>
 
-      <div className="border-b border-slate-200 px-4 sm:px-6">
+      <div className="relative z-10 shrink-0 border-b border-slate-200 bg-white px-4 sm:px-6">
         <div className="flex gap-1 overflow-x-auto no-scrollbar py-3">
           {tabs.map((tab) => (
             <button
@@ -141,7 +141,7 @@ function PlayerModalContent({ player, onClose }: { player: SquadPlayer; onClose:
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+      <div className="relative z-0 min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
