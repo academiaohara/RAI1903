@@ -98,3 +98,14 @@ export const isRealAvilesClubSiteNews = (item: { url: string }) =>
 /** Fallback visual cuando no hay og:image ni foto en la nota del club. */
 export const shouldUseRaiLogoNewsFallback = (item: { url: string; imageUrl?: string }) =>
   !item.imageUrl && isRealAvilesClubSiteNews(item);
+
+/** Hosts que devuelven 403 al optimizador de Next.js; el navegador debe cargar la URL directa. */
+const UNOPTIMIZED_NEWS_IMAGE_HOSTS = new Set(["www.rtpa.es"]);
+
+export const newsImageRequiresUnoptimized = (imageUrl: string) => {
+  try {
+    return UNOPTIMIZED_NEWS_IMAGE_HOSTS.has(new URL(imageUrl).hostname);
+  } catch {
+    return false;
+  }
+};
