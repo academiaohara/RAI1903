@@ -52,8 +52,15 @@ export const newsByChannel = <T extends { channel: NewsChannel; date: string; id
   channel: NewsChannel,
 ) => sortNewsByDate(items.filter((item) => item.channel === channel));
 
-export const newsAppliesToTeam = (item: Pick<NewsItem, "teams">, gender: PrimerEquipoGender) =>
-  !item.teams || item.teams.length === 0 || item.teams.includes(gender);
+/** Sin etiqueta de equipo: noticia general (masculino y femenino). */
+export const isGeneralNewsTeamScope = (teams: PrimerEquipoGender[] | undefined) =>
+  !teams || teams.length === 0;
+
+export const newsAppliesToTeam = (item: Pick<NewsItem, "teams">, gender: PrimerEquipoGender) => {
+  const teams = item.teams;
+  if (isGeneralNewsTeamScope(teams)) return true;
+  return teams!.includes(gender);
+};
 
 export const newsForTeam = (items: NewsItem[], gender: PrimerEquipoGender) =>
   sortNewsByDate(items.filter((item) => newsAppliesToTeam(item, gender)));

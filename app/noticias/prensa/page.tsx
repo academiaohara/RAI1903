@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Badge } from "@/components/Badge";
 import { Card } from "@/components/Card";
 import { AddNewsPanel } from "@/components/editor/AddNewsPanel";
 import { NewsCard } from "@/components/NewsCard";
 import { PageHero } from "@/components/PageHero";
 import { Pagination } from "@/components/Pagination";
 import { usePagination } from "@/hooks/usePagination";
-import { pressLinks } from "@/data/mock";
 import { fetchPublishedNewsItems } from "@/lib/cms/news";
 import { newsByChannel } from "@/lib/noticias";
 import type { NewsItem, NewsTag } from "@/types";
@@ -47,7 +45,7 @@ export default function NoticiasPrensaPage() {
 
   return (
     <div className="space-y-6">
-      <PageHero eyebrow="Noticias" title="Prensa" description="Titulares de medios externos, enlaces a fuentes y archivo reciente." />
+      <PageHero eyebrow="Noticias" title="Prensa" description="Titulares de medios externos y archivo reciente." />
 
       <div className="space-y-4">
         <div className="grid gap-3 lg:grid-cols-[220px_1fr]">
@@ -104,24 +102,6 @@ export default function NoticiasPrensaPage() {
         onNext={pagination.goToNext}
         onLast={pagination.goToLast}
       />
-
-      <Card eyebrow="Enlaces a medios" title="Fuentes para seguir el club">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {pressLinks.map((link) => (
-            <a
-              key={link.id}
-              href={link.url}
-              target="_blank"
-              rel="noreferrer"
-              className="rounded-3xl border border-[#214C9B]/25 bg-white p-5 transition hover:-translate-y-1 hover:border-[#214C9B]"
-            >
-              <Badge tone="blue">{link.outlet}</Badge>
-              <h3 className="mt-4 break-words text-xl font-extrabold uppercase text-[#214C9B] sm:text-2xl">{link.name}</h3>
-              <p className="mt-2 text-sm leading-6 text-slate-600">{link.description}</p>
-            </a>
-          ))}
-        </div>
-      </Card>
 
       <Card eyebrow="Archivo" title="Historico reciente">
         <div className="overflow-hidden rounded-2xl border border-[#214C9B]/20 bg-white">
