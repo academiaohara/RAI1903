@@ -7,7 +7,7 @@ import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamLink } from "@/components/TeamLink";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getListViewScrollTargetId, isUtcToday } from "@/lib/calendar";
-import { matchCompetitionShortLabel } from "@/lib/competition-labels";
+import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
 import { getCompetitionAccentClass } from "@/lib/competition-styles";
 import { cn } from "@/lib/utils";
 import type { CalendarMatch } from "@/types";
@@ -115,7 +115,10 @@ function CalendarListRow({
   const date = new Date(match.date);
   const today = isUtcToday(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
   const accent = getCompetitionAccentClass(match.competition);
-  const competitionLabel = `${matchCompetitionShortLabel(match)}${match.matchday !== undefined ? ` · J${match.matchday}` : ""}`;
+  const jornada = matchJornadaLabel(match);
+  const competitionLabel = jornada
+    ? `${matchCompetitionShortLabel(match)} · ${jornada}`
+    : matchCompetitionShortLabel(match);
 
   const rowClassName = cn(
     showVenue ? LIST_ROW_GRID_WITH_VENUE : LIST_ROW_GRID_WITHOUT_VENUE,

@@ -54,7 +54,7 @@ export function matchCompetitionShortLabel(match: FixtureMetaSource): string {
 
 /** Jornada badge label (e.g. J9) for league fixtures. */
 export function matchJornadaLabel(match: FixtureMetaSource & { matchday?: number }): string | null {
-  if (match.competition === "copa-rey" || match.matchday === undefined) {
+  if (match.competition === "copa-rey" || match.competition === "amistoso" || match.matchday === undefined) {
     return null;
   }
   return `J${match.matchday}`;
