@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import { Calendar, ChevronLeft, Clock, MapPin, User, Users } from "lucide-react";
 import { OpponentCrest } from "@/components/OpponentCrest";
-import { TeamLink } from "@/components/TeamLink";
+import { headerLinkHoverClass, TeamLink } from "@/components/TeamLink";
 import { EditableText } from "@/components/inline-editing/EditableText";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useMatchDetailStorageKeys } from "@/components/match-center/useMatchDetailOverrides";
@@ -69,18 +69,24 @@ function TeamScorers({
         const playerName = entry.player || "Sin nombre";
 
         return (
-          <li key={entry.player} className="text-[10px] font-semibold text-white/85 sm:text-xs">
+          <li
+            key={entry.player}
+            className={cn(
+              "text-[10px] font-semibold text-white/85 sm:text-xs",
+              align === "left" ? "text-left" : "text-right",
+            )}
+          >
             <span className="tabular-nums">{minutesLabel}</span>{" "}
             {squadPlayer ? (
               <button
                 type="button"
                 onClick={() => onPlayerClick(squadPlayer)}
-                className="cursor-pointer transition hover:text-white"
+                className={cn("cursor-pointer", headerLinkHoverClass)}
               >
                 {playerName}
               </button>
             ) : (
-              <span>{playerName}</span>
+              <span className={headerLinkHoverClass}>{playerName}</span>
             )}
           </li>
         );
@@ -173,7 +179,7 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
               <OpponentCrest logo={homeTeam ? getTeamCrest(homeTeam) : "LOC"} opponent={match.homeTeam} size="md" />
               <span className="text-xs font-extrabold uppercase leading-tight sm:text-sm">{match.homeTeam}</span>
             </TeamLink>
-            <div className="w-full">
+            <div className="flex w-full justify-start">
               <TeamScorers
                 goals={homeGoals}
                 align="left"
@@ -218,7 +224,7 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
               <OpponentCrest logo={awayTeam ? getTeamCrest(awayTeam) : "VIS"} opponent={match.awayTeam} size="md" />
               <span className="text-xs font-extrabold uppercase leading-tight sm:text-sm">{match.awayTeam}</span>
             </TeamLink>
-            <div className="w-full">
+            <div className="flex w-full justify-end">
               <TeamScorers
                 goals={awayGoals}
                 align="right"
