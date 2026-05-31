@@ -12,8 +12,12 @@ type TeamLinkProps = {
   className?: string;
 };
 
-const linkHoverClass =
+export const linkHoverClass =
   "underline decoration-[#214C9B]/30 underline-offset-2 transition hover:text-[#214C9B] hover:decoration-[#214C9B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#214C9B]";
+
+/** Misma interacción que `linkHoverClass`, legible sobre fondo azul del marcador. */
+export const headerLinkHoverClass =
+  "underline decoration-white/30 underline-offset-2 transition hover:text-white hover:decoration-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
 export function TeamLink({ gender, teamId, teamName, children, className }: TeamLinkProps) {
   if (!canLinkEquipoLiga(gender, teamId)) {
