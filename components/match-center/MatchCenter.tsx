@@ -95,7 +95,7 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
         </>
       ) : (
         <div className="min-w-0 space-y-8 rounded-[2rem] border border-[#214C9B]/20 bg-white p-5 shadow-[0_12px_30px_rgba(17,24,39,0.06)] sm:p-8">
-          <MatchPreviaPanel detail={resolvedDetail} compact rdpVideo={resolvedDetail.rdpPrevia} showH2H={false} />
+          <MatchPreviaPanel detail={resolvedDetail} compact rdpVideo={resolvedDetail.rdpPrevia} showCaraACara={false} />
           <MatchLineupsPanel
             matchId={resolvedDetail.match.id}
             homeLabel={resolvedDetail.match.homeTeam}

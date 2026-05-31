@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { SquadPlayer, SquadViewMode } from "@/types/squad";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { getCompeticionSquadData } from "@/lib/competicion-squad";
 import { splitSquadByAvailability } from "@/lib/squad-utils";
 import { SquadHeader } from "@/components/squad/SquadHeader";
@@ -21,7 +22,9 @@ type EquipoLigaSquadProps = {
 };
 
 export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
-  const { club, squad, isOwnClub } = useMemo(() => getCompeticionSquadData(gender, team), [gender, team]);
+  const { club, squad: baseSquad, isOwnClub } = useMemo(() => getCompeticionSquadData(gender, team), [gender, team]);
+  const { squad: ownSquad, updatePlayer } = useSquadPlayers(gender);
+  const squad = isOwnClub ? ownSquad : baseSquad;
   const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
   const isFemenino = gender === "femenino";
   const showPlayerModal = isOwnClub && !isFemenino;
@@ -69,7 +72,13 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
         </motion.div>
       </AnimatePresence>
 
-      {showPlayerModal && <PlayerModal player={selected} onClose={() => setSelected(null)} />}
+      {showPlayerModal && (
+        <PlayerModal
+          player={selected ? squad.find((entry) => entry.id === selected.id) ?? selected : null}
+          onClose={() => setSelected(null)}
+          onUpdate={updatePlayer}
+        />
+      )}
       <StadiumModal stadium={club.estadioInfo} open={stadiumOpen} onClose={() => setStadiumOpen(false)} />
     </div>
   );

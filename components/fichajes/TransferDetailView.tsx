@@ -18,6 +18,7 @@ import {
   getTransferOriginClub,
   getTransferPlayerNews,
 } from "@/lib/fichajes";
+import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { formatBirthDate, formatContractDate, getNationalityFlag } from "@/lib/squad-utils";
 import { formatDate } from "@/lib/utils";
 import type { TransferRumor } from "@/types";
@@ -62,7 +63,11 @@ type TransferDetailViewProps = {
   player?: SquadPlayer;
 };
 
-export function TransferDetailView({ transfer, player }: TransferDetailViewProps) {
+export function TransferDetailView({ transfer, player: initialPlayer }: TransferDetailViewProps) {
+  const { getPlayerById } = useSquadPlayers("masculino");
+  const player = initialPlayer
+    ? getPlayerById(initialPlayer.id) ?? initialPlayer
+    : undefined;
   const kind = getTransferKind(transfer);
   const tone = toneByKind[kind];
   const visibleTabs = allTabs.filter((tab) => !tab.requiresPlayer || player);

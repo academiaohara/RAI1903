@@ -1,4 +1,7 @@
-import { CURRENT_QUINIELA_ROUND, matchdays, players, RAI_TEAM_ID, teams } from "@/data/mock";
+import { CURRENT_QUINIELA_ROUND, matchdays, RAI_TEAM_ID, teams } from "@/data/mock";
+import { getAvilesScorerFromEvents } from "@/lib/aviles-match-events";
+import type { MatchEvent } from "@/types";
+import type { SquadPlayer } from "@/types/squad";
 import {
   getHomeAwayRecordBeforeRound,
   getTeamsAtRound,
@@ -86,19 +89,29 @@ export function getAvilesScore(match: Match): number | null {
   return match.homeTeamId === RAI_TEAM_ID ? match.homeScore : match.awayScore;
 }
 
-export function actualAvilesScorer(match: Match): string | null {
+export function actualAvilesScorer(
+  match: Match,
+  options?: { events?: MatchEvent[]; squad?: SquadPlayer[] },
+): string | null {
   const goals = getAvilesScore(match);
   if (goals === null) return null;
   if (goals === 0) return "nadie";
 
-  const outfield = players.filter((player) => player.position !== "Portero");
-  const hash = match.id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return outfield[hash % outfield.length]?.displayName ?? "nadie";
+  if (options?.events && options.squad) {
+    const fromChronicle = getAvilesScorerFromEvents(match, options.events, options.squad);
+    if (fromChronicle !== null) return fromChronicle;
+  }
+
+  return null;
 }
 
-export function isScorerPredictionCorrect(match: Match, prediction: Prediction): boolean {
+export function isScorerPredictionCorrect(
+  match: Match,
+  prediction: Prediction,
+  options?: { events?: MatchEvent[]; squad?: SquadPlayer[] },
+): boolean {
   if (!prediction.scorer) return false;
-  const actual = actualAvilesScorer(match);
+  const actual = actualAvilesScorer(match, options);
   return actual !== null && prediction.scorer === actual;
 }
 

@@ -14,8 +14,8 @@ import { StadiumModal } from "@/components/squad/StadiumModal";
 import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
 import { getCompeticionSquadData } from "@/lib/competicion-squad";
 import { getRaiTeamId, getTeamByGender } from "@/lib/fixtures";
-import { findSquadPlayerByName } from "@/lib/squad-lineup";
-import { getSquadPlayers } from "@/lib/squad-data";
+import { resolveSquadPlayerByName } from "@/lib/squad-player-resolve";
+import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { getTeamCrest } from "@/lib/team-crests";
 import { cn } from "@/lib/utils";
 import type { MatchDetail, MatchEvent } from "@/types";
@@ -64,7 +64,7 @@ function TeamScorers({
   return (
     <ul className={cn("flex flex-col gap-0.5", align === "left" ? "items-start text-left" : "items-end text-right")}>
       {grouped.map((entry) => {
-        const squadPlayer = isAviles ? findSquadPlayerByName(squad, entry.player) : undefined;
+        const squadPlayer = isAviles ? resolveSquadPlayerByName(squad, entry.player) : undefined;
         const minutesLabel = entry.minutes.map((minute) => `${minute}'`).join(", ");
         const playerName = entry.player || "Sin nombre";
 
@@ -142,7 +142,8 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
   const raiId = getRaiTeamId(gender);
   const isHomeAviles = match.homeTeamId === raiId;
   const isAwayAviles = match.awayTeamId === raiId;
-  const avilesSquad = useMemo(() => (isHomeAviles || isAwayAviles ? getSquadPlayers(gender) : []), [gender, isHomeAviles, isAwayAviles]);
+  const { squad: avilesSquad, updatePlayer } = useSquadPlayers(gender);
+  const avilesSquadForMatch = isHomeAviles || isAwayAviles ? avilesSquad : [];
   const homeStadiumInfo = useMemo(() => {
     if (!homeTeam) return null;
     return getCompeticionSquadData(gender, homeTeam).club.estadioInfo;
@@ -184,7 +185,7 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
                 goals={homeGoals}
                 align="left"
                 isAviles={isHomeAviles}
-                squad={avilesSquad}
+                squad={avilesSquadForMatch}
                 onPlayerClick={setSelectedPlayer}
               />
             </div>
@@ -229,7 +230,7 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
                 goals={awayGoals}
                 align="right"
                 isAviles={isAwayAviles}
-                squad={avilesSquad}
+                squad={avilesSquadForMatch}
                 onPlayerClick={setSelectedPlayer}
               />
             </div>
@@ -294,7 +295,17 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
           )}
         </ul>
       </div>
-      {showPlayerModal && <PlayerModal player={selectedPlayer} onClose={() => setSelectedPlayer(null)} />}
+      {showPlayerModal && (
+        <PlayerModal
+          player={
+            selectedPlayer
+              ? avilesSquad.find((entry) => entry.id === selectedPlayer.id) ?? selectedPlayer
+              : null
+          }
+          onClose={() => setSelectedPlayer(null)}
+          onUpdate={updatePlayer}
+        />
+      )}
       <StadiumModal stadium={homeStadiumInfo} open={stadiumOpen} onClose={() => setStadiumOpen(false)} />
     </header>
   );

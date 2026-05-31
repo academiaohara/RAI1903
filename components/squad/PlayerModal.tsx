@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Calendar, MapPin, Ruler, Scale, Star, X } from "lucide-react";
-import type { SquadModalTab, SquadPlayer } from "@/types/squad";
+import type { PlayerCareerRecord, SquadModalTab, SquadPlayer } from "@/types/squad";
 import { SQUAD_POSITIONS, SQUAD_ROLE_CODES } from "@/types/squad";
+import { ageFromBirthDate } from "@/lib/squad-age";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import {
   formatBirthDate,
@@ -198,7 +199,17 @@ function PlayerModalContent({
                 </div>
               </div>
             )}
-            {activeTab === "trayectoria" && <PlayerCareerTimeline player={player} />}
+            {activeTab === "trayectoria" && (
+              <>
+                {editMode && onUpdate && (
+                  <PlayerCareerEditor
+                    trayectoria={player.trayectoria}
+                    onChange={(trayectoria) => onUpdate(player.id, { trayectoria })}
+                  />
+                )}
+                <PlayerCareerTimeline player={player} />
+              </>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -268,6 +279,22 @@ function PlayerInlineEditor({
           value={player.piernaBuena}
           options={["Derecha", "Izquierda", "Ambidiestro"] as const}
           onChange={(value) => onUpdate({ piernaBuena: value })}
+        />
+        <EditorInput
+          label="Fecha nacimiento"
+          type="date"
+          value={player.fechaNacimiento}
+          onChange={(value) =>
+            onUpdate({
+              fechaNacimiento: value,
+              edad: value ? ageFromBirthDate(value) : player.edad,
+            })
+          }
+        />
+        <EditorInput
+          label="Lugar nacimiento"
+          value={player.lugarNacimiento}
+          onChange={(value) => onUpdate({ lugarNacimiento: value })}
         />
         <EditorInput
           label="Contrato"
@@ -367,5 +394,84 @@ function DetailStat({ label, value }: { label: string; value: string }) {
       <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{label}</p>
       <p className="mt-1 text-2xl font-extrabold text-[#214C9B]">{value}</p>
     </div>
+  );
+}
+
+function PlayerCareerEditor({
+  trayectoria,
+  onChange,
+}: {
+  trayectoria: PlayerCareerRecord[];
+  onChange: (records: PlayerCareerRecord[]) => void;
+}) {
+  const updateRow = (index: number, patch: Partial<PlayerCareerRecord>) => {
+    onChange(trayectoria.map((row, rowIndex) => (rowIndex === index ? { ...row, ...patch } : row)));
+  };
+
+  const addRow = () => {
+    onChange([
+      ...trayectoria,
+      { temporada: "2025/26", club: "", partidos: 0, goles: 0, asistencias: 0 },
+    ]);
+  };
+
+  const removeRow = (index: number) => {
+    onChange(trayectoria.filter((_, rowIndex) => rowIndex !== index));
+  };
+
+  return (
+    <section className="mb-6 rounded-2xl border border-[#214C9B]/20 bg-blue-50/60 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#214C9B]">Editar trayectoria</p>
+        <button
+          type="button"
+          onClick={addRow}
+          className="rounded-full border border-[#214C9B]/25 px-3 py-1 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-white"
+        >
+          Añadir equipo
+        </button>
+      </div>
+      <div className="mt-3 space-y-3">
+        {trayectoria.map((row, index) => (
+          <div
+            key={`${row.temporada}-${row.club}-${index}`}
+            className="grid gap-2 rounded-xl border border-[#214C9B]/15 bg-white p-3 sm:grid-cols-2 lg:grid-cols-6"
+          >
+            <EditorInput label="Temporada" value={row.temporada} onChange={(value) => updateRow(index, { temporada: value })} />
+            <EditorInput label="Equipo" value={row.club} onChange={(value) => updateRow(index, { club: value })} />
+            <EditorInput
+              label="PJ"
+              type="number"
+              value={String(row.partidos)}
+              onChange={(value) => updateRow(index, { partidos: Number(value) || 0 })}
+            />
+            <EditorInput
+              label="G"
+              type="number"
+              value={String(row.goles)}
+              onChange={(value) => updateRow(index, { goles: Number(value) || 0 })}
+            />
+            <EditorInput
+              label="A"
+              type="number"
+              value={String(row.asistencias)}
+              onChange={(value) => updateRow(index, { asistencias: Number(value) || 0 })}
+            />
+            <div className="flex items-end">
+              <button
+                type="button"
+                onClick={() => removeRow(index)}
+                className="w-full rounded-xl border border-[#981915]/25 px-3 py-2 text-xs font-extrabold uppercase text-[#981915] hover:bg-red-50"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        ))}
+        {trayectoria.length === 0 && (
+          <p className="text-sm text-slate-600">Sin equipos en la trayectoria. Pulsa «Añadir equipo».</p>
+        )}
+      </div>
+    </section>
   );
 }
