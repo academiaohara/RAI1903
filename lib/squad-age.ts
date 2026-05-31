@@ -1,0 +1,13 @@
+export function ageFromBirthDate(isoDate: string): number {
+  if (!isoDate) return 0;
+  const birth = new Date(isoDate);
+  if (Number.isNaN(birth.getTime())) return 0;
+
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age -= 1;
+  }
+  return Math.max(0, age);
+}

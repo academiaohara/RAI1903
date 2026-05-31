@@ -6,9 +6,14 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { MatchPreviewModal } from "@/components/MatchPreviewModal";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamLink } from "@/components/TeamLink";
-import { players, RAI_TEAM_ID } from "@/data/mock";
+import { RAI_TEAM_ID } from "@/data/mock";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { useSquadPlayers } from "@/hooks/useSquadPlayers";
+import { buildMatchDetail } from "@/lib/match-detail";
 import { getPreviaForMatch } from "@/lib/match-articles";
+import { scorerLabelForPlayer } from "@/lib/squad-player-resolve";
 import {
+  actualAvilesScorer,
   actualOutcome,
   formatGoalsPick,
   getActualGoalsPicks,
@@ -16,6 +21,7 @@ import {
   getTeamById,
   isAvilesMatch,
   isOutcomeLockedByGoals,
+  isScorerPredictionCorrect,
   outcomeFromGoalsPicks,
 } from "@/lib/quiniela";
 import { getTeamCrestById } from "@/lib/team-crests";
@@ -27,14 +33,9 @@ import type { Route } from "next";
 const outcomes: PredictionOutcome[] = ["1", "X", "2"];
 const goalOptions: GoalsPick[] = [0, 1, 2, "M"];
 
-const scorerOptions = [
-  { value: "nadie", label: "Nadie" },
-  ...players
-    .filter((player) => player.position !== "Portero")
-    .map((player) => ({ value: player.displayName, label: player.displayName })),
-];
-
 export type PredictionFormMode = "edit" | "results" | "compare";
+
+type ScorerOption = { value: string; label: string };
 
 function outcomeButtonClass({
   mode,
@@ -116,6 +117,31 @@ export function PredictionForm({
   const homeCrest = getTeamCrestById(match.homeTeamId, getTeamById(match.homeTeamId)?.crestInitials);
   const awayCrest = getTeamCrestById(match.awayTeamId, getTeamById(match.awayTeamId)?.crestInitials);
   const actualGoals = getActualGoalsPicks(match);
+  const { squad } = useSquadPlayers("masculino");
+  const { getValue } = useInlineEditing();
+  const chronicleEvents = getValue(
+    `match:${match.id}:events`,
+    buildMatchDetail(match, "masculino").events,
+  );
+  const scorerOptions = useMemo<ScorerOption[]>(
+    () => [
+      { value: "nadie", label: "Nadie" },
+      ...squad
+        .filter((player) => player.posicion !== "Portero")
+        .map((player) => {
+          const label = scorerLabelForPlayer(player);
+          return { value: label, label };
+        }),
+    ],
+    [squad],
+  );
+  const actualScorer = avilesMatch
+    ? actualAvilesScorer(match, { events: chronicleEvents, squad })
+    : null;
+  const scorerCorrect =
+    avilesMatch && prediction
+      ? isScorerPredictionCorrect(match, prediction, { events: chronicleEvents, squad })
+      : false;
 
   const applyAvilesRules = (next: Prediction): Prediction => {
     const avilesGoals = getAvilesGoalsPick(match, next);
@@ -225,6 +251,10 @@ export function PredictionForm({
                 <ScorerCombobox
                   value={scorerLockedToNadie ? "nadie" : prediction?.scorer}
                   readOnly={formReadOnly || scorerLockedToNadie}
+                  options={scorerOptions}
+                  mode={displayMode}
+                  actualScorer={actualScorer}
+                  isCorrect={scorerCorrect}
                   onChange={(scorer) => update({ scorer })}
                 />
               )}
@@ -266,10 +296,18 @@ export function PredictionForm({
 function ScorerCombobox({
   value,
   readOnly,
+  options,
+  mode,
+  actualScorer,
+  isCorrect,
   onChange,
 }: {
   value?: string;
   readOnly?: boolean;
+  options: ScorerOption[];
+  mode: PredictionFormMode;
+  actualScorer: string | null;
+  isCorrect: boolean;
   onChange: (scorer: string) => void;
 }) {
   const inputId = useId();
@@ -278,14 +316,27 @@ function ScorerCombobox({
   const [query, setQuery] = useState("");
   const rootRef = useRef<HTMLDivElement>(null);
 
-  const selectedLabel = scorerOptions.find((option) => option.value === value)?.label ?? "";
+  const selectedLabel = options.find((option) => option.value === value)?.label ?? "";
   const displayValue = open ? query : selectedLabel;
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    if (!normalized) return scorerOptions;
-    return scorerOptions.filter((option) => option.label.toLowerCase().includes(normalized));
-  }, [query]);
+    if (!normalized) return options;
+    return options.filter((option) => option.label.toLowerCase().includes(normalized));
+  }, [options, query]);
+
+  const inputClassName = cn(
+    "min-w-0 flex-1 rounded-xl border px-3 py-1.5 text-sm font-semibold outline-none transition disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-70",
+    mode === "results" && actualScorer
+      ? "border-[#981915] bg-[#981915]/10 text-[#981915]"
+      : mode === "compare" && isCorrect
+        ? "border-[#981915] bg-[#214C9B]/10 text-[#214C9B] ring-2 ring-[#981915]/40"
+        : mode === "compare" && value && actualScorer && value === actualScorer
+          ? "border-[#981915] bg-[#981915]/10 text-[#981915]"
+          : mode === "compare" && value
+            ? "border-[#214C9B] bg-[#214C9B]/10 text-[#214C9B]"
+            : "border-[#214C9B]/20 bg-white text-slate-800 focus:border-[#214C9B]",
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -336,8 +387,13 @@ function ScorerCombobox({
             setQuery("");
           }
         }}
-        className="min-w-0 flex-1 rounded-xl border border-[#214C9B]/20 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 outline-none transition focus:border-[#214C9B] disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-70"
+        className={inputClassName}
       />
+      {mode !== "edit" && actualScorer && (
+        <p className="text-xs font-bold text-slate-500 sm:col-span-2">
+          Goleador: <span className="text-[#981915]">{actualScorer === "nadie" ? "Nadie" : actualScorer}</span>
+        </p>
+      )}
       <ul
         id={listboxId}
         role="listbox"

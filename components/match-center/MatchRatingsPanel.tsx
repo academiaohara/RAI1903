@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { getSquadPlayers } from "@/lib/squad-data";
+import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { getRaiTeamId } from "@/lib/fixtures";
 import { lineupPlayersToSquad } from "@/lib/squad-lineup";
 import {
@@ -27,7 +27,7 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
   const raiId = getRaiTeamId(detail.gender);
   const isHome = detail.match.homeTeamId === raiId;
   const avilesLineup = isHome ? detail.homeLineup : detail.awayLineup;
-  const squad = useMemo(() => getSquadPlayers(detail.gender), [detail.gender]);
+  const { squad } = useSquadPlayers(detail.gender);
   const lineupEntries = useMemo(
     () => lineupPlayersToSquad(avilesLineup, squad).filter((entry) => entry.player != null),
     [avilesLineup, squad],
