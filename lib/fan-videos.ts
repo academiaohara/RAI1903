@@ -37,6 +37,12 @@ export function createFanVideoId(section: ContenidoFanSlug): string {
   return `${section}-video-${Date.now()}`;
 }
 
+const DEFAULT_FAN_VIDEO_TITLE = "Nuevo vídeo";
+
+export function isDefaultFanVideoTitle(title: string): boolean {
+  return title.trim() === DEFAULT_FAN_VIDEO_TITLE;
+}
+
 export function newFanVideo(section: ContenidoFanSlug): FanYouTubeVideo {
   const today = new Intl.DateTimeFormat("es-ES", {
     day: "2-digit",
@@ -46,7 +52,7 @@ export function newFanVideo(section: ContenidoFanSlug): FanYouTubeVideo {
 
   return {
     id: createFanVideoId(section),
-    title: "Nuevo vídeo",
+    title: DEFAULT_FAN_VIDEO_TITLE,
     url: "",
     date: today,
   };
