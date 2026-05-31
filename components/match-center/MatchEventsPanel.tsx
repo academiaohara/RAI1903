@@ -1,65 +1,206 @@
 "use client";
 
-import { CircleDot, Plus, Trash2 } from "lucide-react";
+import { ArrowDownRight, ArrowUpLeft, Footprints, Plus, Trash2 } from "lucide-react";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { MatchEventPlayerAvatar } from "@/components/match-center/MatchEventPlayerAvatar";
 import { createMatchEventId, matchEventTypeLabels } from "@/lib/match-events";
-import type { MatchEvent, MatchEventType } from "@/types";
+import { getRaiTeamId } from "@/lib/fixtures";
+import type { MatchEvent, MatchEventType, PrimerEquipoGender } from "@/types";
 import { useMatchDetailStorageKeys } from "@/components/match-center/useMatchDetailOverrides";
 
 const eventTypes: MatchEventType[] = ["goal", "goal_disallowed", "yellow", "red", "substitution"];
 
-function EventBadge({ type }: { type: MatchEventType }) {
-  if (type === "yellow") {
-    return <span className="inline-block h-4 w-3 rounded-sm bg-amber-400" aria-hidden />;
-  }
-  if (type === "red") {
-    return <span className="inline-block h-4 w-3 rounded-sm bg-[#981915]" aria-hidden />;
-  }
-  if (type === "goal_disallowed") {
-    return <CircleDot size={16} className="text-slate-400" aria-hidden />;
-  }
-  if (type === "substitution") {
-    return <span className="text-xs font-extrabold text-[#214C9B]" aria-hidden>↔</span>;
-  }
-  return <span className="text-sm" aria-hidden>⚽</span>;
+function formatMatchMinute(minute: number): string {
+  return `${minute}'`;
 }
 
-function EventRow({ event }: { event: MatchEvent }) {
+function CardIcon({ type }: { type: "yellow" | "red" }) {
+  const color = type === "yellow" ? "#FFEB3B" : "#E53935";
+  return <span className="inline-block h-4 w-2.5 shrink-0 rounded-sm" style={{ backgroundColor: color }} aria-hidden />;
+}
+
+function SubstitutionIcons() {
   return (
-    <li className="grid grid-cols-[1rem_2.25rem_minmax(0,1fr)] items-center gap-x-2 text-left">
-      <span className="flex items-center justify-center">
-        <EventBadge type={event.type} />
-      </span>
-      <span className="text-sm font-extrabold tabular-nums text-[#214C9B]">{event.minute}&apos;</span>
-      <div className="min-w-0">
-        <p className="truncate text-sm font-semibold text-slate-800">{event.player || "Sin nombre"}</p>
-        {event.detail && <p className="truncate text-xs font-medium text-slate-500">{event.detail}</p>}
-      </div>
-    </li>
+    <span className="inline-flex shrink-0 items-center gap-0.5" aria-hidden>
+      <ArrowUpLeft size={14} className="text-[#2E7D32]" strokeWidth={2.5} />
+      <ArrowDownRight size={14} className="text-[#C62828]" strokeWidth={2.5} />
+    </span>
   );
 }
 
-function TeamEventsColumn({
-  label,
-  events,
+function GoalBallIcon() {
+  return <span className="shrink-0 text-sm leading-none" aria-hidden>⚽</span>;
+}
+
+function EventTimelineRow({
+  event,
+  gender,
+  isHomeRai,
+  isAwayRai,
 }: {
-  label: string;
-  events: MatchEvent[];
+  event: MatchEvent;
+  gender: PrimerEquipoGender;
+  isHomeRai: boolean;
+  isAwayRai: boolean;
 }) {
+  const isHome = event.team === "home";
+  const lookupSquad = isHome ? isHomeRai : isAwayRai;
+  const minuteLabel = formatMatchMinute(event.minute);
+  const playerName = event.player || "Sin nombre";
+
+  const minuteEl = <span className="shrink-0 text-sm font-bold tabular-nums text-[#2E7D32]">{minuteLabel}</span>;
+
+  if (event.type === "goal" || event.type === "goal_disallowed") {
+    const content = (
+      <>
+        {isHome ? (
+          <>
+            <MatchEventPlayerAvatar playerName={playerName} gender={gender} lookupSquad={lookupSquad} />
+            <div className="min-w-0 text-left">
+              <p className="truncate text-sm font-medium text-[#333333]">{playerName}</p>
+              {event.detail && event.type === "goal" && (
+                <p className="flex items-center gap-1 truncate text-xs text-[#757575]">
+                  <Footprints size={12} className="shrink-0 text-[#333333]" aria-hidden />
+                  {event.detail}
+                </p>
+              )}
+            </div>
+            <GoalBallIcon />
+            {minuteEl}
+          </>
+        ) : (
+          <>
+            {minuteEl}
+            <GoalBallIcon />
+            <div className="min-w-0 text-right">
+              <p className="truncate text-sm font-medium text-[#333333]">{playerName}</p>
+              {event.detail && event.type === "goal" && (
+                <p className="flex items-center justify-end gap-1 truncate text-xs text-[#757575]">
+                  <Footprints size={12} className="shrink-0 text-[#333333]" aria-hidden />
+                  {event.detail}
+                </p>
+              )}
+            </div>
+            <MatchEventPlayerAvatar playerName={playerName} gender={gender} lookupSquad={lookupSquad} />
+          </>
+        )}
+      </>
+    );
+
+    return (
+      <li className="flex border-t border-[#eeeeee] first:border-t-0">
+        {isHome ? (
+          <div className="flex w-1/2 items-center gap-2 px-3 py-3">{content}</div>
+        ) : (
+          <div className="w-1/2" aria-hidden />
+        )}
+        {isHome ? (
+          <div className="w-1/2" aria-hidden />
+        ) : (
+          <div className="flex w-1/2 items-center justify-end gap-2 px-3 py-3">{content}</div>
+        )}
+      </li>
+    );
+  }
+
+  if (event.type === "yellow" || event.type === "red") {
+    const card = <CardIcon type={event.type} />;
+
+    return (
+      <li className="flex border-t border-[#eeeeee] first:border-t-0">
+        {isHome ? (
+          <div className="flex w-1/2 items-center gap-2 px-3 py-3">
+            <MatchEventPlayerAvatar playerName={playerName} gender={gender} lookupSquad={lookupSquad} />
+            <p className="truncate text-sm font-medium text-[#333333]">{playerName}</p>
+            {card}
+            {minuteEl}
+          </div>
+        ) : (
+          <div className="w-1/2" aria-hidden />
+        )}
+        {isHome ? (
+          <div className="w-1/2" aria-hidden />
+        ) : (
+          <div className="flex w-1/2 items-center justify-end gap-2 px-3 py-3">
+            {minuteEl}
+            {card}
+            <p className="truncate text-sm font-medium text-[#333333]">{playerName}</p>
+            <MatchEventPlayerAvatar playerName={playerName} gender={gender} lookupSquad={lookupSquad} />
+          </div>
+        )}
+      </li>
+    );
+  }
+
+  if (event.type === "substitution") {
+    const playerOut = event.detail ?? "";
+
+    return (
+      <li className="flex border-t border-[#eeeeee] first:border-t-0">
+        {isHome ? (
+          <div className="flex w-1/2 items-center gap-2 px-3 py-3">
+            <MatchEventPlayerAvatar playerName={playerName} gender={gender} lookupSquad={lookupSquad} />
+            <div className="min-w-0 text-left">
+              <p className="truncate text-sm font-semibold text-[#333333]">{playerName}</p>
+              {playerOut && <p className="truncate text-xs text-[#888888]">{playerOut}</p>}
+            </div>
+            <SubstitutionIcons />
+            {minuteEl}
+          </div>
+        ) : (
+          <div className="w-1/2" aria-hidden />
+        )}
+        {isHome ? (
+          <div className="w-1/2" aria-hidden />
+        ) : (
+          <div className="flex w-1/2 items-center justify-end gap-2 px-3 py-3">
+            {minuteEl}
+            <SubstitutionIcons />
+            <div className="min-w-0 text-right">
+              <p className="truncate text-sm font-semibold text-[#333333]">{playerName}</p>
+              {playerOut && <p className="truncate text-xs text-[#888888]">{playerOut}</p>}
+            </div>
+            <MatchEventPlayerAvatar playerName={playerName} gender={gender} lookupSquad={lookupSquad} />
+          </div>
+        )}
+      </li>
+    );
+  }
+
+  return null;
+}
+
+function EventSection({
+  title,
+  events,
+  gender,
+  isHomeRai,
+  isAwayRai,
+}: {
+  title: string;
+  events: MatchEvent[];
+  gender: PrimerEquipoGender;
+  isHomeRai: boolean;
+  isAwayRai: boolean;
+}) {
+  if (events.length === 0) return null;
+
   return (
-    <div className="min-w-0">
-      <h3 className="truncate text-sm font-extrabold uppercase text-[#214C9B]" title={label}>
-        {label}
-      </h3>
-      {events.length === 0 ? (
-        <p className="mt-3 text-sm text-slate-500">Sin eventos</p>
-      ) : (
-        <ol className="mt-3 space-y-2">
-          {events.map((event) => (
-            <EventRow key={event.id} event={event} />
-          ))}
-        </ol>
-      )}
+    <div className="overflow-hidden rounded-lg border border-[#e0e0e0] bg-white">
+      <div className="border-b border-[#eeeeee] bg-[#f5f5f5] px-4 py-2">
+        <h3 className="text-sm font-bold uppercase tracking-wide text-[#333333]">{title}</h3>
+      </div>
+      <ol>
+        {events.map((event) => (
+          <EventTimelineRow
+            key={event.id}
+            event={event}
+            gender={gender}
+            isHomeRai={isHomeRai}
+            isAwayRai={isAwayRai}
+          />
+        ))}
+      </ol>
     </div>
   );
 }
@@ -69,15 +210,24 @@ export function MatchEventsPanel({
   events,
   homeLabel,
   awayLabel,
+  gender,
+  homeTeamId,
+  awayTeamId,
 }: {
   matchId: string;
   events: MatchEvent[];
   homeLabel: string;
   awayLabel: string;
+  gender: PrimerEquipoGender;
+  homeTeamId: string;
+  awayTeamId: string;
 }) {
   const { editMode, getValue, saveValue } = useInlineEditing();
   const keys = useMatchDetailStorageKeys(matchId);
   const currentEvents = getValue(keys.events, events);
+  const raiId = getRaiTeamId(gender);
+  const isHomeRai = homeTeamId === raiId;
+  const isAwayRai = awayTeamId === raiId;
 
   const updateEvents = (next: MatchEvent[]) => {
     saveValue(keys.events, next);
@@ -104,14 +254,23 @@ export function MatchEventsPanel({
     updateEvents(currentEvents.filter((event) => event.id !== id));
   };
 
-  const homeEvents = currentEvents.filter((event) => event.team === "home");
-  const awayEvents = currentEvents.filter((event) => event.team === "away");
+  const goals = currentEvents
+    .filter((event) => event.type === "goal" || event.type === "goal_disallowed")
+    .sort((a, b) => a.minute - b.minute);
+  const cards = currentEvents
+    .filter((event) => event.type === "yellow" || event.type === "red")
+    .sort((a, b) => a.minute - b.minute);
+  const substitutions = currentEvents
+    .filter((event) => event.type === "substitution")
+    .sort((a, b) => a.minute - b.minute);
+
+  const hasViewEvents = goals.length > 0 || cards.length > 0 || substitutions.length > 0;
 
   return (
     <section className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <h2 className="text-lg font-extrabold uppercase tracking-normal text-[#214C9B]">Eventos del partido</h2>
-        {editMode && (
+      {editMode && (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs font-semibold uppercase text-slate-500">Modo edición de eventos</p>
           <button
             type="button"
             onClick={addEvent}
@@ -120,8 +279,8 @@ export function MatchEventsPanel({
             <Plus size={14} aria-hidden />
             Añadir evento
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {currentEvents.length === 0 ? (
         <p className="text-sm text-slate-500">No hay eventos registrados para este partido.</p>
@@ -133,7 +292,6 @@ export function MatchEventsPanel({
               className="grid gap-2 rounded-2xl border border-[#214C9B]/15 bg-white px-4 py-3 sm:grid-cols-[auto_1fr_auto]"
             >
               <div className="flex items-center gap-2">
-                <EventBadge type={event.type} />
                 <input
                   type="number"
                   min={0}
@@ -170,14 +328,14 @@ export function MatchEventsPanel({
                 <input
                   value={event.player}
                   onChange={(change) => updateEvent(event.id, { player: change.target.value })}
-                  placeholder="Jugador"
+                  placeholder="Jugador (entra / autor)"
                   aria-label="Jugador del evento"
                   className="rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm font-semibold text-slate-800 outline-none focus:border-[#214C9B] sm:col-span-2"
                 />
                 <input
                   value={event.detail ?? ""}
                   onChange={(change) => updateEvent(event.id, { detail: change.target.value || undefined })}
-                  placeholder="Detalle (VAR, penalti…)"
+                  placeholder="Asistencia o jugador que sale"
                   aria-label="Detalle del evento"
                   className="rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm text-slate-600 outline-none focus:border-[#214C9B] sm:col-span-2 lg:col-span-4"
                 />
@@ -194,10 +352,19 @@ export function MatchEventsPanel({
             </li>
           ))}
         </ol>
+      ) : !hasViewEvents ? (
+        <p className="text-sm text-slate-500">No hay eventos registrados para este partido.</p>
       ) : (
-        <div className="grid gap-8 sm:grid-cols-2">
-          <TeamEventsColumn label={homeLabel} events={homeEvents} />
-          <TeamEventsColumn label={awayLabel} events={awayEvents} />
+        <div className="space-y-6">
+          <EventSection title="Goles" events={goals} gender={gender} isHomeRai={isHomeRai} isAwayRai={isAwayRai} />
+          <EventSection title="Tarjetas" events={cards} gender={gender} isHomeRai={isHomeRai} isAwayRai={isAwayRai} />
+          <EventSection
+            title="Sustituciones"
+            events={substitutions}
+            gender={gender}
+            isHomeRai={isHomeRai}
+            isAwayRai={isAwayRai}
+          />
         </div>
       )}
     </section>
