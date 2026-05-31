@@ -8,7 +8,7 @@ import { NewsEditorForm } from "@/components/editor/NewsEditorForm";
 import { EditableText } from "@/components/inline-editing/EditableText";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { NewsMedia } from "@/components/NewsMedia";
-import { updateNewsItem } from "@/lib/cms/news";
+import { deleteNewsItem, updateNewsItem } from "@/lib/cms/news";
 import { newsCategoryBadge } from "@/lib/noticias";
 import { formatDate } from "@/lib/utils";
 import type { NewsItem } from "@/types";
@@ -39,6 +39,14 @@ export function NewsCard({ item, onUpdated }: NewsCardProps) {
         onCancel={() => setEditing(false)}
         onSave={async (updated) => {
           const result = await updateNewsItem(updated);
+          if (result.ok) {
+            setEditing(false);
+            onUpdated?.();
+          }
+          return result;
+        }}
+        onDelete={async () => {
+          const result = await deleteNewsItem(item.id);
           if (result.ok) {
             setEditing(false);
             onUpdated?.();

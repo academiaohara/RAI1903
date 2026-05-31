@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { useCallback, useState } from "react";
 import { sourceFromUrl } from "@/lib/news-source";
 import type { NewsChannel, NewsItem, NewsTag, PrimerEquipoGender } from "@/types";
@@ -34,6 +34,7 @@ export type NewsEditorFormProps = {
   defaultChannel: NewsChannel;
   initialItem?: NewsItem;
   onSave: (item: NewsItem) => Promise<{ ok: boolean; error?: string }>;
+  onDelete?: () => Promise<{ ok: boolean; error?: string }>;
   onCancel: () => void;
 };
 
@@ -43,6 +44,7 @@ export function NewsEditorForm({
   defaultChannel,
   initialItem,
   onSave,
+  onDelete,
   onCancel,
 }: NewsEditorFormProps) {
   const [url, setUrl] = useState(initialItem?.url ?? "");
@@ -55,6 +57,7 @@ export function NewsEditorForm({
   const [tags, setTags] = useState<NewsTag[]>(initialItem?.tags ?? []);
   const [fetching, setFetching] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
@@ -97,6 +100,22 @@ export function NewsEditorForm({
   const toggleTag = (tag: NewsTag) => {
     setTags((current) => (current.includes(tag) ? current.filter((t) => t !== tag) : [...current, tag]));
   };
+
+  const handleDelete = useCallback(async () => {
+    if (!onDelete) return;
+
+    const confirmed = window.confirm("¿Eliminar esta noticia? No se puede deshacer.");
+    if (!confirmed) return;
+
+    setDeleting(true);
+    setError(null);
+    const result = await onDelete();
+    setDeleting(false);
+
+    if (!result.ok) {
+      setError(result.error ?? "No se pudo eliminar");
+    }
+  }, [onDelete]);
 
   const handleSave = useCallback(async () => {
     const trimmedUrl = url.trim();
@@ -274,6 +293,17 @@ export function NewsEditorForm({
           >
             Cancelar
           </button>
+          {onDelete ? (
+            <button
+              type="button"
+              onClick={() => void handleDelete()}
+              disabled={deleting || saving}
+              className="ml-auto inline-flex items-center gap-2 rounded-xl border border-red-200 px-4 py-2.5 text-xs font-extrabold uppercase text-red-700 hover:bg-red-50 disabled:opacity-50"
+            >
+              {deleting ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Trash2 className="size-4" aria-hidden />}
+              Eliminar noticia
+            </button>
+          ) : null}
         </div>
       </div>
     </section>

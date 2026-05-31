@@ -95,9 +95,13 @@ const REAL_AVILES_CLUB_SITE = "realavilesindustrial1903.com";
 export const isRealAvilesClubSiteNews = (item: { url: string }) =>
   item.url.includes(REAL_AVILES_CLUB_SITE);
 
+/** Noticias del club (canal o web oficial) que usan el escudo RAI si no hay imagen válida. */
+export const raiLogoNewsFallbackEligible = (item: Pick<NewsItem, "url" | "channel">) =>
+  isRealAvilesClubSiteNews(item) || item.channel === "club";
+
 /** Fallback visual cuando no hay og:image ni foto en la nota del club. */
-export const shouldUseRaiLogoNewsFallback = (item: { url: string; imageUrl?: string }) =>
-  !item.imageUrl && isRealAvilesClubSiteNews(item);
+export const shouldUseRaiLogoNewsFallback = (item: Pick<NewsItem, "url" | "imageUrl" | "channel">) =>
+  !item.imageUrl && raiLogoNewsFallbackEligible(item);
 
 /** Hosts que devuelven 403 al optimizador de Next.js; el navegador debe cargar la URL directa. */
 const UNOPTIMIZED_NEWS_IMAGE_HOSTS = new Set(["www.rtpa.es"]);

@@ -4,6 +4,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { NewsItem, NewsTag } from "@/types";
 
 const LOCAL_NEWS_KEY = "rai1903:cms-news:v1";
+const LOCAL_DELETED_NEWS_KEY = "rai1903:cms-news-deleted:v1";
 
 type CmsNewsRow = {
   id: string;
@@ -52,6 +53,27 @@ function writeLocalNewsItems(items: NewsItem[]) {
   window.localStorage.setItem(LOCAL_NEWS_KEY, JSON.stringify(items));
 }
 
+function readDeletedNewsIds(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = window.localStorage.getItem(LOCAL_DELETED_NEWS_KEY);
+    return raw ? new Set(JSON.parse(raw) as string[]) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+
+function addDeletedNewsId(id: string) {
+  const deleted = readDeletedNewsIds();
+  deleted.add(id);
+  window.localStorage.setItem(LOCAL_DELETED_NEWS_KEY, JSON.stringify([...deleted]));
+}
+
+function withoutDeletedNews(items: NewsItem[]) {
+  const deleted = readDeletedNewsIds();
+  return deleted.size ? items.filter((item) => !deleted.has(item.id)) : items;
+}
+
 function mergeNewsLists(...lists: NewsItem[][]): NewsItem[] {
   const byId = new Map<string, NewsItem>();
   for (const list of lists) {
@@ -64,7 +86,7 @@ function mergeNewsLists(...lists: NewsItem[][]): NewsItem[] {
 
 export async function fetchPublishedNewsItems(): Promise<NewsItem[]> {
   if (!isSupabaseConfigured()) {
-    return mergeNewsLists(mockNewsItems, readLocalNewsItems());
+    return withoutDeletedNews(mergeNewsLists(mockNewsItems, readLocalNewsItems()));
   }
 
   const supabase = createClient();
@@ -77,14 +99,14 @@ export async function fetchPublishedNewsItems(): Promise<NewsItem[]> {
   const localItems = readLocalNewsItems();
 
   if (error || !data?.length) {
-    return mergeNewsLists(mockNewsItems, localItems);
+    return withoutDeletedNews(mergeNewsLists(mockNewsItems, localItems));
   }
 
   const cmsItems = data.map((row) => rowToNewsItem(row as CmsNewsRow));
   const cmsIds = new Set(cmsItems.map((item) => item.id));
   const mockOnly = mockNewsItems.filter((item) => !cmsIds.has(item.id));
   const localOnly = localItems.filter((item) => !cmsIds.has(item.id));
-  return mergeNewsLists(cmsItems, mockOnly, localOnly);
+  return withoutDeletedNews(mergeNewsLists(cmsItems, mockOnly, localOnly));
 }
 
 export function newsItemToRow(item: NewsItem): Omit<CmsNewsRow, "published"> & { published: boolean } {
@@ -129,4 +151,19 @@ export function createNewsId() {
     return crypto.randomUUID();
   }
   return `news-${Date.now()}`;
+}
+
+export async function deleteNewsItem(id: string): Promise<{ ok: boolean; error?: string }> {
+  addDeletedNewsId(id);
+
+  if (!isSupabaseConfigured()) {
+    writeLocalNewsItems(readLocalNewsItems().filter((entry) => entry.id !== id));
+    return { ok: true };
+  }
+
+  const supabase = createClient();
+  const { error } = await supabase.from("cms_news_items").delete().eq("id", id);
+
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
 }
