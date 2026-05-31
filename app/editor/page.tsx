@@ -23,6 +23,11 @@ export default function EditorHomePage() {
             Las quinielas de usuarios logueados se guardan en <code>quiniela_predictions</code> y{" "}
             <code>quiniela_saved_rounds</code>.
           </li>
+          <li>
+            La edición en línea (botón <strong>Editar</strong> en la web) se guarda en{" "}
+            <code>cms_inline_overrides</code>. Ejecuta también{" "}
+            <code className="text-[#214C9B]">supabase/migrations/20250531130000_cms_inline_overrides.sql</code>.
+          </li>
         </ol>
       </Card>
     </div>
