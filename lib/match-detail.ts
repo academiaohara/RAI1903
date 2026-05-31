@@ -1,50 +1,23 @@
 import { fanPreviaVideos, fanRdpVideos, newsItems, players, playersFemenino } from "@/data/mock";
 import { matchCompetitionShortLabel } from "@/lib/competition-labels";
-import { getMatchById, getRaiTeamId, getTeamByGender, getTeamMatches } from "@/lib/fixtures";
+import { getMatchById, getRaiTeamId, getTeamMatches } from "@/lib/fixtures";
 import { getSquadPlayers } from "@/lib/squad-data";
 import { getPlayerFullName } from "@/lib/squad-utils";
 import { youtubeVideoId } from "@/lib/youtube";
 import type {
   FormCode,
-  HeadToHeadEntry,
-  LineupPlayer,
   Match,
   MatchArticle,
-  MatchAvailability,
   MatchAvailabilityPlayer,
   MatchDetail,
-  MatchEvent,
   MatchLineup,
-  MatchStatCategory,
   MatchVideo,
   NewsItem,
   PrimerEquipoGender,
   RecentFormMatch,
 } from "@/types";
 
-const REFEREES = [
-  "Miguel San Roman",
-  "Jose Antonio Lopez",
-  "Fernando Iglesias",
-  "Carlos Fernandez",
-  "David Martinez",
-  "Alberto Ramos",
-];
-
-const RIVAL_NAMES = [
-  "Garcia Lopez",
-  "Martinez Ruiz",
-  "Fernandez Diaz",
-  "Lopez Perez",
-  "Sanchez Torres",
-  "Rodriguez Vega",
-  "Hernandez Gil",
-  "Jimenez Costa",
-  "Moreno Blanco",
-  "Navarro Prieto",
-  "Dominguez Solis",
-  "Vazquez Nieto",
-];
+const EMPTY_LINEUP: MatchLineup = { formation: "", starters: [], bench: [] };
 
 function hashSeed(value: string): number {
   let hash = 0;
@@ -92,231 +65,36 @@ function toRecentFormMatch(teamId: string, match: Match): RecentFormMatch {
   };
 }
 
-function buildHeadToHead(homeId: string, awayId: string, seed: number): HeadToHeadEntry[] {
-  const home = getTeamByGender(homeId, "masculino") ?? getTeamByGender(homeId, "femenino");
-  const away = getTeamByGender(awayId, "masculino") ?? getTeamByGender(awayId, "femenino");
-  if (!home || !away) return [];
+function buildLineup(gender: PrimerEquipoGender, isAviles: boolean): MatchLineup {
+  if (!isAviles) return EMPTY_LINEUP;
 
-  const entries: HeadToHeadEntry[] = [];
-  for (let index = 0; index < 6; index += 1) {
-    const homeGoals = Math.floor(seeded(seed, index * 2) * 4);
-    const awayGoals = Math.floor(seeded(seed, index * 2 + 1) * 4);
-    const flip = index % 2 === 0;
-    const date = new Date(Date.UTC(2025, 10 - index, 5 + index * 12));
-    const entryHome = flip ? home.name : away.name;
-    const entryAway = flip ? away.name : home.name;
-    const resultTeamId = flip ? homeId : awayId;
-    entries.push({
-      date: new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "2-digit", year: "2-digit" }).format(date),
-      homeTeam: entryHome,
-      awayTeam: entryAway,
-      score: `${homeGoals}-${awayGoals}`,
-      competition: index % 3 === 0 ? "Copa" : "Liga",
-      resultCode: formFromMatch(
-        resultTeamId,
-        {
-          id: `h2h-${index}`,
-          matchday: 1,
-          homeTeamId: flip ? homeId : awayId,
-          awayTeamId: flip ? awayId : homeId,
-          homeTeam: entryHome,
-          awayTeam: entryAway,
-          date: date.toISOString(),
-          competition: "liga-raij903",
-          venue: home.stadium,
-          status: "finished",
-          homeScore: homeGoals,
-          awayScore: awayGoals,
-        },
-      ),
-    });
-  }
-  return entries;
-}
+  const squad = getSquadPlayers(gender);
+  const titulares = squad
+    .filter((player) => player.estado === "titular" || player.estado === "nuevo fichaje")
+    .slice(0, 11);
+  const bench = squad.filter((player) => player.estado === "suplente" || player.estado === "cantera").slice(0, 7);
 
-function buildLineup(teamId: string, gender: PrimerEquipoGender, seed: number, isAviles: boolean): MatchLineup {
-  const formations = ["4-2-3-1", "4-4-2", "4-3-3", "3-5-2"];
-  const formation = formations[Math.floor(seeded(seed, 1) * formations.length)];
-
-  if (isAviles) {
-    const squad = getSquadPlayers(gender);
-    const titulares = squad
-      .filter((player) => player.estado === "titular" || player.estado === "nuevo fichaje")
-      .slice(0, 11);
-    const bench = squad.filter((player) => player.estado === "suplente" || player.estado === "cantera").slice(0, 7);
-
-    if (titulares.length > 0) {
-      return {
-        formation,
-        starters: titulares.map((player) => ({ number: player.dorsal, name: getPlayerFullName(player) })),
-        bench: bench.map((player) => ({ number: player.dorsal, name: getPlayerFullName(player) })),
-      };
-    }
-  }
-
-  const starters: LineupPlayer[] = Array.from({ length: 11 }, (_, index) => ({
-    number: index + 1,
-    name: RIVAL_NAMES[(index + Math.floor(seed)) % RIVAL_NAMES.length],
-    role: index === 0 ? "POR" : undefined,
-  }));
-  const bench: LineupPlayer[] = Array.from({ length: 7 }, (_, index) => ({
-    number: 12 + index,
-    name: RIVAL_NAMES[(index + 3 + Math.floor(seed)) % RIVAL_NAMES.length],
-  }));
-
-  return { formation, starters, bench };
-}
-
-function pickScorer(lineup: MatchLineup, index: number): string {
-  const pool = [...lineup.starters, ...lineup.bench].filter((player) => player.role !== "POR");
-  if (pool.length === 0) return lineup.starters[index % lineup.starters.length]?.name ?? "Jugador";
-  return pool[index % pool.length]?.name ?? "Jugador";
-}
-
-function buildEvents(match: Match, homeLineup: MatchLineup, awayLineup: MatchLineup, seed: number): MatchEvent[] {
-  if (match.status !== "finished") return [];
-
-  const homeGoals = match.homeScore ?? 0;
-  const awayGoals = match.awayScore ?? 0;
-  const events: MatchEvent[] = [];
-  let minuteCursor = 8;
-
-  const pushGoal = (team: "home" | "away", index: number) => {
-    const lineup = team === "home" ? homeLineup : awayLineup;
-    const minute = Math.min(90, minuteCursor + Math.floor(seeded(seed, index * 3) * 14));
-    minuteCursor = minute + 4;
-    const scorer = pickScorer(lineup, index);
-    const assistLineup = lineup;
-    const withAssist = seeded(seed, 60 + index) > 0.55;
-    events.push({
-      id: `${match.id}-goal-${team}-${index}`,
-      minute,
-      type: "goal",
-      team,
-      player: scorer,
-      detail: withAssist ? pickScorer(assistLineup, index + 2) : undefined,
-    });
-  };
-
-  for (let index = 0; index < homeGoals; index += 1) pushGoal("home", index);
-  for (let index = 0; index < awayGoals; index += 1) pushGoal("away", index + 10);
-
-  if (seeded(seed, 44) > 0.72) {
-    events.push({
-      id: `${match.id}-goal-disallowed`,
-      minute: Math.min(90, minuteCursor + 2),
-      type: "goal_disallowed",
-      team: seeded(seed, 45) > 0.5 ? "home" : "away",
-      player: pickScorer(homeLineup, 2),
-      detail: "VAR",
-    });
-  }
-
-  const cardCount = 2 + Math.floor(seeded(seed, 46) * 4);
-  for (let index = 0; index < cardCount; index += 1) {
-    const isRed = index === cardCount - 1 && seeded(seed, 47 + index) > 0.82;
-    const team: "home" | "away" = seeded(seed, 48 + index) > 0.5 ? "home" : "away";
-    const lineup = team === "home" ? homeLineup : awayLineup;
-    events.push({
-      id: `${match.id}-card-${index}`,
-      minute: 20 + index * 18 + Math.floor(seeded(seed, 49 + index) * 8),
-      type: isRed ? "red" : "yellow",
-      team,
-      player: pickScorer(lineup, index + 4),
-    });
-  }
-
-  const subCount = 2 + Math.floor(seeded(seed, 55) * 3);
-  for (let index = 0; index < subCount; index += 1) {
-    const team: "home" | "away" = seeded(seed, 56 + index) > 0.5 ? "home" : "away";
-    const lineup = team === "home" ? homeLineup : awayLineup;
-    events.push({
-      id: `${match.id}-sub-${index}`,
-      minute: 46 + index * 14 + Math.floor(seeded(seed, 58 + index) * 12),
-      type: "substitution",
-      team,
-      player: pickScorer(lineup, 6 + index),
-      detail: pickScorer(lineup, 7 + index),
-    });
-  }
-
-  return events.sort((a, b) => a.minute - b.minute);
-}
-
-function buildStats(match: Match, seed: number): MatchStatCategory[] {
-  const homeGoals = match.homeScore ?? Math.floor(seeded(seed, 4) * 3);
-  const awayGoals = match.awayScore ?? Math.floor(seeded(seed, 5) * 3);
-  const intensity = homeGoals + awayGoals + 2;
-
-  const pct = (value: number) => `${Math.round(value)}%`;
-  const homePoss = 38 + Math.floor(seeded(seed, 6) * 24);
-  const cornersHome = 2 + Math.floor(seeded(seed, 7) * 8);
-  const cornersAway = 1 + Math.floor(seeded(seed, 8) * 5);
-  const shotsOnHome = 3 + homeGoals + Math.floor(seeded(seed, 9) * 4);
-  const shotsOnAway = 2 + awayGoals + Math.floor(seeded(seed, 10) * 4);
-  const shotsOffHome = 1 + Math.floor(seeded(seed, 11) * 3);
-  const shotsOffAway = 1 + Math.floor(seeded(seed, 12) * 3);
-  const totalShotsHome = shotsOnHome + shotsOffHome;
-  const totalShotsAway = shotsOnAway + shotsOffAway;
-  const yellowHome = Math.floor(seeded(seed, 15) * 4);
-  const yellowAway = Math.floor(seeded(seed, 16) * 5);
-  const redHome = seeded(seed, 17) > 0.88 ? 1 + Math.floor(seeded(seed, 18) * 2) : 0;
-  const redAway = seeded(seed, 19) > 0.9 ? 1 + Math.floor(seeded(seed, 20) * 2) : 0;
-
-  void intensity;
-
-  return [
-    {
-      title: "Estadísticas generales",
-      rows: [
-        { label: "Posesión", home: pct(homePoss), away: pct(100 - homePoss) },
-        { label: "Saques de esquina", home: cornersHome, away: cornersAway },
-      ],
-    },
-    {
-      title: "Ataque",
-      rows: [
-        { label: "Disparos totales", home: totalShotsHome, away: totalShotsAway },
-        { label: "Tiros fuera", home: shotsOffHome, away: shotsOffAway },
-        { label: "Tiros a puerta", home: shotsOnHome, away: shotsOnAway },
-      ],
-    },
-    {
-      title: "Disciplina",
-      rows: [
-        { label: "Tarjetas amarillas", home: yellowHome, away: yellowAway },
-        { label: "Tarjetas rojas", home: redHome, away: redAway },
-      ],
-    },
-  ];
-}
-
-function buildAvailability(homeId: string, awayId: string, gender: PrimerEquipoGender, seed: number): MatchAvailability {
-  const raiId = getRaiTeamId(gender);
-  const squad = gender === "femenino" ? playersFemenino : players;
-
-  const avilesUnavailable = (teamId: string): MatchAvailabilityPlayer[] => {
-    if (teamId !== raiId) {
-      const count = Math.floor(seeded(seed, 20) * 3);
-      return Array.from({ length: count }, (_, index) => ({
-        name: RIVAL_NAMES[(index + 2) % RIVAL_NAMES.length],
-        reason: index % 2 === 0 ? "lesionado" : "sancionado",
-        detail: index % 2 === 0 ? "Sobrecarga muscular" : "Sancion por acumulacion",
-      }));
-    }
-    return squad
-      .filter((player) => player.status === "lesionado" || player.status === "sancionado")
-      .map((player) => ({
-        name: player.displayName,
-        reason: player.status === "lesionado" ? "lesionado" : "sancionado",
-        detail: player.status === "lesionado" ? "Lesion en competicion" : "Sancion disciplinaria",
-      }));
-  };
+  if (titulares.length === 0) return EMPTY_LINEUP;
 
   return {
-    home: avilesUnavailable(homeId),
-    away: avilesUnavailable(awayId),
+    formation: "",
+    starters: titulares.map((player) => ({ number: player.dorsal, name: getPlayerFullName(player) })),
+    bench: bench.map((player) => ({ number: player.dorsal, name: getPlayerFullName(player) })),
   };
+}
+
+function buildAvailability(teamId: string, gender: PrimerEquipoGender): MatchAvailabilityPlayer[] {
+  const raiId = getRaiTeamId(gender);
+  if (teamId !== raiId) return [];
+
+  const squad = gender === "femenino" ? playersFemenino : players;
+  return squad
+    .filter((player) => player.status === "lesionado" || player.status === "sancionado")
+    .map((player) => ({
+      name: player.displayName,
+      reason: player.status === "lesionado" ? "lesionado" : "sancionado",
+      detail: player.status === "lesionado" ? "Lesion en competicion" : "Sancion disciplinaria",
+    }));
 }
 
 function pickVideo(videos: { id: string; title: string; url: string }[], seed: number, label: string): MatchVideo | null {
@@ -345,20 +123,6 @@ function pickNewsForMatch(match: Match, type: "previa" | "cronica" | "press"): N
   return picked;
 }
 
-function summarizeH2H(entries: HeadToHeadEntry[], perspectiveTeamId: string, match: Match): { wins: number; draws: number; losses: number } {
-  let wins = 0;
-  let draws = 0;
-  let losses = 0;
-  for (const entry of entries) {
-    if (entry.resultCode === "G") wins += 1;
-    else if (entry.resultCode === "E") draws += 1;
-    else losses += 1;
-  }
-  void perspectiveTeamId;
-  void match;
-  return { wins, draws, losses };
-}
-
 export function buildMatchDetail(match: Match, gender: PrimerEquipoGender): MatchDetail {
   const seed = hashSeed(`${match.id}-${gender}`);
   const raiId = getRaiTeamId(gender);
@@ -375,28 +139,29 @@ export function buildMatchDetail(match: Match, gender: PrimerEquipoGender): Matc
     .slice(0, 5)
     .map((item) => toRecentFormMatch(match.awayTeamId, item));
 
-  const headToHead = buildHeadToHead(match.homeTeamId, match.awayTeamId, seed);
-  const h2hSummary = summarizeH2H(headToHead, raiId, match);
-  const homeLineup = buildLineup(match.homeTeamId, gender, seed + 1, match.homeTeamId === raiId);
-  const awayLineup = buildLineup(match.awayTeamId, gender, seed + 2, match.awayTeamId === raiId);
+  const homeLineup = buildLineup(gender, match.homeTeamId === raiId);
+  const awayLineup = buildLineup(gender, match.awayTeamId === raiId);
 
   return {
     match,
     gender,
-    referee: REFEREES[seed % REFEREES.length],
-    attendance: match.status === "finished" ? 4200 + (seed % 9000) : null,
+    referee: "",
+    attendance: null,
     kickoffTime: formatKickoffTime(match.date),
     kickoffDateLabel: formatKickoffDateLabel(match.date),
     seasonLabel: "2025/2026",
-    stats: buildStats(match, seed),
-    events: buildEvents(match, homeLineup, awayLineup, seed),
+    stats: [],
+    events: [],
     homeLineup,
     awayLineup,
     homeRecentMatches: homeRecent,
     awayRecentMatches: awayRecent,
-    headToHead,
-    h2hSummary,
-    availability: buildAvailability(match.homeTeamId, match.awayTeamId, gender, seed),
+    headToHead: [],
+    h2hSummary: { wins: 0, draws: 0, losses: 0 },
+    availability: {
+      home: buildAvailability(match.homeTeamId, gender),
+      away: buildAvailability(match.awayTeamId, gender),
+    },
     rdpPrevia: pickVideo(fanPreviaVideos, seed, "RDP Previa"),
     rdpPostpartido: match.status === "finished" ? pickVideo(fanRdpVideos, seed + 3, "RDP Postpartido") : null,
     pressNews: pickNewsForMatch(match, "previa"),

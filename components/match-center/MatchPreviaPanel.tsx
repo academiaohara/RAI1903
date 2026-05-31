@@ -68,6 +68,10 @@ function RecentMatchesTable({ title, matches }: { title: string; matches: Recent
 }
 
 function H2HTable({ entries }: { entries: HeadToHeadEntry[] }) {
+  if (entries.length === 0) {
+    return <p className="mt-4 text-sm text-slate-500">Sin historial de enfrentamientos registrado.</p>;
+  }
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[28rem] text-left text-sm">
