@@ -21,7 +21,7 @@ npm run build      # Next.js production build
 ### Key notes
 
 - No test framework is configured (no Jest, Vitest, or Playwright). Validation relies on lint, typecheck, and manual browser testing.
-- Mock data covers most of the site. **Supabase** (optional) uses `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` — copy `.env.example` to `.env.local` locally, or set the same vars in Vercel. See `lib/supabase/`.
+- Mock data covers most of the site. **Supabase** uses `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Vercel / `.env.local`). Run SQL in `supabase/migrations/` (quiniela, profiles, CMS). Login is direct OAuth from the header; `/login` auto-redirects to X. Editor: `/editor` for `rai1903fan@gmail.com` (see `supabase/seed-editor-profile.sql` for existing users).
 - The dev server uses Turbopack for fast refresh.
 - Browser state (Quiniela predictions) persists via `localStorage` only.
 - Package manager is **npm** (lockfile: `package-lock.json`).

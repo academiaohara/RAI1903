@@ -1,18 +1,23 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { NewsCard } from "@/components/NewsCard";
 import { PageHero } from "@/components/PageHero";
-import { newsItems } from "@/data/mock";
+import { fetchPublishedNewsItems } from "@/lib/cms/news";
 import { newsByChannel } from "@/lib/noticias";
-import type { NewsTag } from "@/types";
-
-const clubNews = newsByChannel(newsItems, "club");
+import type { NewsItem, NewsTag } from "@/types";
 const tags: Array<NewsTag | "todas"> = ["todas", "partido", "fichajes", "cantera", "previa", "cronica", "club", "lesionados", "rumores", "renovaciones", "entrevistas", "otros"];
 
 export default function NoticiasClubPage() {
   const [query, setQuery] = useState("");
   const [tag, setTag] = useState<NewsTag | "todas">("todas");
+  const [allNews, setAllNews] = useState<NewsItem[]>([]);
+
+  useEffect(() => {
+    void fetchPublishedNewsItems().then(setAllNews);
+  }, []);
+
+  const clubNews = useMemo(() => newsByChannel(allNews, "club"), [allNews]);
 
   const filtered = useMemo(
     () =>
@@ -21,7 +26,7 @@ export default function NoticiasClubPage() {
         const matchesTag = tag === "todas" || item.tags.includes(tag);
         return matchesQuery && matchesTag;
       }),
-    [query, tag],
+    [clubNews, query, tag],
   );
 
   return (
