@@ -1,14 +1,14 @@
-import { MatchNewsCarousel } from "@/components/match-center/MatchNewsCarousel";
 import { MatchVideoBlock } from "@/components/match-center/MatchVideoBlock";
 import type { MatchDetail } from "@/types";
 
 export function MatchPressPanel({ detail }: { detail: MatchDetail }) {
-  const pressNews = detail.chronicleNews.filter((item) => item.channel === "prensa");
+  if (!detail.rdpPostpartido) {
+    return <p className="text-sm text-slate-500">Sin contenido de post partido.</p>;
+  }
 
   return (
     <div className="space-y-8">
-      {detail.rdpPostpartido && <MatchVideoBlock video={detail.rdpPostpartido} />}
-      {pressNews.length > 0 && <MatchNewsCarousel items={pressNews} title="Post partido en medios" />}
+      <MatchVideoBlock video={detail.rdpPostpartido} />
     </div>
   );
 }

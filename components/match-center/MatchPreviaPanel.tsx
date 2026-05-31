@@ -1,6 +1,5 @@
 import { TeamLink } from "@/components/TeamLink";
 import { MatchCaraACaraSection } from "@/components/match-center/MatchCaraACaraSection";
-import { MatchNewsCarousel } from "@/components/match-center/MatchNewsCarousel";
 import { MatchVideoBlock } from "@/components/match-center/MatchVideoBlock";
 import { cn, resultTone } from "@/lib/utils";
 import type { MatchAvailability, MatchDetail, MatchVideo, RecentFormMatch } from "@/types";
@@ -92,7 +91,7 @@ export function MatchPreviaPanel({
   showH2H?: boolean;
   showCaraACara?: boolean;
 }) {
-  const { match, gender, homeRecentMatches, awayRecentMatches, availability, pressNews } = detail;
+  const { match, gender, homeRecentMatches, awayRecentMatches, availability } = detail;
   const video = rdpVideo ?? detail.rdpPrevia;
   const showComparison = showCaraACara;
 
@@ -131,8 +130,6 @@ export function MatchPreviaPanel({
       {!compact && <AvailabilityBlock availability={availability} homeLabel={match.homeTeam} awayLabel={match.awayTeam} />}
 
       {video && <MatchVideoBlock video={video} />}
-
-      <MatchNewsCarousel items={pressNews} title="Pre partido en medios" />
     </div>
   );
 }
