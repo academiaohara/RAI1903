@@ -101,7 +101,7 @@ export function PredictionForm({
   const avilesMatch = isAvilesMatch(match);
   const avilesIsHome = match.homeTeamId === RAI_TEAM_ID;
   const previa = getPreviaForMatch(match.id);
-  const previaHref = previa ? (`${primerEquipoBase("masculino")}/previas/${previa.id}` as Route) : undefined;
+  const previaHref = previa ? (`${primerEquipoBase("masculino")}/cronicas/${previa.id}` as Route) : undefined;
   const avilesGoalsPick = prediction ? getAvilesGoalsPick(match, prediction) : undefined;
   const scorerLockedToNadie = avilesGoalsPick === 0;
   const derivedOutcome =

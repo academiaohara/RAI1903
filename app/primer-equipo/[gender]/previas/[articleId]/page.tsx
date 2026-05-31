@@ -1,25 +1,18 @@
-import { notFound } from "next/navigation";
-import { MatchCenter } from "@/components/match-center/MatchCenter";
-import { getMatchDetailForArticle } from "@/lib/match-detail";
+import { redirect } from "next/navigation";
 import { getMatchArticleById } from "@/lib/match-articles";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
-import type { Route } from "next";
 
-export default async function PreviaDetailPage({ params }: { params: Promise<{ gender: PrimerEquipoGender; articleId: string }> }) {
+export default async function PreviaDetailRedirectPage({
+  params,
+}: {
+  params: Promise<{ gender: PrimerEquipoGender; articleId: string }>;
+}) {
   const { gender, articleId } = await params;
   const article = getMatchArticleById(articleId);
 
-  if (!article || article.type !== "previa" || article.gender !== gender) notFound();
+  if (!article || article.type !== "previa" || article.gender !== gender) {
+    redirect(`${primerEquipoBase(gender)}/cronicas`);
+  }
 
-  const detail = getMatchDetailForArticle(article);
-  if (!detail) notFound();
-
-  return (
-    <MatchCenter
-      detail={detail}
-      article={article}
-      backHref={`${primerEquipoBase(gender)}/previas` as Route}
-      backLabel="Volver a previas"
-    />
-  );
+  redirect(`${primerEquipoBase(gender)}/cronicas/${articleId}`);
 }

@@ -59,13 +59,3 @@ export function formatFanRating(value: number): string {
   return value.toFixed(1).replace(".", ",");
 }
 
-/** Media simulada de la afición en un partido concreto (sin backend). */
-export function getMatchCommunityAverage(matchId: string, playerId: string): number {
-  let hash = 0;
-  const key = `${matchId}:${playerId}`;
-  for (let i = 0; i < key.length; i++) {
-    hash = (hash * 31 + key.charCodeAt(i)) | 0;
-  }
-  const step = (hash >>> 0) % 21;
-  return 5 + step * 0.25;
-}

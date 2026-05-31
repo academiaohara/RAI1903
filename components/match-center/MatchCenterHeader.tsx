@@ -99,6 +99,8 @@ type MatchCenterHeaderProps = {
   detail: MatchDetail;
   backHref: Route;
   backLabel: string;
+  /** Previa: sin marcador ni asistencia (solo VS y metadatos básicos). */
+  variant?: "match" | "preview";
 };
 
 function ScoreInput({
@@ -125,8 +127,9 @@ function ScoreInput({
   );
 }
 
-export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHeaderProps) {
+export function MatchCenterHeader({ detail, backHref, backLabel, variant = "match" }: MatchCenterHeaderProps) {
   const { match, gender, referee, attendance, kickoffTime, kickoffDateLabel, seasonLabel } = detail;
+  const isPreview = variant === "preview";
   const { editMode, getValue, saveValue } = useInlineEditing();
   const keys = useMatchDetailStorageKeys(match.id);
   const [selectedPlayer, setSelectedPlayer] = useState<SquadPlayer | null>(null);
@@ -157,9 +160,11 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
   const awayGoals = currentEvents
     .filter((event) => event.type === "goal" && event.team === "away")
     .sort((a, b) => a.minute - b.minute);
-  const isFinished = match.status === "finished";
+  const isFinished = match.status === "finished" && !isPreview;
   const jornada = matchJornadaLabel(match);
   const meta = [matchCompetitionShortLabel(match), jornada, seasonLabel].filter(Boolean).join(" · ");
+  const showAttendance = !isPreview && (currentAttendance !== null || editMode);
+  const showReferee = !isPreview && (currentReferee || editMode);
 
   return (
     <header className="overflow-hidden rounded-[2rem] bg-[#214C9B] text-white shadow-[0_20px_50px_rgba(33,76,155,0.35)]">
@@ -238,7 +243,7 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
         </div>
 
         <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-bold text-white/90 sm:text-sm">
-          {(currentReferee || editMode) && (
+          {showReferee && (
             <li className="inline-flex items-center gap-1.5">
               <User size={14} aria-hidden />
               <EditableText
@@ -272,7 +277,7 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
               match.venue
             )}
           </li>
-          {(currentAttendance !== null || editMode) && (
+          {showAttendance && (
             <li className="inline-flex items-center gap-1.5">
               <Users size={14} aria-hidden />
               {editMode ? (
