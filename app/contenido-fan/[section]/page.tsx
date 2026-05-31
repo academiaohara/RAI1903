@@ -23,10 +23,9 @@ export default async function ContenidoFanSectionPage({ params }: { params: Prom
       <Card eyebrow={config.cardEyebrow} borderlessHeader={!config.cardEyebrow}>
         <p className="mb-5 text-sm leading-6 text-slate-600">{config.cardIntro}</p>
         {isTenteFirme ? (
-          <TenteFirmeShowcase spaces={config.links} videos={config.videos} />
+          <TenteFirmeShowcase section={section} spaces={config.links} videos={config.videos} />
         ) : (
-          config.videos &&
-          config.videos.length > 0 && <ZonaMixtaVideoShowcase videos={config.videos} />
+          config.videos && <ZonaMixtaVideoShowcase section={section} videos={config.videos} />
         )}
       </Card>
     </div>
