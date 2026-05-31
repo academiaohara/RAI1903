@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { InlineEditingProvider } from "@/components/inline-editing/InlineEditingProvider";
-import { fetchInlineOverridesServer } from "@/lib/cms/inline-overrides";
+import { fetchInlineOverridesServer } from "@/lib/cms/inline-overrides-server";
 import { bebasNeue } from "@/lib/fonts";
 
 export const metadata: Metadata = {
