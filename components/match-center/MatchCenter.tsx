@@ -2,6 +2,7 @@
 
 import { BarChart3, Megaphone, Shirt, Star, Target } from "lucide-react";
 import { useMemo, useState } from "react";
+import { MatchArticleInlineBlock } from "@/components/match-articles/MatchArticleInlineBlock";
 import { MatchCenterHeader, MatchCenterTabs } from "@/components/match-center/MatchCenterHeader";
 import { MatchLineupsPanel } from "@/components/match-center/MatchLineupsPanel";
 import { MatchPressPanel } from "@/components/match-center/MatchPressPanel";
@@ -9,11 +10,12 @@ import { MatchRatingsPanel } from "@/components/match-center/MatchRatingsPanel";
 import { getRaiTeamId } from "@/lib/fixtures";
 import { MatchPreviaPanel } from "@/components/match-center/MatchPreviaPanel";
 import { MatchStatsPanel } from "@/components/match-center/MatchStatsPanel";
-import type { MatchDetail } from "@/types";
+import type { MatchArticle, MatchDetail } from "@/types";
 import type { Route } from "next";
 
 type MatchCenterProps = {
   detail: MatchDetail;
+  article?: MatchArticle;
   backHref: Route;
   backLabel: string;
 };
@@ -33,7 +35,7 @@ function isRaiMatch(detail: MatchDetail): boolean {
   return detail.match.homeTeamId === raiId || detail.match.awayTeamId === raiId;
 }
 
-export function MatchCenter({ detail, backHref, backLabel }: MatchCenterProps) {
+export function MatchCenter({ detail, article, backHref, backLabel }: MatchCenterProps) {
   const isFinished = detail.match.status === "finished";
   const showRatings = isRaiMatch(detail);
   const [activeTab, setActiveTab] = useState<FinishedTabId>("stats");
@@ -48,6 +50,7 @@ export function MatchCenter({ detail, backHref, backLabel }: MatchCenterProps) {
   return (
     <div className="space-y-6">
       <MatchCenterHeader detail={detail} backHref={backHref} backLabel={backLabel} />
+      {article && <MatchArticleInlineBlock article={article} />}
 
       {isFinished ? (
         <>

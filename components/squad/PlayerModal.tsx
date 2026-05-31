@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Calendar, MapPin, Ruler, Scale, Star, X } from "lucide-react";
 import type { SquadModalTab, SquadPlayer } from "@/types/squad";
+import { SQUAD_POSITIONS, SQUAD_ROLE_CODES } from "@/types/squad";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import {
   formatBirthDate,
   formatContractDate,
@@ -31,10 +33,20 @@ const tabs: Array<{ id: SquadModalTab; label: string }> = [
 type PlayerModalProps = {
   player: SquadPlayer | null;
   onClose: () => void;
+  onUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
 };
 
-function PlayerModalContent({ player, onClose }: { player: SquadPlayer; onClose: () => void }) {
+function PlayerModalContent({
+  player,
+  onClose,
+  onUpdate,
+}: {
+  player: SquadPlayer;
+  onClose: () => void;
+  onUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
+}) {
   const [activeTab, setActiveTab] = useState<SquadModalTab>("actualidad");
+  const { editMode } = useInlineEditing();
   const fanRating = getPlayerAverageFanRating(player.id);
   const playerName = getPlayerFullName(player);
   const transfer = getTransferForPlayer(player.id);
@@ -142,6 +154,9 @@ function PlayerModalContent({ player, onClose }: { player: SquadPlayer; onClose:
       </div>
 
       <div className="relative z-0 min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+        {editMode && onUpdate && (
+          <PlayerInlineEditor player={player} onUpdate={(patch) => onUpdate(player.id, patch)} />
+        )}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -191,7 +206,7 @@ function PlayerModalContent({ player, onClose }: { player: SquadPlayer; onClose:
   );
 }
 
-export function PlayerModal({ player, onClose }: PlayerModalProps) {
+export function PlayerModal({ player, onClose, onUpdate }: PlayerModalProps) {
   useEffect(() => {
     if (!player) return;
     const onKeyDown = (event: KeyboardEvent) => {
@@ -217,10 +232,112 @@ export function PlayerModal({ player, onClose }: PlayerModalProps) {
           role="dialog"
           aria-modal="true"
         >
-          <PlayerModalContent key={player.id} player={player} onClose={onClose} />
+          <PlayerModalContent key={player.id} player={player} onClose={onClose} onUpdate={onUpdate} />
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+function PlayerInlineEditor({
+  player,
+  onUpdate,
+}: {
+  player: SquadPlayer;
+  onUpdate: (patch: Partial<SquadPlayer>) => void;
+}) {
+  return (
+    <section className="mb-6 rounded-2xl border border-[#214C9B]/20 bg-blue-50/60 p-4">
+      <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#214C9B]">Editar ficha</p>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <EditorInput label="Nombre" value={player.nombre} onChange={(value) => onUpdate({ nombre: value })} />
+        <EditorInput label="Apellido" value={player.apellido} onChange={(value) => onUpdate({ apellido: value })} />
+        <EditorInput
+          label="Dorsal"
+          type="number"
+          value={String(player.dorsal)}
+          onChange={(value) => onUpdate({ dorsal: Number(value) || 0 })}
+        />
+        <EditorSelect label="Rol" value={player.rol} options={SQUAD_ROLE_CODES} onChange={(value) => onUpdate({ rol: value })} />
+        <EditorSelect label="Posición" value={player.posicion} options={SQUAD_POSITIONS} onChange={(value) => onUpdate({ posicion: value })} />
+        <EditorInput label="Nacionalidad" value={player.nacionalidad} onChange={(value) => onUpdate({ nacionalidad: value })} />
+        <EditorInput label="Altura" value={player.altura} onChange={(value) => onUpdate({ altura: value })} />
+        <EditorInput label="Peso" value={player.peso} onChange={(value) => onUpdate({ peso: value })} />
+        <EditorSelect
+          label="Pierna"
+          value={player.piernaBuena}
+          options={["Derecha", "Izquierda", "Ambidiestro"] as const}
+          onChange={(value) => onUpdate({ piernaBuena: value })}
+        />
+        <EditorInput
+          label="Contrato"
+          type="date"
+          value={player.contratoHasta}
+          onChange={(value) => onUpdate({ contratoHasta: value })}
+        />
+      </div>
+      <label className="mt-3 block text-xs font-bold uppercase tracking-wide text-slate-500">
+        Descripción
+        <textarea
+          value={player.descripcion}
+          onChange={(event) => onUpdate({ descripcion: event.target.value })}
+          className="mt-1 min-h-[6rem] w-full resize-y rounded-xl border border-[#214C9B]/20 bg-white px-3 py-2 text-sm normal-case leading-6 text-slate-800 outline-none focus:border-[#214C9B]"
+        />
+      </label>
+    </section>
+  );
+}
+
+function EditorInput({
+  label,
+  value,
+  onChange,
+  type = "text",
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  type?: "text" | "number" | "date";
+}) {
+  return (
+    <label className="block text-xs font-bold uppercase tracking-wide text-slate-500">
+      {label}
+      <input
+        type={type}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="mt-1 w-full rounded-xl border border-[#214C9B]/20 bg-white px-3 py-2 text-sm normal-case text-slate-800 outline-none focus:border-[#214C9B]"
+      />
+    </label>
+  );
+}
+
+function EditorSelect<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: T;
+  options: readonly T[];
+  onChange: (value: T) => void;
+}) {
+  return (
+    <label className="block text-xs font-bold uppercase tracking-wide text-slate-500">
+      {label}
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value as T)}
+        className="mt-1 w-full rounded-xl border border-[#214C9B]/20 bg-white px-3 py-2 text-sm normal-case text-slate-800 outline-none focus:border-[#214C9B]"
+      >
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 

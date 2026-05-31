@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { SquadPlayer, SquadViewMode } from "@/types/squad";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { getSquadClubInfo, getSquadPlayers } from "@/lib/squad-data";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { splitSquadByAvailability } from "@/lib/squad-utils";
@@ -20,7 +21,16 @@ type SquadPageProps = {
 };
 
 export function SquadPage({ gender }: SquadPageProps) {
-  const squad = useMemo(() => getSquadPlayers(gender), [gender]);
+  const { getOverride, saveValue } = useInlineEditing();
+  const baseSquad = useMemo(() => getSquadPlayers(gender), [gender]);
+  const squad = useMemo(
+    () =>
+      baseSquad.map((player) => ({
+        ...player,
+        ...(getOverride<Partial<SquadPlayer>>(`squad-player:${player.id}`) ?? {}),
+      })),
+    [baseSquad, getOverride],
+  );
   const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
   const club = useMemo(() => getSquadClubInfo(gender), [gender]);
   const isFemenino = gender === "femenino";
@@ -30,6 +40,15 @@ export function SquadPage({ gender }: SquadPageProps) {
   const [stadiumOpen, setStadiumOpen] = useState(false);
 
   const handleSelect = isFemenino ? undefined : setSelected;
+  const handleUpdatePlayer = useCallback(
+    (playerId: string, patch: Partial<SquadPlayer>) => {
+      const current = getOverride<Partial<SquadPlayer>>(`squad-player:${playerId}`) ?? {};
+      const next = { ...current, ...patch };
+      saveValue(`squad-player:${playerId}`, next);
+      setSelected((player) => (player?.id === playerId ? { ...player, ...patch } : player));
+    },
+    [getOverride, saveValue],
+  );
 
   return (
     <div className="space-y-6">
@@ -59,7 +78,7 @@ export function SquadPage({ gender }: SquadPageProps) {
         </motion.div>
       </AnimatePresence>
 
-      {!isFemenino && <PlayerModal player={selected} onClose={() => setSelected(null)} />}
+      {!isFemenino && <PlayerModal player={selected} onClose={() => setSelected(null)} onUpdate={handleUpdatePlayer} />}
       {!isFemenino && <StandingsEvolutionChart />}
       <StadiumModal stadium={club.estadioInfo} open={stadiumOpen} onClose={() => setStadiumOpen(false)} />
     </div>

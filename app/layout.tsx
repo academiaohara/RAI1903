@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/Header";
+import { InlineEditingProvider } from "@/components/inline-editing/InlineEditingProvider";
 import { bebasNeue } from "@/lib/fonts";
 
 export const metadata: Metadata = {
@@ -17,10 +18,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="es">
       <body className={bebasNeue.variable}>
-        <div className="min-h-screen athletic-shell">
-          <Header />
-          <main className="mx-auto max-w-[1480px] px-4 pb-12 pt-6 sm:px-6 sm:pt-8 lg:px-8">{children}</main>
-        </div>
+        <InlineEditingProvider>
+          <div className="min-h-screen athletic-shell">
+            <Header />
+            <main className="mx-auto max-w-[1480px] px-4 pb-12 pt-6 sm:px-6 sm:pt-8 lg:px-8">{children}</main>
+          </div>
+        </InlineEditingProvider>
       </body>
     </html>
   );

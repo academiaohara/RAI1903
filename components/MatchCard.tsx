@@ -1,5 +1,8 @@
+"use client";
+
 import { Badge } from "@/components/Badge";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { MatchFixtureTeamLinks } from "@/components/MatchFixtureTeamLinks";
 import { RAI_TEAM_ID } from "@/data/mock";
 import { matchCompetitionShortLabel, matchFixtureMeta } from "@/lib/competition-labels";
@@ -19,31 +22,77 @@ export function MatchCard({
   highlightTeamId?: string;
   gender?: PrimerEquipoGender;
 }) {
-  const scoreLabel = match.status === "finished" ? `${match.homeScore} - ${match.awayScore}` : "vs";
+  const { editMode, getOverride, saveValue } = useInlineEditing();
+  const override = getOverride<Partial<Match>>(`match-result:${match.id}`) ?? {};
+  const editedMatch = { ...match, ...override };
+  const scoreLabel = editedMatch.status === "finished" ? `${editedMatch.homeScore} - ${editedMatch.awayScore}` : "vs";
+  const savePatch = (patch: Partial<Match>) => {
+    saveValue(`match-result:${match.id}`, { ...override, ...patch });
+  };
 
   return (
     <article className={matchFixtureCardClassName}>
       <div className="mb-1 flex items-start justify-between gap-2">
-        <Badge tone={match.status === "finished" ? "slate" : "blue"}>{match.status === "finished" ? "Finalizado" : "Programado"}</Badge>
+        <Badge tone={editedMatch.status === "finished" ? "slate" : "blue"}>{editedMatch.status === "finished" ? "Finalizado" : "Programado"}</Badge>
         <span className="flex shrink-0 items-center justify-end gap-1.5 text-right text-[11px] font-bold uppercase leading-tight tracking-[0.06em] text-[#981915]">
-          <CompetitionLogo competition={match.competition} alt={matchCompetitionShortLabel(match)} size="xs" />
-          {matchFixtureMeta(match)}
+          <CompetitionLogo competition={editedMatch.competition} alt={matchCompetitionShortLabel(editedMatch)} size="xs" />
+          {matchFixtureMeta(editedMatch)}
         </span>
       </div>
       <MatchFixtureTeamLinks
-        match={match}
+        match={editedMatch}
         gender={gender}
         highlightTeamId={highlightTeamId}
         scoreLabel={scoreLabel}
       />
+      {editMode && (
+        <div className="mt-3 grid gap-2 rounded-2xl border border-[#214C9B]/15 bg-blue-50/60 p-3 sm:grid-cols-[9rem_1fr]">
+          <select
+            value={editedMatch.status}
+            onChange={(event) => savePatch({ status: event.target.value as Match["status"] })}
+            className="rounded-xl border border-[#214C9B]/20 bg-white px-3 py-2 text-xs font-bold text-slate-700 outline-none"
+            aria-label="Editar estado del partido"
+          >
+            <option value="scheduled">Programado</option>
+            <option value="finished">Finalizado</option>
+          </select>
+          {editedMatch.status === "finished" ? (
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                value={editedMatch.homeScore ?? 0}
+                onChange={(event) => savePatch({ homeScore: Number(event.target.value) })}
+                className="w-16 rounded-xl border border-[#214C9B]/20 bg-white px-3 py-2 text-center text-sm font-extrabold text-[#214C9B]"
+                aria-label="Goles local"
+              />
+              <span className="text-xs font-extrabold text-slate-400">-</span>
+              <input
+                type="number"
+                value={editedMatch.awayScore ?? 0}
+                onChange={(event) => savePatch({ awayScore: Number(event.target.value) })}
+                className="w-16 rounded-xl border border-[#214C9B]/20 bg-white px-3 py-2 text-center text-sm font-extrabold text-[#214C9B]"
+                aria-label="Goles visitante"
+              />
+            </div>
+          ) : (
+            <input
+              type="datetime-local"
+              value={editedMatch.date.slice(0, 16)}
+              onChange={(event) => savePatch({ date: event.target.value })}
+              className="rounded-xl border border-[#214C9B]/20 bg-white px-3 py-2 text-sm font-bold text-[#214C9B]"
+              aria-label="Fecha del partido"
+            />
+          )}
+        </div>
+      )}
       {compact ? (
-        match.status === "scheduled" && (
-          <p className="mt-2 text-xs font-bold text-slate-600">{formatMatchDate(match.date)}</p>
+        editedMatch.status === "scheduled" && (
+          <p className="mt-2 text-xs font-bold text-slate-600">{formatMatchDate(editedMatch.date)}</p>
         )
       ) : (
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
-          <span>{formatMatchDate(match.date)}</span>
-          <span>{match.venue}</span>
+          <span>{formatMatchDate(editedMatch.date)}</span>
+          <span>{editedMatch.venue}</span>
         </div>
       )}
     </article>
