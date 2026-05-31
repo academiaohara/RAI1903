@@ -16,23 +16,52 @@ import {
   isMatchdayFullyFinished,
   sortQuinielaMatches,
 } from "@/lib/quiniela";
-import { loadPredictions, loadSavedRounds, savePredictions, saveRoundAsSaved } from "@/lib/storage";
+import { loadQuinielaState, saveQuinielaPredictions, saveQuinielaRound } from "@/lib/quiniela-storage";
+import { createClient } from "@/lib/supabase/client";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { Prediction } from "@/types";
+import type { User } from "@supabase/supabase-js";
 
 export default function MiQuinielaPage() {
   const [round, setRound] = useState(CURRENT_QUINIELA_ROUND);
   const [predictions, setPredictions] = useState<Record<string, Prediction>>({});
   const [savedRounds, setSavedRounds] = useState<Record<number, string>>({});
+  const [userId, setUserId] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setPredictions(loadPredictions());
-      setSavedRounds(loadSavedRounds());
+    let cancelled = false;
+
+    const hydrate = async (user: User | null) => {
+      const state = await loadQuinielaState(user?.id ?? null);
+      if (cancelled) return;
+      setPredictions(state.predictions);
+      setSavedRounds(state.savedRounds);
+      setUserId(user?.id ?? null);
       setHydrated(true);
-    }, 0);
-    return () => window.clearTimeout(timer);
+    };
+
+    if (!isSupabaseConfigured()) {
+      void hydrate(null);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    const supabase = createClient();
+    void supabase.auth.getUser().then(({ data }) => void hydrate(data.user));
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      void hydrate(session?.user ?? null);
+    });
+
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const selectedMatchday = useMemo(() => getMatchdayByRound(round), [round]);
@@ -63,12 +92,12 @@ export default function MiQuinielaPage() {
       setPredictions((current) => {
         const next = { ...current, [prediction.matchId]: prediction };
         if (!isSaved || isEditing) {
-          savePredictions(next);
+          void saveQuinielaPredictions(userId, next);
         }
         return next;
       });
     },
-    [isSaved, isEditing],
+    [isSaved, isEditing, userId],
   );
 
   const handleSave = () => {
@@ -76,8 +105,8 @@ export default function MiQuinielaPage() {
       window.alert("Completa los 10 partidos (signo 1-X-2 y porra del Avilés si aplica) antes de guardar.");
       return;
     }
-    savePredictions(predictions);
-    saveRoundAsSaved(round);
+    void saveQuinielaPredictions(userId, predictions);
+    void saveQuinielaRound(userId, round);
     setSavedRounds((current) => ({ ...current, [round]: new Date().toISOString() }));
     setIsEditing(false);
   };

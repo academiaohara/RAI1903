@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X_OAUTH_SCOPES } from "@/lib/auth/x-oauth";
-import { createClient } from "@/lib/supabase/client";
+import { signInWithX } from "@/lib/auth/sign-in-with-x";
 import { cn } from "@/lib/utils";
 
 type TwitterLoginButtonProps = {
@@ -24,20 +23,11 @@ export function TwitterLoginButton({
     setError(null);
 
     try {
-      const supabase = createClient();
       const next = nextPath.startsWith("/") ? nextPath : `/${nextPath}`;
-      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
-
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider: "x",
-        options: {
-          redirectTo,
-          scopes: X_OAUTH_SCOPES,
-        },
-      });
+      const { error: oauthError } = await signInWithX(next);
 
       if (oauthError) {
-        setError(oauthError.message);
+        setError(oauthError);
         setLoading(false);
       }
     } catch (err) {
