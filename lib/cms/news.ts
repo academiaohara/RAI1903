@@ -7,7 +7,6 @@ const LOCAL_NEWS_KEY = "rai1903:cms-news:v1";
 
 type CmsNewsRow = {
   id: string;
-  season_id: string | null;
   channel: "club" | "prensa";
   source: string;
   published_at: string;
@@ -88,10 +87,9 @@ export async function fetchPublishedNewsItems(): Promise<NewsItem[]> {
   return mergeNewsLists(cmsItems, mockOnly, localOnly);
 }
 
-export function newsItemToRow(item: NewsItem, seasonId: string | null = "2025-26"): Omit<CmsNewsRow, "published"> & { published: boolean } {
+export function newsItemToRow(item: NewsItem): Omit<CmsNewsRow, "published"> & { published: boolean } {
   return {
     id: item.id,
-    season_id: seasonId,
     channel: item.channel,
     source: item.source,
     published_at: item.date,
