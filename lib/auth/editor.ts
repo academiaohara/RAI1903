@@ -1,7 +1,7 @@
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 
-/** Cuenta con acceso al panel /editor */
+/** Cuenta con permisos de edición en línea (CMS) */
 export const EDITOR_EMAIL = "rai1903fan@gmail.com";
 
 export function isEditorEmail(email: string | undefined | null): boolean {
