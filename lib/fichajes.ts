@@ -12,13 +12,8 @@ import type { SquadPlayer } from "@/types/squad";
 
 const RAI_CLUB = "Real Avilés Industrial";
 
-/** Altas en calidad de cedidos (carrusel de cesiones en inicio). */
-export const LOAN_TRANSFER_IDS = new Set([
-  "t-alt-eze",
-  "t-alt-uzkudun",
-  "t-alt-nando",
-  "t-alt-ortega",
-]);
+/** Altas en calidad de cedidos (carrusel de cesiones en inicio). IDs se asignan en el CMS. */
+export const LOAN_TRANSFER_IDS = new Set<string>();
 
 export function isLoanTransfer(transfer: TransferRumor): boolean {
   return LOAN_TRANSFER_IDS.has(transfer.id);

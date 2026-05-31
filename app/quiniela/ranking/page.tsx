@@ -8,17 +8,21 @@ export default function QuinielaRankingPage() {
       <PageHero eyebrow="Quiniela" title="Ranking" description="Clasificacion de usuarios mock en una pagina separada." />
 
       <Card eyebrow="Ranking" title="Clasificacion de usuarios">
-        <div className="space-y-3">
-          {quinielaRanking.map((row) => (
-            <div
-              key={row.user}
-              className="flex items-center justify-between gap-3 rounded-2xl border border-[#214C9B]/20 bg-white p-4 text-sm"
-            >
-              <p className="font-extrabold uppercase text-[#214C9B]">{row.user}</p>
-              <span className="font-extrabold text-slate-900">{row.points} pts</span>
-            </div>
-          ))}
-        </div>
+        {quinielaRanking.length === 0 ? (
+          <p className="text-sm text-slate-600">Aun no hay participantes en el ranking.</p>
+        ) : (
+          <div className="space-y-3">
+            {quinielaRanking.map((row) => (
+              <div
+                key={row.user}
+                className="flex items-center justify-between gap-3 rounded-2xl border border-[#214C9B]/20 bg-white p-4 text-sm"
+              >
+                <p className="font-extrabold uppercase text-[#214C9B]">{row.user}</p>
+                <span className="font-extrabold text-slate-900">{row.points} pts</span>
+              </div>
+            ))}
+          </div>
+        )}
       </Card>
     </div>
   );
