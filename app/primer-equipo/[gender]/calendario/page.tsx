@@ -14,7 +14,11 @@ export default async function PrimerEquipoCalendarioPage({ params }: { params: P
     <>
       <PrimerEquipoPageHero
         title="Calendario"
-        description={`Calendario completo de ${genderLabels[gender].club}: partidos jugados y pendientes con acceso directo a las cronicas.`}
+        description={
+          gender === "femenino"
+            ? `Calendario completo de ${genderLabels[gender].club}: partidos jugados y pendientes.`
+            : `Calendario completo de ${genderLabels[gender].club}: partidos jugados y pendientes con acceso directo a las cronicas.`
+        }
       />
 
       <Card eyebrow="Temporada" title="Partidos del equipo">
