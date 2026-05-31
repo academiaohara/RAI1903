@@ -18,6 +18,7 @@ import { tenerifeSquadImport } from "@/data/rivals/tenerife";
 import { unionistasSquadImport } from "@/data/rivals/unionistas";
 import { zamoraSquadImport } from "@/data/rivals/zamora";
 import { getTeamCrestById } from "@/lib/team-crests";
+import { buildPlayerMatchHistory } from "@/lib/player-match-history";
 import { getStadiumPhoto } from "@/lib/squad-photos";
 import type { Team } from "@/types";
 import type { RivalSquadImport, RivalSquadImportPlayer } from "@/types/rival-squad-import";
@@ -132,7 +133,18 @@ function importPlayerToSquadPlayer(
     asistencias: player.a,
     amarillas: player.ta,
     rojas: player.tr,
-    historialPartidos: [],
+    historialPartidos: buildPlayerMatchHistory(
+      {
+        id: `${team.id}-d${player.dorsal}`,
+        partidos: player.pj,
+        minutos: player.pj * 72,
+        goles: player.g,
+        asistencias: player.a,
+        amarillas: player.ta,
+        rojas: player.tr,
+      },
+      "masculino",
+    ),
     trayectoria: [
       {
         temporada: "2025/26",

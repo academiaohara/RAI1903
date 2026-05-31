@@ -1,3 +1,4 @@
+import { buildPlayerMatchHistory, mergeMatchHistoryOverrides } from "@/lib/player-match-history";
 import type { PlayerCareerRecord, PlayerMatchRecord, SquadPlayer } from "@/types/squad";
 
 const NANDO_CAREER: PlayerCareerRecord[] = [
@@ -43,7 +44,21 @@ function enrichNandoAlmodovar(player: SquadPlayer): SquadPlayer {
       "Hernando Almodóvar Marrufo, conocido como Nando, llega cedido desde el Cádiz CF Mirandilla. Portero de 1,92 m formado en la cantera del Cádiz, con experiencia en Segunda Federación y Primera Federación.",
     partidos: 11,
     minutos: 1020,
-    historialPartidos: [...NANDO_MATCHES_2526].reverse(),
+    historialPartidos: mergeMatchHistoryOverrides(
+      buildPlayerMatchHistory(
+        {
+          id: player.id,
+          partidos: 11,
+          minutos: 1020,
+          goles: 0,
+          asistencias: 0,
+          amarillas: 0,
+          rojas: 0,
+        },
+        "masculino",
+      ),
+      NANDO_MATCHES_2526,
+    ),
     trayectoria: NANDO_CAREER,
   };
 }

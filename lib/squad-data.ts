@@ -1,6 +1,7 @@
 import { matchdays, players, playersFemenino, teams, teamsFemenino } from "@/data/mock";
 import { applyRealAvilesPlayerOverrides } from "@/data/real-aviles-player-overrides";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
+import { buildPlayerMatchHistory } from "@/lib/player-match-history";
 import {
   buildClubInfoFromImport,
   buildSquadFromImport,
@@ -11,7 +12,7 @@ import { matchToFinishedLeagueMatch } from "@/lib/standings";
 import { getPlayerRole } from "@/lib/player-roles";
 import { getSquadPlayerPhoto, getStadiumPhoto } from "@/lib/squad-photos";
 import type { Player } from "@/types";
-import type { PlayerCareerRecord, PlayerMatchRecord, SquadClubInfo, SquadPlayer } from "@/types/squad";
+import type { PlayerCareerRecord, SquadClubInfo, SquadPlayer } from "@/types/squad";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 
 const BIRTH_PLACES = [
@@ -26,21 +27,6 @@ const BIRTH_PLACES = [
   "Luanco",
   "Pola de Siero",
 ] as const;
-
-const MATCH_FIXTURES: Array<{ rival: string; competicion: string; fecha: string }> = [
-  { rival: "Pontevedra CF", competicion: "Liga RAI1903 Norte", fecha: "2025-08-17" },
-  { rival: "CD Numancia", competicion: "Liga RAI1903 Norte", fecha: "2025-08-24" },
-  { rival: "UP Langreo", competicion: "Liga RAI1903 Norte", fecha: "2025-08-31" },
-  { rival: "Coruxo FC", competicion: "Liga RAI1903 Norte", fecha: "2025-09-07" },
-  { rival: "Marino de Luanco", competicion: "Liga RAI1903 Norte", fecha: "2025-09-14" },
-  { rival: "SD Compostela", competicion: "Liga RAI1903 Norte", fecha: "2025-09-21" },
-  { rival: "Bergantinos FC", competicion: "Liga RAI1903 Norte", fecha: "2025-09-28" },
-  { rival: "CD Guijuelo", competicion: "Liga RAI1903 Norte", fecha: "2025-10-05" },
-  { rival: "Zamora CF", competicion: "Liga RAI1903 Norte", fecha: "2025-10-12" },
-  { rival: "CD Covadonga", competicion: "Copa del Rey", fecha: "2025-10-19" },
-  { rival: "Barakaldo CF", competicion: "1ª RFEF - Grupo I", fecha: "2025-10-26" },
-  { rival: "Ourense CF", competicion: "1ª RFEF - Grupo I", fecha: "2025-11-02" },
-];
 
 const WEIGHT_BY_POSITION: Record<Player["position"], string> = {
   Portero: "82 kg",
@@ -60,45 +46,6 @@ function hashString(value: string): number {
 
 function pick<T>(items: readonly T[], seed: string, index = 0): T {
   return items[(hashString(`${seed}-${index}`) + index) % items.length] as T;
-}
-
-function buildMatchHistory(player: Player): PlayerMatchRecord[] {
-  const count = Math.min(player.stats.appearances, MATCH_FIXTURES.length);
-  const records: PlayerMatchRecord[] = [];
-
-  let goalsLeft = player.stats.goals;
-  let assistsLeft = player.stats.assists;
-  let yellowsLeft = player.stats.yellowCards;
-  let redsLeft = player.stats.redCards;
-
-  for (let i = 0; i < count; i += 1) {
-    const fixture = MATCH_FIXTURES[i];
-    const playedFull = i < count - 1 || player.stats.minutes >= 75;
-    const minutes = playedFull ? 90 : Math.max(12, player.stats.minutes % 90);
-
-    const matchGoals = goalsLeft > 0 && (i === 0 || hashString(`${player.id}-g-${i}`) % 3 === 0) ? 1 : 0;
-    const matchAssists = assistsLeft > 0 && hashString(`${player.id}-a-${i}`) % 4 === 0 ? 1 : 0;
-    const matchYellow = yellowsLeft > 0 && hashString(`${player.id}-y-${i}`) % 5 === 0 ? 1 : 0;
-    const matchRed = redsLeft > 0 && i === count - 1 && player.stats.redCards > 0 ? 1 : 0;
-
-    goalsLeft -= matchGoals;
-    assistsLeft -= matchAssists;
-    yellowsLeft -= matchYellow;
-    redsLeft -= matchRed;
-
-    records.push({
-      fecha: fixture.fecha,
-      rival: fixture.rival,
-      competicion: fixture.competicion,
-      minutos: minutes,
-      goles: matchGoals,
-      asistencias: matchAssists,
-      amarillas: matchYellow,
-      rojas: matchRed,
-    });
-  }
-
-  return records.reverse();
 }
 
 function buildCareer(player: Player, clubName: string): PlayerCareerRecord[] {
@@ -156,7 +103,18 @@ function toSquadPlayer(player: Player, clubName: string, gender: PrimerEquipoGen
     asistencias: player.stats.assists,
     amarillas: player.stats.yellowCards,
     rojas: player.stats.redCards,
-    historialPartidos: buildMatchHistory(player),
+    historialPartidos: buildPlayerMatchHistory(
+      {
+        id: player.id,
+        partidos: player.stats.appearances,
+        minutos: player.stats.minutes,
+        goles: player.stats.goals,
+        asistencias: player.stats.assists,
+        amarillas: player.stats.yellowCards,
+        rojas: player.stats.redCards,
+      },
+      gender,
+    ),
     trayectoria: buildCareer(player, clubName),
   };
 }
