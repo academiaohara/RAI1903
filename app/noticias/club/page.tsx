@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { AddNewsPanel } from "@/components/editor/AddNewsPanel";
 import { NewsCard } from "@/components/NewsCard";
 import { PageHero } from "@/components/PageHero";
 import { fetchPublishedNewsItems } from "@/lib/cms/news";
@@ -13,9 +14,13 @@ export default function NoticiasClubPage() {
   const [tag, setTag] = useState<NewsTag | "todas">("todas");
   const [allNews, setAllNews] = useState<NewsItem[]>([]);
 
-  useEffect(() => {
+  const loadNews = useCallback(() => {
     void fetchPublishedNewsItems().then(setAllNews);
   }, []);
+
+  useEffect(() => {
+    loadNews();
+  }, [loadNews]);
 
   const clubNews = useMemo(() => newsByChannel(allNews, "club"), [allNews]);
 
@@ -52,6 +57,8 @@ export default function NoticiasClubPage() {
           ))}
         </div>
       </div>
+
+      <AddNewsPanel defaultChannel="club" onCreated={loadNews} />
 
       <div className="grid gap-3 sm:gap-4">
         {filtered.map((item) => (

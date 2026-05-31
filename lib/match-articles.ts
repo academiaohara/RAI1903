@@ -19,7 +19,7 @@ export function getPreviaForMatch(matchId: string, gender: PrimerEquipoGender = 
   return matchArticles.find((article) => article.matchId === matchId && article.type === "previa" && article.gender === gender);
 }
 
-export function getClubChronicleNews(article: MatchArticle): NewsItem | null {
+export function getClubChronicleNews(article: MatchArticle, items: NewsItem[] = newsItems): NewsItem | null {
   if (!article.clubNewsId) return null;
-  return newsItems.find((item) => item.id === article.clubNewsId) ?? null;
+  return items.find((item) => item.id === article.clubNewsId) ?? null;
 }

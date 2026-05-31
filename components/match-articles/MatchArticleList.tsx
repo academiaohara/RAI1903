@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
+import { MatchArticleNewsLinker } from "@/components/editor/MatchArticleNewsLinker";
 import { EditableText } from "@/components/inline-editing/EditableText";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { usePublishedNews } from "@/hooks/usePublishedNews";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { formatDate } from "@/lib/utils";
-import type { MatchArticle } from "@/types";
+import type { MatchArticle, NewsItem } from "@/types";
 import type { Route } from "next";
 
 type MatchArticleListProps = {
@@ -16,10 +18,12 @@ type MatchArticleListProps = {
 };
 
 export function MatchArticleList({ articles, gender, type }: MatchArticleListProps) {
+  const { items: newsItems } = usePublishedNews();
+
   return (
     <div className="space-y-3">
       {articles.map((article) => (
-        <MatchArticleCard key={article.id} article={article} gender={gender} type={type} />
+        <MatchArticleCard key={article.id} article={article} gender={gender} type={type} newsItems={newsItems} />
       ))}
     </div>
   );
@@ -29,10 +33,12 @@ function MatchArticleCard({
   article,
   gender,
   type,
+  newsItems,
 }: {
   article: MatchArticle;
   gender: PrimerEquipoGender;
   type: MatchArticle["type"];
+  newsItems: NewsItem[];
 }) {
   const { editMode } = useInlineEditing();
   const href = `${primerEquipoBase(gender)}/${type === "cronica" ? "cronicas" : "previas"}/${article.id}` as Route;
@@ -65,6 +71,7 @@ function MatchArticleCard({
     return (
       <article className="rounded-2xl border border-[#214C9B]/20 bg-white p-4">
         {content}
+        <MatchArticleNewsLinker article={article} newsItems={newsItems} />
         <Link
           href={href}
           className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"

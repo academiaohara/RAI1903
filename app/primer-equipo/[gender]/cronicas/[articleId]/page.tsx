@@ -17,6 +17,7 @@ export default async function CronicaDetailPage({ params }: { params: Promise<{ 
   return (
     <MatchCenter
       detail={detail}
+      article={article}
       backHref={`${primerEquipoBase(gender)}/cronicas` as Route}
       backLabel="Volver a cronicas"
     />
