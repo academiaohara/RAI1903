@@ -1,7 +1,11 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
 import {
   RAI_LOGO_PATH,
   newsImageRequiresUnoptimized,
+  raiLogoNewsFallbackEligible,
   raiNewsMediaBgClass,
   shouldUseRaiLogoNewsFallback,
 } from "@/lib/noticias";
@@ -21,7 +25,30 @@ const initialsByVariant: Record<NewsMediaVariant, string> = {
   ticker: "text-2xl",
 };
 
+function RaiLogoNewsMedia({ variant, frame }: { variant: NewsMediaVariant; frame: string }) {
+  const logoSize =
+    variant === "featured"
+      ? "h-[72%] w-[72%] max-h-32 max-w-32"
+      : variant === "ticker"
+        ? "h-full w-full max-h-48 max-w-48"
+        : "h-[68%] w-[68%] max-h-28 max-w-28";
+
+  return (
+    <div className={`flex items-center justify-center ${frame}`}>
+      <Image
+        src={RAI_LOGO_PATH}
+        alt=""
+        width={160}
+        height={160}
+        className={`object-contain ${logoSize}`}
+        sizes={variant === "ticker" ? "192px" : variant === "featured" ? "128px" : "112px"}
+      />
+    </div>
+  );
+}
+
 export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?: NewsMediaVariant }) {
+  const [imageError, setImageError] = useState(false);
   const rounded =
     variant === "ticker"
       ? "rounded-t-2xl"
@@ -31,14 +58,18 @@ export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?
   const widthClass = variant === "ticker" ? "w-full" : "";
   const frame = `relative shrink-0 overflow-hidden ${widthClass} ${raiNewsMediaBgClass(item.teams)} ${rounded} ${frameByVariant[variant]}`;
 
-  if (item.imageUrl) {
+  const showRemoteImage = Boolean(item.imageUrl) && !imageError;
+  const showRaiLogo =
+    raiLogoNewsFallbackEligible(item) && (shouldUseRaiLogoNewsFallback(item) || imageError);
+
+  if (showRemoteImage) {
     return (
       <div className={frame}>
         <Image
-          src={item.imageUrl}
+          src={item.imageUrl!}
           alt=""
           fill
-          unoptimized={newsImageRequiresUnoptimized(item.imageUrl)}
+          unoptimized={newsImageRequiresUnoptimized(item.imageUrl!)}
           className="object-cover"
           sizes={
             variant === "ticker"
@@ -49,31 +80,14 @@ export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?
                   ? "(max-width: 640px) 108px, (max-width: 768px) 160px, 192px"
                   : "960px"
           }
+          onError={() => setImageError(true)}
         />
       </div>
     );
   }
 
-  if (shouldUseRaiLogoNewsFallback(item)) {
-    const logoSize =
-      variant === "featured"
-        ? "h-[72%] w-[72%] max-h-32 max-w-32"
-        : variant === "ticker"
-          ? "h-full w-full max-h-48 max-w-48"
-          : "h-[68%] w-[68%] max-h-28 max-w-28";
-
-    return (
-      <div className={`flex items-center justify-center ${frame}`}>
-        <Image
-          src={RAI_LOGO_PATH}
-          alt=""
-          width={160}
-          height={160}
-          className={`object-contain ${logoSize}`}
-          sizes={variant === "ticker" ? "192px" : variant === "featured" ? "128px" : "112px"}
-        />
-      </div>
-    );
+  if (showRaiLogo) {
+    return <RaiLogoNewsMedia variant={variant} frame={frame} />;
   }
 
   return (
