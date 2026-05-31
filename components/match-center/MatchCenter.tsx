@@ -2,7 +2,11 @@
 
 import { BarChart3, ListOrdered, Megaphone, Shirt, Star, Target } from "lucide-react";
 import { useMemo, useState } from "react";
+import { MatchArticleNewsLinker } from "@/components/editor/MatchArticleNewsLinker";
+import { MatchArticleClubNewsBlock } from "@/components/match-articles/MatchArticleClubNewsBlock";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { MatchArticleInlineBlock } from "@/components/match-articles/MatchArticleInlineBlock";
+import { usePublishedNews } from "@/hooks/usePublishedNews";
 import { MatchCenterHeader, MatchCenterTabs } from "@/components/match-center/MatchCenterHeader";
 import { MatchEventsPanel } from "@/components/match-center/MatchEventsPanel";
 import { MatchLineupsPanel } from "@/components/match-center/MatchLineupsPanel";
@@ -39,6 +43,8 @@ function isRaiMatch(detail: MatchDetail): boolean {
 }
 
 export function MatchCenter({ detail, article, backHref, backLabel }: MatchCenterProps) {
+  const { items: newsItems } = usePublishedNews();
+  const { editMode } = useInlineEditing();
   const resolvedDetail = useMatchDetailOverrides(detail);
   const isFinished = resolvedDetail.match.status === "finished";
   const showRatings = isRaiMatch(resolvedDetail);
@@ -55,6 +61,13 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
     <div className="space-y-6">
       <MatchCenterHeader detail={resolvedDetail} backHref={backHref} backLabel={backLabel} />
       {article?.type === "previa" && <MatchArticleInlineBlock article={article} />}
+      {article && (article.type === "cronica" || article.type === "previa") ? (
+        editMode ? (
+          <MatchArticleNewsLinker article={article} newsItems={newsItems} />
+        ) : (
+          <MatchArticleClubNewsBlock article={article} newsItems={newsItems} />
+        )
+      ) : null}
 
       {isFinished ? (
         <>

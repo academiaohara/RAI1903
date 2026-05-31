@@ -1,21 +1,32 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/Badge";
 import { Card } from "@/components/Card";
+import { AddNewsPanel } from "@/components/editor/AddNewsPanel";
 import { NewsCard } from "@/components/NewsCard";
 import { PageHero } from "@/components/PageHero";
-import { newsItems, pressLinks } from "@/data/mock";
+import { pressLinks } from "@/data/mock";
+import { fetchPublishedNewsItems } from "@/lib/cms/news";
 import { newsByChannel } from "@/lib/noticias";
-import type { NewsTag } from "@/types";
-
-const pressNews = newsByChannel(newsItems, "prensa");
+import type { NewsItem, NewsTag } from "@/types";
 const tags: Array<NewsTag | "todas"> = ["todas", "partido", "fichajes", "cantera", "previa", "cronica", "club", "lesionados", "rumores", "renovaciones", "entrevistas", "otros"];
 
 export default function NoticiasPrensaPage() {
   const [source, setSource] = useState("Todos");
   const [query, setQuery] = useState("");
   const [tag, setTag] = useState<NewsTag | "todas">("todas");
+  const [allNews, setAllNews] = useState<NewsItem[]>([]);
+
+  const loadNews = () => {
+    void fetchPublishedNewsItems().then(setAllNews);
+  };
+
+  useEffect(() => {
+    loadNews();
+  }, []);
+
+  const pressNews = useMemo(() => newsByChannel(allNews, "prensa"), [allNews]);
   const sources = ["Todos", ...Array.from(new Set(pressNews.map((item) => item.source)))];
 
   const filtered = useMemo(
@@ -26,7 +37,7 @@ export default function NoticiasPrensaPage() {
         const matchesTag = tag === "todas" || item.tags.includes(tag);
         return matchesSource && matchesQuery && matchesTag;
       }),
-    [query, source, tag],
+    [pressNews, query, source, tag],
   );
 
   return (
@@ -63,6 +74,8 @@ export default function NoticiasPrensaPage() {
           ))}
         </div>
       </div>
+
+      <AddNewsPanel defaultChannel="prensa" onCreated={loadNews} />
 
       <div className="grid gap-3 sm:gap-4">
         {filtered.map((item) => (
