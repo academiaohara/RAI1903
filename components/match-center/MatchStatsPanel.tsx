@@ -101,6 +101,9 @@ export function MatchStatsPanel({
   return (
     <section>
       <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-[#333333]">Estadísticas del partido</h2>
+      {currentCategories.length === 0 && !editMode ? (
+        <p className="text-sm text-slate-500">No hay estadísticas registradas para este partido.</p>
+      ) : (
       <div className="overflow-hidden rounded-lg border border-[#e0e0e0] bg-white">
         {currentCategories.map((category, categoryIndex) => (
           <CategorySection
@@ -122,6 +125,7 @@ export function MatchStatsPanel({
           </CategorySection>
         ))}
       </div>
+      )}
     </section>
   );
 }

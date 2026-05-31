@@ -237,15 +237,18 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
         </div>
 
         <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-bold text-white/90 sm:text-sm">
-          <li className="inline-flex items-center gap-1.5">
-            <User size={14} aria-hidden />
-            <EditableText
-              storageKey={keys.referee}
-              value={currentReferee}
-              aria-label="Editar arbitro"
-              inputClassName="text-xs font-bold text-slate-800 sm:text-sm"
-            />
-          </li>
+          {(currentReferee || editMode) && (
+            <li className="inline-flex items-center gap-1.5">
+              <User size={14} aria-hidden />
+              <EditableText
+                storageKey={keys.referee}
+                value={currentReferee}
+                placeholder="Árbitro"
+                aria-label="Editar arbitro"
+                inputClassName="text-xs font-bold text-slate-800 sm:text-sm"
+              />
+            </li>
+          )}
           <li className="inline-flex items-center gap-1.5">
             <Calendar size={14} aria-hidden />
             {kickoffDateLabel}
