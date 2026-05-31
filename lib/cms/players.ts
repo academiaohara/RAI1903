@@ -1,14 +1,11 @@
-import { players, playersFemenino } from "@/data/mock";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { Player } from "@/types";
 import type { PrimerEquipoGender } from "@/types";
 
 export async function fetchSquadPlayers(gender: PrimerEquipoGender, seasonId = "2025-26"): Promise<Player[]> {
-  const mock = gender === "femenino" ? playersFemenino : players;
-
   if (!isSupabaseConfigured()) {
-    return mock;
+    return [];
   }
 
   const supabase = createClient();
@@ -20,13 +17,10 @@ export async function fetchSquadPlayers(gender: PrimerEquipoGender, seasonId = "
     .eq("published", true);
 
   if (error || !data?.length) {
-    return mock;
+    return [];
   }
 
-  const cmsPlayers = data.map((row) => row.payload as Player);
-  const cmsIds = new Set(cmsPlayers.map((p) => p.id));
-  const mockOnly = mock.filter((p) => !cmsIds.has(p.id));
-  return [...cmsPlayers, ...mockOnly];
+  return data.map((row) => row.payload as Player);
 }
 
 export function playerPayload(player: Player): Player {

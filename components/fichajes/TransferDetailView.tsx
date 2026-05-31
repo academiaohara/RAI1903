@@ -18,6 +18,8 @@ import {
   getTransferOriginClub,
   getTransferPlayerNews,
 } from "@/lib/fichajes";
+import { usePublishedNews } from "@/hooks/usePublishedNews";
+import { useSeasonPlayerRatings } from "@/hooks/useSeasonPlayerRatings";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { formatBirthDate, formatContractDate, getNationalityFlag } from "@/lib/squad-utils";
 import { formatDate } from "@/lib/utils";
@@ -65,6 +67,8 @@ type TransferDetailViewProps = {
 
 export function TransferDetailView({ transfer, player: initialPlayer }: TransferDetailViewProps) {
   const { getPlayerById } = useSquadPlayers("masculino");
+  const { items: allNews } = usePublishedNews();
+  const { averages } = useSeasonPlayerRatings();
   const player = initialPlayer
     ? getPlayerById(initialPlayer.id) ?? initialPlayer
     : undefined;
@@ -72,8 +76,8 @@ export function TransferDetailView({ transfer, player: initialPlayer }: Transfer
   const tone = toneByKind[kind];
   const visibleTabs = allTabs.filter((tab) => !tab.requiresPlayer || player);
   const [activeTab, setActiveTab] = useState<TransferDetailTab>("actualidad");
-  const clubAnnouncementNews = getTransferClubAnnouncementNews(transfer);
-  const playerNews = getTransferPlayerNews(transfer);
+  const clubAnnouncementNews = getTransferClubAnnouncementNews(transfer, allNews);
+  const playerNews = getTransferPlayerNews(transfer, allNews);
   const displayName = getTransferDisplayName(transfer);
   const originClub = getTransferOriginClub(transfer);
   const flag = player ? getNationalityFlag(player.nacionalidad) : "🇪🇸";
@@ -196,7 +200,9 @@ export function TransferDetailView({ transfer, player: initialPlayer }: Transfer
               </div>
             )}
 
-            {player && activeTab === "resumen" && <PlayerResumenSection player={player} />}
+            {player && activeTab === "resumen" && (
+              <PlayerResumenSection player={player} fanRating={averages[player.id] ?? null} />
+            )}
             {player && activeTab === "partidos" && <PlayerMatchesTable player={player} />}
             {player && activeTab === "estadisticas" && <PlayerStats player={player} />}
             {player && activeTab === "trayectoria" && <PlayerCareerTimeline player={player} />}

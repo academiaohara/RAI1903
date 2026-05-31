@@ -1,4 +1,3 @@
-import { newsItems } from "@/data/mock";
 import { sortNewsByDate } from "@/lib/noticias";
 import type { NewsItem } from "@/types";
 
@@ -18,22 +17,23 @@ export function newsMatchesPlayer(
   return namePartsInText(playerName, `${item.title} ${item.excerpt}`);
 }
 
-export function getNewsById(id: string): NewsItem | undefined {
-  return newsItems.find((item) => item.id === id);
+export function getNewsById(allNews: NewsItem[], id: string): NewsItem | undefined {
+  return allNews.find((item) => item.id === id);
 }
 
 /** Noticia oficial del club vinculada a un fichaje o renovacion (comunicado). */
 export function getPlayerClubAnnouncementNews(
+  allNews: NewsItem[],
   playerId: string,
   options?: { announcementNewsId?: string; playerName?: string },
 ): NewsItem | undefined {
   if (options?.announcementNewsId) {
-    const linked = getNewsById(options.announcementNewsId);
+    const linked = getNewsById(allNews, options.announcementNewsId);
     if (linked) return linked;
   }
 
   return sortNewsByDate(
-    newsItems.filter(
+    allNews.filter(
       (item) =>
         item.channel === "club" &&
         (item.tags.includes("fichajes") || item.tags.includes("renovaciones")) &&
@@ -44,11 +44,12 @@ export function getPlayerClubAnnouncementNews(
 
 /** Resto de noticias del jugador (club y prensa) para el carrusel. */
 export function getPlayerNews(
+  allNews: NewsItem[],
   playerId: string,
   options?: { excludeNewsId?: string; playerName?: string },
 ): NewsItem[] {
   return sortNewsByDate(
-    newsItems.filter(
+    allNews.filter(
       (item) =>
         item.id !== options?.excludeNewsId &&
         newsMatchesPlayer(item, playerId, options?.playerName),
@@ -57,9 +58,9 @@ export function getPlayerNews(
 }
 
 /** Noticias del jugador cuando solo se dispone del nombre (fichajes sin ficha). */
-export function getPlayerNewsByName(playerName: string, excludeNewsId?: string): NewsItem[] {
+export function getPlayerNewsByName(allNews: NewsItem[], playerName: string, excludeNewsId?: string): NewsItem[] {
   return sortNewsByDate(
-    newsItems.filter(
+    allNews.filter(
       (item) =>
         item.id !== excludeNewsId && namePartsInText(playerName, `${item.title} ${item.excerpt}`),
     ),
