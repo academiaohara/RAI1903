@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { OpponentCrest } from "@/components/OpponentCrest";
@@ -110,6 +110,7 @@ function CalendarListRow({
   showCrests: boolean;
   showVenue: boolean;
 }) {
+  const router = useRouter();
   const href = match.played ? match.chronicleUrl : match.previaUrl;
   const opponentTeamId = match.isHome ? match.awayTeamId : match.homeTeamId;
   const date = new Date(match.date);
@@ -126,8 +127,14 @@ function CalendarListRow({
     zebra ? "bg-slate-50/80" : "bg-white",
     scrollTarget && "bg-blue-50/90 ring-1 ring-inset ring-[#214C9B]/25",
     today && !scrollTarget && "bg-[#214C9B]/[0.06]",
-    href && "has-[a.cal-list-overlay:hover]:bg-[#214C9B]/10",
+    href && "cursor-pointer hover:bg-[#214C9B]/10",
   );
+
+  const handleActivate = (event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
+    if (!href) return;
+    if ("target" in event && (event.target as HTMLElement).closest("a")) return;
+    router.push(href as Route);
+  };
 
   const content = (
     <>
@@ -167,7 +174,7 @@ function CalendarListRow({
 
       <span className="flex min-w-0 items-center gap-2">
         {showCrests ? (
-          <TeamLink gender={gender} teamId={opponentTeamId} teamName={match.opponent} className="relative z-10 shrink-0 pointer-events-auto">
+          <TeamLink gender={gender} teamId={opponentTeamId} teamName={match.opponent} className="shrink-0">
             <OpponentCrest logo={match.opponentLogo} opponent={match.opponent} size="sm" className="text-[#214C9B]" />
           </TeamLink>
         ) : null}
@@ -176,7 +183,7 @@ function CalendarListRow({
             gender={gender}
             teamId={opponentTeamId}
             teamName={match.opponent}
-            className="relative z-10 min-w-0 truncate text-sm font-extrabold text-[#214C9B] hover:underline pointer-events-auto"
+            className="min-w-0 truncate text-sm font-extrabold text-[#214C9B] hover:underline"
           >
             {match.opponent}
           </TeamLink>
@@ -201,15 +208,20 @@ function CalendarListRow({
   );
 
   return (
-    <article id={`cal-list-match-${match.id}`} className={rowClassName}>
-      {href ? (
-        <Link
-          href={href as Route}
-          className="cal-list-overlay absolute inset-0 z-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#214C9B]"
-          aria-label={`${match.opponent}, ${match.played ? "crónica" : "previa"}`}
-        />
-      ) : null}
-      <div className={cn("contents", href && "[&>*]:pointer-events-none [&_a]:pointer-events-auto")}>{content}</div>
+    <article
+      id={`cal-list-match-${match.id}`}
+      className={rowClassName}
+      onClick={handleActivate}
+      onKeyDown={(event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        handleActivate(event);
+      }}
+      role={href ? "link" : undefined}
+      tabIndex={href ? 0 : undefined}
+      aria-label={href ? `${match.opponent}, ${match.played ? "crónica" : "previa"}` : undefined}
+    >
+      {content}
     </article>
   );
 }
