@@ -185,12 +185,16 @@ function buildEvents(match: Match, homeLineup: MatchLineup, awayLineup: MatchLin
     const lineup = team === "home" ? homeLineup : awayLineup;
     const minute = Math.min(90, minuteCursor + Math.floor(seeded(seed, index * 3) * 14));
     minuteCursor = minute + 4;
+    const scorer = pickScorer(lineup, index);
+    const assistLineup = lineup;
+    const withAssist = seeded(seed, 60 + index) > 0.55;
     events.push({
       id: `${match.id}-goal-${team}-${index}`,
       minute,
       type: "goal",
       team,
-      player: pickScorer(lineup, index),
+      player: scorer,
+      detail: withAssist ? pickScorer(assistLineup, index + 2) : undefined,
     });
   };
 
@@ -222,14 +226,17 @@ function buildEvents(match: Match, homeLineup: MatchLineup, awayLineup: MatchLin
     });
   }
 
-  if (seeded(seed, 55) > 0.35) {
+  const subCount = 2 + Math.floor(seeded(seed, 55) * 3);
+  for (let index = 0; index < subCount; index += 1) {
+    const team: "home" | "away" = seeded(seed, 56 + index) > 0.5 ? "home" : "away";
+    const lineup = team === "home" ? homeLineup : awayLineup;
     events.push({
-      id: `${match.id}-sub-1`,
-      minute: 62 + Math.floor(seeded(seed, 56) * 20),
+      id: `${match.id}-sub-${index}`,
+      minute: 46 + index * 14 + Math.floor(seeded(seed, 58 + index) * 12),
       type: "substitution",
-      team: seeded(seed, 57) > 0.5 ? "home" : "away",
-      player: pickScorer(homeLineup, 6),
-      detail: "Entra por lesion",
+      team,
+      player: pickScorer(lineup, 6 + index),
+      detail: pickScorer(lineup, 7 + index),
     });
   }
 
@@ -243,31 +250,42 @@ function buildStats(match: Match, seed: number): MatchStatCategory[] {
 
   const pct = (value: number) => `${Math.round(value)}%`;
   const homePoss = 38 + Math.floor(seeded(seed, 6) * 24);
-  const shotsHome = 8 + homeGoals * 2 + Math.floor(seeded(seed, 7) * 6);
-  const shotsAway = 6 + awayGoals * 2 + Math.floor(seeded(seed, 8) * 5);
+  const cornersHome = 2 + Math.floor(seeded(seed, 7) * 8);
+  const cornersAway = 1 + Math.floor(seeded(seed, 8) * 5);
+  const shotsOnHome = 3 + homeGoals + Math.floor(seeded(seed, 9) * 4);
+  const shotsOnAway = 2 + awayGoals + Math.floor(seeded(seed, 10) * 4);
+  const shotsOffHome = 1 + Math.floor(seeded(seed, 11) * 3);
+  const shotsOffAway = 1 + Math.floor(seeded(seed, 12) * 3);
+  const totalShotsHome = shotsOnHome + shotsOffHome;
+  const totalShotsAway = shotsOnAway + shotsOffAway;
+  const yellowHome = Math.floor(seeded(seed, 15) * 4);
+  const yellowAway = Math.floor(seeded(seed, 16) * 5);
+  const redHome = seeded(seed, 17) > 0.88 ? 1 + Math.floor(seeded(seed, 18) * 2) : 0;
+  const redAway = seeded(seed, 19) > 0.9 ? 1 + Math.floor(seeded(seed, 20) * 2) : 0;
+
+  void intensity;
 
   return [
     {
-      title: "Remates",
+      title: "Estadísticas generales",
       rows: [
-        { label: "Remates a puerta", home: shotsHome, away: shotsAway },
-        { label: "Remates totales", home: shotsHome + 5, away: shotsAway + 4 },
+        { label: "Posesión", home: pct(homePoss), away: pct(100 - homePoss) },
+        { label: "Saques de esquina", home: cornersHome, away: cornersAway },
       ],
     },
     {
-      title: "Pases",
+      title: "Ataque",
       rows: [
-        { label: "Pases totales", home: 380 + intensity * 18, away: 360 + intensity * 16 },
-        { label: "Pases completados", home: pct(72 + seeded(seed, 11) * 12), away: pct(70 + seeded(seed, 12) * 12) },
-        { label: "Posesion", home: pct(homePoss), away: pct(100 - homePoss) },
+        { label: "Disparos totales", home: totalShotsHome, away: totalShotsAway },
+        { label: "Tiros fuera", home: shotsOffHome, away: shotsOffAway },
+        { label: "Tiros a puerta", home: shotsOnHome, away: shotsOnAway },
       ],
     },
     {
       title: "Disciplina",
       rows: [
-        { label: "Faltas", home: 10 + Math.floor(seeded(seed, 13) * 8), away: 11 + Math.floor(seeded(seed, 14) * 7) },
-        { label: "Tarjetas amarillas", home: Math.floor(seeded(seed, 15) * 4), away: Math.floor(seeded(seed, 16) * 4) },
-        { label: "Fueras de juego", home: Math.floor(seeded(seed, 17) * 3), away: Math.floor(seeded(seed, 18) * 3) },
+        { label: "Tarjetas amarillas", home: yellowHome, away: yellowAway },
+        { label: "Tarjetas rojas", home: redHome, away: redAway },
       ],
     },
   ];
