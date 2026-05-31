@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
 import type { ContenidoFanSlug } from "@/lib/contenido-fan";
 import {
   fanVideosStorageKey,
+  isDefaultFanVideoTitle,
   newFanVideo,
   sortFanVideosByDate,
 } from "@/lib/fan-videos";
@@ -49,6 +50,39 @@ export function ZonaMixtaVideoShowcase({ section, videos }: ZonaMixtaVideoShowca
 
   const removeVideo = (id: string) => {
     updateVideos(currentVideos.filter((video) => video.id !== id));
+  };
+
+  const fetchVideoTitle = async (videoId: string, url: string) => {
+    const trimmedUrl = url.trim();
+    if (!youtubeVideoId(trimmedUrl)) return;
+
+    try {
+      const response = await fetch("/api/url-metadata", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: trimmedUrl }),
+      });
+      const data = (await response.json()) as { title?: string | null; error?: string };
+      if (!response.ok || !data.title) return;
+
+      const latestVideos = getValue(storageKey, videos);
+      const video = latestVideos.find((item) => item.id === videoId);
+      if (!video || video.url.trim() !== trimmedUrl || !isDefaultFanVideoTitle(video.title)) return;
+
+      saveValue(
+        storageKey,
+        latestVideos.map((item) => (item.id === videoId ? { ...item, title: data.title! } : item)),
+      );
+    } catch {
+      // Sin título automático si falla la red o YouTube.
+    }
+  };
+
+  const handleUrlChange = (video: FanYouTubeVideo, url: string) => {
+    updateVideo(video.id, { url });
+    if (isDefaultFanVideoTitle(video.title)) {
+      void fetchVideoTitle(video.id, url);
+    }
   };
 
   const addVideo = () => {
@@ -108,7 +142,7 @@ export function ZonaMixtaVideoShowcase({ section, videos }: ZonaMixtaVideoShowca
                     <input
                       type="url"
                       value={video.url}
-                      onChange={(event) => updateVideo(video.id, { url: event.target.value })}
+                      onChange={(event) => handleUrlChange(video, event.target.value)}
                       placeholder="https://youtu.be/..."
                       aria-label="URL de YouTube"
                       className={fieldClassName}

@@ -1,3 +1,5 @@
+import { fetchYouTubeTitle, youtubeVideoId } from "@/lib/youtube";
+
 export type UrlMetadata = {
   title: string | null;
   description: string | null;
@@ -122,6 +124,13 @@ export function parseUrlMetadata(html: string, url: string): UrlMetadata {
 }
 
 export async function fetchUrlMetadata(url: string, init?: RequestInit): Promise<UrlMetadata> {
+  if (youtubeVideoId(url)) {
+    const title = await fetchYouTubeTitle(url, init);
+    if (title) {
+      return { title, description: null, date: null, image: null };
+    }
+  }
+
   const response = await fetch(url, {
     ...init,
     headers: {
