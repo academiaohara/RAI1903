@@ -1,5 +1,10 @@
 import Image from "next/image";
-import { RAI_LOGO_PATH, raiNewsMediaBgClass, shouldUseRaiLogoNewsFallback } from "@/lib/noticias";
+import {
+  RAI_LOGO_PATH,
+  newsImageRequiresUnoptimized,
+  raiNewsMediaBgClass,
+  shouldUseRaiLogoNewsFallback,
+} from "@/lib/noticias";
 import type { NewsItem } from "@/types";
 
 type NewsMediaVariant = "card" | "featured" | "ticker";
@@ -33,6 +38,7 @@ export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?
           src={item.imageUrl}
           alt=""
           fill
+          unoptimized={newsImageRequiresUnoptimized(item.imageUrl)}
           className="object-cover"
           sizes={
             variant === "ticker"
