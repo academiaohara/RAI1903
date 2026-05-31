@@ -12,8 +12,25 @@ import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition
 import { getTeamByGender } from "@/lib/fixtures";
 import { getTeamCrest } from "@/lib/team-crests";
 import { cn } from "@/lib/utils";
-import type { MatchDetail } from "@/types";
+import type { MatchDetail, MatchEvent } from "@/types";
 import type { Route } from "next";
+
+const scorerClassName =
+  "text-[10px] font-semibold text-white/85 underline decoration-white/30 underline-offset-2 transition hover:text-white hover:decoration-white sm:text-xs";
+
+function TeamScorers({ goals }: { goals: MatchEvent[] }) {
+  if (goals.length === 0) return null;
+
+  return (
+    <ul className="flex flex-col items-center gap-0.5">
+      {goals.map((event) => (
+        <li key={event.id} className={scorerClassName}>
+          <span className="tabular-nums">{event.minute}&apos;</span> {event.player || "Sin nombre"}
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 type MatchCenterHeaderProps = {
   detail: MatchDetail;
@@ -57,6 +74,13 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
 
   const homeTeam = getTeamByGender(match.homeTeamId, gender);
   const awayTeam = getTeamByGender(match.awayTeamId, gender);
+  const currentEvents = getValue(keys.events, detail.events);
+  const homeGoals = currentEvents
+    .filter((event) => event.type === "goal" && event.team === "home")
+    .sort((a, b) => a.minute - b.minute);
+  const awayGoals = currentEvents
+    .filter((event) => event.type === "goal" && event.team === "away")
+    .sort((a, b) => a.minute - b.minute);
   const isFinished = match.status === "finished";
   const jornada = matchJornadaLabel(match);
   const meta = [matchCompetitionShortLabel(match), jornada, seasonLabel].filter(Boolean).join(" · ");
@@ -80,6 +104,7 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
               <OpponentCrest logo={homeTeam ? getTeamCrest(homeTeam) : "LOC"} opponent={match.homeTeam} size="md" />
               <span className="text-xs font-extrabold uppercase leading-tight sm:text-sm">{match.homeTeam}</span>
             </TeamLink>
+            <TeamScorers goals={homeGoals} />
           </div>
 
           <div className="text-center">
@@ -116,12 +141,9 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
               <OpponentCrest logo={awayTeam ? getTeamCrest(awayTeam) : "VIS"} opponent={match.awayTeam} size="md" />
               <span className="text-xs font-extrabold uppercase leading-tight sm:text-sm">{match.awayTeam}</span>
             </TeamLink>
+            <TeamScorers goals={awayGoals} />
           </div>
         </div>
-
-        <h1 className="mt-6 text-center text-xl font-extrabold uppercase leading-tight tracking-tight sm:text-3xl">
-          {match.homeTeam} vs {match.awayTeam}
-        </h1>
 
         <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-bold text-white/90 sm:text-sm">
           <li className="inline-flex items-center gap-1.5">
