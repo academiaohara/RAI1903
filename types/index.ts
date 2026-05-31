@@ -301,6 +301,17 @@ export type MatchLineup = {
   bench: LineupPlayer[];
 };
 
+export type MatchEventType = "goal" | "goal_disallowed" | "yellow" | "red" | "substitution";
+
+export type MatchEvent = {
+  id: string;
+  minute: number;
+  type: MatchEventType;
+  team: "home" | "away";
+  player: string;
+  detail?: string;
+};
+
 export type RecentFormMatch = {
   date: string;
   homeTeam: string;
@@ -346,6 +357,7 @@ export type MatchDetail = {
   kickoffDateLabel: string;
   seasonLabel: string;
   stats: MatchStatCategory[];
+  events: MatchEvent[];
   homeLineup: MatchLineup;
   awayLineup: MatchLineup;
   homeRecentMatches: RecentFormMatch[];

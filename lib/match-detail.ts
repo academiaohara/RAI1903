@@ -13,6 +13,7 @@ import type {
   MatchAvailability,
   MatchAvailabilityPlayer,
   MatchDetail,
+  MatchEvent,
   MatchLineup,
   MatchStatCategory,
   MatchVideo,
@@ -166,6 +167,75 @@ function buildLineup(teamId: string, gender: PrimerEquipoGender, seed: number, i
   return { formation, starters, bench };
 }
 
+function pickScorer(lineup: MatchLineup, index: number): string {
+  const pool = [...lineup.starters, ...lineup.bench].filter((player) => player.role !== "POR");
+  if (pool.length === 0) return lineup.starters[index % lineup.starters.length]?.name ?? "Jugador";
+  return pool[index % pool.length]?.name ?? "Jugador";
+}
+
+function buildEvents(match: Match, homeLineup: MatchLineup, awayLineup: MatchLineup, seed: number): MatchEvent[] {
+  if (match.status !== "finished") return [];
+
+  const homeGoals = match.homeScore ?? 0;
+  const awayGoals = match.awayScore ?? 0;
+  const events: MatchEvent[] = [];
+  let minuteCursor = 8;
+
+  const pushGoal = (team: "home" | "away", index: number) => {
+    const lineup = team === "home" ? homeLineup : awayLineup;
+    const minute = Math.min(90, minuteCursor + Math.floor(seeded(seed, index * 3) * 14));
+    minuteCursor = minute + 4;
+    events.push({
+      id: `${match.id}-goal-${team}-${index}`,
+      minute,
+      type: "goal",
+      team,
+      player: pickScorer(lineup, index),
+    });
+  };
+
+  for (let index = 0; index < homeGoals; index += 1) pushGoal("home", index);
+  for (let index = 0; index < awayGoals; index += 1) pushGoal("away", index + 10);
+
+  if (seeded(seed, 44) > 0.72) {
+    events.push({
+      id: `${match.id}-goal-disallowed`,
+      minute: Math.min(90, minuteCursor + 2),
+      type: "goal_disallowed",
+      team: seeded(seed, 45) > 0.5 ? "home" : "away",
+      player: pickScorer(homeLineup, 2),
+      detail: "VAR",
+    });
+  }
+
+  const cardCount = 2 + Math.floor(seeded(seed, 46) * 4);
+  for (let index = 0; index < cardCount; index += 1) {
+    const isRed = index === cardCount - 1 && seeded(seed, 47 + index) > 0.82;
+    const team: "home" | "away" = seeded(seed, 48 + index) > 0.5 ? "home" : "away";
+    const lineup = team === "home" ? homeLineup : awayLineup;
+    events.push({
+      id: `${match.id}-card-${index}`,
+      minute: 20 + index * 18 + Math.floor(seeded(seed, 49 + index) * 8),
+      type: isRed ? "red" : "yellow",
+      team,
+      player: pickScorer(lineup, index + 4),
+    });
+  }
+
+  if (seeded(seed, 55) > 0.35) {
+    events.push({
+      id: `${match.id}-sub-1`,
+      minute: 62 + Math.floor(seeded(seed, 56) * 20),
+      type: "substitution",
+      team: seeded(seed, 57) > 0.5 ? "home" : "away",
+      player: pickScorer(homeLineup, 6),
+      detail: "Entra por lesion",
+    });
+  }
+
+  return events.sort((a, b) => a.minute - b.minute);
+}
+
 function buildStats(match: Match, seed: number): MatchStatCategory[] {
   const homeGoals = match.homeScore ?? Math.floor(seeded(seed, 4) * 3);
   const awayGoals = match.awayScore ?? Math.floor(seeded(seed, 5) * 3);
@@ -289,6 +359,8 @@ export function buildMatchDetail(match: Match, gender: PrimerEquipoGender): Matc
 
   const headToHead = buildHeadToHead(match.homeTeamId, match.awayTeamId, seed);
   const h2hSummary = summarizeH2H(headToHead, raiId, match);
+  const homeLineup = buildLineup(match.homeTeamId, gender, seed + 1, match.homeTeamId === raiId);
+  const awayLineup = buildLineup(match.awayTeamId, gender, seed + 2, match.awayTeamId === raiId);
 
   return {
     match,
@@ -299,8 +371,9 @@ export function buildMatchDetail(match: Match, gender: PrimerEquipoGender): Matc
     kickoffDateLabel: formatKickoffDateLabel(match.date),
     seasonLabel: "2025/2026",
     stats: buildStats(match, seed),
-    homeLineup: buildLineup(match.homeTeamId, gender, seed + 1, match.homeTeamId === raiId),
-    awayLineup: buildLineup(match.awayTeamId, gender, seed + 2, match.awayTeamId === raiId),
+    events: buildEvents(match, homeLineup, awayLineup, seed),
+    homeLineup,
+    awayLineup,
     homeRecentMatches: homeRecent,
     awayRecentMatches: awayRecent,
     headToHead,

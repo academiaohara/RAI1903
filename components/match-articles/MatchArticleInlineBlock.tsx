@@ -16,7 +16,7 @@ export function MatchArticleInlineBlock({ article }: { article: MatchArticle }) 
     .filter(Boolean);
 
   return (
-    <article className="rounded-[2rem] border border-[#214C9B]/20 bg-white p-5 shadow-[0_12px_30px_rgba(17,24,39,0.06)] sm:p-8">
+    <article>
       <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
         {article.type === "cronica" ? "Crónica" : "Previa"} · {formatDate(article.date)} · {article.source}
       </p>
