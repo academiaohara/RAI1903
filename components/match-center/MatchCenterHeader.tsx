@@ -1,8 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { Calendar, ChevronLeft, Clock, MapPin, User, Users } from "lucide-react";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamLink } from "@/components/TeamLink";
+import { EditableText } from "@/components/inline-editing/EditableText";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { useMatchDetailStorageKeys } from "@/components/match-center/useMatchDetailOverrides";
 import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
 import { getTeamByGender } from "@/lib/fixtures";
 import { getTeamCrest } from "@/lib/team-crests";
@@ -16,8 +21,40 @@ type MatchCenterHeaderProps = {
   backLabel: string;
 };
 
+function ScoreInput({
+  value,
+  onChange,
+  ariaLabel,
+}: {
+  value: number | undefined;
+  onChange: (value: number | undefined) => void;
+  ariaLabel: string;
+}) {
+  return (
+    <input
+      type="number"
+      min={0}
+      value={value ?? ""}
+      onChange={(event) => {
+        const raw = event.target.value;
+        onChange(raw === "" ? undefined : Number(raw));
+      }}
+      aria-label={ariaLabel}
+      className="w-14 rounded-xl border border-white/35 bg-white/10 px-2 py-1 text-center text-3xl font-extrabold tabular-nums text-white outline-none focus:border-white sm:w-16 sm:text-4xl"
+    />
+  );
+}
+
 export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHeaderProps) {
   const { match, gender, referee, attendance, kickoffTime, kickoffDateLabel, seasonLabel } = detail;
+  const { editMode, getValue, saveValue } = useInlineEditing();
+  const keys = useMatchDetailStorageKeys(match.id);
+
+  const homeScore = getValue(keys.homeScore, match.homeScore);
+  const awayScore = getValue(keys.awayScore, match.awayScore);
+  const currentAttendance = getValue(keys.attendance, attendance);
+  const currentReferee = getValue(keys.referee, referee);
+
   const homeTeam = getTeamByGender(match.homeTeamId, gender);
   const awayTeam = getTeamByGender(match.awayTeamId, gender);
   const isFinished = match.status === "finished";
@@ -46,10 +83,28 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
           </div>
 
           <div className="text-center">
-            {isFinished && match.homeScore !== undefined && match.awayScore !== undefined ? (
-              <p className="text-4xl font-extrabold tabular-nums tracking-tight sm:text-5xl">
-                {match.homeScore} - {match.awayScore}
-              </p>
+            {isFinished ? (
+              editMode ? (
+                <div className="flex items-center justify-center gap-2">
+                  <ScoreInput
+                    value={homeScore}
+                    onChange={(value) => saveValue(keys.homeScore, value)}
+                    ariaLabel="Goles local"
+                  />
+                  <span className="text-3xl font-extrabold sm:text-4xl">-</span>
+                  <ScoreInput
+                    value={awayScore}
+                    onChange={(value) => saveValue(keys.awayScore, value)}
+                    ariaLabel="Goles visitante"
+                  />
+                </div>
+              ) : homeScore !== undefined && awayScore !== undefined ? (
+                <p className="text-4xl font-extrabold tabular-nums tracking-tight sm:text-5xl">
+                  {homeScore} - {awayScore}
+                </p>
+              ) : (
+                <p className="text-3xl font-extrabold uppercase sm:text-4xl">VS</p>
+              )
             ) : (
               <p className="text-3xl font-extrabold uppercase sm:text-4xl">VS</p>
             )}
@@ -71,7 +126,12 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
         <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-bold text-white/90 sm:text-sm">
           <li className="inline-flex items-center gap-1.5">
             <User size={14} aria-hidden />
-            {referee}
+            <EditableText
+              storageKey={keys.referee}
+              value={currentReferee}
+              aria-label="Editar arbitro"
+              inputClassName="text-xs font-bold text-slate-800 sm:text-sm"
+            />
           </li>
           <li className="inline-flex items-center gap-1.5">
             <Calendar size={14} aria-hidden />
@@ -85,10 +145,25 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
             <MapPin size={14} aria-hidden />
             {match.venue}
           </li>
-          {attendance !== null && (
+          {(currentAttendance !== null || editMode) && (
             <li className="inline-flex items-center gap-1.5">
               <Users size={14} aria-hidden />
-              {attendance.toLocaleString("es-ES")}
+              {editMode ? (
+                <input
+                  type="number"
+                  min={0}
+                  value={currentAttendance ?? ""}
+                  onChange={(event) => {
+                    const raw = event.target.value;
+                    saveValue(keys.attendance, raw === "" ? null : Number(raw));
+                  }}
+                  placeholder="Espectadores"
+                  aria-label="Editar espectadores"
+                  className="w-28 rounded-lg border border-white/35 bg-white/10 px-2 py-1 text-xs font-bold text-white outline-none focus:border-white sm:text-sm"
+                />
+              ) : (
+                currentAttendance?.toLocaleString("es-ES")
+              )}
             </li>
           )}
         </ul>
