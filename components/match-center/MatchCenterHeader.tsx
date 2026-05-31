@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import { Calendar, ChevronLeft, Clock, MapPin, User, Users } from "lucide-react";
 import { OpponentCrest } from "@/components/OpponentCrest";
@@ -8,26 +9,82 @@ import { TeamLink } from "@/components/TeamLink";
 import { EditableText } from "@/components/inline-editing/EditableText";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useMatchDetailStorageKeys } from "@/components/match-center/useMatchDetailOverrides";
+import { PlayerModal } from "@/components/squad/PlayerModal";
+import { StadiumModal } from "@/components/squad/StadiumModal";
 import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
-import { getTeamByGender } from "@/lib/fixtures";
+import { getCompeticionSquadData } from "@/lib/competicion-squad";
+import { getRaiTeamId, getTeamByGender } from "@/lib/fixtures";
+import { findSquadPlayerByName } from "@/lib/squad-lineup";
+import { getSquadPlayers } from "@/lib/squad-data";
 import { getTeamCrest } from "@/lib/team-crests";
 import { cn } from "@/lib/utils";
 import type { MatchDetail, MatchEvent } from "@/types";
+import type { SquadPlayer } from "@/types/squad";
 import type { Route } from "next";
 
-const scorerClassName =
-  "text-[10px] font-semibold text-white/85 underline decoration-white/30 underline-offset-2 transition hover:text-white hover:decoration-white sm:text-xs";
+type GroupedScorer = {
+  player: string;
+  minutes: number[];
+};
 
-function TeamScorers({ goals }: { goals: MatchEvent[] }) {
-  if (goals.length === 0) return null;
+function groupGoalsByPlayer(goals: MatchEvent[]): GroupedScorer[] {
+  const order: string[] = [];
+  const byPlayer = new Map<string, number[]>();
+
+  for (const goal of goals) {
+    if (!byPlayer.has(goal.player)) {
+      order.push(goal.player);
+      byPlayer.set(goal.player, []);
+    }
+    byPlayer.get(goal.player)!.push(goal.minute);
+  }
+
+  return order.map((player) => ({
+    player,
+    minutes: byPlayer.get(player)!.sort((a, b) => a - b),
+  }));
+}
+
+function TeamScorers({
+  goals,
+  align,
+  isAviles,
+  squad,
+  onPlayerClick,
+}: {
+  goals: MatchEvent[];
+  align: "left" | "right";
+  isAviles: boolean;
+  squad: SquadPlayer[];
+  onPlayerClick: (player: SquadPlayer) => void;
+}) {
+  const grouped = groupGoalsByPlayer(goals);
+  if (grouped.length === 0) return null;
 
   return (
-    <ul className="flex flex-col items-center gap-0.5">
-      {goals.map((event) => (
-        <li key={event.id} className={scorerClassName}>
-          <span className="tabular-nums">{event.minute}&apos;</span> {event.player || "Sin nombre"}
-        </li>
-      ))}
+    <ul className={cn("flex flex-col gap-0.5", align === "left" ? "items-start text-left" : "items-end text-right")}>
+      {grouped.map((entry) => {
+        const squadPlayer = isAviles ? findSquadPlayerByName(squad, entry.player) : undefined;
+        const minutesLabel = entry.minutes.map((minute) => `${minute}'`).join(", ");
+        const playerName = entry.player || "Sin nombre";
+
+        return (
+          <li key={entry.player} className="text-[10px] font-semibold text-white/85 sm:text-xs">
+            <span className="tabular-nums">{minutesLabel}</span>{" "}
+            {squadPlayer ? (
+              <button
+                type="button"
+                onClick={() => onPlayerClick(squadPlayer)}
+                className="cursor-pointer transition hover:text-white"
+              >
+                {playerName}
+              </button>
+            ) : (
+              <span>{playerName}</span>
+            )}
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -66,6 +123,8 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
   const { match, gender, referee, attendance, kickoffTime, kickoffDateLabel, seasonLabel } = detail;
   const { editMode, getValue, saveValue } = useInlineEditing();
   const keys = useMatchDetailStorageKeys(match.id);
+  const [selectedPlayer, setSelectedPlayer] = useState<SquadPlayer | null>(null);
+  const [stadiumOpen, setStadiumOpen] = useState(false);
 
   const homeScore = getValue(keys.homeScore, match.homeScore);
   const awayScore = getValue(keys.awayScore, match.awayScore);
@@ -74,6 +133,16 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
 
   const homeTeam = getTeamByGender(match.homeTeamId, gender);
   const awayTeam = getTeamByGender(match.awayTeamId, gender);
+  const raiId = getRaiTeamId(gender);
+  const isHomeAviles = match.homeTeamId === raiId;
+  const isAwayAviles = match.awayTeamId === raiId;
+  const avilesSquad = useMemo(() => (isHomeAviles || isAwayAviles ? getSquadPlayers(gender) : []), [gender, isHomeAviles, isAwayAviles]);
+  const homeStadiumInfo = useMemo(() => {
+    if (!homeTeam) return null;
+    return getCompeticionSquadData(gender, homeTeam).club.estadioInfo;
+  }, [gender, homeTeam]);
+  const showPlayerModal = gender === "masculino";
+
   const currentEvents = getValue(keys.events, detail.events);
   const homeGoals = currentEvents
     .filter((event) => event.type === "goal" && event.team === "home")
@@ -99,12 +168,20 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
         <p className="mt-4 text-center text-xs font-bold uppercase tracking-[0.12em] text-white/85">{meta}</p>
 
         <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-6">
-          <div className="flex flex-col items-center gap-2 text-center">
-            <TeamLink gender={gender} teamId={match.homeTeamId} teamName={match.homeTeam} className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-2">
+            <TeamLink gender={gender} teamId={match.homeTeamId} teamName={match.homeTeam} className="flex flex-col items-center gap-2 text-center">
               <OpponentCrest logo={homeTeam ? getTeamCrest(homeTeam) : "LOC"} opponent={match.homeTeam} size="md" />
               <span className="text-xs font-extrabold uppercase leading-tight sm:text-sm">{match.homeTeam}</span>
             </TeamLink>
-            <TeamScorers goals={homeGoals} />
+            <div className="w-full">
+              <TeamScorers
+                goals={homeGoals}
+                align="left"
+                isAviles={isHomeAviles}
+                squad={avilesSquad}
+                onPlayerClick={setSelectedPlayer}
+              />
+            </div>
           </div>
 
           <div className="text-center">
@@ -136,12 +213,20 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
             <p className="mt-1 text-sm font-bold text-white/80">{kickoffTime}</p>
           </div>
 
-          <div className="flex flex-col items-center gap-2 text-center">
-            <TeamLink gender={gender} teamId={match.awayTeamId} teamName={match.awayTeam} className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-2">
+            <TeamLink gender={gender} teamId={match.awayTeamId} teamName={match.awayTeam} className="flex flex-col items-center gap-2 text-center">
               <OpponentCrest logo={awayTeam ? getTeamCrest(awayTeam) : "VIS"} opponent={match.awayTeam} size="md" />
               <span className="text-xs font-extrabold uppercase leading-tight sm:text-sm">{match.awayTeam}</span>
             </TeamLink>
-            <TeamScorers goals={awayGoals} />
+            <div className="w-full">
+              <TeamScorers
+                goals={awayGoals}
+                align="right"
+                isAviles={isAwayAviles}
+                squad={avilesSquad}
+                onPlayerClick={setSelectedPlayer}
+              />
+            </div>
           </div>
         </div>
 
@@ -165,7 +250,17 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
           </li>
           <li className="inline-flex items-center gap-1.5">
             <MapPin size={14} aria-hidden />
-            {match.venue}
+            {homeStadiumInfo ? (
+              <button
+                type="button"
+                onClick={() => setStadiumOpen(true)}
+                className="cursor-pointer transition hover:text-white"
+              >
+                {match.venue}
+              </button>
+            ) : (
+              match.venue
+            )}
           </li>
           {(currentAttendance !== null || editMode) && (
             <li className="inline-flex items-center gap-1.5">
@@ -190,6 +285,8 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
           )}
         </ul>
       </div>
+      {showPlayerModal && <PlayerModal player={selectedPlayer} onClose={() => setSelectedPlayer(null)} />}
+      <StadiumModal stadium={homeStadiumInfo} open={stadiumOpen} onClose={() => setStadiumOpen(false)} />
     </header>
   );
 }
