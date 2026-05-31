@@ -50,7 +50,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             ) : null}
             <TwitterLoginButton nextPath={nextPath} />
             <p className="text-center text-xs leading-6 text-slate-500">
-              En Supabase debes tener activado el proveedor <strong>Twitter</strong> y la URL de callback de tu
+              En Supabase debes tener activado el proveedor <strong>X / Twitter (OAuth 2.0)</strong> y la URL de
+              callback de tu
               despliegue en Authentication → URL Configuration.
             </p>
           </div>
