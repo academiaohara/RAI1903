@@ -1,4 +1,5 @@
 import {
+  amistosoMatches,
   copaDelReyMatches,
   matchdays,
   matchdaysFemenino,
@@ -33,12 +34,14 @@ function leagueMatchesForGender(gender: PrimerEquipoGender): Match[] {
   return matchdays.flatMap((matchday) => matchday.matches);
 }
 
+const masculinoNonLeagueMatches = [...amistosoMatches, ...copaDelReyMatches];
+
 export const getAvilesMatchesByGender = (gender: PrimerEquipoGender): Match[] => {
   const raiId = getRaiTeamId(gender);
   const source =
     gender === "femenino"
       ? leagueMatchesForGender(gender)
-      : [...leagueMatchesForGender(gender), ...copaDelReyMatches];
+      : [...leagueMatchesForGender(gender), ...masculinoNonLeagueMatches];
   return source.filter((match) => match.homeTeamId === raiId || match.awayTeamId === raiId);
 };
 
@@ -52,8 +55,13 @@ export const getUpcomingAvilesMatches = (limit = 5): Match[] =>
 
 export const getNextAvilesMatch = (): Match | undefined => getUpcomingAvilesMatches(1)[0];
 
+export const getAmistosoMatchesByGender = (gender: PrimerEquipoGender): Match[] =>
+  gender === "masculino"
+    ? [...amistosoMatches].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    : [];
+
 export const getTeamMatches = (teamId: string): Match[] => {
-  const masculino = [...matchdays.flatMap((matchday) => matchday.matches), ...copaDelReyMatches].filter(
+  const masculino = [...matchdays.flatMap((matchday) => matchday.matches), ...masculinoNonLeagueMatches].filter(
     (match) => match.homeTeamId === teamId || match.awayTeamId === teamId,
   );
   if (masculino.length > 0) return masculino;
@@ -108,7 +116,9 @@ export const getNextAvilesMatchByGender = (gender: PrimerEquipoGender): Match | 
   getUpcomingAvilesMatchesByGender(gender, 1)[0];
 
 export function getMatchById(matchId: string): Match | undefined {
-  return [...matchdays.flatMap((round) => round.matches), ...matchdaysFemenino.flatMap((round) => round.matches)].find(
-    (match) => match.id === matchId,
-  );
+  return [
+    ...matchdays.flatMap((round) => round.matches),
+    ...matchdaysFemenino.flatMap((round) => round.matches),
+    ...masculinoNonLeagueMatches,
+  ].find((match) => match.id === matchId);
 }
