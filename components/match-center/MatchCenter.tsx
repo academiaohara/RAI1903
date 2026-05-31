@@ -54,7 +54,7 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
   return (
     <div className="space-y-6">
       <MatchCenterHeader detail={resolvedDetail} backHref={backHref} backLabel={backLabel} />
-      {article && <MatchArticleInlineBlock article={article} />}
+      {article?.type === "previa" && <MatchArticleInlineBlock article={article} />}
 
       {isFinished ? (
         <>
