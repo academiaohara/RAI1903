@@ -5,11 +5,9 @@ export function getPlayerFullName(player: SquadPlayer): string {
   return `${player.nombre} ${player.apellido}`;
 }
 
-/** Nombre corto para fichas (p. ej. "Alvaro Fdez"). */
+/** Nombre para fichas de plantilla (nombre + apellido completo). */
 export function getPlayerDisplayName(player: SquadPlayer): string {
-  const shortLast =
-    player.apellido.length > 5 ? `${player.apellido.slice(0, 4)}.` : player.apellido;
-  return `${player.nombre} ${shortLast}`;
+  return player.apellido ? `${player.nombre} ${player.apellido}` : player.nombre;
 }
 
 export function getPlayerInitials(player: SquadPlayer): string {
