@@ -2,19 +2,9 @@
 
 import type { ReactNode } from "react";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
-import { MatchShotsNestedBlock, MatchStatBarRow } from "@/components/match-center/match-stats-ui";
+import { MatchStatBarRow } from "@/components/match-center/match-stats-ui";
 import { useMatchDetailStorageKeys } from "@/components/match-center/useMatchDetailOverrides";
 import type { MatchStatCategory, MatchStatRow } from "@/types";
-
-function isShotsOffRow(label: string): boolean {
-  const normalized = label.toLowerCase();
-  return normalized.includes("tiros fuera") || normalized.includes("remates fuera");
-}
-
-function isShotsOnRow(label: string): boolean {
-  const normalized = label.toLowerCase();
-  return normalized.includes("tiros a puerta") || normalized.includes("remates a puerta");
-}
 
 function CategorySection({
   title,
@@ -39,13 +29,6 @@ function renderCategoryRows(rows: MatchStatRow[], editMode: boolean, categoryInd
 
   while (rowIndex < rows.length) {
     const row = rows[rowIndex]!;
-    const next = rows[rowIndex + 1];
-
-    if (!editMode && next && isShotsOffRow(row.label) && isShotsOnRow(next.label)) {
-      elements.push(<MatchShotsNestedBlock key={`shots-${rowIndex}`} offTarget={row} onTarget={next} />);
-      rowIndex += 2;
-      continue;
-    }
 
     if (editMode) {
       elements.push(
