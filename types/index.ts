@@ -127,6 +127,12 @@ export type TransferCategory = "Rumores" | "Altas" | "Bajas" | "Renovaciones";
 
 export type TransferKind = "fichaje" | "renovacion" | "cesion";
 
+export type TransferMarketWindowId =
+  | "verano-24-25"
+  | "invierno-24-25"
+  | "verano-25-26"
+  | "invierno-25-26";
+
 export type TransferRumor = {
   id: string;
   playerName: string;
@@ -147,6 +153,8 @@ export type TransferRumor = {
   clubAnnouncement?: string;
   /** Noticia del club enlazada al comunicado (fichaje, renovacion, etc.). */
   clubAnnouncementNewsId?: string;
+  /** Ventana de mercado (verano / invierno de una temporada). */
+  marketWindowId?: TransferMarketWindowId;
 };
 
 export type PredictionOutcome = "1" | "X" | "2";
