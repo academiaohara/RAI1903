@@ -9,6 +9,7 @@ import { useCallback, useRef, useState } from "react";
 import { AuthHeaderButton } from "@/components/auth/AuthHeaderButton";
 import { MobileNavDrawer } from "@/components/MobileNavDrawer";
 import { navItems, type NavItem } from "@/lib/navigation";
+import { shouldPrefetchRoute } from "@/lib/should-prefetch-route";
 import { cn } from "@/lib/utils";
 
 function isNavActive(pathname: string, item: NavItem) {
@@ -18,6 +19,7 @@ function isNavActive(pathname: string, item: NavItem) {
 
 export function Header() {
   const pathname = usePathname();
+  const prefetch = shouldPrefetchRoute(pathname);
   const [open, setOpen] = useState(false);
   const [hoveredNav, setHoveredNav] = useState<NavItem | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -49,7 +51,7 @@ export function Header() {
       onMouseLeave={scheduleClose}
     >
       <div className="mx-auto flex h-16 max-w-[1480px] items-center gap-3 px-4 sm:h-20 sm:gap-4 sm:px-6 lg:px-8">
-        <Link href="/" className="group flex shrink-0 items-center gap-3" onClick={() => setOpen(false)}>
+        <Link href="/" prefetch={prefetch} className="group flex shrink-0 items-center gap-3" onClick={() => setOpen(false)}>
           <Image
             src="/logo.png"
             alt="RAI1903"
@@ -73,6 +75,7 @@ export function Header() {
               <div key={item.href} className="relative" onMouseEnter={() => openMega(item)}>
                 <Link
                   href={item.href as Route}
+                  prefetch={prefetch}
                   style={active ? { color: "#214C9B" } : undefined}
                   className={cn(
                     "inline-flex items-center gap-1 rounded-full border border-transparent px-4 py-2 text-sm font-bold uppercase tracking-normal transition hover:border-white",
@@ -120,6 +123,7 @@ export function Header() {
                 <Link
                   key={child.href}
                   href={child.href as Route}
+                  prefetch={prefetch}
                   aria-current={childActive ? "page" : undefined}
                   className={cn(
                     "group flex flex-col items-center justify-center rounded-xl border border-[#e0e0e0] bg-white px-4 py-6 text-center text-[0.95rem] font-medium text-[#444] transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]",

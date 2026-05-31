@@ -7,6 +7,7 @@ import type { Route } from "next";
 import { ChevronRight, X } from "lucide-react";
 import { useEffect } from "react";
 import { isMobileNavItemActive, mobileNavSections } from "@/lib/navigation";
+import { shouldPrefetchRoute } from "@/lib/should-prefetch-route";
 import { cn } from "@/lib/utils";
 
 type MobileNavDrawerProps = {
@@ -16,6 +17,7 @@ type MobileNavDrawerProps = {
 
 export function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps) {
   const pathname = usePathname();
+  const prefetch = shouldPrefetchRoute(pathname);
 
   useEffect(() => {
     if (!open) return;
@@ -36,7 +38,7 @@ export function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps) {
       aria-label="Menu de navegacion"
     >
       <div className="flex shrink-0 items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
-        <Link href="/" className="flex min-w-0 items-center gap-2.5" onClick={onClose}>
+        <Link href="/" prefetch={prefetch} className="flex min-w-0 items-center gap-2.5" onClick={onClose}>
           <Image src="/logo.png" alt="RAI1903" width={44} height={44} className="h-10 w-10 shrink-0 object-contain" />
           <span className="truncate">
             <span className="block text-lg font-extrabold leading-tight tracking-tight">RAI1903</span>
@@ -68,6 +70,7 @@ export function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps) {
                   <li key={item.href}>
                     <Link
                       href={item.href as Route}
+                      prefetch={prefetch}
                       onClick={onClose}
                       aria-current={active ? "page" : undefined}
                       className={cn(
