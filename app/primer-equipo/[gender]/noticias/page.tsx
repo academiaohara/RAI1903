@@ -2,7 +2,9 @@
 
 import { use, useMemo, useState } from "react";
 import { NewsCard } from "@/components/NewsCard";
+import { Pagination } from "@/components/Pagination";
 import { PrimerEquipoPageHero } from "@/components/PrimerEquipoPageHero";
+import { usePagination } from "@/hooks/usePagination";
 import { newsItems } from "@/data/mock";
 import { newsForTeam } from "@/lib/noticias";
 import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -19,6 +21,8 @@ export default function PrimerEquipoNoticiasPage({ params }: { params: Promise<{
     () => teamNews.filter((item) => tag === "todas" || item.tags.includes(tag)),
     [teamNews, tag],
   );
+
+  const pagination = usePagination(filtered);
 
   return (
     <div className="space-y-6">
@@ -41,14 +45,31 @@ export default function PrimerEquipoNoticiasPage({ params }: { params: Promise<{
       </div>
 
       <div className="grid gap-3 sm:gap-4">
-        {filtered.length > 0 ? (
-          filtered.map((item) => <NewsCard key={item.id} item={item} />)
+        {pagination.paginatedItems.length > 0 ? (
+          pagination.paginatedItems.map((item) => <NewsCard key={item.id} item={item} />)
         ) : (
           <p className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm font-bold text-slate-500">
             Sin noticias en esta categoria para {genderLabels[gender].title.toLowerCase()}.
           </p>
         )}
       </div>
+
+      <Pagination
+        pageSize={pagination.pageSize}
+        pageSizes={pagination.pageSizes}
+        totalItems={pagination.totalItems}
+        rangeStart={pagination.rangeStart}
+        rangeEnd={pagination.rangeEnd}
+        canGoFirst={pagination.canGoFirst}
+        canGoPrevious={pagination.canGoPrevious}
+        canGoNext={pagination.canGoNext}
+        canGoLast={pagination.canGoLast}
+        onPageSizeChange={pagination.setPageSize}
+        onFirst={pagination.goToFirst}
+        onPrevious={pagination.goToPrevious}
+        onNext={pagination.goToNext}
+        onLast={pagination.goToLast}
+      />
     </div>
   );
 }

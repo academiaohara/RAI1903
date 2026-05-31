@@ -6,6 +6,8 @@ import { Card } from "@/components/Card";
 import { AddNewsPanel } from "@/components/editor/AddNewsPanel";
 import { NewsCard } from "@/components/NewsCard";
 import { PageHero } from "@/components/PageHero";
+import { Pagination } from "@/components/Pagination";
+import { usePagination } from "@/hooks/usePagination";
 import { pressLinks } from "@/data/mock";
 import { fetchPublishedNewsItems } from "@/lib/cms/news";
 import { newsByChannel } from "@/lib/noticias";
@@ -39,6 +41,9 @@ export default function NoticiasPrensaPage() {
       }),
     [pressNews, query, source, tag],
   );
+
+  const pagination = usePagination(filtered);
+  const archivePagination = usePagination(pressNews, { defaultPageSize: 20, pageSizes: [20, 50, 100] });
 
   return (
     <div className="space-y-6">
@@ -78,10 +83,27 @@ export default function NoticiasPrensaPage() {
       <AddNewsPanel defaultChannel="prensa" onCreated={loadNews} />
 
       <div className="grid gap-3 sm:gap-4">
-        {filtered.map((item) => (
+        {pagination.paginatedItems.map((item) => (
           <NewsCard key={item.id} item={item} onUpdated={loadNews} />
         ))}
       </div>
+
+      <Pagination
+        pageSize={pagination.pageSize}
+        pageSizes={pagination.pageSizes}
+        totalItems={pagination.totalItems}
+        rangeStart={pagination.rangeStart}
+        rangeEnd={pagination.rangeEnd}
+        canGoFirst={pagination.canGoFirst}
+        canGoPrevious={pagination.canGoPrevious}
+        canGoNext={pagination.canGoNext}
+        canGoLast={pagination.canGoLast}
+        onPageSizeChange={pagination.setPageSize}
+        onFirst={pagination.goToFirst}
+        onPrevious={pagination.goToPrevious}
+        onNext={pagination.goToNext}
+        onLast={pagination.goToLast}
+      />
 
       <Card eyebrow="Enlaces a medios" title="Fuentes para seguir el club">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -104,7 +126,7 @@ export default function NoticiasPrensaPage() {
       <Card eyebrow="Archivo" title="Historico reciente">
         <div className="overflow-hidden rounded-2xl border border-[#214C9B]/20 bg-white">
           <div className="divide-y divide-slate-100 md:hidden">
-            {pressNews.map((item) => (
+            {archivePagination.paginatedItems.map((item) => (
               <article key={item.id} className="p-4">
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="min-w-0 break-words text-sm font-extrabold leading-snug text-slate-900">{item.title}</h3>
@@ -124,7 +146,7 @@ export default function NoticiasPrensaPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {pressNews.map((item) => (
+              {archivePagination.paginatedItems.map((item) => (
                 <tr key={item.id}>
                   <td className="px-4 py-3 text-slate-500">{item.date}</td>
                   <td className="px-4 py-3 font-bold text-slate-900">{item.title}</td>
@@ -134,6 +156,25 @@ export default function NoticiasPrensaPage() {
             </tbody>
           </table>
         </div>
+
+        <Pagination
+          className="mt-4 border-0 bg-transparent px-0"
+          pageSizeLabel="Filas por página"
+          pageSize={archivePagination.pageSize}
+          pageSizes={archivePagination.pageSizes}
+          totalItems={archivePagination.totalItems}
+          rangeStart={archivePagination.rangeStart}
+          rangeEnd={archivePagination.rangeEnd}
+          canGoFirst={archivePagination.canGoFirst}
+          canGoPrevious={archivePagination.canGoPrevious}
+          canGoNext={archivePagination.canGoNext}
+          canGoLast={archivePagination.canGoLast}
+          onPageSizeChange={archivePagination.setPageSize}
+          onFirst={archivePagination.goToFirst}
+          onPrevious={archivePagination.goToPrevious}
+          onNext={archivePagination.goToNext}
+          onLast={archivePagination.goToLast}
+        />
       </Card>
     </div>
   );
