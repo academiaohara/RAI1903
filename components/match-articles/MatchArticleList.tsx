@@ -14,16 +14,15 @@ import type { Route } from "next";
 type MatchArticleListProps = {
   articles: MatchArticle[];
   gender: PrimerEquipoGender;
-  type: MatchArticle["type"];
 };
 
-export function MatchArticleList({ articles, gender, type }: MatchArticleListProps) {
+export function MatchArticleList({ articles, gender }: MatchArticleListProps) {
   const { items: newsItems } = usePublishedNews();
 
   return (
     <div className="space-y-3">
       {articles.map((article) => (
-        <MatchArticleCard key={article.id} article={article} gender={gender} type={type} newsItems={newsItems} />
+        <MatchArticleCard key={article.id} article={article} gender={gender} newsItems={newsItems} />
       ))}
     </div>
   );
@@ -32,20 +31,19 @@ export function MatchArticleList({ articles, gender, type }: MatchArticleListPro
 function MatchArticleCard({
   article,
   gender,
-  type,
   newsItems,
 }: {
   article: MatchArticle;
   gender: PrimerEquipoGender;
-  type: MatchArticle["type"];
   newsItems: NewsItem[];
 }) {
   const { editMode } = useInlineEditing();
-  const href = `${primerEquipoBase(gender)}/${type === "cronica" ? "cronicas" : "previas"}/${article.id}` as Route;
+  const href = `${primerEquipoBase(gender)}/cronicas/${article.id}` as Route;
+  const typeLabel = article.type === "cronica" ? "Crónica" : "Previa";
   const content = (
     <>
       <p className="text-xs font-bold uppercase tracking-normal text-slate-500">
-        {formatDate(article.date)} · {article.source}
+        {typeLabel} · {formatDate(article.date)} · {article.source}
       </p>
       <h2 className="mt-2 text-lg font-extrabold uppercase text-[#214C9B]">
         <EditableText

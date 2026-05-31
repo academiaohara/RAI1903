@@ -61,7 +61,7 @@ export default function HomePage() {
           <MatchBanner
             match={nextMatch}
             label="Siguiente partido"
-            href={(nextPrevia ? `${primerEquipoBase("masculino")}/previas/${nextPrevia.id}` : `${primerEquipoBase("masculino")}/previas`) as Route}
+            href={(nextPrevia ? `${primerEquipoBase("masculino")}/cronicas/${nextPrevia.id}` : `${primerEquipoBase("masculino")}/cronicas`) as Route}
             action="Entrar en la previa"
           />
         )}

@@ -59,7 +59,7 @@ export function matchToCalendarMatch(match: Match, gender: PrimerEquipoGender): 
     homeScore: match.homeScore,
     awayScore: match.awayScore,
     chronicleUrl: cronica ? (`${primerEquipoBase(gender)}/cronicas/${cronica.id}` as Route) : null,
-    previaUrl: !played && previa ? (`${primerEquipoBase(gender)}/previas/${previa.id}` as Route) : null,
+    previaUrl: !played && previa ? (`${primerEquipoBase(gender)}/cronicas/${previa.id}` as Route) : null,
   };
 }
 

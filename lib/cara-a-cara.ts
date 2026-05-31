@@ -11,8 +11,6 @@ export type CaraACaraTeamSide = {
   goalsAgainst: number;
   form: FormCode[];
   accent: "home" | "away";
-  featuredPlayerName?: string;
-  featuredPlayerPhoto?: string | null;
 };
 
 export type CaraACaraData = {
@@ -37,25 +35,13 @@ export function buildCaraACaraData(
   homeTeamId: string,
   awayTeamId: string,
   gender: PrimerEquipoGender,
-  options?: {
-    homeFeatured?: { name: string; photo: string | null };
-    awayFeatured?: { name: string; photo: string | null };
-  },
 ): CaraACaraData | null {
   const homeTeam = getTeamByGender(homeTeamId, gender);
   const awayTeam = getTeamByGender(awayTeamId, gender);
   if (!homeTeam || !awayTeam) return null;
 
   return {
-    home: {
-      ...teamToSide(homeTeam, "home"),
-      featuredPlayerName: options?.homeFeatured?.name,
-      featuredPlayerPhoto: options?.homeFeatured?.photo ?? null,
-    },
-    away: {
-      ...teamToSide(awayTeam, "away"),
-      featuredPlayerName: options?.awayFeatured?.name,
-      featuredPlayerPhoto: options?.awayFeatured?.photo ?? null,
-    },
+    home: teamToSide(homeTeam, "home"),
+    away: teamToSide(awayTeam, "away"),
   };
 }

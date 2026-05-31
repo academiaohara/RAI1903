@@ -22,7 +22,6 @@ export const PRIMER_EQUIPO_SECTIONS = [
   "jornadas",
   "calendario",
   "cronicas",
-  "previas",
 ] as const;
 
 export type PrimerEquipoSection = (typeof PRIMER_EQUIPO_SECTIONS)[number];
@@ -36,7 +35,6 @@ export function getPrimerEquipoTabs(gender: PrimerEquipoGender) {
     { href: `${base}/jornadas`, label: "Jornadas" },
     { href: `${base}/calendario`, label: "Calendario" },
     { href: `${base}/cronicas`, label: "Crónicas" },
-    { href: `${base}/previas`, label: "Previas" },
   ];
 }
 
