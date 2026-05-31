@@ -3,6 +3,7 @@ import Link from "next/link";
 import { TwitterLoginButton } from "@/components/auth/TwitterLoginButton";
 import { Card } from "@/components/Card";
 import { PageHero } from "@/components/PageHero";
+import { isXProfileProviderError } from "@/lib/auth/x-oauth";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export const metadata: Metadata = {
@@ -27,6 +28,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const errorDetail = params.reason?.replace(/\+/g, " ");
   const nextPath = params.next?.startsWith("/") ? params.next : "/quiniela";
   const configured = isSupabaseConfigured();
+  const showXSetupHelp = isXProfileProviderError(errorDetail);
 
   return (
     <div className="space-y-8">
@@ -54,10 +56,31 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               </div>
             ) : null}
             <TwitterLoginButton nextPath={nextPath} />
+            {showXSetupHelp ? (
+              <div className="rounded-lg border border-[#214C9B]/20 bg-blue-50 px-4 py-3 text-left text-xs leading-6 text-slate-700">
+                <p className="font-bold text-[#214C9B]">Si ves «Error getting user profile…»:</p>
+                <ol className="mt-2 list-decimal space-y-1 pl-4">
+                  <li>
+                    En <strong>developer.x.com → tu app → User authentication</strong>, activa{" "}
+                    <strong>Request email from users</strong> y tipo <strong>Web App</strong>. Guarda.
+                  </li>
+                  <li>
+                    Usa <strong>Client ID</strong> y <strong>Client Secret</strong> de OAuth 2.0 (no Consumer Key ni
+                    Access Token).
+                  </li>
+                  <li>
+                    En la cuenta de X con la que pruebas: Ajustes → Email y confirma que hay email. Si cambiaste la app,
+                    revoca el acceso en X y vuelve a entrar.
+                  </li>
+                  <li>
+                    Supabase: <strong>Allow users without an email</strong> activado (ya lo tienes).
+                  </li>
+                </ol>
+              </div>
+            ) : null}
             <p className="text-center text-xs leading-6 text-slate-500">
               En Supabase debes tener activado el proveedor <strong>X / Twitter (OAuth 2.0)</strong> y la URL de
-              callback de tu
-              despliegue en Authentication → URL Configuration.
+              callback de tu despliegue en Authentication → URL Configuration.
             </p>
           </div>
         )}
