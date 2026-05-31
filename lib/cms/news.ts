@@ -1,10 +1,9 @@
-import { newsItems as mockNewsItems } from "@/data/mock";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { NewsItem, NewsTag } from "@/types";
 
 const LOCAL_NEWS_KEY = "rai1903:cms-news:v1";
-const LOCAL_DELETED_NEWS_KEY = "rai1903:cms-news-deleted:v1";
+const LOCAL_NEWS_MIGRATED_KEY = "rai1903:cms-news:migrated-to-supabase";
 
 type CmsNewsRow = {
   id: string;
@@ -49,45 +48,38 @@ function readLocalNewsItems(): NewsItem[] {
   }
 }
 
-function writeLocalNewsItems(items: NewsItem[]) {
-  window.localStorage.setItem(LOCAL_NEWS_KEY, JSON.stringify(items));
+function clearLocalNewsItems() {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(LOCAL_NEWS_KEY);
 }
 
-function readDeletedNewsIds(): Set<string> {
-  if (typeof window === "undefined") return new Set();
-  try {
-    const raw = window.localStorage.getItem(LOCAL_DELETED_NEWS_KEY);
-    return raw ? new Set(JSON.parse(raw) as string[]) : new Set();
-  } catch {
-    return new Set();
+/** Sube noticias creadas en localStorage a Supabase (una vez por navegador). */
+export async function migrateLocalNewsToSupabase(): Promise<void> {
+  if (!isSupabaseConfigured() || typeof window === "undefined") return;
+  if (window.localStorage.getItem(LOCAL_NEWS_MIGRATED_KEY) === "1") return;
+
+  const localItems = readLocalNewsItems();
+  if (!localItems.length) {
+    window.localStorage.setItem(LOCAL_NEWS_MIGRATED_KEY, "1");
+    return;
   }
-}
 
-function addDeletedNewsId(id: string) {
-  const deleted = readDeletedNewsIds();
-  deleted.add(id);
-  window.localStorage.setItem(LOCAL_DELETED_NEWS_KEY, JSON.stringify([...deleted]));
-}
+  const supabase = createClient();
+  const rows = localItems.map((item) => newsItemToRow(item));
+  const { error } = await supabase.from("cms_news_items").upsert(rows);
 
-function withoutDeletedNews(items: NewsItem[]) {
-  const deleted = readDeletedNewsIds();
-  return deleted.size ? items.filter((item) => !deleted.has(item.id)) : items;
-}
-
-function mergeNewsLists(...lists: NewsItem[][]): NewsItem[] {
-  const byId = new Map<string, NewsItem>();
-  for (const list of lists) {
-    for (const item of list) {
-      byId.set(item.id, item);
-    }
+  if (!error) {
+    clearLocalNewsItems();
+    window.localStorage.setItem(LOCAL_NEWS_MIGRATED_KEY, "1");
   }
-  return [...byId.values()].sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
 }
 
 export async function fetchPublishedNewsItems(): Promise<NewsItem[]> {
   if (!isSupabaseConfigured()) {
-    return withoutDeletedNews(mergeNewsLists(mockNewsItems, readLocalNewsItems()));
+    return [];
   }
+
+  await migrateLocalNewsToSupabase();
 
   const supabase = createClient();
   const { data, error } = await supabase
@@ -96,17 +88,8 @@ export async function fetchPublishedNewsItems(): Promise<NewsItem[]> {
     .eq("published", true)
     .order("published_at", { ascending: false });
 
-  const localItems = readLocalNewsItems();
-
-  if (error || !data?.length) {
-    return withoutDeletedNews(mergeNewsLists(mockNewsItems, localItems));
-  }
-
-  const cmsItems = data.map((row) => rowToNewsItem(row as CmsNewsRow));
-  const cmsIds = new Set(cmsItems.map((item) => item.id));
-  const mockOnly = mockNewsItems.filter((item) => !cmsIds.has(item.id));
-  const localOnly = localItems.filter((item) => !cmsIds.has(item.id));
-  return withoutDeletedNews(mergeNewsLists(cmsItems, mockOnly, localOnly));
+  if (error || !data) return [];
+  return data.map((row) => rowToNewsItem(row as CmsNewsRow));
 }
 
 export function newsItemToRow(item: NewsItem): Omit<CmsNewsRow, "published"> & { published: boolean } {
@@ -133,9 +116,7 @@ export async function updateNewsItem(item: NewsItem): Promise<{ ok: boolean; err
 
 export async function insertNewsItem(item: NewsItem): Promise<{ ok: boolean; error?: string }> {
   if (!isSupabaseConfigured()) {
-    const existing = readLocalNewsItems();
-    writeLocalNewsItems([item, ...existing.filter((entry) => entry.id !== item.id)]);
-    return { ok: true };
+    return { ok: false, error: "Supabase no configurado" };
   }
 
   const supabase = createClient();
@@ -154,11 +135,8 @@ export function createNewsId() {
 }
 
 export async function deleteNewsItem(id: string): Promise<{ ok: boolean; error?: string }> {
-  addDeletedNewsId(id);
-
   if (!isSupabaseConfigured()) {
-    writeLocalNewsItems(readLocalNewsItems().filter((entry) => entry.id !== id));
-    return { ok: true };
+    return { ok: false, error: "Supabase no configurado" };
   }
 
   const supabase = createClient();

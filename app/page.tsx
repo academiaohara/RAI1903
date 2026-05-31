@@ -6,13 +6,14 @@ import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard"
 import { MatchCard } from "@/components/MatchCard";
 import { TransfersCarousel } from "@/components/fichajes/TransfersCarousel";
 import { NewsNavButton } from "@/components/NewsNavButton";
-import { NewsTicker } from "@/components/NewsTicker";
+import { HomeNewsTicker } from "@/components/home/HomeNewsTicker";
+import { HomeStatHighlights } from "@/components/home/HomeStatHighlights";
 import { getAllCarouselTransfers } from "@/lib/fichajes";
 import { MatchScoreCenter } from "@/components/MatchScoreCenter";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { PageHero } from "@/components/PageHero";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
-import { RAI_TEAM_ID, matchdays, newsItems, players, teams } from "@/data/mock";
+import { RAI_TEAM_ID, matchdays, teams } from "@/data/mock";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
 import { getLatestAvilesMatches, getNextAvilesMatch, getTeam, getUpcomingAvilesMatches } from "@/lib/fixtures";
@@ -31,14 +32,6 @@ export default function HomePage() {
   const latestCronica = latestMatch ? getCronicaForMatch(latestMatch.id) : undefined;
   const nextPrevia = nextMatch ? getPreviaForMatch(nextMatch.id) : undefined;
   const carouselTransfers = getAllCarouselTransfers();
-  const statHighlights = [
-    { label: "Mas goles", player: [...players].sort((a, b) => b.stats.goals - a.stats.goals)[0], valueKey: "goals", suffix: "goles" },
-    { label: "Mas asistencias", player: [...players].sort((a, b) => b.stats.assists - a.stats.assists)[0], valueKey: "assists", suffix: "asist." },
-    { label: "Mas amarillas", player: [...players].sort((a, b) => b.stats.yellowCards - a.stats.yellowCards)[0], valueKey: "yellowCards", suffix: "TA" },
-    { label: "Mas rojas", player: [...players].sort((a, b) => b.stats.redCards - a.stats.redCards)[0], valueKey: "redCards", suffix: "TR" },
-    { label: "Porterias imbatidas", player: players.find((player) => player.position === "Portero") ?? players[0], fixedValue: 4, suffix: "porterias" },
-    { label: "Nota media", player: [...players].sort((a, b) => b.rating - a.rating)[0], fixedValue: [...players].sort((a, b) => b.rating - a.rating)[0].rating.toFixed(2), suffix: "media" },
-  ] as const;
 
   return (
     <div className="space-y-6">
@@ -72,7 +65,7 @@ export default function HomePage() {
         title="Actualidad en movimiento"
         action={<NewsNavButton href="/noticias/club" />}
       >
-        <NewsTicker items={newsItems} />
+        <HomeNewsTicker />
       </Card>
 
       {carouselTransfers.length > 0 && (
@@ -104,22 +97,7 @@ export default function HomePage() {
             </Link>
           }
         >
-          <ul className="space-y-3">
-            {statHighlights.map((item) => {
-              const value = "fixedValue" in item ? item.fixedValue : item.player.stats[item.valueKey];
-              return (
-                <li key={item.label} className="flex items-center justify-between gap-4 border-b border-[#214C9B]/10 pb-3 last:border-b-0 last:pb-0">
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold uppercase tracking-normal text-slate-500">{item.label}</p>
-                    <p className="mt-1 truncate text-base font-extrabold uppercase text-[#214C9B]">{item.player.displayName}</p>
-                  </div>
-                  <p className="shrink-0 text-right text-2xl font-extrabold text-slate-950">
-                    {value} <span className="text-xs font-bold text-slate-500">{item.suffix}</span>
-                  </p>
-                </li>
-              );
-            })}
-          </ul>
+          <HomeStatHighlights />
         </Card>
       </section>
 

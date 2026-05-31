@@ -1,9 +1,16 @@
+"use client";
+
+import type { PlayerRatingAverage } from "@/lib/match-ratings-storage";
+import { formatFanRating } from "@/lib/format-fan-rating";
 import type { SquadPlayer } from "@/types/squad";
-import { formatFanRating, getPlayerAverageFanRating } from "@/lib/player-ratings";
 
-export function PlayerResumenSection({ player }: { player: SquadPlayer }) {
-  const fanRating = getPlayerAverageFanRating(player.id);
-
+export function PlayerResumenSection({
+  player,
+  fanRating,
+}: {
+  player: SquadPlayer;
+  fanRating?: PlayerRatingAverage | null;
+}) {
   return (
     <div className="space-y-4">
       {(player.valorMercado || fanRating) && (

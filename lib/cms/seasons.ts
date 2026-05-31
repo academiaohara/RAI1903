@@ -1,6 +1,6 @@
-import { competitionSeasons } from "@/data/mock";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+
 export type CmsSeason = {
   id: string;
   label: string;
@@ -9,15 +9,13 @@ export type CmsSeason = {
   published: boolean;
 };
 
+const FALLBACK_SEASONS: CmsSeason[] = [
+  { id: "2025-26", label: "2025/26", isDefault: true, sortOrder: 0, published: true },
+];
+
 export async function fetchPublishedSeasons(): Promise<CmsSeason[]> {
   if (!isSupabaseConfigured()) {
-    return competitionSeasons.map((s, index) => ({
-      id: s.id,
-      label: s.label,
-      isDefault: s.id === "2025-26",
-      sortOrder: index,
-      published: true,
-    }));
+    return FALLBACK_SEASONS;
   }
 
   const supabase = createClient();
@@ -28,13 +26,7 @@ export async function fetchPublishedSeasons(): Promise<CmsSeason[]> {
     .order("sort_order", { ascending: true });
 
   if (error || !data?.length) {
-    return competitionSeasons.map((s, index) => ({
-      id: s.id,
-      label: s.label,
-      isDefault: s.id === "2025-26",
-      sortOrder: index,
-      published: true,
-    }));
+    return FALLBACK_SEASONS;
   }
 
   return data.map((row) => ({

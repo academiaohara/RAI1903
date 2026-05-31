@@ -217,10 +217,13 @@ export function getTransferForPlayer(playerId: string): TransferRumor | undefine
   });
 }
 
-export function getTransferClubAnnouncementNews(transfer: TransferRumor): NewsItem | undefined {
+export function getTransferClubAnnouncementNews(
+  transfer: TransferRumor,
+  allNews: NewsItem[],
+): NewsItem | undefined {
   const playerId = resolveTransferPlayerId(transfer);
   if (playerId) {
-    return getPlayerClubAnnouncementNews(playerId, {
+    return getPlayerClubAnnouncementNews(allNews, playerId, {
       announcementNewsId: transfer.clubAnnouncementNewsId,
       playerName: transfer.playerName,
     });
@@ -228,18 +231,18 @@ export function getTransferClubAnnouncementNews(transfer: TransferRumor): NewsIt
   return undefined;
 }
 
-export function getTransferPlayerNews(transfer: TransferRumor): NewsItem[] {
-  const announcement = getTransferClubAnnouncementNews(transfer);
+export function getTransferPlayerNews(transfer: TransferRumor, allNews: NewsItem[]): NewsItem[] {
+  const announcement = getTransferClubAnnouncementNews(transfer, allNews);
   const playerId = resolveTransferPlayerId(transfer);
 
   if (playerId) {
-    return getPlayerNews(playerId, {
+    return getPlayerNews(allNews, playerId, {
       excludeNewsId: announcement?.id,
       playerName: transfer.playerName,
     });
   }
 
-  return getPlayerNewsByName(transfer.playerName, announcement?.id);
+  return getPlayerNewsByName(allNews, transfer.playerName, announcement?.id);
 }
 
 export function getTransferOriginClub(transfer: TransferRumor): string {

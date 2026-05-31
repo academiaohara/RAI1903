@@ -19,7 +19,6 @@ export type Player = {
   preferredFoot: "Derecha" | "Izquierda" | "Ambidiestro";
   seasonsAtClub: number;
   status: PlayerStatus;
-  rating: number;
   bio: string;
   clubHistory: string[];
   stats: {

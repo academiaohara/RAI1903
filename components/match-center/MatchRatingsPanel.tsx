@@ -5,12 +5,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { signInWithX } from "@/lib/auth/sign-in-with-x";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { getAvilesPlayersWhoPlayed } from "@/lib/match-rating-eligibility";
+import { formatFanRating } from "@/lib/format-fan-rating";
 import {
   fetchMatchRatingAverages,
   fetchUserMatchRatings,
+  migrateLegacyPlayerRatingsToSupabase,
   submitMatchRatings,
 } from "@/lib/match-ratings-storage";
-import { formatFanRating } from "@/lib/player-ratings";
 import { getPlayerFullName } from "@/lib/squad-utils";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -66,6 +67,7 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
 
   const reloadRatings = useCallback(async () => {
     if (!configured) return;
+    if (user) await migrateLegacyPlayerRatingsToSupabase(user.id, detail.gender);
 
     const [communityAverages, userRatings] = await Promise.all([
       fetchMatchRatingAverages(detail.match.id),
@@ -73,7 +75,7 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
     ]);
     setAverages(communityAverages);
     setDraftRatings(userRatings);
-  }, [configured, detail.match.id, user]);
+  }, [configured, detail.gender, detail.match.id, user]);
 
   useEffect(() => {
     if (!configured || !authReady) return;
@@ -81,6 +83,8 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
     let cancelled = false;
 
     void (async () => {
+      if (user) await migrateLegacyPlayerRatingsToSupabase(user.id, detail.gender);
+
       const [communityAverages, userRatings] = await Promise.all([
         fetchMatchRatingAverages(detail.match.id),
         user ? fetchUserMatchRatings(user.id, detail.match.id) : Promise.resolve({}),
@@ -94,7 +98,7 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
     return () => {
       cancelled = true;
     };
-  }, [authReady, configured, detail.match.id, sessionKey, user]);
+  }, [authReady, configured, detail.gender, detail.match.id, sessionKey, user]);
 
   const handleSubmit = async () => {
     if (!user) return;

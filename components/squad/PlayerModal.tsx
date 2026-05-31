@@ -14,7 +14,9 @@ import {
   getPlayerFullName,
 } from "@/lib/squad-utils";
 import { getTransferForPlayer, getTransferKind } from "@/lib/fichajes";
-import { formatFanRating, getPlayerAverageFanRating } from "@/lib/player-ratings";
+import { formatFanRating } from "@/lib/format-fan-rating";
+import { usePublishedNews } from "@/hooks/usePublishedNews";
+import { useSeasonPlayerRatings } from "@/hooks/useSeasonPlayerRatings";
 import { getPlayerClubAnnouncementNews, getPlayerNews } from "@/lib/player-news";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 import { PlayerStats } from "@/components/squad/PlayerStats";
@@ -48,16 +50,18 @@ function PlayerModalContent({
 }) {
   const [activeTab, setActiveTab] = useState<SquadModalTab>("actualidad");
   const { editMode } = useInlineEditing();
-  const fanRating = getPlayerAverageFanRating(player.id);
+  const { averages } = useSeasonPlayerRatings();
+  const { items: allNews } = usePublishedNews();
+  const fanRating = averages[player.id] ?? null;
   const playerName = getPlayerFullName(player);
   const transfer = getTransferForPlayer(player.id);
 
   const { clubAnnouncementNews, playerNews, announcementTone } = useMemo(() => {
-    const announcementNews = getPlayerClubAnnouncementNews(player.id, {
+    const announcementNews = getPlayerClubAnnouncementNews(allNews, player.id, {
       announcementNewsId: transfer?.clubAnnouncementNewsId,
       playerName,
     });
-    const news = getPlayerNews(player.id, {
+    const news = getPlayerNews(allNews, player.id, {
       excludeNewsId: announcementNews?.id,
       playerName,
     });
@@ -70,7 +74,7 @@ function PlayerModalContent({
       playerNews: news,
       announcementTone: tone as "fichaje" | "renovacion" | "default",
     };
-  }, [player.id, playerName, transfer]);
+  }, [allNews, player.id, playerName, transfer]);
 
   return (
     <motion.div
@@ -187,7 +191,7 @@ function PlayerModalContent({
                 announcementTone={announcementTone}
               />
             )}
-            {activeTab === "resumen" && <PlayerResumenSection player={player} />}
+            {activeTab === "resumen" && <PlayerResumenSection player={player} fanRating={fanRating} />}
             {activeTab === "partidos" && <PlayerMatchesTable player={player} />}
             {activeTab === "estadisticas" && (
               <div className="space-y-6">
