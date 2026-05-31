@@ -60,16 +60,29 @@ async function canCurrentUserEdit(user: User | null): Promise<boolean> {
   return isEditorSession(user);
 }
 
-export function InlineEditingProvider({ children }: { children: React.ReactNode }) {
+function mergeOverrideMaps(...maps: InlineOverrides[]): InlineOverrides {
+  return Object.assign({}, ...maps);
+}
+
+export function InlineEditingProvider({
+  children,
+  initialOverrides = {},
+}: {
+  children: React.ReactNode;
+  initialOverrides?: InlineOverrides;
+}) {
   const configured = isSupabaseConfigured();
   const [ready, setReady] = useState(false);
   const [canEdit, setCanEdit] = useState(!configured);
   const [editMode, setEditModeState] = useState(false);
-  const [overrides, setOverrides] = useState<InlineOverrides>({});
+  const [overrides, setOverrides] = useState<InlineOverrides>(() =>
+    configured ? initialOverrides : readLegacyOverrides(),
+  );
   const [syncError, setSyncError] = useState<string | null>(null);
 
   const userIdRef = useRef<string | null>(null);
   const saveTimersRef = useRef<Map<string, number>>(new Map());
+  const pendingValuesRef = useRef<Map<string, unknown>>(new Map());
   const overridesRef = useRef<InlineOverrides>({});
 
   useEffect(() => {
@@ -80,6 +93,7 @@ export function InlineEditingProvider({ children }: { children: React.ReactNode 
     async (key: string, value: unknown) => {
       if (!configured) return;
 
+      pendingValuesRef.current.delete(key);
       const result = await upsertInlineOverride(key, value, userIdRef.current);
       if (!result.ok) {
         setSyncError(result.error ?? "No se pudo guardar en Supabase");
@@ -90,9 +104,22 @@ export function InlineEditingProvider({ children }: { children: React.ReactNode 
     [configured],
   );
 
+  const flushPendingSaves = useCallback(() => {
+    for (const timer of saveTimersRef.current.values()) {
+      window.clearTimeout(timer);
+    }
+    saveTimersRef.current.clear();
+
+    for (const [key, value] of pendingValuesRef.current.entries()) {
+      void flushSave(key, value);
+    }
+  }, [flushSave]);
+
   const scheduleCloudSave = useCallback(
     (key: string, value: unknown) => {
       if (!configured) return;
+
+      pendingValuesRef.current.set(key, value);
 
       const pending = saveTimersRef.current.get(key);
       if (pending) window.clearTimeout(pending);
@@ -148,11 +175,15 @@ export function InlineEditingProvider({ children }: { children: React.ReactNode 
       return;
     }
 
-    void fetchInlineOverrides().then((cloud) => {
-      setOverrides(cloud);
+    void fetchInlineOverrides().then(({ overrides: cloud, error }) => {
+      const legacy = readLegacyOverrides();
+      setOverrides(mergeOverrideMaps(legacy, initialOverrides, cloud));
+      if (error) {
+        setSyncError(`No se pudieron cargar cambios de Supabase: ${error}`);
+      }
       setReady(true);
     });
-  }, [configured]);
+  }, [configured, initialOverrides]);
 
   useEffect(() => {
     if (!configured) return;
@@ -179,22 +210,27 @@ export function InlineEditingProvider({ children }: { children: React.ReactNode 
   }, [configured, migrateLegacyToCloud]);
 
   useEffect(() => {
-    const timers = saveTimersRef.current;
-    return () => {
-      for (const timer of timers.values()) {
-        window.clearTimeout(timer);
-      }
-      timers.clear();
+    if (!configured) return;
+
+    const handlePageHide = () => {
+      flushPendingSaves();
     };
-  }, []);
+
+    window.addEventListener("pagehide", handlePageHide);
+    return () => {
+      window.removeEventListener("pagehide", handlePageHide);
+      flushPendingSaves();
+    };
+  }, [configured, flushPendingSaves]);
 
   const setEditMode = useCallback(
     (enabled: boolean) => {
       if (!canEdit && enabled) return;
+      if (!enabled) flushPendingSaves();
       setEditModeState(enabled);
       window.localStorage.setItem(MODE_KEY, enabled ? "1" : "0");
     },
-    [canEdit],
+    [canEdit, flushPendingSaves],
   );
 
   const saveValue = useCallback(
@@ -239,6 +275,7 @@ export function InlineEditingProvider({ children }: { children: React.ReactNode 
       window.clearTimeout(timer);
     }
     saveTimersRef.current.clear();
+    pendingValuesRef.current.clear();
 
     setOverrides({});
     clearLegacyOverrides();
@@ -323,8 +360,8 @@ function InlineEditingToolbar() {
   const statusLabel = syncError
     ? syncError
     : localOnly
-      ? "Autoguardado local (sin Supabase)"
-      : "Guardado en Supabase";
+      ? "Solo en este navegador (sin Supabase)"
+      : "Guardado en Supabase para todos";
 
   return (
     <div className="fixed bottom-4 right-4 z-[80] flex max-w-[calc(100vw-2rem)] flex-col items-end gap-2">

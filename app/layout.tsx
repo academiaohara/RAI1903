@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { InlineEditingProvider } from "@/components/inline-editing/InlineEditingProvider";
+import { fetchInlineOverridesServer } from "@/lib/cms/inline-overrides";
 import { bebasNeue } from "@/lib/fonts";
 
 export const metadata: Metadata = {
@@ -14,11 +15,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const initialOverrides = await fetchInlineOverridesServer();
+
   return (
     <html lang="es">
       <body className={bebasNeue.variable}>
-        <InlineEditingProvider>
+        <InlineEditingProvider initialOverrides={initialOverrides}>
           <div className="min-h-screen athletic-shell">
             <Header />
             <main className="mx-auto max-w-[1480px] px-4 pb-12 pt-6 sm:px-6 sm:pt-8 lg:px-8">{children}</main>

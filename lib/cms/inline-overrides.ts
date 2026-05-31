@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/client";
+import { createClient as createBrowserClient } from "@/lib/supabase/client";
+import { createClient as createServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export type InlineOverridesMap = Record<string, unknown>;
@@ -8,19 +9,42 @@ type InlineOverrideRow = {
   value: unknown;
 };
 
-export async function fetchInlineOverrides(): Promise<InlineOverridesMap> {
-  if (!isSupabaseConfigured()) return {};
-
-  const supabase = createClient();
-  const { data, error } = await supabase.from("cms_inline_overrides").select("key, value");
-
-  if (error || !data?.length) return {};
-
+function rowsToMap(data: InlineOverrideRow[]): InlineOverridesMap {
   const map: InlineOverridesMap = {};
-  for (const row of data as InlineOverrideRow[]) {
+  for (const row of data) {
     map[row.key] = row.value;
   }
   return map;
+}
+
+/** Carga overrides en el servidor (visitantes ven el CMS sin esperar al cliente). */
+export async function fetchInlineOverridesServer(): Promise<InlineOverridesMap> {
+  if (!isSupabaseConfigured()) return {};
+
+  try {
+    const supabase = await createServerClient();
+    const { data, error } = await supabase.from("cms_inline_overrides").select("key, value");
+
+    if (error || !data?.length) return {};
+    return rowsToMap(data as InlineOverrideRow[]);
+  } catch {
+    return {};
+  }
+}
+
+export async function fetchInlineOverrides(): Promise<{
+  overrides: InlineOverridesMap;
+  error?: string;
+}> {
+  if (!isSupabaseConfigured()) return { overrides: {} };
+
+  const supabase = createBrowserClient();
+  const { data, error } = await supabase.from("cms_inline_overrides").select("key, value");
+
+  if (error) return { overrides: {}, error: error.message };
+  if (!data?.length) return { overrides: {} };
+
+  return { overrides: rowsToMap(data as InlineOverrideRow[]) };
 }
 
 export async function upsertInlineOverride(
@@ -32,7 +56,7 @@ export async function upsertInlineOverride(
     return { ok: false, error: "Supabase no configurado" };
   }
 
-  const supabase = createClient();
+  const supabase = createBrowserClient();
   const { error } = await supabase.from("cms_inline_overrides").upsert({
     key,
     value,
@@ -49,7 +73,7 @@ export async function deleteInlineOverride(key: string): Promise<{ ok: boolean; 
     return { ok: false, error: "Supabase no configurado" };
   }
 
-  const supabase = createClient();
+  const supabase = createBrowserClient();
   const { error } = await supabase.from("cms_inline_overrides").delete().eq("key", key);
 
   if (error) return { ok: false, error: error.message };
@@ -61,7 +85,7 @@ export async function clearInlineOverrides(): Promise<{ ok: boolean; error?: str
     return { ok: false, error: "Supabase no configurado" };
   }
 
-  const supabase = createClient();
+  const supabase = createBrowserClient();
   const { error } = await supabase.from("cms_inline_overrides").delete().neq("key", "");
 
   if (error) return { ok: false, error: error.message };
@@ -79,7 +103,7 @@ export async function upsertInlineOverridesBatch(
   const keys = Object.keys(entries);
   if (!keys.length) return { ok: true };
 
-  const supabase = createClient();
+  const supabase = createBrowserClient();
   const now = new Date().toISOString();
   const rows = keys.map((key) => ({
     key,

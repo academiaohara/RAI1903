@@ -29,11 +29,13 @@ const fieldClassName =
   "w-full rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm outline-none focus:border-[#214C9B]";
 
 export function ZonaMixtaVideoShowcase({ section, videos }: ZonaMixtaVideoShowcaseProps) {
-  const { editMode, getValue, saveValue } = useInlineEditing();
+  const { editMode, getValue, saveValue, getOverride, clearValue } = useInlineEditing();
   const storageKey = fanVideosStorageKey(section);
+  const hasCustomList = getOverride<FanYouTubeVideo[]>(storageKey) !== undefined;
   const currentVideos = getValue(storageKey, videos);
   const sorted = sortFanVideosByDate(currentVideos);
   const resolved = sorted.map(resolveVideo).filter((video): video is NonNullable<typeof video> => video !== null);
+  const unresolved = sorted.filter((video) => resolveVideo(video) === null);
   const featured = resolved.length > 0 ? resolved[0] : null;
   const carouselItems = resolved.length > 1 ? resolved.slice(1) : [];
   const carouselCount = carouselItems.length;
@@ -97,14 +99,25 @@ export function ZonaMixtaVideoShowcase({ section, videos }: ZonaMixtaVideoShowca
         <div className="space-y-4 rounded-2xl border border-dashed border-[#214C9B]/35 bg-blue-50/40 p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs font-semibold uppercase text-slate-600">Modo edición de vídeos</p>
-            <button
-              type="button"
-              onClick={addVideo}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/25 bg-white px-3 py-1.5 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
-            >
-              <Plus size={14} aria-hidden />
-              Añadir nuevo vídeo
-            </button>
+            <div className="flex flex-wrap gap-2">
+              {hasCustomList && (
+                <button
+                  type="button"
+                  onClick={() => clearValue(storageKey)}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-extrabold uppercase text-slate-600 hover:bg-slate-50"
+                >
+                  Restaurar lista por defecto
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={addVideo}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/25 bg-white px-3 py-1.5 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+              >
+                <Plus size={14} aria-hidden />
+                Añadir nuevo vídeo
+              </button>
+            </div>
           </div>
 
           {sorted.length === 0 ? (
@@ -166,6 +179,34 @@ export function ZonaMixtaVideoShowcase({ section, videos }: ZonaMixtaVideoShowca
       {!featured ? (
         editMode ? (
           <p className="text-sm text-slate-500">Añade una URL de YouTube válida para previsualizar el vídeo.</p>
+        ) : unresolved.length > 0 ? (
+          <ul className="space-y-3">
+            {unresolved.map((video) => (
+              <li
+                key={video.id}
+                className="rounded-2xl border border-[#214C9B]/20 bg-white px-4 py-3 shadow-sm"
+              >
+                {video.date && (
+                  <time dateTime={video.date} className="text-xs font-bold uppercase text-[#981915]">
+                    {video.date}
+                  </time>
+                )}
+                <p className="text-sm font-bold text-[#214C9B]">{video.title}</p>
+                {video.url.trim() ? (
+                  <a
+                    href={video.url.trim()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 inline-block text-sm font-semibold text-[#214C9B] underline"
+                  >
+                    Abrir enlace del vídeo
+                  </a>
+                ) : (
+                  <p className="mt-2 text-sm text-slate-500">Falta la URL de YouTube.</p>
+                )}
+              </li>
+            ))}
+          </ul>
         ) : null
       ) : (
         <>
