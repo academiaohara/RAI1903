@@ -1,3 +1,4 @@
+import type { Route } from "next";
 import { redirect } from "next/navigation";
 import { getMatchArticleById } from "@/lib/match-articles";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -11,8 +12,8 @@ export default async function PreviaDetailRedirectPage({
   const article = getMatchArticleById(articleId);
 
   if (!article || article.type !== "previa" || article.gender !== gender) {
-    redirect(`${primerEquipoBase(gender)}/cronicas`);
+    redirect(`${primerEquipoBase(gender)}/cronicas` as Route);
   }
 
-  redirect(`${primerEquipoBase(gender)}/cronicas/${articleId}`);
+  redirect(`${primerEquipoBase(gender)}/cronicas/${articleId}` as Route);
 }
