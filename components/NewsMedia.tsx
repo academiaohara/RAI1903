@@ -5,7 +5,7 @@ import type { NewsItem } from "@/types";
 type NewsMediaVariant = "card" | "featured" | "ticker";
 
 const frameByVariant: Record<NewsMediaVariant, string> = {
-  card: "h-auto min-h-full w-[5.25rem] shrink-0 self-stretch sm:w-[7.25rem] md:w-[8.75rem]",
+  card: "h-auto min-h-full w-[6.75rem] shrink-0 self-stretch sm:w-[10rem] md:w-[12rem]",
   featured: "h-24 w-[8.75rem] sm:h-28 sm:w-40",
   ticker: "aspect-[16/9] w-full",
 };
@@ -40,7 +40,7 @@ export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?
               : variant === "featured"
                 ? "160px"
                 : variant === "card"
-                  ? "140px"
+                  ? "(max-width: 640px) 108px, (max-width: 768px) 160px, 192px"
                   : "960px"
           }
         />
