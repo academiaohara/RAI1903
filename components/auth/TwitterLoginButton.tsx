@@ -28,7 +28,7 @@ export function TwitterLoginButton({
       const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
 
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider: "twitter",
+        provider: "x",
         options: { redirectTo },
       });
 
