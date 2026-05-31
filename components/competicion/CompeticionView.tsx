@@ -5,6 +5,7 @@ import { CalendarNavButton } from "@/components/CalendarNavButton";
 import { Card } from "@/components/Card";
 import { GrupoSwitcher } from "@/components/competicion/GrupoSwitcher";
 import { GuiaLiga } from "@/components/competicion/GuiaLiga";
+import { EditableText } from "@/components/inline-editing/EditableText";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
 import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
@@ -50,6 +51,12 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
   const upcoming = getUpcomingAvilesMatchesByGender(gender, 5);
   const copaDelReyMatches = getCopaDelReyMatchesByGender(gender);
   const calendarHref = `${primerEquipoBase(gender)}/calendario` as Route;
+  const competitionLabel =
+    panel === "liga"
+      ? grupo === "1"
+        ? "1ª RFEF - Grupo I (Real Avilés)"
+        : "1ª RFEF - Grupo II"
+      : "Copa del Rey 2025/26";
 
   const lastGrupoJornada = useMemo(() => {
     if (showAvilesSidebar) return null;
@@ -78,13 +85,25 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
             )}
           </div>
           <p className="text-sm font-bold text-slate-600">
-            {panel === "liga"
-              ? grupo === "1"
-                ? "1ª RFEF - Grupo I (Real Avilés)"
-                : "1ª RFEF - Grupo II"
-              : "Copa del Rey 2025/26"}
+            <EditableText
+              storageKey={`competition:${gender}:${panel}:${grupo}:label`}
+              value={competitionLabel}
+              aria-label="Editar etiqueta de competición"
+              inputClassName="text-sm font-bold text-slate-700"
+            />
           </p>
         </div>
+      )}
+
+      {!isMasculino && (
+        <p className="text-sm font-bold text-slate-600">
+          <EditableText
+            storageKey={`competition:${gender}:liga:label`}
+            value="2ª RFEF Femenina · Grupo 1"
+            aria-label="Editar etiqueta de competición"
+            inputClassName="text-sm font-bold text-slate-700"
+          />
+        </p>
       )}
 
       {panel === "copa-rey" ? (
