@@ -12,17 +12,19 @@ export const metadata: Metadata = {
 
 const ERROR_MESSAGES: Record<string, string> = {
   auth: "No se pudo completar el inicio de sesión. Vuelve a intentarlo.",
+  no_code: "X no devolvió el código de autorización. Revisa las Redirect URLs en Supabase.",
   config: "Supabase no está configurado en este entorno.",
 };
 
 type LoginPageProps = {
-  searchParams: Promise<{ error?: string; next?: string }>;
+  searchParams: Promise<{ error?: string; next?: string; reason?: string }>;
 };
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = await searchParams;
   const errorKey = params.error;
-  const errorMessage = errorKey ? ERROR_MESSAGES[errorKey] : undefined;
+  const errorMessage = errorKey ? ERROR_MESSAGES[errorKey] ?? ERROR_MESSAGES.auth : undefined;
+  const errorDetail = params.reason?.replace(/\+/g, " ");
   const nextPath = params.next?.startsWith("/") ? params.next : "/quiniela";
   const configured = isSupabaseConfigured();
 
@@ -44,9 +46,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         ) : (
           <div className="mx-auto max-w-md space-y-4">
             {errorMessage ? (
-              <p className="rounded-lg border border-[#981915]/30 bg-[#981915]/10 px-4 py-3 text-sm font-medium text-[#981915]">
-                {errorMessage}
-              </p>
+              <div className="rounded-lg border border-[#981915]/30 bg-[#981915]/10 px-4 py-3 text-sm font-medium text-[#981915]">
+                <p>{errorMessage}</p>
+                {errorDetail ? (
+                  <p className="mt-2 text-xs font-normal opacity-90">Detalle: {errorDetail}</p>
+                ) : null}
+              </div>
             ) : null}
             <TwitterLoginButton nextPath={nextPath} />
             <p className="text-center text-xs leading-6 text-slate-500">
