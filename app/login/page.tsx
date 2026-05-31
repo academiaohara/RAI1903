@@ -62,7 +62,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </div>
         )}
         <p className="mt-6 text-center text-sm text-slate-600">
-          <Link href="/" className="font-bold text-[#214C9B] underline-offset-2 hover:underline">
+          <Link href="/" prefetch={false} className="font-bold text-[#214C9B] underline-offset-2 hover:underline">
             Volver al inicio
           </Link>
         </p>
