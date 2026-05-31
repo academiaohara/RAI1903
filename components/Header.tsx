@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import type { Route } from "next";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
+import { AuthHeaderButton } from "@/components/auth/AuthHeaderButton";
 import { MobileNavDrawer } from "@/components/MobileNavDrawer";
 import { navItems, type NavItem } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
@@ -89,10 +90,12 @@ export function Header() {
           })}
         </nav>
 
+        <AuthHeaderButton className="ml-auto lg:ml-0" />
+
         <button
           type="button"
           onClick={() => setOpen((current) => !current)}
-          className="ml-auto rounded-full border border-white/40 p-2 text-white lg:hidden"
+          className="rounded-full border border-white/40 p-2 text-white lg:hidden"
           aria-expanded={open}
           aria-label={open ? "Cerrar navegacion" : "Abrir navegacion"}
         >
