@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "estaticos-cdn.prensaiberica.es" },
+      { protocol: "https", hostname: "s1.ppllstatics.com" },
       { protocol: "https", hostname: "s2.ppllstatics.com" },
       { protocol: "https", hostname: "s3.ppllstatics.com" },
       { protocol: "https", hostname: "www.rtpa.es" },
