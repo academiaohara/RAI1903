@@ -122,11 +122,11 @@ function CalendarListRow({
 
   const rowClassName = cn(
     showVenue ? LIST_ROW_GRID_WITH_VENUE : LIST_ROW_GRID_WITHOUT_VENUE,
-    "border-b border-[#214C9B]/8 px-3 py-2.5 text-sm transition last:border-b-0",
+    "relative border-b border-[#214C9B]/8 px-3 py-2.5 text-sm transition last:border-b-0",
     zebra ? "bg-slate-50/80" : "bg-white",
     scrollTarget && "bg-blue-50/90 ring-1 ring-inset ring-[#214C9B]/25",
     today && !scrollTarget && "bg-[#214C9B]/[0.06]",
-    href && "hover:bg-[#214C9B]/10",
+    href && "has-[a.cal-list-overlay:hover]:bg-[#214C9B]/10",
   );
 
   const content = (
@@ -167,7 +167,7 @@ function CalendarListRow({
 
       <span className="flex min-w-0 items-center gap-2">
         {showCrests ? (
-          <TeamLink gender={gender} teamId={opponentTeamId} teamName={match.opponent} className="shrink-0">
+          <TeamLink gender={gender} teamId={opponentTeamId} teamName={match.opponent} className="relative z-10 shrink-0 pointer-events-auto">
             <OpponentCrest logo={match.opponentLogo} opponent={match.opponent} size="sm" className="text-[#214C9B]" />
           </TeamLink>
         ) : null}
@@ -176,7 +176,7 @@ function CalendarListRow({
             gender={gender}
             teamId={opponentTeamId}
             teamName={match.opponent}
-            className="min-w-0 truncate text-sm font-extrabold text-[#214C9B] hover:underline"
+            className="relative z-10 min-w-0 truncate text-sm font-extrabold text-[#214C9B] hover:underline pointer-events-auto"
           >
             {match.opponent}
           </TeamLink>
@@ -200,22 +200,16 @@ function CalendarListRow({
     </>
   );
 
-  if (href) {
-    return (
-      <Link
-        id={`cal-list-match-${match.id}`}
-        href={href as Route}
-        className={cn(rowClassName, "no-underline")}
-        aria-label={`${match.opponent}, ${match.played ? "cronica" : "previa"}`}
-      >
-        {content}
-      </Link>
-    );
-  }
-
   return (
     <article id={`cal-list-match-${match.id}`} className={rowClassName}>
-      {content}
+      {href ? (
+        <Link
+          href={href as Route}
+          className="cal-list-overlay absolute inset-0 z-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#214C9B]"
+          aria-label={`${match.opponent}, ${match.played ? "crónica" : "previa"}`}
+        />
+      ) : null}
+      <div className={cn("contents", href && "[&>*]:pointer-events-none [&_a]:pointer-events-auto")}>{content}</div>
     </article>
   );
 }
