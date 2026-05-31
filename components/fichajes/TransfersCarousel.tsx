@@ -17,6 +17,7 @@ import {
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import type { Route } from "next";
+import type { TransferMarketWindowId } from "@/types";
 import { TransferFichaCard } from "@/components/fichajes/TransferFichaCard";
 
 const MODE_OPTIONS = [
@@ -26,15 +27,19 @@ const MODE_OPTIONS = [
   { id: "cesiones" as const, label: "Cesiones" },
 ];
 
-export function TransfersCarousel() {
+type TransfersCarouselProps = {
+  marketWindowId: TransferMarketWindowId;
+};
+
+export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
   const transfersByMode = useMemo(
     () => ({
-      todos: getAllCarouselTransfers(),
-      fichajes: getSigningCarouselTransfers(),
-      renovaciones: getRenewalCarouselTransfers(),
-      cesiones: getLoanTransfers(),
+      todos: getAllCarouselTransfers(marketWindowId),
+      fichajes: getSigningCarouselTransfers(marketWindowId),
+      renovaciones: getRenewalCarouselTransfers(marketWindowId),
+      cesiones: getLoanTransfers(marketWindowId),
     }),
-    [],
+    [marketWindowId],
   );
 
   const hasCarousel = transfersByMode.todos.length > 0;
@@ -43,7 +48,7 @@ export function TransfersCarousel() {
 
   const activeMode = mode;
 
-  const transfers = getCarouselTransfersByMode(activeMode);
+  const transfers = getCarouselTransfersByMode(activeMode, marketWindowId);
   const useTicker = transfers.length > 1;
   const loop = useTicker ? [...transfers, ...transfers] : transfers;
 
@@ -166,10 +171,32 @@ export function TransfersCarousel() {
 
   useEffect(() => {
     resetManualScroll();
-  }, [activeMode, resetManualScroll]);
+  }, [activeMode, marketWindowId, resetManualScroll]);
 
-  if (!hasCarousel) return null;
-  if (transfers.length === 0) return null;
+  if (!hasCarousel) {
+    return (
+      <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 p-4 text-sm font-bold text-slate-500">
+        No hay movimientos oficiales en esta ventana de mercado.
+      </p>
+    );
+  }
+
+  if (transfers.length === 0) {
+    return (
+      <div className="space-y-4">
+        <QuinielaViewToggle
+          value={activeMode}
+          onChange={handleModeChange}
+          options={MODE_OPTIONS}
+          layoutId="transfers-carousel-mode"
+          className="text-[10px] sm:text-xs"
+        />
+        <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 p-4 text-sm font-bold text-slate-500">
+          No hay movimientos en esta categoria para la ventana seleccionada.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

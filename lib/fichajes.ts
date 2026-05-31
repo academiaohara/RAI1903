@@ -7,7 +7,8 @@ import {
 import { getPlayerRole } from "@/lib/player-roles";
 import { getSquadPlayers } from "@/lib/squad-data";
 import { getSquadPlayerPhoto } from "@/lib/squad-photos";
-import type { NewsItem, Player, TransferKind, TransferRumor } from "@/types";
+import { resolveTransferMarketWindowId } from "@/lib/transfer-market-windows";
+import type { NewsItem, Player, TransferKind, TransferMarketWindowId, TransferRumor } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
 
 const RAI_CLUB = "Real Avilés Industrial";
@@ -148,6 +149,15 @@ function sortTransfersByDate(items: TransferRumor[]): TransferRumor[] {
   return [...items].sort((a, b) => b.date.localeCompare(a.date));
 }
 
+function belongsToMarketWindow(transfer: TransferRumor, windowId: TransferMarketWindowId): boolean {
+  return resolveTransferMarketWindowId(transfer) === windowId;
+}
+
+function filterByMarketWindow(items: TransferRumor[], windowId?: TransferMarketWindowId): TransferRumor[] {
+  if (!windowId) return items;
+  return items.filter((transfer) => belongsToMarketWindow(transfer, windowId));
+}
+
 function isOfficialMarketTransfer(transfer: TransferRumor): boolean {
   return (
     (transfer.category === "Altas" || transfer.category === "Renovaciones") && transfer.status === "Oficial"
@@ -155,43 +165,65 @@ function isOfficialMarketTransfer(transfer: TransferRumor): boolean {
 }
 
 /** Todos los movimientos oficiales del carrusel de inicio (altas, renovaciones y cesiones). */
-export function getAllCarouselTransfers(): TransferRumor[] {
-  return sortTransfersByDate(transfers.filter(isOfficialMarketTransfer));
+export function getAllCarouselTransfers(windowId?: TransferMarketWindowId): TransferRumor[] {
+  return sortTransfersByDate(
+    filterByMarketWindow(transfers.filter(isOfficialMarketTransfer), windowId),
+  );
 }
 
 /** Altas oficiales en propiedad (agente libre u otro), sin cesiones. */
-export function getSigningCarouselTransfers(): TransferRumor[] {
+export function getSigningCarouselTransfers(windowId?: TransferMarketWindowId): TransferRumor[] {
   return sortTransfersByDate(
-    transfers.filter(
-      (transfer) => transfer.category === "Altas" && transfer.status === "Oficial" && !isLoanTransfer(transfer),
+    filterByMarketWindow(
+      transfers.filter(
+        (transfer) => transfer.category === "Altas" && transfer.status === "Oficial" && !isLoanTransfer(transfer),
+      ),
+      windowId,
     ),
   );
 }
 
 /** Renovaciones oficiales del carrusel de inicio. */
-export function getRenewalCarouselTransfers(): TransferRumor[] {
+export function getRenewalCarouselTransfers(windowId?: TransferMarketWindowId): TransferRumor[] {
   return sortTransfersByDate(
-    transfers.filter((transfer) => transfer.category === "Renovaciones" && transfer.status === "Oficial"),
+    filterByMarketWindow(
+      transfers.filter((transfer) => transfer.category === "Renovaciones" && transfer.status === "Oficial"),
+      windowId,
+    ),
   );
 }
 
 /** Jugadores cedidos al club en la temporada 25/26. */
-export function getLoanTransfers(): TransferRumor[] {
+export function getLoanTransfers(windowId?: TransferMarketWindowId): TransferRumor[] {
   return sortTransfersByDate(
-    transfers.filter((transfer) => isLoanTransfer(transfer) && transfer.status === "Oficial"),
+    filterByMarketWindow(
+      transfers.filter((transfer) => isLoanTransfer(transfer) && transfer.status === "Oficial"),
+      windowId,
+    ),
   );
 }
 
-export function getCarouselTransfersByMode(mode: TransferCarouselMode): TransferRumor[] {
+export function hasCarouselTransfersForWindow(windowId: TransferMarketWindowId): boolean {
+  return getAllCarouselTransfers(windowId).length > 0;
+}
+
+export function hasAnyCarouselTransfers(): boolean {
+  return getAllCarouselTransfers().length > 0;
+}
+
+export function getCarouselTransfersByMode(
+  mode: TransferCarouselMode,
+  windowId?: TransferMarketWindowId,
+): TransferRumor[] {
   switch (mode) {
     case "todos":
-      return getAllCarouselTransfers();
+      return getAllCarouselTransfers(windowId);
     case "fichajes":
-      return getSigningCarouselTransfers();
+      return getSigningCarouselTransfers(windowId);
     case "renovaciones":
-      return getRenewalCarouselTransfers();
+      return getRenewalCarouselTransfers(windowId);
     case "cesiones":
-      return getLoanTransfers();
+      return getLoanTransfers(windowId);
   }
 }
 

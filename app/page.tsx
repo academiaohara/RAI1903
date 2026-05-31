@@ -4,11 +4,11 @@ import { CalendarNavButton } from "@/components/CalendarNavButton";
 import { Card } from "@/components/Card";
 import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
-import { TransfersCarousel } from "@/components/fichajes/TransfersCarousel";
+import { HomeTransfersSection } from "@/components/fichajes/HomeTransfersSection";
 import { NewsNavButton } from "@/components/NewsNavButton";
 import { HomeNewsTicker } from "@/components/home/HomeNewsTicker";
 import { HomeStatHighlights } from "@/components/home/HomeStatHighlights";
-import { getAllCarouselTransfers } from "@/lib/fichajes";
+import { hasAnyCarouselTransfers } from "@/lib/fichajes";
 import { MatchScoreCenter } from "@/components/MatchScoreCenter";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { PageHero } from "@/components/PageHero";
@@ -31,7 +31,7 @@ export default function HomePage() {
   const upcomingMatches = getUpcomingAvilesMatches();
   const latestCronica = latestMatch ? getCronicaForMatch(latestMatch.id) : undefined;
   const nextPrevia = nextMatch ? getPreviaForMatch(nextMatch.id) : undefined;
-  const carouselTransfers = getAllCarouselTransfers();
+  const showTransfersSection = hasAnyCarouselTransfers();
 
   return (
     <div className="space-y-6">
@@ -68,13 +68,7 @@ export default function HomePage() {
         <HomeNewsTicker />
       </Card>
 
-      {carouselTransfers.length > 0 && (
-        <div id="fichajes">
-          <Card eyebrow="Mercado" title="Fichajes y renovaciones">
-            <TransfersCarousel />
-          </Card>
-        </div>
-      )}
+      {showTransfersSection && <HomeTransfersSection />}
 
       <section className="grid gap-6 xl:grid-cols-[1fr_0.42fr]">
         <StandingsLeagueTableCard
