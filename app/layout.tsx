@@ -3,6 +3,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { TeamCrestResolverProvider } from "@/components/assets/TeamCrestResolverProvider";
 import { SeasonProvider } from "@/components/season/SeasonProvider";
+import { HomeLayoutProvider } from "@/components/home/HomeLayoutProvider";
 import { InlineEditingProvider } from "@/components/inline-editing/InlineEditingProvider";
 import { fetchInlineOverridesServer } from "@/lib/cms/inline-overrides-server";
 import { fetchDefaultSeasonIdServer } from "@/lib/cms/seasons-server";
@@ -28,12 +29,14 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body className={bebasNeue.variable}>
         <SeasonProvider defaultSeasonId={defaultSeasonId}>
           <InlineEditingProvider initialOverrides={initialOverrides}>
+            <HomeLayoutProvider>
             <TeamCrestResolverProvider>
               <div className="min-h-screen athletic-shell">
                 <Header />
                 <main className="mx-auto max-w-[1480px] px-4 pb-12 pt-6 sm:px-6 sm:pt-8 lg:px-8">{children}</main>
               </div>
             </TeamCrestResolverProvider>
+            </HomeLayoutProvider>
           </InlineEditingProvider>
         </SeasonProvider>
       </body>

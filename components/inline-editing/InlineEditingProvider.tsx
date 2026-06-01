@@ -15,6 +15,7 @@ import {
 } from "@/lib/cms/inline-overrides";
 import { SeasonManagerPanel } from "@/components/editor/SeasonManagerPanel";
 import { TeamCrestEditorPanel } from "@/components/editor/TeamCrestEditorPanel";
+import { HomeLayoutEditorPanel } from "@/components/editor/HomeLayoutEditorPanel";
 import { TransferMarketEditorPanel } from "@/components/editor/TransferMarketEditorPanel";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -364,6 +365,7 @@ function InlineEditingToolbar({
   const [seasonPanelOpen, setSeasonPanelOpen] = useState(false);
   const [crestPanelOpen, setCrestPanelOpen] = useState(false);
   const [transfersPanelOpen, setTransfersPanelOpen] = useState(false);
+  const [homePanelOpen, setHomePanelOpen] = useState(false);
 
   if (!ready || !canEdit) return null;
 
@@ -401,6 +403,9 @@ function InlineEditingToolbar({
       {editMode && transfersPanelOpen && (
         <TransferMarketEditorPanel onClose={() => setTransfersPanelOpen(false)} />
       )}
+      {editMode && homePanelOpen && (
+        <HomeLayoutEditorPanel onClose={() => setHomePanelOpen(false)} />
+      )}
       <div className="flex flex-wrap justify-end gap-2 rounded-full border border-[#214C9B]/20 bg-white/95 p-2 shadow-2xl backdrop-blur">
         {editMode && (
           <>
@@ -409,6 +414,7 @@ function InlineEditingToolbar({
               onClick={() => {
                 setCrestPanelOpen(false);
                 setTransfersPanelOpen(false);
+                setHomePanelOpen(false);
                 setSeasonPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -420,6 +426,7 @@ function InlineEditingToolbar({
               onClick={() => {
                 setSeasonPanelOpen(false);
                 setTransfersPanelOpen(false);
+                setHomePanelOpen(false);
                 setCrestPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -431,6 +438,19 @@ function InlineEditingToolbar({
               onClick={() => {
                 setSeasonPanelOpen(false);
                 setCrestPanelOpen(false);
+                setTransfersPanelOpen(false);
+                setHomePanelOpen((open) => !open);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+            >
+              Inicio
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSeasonPanelOpen(false);
+                setCrestPanelOpen(false);
+                setHomePanelOpen(false);
                 setTransfersPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"

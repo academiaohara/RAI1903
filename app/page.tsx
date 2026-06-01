@@ -1,8 +1,4 @@
-import { HomeTransfersGate } from "@/components/fichajes/HomeTransfersGate";
-import { HomeCompetitionSection } from "@/components/home/HomeCompetitionSection";
-import { HomeNewsTicker } from "@/components/home/HomeNewsTicker";
-import { Card } from "@/components/Card";
-import { NewsNavButton } from "@/components/NewsNavButton";
+import { HomePageSections } from "@/components/home/HomePageSections";
 import { PageHero } from "@/components/PageHero";
 
 export default function HomePage() {
@@ -14,17 +10,7 @@ export default function HomePage() {
         titleWrapperClassName="title-gear-rai-home"
       />
 
-      <HomeCompetitionSection />
-
-      <Card
-        eyebrow="Noticiero"
-        title="Actualidad en movimiento"
-        action={<NewsNavButton href="/noticias/club" />}
-      >
-        <HomeNewsTicker />
-      </Card>
-
-      <HomeTransfersGate />
+      <HomePageSections />
     </div>
   );
 }
