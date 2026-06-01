@@ -1,5 +1,5 @@
 import { getAvilesMatchesByGender, getRaiTeamId, getTeamsByGender } from "@/lib/fixtures";
-import { getTeamCrest } from "@/lib/team-crests";
+import { getTeamCrest, getTeamCrestById } from "@/lib/team-crests";
 import { defaultCronicaId, defaultPreviaId } from "@/lib/match-article-factory";
 import { getCronicaForMatch, getPreviaForMatch } from "@/lib/match-articles";
 import { primerEquipoBase, primerEquipoHasCronicas, type PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -33,6 +33,8 @@ function avilesResult(match: Match, raiId: string): string | null {
 type MatchArticleLookup = {
   getCronica?: (matchId: string, gender: PrimerEquipoGender) => { id: string } | undefined;
   getPrevia?: (matchId: string, gender: PrimerEquipoGender) => { id: string } | undefined;
+  /** When CMS crests load, pass the map so calendar rows re-resolve opponent logos. */
+  crestMap?: Record<string, string>;
 };
 
 export function matchToCalendarMatch(
@@ -48,12 +50,15 @@ export function matchToCalendarMatch(
   const previa = articles?.getPrevia?.(match.id, gender) ?? getPreviaForMatch(match.id, gender);
   const played = match.status === "finished";
   const hasTime = !NO_TIME_COMPETITIONS.has(match.competition);
+  const opponentLogo = rival
+    ? getTeamCrest(rival)
+    : getTeamCrestById(rivalId, rivalId.slice(0, 3).toUpperCase());
 
   return {
     id: match.id,
     date: match.date,
     opponent: avilesHome ? match.awayTeam : match.homeTeam,
-    opponentLogo: rival ? getTeamCrest(rival) : rivalId.slice(0, 3).toUpperCase(),
+    opponentLogo,
     homeTeam: match.homeTeam,
     awayTeam: match.awayTeam,
     homeTeamId: match.homeTeamId,
@@ -90,6 +95,7 @@ export function getCalendarMatchesFromSource(
   gender: PrimerEquipoGender,
   articles?: MatchArticleLookup,
 ): CalendarMatch[] {
+  void articles?.crestMap;
   return matches
     .map((match) => matchToCalendarMatch(match, gender, articles))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());

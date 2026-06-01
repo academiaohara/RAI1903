@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { Card } from "@/components/Card";
 import { TeamCalendar } from "@/components/TeamCalendar";
+import { useTeamCrestMap } from "@/components/assets/TeamCrestResolverProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { getCalendarMatchesFromSource } from "@/lib/calendar";
@@ -15,12 +16,13 @@ type CalendarioSeasonViewProps = {
 
 export function CalendarioSeasonView({ gender }: CalendarioSeasonViewProps) {
   const { getFixtureSource } = useSeason();
+  const crestMap = useTeamCrestMap();
   const { getCronica, getPrevia } = useSeasonMatchArticles();
   const matches = useMemo(() => {
     const source = getFixtureSource(gender);
     const aviles = getAvilesMatchesFromSource(source, gender);
-    return getCalendarMatchesFromSource(aviles, gender, { getCronica, getPrevia });
-  }, [gender, getCronica, getFixtureSource, getPrevia]);
+    return getCalendarMatchesFromSource(aviles, gender, { getCronica, getPrevia, crestMap });
+  }, [gender, getCronica, getFixtureSource, getPrevia, crestMap]);
 
   const played = matches.filter((match) => match.played).length;
   const upcoming = matches.length - played;

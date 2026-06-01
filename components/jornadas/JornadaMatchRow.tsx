@@ -1,9 +1,11 @@
 "use client";
 
+import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamCrest } from "@/components/TeamCrest";
 import { TeamLink } from "@/components/TeamLink";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { getJornadaTeam } from "@/lib/jornadas-data";
+import { getTeamCrestById } from "@/lib/team-crests";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { formatMatchDate } from "@/lib/utils";
 import type { JornadaFixture } from "@/types/jornadas";
@@ -50,6 +52,18 @@ export function JornadaMatchRow({
       isHighlight ? (highlighted ? "text-[#981915]" : "text-[#214C9B]") : "text-slate-800",
     );
 
+  const crestForTeam = (teamId: string, teamName: string, team?: ReturnType<typeof getJornadaTeam>) => {
+    if (team) return <TeamCrest team={team} size="sm" className="shrink-0" />;
+    return (
+      <OpponentCrest
+        logo={getTeamCrestById(teamId, teamName.slice(0, 3).toUpperCase())}
+        opponent={teamName}
+        size="sm"
+        className="shrink-0"
+      />
+    );
+  };
+
   return (
     <article
       className={cn(
@@ -60,9 +74,9 @@ export function JornadaMatchRow({
       )}
     >
       <div className="flex min-w-0 items-center gap-2">
-        {home && showCrests ? (
+        {showCrests ? (
           <TeamLink gender={gender} teamId={editedFixture.homeTeamId} teamName={editedFixture.homeTeamName} className="shrink-0">
-            <TeamCrest team={home} size="sm" className="shrink-0" />
+            {crestForTeam(editedFixture.homeTeamId, editedFixture.homeTeamName, home)}
           </TeamLink>
         ) : null}
         <TeamLink gender={gender} teamId={editedFixture.homeTeamId} teamName={editedFixture.homeTeamName} className={nameClass(highlightHome)}>
@@ -129,9 +143,9 @@ export function JornadaMatchRow({
         >
           {editedFixture.awayTeamName}
         </TeamLink>
-        {away && showCrests ? (
+        {showCrests ? (
           <TeamLink gender={gender} teamId={editedFixture.awayTeamId} teamName={editedFixture.awayTeamName} className="shrink-0">
-            <TeamCrest team={away} size="sm" className="shrink-0" />
+            {crestForTeam(editedFixture.awayTeamId, editedFixture.awayTeamName, away)}
           </TeamLink>
         ) : null}
       </div>
