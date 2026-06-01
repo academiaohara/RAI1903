@@ -12,7 +12,8 @@
     "sync:news": "node --experimental-strip-types scripts/sync-news-from-urls.ts",
     "sync:escudos": "node --experimental-strip-types scripts/sync-escudos-manifest.ts",
     "sync:estadios": "node --experimental-strip-types scripts/sync-stadium-manifest.ts",
-    "import:assets": "node --experimental-strip-types scripts/import-uploaded-assets.ts && npm run sync:escudos && npm run sync:estadios"
+    "import:assets": "node --experimental-strip-types scripts/import-uploaded-assets.ts && npm run sync:escudos && npm run sync:estadios",
+    "seed:cms": "npx --yes tsx scripts/seed-cms-season.ts"
   },
   "repository": {
     "type": "git",

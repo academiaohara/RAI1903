@@ -1,9 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import { Badge } from "@/components/Badge";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { MatchFixtureTeamLinks } from "@/components/MatchFixtureTeamLinks";
 import { matchCompetitionShortLabel, matchFixtureMeta } from "@/lib/competition-labels";
-import { getCronicaForMatch } from "@/lib/match-articles";
+import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { getAvilesMatchResult } from "@/lib/fixtures";
 import { matchFixtureCardClassName } from "@/lib/match-card-styles";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -47,8 +49,9 @@ const cronicaCardHoverClass = cn(
 const cronicaContentHoverClass = "group-has-[a.cronica-overlay:hover]/card:text-white";
 
 export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCardProps) {
-  const result = getAvilesMatchResult(match);
-  const cronica = getCronicaForMatch(match.id, gender);
+  const { getCronica } = useSeasonMatchArticles();
+  const result = getAvilesMatchResult(match, gender);
+  const cronica = getCronica(match.id, gender);
   const hasCronicas = primerEquipoHasCronicas(gender);
   const cronicaHref = (
     hasCronicas
