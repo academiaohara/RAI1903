@@ -1,4 +1,5 @@
 import { ESCUDO_PATHS } from "@/lib/escudo-manifest";
+import { scanCrestAssetsFromDisk } from "@/lib/escudos-scan";
 import { STADIUM_PATHS } from "@/lib/stadium-manifest";
 
 export type AssetCatalogEntry = {
@@ -7,11 +8,23 @@ export type AssetCatalogEntry = {
   kind: "crest" | "stadium";
 };
 
-/** Imágenes versionadas en GitHub (public/escudos, public/estadio). No son datos de competición. */
-export function listCrestAssets(): AssetCatalogEntry[] {
+/** Catálogo estático (manifest). En servidor preferir listCrestAssets(). */
+export function listCrestAssetsFromManifest(): AssetCatalogEntry[] {
   return Object.entries(ESCUDO_PATHS)
     .map(([slug, path]) => ({ slug, path, kind: "crest" as const }))
     .sort((a, b) => a.slug.localeCompare(b.slug, "es"));
+}
+
+/** Imágenes en GitHub: public/escudos, Escudos/ y manifest. */
+export function listCrestAssets(): AssetCatalogEntry[] {
+  if (typeof window === "undefined") {
+    try {
+      return scanCrestAssetsFromDisk();
+    } catch {
+      return listCrestAssetsFromManifest();
+    }
+  }
+  return listCrestAssetsFromManifest();
 }
 
 export function listStadiumAssets(): AssetCatalogEntry[] {
@@ -27,3 +40,5 @@ export function crestPathFromSlug(slug: string): string | undefined {
 export function findCrestAssetByPath(path: string): AssetCatalogEntry | undefined {
   return listCrestAssets().find((entry) => entry.path === path);
 }
+
+export { scanCrestAssetsFromDisk };

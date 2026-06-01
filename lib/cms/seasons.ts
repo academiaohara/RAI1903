@@ -10,7 +10,7 @@ export type CmsSeason = {
 };
 
 const FALLBACK_SEASONS: CmsSeason[] = [
-  { id: "2025-26", label: "2025/26", isDefault: true, sortOrder: 0, published: true },
+  { id: "2025-26", label: "25/26", isDefault: true, sortOrder: 0, published: true },
 ];
 
 export async function fetchDefaultSeasonId(): Promise<string> {

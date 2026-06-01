@@ -51,7 +51,8 @@ export const loadSeasonId = (): CompetitionSeasonId => {
 
   try {
     const stored = window.localStorage.getItem(SEASON_STORAGE_KEY);
-    return stored === "2024-25" || stored === "2025-26" || stored === "2026-27" ? stored : DEFAULT_COMPETITION_SEASON_ID;
+    if (!stored || stored === "2024-25") return DEFAULT_COMPETITION_SEASON_ID;
+    return stored;
   } catch {
     return DEFAULT_COMPETITION_SEASON_ID;
   }

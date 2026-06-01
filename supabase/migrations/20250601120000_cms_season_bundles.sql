@@ -2,9 +2,8 @@
 
 insert into public.cms_seasons (id, label, is_default, sort_order, published)
 values
-  ('2024-25', '2024/25', false, 0, true),
-  ('2025-26', '2025/26', true, 1, true),
-  ('2026-27', '2026/27', false, 2, false)
+  ('2025-26', '25/26', true, 0, true),
+  ('2026-27', '26/27', false, 1, false)
 on conflict (id) do update set
   label = excluded.label,
   sort_order = excluded.sort_order;

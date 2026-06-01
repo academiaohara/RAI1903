@@ -47,13 +47,8 @@ export { RAI_FEM_TEAM_ID };
 export const COMPETITION_NAME = "1ª RFEF - Grupo I";
 export const COMPETITION_NAME_FEM = SEGUNDA_RFEF_FEMENINA_DATA.competicion;
 
-export const competitionSeasons = [
-  { id: "2024-25", label: "24/25" },
-  { id: "2025-26", label: "25/26" },
-  { id: "2026-27", label: "26/27" },
-] as const;
-
-export type CompetitionSeasonId = (typeof competitionSeasons)[number]["id"];
+/** IDs de temporada (p. ej. 2025-26). La lista real vive en Supabase (`cms_seasons`). */
+export type CompetitionSeasonId = string;
 
 export const DEFAULT_COMPETITION_SEASON_ID: CompetitionSeasonId = "2025-26";
 
