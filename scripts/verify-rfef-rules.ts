@@ -156,4 +156,19 @@ function match(home: string, away: string, hs: number, as: number) {
   assert(played.size === 1 && played.has(1), "J1 con matchday.round mal: todos con 1 PJ");
 }
 
+{
+  const atJ1 = getTeamsAtRound(
+    teams,
+    matchdays,
+    qualifyingRoundAfterJornada(1),
+    PRIMERA_RFEF_STANDINGS_ZONES,
+    PRIMERA_RFEF_RULES.tiebreak,
+  );
+  assert(atJ1.length === teams.length, "J1 con desempate RFEF: aparecen todos los equipos");
+  assert(
+    atJ1.every((team) => team.stats.played === 1),
+    "J1 con desempate RFEF: cada equipo con 1 PJ",
+  );
+}
+
 console.log("OK: reglas RFEF verificadas");
