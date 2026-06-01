@@ -1,6 +1,8 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { useSeasonOptional } from "@/components/season/SeasonProvider";
+import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
 import type { ContenidoFanSlug } from "@/lib/contenido-fan";
 import {
   fanVideosStorageKey,
@@ -40,8 +42,10 @@ export function ZonaMixtaVideoShowcase({
   featuredLabel = "Último episodio",
   carouselLabel = "Más episodios",
 }: ZonaMixtaVideoShowcaseProps) {
+  const seasonContext = useSeasonOptional();
+  const seasonId = seasonContext?.viewedSeasonId ?? DEFAULT_COMPETITION_SEASON_ID;
   const { editMode, getValue, saveValue, getOverride, clearValue } = useInlineEditing();
-  const storageKey = fanVideosStorageKey(section, gender);
+  const storageKey = fanVideosStorageKey(section, seasonId, gender);
   const hasCustomList = getOverride<FanYouTubeVideo[]>(storageKey) !== undefined;
   const currentVideos = getValue(storageKey, videos);
   const sorted = sortFanVideosByDate(currentVideos);

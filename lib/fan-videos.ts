@@ -3,9 +3,13 @@ import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { FanYouTubeVideo } from "@/types";
 
 /** Clave CMS para la lista completa de vídeos de una sección. */
-export function fanVideosStorageKey(section: ContenidoFanSlug, gender?: PrimerEquipoGender): string {
-  if (gender) return `primer-equipo:${gender}:contenido-fan:${section}:videos`;
-  return `contenido-fan:${section}:videos`;
+export function fanVideosStorageKey(
+  section: ContenidoFanSlug,
+  seasonId: string,
+  gender?: PrimerEquipoGender,
+): string {
+  if (gender) return `primer-equipo:${gender}:contenido-fan:${seasonId}:${section}:videos`;
+  return `contenido-fan:${seasonId}:${section}:videos`;
 }
 
 /** Convierte DD/MM/AAAA o ISO a timestamp; sin fecha válida devuelve 0. */

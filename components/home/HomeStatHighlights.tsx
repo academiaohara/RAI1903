@@ -1,10 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
+import { useSeason } from "@/components/season/SeasonProvider";
 import { useSeasonPlayerRatings } from "@/hooks/useSeasonPlayerRatings";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { formatFanRating } from "@/lib/format-fan-rating";
-import { getSquadClubInfo } from "@/lib/squad-data";
+import { getLeagueMatchdaysForGender } from "@/lib/season/aviles-matches";
+import { computeClubLeagueStatsForGender } from "@/lib/season/club-league-stats";
 import { getPlayerFullName } from "@/lib/squad-utils";
 import type { SquadPlayer } from "@/types/squad";
 
@@ -26,6 +28,11 @@ function topBy<T extends SquadPlayer>(players: T[], pick: (player: T) => number,
 export function HomeStatHighlights() {
   const { squad } = useSquadPlayers("masculino");
   const { averages, loading: ratingsLoading } = useSeasonPlayerRatings();
+  const { getFixtureSource } = useSeason();
+  const leagueMatchdays = useMemo(
+    () => getLeagueMatchdaysForGender(getFixtureSource("masculino"), "masculino"),
+    [getFixtureSource],
+  );
 
   const rows = useMemo(() => {
     const list: HighlightRow[] = [];
@@ -42,8 +49,7 @@ export function HomeStatHighlights() {
     const reds = topBy(squad, (p) => p.rojas, "TR", "Mas rojas");
     if (reds) list.push(reds);
 
-    const clubInfo = getSquadClubInfo("masculino");
-    const cleanSheets = clubInfo.stats.porteriasImbatidas;
+    const cleanSheets = computeClubLeagueStatsForGender("masculino", leagueMatchdays).porteriasImbatidas;
     if (cleanSheets > 0) {
       const keeper = squad.find((p) => p.posicion === "Portero") ?? squad[0];
       if (keeper) {
@@ -71,7 +77,7 @@ export function HomeStatHighlights() {
     }
 
     return list;
-  }, [averages, squad]);
+  }, [averages, leagueMatchdays, squad]);
 
   if (!rows.length && ratingsLoading) {
     return (
