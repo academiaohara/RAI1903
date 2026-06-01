@@ -12,6 +12,7 @@ import {
   type JornadasFixtureSource,
 } from "@/lib/season/fixture-source";
 import { getTeam } from "@/lib/fixtures";
+import { getLastPlayedLeagueRound } from "@/lib/standings";
 import type { Match, Matchday } from "@/types";
 import type {
   JornadaFixture,
@@ -187,7 +188,7 @@ function matchdayByRound(matchdaysList: Matchday[], round: number): Matchday | u
  */
 function buildFemeninoJornadasDataset(source: JornadasFixtureSource): JornadasDataset {
   const raiId = RAI_FEM_TEAM_ID;
-  const currentRound = source.lastRoundFemenino;
+  const currentRound = getLastPlayedLeagueRound(source.matchdaysFemenino);
   const currentRoundId: JornadaRoundId = `j${currentRound}`;
 
   const leagueSummaries = [...source.matchdaysFemenino]
@@ -222,7 +223,7 @@ export function buildJornadasDataset(
   }
 
   const raiId = raiTeamId(gender);
-  const currentRound = source.lastRoundMasculino;
+  const currentRound = getLastPlayedLeagueRound(source.matchdays);
   const currentRoundId: JornadaRoundId = `j${currentRound}`;
   const definitiveQualifyingLeagueRound = source.definitiveQualifyingLeagueRound;
 

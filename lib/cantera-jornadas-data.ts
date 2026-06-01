@@ -4,6 +4,7 @@ import {
   type CanteraTeamId,
 } from "@/lib/cantera-data";
 import { buildSegundaAsturfutbolAllMatches } from "@/lib/segunda-asturfutbol-2526";
+import { getLastPlayedLeagueRound } from "@/lib/standings";
 import type { Match, Matchday } from "@/types";
 import type {
   JornadaFixture,
@@ -101,19 +102,10 @@ function getCanteraMatchdays(teamId: CanteraTeamId): Matchday[] {
   return matchesToMatchdays(matches);
 }
 
-function lastPlayedRound(matchdays: Matchday[]): number {
-  let last = 1;
-  for (const matchday of matchdays) {
-    const hasFinished = matchday.matches.some((m) => m.status === "finished");
-    if (hasFinished) last = matchday.round;
-  }
-  return last;
-}
-
 export function buildCanteraJornadasDataset(teamId: CanteraTeamId): JornadasDataset {
   const clubTeamId = getCanteraPrimaryAvilesTeamId(teamId);
   const matchdays = getCanteraMatchdays(teamId);
-  const currentRound = lastPlayedRound(matchdays);
+  const currentRound = getLastPlayedLeagueRound(matchdays);
   const currentRoundId: JornadaRoundId = `j${currentRound}`;
 
   const leagueSummaries = matchdays.map((md) => buildLeagueRoundSummary(md, clubTeamId, currentRound));

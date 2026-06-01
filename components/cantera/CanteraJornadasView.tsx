@@ -21,10 +21,11 @@ function partitionMatches(matches: JornadaFixture[], clubTeamId: string) {
 export function CanteraJornadasView({ teamId }: CanteraJornadasViewProps) {
   const dataset = useMemo(() => buildCanteraJornadasDataset(teamId), [teamId]);
   const clubTeamId = getCanteraPrimaryAvilesTeamId(teamId);
-  const [selectedRoundId, setSelectedRoundId] = useState<JornadaRoundId>(dataset.currentRoundId);
+  const [manualRoundId, setManualRoundId] = useState<JornadaRoundId | null>(null);
+  const selectedRoundId = manualRoundId ?? dataset.currentRoundId;
 
   const handleSelectRound = useCallback((roundId: JornadaRoundId) => {
-    setSelectedRoundId(roundId);
+    setManualRoundId(roundId);
   }, []);
 
   const roundData = dataset.getRound(selectedRoundId);
