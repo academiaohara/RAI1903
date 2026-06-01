@@ -49,12 +49,37 @@ export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
   const activeMode = mode;
 
   const transfers = getCarouselTransfersByMode(activeMode, marketWindowId);
-  const useTicker = transfers.length > 1;
-  const loop = useTicker ? [...transfers, ...transfers] : transfers;
-
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const [hasOverflow, setHasOverflow] = useState(false);
   const [manualScroll, setManualScroll] = useState(false);
+
+  const useTicker = transfers.length > 1 && hasOverflow;
+  const loop = useTicker ? [...transfers, ...transfers] : transfers;
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    const track = trackRef.current;
+    if (!container || !track) return;
+
+    const measureOverflow = () => {
+      if (transfers.length <= 1) {
+        setHasOverflow(false);
+        return;
+      }
+
+      const singleSetWidth = track.scrollWidth / (useTicker ? 2 : 1);
+      setHasOverflow(singleSetWidth > container.clientWidth + 1);
+    };
+
+    measureOverflow();
+
+    const observer = new ResizeObserver(measureOverflow);
+    observer.observe(container);
+    observer.observe(track);
+
+    return () => observer.disconnect();
+  }, [transfers, useTicker]);
 
   const getLoopWidth = useCallback(() => {
     const track = trackRef.current;
@@ -85,7 +110,7 @@ export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
     track.style.transform = "";
     track.style.animationPlayState = "";
     setManualScroll(false);
-  }, [smoothScroll]);
+  }, [smoothScroll, setManualScroll]);
 
   useLayoutEffect(() => {
     const pending = pendingManualWheelRef.current;
@@ -135,7 +160,7 @@ export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
 
       handleScrollWheel(event);
     },
-    [handleScrollWheel, manualScroll, useTicker],
+    [handleScrollWheel, manualScroll, useTicker, setManualScroll],
   );
 
   useHorizontalWheelScrollListener(containerRef, handleWheel);
@@ -221,13 +246,21 @@ export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
       <div
         ref={containerRef}
         onMouseLeave={manualScroll ? resetManualScroll : undefined}
-        className={`py-1 no-scrollbar overflow-x-auto overscroll-x-contain overscroll-y-none${
-          useTicker && !manualScroll ? " news-ticker" : ""
-        }`}
+        className={
+          useTicker
+            ? `py-1 no-scrollbar overflow-x-auto overscroll-x-contain overscroll-y-none${
+                !manualScroll ? " news-ticker" : ""
+              }`
+            : "py-1"
+        }
       >
         <div
           ref={trackRef}
-          className={`flex w-max gap-4${useTicker && !manualScroll ? " news-ticker-track" : ""}`}
+          className={`flex gap-4${
+            useTicker
+              ? ` w-max${!manualScroll ? " news-ticker-track" : ""}`
+              : " w-full justify-center"
+          }`}
         >
           {loop.map((transfer, index) => (
             <TransferFichaCard

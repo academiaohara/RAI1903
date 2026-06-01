@@ -7,8 +7,6 @@ export type TransferMarketWindow = {
 
 /** Ventanas de mercado ordenadas de la más antigua a la más reciente. */
 export const TRANSFER_MARKET_WINDOWS: TransferMarketWindow[] = [
-  { id: "verano-24-25", label: "Verano 24/25" },
-  { id: "invierno-24-25", label: "Invierno 24/25" },
   { id: "verano-25-26", label: "Verano 25/26" },
   { id: "invierno-25-26", label: "Invierno 25/26" },
 ];
