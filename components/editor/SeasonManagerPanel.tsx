@@ -1,0 +1,221 @@
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { Loader2, X } from "lucide-react";
+import { useSeason } from "@/components/season/SeasonProvider";
+import type { CompetitionSeasonId } from "@/data/mock";
+import {
+  duplicateSeason,
+  fetchEditorSeasons,
+  seedSeasonFromMock,
+  setDefaultSeason,
+  updateSeason,
+} from "@/lib/cms/seasons-editor";
+import type { CmsSeason } from "@/lib/cms/seasons";
+
+type SeasonManagerPanelProps = {
+  onClose: () => void;
+};
+
+export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
+  const { viewedSeasonId, refreshSeasons, refreshBundles, setViewedSeasonId } = useSeason();
+  const [rows, setRows] = useState<CmsSeason[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const [newId, setNewId] = useState("2026-27");
+  const [newLabel, setNewLabel] = useState("2026/27");
+  const [duplicateFrom, setDuplicateFrom] = useState<CompetitionSeasonId>("2025-26");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchEditorSeasons();
+    setRows(data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      void load();
+    });
+  }, [load]);
+
+  const runAction = async (action: () => Promise<{ ok: boolean; error?: string }>, success: string) => {
+    setBusy(true);
+    setMessage(null);
+    const result = await action();
+    setBusy(false);
+    if (!result.ok) {
+      setMessage(result.error ?? "Error desconocido");
+      return;
+    }
+    setMessage(success);
+    await refreshSeasons();
+    await refreshBundles();
+    await load();
+  };
+
+  return (
+    <div className="w-[min(100vw-2rem,24rem)] rounded-2xl border border-[#214C9B]/20 bg-white p-4 shadow-2xl">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <h3 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Temporadas CMS</h3>
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-full p-1 text-slate-500 hover:bg-slate-100"
+          aria-label="Cerrar"
+        >
+          <X size={16} />
+        </button>
+      </div>
+
+      {loading ? (
+        <p className="flex items-center gap-2 text-xs text-slate-500">
+          <Loader2 size={14} className="animate-spin" /> Cargando…
+        </p>
+      ) : (
+        <ul className="mb-4 max-h-40 space-y-2 overflow-y-auto text-xs">
+          {rows.map((row) => (
+            <li
+              key={row.id}
+              className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-100 px-2 py-2"
+            >
+              <div>
+                <span className="font-bold text-slate-800">{row.label}</span>
+                <span className="ml-2 text-slate-400">{row.id}</span>
+                {row.isDefault && (
+                  <span className="ml-2 rounded-full bg-emerald-100 px-2 py-0.5 font-bold text-emerald-800">
+                    Activa
+                  </span>
+                )}
+                {!row.published && (
+                  <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 font-bold text-amber-800">
+                    Borrador
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-1">
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => {
+                    setViewedSeasonId(row.id as CompetitionSeasonId);
+                    setMessage(`Consultando ${row.label}`);
+                  }}
+                  className="rounded-lg border border-[#214C9B]/20 px-2 py-1 font-bold text-[#214C9B] hover:bg-blue-50 disabled:opacity-50"
+                >
+                  Ver
+                </button>
+                {!row.isDefault && (
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() =>
+                      void runAction(() => setDefaultSeason(row.id), `${row.label} es ahora la temporada activa`)
+                    }
+                    className="rounded-lg bg-[#214C9B] px-2 py-1 font-bold text-white hover:bg-[#173a78] disabled:opacity-50"
+                  >
+                    Activar
+                  </button>
+                )}
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() =>
+                    void runAction(
+                      () => updateSeason(row.id, { published: !row.published }),
+                      row.published ? "Oculta del selector público" : "Publicada en el selector",
+                    )
+                  }
+                  className="rounded-lg border border-slate-200 px-2 py-1 font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                >
+                  {row.published ? "Ocultar" : "Publicar"}
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="space-y-3 border-t border-slate-100 pt-3 text-xs">
+        <p className="font-bold uppercase tracking-wide text-slate-500">Nueva temporada</p>
+        <div className="grid grid-cols-2 gap-2">
+          <label className="space-y-1">
+            <span className="font-semibold text-slate-600">ID</span>
+            <input
+              value={newId}
+              onChange={(event) => setNewId(event.target.value)}
+              className="w-full rounded-lg border border-slate-200 px-2 py-1.5"
+              placeholder="2026-27"
+            />
+          </label>
+          <label className="space-y-1">
+            <span className="font-semibold text-slate-600">Etiqueta</span>
+            <input
+              value={newLabel}
+              onChange={(event) => setNewLabel(event.target.value)}
+              className="w-full rounded-lg border border-slate-200 px-2 py-1.5"
+              placeholder="2026/27"
+            />
+          </label>
+        </div>
+        <label className="block space-y-1">
+          <span className="font-semibold text-slate-600">Duplicar datos desde</span>
+          <select
+            value={duplicateFrom}
+            onChange={(event) => setDuplicateFrom(event.target.value as CompetitionSeasonId)}
+            className="w-full rounded-lg border border-slate-200 px-2 py-1.5"
+          >
+            {rows.map((row) => (
+              <option key={row.id} value={row.id}>
+                {row.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button
+          type="button"
+          disabled={busy || !newId.trim()}
+          onClick={() =>
+            void runAction(
+              () =>
+                duplicateSeason(duplicateFrom, {
+                  id: newId.trim(),
+                  label: newLabel.trim() || newId.trim(),
+                  published: false,
+                }),
+              `Temporada ${newLabel} creada`,
+            )
+          }
+          className="w-full rounded-xl bg-[#214C9B] py-2 font-extrabold uppercase text-white hover:bg-[#173a78] disabled:opacity-50"
+        >
+          Crear y duplicar
+        </button>
+
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() =>
+            void runAction(
+              () => seedSeasonFromMock(viewedSeasonId, rows.find((row) => row.id === viewedSeasonId)?.label ?? viewedSeasonId),
+              "Datos del código subidos a Supabase para la temporada consultada",
+            )
+          }
+          className="w-full rounded-xl border border-[#214C9B]/25 py-2 font-extrabold uppercase text-[#214C9B] hover:bg-blue-50 disabled:opacity-50"
+        >
+          Subir mock actual a «{viewedSeasonId}»
+        </button>
+      </div>
+
+      {message && (
+        <p className="mt-3 rounded-lg bg-slate-50 px-2 py-2 text-xs font-semibold text-slate-600">{message}</p>
+      )}
+      {busy && (
+        <p className="mt-2 flex items-center gap-2 text-xs text-slate-500">
+          <Loader2 size={14} className="animate-spin" /> Guardando…
+        </p>
+      )}
+    </div>
+  );
+}

@@ -9,16 +9,17 @@ import { EditableText } from "@/components/inline-editing/EditableText";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
 import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
+import { getTeamsByGender } from "@/lib/fixtures";
+import { useSeason } from "@/components/season/SeasonProvider";
 import {
-  getCopaDelReyMatchesByGender,
-  getLatestAvilesMatchesByGender,
-  getTeamsByGender,
-  getUpcomingAvilesMatchesByGender,
-} from "@/lib/fixtures";
+  getAvilesMatchesFromSource,
+  getCopaDelReyMatchesFromSource,
+  getGrupo2Matchdays,
+  getLeagueMatchdaysForGender,
+} from "@/lib/season/aviles-matches";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getTeamsForRfefGrupo, type RfefGrupoId } from "@/lib/rfef-grupos";
 import { getPlayedLeagueRounds } from "@/lib/standings";
-import { matchdays, matchdaysFemenino, matchdaysGrupo2 } from "@/data/mock";
 import { FEMENINA_STANDINGS_ZONES } from "@/lib/segunda-rfef-femenina-2526";
 import type { Route } from "next";
 import type { Match } from "@/types";
@@ -37,6 +38,22 @@ const COMPETICION_OPTIONS = [
 type CompeticionPanel = (typeof COMPETICION_OPTIONS)[number]["id"];
 
 export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }: CompeticionViewProps) {
+  const { getFixtureSource } = useSeason();
+  const fixtureSource = useMemo(() => getFixtureSource(gender), [gender, getFixtureSource]);
+  const leagueMatchdays = useMemo(
+    () => getLeagueMatchdaysForGender(fixtureSource, gender),
+    [fixtureSource, gender],
+  );
+  const matchdaysGrupo2 = useMemo(() => getGrupo2Matchdays(fixtureSource), [fixtureSource]);
+  const avilesMatches = useMemo(
+    () => getAvilesMatchesFromSource(fixtureSource, gender),
+    [fixtureSource, gender],
+  );
+  const copaMatches = useMemo(
+    () => getCopaDelReyMatchesFromSource(fixtureSource, gender),
+    [fixtureSource, gender],
+  );
+
   const [grupo, setGrupo] = useState<RfefGrupoId>(initialGrupo);
   const [panel, setPanel] = useState<CompeticionPanel>("liga");
   const isMasculino = gender === "masculino";
@@ -44,12 +61,18 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
   const standingsMatchdays = isMasculino
     ? grupo === "2"
       ? matchdaysGrupo2
-      : matchdays
-    : matchdaysFemenino;
+      : leagueMatchdays
+    : leagueMatchdays;
   const showAvilesSidebar = !isMasculino || grupo === "1";
-  const latest = getLatestAvilesMatchesByGender(gender, 5);
-  const upcoming = getUpcomingAvilesMatchesByGender(gender, 5);
-  const copaDelReyMatches = getCopaDelReyMatchesByGender(gender);
+  const finishedAviles = avilesMatches.filter((match) => match.status === "finished");
+  const scheduledAviles = avilesMatches.filter((match) => match.status === "scheduled");
+  const latest = [...finishedAviles]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 5);
+  const upcoming = [...scheduledAviles]
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .slice(0, 5);
+  const copaDelReyMatches = copaMatches;
   const calendarHref = `${primerEquipoBase(gender)}/calendario` as Route;
   const competitionLabel =
     panel === "liga"

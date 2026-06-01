@@ -3,6 +3,8 @@
 import type { User } from "@supabase/supabase-js";
 import { Check, Clipboard, Pencil, Trash2, X } from "lucide-react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useSeasonOptional } from "@/components/season/SeasonProvider";
+import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
 import { isEditorSession } from "@/lib/auth/editor";
 import {
   clearInlineOverrides,
@@ -11,6 +13,7 @@ import {
   upsertInlineOverride,
   upsertInlineOverridesBatch,
 } from "@/lib/cms/inline-overrides";
+import { SeasonManagerPanel } from "@/components/editor/SeasonManagerPanel";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
@@ -71,6 +74,8 @@ export function InlineEditingProvider({
   children: React.ReactNode;
   initialOverrides?: InlineOverrides;
 }) {
+  const seasonContext = useSeasonOptional();
+  const seasonId = seasonContext?.viewedSeasonId ?? DEFAULT_COMPETITION_SEASON_ID;
   const configured = isSupabaseConfigured();
   const [ready, setReady] = useState(false);
   const [canEdit, setCanEdit] = useState(!configured);
@@ -94,14 +99,14 @@ export function InlineEditingProvider({
       if (!configured) return;
 
       pendingValuesRef.current.delete(key);
-      const result = await upsertInlineOverride(key, value, userIdRef.current);
+      const result = await upsertInlineOverride(key, value, userIdRef.current, seasonId);
       if (!result.ok) {
         setSyncError(result.error ?? "No se pudo guardar en Supabase");
       } else {
         setSyncError(null);
       }
     },
-    [configured],
+    [configured, seasonId],
   );
 
   const flushPendingSaves = useCallback(() => {
@@ -151,14 +156,14 @@ export function InlineEditingProvider({
       return;
     }
 
-    const result = await upsertInlineOverridesBatch(toUpload, userIdRef.current);
+    const result = await upsertInlineOverridesBatch(toUpload, userIdRef.current, seasonId);
     if (result.ok) {
       setOverrides((prev) => ({ ...prev, ...toUpload }));
       clearLegacyOverrides();
     } else {
       setSyncError(result.error ?? "No se pudo migrar cambios locales");
     }
-  }, []);
+  }, [seasonId]);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -175,15 +180,15 @@ export function InlineEditingProvider({
       return;
     }
 
-    void fetchInlineOverrides().then(({ overrides: cloud, error }) => {
+    void fetchInlineOverrides(seasonId).then(({ overrides: cloud, error }) => {
       const legacy = readLegacyOverrides();
-      setOverrides(mergeOverrideMaps(legacy, initialOverrides, cloud));
+      setOverrides(mergeOverrideMaps(legacy, seasonId === DEFAULT_COMPETITION_SEASON_ID ? initialOverrides : {}, cloud));
       if (error) {
         setSyncError(`No se pudieron cargar cambios de Supabase: ${error}`);
       }
       setReady(true);
     });
-  }, [configured, initialOverrides]);
+  }, [configured, initialOverrides, seasonId]);
 
   useEffect(() => {
     if (!configured) return;
@@ -261,13 +266,13 @@ export function InlineEditingProvider({
       });
 
       if (configured) {
-        void deleteInlineOverride(key).then((result) => {
+        void deleteInlineOverride(key, seasonId).then((result) => {
           if (!result.ok) setSyncError(result.error ?? "No se pudo borrar en Supabase");
           else setSyncError(null);
         });
       }
     },
-    [configured],
+    [configured, seasonId],
   );
 
   const clearAll = useCallback(() => {
@@ -281,12 +286,12 @@ export function InlineEditingProvider({
     clearLegacyOverrides();
 
     if (configured) {
-      void clearInlineOverrides().then((result) => {
+      void clearInlineOverrides(seasonId).then((result) => {
         if (!result.ok) setSyncError(result.error ?? "No se pudo limpiar Supabase");
         else setSyncError(null);
       });
     }
-  }, [configured]);
+  }, [configured, seasonId]);
 
   const exportJson = useCallback(async () => {
     const payload = JSON.stringify(overridesRef.current, null, 2);
@@ -331,7 +336,7 @@ export function InlineEditingProvider({
   return (
     <InlineEditingContext.Provider value={value}>
       {children}
-      <InlineEditingToolbar />
+      <InlineEditingToolbar seasonLabel={seasonContext?.viewedSeason.label} isArchive={seasonContext?.isViewingArchive} />
     </InlineEditingContext.Provider>
   );
 }
@@ -344,10 +349,17 @@ export function useInlineEditing() {
   return context;
 }
 
-function InlineEditingToolbar() {
+function InlineEditingToolbar({
+  seasonLabel,
+  isArchive,
+}: {
+  seasonLabel?: string;
+  isArchive?: boolean;
+}) {
   const { canEdit, editMode, ready, localOnly, syncError, setEditMode, clearAll, exportJson } =
     useInlineEditing();
   const [copied, setCopied] = useState(false);
+  const [seasonPanelOpen, setSeasonPanelOpen] = useState(false);
 
   if (!ready || !canEdit) return null;
 
@@ -361,7 +373,9 @@ function InlineEditingToolbar() {
     ? syncError
     : localOnly
       ? "Solo en este navegador (sin Supabase)"
-      : "Guardado en Supabase para todos";
+      : isArchive
+        ? `Editando archivo ${seasonLabel ?? ""} · Supabase`
+        : `Temporada ${seasonLabel ?? ""} · Supabase`;
 
   return (
     <div className="fixed bottom-4 right-4 z-[80] flex max-w-[calc(100vw-2rem)] flex-col items-end gap-2">
@@ -374,9 +388,19 @@ function InlineEditingToolbar() {
           {statusLabel}
         </div>
       )}
+      {editMode && seasonPanelOpen && (
+        <SeasonManagerPanel onClose={() => setSeasonPanelOpen(false)} />
+      )}
       <div className="flex flex-wrap justify-end gap-2 rounded-full border border-[#214C9B]/20 bg-white/95 p-2 shadow-2xl backdrop-blur">
         {editMode && (
           <>
+            <button
+              type="button"
+              onClick={() => setSeasonPanelOpen((open) => !open)}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+            >
+              Temporadas
+            </button>
             <button
               type="button"
               onClick={() => void handleExport()}

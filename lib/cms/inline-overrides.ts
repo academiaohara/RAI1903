@@ -1,5 +1,6 @@
 import { createClient as createBrowserClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
 
 export type InlineOverridesMap = Record<string, unknown>;
 
@@ -16,14 +17,17 @@ function rowsToMap(data: InlineOverrideRow[]): InlineOverridesMap {
   return map;
 }
 
-export async function fetchInlineOverrides(): Promise<{
+export async function fetchInlineOverrides(seasonId = DEFAULT_COMPETITION_SEASON_ID): Promise<{
   overrides: InlineOverridesMap;
   error?: string;
 }> {
   if (!isSupabaseConfigured()) return { overrides: {} };
 
   const supabase = createBrowserClient();
-  const { data, error } = await supabase.from("cms_inline_overrides").select("key, value");
+  const { data, error } = await supabase
+    .from("cms_inline_overrides")
+    .select("key, value")
+    .eq("season_id", seasonId);
 
   if (error) return { overrides: {}, error: error.message };
   if (!data?.length) return { overrides: {} };
@@ -35,6 +39,7 @@ export async function upsertInlineOverride(
   key: string,
   value: unknown,
   userId?: string | null,
+  seasonId = DEFAULT_COMPETITION_SEASON_ID,
 ): Promise<{ ok: boolean; error?: string }> {
   if (!isSupabaseConfigured()) {
     return { ok: false, error: "Supabase no configurado" };
@@ -42,6 +47,7 @@ export async function upsertInlineOverride(
 
   const supabase = createBrowserClient();
   const { error } = await supabase.from("cms_inline_overrides").upsert({
+    season_id: seasonId,
     key,
     value,
     updated_at: new Date().toISOString(),
@@ -52,25 +58,35 @@ export async function upsertInlineOverride(
   return { ok: true };
 }
 
-export async function deleteInlineOverride(key: string): Promise<{ ok: boolean; error?: string }> {
+export async function deleteInlineOverride(
+  key: string,
+  seasonId = DEFAULT_COMPETITION_SEASON_ID,
+): Promise<{ ok: boolean; error?: string }> {
   if (!isSupabaseConfigured()) {
     return { ok: false, error: "Supabase no configurado" };
   }
 
   const supabase = createBrowserClient();
-  const { error } = await supabase.from("cms_inline_overrides").delete().eq("key", key);
+  const { error } = await supabase
+    .from("cms_inline_overrides")
+    .delete()
+    .eq("season_id", seasonId)
+    .eq("key", key);
 
   if (error) return { ok: false, error: error.message };
   return { ok: true };
 }
 
-export async function clearInlineOverrides(): Promise<{ ok: boolean; error?: string }> {
+export async function clearInlineOverrides(seasonId = DEFAULT_COMPETITION_SEASON_ID): Promise<{
+  ok: boolean;
+  error?: string;
+}> {
   if (!isSupabaseConfigured()) {
     return { ok: false, error: "Supabase no configurado" };
   }
 
   const supabase = createBrowserClient();
-  const { error } = await supabase.from("cms_inline_overrides").delete().neq("key", "");
+  const { error } = await supabase.from("cms_inline_overrides").delete().eq("season_id", seasonId);
 
   if (error) return { ok: false, error: error.message };
   return { ok: true };
@@ -79,6 +95,7 @@ export async function clearInlineOverrides(): Promise<{ ok: boolean; error?: str
 export async function upsertInlineOverridesBatch(
   entries: InlineOverridesMap,
   userId?: string | null,
+  seasonId = DEFAULT_COMPETITION_SEASON_ID,
 ): Promise<{ ok: boolean; error?: string }> {
   if (!isSupabaseConfigured()) {
     return { ok: false, error: "Supabase no configurado" };
@@ -90,6 +107,7 @@ export async function upsertInlineOverridesBatch(
   const supabase = createBrowserClient();
   const now = new Date().toISOString();
   const rows = keys.map((key) => ({
+    season_id: seasonId,
     key,
     value: entries[key],
     updated_at: now,
@@ -99,5 +117,36 @@ export async function upsertInlineOverridesBatch(
   const { error } = await supabase.from("cms_inline_overrides").upsert(rows);
 
   if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
+export async function copyInlineOverrides(
+  fromSeasonId: string,
+  toSeasonId: string,
+): Promise<{ ok: boolean; error?: string }> {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: "Supabase no configurado" };
+  }
+
+  const supabase = createBrowserClient();
+  const { data, error } = await supabase
+    .from("cms_inline_overrides")
+    .select("key, value, updated_by")
+    .eq("season_id", fromSeasonId);
+
+  if (error) return { ok: false, error: error.message };
+  if (!data?.length) return { ok: true };
+
+  const now = new Date().toISOString();
+  const rows = data.map((row) => ({
+    season_id: toSeasonId,
+    key: row.key,
+    value: row.value,
+    updated_at: now,
+    updated_by: row.updated_by,
+  }));
+
+  const { error: upsertError } = await supabase.from("cms_inline_overrides").upsert(rows);
+  if (upsertError) return { ok: false, error: upsertError.message };
   return { ok: true };
 }

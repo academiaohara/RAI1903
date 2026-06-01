@@ -1,21 +1,34 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { useSeason } from "@/components/season/SeasonProvider";
 import {
   applyChronicleStatsToSquad,
   aggregateAvilesStatsFromChronicles,
 } from "@/lib/aviles-chronicle-stats";
-import { getSquadPlayers } from "@/lib/squad-data";
+import { upsertSquadPlayer } from "@/lib/cms/players";
 import { mergeSquadPlayerOverrides, squadPlayerOverrideKey } from "@/lib/squad-overrides";
 import { ageFromBirthDate } from "@/lib/squad-age";
+import { resolveSquadPlayers } from "@/lib/season/squad-source";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { SquadPlayer } from "@/types/squad";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export function useSquadPlayers(gender: PrimerEquipoGender) {
   const { getOverride, saveValue } = useInlineEditing();
+  const { viewedSeasonId, bundles, bundlesLoading } = useSeason();
+  const [baseSquad, setBaseSquad] = useState<SquadPlayer[]>([]);
 
-  const baseSquad = useMemo(() => getSquadPlayers(gender), [gender]);
+  useEffect(() => {
+    let cancelled = false;
+    void resolveSquadPlayers(gender, viewedSeasonId, bundles).then((players) => {
+      if (!cancelled) setBaseSquad(players);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [bundles, gender, viewedSeasonId]);
 
   const squad = useMemo(() => {
     const withOverrides = mergeSquadPlayerOverrides(baseSquad, getOverride);
@@ -38,8 +51,15 @@ export function useSquadPlayers(gender: PrimerEquipoGender) {
         next.edad = ageFromBirthDate(patch.fechaNacimiento);
       }
       saveValue(squadPlayerOverrideKey(playerId), next);
+
+      if (isSupabaseConfigured()) {
+        const player = squad.find((entry) => entry.id === playerId);
+        if (player) {
+          void upsertSquadPlayer(gender, viewedSeasonId, { ...player, ...next });
+        }
+      }
     },
-    [getOverride, saveValue],
+    [gender, getOverride, saveValue, squad, viewedSeasonId],
   );
 
   const getPlayerById = useCallback(
@@ -47,5 +67,5 @@ export function useSquadPlayers(gender: PrimerEquipoGender) {
     [squad],
   );
 
-  return { squad, updatePlayer, getPlayerById };
+  return { squad, updatePlayer, getPlayerById, loading: bundlesLoading };
 }

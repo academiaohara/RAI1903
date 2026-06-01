@@ -1,15 +1,16 @@
-import { matchdays, matchdaysFemenino, matchdaysGrupo2, RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
-import { SEGUNDA_RFEF_FEMENINA_LAST_ROUND } from "@/lib/segunda-rfef-femenina-2526";
+import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import {
-  DEFINITIVE_QUALIFYING_LEAGUE_ROUND,
   buildPlayoffBracketThroughLeagueRound,
   buildPlayoffFixturesForRound,
   isDefinitiveQualifyingRound,
   playoffFixturesForBothGrupos,
   type PlayoffRoundKey,
 } from "@/lib/playoff-jornadas";
-import { RESULTADOS_2526_LAST_ROUND } from "@/lib/resultados-2526";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import {
+  getDefaultFixtureSource,
+  type JornadasFixtureSource,
+} from "@/lib/season/fixture-source";
 import { getTeam } from "@/lib/fixtures";
 import type { Match, Matchday } from "@/types";
 import type {
@@ -184,12 +185,12 @@ function matchdayByRound(matchdaysList: Matchday[], round: number): Matchday | u
  * Los partidos de liga provienen de los JSON de resultados; el playoff de ascenso
  * se genera desde el cuadro RFEF (clasificados definitivos o provisionales por jornada).
  */
-function buildFemeninoJornadasDataset(): JornadasDataset {
+function buildFemeninoJornadasDataset(source: JornadasFixtureSource): JornadasDataset {
   const raiId = RAI_FEM_TEAM_ID;
-  const currentRound = SEGUNDA_RFEF_FEMENINA_LAST_ROUND;
+  const currentRound = source.lastRoundFemenino;
   const currentRoundId: JornadaRoundId = `j${currentRound}`;
 
-  const leagueSummaries = [...matchdaysFemenino]
+  const leagueSummaries = [...source.matchdaysFemenino]
     .sort((a, b) => a.round - b.round)
     .map((md) => buildLeagueRoundSummary(md, raiId, currentRound));
 
@@ -198,7 +199,7 @@ function buildFemeninoJornadasDataset(): JornadasDataset {
 
   for (const summary of leagueSummaries) {
     const round = summary.roundNumber!;
-    const matches = matchdayByRound(matchdaysFemenino, round)?.matches ?? [];
+    const matches = matchdayByRound(source.matchdaysFemenino, round)?.matches ?? [];
     leagueRoundDataCache.set(summary.id, buildRoundData(summary, matches, [], raiId));
   }
 
@@ -212,21 +213,25 @@ function buildFemeninoJornadasDataset(): JornadasDataset {
   };
 }
 
-export function buildJornadasDataset(gender: PrimerEquipoGender): JornadasDataset {
+export function buildJornadasDataset(
+  gender: PrimerEquipoGender,
+  source: JornadasFixtureSource = getDefaultFixtureSource(),
+): JornadasDataset {
   if (gender === "femenino") {
-    return buildFemeninoJornadasDataset();
+    return buildFemeninoJornadasDataset(source);
   }
 
   const raiId = raiTeamId(gender);
-  const currentRound = RESULTADOS_2526_LAST_ROUND;
+  const currentRound = source.lastRoundMasculino;
   const currentRoundId: JornadaRoundId = `j${currentRound}`;
+  const definitiveQualifyingLeagueRound = source.definitiveQualifyingLeagueRound;
 
-  const leagueSummaries = [...matchdays]
+  const leagueSummaries = [...source.matchdays]
     .sort((a, b) => a.round - b.round)
     .map((md) => buildLeagueRoundSummary(md, raiId, currentRound));
 
   const playoffSummaries = PLAYOFF_ROUNDS.map((po) =>
-    buildPlayoffRoundSummary(po, false, DEFINITIVE_QUALIFYING_LEAGUE_ROUND),
+    buildPlayoffRoundSummary(po, false, definitiveQualifyingLeagueRound),
   );
 
   const rounds: JornadaRoundSummary[] = [...leagueSummaries, ...playoffSummaries];
@@ -235,18 +240,18 @@ export function buildJornadasDataset(gender: PrimerEquipoGender): JornadasDatase
 
   for (const summary of leagueSummaries) {
     const round = summary.roundNumber!;
-    const g1 = matchdayByRound(matchdays, round)?.matches ?? [];
-    const g2 = matchdayByRound(matchdaysGrupo2, round)?.matches ?? [];
+    const g1 = matchdayByRound(source.matchdays, round)?.matches ?? [];
+    const g2 = matchdayByRound(source.matchdaysGrupo2, round)?.matches ?? [];
     leagueRoundDataCache.set(summary.id, buildRoundData(summary, g1, g2, raiId));
   }
 
   return {
     rounds,
     currentRoundId,
-    definitiveQualifyingLeagueRound: DEFINITIVE_QUALIFYING_LEAGUE_ROUND,
+    definitiveQualifyingLeagueRound,
     getRound(roundId, options?: JornadasGetRoundOptions) {
       const qualifyingLeagueRound =
-        options?.qualifyingLeagueRound ?? DEFINITIVE_QUALIFYING_LEAGUE_ROUND;
+        options?.qualifyingLeagueRound ?? definitiveQualifyingLeagueRound;
 
       const leagueData = leagueRoundDataCache.get(roundId);
       if (leagueData) return leagueData;

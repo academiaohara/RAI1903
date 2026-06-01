@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { SquadPlayer, SquadViewMode } from "@/types/squad";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
-import { getSquadClubInfo } from "@/lib/squad-data";
+import { useSeason } from "@/components/season/SeasonProvider";
+import { resolveSquadClubInfo } from "@/lib/season/squad-source";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { splitSquadByAvailability } from "@/lib/squad-utils";
 import { SquadHeader } from "@/components/squad/SquadHeader";
@@ -22,8 +23,12 @@ type SquadPageProps = {
 
 export function SquadPage({ gender }: SquadPageProps) {
   const { squad, updatePlayer } = useSquadPlayers(gender);
+  const { bundles, viewedSeason } = useSeason();
   const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
-  const club = useMemo(() => getSquadClubInfo(gender), [gender]);
+  const club = useMemo(
+    () => resolveSquadClubInfo(gender, viewedSeason.label, bundles, squad.length),
+    [bundles, gender, squad.length, viewedSeason.label],
+  );
   const isFemenino = gender === "femenino";
 
   const [viewMode, setViewMode] = useState<SquadViewMode>(isFemenino ? "lista" : "fichas");

@@ -1,9 +1,12 @@
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import type { Player } from "@/types";
-import type { PrimerEquipoGender } from "@/types";
+import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import type { SquadPlayer } from "@/types/squad";
 
-export async function fetchSquadPlayers(gender: PrimerEquipoGender, seasonId = "2025-26"): Promise<Player[]> {
+export async function fetchSquadPlayersFromCms(
+  gender: PrimerEquipoGender,
+  seasonId: string,
+): Promise<SquadPlayer[]> {
   if (!isSupabaseConfigured()) {
     return [];
   }
@@ -20,9 +23,55 @@ export async function fetchSquadPlayers(gender: PrimerEquipoGender, seasonId = "
     return [];
   }
 
-  return data.map((row) => row.payload as Player);
+  return data.map((row) => row.payload as SquadPlayer);
 }
 
-export function playerPayload(player: Player): Player {
-  return player;
+export async function upsertSquadPlayer(
+  gender: PrimerEquipoGender,
+  seasonId: string,
+  player: SquadPlayer,
+): Promise<{ ok: boolean; error?: string }> {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: "Supabase no configurado" };
+  }
+
+  const supabase = createClient();
+  const { error } = await supabase.from("cms_players").upsert({
+    id: player.id,
+    season_id: seasonId,
+    squad: gender,
+    payload: player,
+    published: true,
+    updated_at: new Date().toISOString(),
+  });
+
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
+export async function upsertSquadPlayersBatch(
+  gender: PrimerEquipoGender,
+  seasonId: string,
+  players: SquadPlayer[],
+): Promise<{ ok: boolean; error?: string }> {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: "Supabase no configurado" };
+  }
+
+  if (!players.length) return { ok: true };
+
+  const supabase = createClient();
+  const now = new Date().toISOString();
+  const rows = players.map((player) => ({
+    id: player.id,
+    season_id: seasonId,
+    squad: gender,
+    payload: player,
+    published: true,
+    updated_at: now,
+  }));
+
+  const { error } = await supabase.from("cms_players").upsert(rows);
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
 }
