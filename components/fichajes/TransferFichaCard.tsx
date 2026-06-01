@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { Route } from "next";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { useTransferMarketEditOptional } from "@/components/editor/TransferMarketEditProvider";
+import { TransferFichaCardEditForm } from "@/components/fichajes/TransferFichaCardEditForm";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 import { getTransferKind, getTransferKindLabel, getTransferOriginClub, getSquadPlayerForTransfer } from "@/lib/fichajes";
 import { getNationalityFlag, getPlayerDisplayName } from "@/lib/squad-utils";
@@ -45,13 +48,20 @@ type TransferFichaCardProps = {
 };
 
 export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: TransferFichaCardProps) {
+  const { editMode } = useInlineEditing();
+  const marketEdit = useTransferMarketEditOptional();
+  const cmsEntry = marketEdit?.getEntry(transfer.id);
+  const isCardEditing = Boolean(editMode && marketEdit && cmsEntry);
+
   const kind = getTransferKind(transfer);
   const styles = toneStyles[kind];
   const player = getSquadPlayerForTransfer(transfer);
   const displayName = player ? getPlayerDisplayName(player) : transfer.playerName;
   const fullName = player ? `${player.nombre} ${player.apellido}` : transfer.playerName;
   const wrapperClass =
-    layout === "grid" ? "group w-full max-w-[168px] justify-self-center" : "group w-[min(100%,168px)] shrink-0 snap-start sm:w-[175px]";
+    layout === "grid"
+      ? `group w-full max-w-[168px] justify-self-center${isCardEditing ? " max-w-[220px]" : ""}`
+      : `group shrink-0 snap-start${isCardEditing ? " w-[min(100%,220px)]" : " w-[min(100%,168px)] sm:w-[175px]"}`;
   const flag = player ? getNationalityFlag(player.nacionalidad) : "🇪🇸";
   const originClub = getTransferOriginClub(transfer);
   const initials = transfer.playerName
@@ -61,18 +71,7 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
     .slice(0, 2)
     .toUpperCase();
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.04, duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-      className={wrapperClass}
-    >
-      <Link
-        href={`/fichajes/${transfer.id}` as Route}
-        className="block w-full text-left"
-        aria-label={`${getTransferKindLabel(kind)} de ${fullName}, procedente de ${originClub}`}
-      >
+  const cardBody = (
         <article
           className={`overflow-hidden rounded-tl-[1.25rem] rounded-br-[1.25rem] rounded-tr-sm rounded-bl-sm border-2 bg-gradient-to-b ${styles.gradient} ${styles.border} ${styles.shadow} transition-shadow ${styles.hoverShadow}`}
         >
@@ -112,7 +111,29 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
             <p className="mt-0.5 truncate text-[10px] font-semibold uppercase tracking-wide text-white/85">{originClub}</p>
           </div>
         </article>
-      </Link>
+  );
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.04, duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+      className={wrapperClass}
+    >
+      {isCardEditing ? (
+        <div className="block w-full text-left">
+          {cardBody}
+          <TransferFichaCardEditForm entry={cmsEntry!} />
+        </div>
+      ) : (
+        <Link
+          href={`/fichajes/${transfer.id}` as Route}
+          className="block w-full text-left"
+          aria-label={`${getTransferKindLabel(kind)} de ${fullName}, procedente de ${originClub}`}
+        >
+          {cardBody}
+        </Link>
+      )}
     </motion.div>
   );
 }

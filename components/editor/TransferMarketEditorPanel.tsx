@@ -1,40 +1,20 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Loader2, Plus, Trash2, X } from "lucide-react";
+import { useState } from "react";
+import { Loader2, Plus, X } from "lucide-react";
 import { useSeason } from "@/components/season/SeasonProvider";
-import { formatSeasonBundleSaveError } from "@/lib/cms/bundle-save-error";
-import {
-  getTransfersBundle,
-  upsertSeasonBundle,
-  type CmsTransferEntry,
-  type SeasonTransfersBundle,
-} from "@/lib/cms/season-bundles";
-import { TRANSFER_MARKET_WINDOWS, inferTransferMarketWindowId } from "@/lib/transfer-market-windows";
-import { useSquadPlayers } from "@/hooks/useSquadPlayers";
-import { getPlayerDisplayName } from "@/lib/squad-utils";
+import { useTransferMarketEdit } from "@/components/editor/TransferMarketEditProvider";
+import { TRANSFER_KIND_OPTIONS, newTransferEntryId } from "@/hooks/useTransferMarketDraft";
 import type { TransferKind, TransferMarketWindowId } from "@/types";
 
 type TransferMarketEditorPanelProps = {
   onClose: () => void;
 };
 
-const KIND_OPTIONS: Array<{ value: TransferKind; label: string }> = [
-  { value: "fichaje", label: "Fichaje" },
-  { value: "cesion", label: "Cesión" },
-  { value: "renovacion", label: "Renovación" },
-];
-
-function newEntryId(): string {
-  return `tm-${Date.now().toString(36)}`;
-}
-
 export function TransferMarketEditorPanel({ onClose }: TransferMarketEditorPanelProps) {
-  const { viewedSeasonId, viewedSeason, bundles, refreshBundles } = useSeason();
-  const { squad, loading: squadLoading } = useSquadPlayers("masculino");
-  const [draft, setDraft] = useState<CmsTransferEntry[] | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const { viewedSeason } = useSeason();
+  const { squad, squadLoading, addEntry, save, busy, message, hasDraft, inferWindow, marketWindows } =
+    useTransferMarketEdit();
 
   const [playerId, setPlayerId] = useState("");
   const [kind, setKind] = useState<TransferKind>("fichaje");
@@ -43,76 +23,27 @@ export function TransferMarketEditorPanel({ onClose }: TransferMarketEditorPanel
   const [originClub, setOriginClub] = useState("");
   const [clubAnnouncement, setClubAnnouncement] = useState("");
 
-  const bundleEntries = useMemo(() => getTransfersBundle(bundles)?.entries ?? [], [bundles]);
-  const entries = draft ?? bundleEntries;
-
-  useEffect(() => {
-    queueMicrotask(() => setDraft(null));
-  }, [bundles, viewedSeasonId]);
-
-  const squadById = useMemo(() => new Map(squad.map((player) => [player.id, player])), [squad]);
-
-  const playerLabel = useCallback(
-    (id: string) => {
-      const player = squadById.get(id);
-      return player ? getPlayerDisplayName(player) : id;
-    },
-    [squadById],
-  );
-
-  const save = async () => {
-    setBusy(true);
-    setMessage(null);
-    const payload: SeasonTransfersBundle = { entries };
-    const result = await upsertSeasonBundle(viewedSeasonId, "global", "transfers", payload);
-    setBusy(false);
-    if (!result.ok) {
-      setMessage(formatSeasonBundleSaveError(result.error ?? "Error al guardar"));
-      return;
-    }
-    setMessage(`Mercado guardado para ${viewedSeason.label}`);
-    setDraft(null);
-    await refreshBundles();
-  };
-
-  const removeEntry = (id: string) => {
-    setDraft((current) => (current ?? bundleEntries).filter((entry) => entry.id !== id));
-  };
-
-  const addEntry = () => {
-    if (!playerId) {
-      setMessage("Selecciona un jugador de la plantilla");
-      return;
-    }
-    const current = draft ?? bundleEntries;
-    if (current.some((entry) => entry.playerId === playerId)) {
-      setMessage("Ese jugador ya está en el mercado de esta temporada");
-      return;
-    }
-    const resolvedWindow =
-      marketWindowId || inferTransferMarketWindowId(date);
-
-    const entry: CmsTransferEntry = {
-      id: newEntryId(),
+  const handleAdd = () => {
+    if (!playerId) return;
+    const ok = addEntry({
+      id: newTransferEntryId(),
       playerId,
       kind,
       date,
-      marketWindowId: resolvedWindow,
+      marketWindowId: marketWindowId || inferWindow(date),
       ...(kind !== "renovacion" && originClub.trim() ? { originClub: originClub.trim() } : {}),
       ...(clubAnnouncement.trim() ? { clubAnnouncement: clubAnnouncement.trim() } : {}),
-    };
-
-    setDraft([entry, ...current]);
+    });
+    if (!ok) return;
     setPlayerId("");
     setOriginClub("");
     setClubAnnouncement("");
-    setMessage(null);
   };
 
   const handleDateChange = (value: string) => {
     setDate(value);
     if (!marketWindowId) return;
-    setMarketWindowId(inferTransferMarketWindowId(value));
+    setMarketWindowId(inferWindow(value));
   };
 
   return (
@@ -130,8 +61,8 @@ export function TransferMarketEditorPanel({ onClose }: TransferMarketEditorPanel
       </div>
 
       <p className="mb-3 text-xs leading-relaxed text-slate-600">
-        Altas, cesiones y renovaciones del carrusel de inicio para <strong>{viewedSeason.label}</strong>.
-        Solo entran jugadores de la plantilla masculina (por id). No se muestran salidas.
+        Altas, cesiones y renovaciones del carrusel para <strong>{viewedSeason.label}</strong>. Edita cada ficha en el
+        carrusel; aquí solo añades movimientos nuevos.
       </p>
 
       <div className="mb-4 space-y-2 rounded-xl border border-slate-100 bg-slate-50/80 p-3">
@@ -152,7 +83,7 @@ export function TransferMarketEditorPanel({ onClose }: TransferMarketEditorPanel
                 <option value="">— Elegir de plantilla —</option>
                 {squad.map((player) => (
                   <option key={player.id} value={player.id}>
-                    {getPlayerDisplayName(player)} · #{player.dorsal} · {player.id}
+                    {player.nombre} {player.apellido} · #{player.dorsal}
                   </option>
                 ))}
               </select>
@@ -165,7 +96,7 @@ export function TransferMarketEditorPanel({ onClose }: TransferMarketEditorPanel
                   onChange={(event) => setKind(event.target.value as TransferKind)}
                   className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-semibold"
                 >
-                  {KIND_OPTIONS.map((option) => (
+                  {TRANSFER_KIND_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -189,8 +120,8 @@ export function TransferMarketEditorPanel({ onClose }: TransferMarketEditorPanel
                 onChange={(event) => setMarketWindowId(event.target.value as TransferMarketWindowId | "")}
                 className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-semibold"
               >
-                <option value="">Auto ({inferTransferMarketWindowId(date)})</option>
-                {TRANSFER_MARKET_WINDOWS.map((window) => (
+                <option value="">Auto ({inferWindow(date)})</option>
+                {marketWindows.map((window) => (
                   <option key={window.id} value={window.id}>
                     {window.label}
                   </option>
@@ -210,17 +141,18 @@ export function TransferMarketEditorPanel({ onClose }: TransferMarketEditorPanel
               </label>
             )}
             <label className="block text-[10px] font-bold uppercase text-slate-500">
-              Comunicado (opcional)
-              <textarea
+              Enlace al comunicado (opcional)
+              <input
+                type="url"
                 value={clubAnnouncement}
                 onChange={(event) => setClubAnnouncement(event.target.value)}
-                rows={2}
+                placeholder="https://realavilesindustrial1903.com/…"
                 className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-semibold"
               />
             </label>
             <button
               type="button"
-              onClick={addEntry}
+              onClick={handleAdd}
               className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-[#214C9B] px-3 py-2 text-xs font-extrabold uppercase text-white hover:bg-[#173a78]"
             >
               <Plus size={14} />
@@ -229,37 +161,6 @@ export function TransferMarketEditorPanel({ onClose }: TransferMarketEditorPanel
           </>
         )}
       </div>
-
-      <ul className="mb-3 max-h-52 space-y-2 overflow-y-auto text-xs">
-        {entries.length === 0 ? (
-          <li className="rounded-xl border border-dashed border-slate-200 p-3 text-slate-500">
-            Sin movimientos en Supabase para esta temporada.
-          </li>
-        ) : (
-          entries.map((entry) => (
-            <li
-              key={entry.id}
-              className="flex items-start justify-between gap-2 rounded-xl border border-slate-100 px-2 py-2"
-            >
-              <div className="min-w-0">
-                <p className="font-bold text-slate-800">{playerLabel(entry.playerId)}</p>
-                <p className="text-slate-500">
-                  {KIND_OPTIONS.find((option) => option.value === entry.kind)?.label ?? entry.kind} · {entry.date}
-                  {entry.marketWindowId ? ` · ${entry.marketWindowId}` : ""}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => removeEntry(entry.id)}
-                className="shrink-0 rounded-full p-1.5 text-[#981915] hover:bg-red-50"
-                aria-label="Quitar"
-              >
-                <Trash2 size={14} />
-              </button>
-            </li>
-          ))
-        )}
-      </ul>
 
       {message && (
         <p
@@ -271,7 +172,7 @@ export function TransferMarketEditorPanel({ onClose }: TransferMarketEditorPanel
 
       <button
         type="button"
-        disabled={busy || draft === null}
+        disabled={busy || !hasDraft}
         onClick={() => void save()}
         className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#981915] px-4 py-2 text-xs font-extrabold uppercase text-white hover:bg-[#7a1411] disabled:opacity-50"
       >
