@@ -1,13 +1,33 @@
 -- =============================================================================
 -- RAI1903 — Ejecutar en Supabase → SQL Editor (una vez)
 -- Corrige: "column cms_inline_overrides.season_id does not exist"
+--           FK season_id → cms_seasons (temporadas deben existir ANTES)
 -- =============================================================================
--- Orden: 1) temporadas + bundles + overrides   2) escudos (bundle team_crests)
--- Es idempotente: puedes ejecutarlo varias veces sin romper datos existentes.
+-- Si probaste API-Football antes, ejecuta primero: supabase/DROP_API_FOOTBALL.sql
+-- Es idempotente: puedes ejecutarlo varias veces.
 -- =============================================================================
 
--- --- Migración 20250601120000_cms_season_bundles.sql ---
+-- 1) Catálogo de temporadas (OBLIGATORIO antes de FKs)
+create table if not exists public.cms_seasons (
+  id text primary key,
+  label text not null,
+  is_default boolean not null default false,
+  sort_order int not null default 0,
+  published boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
 
+insert into public.cms_seasons (id, label, is_default, sort_order, published)
+values
+  ('2024-25', '2024/25', false, 0, true),
+  ('2025-26', '2025/26', true, 1, true),
+  ('2026-27', '2026/27', false, 2, false)
+on conflict (id) do update set
+  label = excluded.label,
+  sort_order = excluded.sort_order;
+
+-- 2) Bundles por temporada (plantilla, calendario, crónicas…)
 create table if not exists public.cms_season_bundles (
   season_id text not null references public.cms_seasons (id) on delete cascade,
   scope text not null check (scope in ('masculino', 'femenino', 'global')),
@@ -33,47 +53,6 @@ create policy "cms_season_bundles_editor"
   using (public.is_editor())
   with check (public.is_editor());
 
--- Overrides por temporada
-alter table public.cms_inline_overrides
-  add column if not exists season_id text default '2025-26';
-
-update public.cms_inline_overrides
-set season_id = '2025-26'
-where season_id is null;
-
-alter table public.cms_inline_overrides
-  alter column season_id set not null;
-
-do $$
-begin
-  if not exists (
-    select 1 from pg_constraint
-    where conname = 'cms_inline_overrides_season_id_fkey'
-  ) then
-    alter table public.cms_inline_overrides
-      add constraint cms_inline_overrides_season_id_fkey
-      foreign key (season_id) references public.cms_seasons (id) on delete cascade;
-  end if;
-end $$;
-
-alter table public.cms_inline_overrides drop constraint if exists cms_inline_overrides_pkey;
-
-alter table public.cms_inline_overrides
-  add primary key (season_id, key);
-
-create index if not exists cms_inline_overrides_season_idx
-  on public.cms_inline_overrides (season_id);
-
-insert into public.cms_seasons (id, label, is_default, sort_order, published)
-values
-  ('2024-25', '2024/25', false, 0, true),
-  ('2025-26', '2025/26', true, 1, true),
-  ('2026-27', '2026/27', false, 2, false)
-on conflict (id) do update set
-  label = excluded.label,
-  sort_order = excluded.sort_order;
-
--- Restricción bundle_key (fixtures + escudos)
 alter table public.cms_season_bundles
   drop constraint if exists cms_season_bundles_bundle_key_check;
 
@@ -89,6 +68,42 @@ alter table public.cms_season_bundles
       'stadium_photos'
     )
   );
+
+-- 3) Overrides por temporada
+alter table public.cms_inline_overrides
+  add column if not exists season_id text default '2025-26';
+
+update public.cms_inline_overrides
+set season_id = '2025-26'
+where season_id is null;
+
+-- Filas huérfanas: temporada inexistente → 2025-26
+update public.cms_inline_overrides o
+set season_id = '2025-26'
+where not exists (select 1 from public.cms_seasons s where s.id = o.season_id);
+
+alter table public.cms_inline_overrides
+  alter column season_id set not null;
+
+alter table public.cms_inline_overrides
+  drop constraint if exists cms_inline_overrides_season_id_fkey;
+
+alter table public.cms_inline_overrides
+  add constraint cms_inline_overrides_season_id_fkey
+  foreign key (season_id) references public.cms_seasons (id) on delete cascade;
+
+alter table public.cms_inline_overrides drop constraint if exists cms_inline_overrides_pkey;
+
+do $$
+begin
+  alter table public.cms_inline_overrides
+    add primary key (season_id, key);
+exception
+  when duplicate_object then null;
+end $$;
+
+create index if not exists cms_inline_overrides_season_idx
+  on public.cms_inline_overrides (season_id);
 
 -- =============================================================================
 -- Después de ejecutar:
