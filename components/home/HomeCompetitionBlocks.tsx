@@ -6,10 +6,10 @@ import { CalendarNavButton } from "@/components/CalendarNavButton";
 import { Card } from "@/components/Card";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { HomeStatHighlights } from "@/components/home/HomeStatHighlights";
-import { MatchCard } from "@/components/MatchCard";
 import { MatchScoreCenter } from "@/components/MatchScoreCenter";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
+import { MatchCard } from "@/components/MatchCard";
 import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
@@ -24,82 +24,94 @@ import { formatMatchDate } from "@/lib/utils";
 import type { Route } from "next";
 import type { Match } from "@/types";
 
-export function HomeCompetitionSection() {
-  const {
-    teams,
-    leagueMatchdays,
-    latestMatches,
-    upcomingMatches,
-    nextMatch,
-    highlightTeamId,
-    bundlesLoading,
-  } = useMasculinoLeagueSeason();
-  const { getCronica, getPrevia } = useSeasonMatchArticles();
+export function useHomeCompetitionEmptyHint(): boolean {
+  const { leagueMatchdays, bundlesLoading } = useMasculinoLeagueSeason();
   const { bundles } = useSeason();
+  return !bundlesLoading && !seasonHasCompetitionBundles(bundles) && leagueMatchdays.length === 0;
+}
+
+export function HomeCompetitionEmptyHint() {
+  if (!useHomeCompetitionEmptyHint()) return null;
+
+  return (
+    <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 px-4 py-3 text-sm font-semibold text-slate-600">
+      Calendario y clasificación en preparación para esta temporada.
+    </p>
+  );
+}
+
+export function HomeMatchBannersBlock() {
+  const { latestMatches, nextMatch } = useMasculinoLeagueSeason();
+  const { getCronica, getPrevia } = useSeasonMatchArticles();
 
   const latestMatch = latestMatches[0];
   const latestCronica = latestMatch ? getCronica(latestMatch.id, "masculino") : undefined;
   const nextPrevia = nextMatch ? getPrevia(nextMatch.id, "masculino") : undefined;
 
-  const showEmptyHint =
-    !bundlesLoading && !seasonHasCompetitionBundles(bundles) && leagueMatchdays.length === 0;
+  if (!latestMatch && !nextMatch) return null;
+
+  return (
+    <section className="grid gap-4">
+      {latestMatch && (
+        <MatchBanner
+          match={latestMatch}
+          label="Ultimo partido"
+          href={
+            `${primerEquipoBase("masculino")}/cronicas/${latestCronica?.id ?? defaultCronicaId(latestMatch.id, "masculino")}` as Route
+          }
+          action="Entrar en la cronica"
+        />
+      )}
+      {nextMatch && (
+        <MatchBanner
+          match={nextMatch}
+          label="Siguiente partido"
+          href={
+            `${primerEquipoBase("masculino")}/cronicas/${nextPrevia?.id ?? defaultPreviaId(nextMatch.id, "masculino")}` as Route
+          }
+          action="Entrar en la previa"
+        />
+      )}
+    </section>
+  );
+}
+
+export function HomeStandingsStatsBlock() {
+  const { teams, leagueMatchdays, highlightTeamId } = useMasculinoLeagueSeason();
+
+  return (
+    <section className="grid gap-6 xl:grid-cols-[1fr_0.42fr]">
+      <StandingsLeagueTableCard
+        eyebrow="Estado competitivo"
+        sourceTeams={teams}
+        matchdays={leagueMatchdays}
+        highlightTeamId={highlightTeamId}
+        compact
+      />
+      <Card
+        eyebrow="Jugadores destacados"
+        title="Estadisticas"
+        action={
+          <Link
+            href={`${primerEquipoBase("masculino")}/plantilla` as Route}
+            className="inline-flex items-center justify-center rounded-2xl border border-[#214C9B]/20 p-2 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
+            aria-label="Ir a estadisticas"
+          >
+            <Users size={16} />
+          </Link>
+        }
+      >
+        <HomeStatHighlights />
+      </Card>
+    </section>
+  );
+}
+
+export function HomeRecentUpcomingBlock() {
+  const { latestMatches, upcomingMatches } = useMasculinoLeagueSeason();
 
   return (
     <>
-      {showEmptyHint && (
-        <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 px-4 py-3 text-sm font-semibold text-slate-600">
-          Calendario y clasificación en preparación para esta temporada.
-        </p>
-      )}
-
-      <section className="grid gap-4">
-        {latestMatch && (
-          <MatchBanner
-            match={latestMatch}
-            label="Ultimo partido"
-            href={
-              `${primerEquipoBase("masculino")}/cronicas/${latestCronica?.id ?? defaultCronicaId(latestMatch.id, "masculino")}` as Route
-            }
-            action="Entrar en la cronica"
-          />
-        )}
-        {nextMatch && (
-          <MatchBanner
-            match={nextMatch}
-            label="Siguiente partido"
-            href={
-              `${primerEquipoBase("masculino")}/cronicas/${nextPrevia?.id ?? defaultPreviaId(nextMatch.id, "masculino")}` as Route
-            }
-            action="Entrar en la previa"
-          />
-        )}
-      </section>
-
-      <section className="grid gap-6 xl:grid-cols-[1fr_0.42fr]">
-        <StandingsLeagueTableCard
-          eyebrow="Estado competitivo"
-          sourceTeams={teams}
-          matchdays={leagueMatchdays}
-          highlightTeamId={highlightTeamId}
-          compact
-        />
-        <Card
-          eyebrow="Jugadores destacados"
-          title="Estadisticas"
-          action={
-            <Link
-              href={`${primerEquipoBase("masculino")}/plantilla` as Route}
-              className="inline-flex items-center justify-center rounded-2xl border border-[#214C9B]/20 p-2 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
-              aria-label="Ir a estadisticas"
-            >
-              <Users size={16} />
-            </Link>
-          }
-        >
-          <HomeStatHighlights />
-        </Card>
-      </section>
-
       <section className="grid gap-6 xl:hidden">
         <Card eyebrow="Resultados" title="Ultimos 5 partidos">
           <div className="space-y-3">
