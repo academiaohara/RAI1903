@@ -1,12 +1,9 @@
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { copyInlineOverrides } from "@/lib/cms/inline-overrides";
-import { upsertSquadPlayersBatch } from "@/lib/cms/players";
-import { copySeasonBundles, upsertSeasonBundlesBatch } from "@/lib/cms/season-bundles";
+import { copySeasonBundles } from "@/lib/cms/season-bundles";
 import type { CmsSeason } from "@/lib/cms/seasons";
-import { buildMockSeasonBundleEntries } from "@/lib/season/build-mock-bundles";
-import { getSquadPlayers } from "@/lib/squad-data";
-import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import { seedSeasonFromRepo } from "@/lib/cms/seed-season-from-repo";
 
 export type SeasonEditorInput = {
   id: string;
@@ -147,25 +144,12 @@ export async function seedSeasonFromMock(
   seasonId: string,
   seasonLabel: string,
 ): Promise<{ ok: boolean; error?: string }> {
-  const entries = buildMockSeasonBundleEntries(seasonLabel);
-  const bundles = await upsertSeasonBundlesBatch(
-    seasonId,
-    entries.map((entry) => ({
-      scope: entry.scope,
-      bundleKey: entry.bundleKey,
-      payload: entry.payload,
-    })),
-  );
-  if (!bundles.ok) return bundles;
-
-  const genders: PrimerEquipoGender[] = ["masculino", "femenino"];
-  for (const gender of genders) {
-    const players = getSquadPlayers(gender);
-    const saved = await upsertSquadPlayersBatch(gender, seasonId, players);
-    if (!saved.ok) return saved;
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: "Supabase no configurado" };
   }
 
-  return { ok: true };
+  const supabase = createClient();
+  return seedSeasonFromRepo(supabase, seasonId, seasonLabel);
 }
 
 async function copySeasonPlayers(
