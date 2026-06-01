@@ -9,6 +9,7 @@ import {
 import { DEFINITIVE_QUALIFYING_LEAGUE_ROUND } from "@/lib/playoff-jornadas";
 import { RESULTADOS_2526_LAST_ROUND } from "@/lib/resultados-2526";
 import { SEGUNDA_RFEF_FEMENINA_LAST_ROUND } from "@/lib/segunda-rfef-femenina-2526";
+import { computeClubLeagueStatsForGender } from "@/lib/season/club-league-stats";
 import { getSquadClubInfo, getSquadPlayers } from "@/lib/squad-data";
 import type { SeasonBundleKey, SeasonBundleScope } from "@/lib/cms/season-bundles";
 import type {
@@ -46,9 +47,14 @@ export function buildMockSeasonBundleEntries(seasonLabel: string): MockBundleEnt
   const genders: PrimerEquipoGender[] = ["masculino", "femenino"];
   const squadEntries: MockBundleEntry[] = genders.map((gender) => {
     const club = getSquadClubInfo(gender);
+    const leagueMatchdays = gender === "femenino" ? matchdaysFemenino : matchdays;
     const bundle: SeasonSquadBundle = {
       players: getSquadPlayers(gender),
-      clubInfo: { ...club, temporada: seasonLabel },
+      clubInfo: {
+        ...club,
+        temporada: seasonLabel,
+        stats: computeClubLeagueStatsForGender(gender, leagueMatchdays),
+      },
     };
     return { scope: gender, bundleKey: "squad" as const, payload: bundle };
   });

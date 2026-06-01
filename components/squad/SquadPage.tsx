@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { SquadPlayer, SquadViewMode } from "@/types/squad";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { useSeason } from "@/components/season/SeasonProvider";
+import { getLeagueMatchdaysForGender } from "@/lib/season/aviles-matches";
 import { resolveSquadClubInfo } from "@/lib/season/squad-source";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { splitSquadByAvailability } from "@/lib/squad-utils";
@@ -23,11 +24,15 @@ type SquadPageProps = {
 
 export function SquadPage({ gender }: SquadPageProps) {
   const { squad, updatePlayer } = useSquadPlayers(gender);
-  const { bundles, viewedSeason } = useSeason();
+  const { bundles, viewedSeason, getFixtureSource } = useSeason();
+  const leagueMatchdays = useMemo(
+    () => getLeagueMatchdaysForGender(getFixtureSource(gender), gender),
+    [gender, getFixtureSource],
+  );
   const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
   const club = useMemo(
-    () => resolveSquadClubInfo(gender, viewedSeason.label, bundles, squad.length),
-    [bundles, gender, squad.length, viewedSeason.label],
+    () => resolveSquadClubInfo(gender, viewedSeason.label, bundles, squad.length, leagueMatchdays),
+    [bundles, gender, leagueMatchdays, squad.length, viewedSeason.label],
   );
   const isFemenino = gender === "femenino";
 

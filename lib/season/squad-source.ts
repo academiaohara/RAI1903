@@ -1,9 +1,11 @@
 import type { SeasonBundlesMap, SeasonSquadBundle } from "@/lib/cms/season-bundles";
 import { getSquadBundle } from "@/lib/cms/season-bundles";
 import { fetchSquadPlayersFromCms } from "@/lib/cms/players";
+import { computeClubLeagueStatsForGender } from "@/lib/season/club-league-stats";
 import { shouldUseMockCompetitionFallback } from "@/lib/season/cms-data-policy";
 import { getSquadClubInfo, getSquadPlayers } from "@/lib/squad-data";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import type { Matchday } from "@/types";
 import type { SquadClubInfo, SquadPlayer } from "@/types/squad";
 
 export async function resolveSquadPlayers(
@@ -26,16 +28,19 @@ export function resolveSquadClubInfo(
   seasonLabel: string,
   bundles: SeasonBundlesMap,
   squadSize: number,
+  leagueMatchdays: readonly Matchday[],
 ): SquadClubInfo {
   const bundle = getSquadBundle(bundles, gender);
   const base = getSquadClubInfo(gender);
-  const merged: SquadClubInfo = {
+  const stats = computeClubLeagueStatsForGender(gender, leagueMatchdays);
+
+  return {
     ...base,
     ...(bundle?.clubInfo ?? {}),
     temporada: bundle?.clubInfo?.temporada ?? seasonLabel,
     jugadores: squadSize,
+    stats,
   };
-  return merged;
 }
 
 export function seasonSquadBundlePayload(players: SquadPlayer[], clubInfo?: Partial<SquadClubInfo>): SeasonSquadBundle {
