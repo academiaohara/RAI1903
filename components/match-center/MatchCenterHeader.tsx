@@ -16,7 +16,7 @@ import { getCompeticionSquadData } from "@/lib/competicion-squad";
 import { getRaiTeamId, getTeamByGender } from "@/lib/fixtures";
 import { resolveSquadPlayerByName } from "@/lib/squad-player-resolve";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
-import { getTeamCrest } from "@/lib/team-crests";
+import { getTeamCrest, getTeamCrestById } from "@/lib/team-crests";
 import { cn } from "@/lib/utils";
 import type { MatchDetail, MatchEvent } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
@@ -182,7 +182,11 @@ export function MatchCenterHeader({ detail, backHref, backLabel, variant = "matc
         <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-6">
           <div className="flex flex-col items-center gap-2">
             <TeamLink gender={gender} teamId={match.homeTeamId} teamName={match.homeTeam} className="flex flex-col items-center gap-2 text-center">
-              <OpponentCrest logo={homeTeam ? getTeamCrest(homeTeam) : "LOC"} opponent={match.homeTeam} size="md" />
+              <OpponentCrest
+                logo={homeTeam ? getTeamCrest(homeTeam) : getTeamCrestById(match.homeTeamId, "LOC")}
+                opponent={match.homeTeam}
+                size="md"
+              />
               <span className="text-xs font-extrabold uppercase leading-tight sm:text-sm">{match.homeTeam}</span>
             </TeamLink>
             <div className="flex w-full justify-start">
@@ -227,7 +231,11 @@ export function MatchCenterHeader({ detail, backHref, backLabel, variant = "matc
 
           <div className="flex flex-col items-center gap-2">
             <TeamLink gender={gender} teamId={match.awayTeamId} teamName={match.awayTeam} className="flex flex-col items-center gap-2 text-center">
-              <OpponentCrest logo={awayTeam ? getTeamCrest(awayTeam) : "VIS"} opponent={match.awayTeam} size="md" />
+              <OpponentCrest
+                logo={awayTeam ? getTeamCrest(awayTeam) : getTeamCrestById(match.awayTeamId, "VIS")}
+                opponent={match.awayTeam}
+                size="md"
+              />
               <span className="text-xs font-extrabold uppercase leading-tight sm:text-sm">{match.awayTeam}</span>
             </TeamLink>
             <div className="flex w-full justify-end">

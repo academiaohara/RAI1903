@@ -3,6 +3,7 @@
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamCrest } from "@/components/TeamCrest";
 import { getJornadaTeam } from "@/lib/jornadas-data";
+import { getTeamCrestById } from "@/lib/team-crests";
 import { scrollElementHorizontally } from "@/lib/scroll-horizontal";
 import { cn } from "@/lib/utils";
 import type { JornadaRoundId, JornadaRoundSummary } from "@/types/jornadas";
@@ -84,6 +85,13 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests 
                 <div className="flex h-12 w-12 items-center justify-center">
                   {opponent ? (
                     <TeamCrest team={opponent} size="md" className="transition group-hover:brightness-110" />
+                  ) : round.opponentTeamId ? (
+                    <OpponentCrest
+                      logo={getTeamCrestById(round.opponentTeamId)}
+                      opponent={round.opponentTeamId}
+                      size="md"
+                      className="transition group-hover:brightness-110"
+                    />
                   ) : round.kind === "playoff" ? (
                     <span
                       className={cn(
