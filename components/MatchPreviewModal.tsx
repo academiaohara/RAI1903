@@ -4,7 +4,8 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { Modal } from "@/components/Modal";
 import { canLinkEquipoLiga, equipoLigaHref } from "@/lib/equipo-liga";
-import { players, teams } from "@/data/mock";
+import { players } from "@/data/mock";
+import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
 import {
   getTeamHomeAwayRecordBeforeRound,
   getTeamsBeforeRound,
@@ -87,17 +88,21 @@ function TeamPreviewBlock({
 }
 
 export function MatchPreviewModal({ match, open, onClose }: { match: Match; open: boolean; onClose: () => void }) {
+  const { teams, leagueMatchdays } = useMasculinoLeagueSeason();
   const beforeRound = match.matchday;
-  const teamsBeforeRound = useMemo(() => getTeamsBeforeRound(beforeRound), [beforeRound]);
+  const teamsBeforeRound = useMemo(
+    () => getTeamsBeforeRound(leagueMatchdays, teams, beforeRound),
+    [beforeRound, leagueMatchdays, teams],
+  );
   const homeTeam = teamsBeforeRound.find((team) => team.id === match.homeTeamId) ?? teams[0];
   const awayTeam = teamsBeforeRound.find((team) => team.id === match.awayTeamId) ?? teams[0];
   const homeSideRecord = useMemo(
-    () => getTeamHomeAwayRecordBeforeRound(match.homeTeamId, "home", beforeRound),
-    [match.homeTeamId, beforeRound],
+    () => getTeamHomeAwayRecordBeforeRound(match.homeTeamId, "home", beforeRound, leagueMatchdays),
+    [match.homeTeamId, beforeRound, leagueMatchdays],
   );
   const awaySideRecord = useMemo(
-    () => getTeamHomeAwayRecordBeforeRound(match.awayTeamId, "away", beforeRound),
-    [match.awayTeamId, beforeRound],
+    () => getTeamHomeAwayRecordBeforeRound(match.awayTeamId, "away", beforeRound, leagueMatchdays),
+    [match.awayTeamId, beforeRound, leagueMatchdays],
   );
 
   if (isAvilesMatch(match)) return null;

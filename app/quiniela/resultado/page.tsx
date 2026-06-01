@@ -6,7 +6,8 @@ import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
 import { PredictionForm } from "@/components/PredictionForm";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
-import { CURRENT_QUINIELA_ROUND, jornadaParticipants, matchdays } from "@/data/mock";
+import { jornadaParticipants } from "@/data/mock";
+import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
 import {
   getMatchdayByRound,
   hasFirstMatchStarted,
@@ -16,9 +17,10 @@ import {
 type ResultadoView = "quiniela" | "ranking";
 
 export default function QuinielaResultadoPage() {
-  const [round, setRound] = useState(CURRENT_QUINIELA_ROUND);
+  const { leagueMatchdays, currentRound } = useMasculinoLeagueSeason();
+  const [round, setRound] = useState(currentRound);
   const [view, setView] = useState<ResultadoView>("quiniela");
-  const selectedMatchday = useMemo(() => getMatchdayByRound(round), [round]);
+  const selectedMatchday = useMemo(() => getMatchdayByRound(leagueMatchdays, round), [leagueMatchdays, round]);
   const orderedMatches = useMemo(
     () => sortQuinielaMatches(selectedMatchday.matches),
     [selectedMatchday.matches],
@@ -41,8 +43,8 @@ export default function QuinielaResultadoPage() {
       />
       <JornadaSelector
         value={round}
-        total={matchdays.length}
-        currentRound={CURRENT_QUINIELA_ROUND}
+        total={leagueMatchdays.length}
+        currentRound={currentRound}
         onChange={setRound}
       />
 

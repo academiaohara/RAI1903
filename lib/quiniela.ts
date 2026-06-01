@@ -1,4 +1,4 @@
-import { CURRENT_QUINIELA_ROUND, matchdays, RAI_TEAM_ID, teams } from "@/data/mock";
+import { CURRENT_QUINIELA_ROUND, RAI_TEAM_ID, teams as mockTeams } from "@/data/mock";
 import { getAvilesScorerFromEvents } from "@/lib/aviles-match-events";
 import type { MatchEvent } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
@@ -39,8 +39,8 @@ export function getActualGoalsPicks(match: Match): { home: GoalsPick | null; awa
   };
 }
 
-export function getMatchdayByRound(round: number): Matchday {
-  return matchdays.find((matchday) => matchday.round === round) ?? matchdays[0];
+export function getMatchdayByRound(matchdays: Matchday[], round: number): Matchday {
+  return matchdays.find((matchday) => matchday.round === round) ?? matchdays[0] ?? { round, matches: [] };
 }
 
 export function getFirstKickoff(matchday: Matchday): Date {
@@ -115,29 +115,37 @@ export function isScorerPredictionCorrect(
   return actual !== null && prediction.scorer === actual;
 }
 
-export function getTeamById(teamId: string) {
+export function getTeamById(teamId: string, teams: Team[] = mockTeams) {
   return teams.find((team) => team.id === teamId);
 }
 
-const zeroedTeams: Team[] = teams.map((team) => ({
-  ...team,
-  position: 0,
-  form: [],
-  stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 },
-}));
-
-export function getTeamsBeforeRound(round: number): Team[] {
-  return getTeamsAtRound(zeroedTeams, matchdays, round);
+function zeroedTeams(teams: Team[]): Team[] {
+  return teams.map((team) => ({
+    ...team,
+    position: 0,
+    form: [],
+    stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 },
+  }));
 }
 
-export function getTeamByIdBeforeRound(teamId: string, round: number): Team | undefined {
-  return getTeamsBeforeRound(round).find((team) => team.id === teamId);
+export function getTeamsBeforeRound(matchdays: Matchday[], teams: Team[], round: number): Team[] {
+  return getTeamsAtRound(zeroedTeams(teams), matchdays, round);
+}
+
+export function getTeamByIdBeforeRound(
+  teamId: string,
+  round: number,
+  matchdays: Matchday[],
+  teams: Team[],
+): Team | undefined {
+  return getTeamsBeforeRound(matchdays, teams, round).find((team) => team.id === teamId);
 }
 
 export function getTeamHomeAwayRecordBeforeRound(
   teamId: string,
   side: "home" | "away",
   round: number,
+  matchdays: Matchday[],
 ): HomeAwayRecord {
   return getHomeAwayRecordBeforeRound(teamId, side, matchdays, round);
 }
