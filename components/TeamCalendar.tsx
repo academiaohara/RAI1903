@@ -33,18 +33,9 @@ function shiftMonth(year: number, month: number, delta: number): { year: number;
   return { year: date.getUTCFullYear(), month: date.getUTCMonth() };
 }
 
-function initialViewDate(matches: CalendarMatch[]): { year: number; month: number } {
+function initialViewDate(): { year: number; month: number } {
   const now = new Date();
-  const year = now.getUTCFullYear();
-  const month = now.getUTCMonth();
-  const hasMatchesThisMonth = matches.some((match) => {
-    const date = new Date(match.date);
-    return date.getUTCFullYear() === year && date.getUTCMonth() === month;
-  });
-  if (hasMatchesThisMonth || matches.length === 0) return { year, month };
-
-  const first = new Date(matches[0].date);
-  return { year: first.getUTCFullYear(), month: first.getUTCMonth() };
+  return { year: now.getUTCFullYear(), month: now.getUTCMonth() };
 }
 
 export function TeamCalendar({
@@ -56,7 +47,7 @@ export function TeamCalendar({
   showVenue = true,
 }: TeamCalendarProps) {
   const showCrests = showCrestsProp ?? gender !== "femenino";
-  const initial = initialViewDate(matches);
+  const initial = initialViewDate();
   const [viewMode, setViewMode] = useState<CalendarViewMode>(listOnly ? "lista" : "mes");
   const [viewYear, setViewYear] = useState(initial.year);
   const [viewMonth, setViewMonth] = useState(initial.month);

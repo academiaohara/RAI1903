@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamLink } from "@/components/TeamLink";
@@ -72,6 +72,12 @@ export function CalendarListView({
     [matches],
   );
   const scrollTargetId = getListViewScrollTargetId(sortedMatches);
+
+  useEffect(() => {
+    if (!scrollTargetId) return;
+    const element = document.getElementById(`cal-list-match-${scrollTargetId}`);
+    element?.scrollIntoView({ block: "center", behavior: "instant" });
+  }, [scrollTargetId]);
 
   return (
     <div className={cn("overflow-x-auto rounded-xl border border-[#214C9B]/15 bg-white", className)} role="table" aria-label="Calendario de partidos">

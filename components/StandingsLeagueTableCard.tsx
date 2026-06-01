@@ -8,6 +8,7 @@ import { PRIMERA_RFEF_RULES } from "@/lib/rfef-rules";
 import { getBalancedStandingsWindow } from "@/lib/standings-window";
 import {
   STANDINGS_VENUE_LABELS,
+  getLastPlayedLeagueRound,
   getPlayedLeagueRounds,
   getTeamsAtRound,
   qualifyingRoundAfterJornada,
@@ -57,12 +58,12 @@ export function StandingsLeagueTableCard({
   gender = "masculino",
 }: StandingsLeagueTableCardProps) {
   const playedRounds = useMemo(() => getPlayedLeagueRounds(matchdays), [matchdays]);
-  const lastPlayedRound = playedRounds[playedRounds.length - 1] ?? 1;
+  const lastPlayedRound = useMemo(() => getLastPlayedLeagueRound(matchdays), [matchdays]);
 
-  const [jornada, setJornada] = useState(lastPlayedRound);
+  const [jornadaOverride, setJornadaOverride] = useState<number | null>(null);
   const [venue, setVenue] = useState<StandingsVenue>("all");
 
-  const effectiveJornada = Math.min(jornada, lastPlayedRound);
+  const effectiveJornada = Math.min(jornadaOverride ?? lastPlayedRound, lastPlayedRound);
   const qualifyingRound = qualifyingRoundAfterJornada(effectiveJornada);
 
   const fullTeams = useMemo(
@@ -96,7 +97,7 @@ export function StandingsLeagueTableCard({
           value={effectiveJornada}
           total={lastPlayedRound}
           currentRound={lastPlayedRound}
-          onChange={setJornada}
+          onChange={setJornadaOverride}
         />
       )}
     </>

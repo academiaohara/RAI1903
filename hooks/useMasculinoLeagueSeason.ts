@@ -8,6 +8,7 @@ import {
   getLeagueMatchdaysForGender,
 } from "@/lib/season/aviles-matches";
 import { getTeamsForRfefGrupo } from "@/lib/rfef-grupos";
+import { getLastPlayedLeagueRound } from "@/lib/standings";
 import type { Match, Matchday, Team } from "@/types";
 
 export function useMasculinoLeagueSeason() {
@@ -22,7 +23,10 @@ export function useMasculinoLeagueSeason() {
     () => getAvilesMatchesFromSource(fixtureSource, "masculino"),
     [fixtureSource],
   );
-  const currentRound = fixtureSource.lastRoundMasculino;
+  const currentRound = useMemo(
+    () => getLastPlayedLeagueRound(leagueMatchdays),
+    [leagueMatchdays],
+  );
 
   const latestMatches = useMemo(
     () =>

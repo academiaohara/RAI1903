@@ -31,7 +31,8 @@ export function JornadasView({ gender }: JornadasViewProps) {
     [gender, getFixtureSource],
   );
   const raiTeamId = getRaiTeamId(gender);
-  const [selectedRoundId, setSelectedRoundId] = useState<JornadaRoundId>(dataset.currentRoundId);
+  const [manualRoundId, setManualRoundId] = useState<JornadaRoundId | null>(null);
+  const selectedRoundId = manualRoundId ?? dataset.currentRoundId;
   const [lastLeagueQualifyingRound, setLastLeagueQualifyingRound] = useState(
     dataset.definitiveQualifyingLeagueRound,
   );
@@ -47,7 +48,7 @@ export function JornadasView({ gender }: JornadasViewProps) {
 
   const handleSelectRound = useCallback(
     (roundId: JornadaRoundId) => {
-      setSelectedRoundId(roundId);
+      setManualRoundId(roundId);
       const summary = dataset.getRound(roundId).summary;
       if (summary.kind === "league" && summary.roundNumber) {
         setLastLeagueQualifyingRound(leagueRoundForQualifyingStandings(summary.roundNumber));

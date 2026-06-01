@@ -296,6 +296,12 @@ export function getPlayedLeagueRounds(matchdays: Array<{ round: number; matches:
   return [...rounds].sort((a, b) => a - b);
 }
 
+/** Última jornada de liga con al menos un partido finalizado (1 si aún no hay resultados). */
+export function getLastPlayedLeagueRound(matchdays: Array<{ round: number; matches: Match[] }>): number {
+  const played = getPlayedLeagueRounds(matchdays);
+  return played[played.length - 1] ?? 1;
+}
+
 /** Round exclusivo superior para incluir la jornada indicada en la clasificación. */
 export function qualifyingRoundAfterJornada(jornada: number): number {
   return Math.min(jornada + 1, RESULTADOS_2526_LAST_ROUND + 1);
