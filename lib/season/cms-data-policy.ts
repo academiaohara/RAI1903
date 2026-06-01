@@ -8,5 +8,11 @@ export function shouldUseMockCompetitionFallback(): boolean {
 
 export function seasonHasCompetitionBundles(bundles: SeasonBundlesMap): boolean {
   const keys = Object.keys(bundles);
-  return keys.some((key) => key.endsWith(":fixtures") || key.endsWith(":squad") || key === "global:match_articles");
+  return keys.some(
+    (key) =>
+      key.endsWith(":fixtures") ||
+      key.endsWith(":squad") ||
+      key === "global:match_articles" ||
+      key === "global:transfers",
+  );
 }

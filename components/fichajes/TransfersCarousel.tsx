@@ -6,14 +6,8 @@ import {
   useHorizontalWheelScrollListener,
 } from "@/lib/use-horizontal-wheel-scroll";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
-import {
-  getAllCarouselTransfers,
-  getCarouselTransfersByMode,
-  getLoanTransfers,
-  getRenewalCarouselTransfers,
-  getSigningCarouselTransfers,
-  type TransferCarouselMode,
-} from "@/lib/fichajes";
+import type { TransferCarouselMode } from "@/lib/fichajes";
+import { useTransfers } from "@/hooks/useTransfers";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import type { Route } from "next";
@@ -32,14 +26,16 @@ type TransfersCarouselProps = {
 };
 
 export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
+  const { getAllCarousel, getSigningCarousel, getRenewalCarousel, getLoans, getByMode } = useTransfers();
+
   const transfersByMode = useMemo(
     () => ({
-      todos: getAllCarouselTransfers(marketWindowId),
-      fichajes: getSigningCarouselTransfers(marketWindowId),
-      renovaciones: getRenewalCarouselTransfers(marketWindowId),
-      cesiones: getLoanTransfers(marketWindowId),
+      todos: getAllCarousel(marketWindowId),
+      fichajes: getSigningCarousel(marketWindowId),
+      renovaciones: getRenewalCarousel(marketWindowId),
+      cesiones: getLoans(marketWindowId),
     }),
-    [marketWindowId],
+    [getAllCarousel, getLoans, getRenewalCarousel, getSigningCarousel, marketWindowId],
   );
 
   const hasCarousel = transfersByMode.todos.length > 0;
@@ -48,7 +44,7 @@ export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
 
   const activeMode = mode;
 
-  const transfers = getCarouselTransfersByMode(activeMode, marketWindowId);
+  const transfers = getByMode(activeMode, marketWindowId);
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [hasOverflow, setHasOverflow] = useState(false);

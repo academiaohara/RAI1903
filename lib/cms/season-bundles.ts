@@ -3,6 +3,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { MatchArticle } from "@/types";
 import type { Match, Matchday } from "@/types";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import type { TransferKind, TransferMarketWindowId } from "@/types";
 import type { SquadClubInfo, SquadPlayer } from "@/types/squad";
 
 export type SeasonBundleScope = PrimerEquipoGender | "global";
@@ -13,7 +14,25 @@ export type SeasonBundleKey =
   | "match_articles"
   | "competition_labels"
   | "team_crests"
-  | "stadium_photos";
+  | "stadium_photos"
+  | "transfers";
+
+/** Movimiento oficial del mercado (carrusel de inicio). */
+export type CmsTransferEntry = {
+  id: string;
+  playerId: string;
+  kind: TransferKind;
+  date: string;
+  marketWindowId?: TransferMarketWindowId;
+  originClub?: string;
+  analysis?: string;
+  clubAnnouncement?: string;
+  clubAnnouncementNewsId?: string;
+};
+
+export type SeasonTransfersBundle = {
+  entries: CmsTransferEntry[];
+};
 
 export type SeasonFixturesBundle = {
   matchdays: Matchday[];
@@ -169,4 +188,9 @@ export function getSquadBundle(map: SeasonBundlesMap, gender: PrimerEquipoGender
 export function getMatchArticlesBundle(map: SeasonBundlesMap): SeasonMatchArticlesBundle | null {
   const payload = map[bundleMapKey("global", "match_articles")];
   return (payload as SeasonMatchArticlesBundle | undefined) ?? null;
+}
+
+export function getTransfersBundle(map: SeasonBundlesMap): SeasonTransfersBundle | null {
+  const payload = map[bundleMapKey("global", "transfers")];
+  return (payload as SeasonTransfersBundle | undefined) ?? null;
 }
