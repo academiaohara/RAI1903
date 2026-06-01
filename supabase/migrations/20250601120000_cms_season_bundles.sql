@@ -1,4 +1,14 @@
 -- Datos de temporada (plantilla, calendario, crónicas) editables desde el CMS
+
+insert into public.cms_seasons (id, label, is_default, sort_order, published)
+values
+  ('2024-25', '2024/25', false, 0, true),
+  ('2025-26', '2025/26', true, 1, true),
+  ('2026-27', '2026/27', false, 2, false)
+on conflict (id) do update set
+  label = excluded.label,
+  sort_order = excluded.sort_order;
+
 create table if not exists public.cms_season_bundles (
   season_id text not null references public.cms_seasons (id) on delete cascade,
   scope text not null check (scope in ('masculino', 'femenino', 'global')),
@@ -36,13 +46,3 @@ alter table public.cms_inline_overrides
 
 create index if not exists cms_inline_overrides_season_idx
   on public.cms_inline_overrides (season_id);
-
--- Catálogo inicial de temporadas
-insert into public.cms_seasons (id, label, is_default, sort_order, published)
-values
-  ('2024-25', '2024/25', false, 0, true),
-  ('2025-26', '2025/26', true, 1, true),
-  ('2026-27', '2026/27', false, 2, false)
-on conflict (id) do update set
-  label = excluded.label,
-  sort_order = excluded.sort_order;
