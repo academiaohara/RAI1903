@@ -18,6 +18,7 @@ import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
 import { getLatestAvilesMatches, getNextAvilesMatch, getTeam, getUpcomingAvilesMatches } from "@/lib/fixtures";
 import { getTeamCrestById } from "@/lib/team-crests";
+import { defaultCronicaId, defaultPreviaId } from "@/lib/match-article-factory";
 import { getCronicaForMatch, getPreviaForMatch } from "@/lib/match-articles";
 import { primerEquipoBase } from "@/lib/primer-equipo";
 import { formatMatchDate } from "@/lib/utils";
@@ -46,7 +47,11 @@ export default function HomePage() {
           <MatchBanner
             match={latestMatch}
             label="Ultimo partido"
-            href={(latestCronica ? `${primerEquipoBase("masculino")}/cronicas/${latestCronica.id}` : `${primerEquipoBase("masculino")}/cronicas`) as Route}
+            href={
+              (latestMatch
+                ? `${primerEquipoBase("masculino")}/cronicas/${latestCronica?.id ?? defaultCronicaId(latestMatch.id, "masculino")}`
+                : `${primerEquipoBase("masculino")}/cronicas`) as Route
+            }
             action="Entrar en la cronica"
           />
         )}
@@ -54,7 +59,11 @@ export default function HomePage() {
           <MatchBanner
             match={nextMatch}
             label="Siguiente partido"
-            href={(nextPrevia ? `${primerEquipoBase("masculino")}/cronicas/${nextPrevia.id}` : `${primerEquipoBase("masculino")}/cronicas`) as Route}
+            href={
+              (nextMatch
+                ? `${primerEquipoBase("masculino")}/cronicas/${nextPrevia?.id ?? defaultPreviaId(nextMatch.id, "masculino")}`
+                : `${primerEquipoBase("masculino")}/cronicas`) as Route
+            }
             action="Entrar en la previa"
           />
         )}

@@ -3,6 +3,7 @@ import { Badge } from "@/components/Badge";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { MatchFixtureTeamLinks } from "@/components/MatchFixtureTeamLinks";
 import { matchCompetitionShortLabel, matchFixtureMeta } from "@/lib/competition-labels";
+import { defaultCronicaId } from "@/lib/match-article-factory";
 import { getCronicaForMatch } from "@/lib/match-articles";
 import { getAvilesMatchResult } from "@/lib/fixtures";
 import { matchFixtureCardClassName } from "@/lib/match-card-styles";
@@ -52,9 +53,7 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
   const hasCronicas = primerEquipoHasCronicas(gender);
   const cronicaHref = (
     hasCronicas
-      ? cronica
-        ? `${primerEquipoBase(gender)}/cronicas/${cronica.id}`
-        : `${primerEquipoBase(gender)}/cronicas`
+      ? `${primerEquipoBase(gender)}/cronicas/${cronica?.id ?? defaultCronicaId(match.id, gender)}`
       : `${primerEquipoBase(gender)}/calendario`
   ) as Route;
   const competicionHref = `${primerEquipoBase(gender)}/competicion` as Route;
