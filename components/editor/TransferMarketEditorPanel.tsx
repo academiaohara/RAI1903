@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Loader2, Plus, Trash2, X } from "lucide-react";
 import { useSeason } from "@/components/season/SeasonProvider";
+import { formatSeasonBundleSaveError } from "@/lib/cms/bundle-save-error";
 import {
   getTransfersBundle,
   upsertSeasonBundle,
@@ -66,7 +67,7 @@ export function TransferMarketEditorPanel({ onClose }: TransferMarketEditorPanel
     const result = await upsertSeasonBundle(viewedSeasonId, "global", "transfers", payload);
     setBusy(false);
     if (!result.ok) {
-      setMessage(result.error ?? "Error al guardar");
+      setMessage(formatSeasonBundleSaveError(result.error ?? "Error al guardar"));
       return;
     }
     setMessage(`Mercado guardado para ${viewedSeason.label}`);

@@ -111,4 +111,8 @@ create index if not exists cms_inline_overrides_season_idx
 -- Después de ejecutar:
 -- 1. Recarga la web
 -- 2. Editar → Temporadas → "Subir mock actual a 2025-26" (primera vez)
+--
+-- Si al guardar fichajes falla cms_season_bundles_bundle_key_check, ejecuta solo:
+--   supabase/FIX_TRANSFERS_BUNDLE.sql
+-- (o vuelve a ejecutar este archivo; la sección de bundles es idempotente).
 -- =============================================================================

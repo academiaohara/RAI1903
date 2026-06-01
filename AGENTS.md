@@ -22,6 +22,7 @@ npm run build      # Next.js production build
 
 - No test framework is configured (no Jest, Vitest, or Playwright). Validation relies on lint, typecheck, and manual browser testing.
 - With Supabase env vars set, **competition data** (squad, fixtures, articles) comes from `cms_season_bundles` only — not from mock. Run **`supabase/APPLY_CMS_MIGRATIONS.sql`** once in the Supabase SQL Editor (if usaste API-Football antes, ejecuta antes **`supabase/DROP_API_FOOTBALL.sql`**), then seed via **Editar → Temporadas**. Without Supabase, mock in `/data/mock.ts` is still used locally.
+- Mercado de fichajes (Editar → Mercado) guarda el bundle `transfers`. Si Supabase devuelve `cms_season_bundles_bundle_key_check`, ejecuta **`supabase/FIX_TRANSFERS_BUNDLE.sql`** (o vuelve a ejecutar `APPLY_CMS_MIGRATIONS.sql`).
 - **API-Football** no está en el código (revertido). No hace falta `API_FOOTBALL_KEY` ni Edge Functions de sync.
 - **Supabase** uses `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Vercel / `.env.local`). Login is direct OAuth from the header; `/login` auto-redirects to X. Edición en línea para `rai1903fan@gmail.com` (rol `editor` en `profiles`; ver `supabase/seed-editor-profile.sql`).
 - The dev server uses Turbopack for fast refresh.
