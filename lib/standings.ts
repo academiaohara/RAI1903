@@ -242,11 +242,33 @@ export type HomeAwayRecord = {
   losses: number;
 };
 
+/** Jornada de liga del partido (prioriza `match.matchday`; el contenedor puede venir mal del CMS). */
+export function leagueRoundForMatch(match: Match, matchdayRound?: number): number {
+  if (Number.isFinite(match.matchday) && match.matchday > 0) {
+    return match.matchday;
+  }
+  if (Number.isFinite(matchdayRound) && matchdayRound! > 0) {
+    return matchdayRound!;
+  }
+  return 0;
+}
+
 export function getMatchesBeforeRound(
   matchdays: Array<{ round: number; matches: Match[] }>,
-  round: number,
+  exclusiveUpperRound: number,
 ): Match[] {
-  return matchdays.filter((matchday) => matchday.round < round).flatMap((matchday) => matchday.matches);
+  return matchdays.flatMap((matchday) =>
+    matchday.matches.filter((match) => leagueRoundForMatch(match, matchday.round) < exclusiveUpperRound),
+  );
+}
+
+export function zeroedTeamsForStandings(teams: Team[]): Team[] {
+  return teams.map((team) => ({
+    ...team,
+    position: 0,
+    form: [],
+    stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 },
+  }));
 }
 
 export function getTeamsAtRound(
@@ -258,15 +280,20 @@ export function getTeamsAtRound(
   venue: StandingsVenue = "all",
 ): Team[] {
   const priorMatches = getMatchesBeforeRound(matchdays, round);
-  return applyStandingsToTeams(teams, priorMatches, zones, tiebreak, venue);
+  return applyStandingsToTeams(zeroedTeamsForStandings(teams), priorMatches, zones, tiebreak, venue);
 }
 
 /** Jornadas de liga con al menos un partido finalizado. */
 export function getPlayedLeagueRounds(matchdays: Array<{ round: number; matches: Match[] }>): number[] {
-  return matchdays
-    .filter((matchday) => matchday.matches.some((match) => match.status === "finished"))
-    .map((matchday) => matchday.round)
-    .sort((a, b) => a - b);
+  const rounds = new Set<number>();
+  for (const matchday of matchdays) {
+    for (const match of matchday.matches) {
+      if (match.status !== "finished") continue;
+      const round = leagueRoundForMatch(match, matchday.round);
+      if (round > 0) rounds.add(round);
+    }
+  }
+  return [...rounds].sort((a, b) => a - b);
 }
 
 /** Round exclusivo superior para incluir la jornada indicada en la clasificación. */
