@@ -1,6 +1,7 @@
 import type { SeasonBundlesMap, SeasonSquadBundle } from "@/lib/cms/season-bundles";
 import { getSquadBundle } from "@/lib/cms/season-bundles";
 import { fetchSquadPlayersFromCms } from "@/lib/cms/players";
+import { shouldUseMockCompetitionFallback } from "@/lib/season/cms-data-policy";
 import { getSquadClubInfo, getSquadPlayers } from "@/lib/squad-data";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { SquadClubInfo, SquadPlayer } from "@/types/squad";
@@ -16,7 +17,8 @@ export async function resolveSquadPlayers(
   const fromCms = await fetchSquadPlayersFromCms(gender, seasonId);
   if (fromCms.length) return fromCms;
 
-  return getSquadPlayers(gender);
+  if (shouldUseMockCompetitionFallback()) return getSquadPlayers(gender);
+  return [];
 }
 
 export function resolveSquadClubInfo(

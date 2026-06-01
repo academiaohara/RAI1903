@@ -1,4 +1,5 @@
 import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
+import { isMissingSeasonIdColumnError } from "@/lib/cms/inline-overrides-compat";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { InlineOverridesMap } from "@/lib/cms/inline-overrides";
@@ -24,10 +25,16 @@ export async function fetchInlineOverridesServer(
 
   try {
     const supabase = await createServerClient();
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from("cms_inline_overrides")
       .select("key, value")
       .eq("season_id", seasonId);
+
+    if (error && isMissingSeasonIdColumnError(error.message)) {
+      const legacy = await supabase.from("cms_inline_overrides").select("key, value");
+      data = legacy.data;
+      error = legacy.error;
+    }
 
     if (error || !data?.length) return {};
     return rowsToMap(data as InlineOverrideRow[]);

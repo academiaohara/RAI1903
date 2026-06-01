@@ -1,6 +1,7 @@
 import type { SeasonBundlesMap, SeasonFixturesBundle, SeasonFemeninoFixturesBundle } from "@/lib/cms/season-bundles";
 import { getFixturesBundle } from "@/lib/cms/season-bundles";
 import { getAllTeamsForGender } from "@/lib/fixtures";
+import { shouldUseMockCompetitionFallback } from "@/lib/season/cms-data-policy";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Match, Matchday } from "@/types";
 
@@ -35,10 +36,12 @@ export function collectTeamsFromBundles(bundles: SeasonBundlesMap): TeamRef[] {
   const fem = getFixturesBundle(bundles, "femenino") as SeasonFemeninoFixturesBundle | null;
   if (fem?.matchdaysFemenino) fem.matchdaysFemenino.forEach((md) => addFromMatchday(map, md));
 
-  const genders: PrimerEquipoGender[] = ["masculino", "femenino"];
-  for (const gender of genders) {
-    for (const team of getAllTeamsForGender(gender)) {
-      if (!map.has(team.id)) map.set(team.id, team.name);
+  if (shouldUseMockCompetitionFallback()) {
+    const genders: PrimerEquipoGender[] = ["masculino", "femenino"];
+    for (const gender of genders) {
+      for (const team of getAllTeamsForGender(gender)) {
+        if (!map.has(team.id)) map.set(team.id, team.name);
+      }
     }
   }
 
