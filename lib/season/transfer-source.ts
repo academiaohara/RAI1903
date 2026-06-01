@@ -1,25 +1,11 @@
-import { transfers as mockTransfers } from "@/data/mock";
 import type { SeasonBundlesMap, SeasonTransfersBundle, CmsTransferEntry } from "@/lib/cms/season-bundles";
-import { getSquadBundle, getTransfersBundle } from "@/lib/cms/season-bundles";
+import { getTransfersBundle } from "@/lib/cms/season-bundles";
 import { shouldUseMockCompetitionFallback } from "@/lib/season/cms-data-policy";
 import { inferTransferKind } from "@/lib/fichajes-kind";
-import { getSquadPlayers } from "@/lib/squad-data";
-import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { TransferRumor } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
 
 const RAI_CLUB = "Real Avilés Industrial";
-const DEFAULT_GENDER: PrimerEquipoGender = "masculino";
-
-function isCarouselTransfer(transfer: TransferRumor): boolean {
-  if (transfer.category === "Bajas") return false;
-  if (transfer.status !== "Oficial") return false;
-  return transfer.category === "Altas" || transfer.category === "Renovaciones";
-}
-
-function mockCarouselTransfers(): TransferRumor[] {
-  return mockTransfers.filter(isCarouselTransfer);
-}
 
 function squadLookup(players: SquadPlayer[], playerId: string): SquadPlayer | undefined {
   return players.find((player) => player.id === playerId);
@@ -78,25 +64,17 @@ export function cmsEntryFromTransferRumor(transfer: TransferRumor): CmsTransferE
   };
 }
 
-export function buildMockTransfersBundle(): SeasonTransfersBundle {
-  const entries = mockCarouselTransfers()
-    .map((transfer) => cmsEntryFromTransferRumor(transfer))
-    .filter((entry): entry is CmsTransferEntry => entry !== null);
-  return { entries };
-}
-
+/** Resuelve movimientos CMS; el fallback mock lo aplica el llamador (evita import circular con data/mock). */
 export function resolveTransfersFromBundles(
   bundles: SeasonBundlesMap,
-  gender: PrimerEquipoGender = DEFAULT_GENDER,
+  squadPlayers: SquadPlayer[],
+  mockFallback?: TransferRumor[],
 ): TransferRumor[] {
   const bundle = getTransfersBundle(bundles);
-  const squadBundle = getSquadBundle(bundles, gender);
-  const squadPlayers = squadBundle?.players?.length ? squadBundle.players : getSquadPlayers(gender);
-
   const fromCms = transfersFromBundle(bundle, squadPlayers);
   if (fromCms.length) return fromCms;
 
-  if (shouldUseMockCompetitionFallback()) return mockCarouselTransfers();
+  if (shouldUseMockCompetitionFallback() && mockFallback?.length) return mockFallback;
   return [];
 }
 

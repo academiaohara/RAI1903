@@ -18,7 +18,7 @@ import type {
   SeasonMatchArticlesBundle,
   SeasonSquadBundle,
 } from "@/lib/cms/season-bundles";
-import { buildMockTransfersBundle } from "@/lib/season/transfer-source";
+import { buildMockTransfersBundle } from "@/lib/season/mock-transfers-bundle";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 
 export type MockBundleEntry = {
