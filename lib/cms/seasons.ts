@@ -13,6 +13,12 @@ const FALLBACK_SEASONS: CmsSeason[] = [
   { id: "2025-26", label: "2025/26", isDefault: true, sortOrder: 0, published: true },
 ];
 
+export async function fetchDefaultSeasonId(): Promise<string> {
+  const seasons = await fetchPublishedSeasons();
+  const fallback = seasons.find((row) => row.isDefault) ?? seasons[0];
+  return fallback?.id ?? FALLBACK_SEASONS[0].id;
+}
+
 export async function fetchPublishedSeasons(): Promise<CmsSeason[]> {
   if (!isSupabaseConfigured()) {
     return FALLBACK_SEASONS;

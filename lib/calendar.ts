@@ -29,13 +29,22 @@ function avilesResult(match: Match, raiId: string): string | null {
   return `${avilesGoals}-${rivalGoals}`;
 }
 
-export function matchToCalendarMatch(match: Match, gender: PrimerEquipoGender): CalendarMatch {
+type MatchArticleLookup = {
+  getCronica?: (matchId: string, gender: PrimerEquipoGender) => { id: string } | undefined;
+  getPrevia?: (matchId: string, gender: PrimerEquipoGender) => { id: string } | undefined;
+};
+
+export function matchToCalendarMatch(
+  match: Match,
+  gender: PrimerEquipoGender,
+  articles?: MatchArticleLookup,
+): CalendarMatch {
   const raiId = getRaiTeamId(gender);
   const avilesHome = match.homeTeamId === raiId;
   const rivalId = avilesHome ? match.awayTeamId : match.homeTeamId;
   const rival = getTeamsByGender(gender).find((team) => team.id === rivalId);
-  const cronica = getCronicaForMatch(match.id, gender);
-  const previa = getPreviaForMatch(match.id, gender);
+  const cronica = articles?.getCronica?.(match.id, gender) ?? getCronicaForMatch(match.id, gender);
+  const previa = articles?.getPrevia?.(match.id, gender) ?? getPreviaForMatch(match.id, gender);
   const played = match.status === "finished";
   const hasTime = !NO_TIME_COMPETITIONS.has(match.competition);
 
@@ -72,6 +81,16 @@ export function matchToCalendarMatch(match: Match, gender: PrimerEquipoGender): 
 export function getCalendarMatchesByGender(gender: PrimerEquipoGender): CalendarMatch[] {
   return getAvilesMatchesByGender(gender)
     .map((match) => matchToCalendarMatch(match, gender))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+}
+
+export function getCalendarMatchesFromSource(
+  matches: Match[],
+  gender: PrimerEquipoGender,
+  articles?: MatchArticleLookup,
+): CalendarMatch[] {
+  return matches
+    .map((match) => matchToCalendarMatch(match, gender, articles))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }
 

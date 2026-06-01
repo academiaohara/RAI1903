@@ -1,3 +1,4 @@
+import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { InlineOverridesMap } from "@/lib/cms/inline-overrides";
@@ -16,12 +17,17 @@ function rowsToMap(data: InlineOverrideRow[]): InlineOverridesMap {
 }
 
 /** Carga overrides en el servidor (visitantes ven el CMS sin esperar al cliente). */
-export async function fetchInlineOverridesServer(): Promise<InlineOverridesMap> {
+export async function fetchInlineOverridesServer(
+  seasonId = DEFAULT_COMPETITION_SEASON_ID,
+): Promise<InlineOverridesMap> {
   if (!isSupabaseConfigured()) return {};
 
   try {
     const supabase = await createServerClient();
-    const { data, error } = await supabase.from("cms_inline_overrides").select("key, value");
+    const { data, error } = await supabase
+      .from("cms_inline_overrides")
+      .select("key, value")
+      .eq("season_id", seasonId);
 
     if (error || !data?.length) return {};
     return rowsToMap(data as InlineOverrideRow[]);

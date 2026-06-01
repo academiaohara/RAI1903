@@ -5,6 +5,7 @@ import { JornadaMatchRow } from "@/components/jornadas/JornadaMatchRow";
 import { JornadaRoundCarousel } from "@/components/jornadas/JornadaRoundCarousel";
 import { JornadasGrupoSwitcher } from "@/components/jornadas/JornadasGrupoSwitcher";
 import { PlayoffAscensoGuia } from "@/components/jornadas/PlayoffAscensoGuia";
+import { useSeason } from "@/components/season/SeasonProvider";
 import { buildJornadasDataset } from "@/lib/jornadas-data";
 import { getRaiTeamId } from "@/lib/fixtures";
 import { leagueRoundForQualifyingStandings } from "@/lib/playoff-jornadas";
@@ -24,7 +25,11 @@ function partitionMatches(matches: JornadaFixture[]) {
 }
 
 export function JornadasView({ gender }: JornadasViewProps) {
-  const dataset = useMemo(() => buildJornadasDataset(gender), [gender]);
+  const { getFixtureSource } = useSeason();
+  const dataset = useMemo(
+    () => buildJornadasDataset(gender, getFixtureSource(gender)),
+    [gender, getFixtureSource],
+  );
   const raiTeamId = getRaiTeamId(gender);
   const [selectedRoundId, setSelectedRoundId] = useState<JornadaRoundId>(dataset.currentRoundId);
   const [lastLeagueQualifyingRound, setLastLeagueQualifyingRound] = useState(
