@@ -1,14 +1,11 @@
 import { ExternalLink, Megaphone } from "lucide-react";
 import { MatchNewsCarousel } from "@/components/match-center/MatchNewsCarousel";
 import { formatDate } from "@/lib/utils";
+import type { ClubAnnouncementDisplay } from "@/lib/club-announcement";
 import type { NewsItem } from "@/types";
 
 type PlayerActualidadSectionProps = {
-  clubAnnouncement?: {
-    text: string;
-    date?: string;
-    newsItem?: NewsItem;
-  };
+  clubAnnouncement?: ClubAnnouncementDisplay;
   playerNews: NewsItem[];
   accentClass?: string;
   announcementTone?: "fichaje" | "renovacion" | "default";
@@ -26,7 +23,9 @@ export function PlayerActualidadSection({
   accentClass = "text-[#214C9B]",
   announcementTone = "default",
 }: PlayerActualidadSectionProps) {
-  const hasAnnouncement = Boolean(clubAnnouncement?.text);
+  const hasUrl = Boolean(clubAnnouncement?.url);
+  const hasText = Boolean(clubAnnouncement?.text);
+  const hasAnnouncement = hasUrl || hasText;
   const hasNews = playerNews.length > 0;
 
   if (!hasAnnouncement && !hasNews) {
@@ -42,7 +41,19 @@ export function PlayerActualidadSection({
             <h2 className="text-sm font-extrabold uppercase tracking-wide text-slate-900">Comunicado del club</h2>
           </div>
           <div className={`rounded-2xl border p-5 ${announcementToneClass[announcementTone]}`}>
-            <p className="text-sm leading-7 text-slate-700">{clubAnnouncement.text}</p>
+            {hasUrl && clubAnnouncement.url ? (
+              <a
+                href={clubAnnouncement.url}
+                target="_blank"
+                rel="noreferrer"
+                className={`inline-flex items-center gap-1.5 text-sm font-bold uppercase tracking-wide ${accentClass} hover:underline`}
+              >
+                Ver comunicado oficial
+                <ExternalLink size={14} aria-hidden />
+              </a>
+            ) : hasText ? (
+              <p className="text-sm leading-7 text-slate-700">{clubAnnouncement.text}</p>
+            ) : null}
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
               <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
                 Real Avilés Industrial

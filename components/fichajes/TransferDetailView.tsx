@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Building2, Calendar } from "lucide-react";
 import { Badge } from "@/components/Badge";
 import { PlayerActualidadSection } from "@/components/squad/PlayerActualidadSection";
+import { clubAnnouncementFromTransfer } from "@/lib/club-announcement";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 import { PlayerCareerTimeline } from "@/components/squad/PlayerCareerTimeline";
 import { PlayerMatchesTable } from "@/components/squad/PlayerMatchesTable";
@@ -174,15 +175,7 @@ export function TransferDetailView({ transfer, player: initialPlayer }: Transfer
             {activeTab === "actualidad" && (
               <div className="space-y-8">
                 <PlayerActualidadSection
-                  clubAnnouncement={
-                    transfer.clubAnnouncement
-                      ? {
-                          text: transfer.clubAnnouncement,
-                          date: transfer.date,
-                          newsItem: clubAnnouncementNews,
-                        }
-                      : undefined
-                  }
+                  clubAnnouncement={clubAnnouncementFromTransfer(transfer, clubAnnouncementNews)}
                   playerNews={playerNews}
                   accentClass={tone.accent}
                   announcementTone={tone.announcement}

@@ -151,7 +151,7 @@ export type TransferRumor = {
   kind?: TransferKind;
   /** Enlace con jugador de plantilla cuando existe. */
   playerId?: string;
-  /** Comunicado oficial del club (mock). */
+  /** Enlace al comunicado oficial del club (URL). Texto legacy en mock antiguo. */
   clubAnnouncement?: string;
   /** Noticia del club enlazada al comunicado (fichaje, renovacion, etc.). */
   clubAnnouncementNewsId?: string;

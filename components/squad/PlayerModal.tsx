@@ -24,6 +24,7 @@ import { PlayerStats } from "@/components/squad/PlayerStats";
 import { PlayerMatchesTable } from "@/components/squad/PlayerMatchesTable";
 import { PlayerCareerTimeline } from "@/components/squad/PlayerCareerTimeline";
 import { PlayerActualidadSection } from "@/components/squad/PlayerActualidadSection";
+import { clubAnnouncementFromTransfer } from "@/lib/club-announcement";
 import { PlayerResumenSection } from "@/components/squad/PlayerResumenSection";
 
 const tabs: Array<{ id: SquadModalTab; label: string }> = [
@@ -174,21 +175,7 @@ function PlayerModalContent({
           >
             {activeTab === "actualidad" && (
               <PlayerActualidadSection
-                clubAnnouncement={
-                  transfer?.clubAnnouncement
-                    ? {
-                        text: transfer.clubAnnouncement,
-                        date: transfer.date,
-                        newsItem: clubAnnouncementNews,
-                      }
-                    : clubAnnouncementNews
-                      ? {
-                          text: clubAnnouncementNews.excerpt,
-                          date: clubAnnouncementNews.date,
-                          newsItem: clubAnnouncementNews,
-                        }
-                      : undefined
-                }
+                clubAnnouncement={clubAnnouncementFromTransfer(transfer, clubAnnouncementNews)}
                 playerNews={playerNews}
                 announcementTone={announcementTone}
               />
