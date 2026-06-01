@@ -259,7 +259,7 @@ export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
           className={`flex gap-4${
             useTicker
               ? ` w-max${!manualScroll ? " news-ticker-track" : ""}`
-              : " w-full justify-center"
+              : " w-full justify-start"
           }`}
         >
           {loop.map((transfer, index) => (
