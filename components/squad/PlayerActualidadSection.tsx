@@ -1,6 +1,11 @@
-import { ExternalLink, Megaphone } from "lucide-react";
+import { Megaphone } from "lucide-react";
 import { MatchNewsCarousel } from "@/components/match-center/MatchNewsCarousel";
-import { formatDate } from "@/lib/utils";
+import {
+  ClubAnnouncementCard,
+  ClubAnnouncementCardStatic,
+  clubAnnouncementIsLinkable,
+  hasClubAnnouncementCard,
+} from "@/components/squad/ClubAnnouncementCard";
 import type { ClubAnnouncementDisplay } from "@/lib/club-announcement";
 import type { NewsItem } from "@/types";
 
@@ -11,21 +16,12 @@ type PlayerActualidadSectionProps = {
   announcementTone?: "fichaje" | "renovacion" | "default";
 };
 
-const announcementToneClass = {
-  fichaje: "border-[#981915]/20 bg-rose-50/50",
-  renovacion: "border-[#214C9B]/20 bg-blue-50/40",
-  default: "border-slate-200 bg-slate-50",
-} as const;
-
 export function PlayerActualidadSection({
   clubAnnouncement,
   playerNews,
   accentClass = "text-[#214C9B]",
-  announcementTone = "default",
 }: PlayerActualidadSectionProps) {
-  const hasUrl = Boolean(clubAnnouncement?.url);
-  const hasText = Boolean(clubAnnouncement?.text);
-  const hasAnnouncement = hasUrl || hasText;
+  const hasAnnouncement = Boolean(clubAnnouncement && hasClubAnnouncementCard(clubAnnouncement));
   const hasNews = playerNews.length > 0;
 
   if (!hasAnnouncement && !hasNews) {
@@ -40,38 +36,11 @@ export function PlayerActualidadSection({
             <Megaphone className={accentClass} size={18} aria-hidden />
             <h2 className="text-sm font-extrabold uppercase tracking-wide text-slate-900">Comunicado del club</h2>
           </div>
-          <div className={`rounded-2xl border p-5 ${announcementToneClass[announcementTone]}`}>
-            {hasUrl && clubAnnouncement.url ? (
-              <a
-                href={clubAnnouncement.url}
-                target="_blank"
-                rel="noreferrer"
-                className={`inline-flex items-center gap-1.5 text-sm font-bold uppercase tracking-wide ${accentClass} hover:underline`}
-              >
-                Ver comunicado oficial
-                <ExternalLink size={14} aria-hidden />
-              </a>
-            ) : hasText ? (
-              <p className="text-sm leading-7 text-slate-700">{clubAnnouncement.text}</p>
-            ) : null}
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                Real Avilés Industrial
-                {clubAnnouncement.date ? ` · ${formatDate(clubAnnouncement.date)}` : ""}
-              </p>
-              {clubAnnouncement.newsItem && (
-                <a
-                  href={clubAnnouncement.newsItem.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide ${accentClass} hover:underline`}
-                >
-                  Ver noticia oficial
-                  <ExternalLink size={14} aria-hidden />
-                </a>
-              )}
-            </div>
-          </div>
+          {clubAnnouncementIsLinkable(clubAnnouncement) ? (
+            <ClubAnnouncementCard announcement={clubAnnouncement} />
+          ) : (
+            <ClubAnnouncementCardStatic announcement={clubAnnouncement} />
+          )}
         </section>
       )}
 

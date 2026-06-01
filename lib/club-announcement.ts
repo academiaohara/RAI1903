@@ -42,6 +42,61 @@ export function parseClubAnnouncementField(value: string | undefined): {
   return { url: null, legacyText: trimmed };
 }
 
+const INLINE_ANNOUNCEMENT_ID = "club-announcement-inline";
+
+/** Noticia para mostrar el comunicado con foto y titular (vinculada o sintetizada). */
+export function clubAnnouncementNewsItem(
+  announcement: ClubAnnouncementDisplay,
+): NewsItem | null {
+  if (announcement.newsItem) return announcement.newsItem;
+
+  const date = announcement.date ?? new Date().toISOString().slice(0, 10);
+  const source = "Real Avilés Industrial";
+
+  if (announcement.text?.trim()) {
+    const text = announcement.text.trim();
+    const titleEnd = text.search(/[.!?](\s|$)/);
+    const title =
+      titleEnd > 0 && titleEnd < 100 ? text.slice(0, titleEnd + 1) : text.length > 90 ? `${text.slice(0, 87)}…` : text;
+
+    return {
+      id: INLINE_ANNOUNCEMENT_ID,
+      channel: "club",
+      source,
+      date,
+      title,
+      excerpt: text,
+      url: announcement.url ?? "#",
+      tags: ["fichajes"],
+      teams: ["masculino"],
+    };
+  }
+
+  if (announcement.url) {
+    return {
+      id: INLINE_ANNOUNCEMENT_ID,
+      channel: "club",
+      source,
+      date,
+      title: "Comunicado oficial",
+      excerpt: "Lee el comunicado del club en la web oficial.",
+      url: announcement.url,
+      tags: ["club"],
+      teams: ["masculino"],
+    };
+  }
+
+  return null;
+}
+
+/** Enlace principal del comunicado (URL del mercado o de la noticia). */
+export function clubAnnouncementHref(announcement: ClubAnnouncementDisplay): string | null {
+  if (announcement.url) return announcement.url;
+  const news = announcement.newsItem;
+  if (news?.url && news.url !== "#") return news.url;
+  return null;
+}
+
 export function clubAnnouncementFromTransfer(
   transfer: TransferRumor | undefined,
   announcementNews?: NewsItem,
