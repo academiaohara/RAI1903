@@ -1,4 +1,5 @@
 import { createClient as createBrowserClient } from "@/lib/supabase/client";
+import { isMissingSeasonIdColumnError } from "@/lib/cms/inline-overrides-compat";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
 
@@ -24,12 +25,23 @@ export async function fetchInlineOverrides(seasonId = DEFAULT_COMPETITION_SEASON
   if (!isSupabaseConfigured()) return { overrides: {} };
 
   const supabase = createBrowserClient();
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("cms_inline_overrides")
     .select("key, value")
     .eq("season_id", seasonId);
 
-  if (error) return { overrides: {}, error: error.message };
+  if (error && isMissingSeasonIdColumnError(error.message)) {
+    const legacy = await supabase.from("cms_inline_overrides").select("key, value");
+    data = legacy.data;
+    error = legacy.error;
+  }
+
+  if (error) {
+    return {
+      overrides: {},
+      error: `${error.message} — Ejecuta supabase/APPLY_CMS_MIGRATIONS.sql en el SQL Editor de Supabase.`,
+    };
+  }
   if (!data?.length) return { overrides: {} };
 
   return { overrides: rowsToMap(data as InlineOverrideRow[]) };
@@ -46,13 +58,25 @@ export async function upsertInlineOverride(
   }
 
   const supabase = createBrowserClient();
-  const { error } = await supabase.from("cms_inline_overrides").upsert({
+  const row = {
     season_id: seasonId,
     key,
     value,
     updated_at: new Date().toISOString(),
     updated_by: userId ?? null,
-  });
+  };
+
+  let { error } = await supabase.from("cms_inline_overrides").upsert(row);
+
+  if (error && isMissingSeasonIdColumnError(error.message)) {
+    const legacy = await supabase.from("cms_inline_overrides").upsert({
+      key,
+      value,
+      updated_at: row.updated_at,
+      updated_by: row.updated_by,
+    });
+    error = legacy.error;
+  }
 
   if (error) return { ok: false, error: error.message };
   return { ok: true };

@@ -7,7 +7,13 @@ import type { SquadClubInfo, SquadPlayer } from "@/types/squad";
 
 export type SeasonBundleScope = PrimerEquipoGender | "global";
 
-export type SeasonBundleKey = "fixtures" | "squad" | "match_articles" | "competition_labels";
+export type SeasonBundleKey =
+  | "fixtures"
+  | "squad"
+  | "match_articles"
+  | "competition_labels"
+  | "team_crests"
+  | "stadium_photos";
 
 export type SeasonFixturesBundle = {
   matchdays: Matchday[];

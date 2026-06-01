@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { PrimerEquipoContextBar } from "@/components/PrimerEquipoContextBar";
+import { SeasonDataSeedBanner } from "@/components/season/SeasonDataSeedBanner";
 import { isPrimerEquipoGender, type PrimerEquipoGender } from "@/lib/primer-equipo";
 
 export default async function PrimerEquipoGenderLayout({
@@ -15,6 +16,7 @@ export default async function PrimerEquipoGenderLayout({
   return (
     <div className="space-y-6">
       <PrimerEquipoContextBar gender={gender as PrimerEquipoGender} />
+      <SeasonDataSeedBanner />
       <div className="min-w-0">{children}</div>
     </div>
   );

@@ -1,12 +1,13 @@
 import { matchArticles } from "@/data/mock";
 import type { SeasonBundlesMap, SeasonMatchArticlesBundle } from "@/lib/cms/season-bundles";
+import { shouldUseMockCompetitionFallback } from "@/lib/season/cms-data-policy";
 import { getMatchArticlesBundle } from "@/lib/cms/season-bundles";
 import type { MatchArticle, PrimerEquipoGender } from "@/types";
 
 export function getMatchArticlesForSeason(bundles: SeasonBundlesMap): MatchArticle[] {
   const bundle = getMatchArticlesBundle(bundles);
   if (bundle?.articles?.length) return bundle.articles;
-  return matchArticles;
+  return shouldUseMockCompetitionFallback() ? matchArticles : [];
 }
 
 export function getMatchArticlesByType(
