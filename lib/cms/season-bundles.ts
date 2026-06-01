@@ -26,6 +26,7 @@ export type CmsTransferEntry = {
   marketWindowId?: TransferMarketWindowId;
   originClub?: string;
   analysis?: string;
+  /** URL al comunicado oficial del club. */
   clubAnnouncement?: string;
   clubAnnouncementNewsId?: string;
 };
