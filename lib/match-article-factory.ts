@@ -1,6 +1,14 @@
-import { getRaiTeamId } from "@/lib/fixtures";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Match, MatchArticle } from "@/types";
+
+const RAI_TEAM_IDS: Record<PrimerEquipoGender, string> = {
+  masculino: "real-aviles-industrial",
+  femenino: "real-aviles-industrial-femenino",
+};
+
+function getRaiTeamId(gender: PrimerEquipoGender): string {
+  return RAI_TEAM_IDS[gender];
+}
 
 export function matchArticleIdPrefix(gender: PrimerEquipoGender): string {
   return gender === "femenino" ? "fem-" : "";

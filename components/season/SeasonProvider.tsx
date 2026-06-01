@@ -11,9 +11,10 @@ import {
 } from "react";
 import type { CompetitionSeasonId } from "@/data/mock";
 import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
-import { fetchSeasonBundles, type SeasonBundlesMap } from "@/lib/cms/season-bundles";
+import { fetchSeasonBundles, getSquadBundle, type SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import { fetchPublishedSeasons, type CmsSeason } from "@/lib/cms/seasons";
 import { fixtureSourceFromBundles } from "@/lib/season/fixture-source";
+import { getMockCarouselTransfers } from "@/lib/season/mock-transfers-bundle";
 import { resolveTransfersFromBundles } from "@/lib/season/transfer-source";
 import type { TransferRumor } from "@/types";
 import type { JornadasFixtureSource } from "@/lib/season/fixture-source";
@@ -49,6 +50,11 @@ function pickViewedSeasonId(rows: CmsSeason[], activeId: CompetitionSeasonId): C
   return activeId;
 }
 
+function resolveSeasonTransfers(map: SeasonBundlesMap) {
+  const squadPlayers = getSquadBundle(map, "masculino")?.players ?? [];
+  return resolveTransfersFromBundles(map, squadPlayers, getMockCarouselTransfers());
+}
+
 export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION_SEASON_ID }: SeasonProviderProps) {
   const [seasons, setSeasons] = useState<CmsSeason[]>([]);
   const [activeSeasonId, setActiveSeasonId] = useState<CompetitionSeasonId>(defaultSeasonId);
@@ -77,7 +83,7 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
     setTransfersLoading(true);
     const map = await fetchSeasonBundles(viewedSeasonId);
     setBundles(map);
-    setTransfers(resolveTransfersFromBundles(map));
+    setTransfers(resolveSeasonTransfers(map));
     setBundlesLoading(false);
     setTransfersLoading(false);
   }, [viewedSeasonId]);
@@ -97,7 +103,7 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
     void fetchSeasonBundles(viewedSeasonId).then((map) => {
       if (cancelled) return;
       setBundles(map);
-      setTransfers(resolveTransfersFromBundles(map));
+      setTransfers(resolveSeasonTransfers(map));
       setBundlesLoading(false);
       setTransfersLoading(false);
     });
