@@ -14,6 +14,7 @@ import {
   upsertInlineOverridesBatch,
 } from "@/lib/cms/inline-overrides";
 import { SeasonManagerPanel } from "@/components/editor/SeasonManagerPanel";
+import { TeamCrestEditorPanel } from "@/components/editor/TeamCrestEditorPanel";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
@@ -360,6 +361,7 @@ function InlineEditingToolbar({
     useInlineEditing();
   const [copied, setCopied] = useState(false);
   const [seasonPanelOpen, setSeasonPanelOpen] = useState(false);
+  const [crestPanelOpen, setCrestPanelOpen] = useState(false);
 
   if (!ready || !canEdit) return null;
 
@@ -391,15 +393,31 @@ function InlineEditingToolbar({
       {editMode && seasonPanelOpen && (
         <SeasonManagerPanel onClose={() => setSeasonPanelOpen(false)} />
       )}
+      {editMode && crestPanelOpen && (
+        <TeamCrestEditorPanel onClose={() => setCrestPanelOpen(false)} />
+      )}
       <div className="flex flex-wrap justify-end gap-2 rounded-full border border-[#214C9B]/20 bg-white/95 p-2 shadow-2xl backdrop-blur">
         {editMode && (
           <>
             <button
               type="button"
-              onClick={() => setSeasonPanelOpen((open) => !open)}
+              onClick={() => {
+                setCrestPanelOpen(false);
+                setSeasonPanelOpen((open) => !open);
+              }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
             >
               Temporadas
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSeasonPanelOpen(false);
+                setCrestPanelOpen((open) => !open);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+            >
+              Escudos
             </button>
             <button
               type="button"
