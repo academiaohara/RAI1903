@@ -13,11 +13,10 @@ import { MatchScoreCenter } from "@/components/MatchScoreCenter";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { PageHero } from "@/components/PageHero";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
-import { RAI_TEAM_ID } from "@/data/mock";
+import { RAI_TEAM_ID, matchdays, teams } from "@/data/mock";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
-import { getAvilesMatchesResolved, getLeagueMatchdaysResolved, getStandingsTeamsResolved } from "@/lib/football-data";
-import { getTeam } from "@/lib/fixtures";
+import { getLatestAvilesMatches, getNextAvilesMatch, getTeam, getUpcomingAvilesMatches } from "@/lib/fixtures";
 import { getTeamCrestById } from "@/lib/team-crests";
 import { getCronicaForMatch, getPreviaForMatch } from "@/lib/match-articles";
 import { primerEquipoBase } from "@/lib/primer-equipo";
@@ -25,22 +24,11 @@ import { formatMatchDate } from "@/lib/utils";
 import type { Route } from "next";
 import type { Match } from "@/types";
 
-export default async function HomePage() {
-  const avilesMatches = await getAvilesMatchesResolved();
-  const teams = await getStandingsTeamsResolved();
-  const matchdays = await getLeagueMatchdaysResolved();
-
-  const finished = avilesMatches
-    .filter((m) => m.status === "finished")
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  const upcoming = avilesMatches
-    .filter((m) => m.status === "scheduled")
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-  const latestMatch = finished[0];
-  const latestMatches = finished.slice(0, 5);
-  const nextMatch = upcoming[0];
-  const upcomingMatches = upcoming.slice(0, 5);
+export default function HomePage() {
+  const nextMatch = getNextAvilesMatch();
+  const latestMatches = getLatestAvilesMatches();
+  const latestMatch = latestMatches[0];
+  const upcomingMatches = getUpcomingAvilesMatches();
   const latestCronica = latestMatch ? getCronicaForMatch(latestMatch.id) : undefined;
   const nextPrevia = nextMatch ? getPreviaForMatch(nextMatch.id) : undefined;
   const showTransfersSection = hasAnyCarouselTransfers();
