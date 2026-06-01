@@ -21,12 +21,15 @@ import { getPlayedLeagueRounds } from "@/lib/standings";
 import { matchdays, matchdaysFemenino, matchdaysGrupo2 } from "@/data/mock";
 import { FEMENINA_STANDINGS_ZONES } from "@/lib/segunda-rfef-femenina-2526";
 import type { Route } from "next";
-import type { Match } from "@/types";
+import type { Match, Matchday, Team } from "@/types";
 
 type CompeticionViewProps = {
   gender: PrimerEquipoGender;
   highlightTeamId: string;
   initialGrupo?: RfefGrupoId;
+  /** Datos sincronizados desde Supabase (masculino, grupo I). */
+  supabaseTeams?: Team[];
+  supabaseMatchdays?: Matchday[];
 };
 
 const COMPETICION_OPTIONS = [

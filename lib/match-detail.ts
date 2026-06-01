@@ -158,3 +158,22 @@ export function getMatchDetailForArticle(article: MatchArticle): MatchDetail | n
   if (!match) return null;
   return buildMatchDetail(match, article.gender);
 }
+
+export async function getMatchDetailForArticleResolved(article: MatchArticle): Promise<MatchDetail | null> {
+  const { getMatchByIdResolved } = await import("@/lib/football-data");
+  const { buildMatchDetailFromSupabase, hasFootballDataInSupabase } = await import("@/lib/football-supabase");
+
+  let match = await getMatchByIdResolved(article.matchId);
+  if (!match) {
+    const fallback = getMatchForArticle(article);
+    if (!fallback) return null;
+    match = fallback;
+  }
+
+  if (article.gender === "masculino" && (await hasFootballDataInSupabase())) {
+    const fromDb = await buildMatchDetailFromSupabase(match, article.gender);
+    if (fromDb) return fromDb;
+  }
+
+  return buildMatchDetail(match, article.gender);
+}

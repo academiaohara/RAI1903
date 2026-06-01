@@ -1,12 +1,16 @@
 import { Card } from "@/components/Card";
 import { PrimerEquipoPageHero } from "@/components/PrimerEquipoPageHero";
 import { TeamCalendar } from "@/components/TeamCalendar";
-import { getCalendarMatchesByGender } from "@/lib/calendar";
+import { getCalendarMatchesByGender, matchToCalendarMatch } from "@/lib/calendar";
+import { getAvilesMatchesResolved } from "@/lib/football-data";
 import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
 
 export default async function PrimerEquipoCalendarioPage({ params }: { params: Promise<{ gender: PrimerEquipoGender }> }) {
   const { gender } = await params;
-  const matches = getCalendarMatchesByGender(gender);
+  const matches =
+    gender === "masculino"
+      ? (await getAvilesMatchesResolved()).map((m) => matchToCalendarMatch(m, gender))
+      : getCalendarMatchesByGender(gender);
   const played = matches.filter((match) => match.played).length;
   const upcoming = matches.length - played;
 
