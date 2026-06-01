@@ -11,6 +11,6 @@ export async function GET() {
   return NextResponse.json({
     crests: listCrestAssets(),
     stadiums: listStadiumAssets(),
-    hint: "Sube PNG/JPG a /Escudos o /Estadios en GitHub, ejecuta npm run import:assets y despliega.",
+    hint: "Sube PNG a public/escudos/ o Escudos/ en GitHub y despliega. Asocia rutas en Editar → Escudos.",
   });
 }

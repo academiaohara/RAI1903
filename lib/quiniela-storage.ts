@@ -26,9 +26,8 @@ export function getActiveSeasonId(): CompetitionSeasonId {
   if (typeof window === "undefined") return DEFAULT_COMPETITION_SEASON_ID;
   try {
     const stored = window.localStorage.getItem("rai1903.season.v1");
-    return stored === "2024-25" || stored === "2025-26" || stored === "2026-27"
-      ? stored
-      : DEFAULT_COMPETITION_SEASON_ID;
+    if (!stored || stored === "2024-25") return DEFAULT_COMPETITION_SEASON_ID;
+    return stored;
   } catch {
     return DEFAULT_COMPETITION_SEASON_ID;
   }

@@ -76,6 +76,32 @@ export async function updateSeason(
   return { ok: true };
 }
 
+export async function deleteSeason(seasonId: string): Promise<{ ok: boolean; error?: string }> {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: "Supabase no configurado" };
+  }
+
+  const supabase = createClient();
+  const { data: row, error: fetchError } = await supabase
+    .from("cms_seasons")
+    .select("is_default")
+    .eq("id", seasonId)
+    .maybeSingle();
+
+  if (fetchError) return { ok: false, error: fetchError.message };
+  if (!row) return { ok: false, error: "Temporada no encontrada" };
+  if (row.is_default) {
+    return {
+      ok: false,
+      error: "No puedes borrar la temporada principal. Activa otra antes.",
+    };
+  }
+
+  const { error } = await supabase.from("cms_seasons").delete().eq("id", seasonId);
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
 export async function setDefaultSeason(seasonId: string): Promise<{ ok: boolean; error?: string }> {
   if (!isSupabaseConfigured()) {
     return { ok: false, error: "Supabase no configurado" };

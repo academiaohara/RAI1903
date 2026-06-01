@@ -27,4 +27,4 @@ npm run build      # Next.js production build
 - The dev server uses Turbopack for fast refresh.
 - Browser state (Quiniela predictions) persists via `localStorage` only.
 - Package manager is **npm** (lockfile: `package-lock.json`).
-- Team crests live in `/public/escudos` (slug filenames). Upload all team PNGs to `/Escudos` (not the repo root); competition logos go in `/Competiciones`; stadium photos go in `/Estadios`. Run `npm run import:assets` to copy into `public/` and regenerate `lib/escudo-manifest.ts` and `lib/stadium-manifest.ts`. Editors assign which crest file maps to each `teamId` per season via **Editar → Escudos** (saved in Supabase, not in mock data).
+- Team crests: sube PNG a `public/escudos/` (ruta web `/escudos/…`) o a `Escudos/` en la raíz (ruta `/api/crest-file/…`). En el editor (Editar → Escudos) asocia cada equipo con la ruta; no hace falta `npm run import:assets` para escudos nuevos. Opcional: `npm run import:assets` sigue copiando desde `/Escudos` y regenerando manifests para estadios/competiciones. Editors assign which crest file maps to each `teamId` per season via **Editar → Escudos** (saved in Supabase, not in mock data).

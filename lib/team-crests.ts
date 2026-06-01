@@ -1,7 +1,7 @@
 import { ESCUDO_PATHS } from "@/lib/escudo-manifest";
 import type { Team } from "@/types";
 
-/** Rutas por defecto desde imágenes en el repo (`npm run sync:escudos`). */
+/** Rutas por defecto desde imágenes en public/escudos (manifest). */
 export const TEAM_CREST_PATHS: Record<string, string> = ESCUDO_PATHS;
 
 /** Asociaciones temporada → escudo guardadas en Supabase (las define el editor). */

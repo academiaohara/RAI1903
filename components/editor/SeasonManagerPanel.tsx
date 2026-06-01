@@ -1,10 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Loader2, X } from "lucide-react";
+import { Loader2, Trash2, X } from "lucide-react";
 import { useSeason } from "@/components/season/SeasonProvider";
 import type { CompetitionSeasonId } from "@/data/mock";
 import {
+  deleteSeason,
   duplicateSeason,
   fetchEditorSeasons,
   seedSeasonFromMock,
@@ -18,20 +19,26 @@ type SeasonManagerPanelProps = {
 };
 
 export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
-  const { viewedSeasonId, refreshSeasons, refreshBundles, setViewedSeasonId } = useSeason();
+  const { viewedSeasonId, refreshSeasons, refreshBundles, setViewedSeasonId, activeSeasonId } =
+    useSeason();
   const [rows, setRows] = useState<CmsSeason[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   const [newId, setNewId] = useState("2026-27");
-  const [newLabel, setNewLabel] = useState("2026/27");
+  const [newLabel, setNewLabel] = useState("26/27");
   const [duplicateFrom, setDuplicateFrom] = useState<CompetitionSeasonId>("2025-26");
 
   const load = useCallback(async () => {
     setLoading(true);
     const data = await fetchEditorSeasons();
     setRows(data);
+    setDuplicateFrom((current) => {
+      if (!data.length) return current;
+      if (data.some((row) => row.id === current)) return current;
+      return data.find((row) => row.isDefault)?.id ?? data[0].id;
+    });
     setLoading(false);
   }, []);
 
@@ -56,10 +63,18 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
     await load();
   };
 
+  const handleDelete = (row: CmsSeason) => {
+    const confirmed = window.confirm(
+      `¿Borrar la temporada «${row.label}» (${row.id})?\n\nSe eliminarán plantillas, calendarios, escudos y ediciones asociadas. No se puede deshacer.`,
+    );
+    if (!confirmed) return;
+    void runAction(() => deleteSeason(row.id), `Temporada ${row.label} eliminada`);
+  };
+
   return (
-    <div className="w-[min(100vw-2rem,24rem)] rounded-2xl border border-[#214C9B]/20 bg-white p-4 shadow-2xl">
+    <div className="w-[min(100vw-2rem,26rem)] rounded-2xl border border-[#214C9B]/20 bg-white p-4 shadow-2xl">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <h3 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Temporadas CMS</h3>
+        <h3 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Temporadas</h3>
         <button
           type="button"
           onClick={onClose}
@@ -70,12 +85,18 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
         </button>
       </div>
 
+      <p className="mb-3 text-xs leading-relaxed text-slate-600">
+        Puedes tener varias temporadas (25/26, 26/27…). La <strong>principal</strong> es la que ve la
+        web por defecto en el selector. <strong>Ver</strong> cambia qué temporada editas ahora (
+        {viewedSeasonId}). Las publicadas aparecen en el selector del público.
+      </p>
+
       {loading ? (
         <p className="flex items-center gap-2 text-xs text-slate-500">
           <Loader2 size={14} className="animate-spin" /> Cargando…
         </p>
       ) : (
-        <ul className="mb-4 max-h-40 space-y-2 overflow-y-auto text-xs">
+        <ul className="mb-4 max-h-48 space-y-2 overflow-y-auto text-xs">
           {rows.map((row) => (
             <li
               key={row.id}
@@ -86,7 +107,12 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
                 <span className="ml-2 text-slate-400">{row.id}</span>
                 {row.isDefault && (
                   <span className="ml-2 rounded-full bg-emerald-100 px-2 py-0.5 font-bold text-emerald-800">
-                    Activa
+                    Principal
+                  </span>
+                )}
+                {viewedSeasonId === row.id && (
+                  <span className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 font-bold text-[#214C9B]">
+                    Editando
                   </span>
                 )}
                 {!row.published && (
@@ -101,7 +127,7 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
                   disabled={busy}
                   onClick={() => {
                     setViewedSeasonId(row.id as CompetitionSeasonId);
-                    setMessage(`Consultando ${row.label}`);
+                    setMessage(`Editando ${row.label}`);
                   }}
                   className="rounded-lg border border-[#214C9B]/20 px-2 py-1 font-bold text-[#214C9B] hover:bg-blue-50 disabled:opacity-50"
                 >
@@ -112,11 +138,14 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
                     type="button"
                     disabled={busy}
                     onClick={() =>
-                      void runAction(() => setDefaultSeason(row.id), `${row.label} es ahora la temporada activa`)
+                      void runAction(
+                        () => setDefaultSeason(row.id),
+                        `${row.label} es ahora la temporada principal`,
+                      )
                     }
                     className="rounded-lg bg-[#214C9B] px-2 py-1 font-bold text-white hover:bg-[#173a78] disabled:opacity-50"
                   >
-                    Activar
+                    Principal
                   </button>
                 )}
                 <button
@@ -125,13 +154,25 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
                   onClick={() =>
                     void runAction(
                       () => updateSeason(row.id, { published: !row.published }),
-                      row.published ? "Oculta del selector público" : "Publicada en el selector",
+                      row.published ? "Oculta del selector público" : "Visible en el selector público",
                     )
                   }
                   className="rounded-lg border border-slate-200 px-2 py-1 font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                 >
                   {row.published ? "Ocultar" : "Publicar"}
                 </button>
+                {!row.isDefault && (
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => handleDelete(row)}
+                    className="inline-flex items-center gap-0.5 rounded-lg border border-[#981915]/25 px-2 py-1 font-bold text-[#981915] hover:bg-red-50 disabled:opacity-50"
+                    title="Eliminar temporada"
+                  >
+                    <Trash2 size={12} />
+                    Borrar
+                  </button>
+                )}
               </div>
             </li>
           ))}
@@ -140,6 +181,10 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
 
       <div className="space-y-3 border-t border-slate-100 pt-3 text-xs">
         <p className="font-bold uppercase tracking-wide text-slate-500">Nueva temporada</p>
+        <p className="text-slate-500">
+          ID recomendado: <code className="rounded bg-slate-100 px-1">2026-27</code> · etiqueta:{" "}
+          <code className="rounded bg-slate-100 px-1">26/27</code>
+        </p>
         <div className="grid grid-cols-2 gap-2">
           <label className="space-y-1">
             <span className="font-semibold text-slate-600">ID</span>
@@ -156,7 +201,7 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
               value={newLabel}
               onChange={(event) => setNewLabel(event.target.value)}
               className="w-full rounded-lg border border-slate-200 px-2 py-1.5"
-              placeholder="2026/27"
+              placeholder="26/27"
             />
           </label>
         </div>
@@ -164,7 +209,7 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
           <span className="font-semibold text-slate-600">Duplicar datos desde</span>
           <select
             value={duplicateFrom}
-            onChange={(event) => setDuplicateFrom(event.target.value as CompetitionSeasonId)}
+            onChange={(event) => setDuplicateFrom(event.target.value)}
             className="w-full rounded-lg border border-slate-200 px-2 py-1.5"
           >
             {rows.map((row) => (
@@ -198,13 +243,17 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
           disabled={busy}
           onClick={() =>
             void runAction(
-              () => seedSeasonFromMock(viewedSeasonId, rows.find((row) => row.id === viewedSeasonId)?.label ?? viewedSeasonId),
-              "Datos del código subidos a Supabase para la temporada consultada",
+              () =>
+                seedSeasonFromMock(
+                  viewedSeasonId,
+                  rows.find((row) => row.id === viewedSeasonId)?.label ?? viewedSeasonId,
+                ),
+              "Datos del código subidos a Supabase para la temporada en edición",
             )
           }
           className="w-full rounded-xl border border-[#214C9B]/25 py-2 font-extrabold uppercase text-[#214C9B] hover:bg-blue-50 disabled:opacity-50"
         >
-          Subir mock actual a «{viewedSeasonId}»
+          Subir datos mock a «{viewedSeasonId}»
         </button>
       </div>
 
@@ -214,6 +263,11 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
       {busy && (
         <p className="mt-2 flex items-center gap-2 text-xs text-slate-500">
           <Loader2 size={14} className="animate-spin" /> Guardando…
+        </p>
+      )}
+      {!loading && activeSeasonId && (
+        <p className="mt-2 text-[10px] text-slate-400">
+          Principal actual en la web: <strong>{activeSeasonId}</strong>
         </p>
       )}
     </div>
