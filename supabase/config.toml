@@ -1,0 +1,41 @@
+# Supabase local / deploy config — https://supabase.com/docs/guides/cli/config
+
+[project]
+id = "rai1903"
+
+[api]
+enabled = true
+
+[db]
+major_version = 15
+
+[functions]
+# Variables disponibles en Edge Functions (configúralas en el dashboard o `supabase secrets set`)
+# API_FOOTBALL_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, AVILES_TEAM_ID, SEASON
+
+[functions.sync-season-fixtures]
+verify_jwt = false
+
+[functions.sync-standings]
+verify_jwt = false
+
+[functions.sync-match-detail]
+verify_jwt = false
+
+[functions.sync-aviles-lineup]
+verify_jwt = false
+
+# Cron (UTC). Ajusta en producción si necesitas horario peninsular.
+[functions.sync-standings.cron]
+schedule = "0 6 * * *"
+
+[functions.sync-season-fixtures.cron]
+schedule = "0 5 * * *"
+
+# Cada hora: partidos terminados hace ≥3 h sin detalle sincronizado
+[functions.sync-match-detail.cron]
+schedule = "0 * * * *"
+
+# Cada 30 min: alineación del Avilés en ventana de día de partido
+[functions.sync-aviles-lineup.cron]
+schedule = "*/30 * * * *"
