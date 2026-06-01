@@ -77,8 +77,7 @@ export function InlineEditingProvider({
   children: React.ReactNode;
   initialOverrides?: InlineOverrides;
 }) {
-  const seasonContext = useSeasonOptional();
-  const seasonId = seasonContext?.viewedSeasonId ?? DEFAULT_COMPETITION_SEASON_ID;
+  const seasonId = useSeasonOptional()?.viewedSeasonId ?? DEFAULT_COMPETITION_SEASON_ID;
   const configured = isSupabaseConfigured();
   const [ready, setReady] = useState(false);
   const [canEdit, setCanEdit] = useState(!configured);
@@ -336,12 +335,7 @@ export function InlineEditingProvider({
     ],
   );
 
-  return (
-    <InlineEditingContext.Provider value={value}>
-      {children}
-      <InlineEditingToolbar seasonLabel={seasonContext?.viewedSeason.label} isArchive={seasonContext?.isViewingArchive} />
-    </InlineEditingContext.Provider>
-  );
+  return <InlineEditingContext.Provider value={value}>{children}</InlineEditingContext.Provider>;
 }
 
 export function useInlineEditing() {
@@ -352,15 +346,12 @@ export function useInlineEditing() {
   return context;
 }
 
-function InlineEditingToolbar({
-  seasonLabel,
-  isArchive,
-}: {
-  seasonLabel?: string;
-  isArchive?: boolean;
-}) {
+export function InlineEditingToolbar() {
+  const seasonContext = useSeasonOptional();
   const { canEdit, editMode, ready, localOnly, syncError, setEditMode, clearAll, exportJson } =
     useInlineEditing();
+  const seasonLabel = seasonContext?.viewedSeason.label;
+  const isArchive = seasonContext?.isViewingArchive;
   const [copied, setCopied] = useState(false);
   const [seasonPanelOpen, setSeasonPanelOpen] = useState(false);
   const [crestPanelOpen, setCrestPanelOpen] = useState(false);
