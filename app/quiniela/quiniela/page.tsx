@@ -6,7 +6,6 @@ import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
 import { PredictionForm } from "@/components/PredictionForm";
 import { QuinielaHowItWorks } from "@/components/QuinielaHowItWorks";
-import { CURRENT_QUINIELA_ROUND, matchdays } from "@/data/mock";
 import {
   countFinishedMatches,
   countOutcomeHits,
@@ -16,6 +15,7 @@ import {
   isMatchdayFullyFinished,
   sortQuinielaMatches,
 } from "@/lib/quiniela";
+import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
 import { loadQuinielaState, saveQuinielaPredictions, saveQuinielaRound } from "@/lib/quiniela-storage";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -23,7 +23,8 @@ import type { Prediction } from "@/types";
 import type { User } from "@supabase/supabase-js";
 
 export default function MiQuinielaPage() {
-  const [round, setRound] = useState(CURRENT_QUINIELA_ROUND);
+  const { leagueMatchdays, currentRound } = useMasculinoLeagueSeason();
+  const [round, setRound] = useState(currentRound);
   const [predictions, setPredictions] = useState<Record<string, Prediction>>({});
   const [savedRounds, setSavedRounds] = useState<Record<number, string>>({});
   const [userId, setUserId] = useState<string | null>(null);
@@ -64,7 +65,7 @@ export default function MiQuinielaPage() {
     };
   }, []);
 
-  const selectedMatchday = useMemo(() => getMatchdayByRound(round), [round]);
+  const selectedMatchday = useMemo(() => getMatchdayByRound(leagueMatchdays, round), [leagueMatchdays, round]);
   const orderedMatches = useMemo(
     () => sortQuinielaMatches(selectedMatchday.matches),
     [selectedMatchday.matches],
@@ -131,8 +132,8 @@ export default function MiQuinielaPage() {
       <QuinielaHowItWorks />
       <JornadaSelector
         value={round}
-        total={matchdays.length}
-        currentRound={CURRENT_QUINIELA_ROUND}
+        total={leagueMatchdays.length}
+        currentRound={currentRound}
         onChange={handleRoundChange}
       />
 

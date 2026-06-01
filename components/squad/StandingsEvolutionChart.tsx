@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { Card } from "@/components/Card";
-import { matchdays, RAI_TEAM_ID, teams } from "@/data/mock";
+import { RAI_TEAM_ID } from "@/data/mock";
+import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
 import { getTeamStandingsEvolution } from "@/lib/standings-evolution";
 import { PRIMERA_RFEF_STANDINGS_ZONES } from "@/lib/rfef-rules";
 
@@ -21,8 +22,12 @@ function formatPointLabel(round: number, position: number) {
 }
 
 export function StandingsEvolutionChart({ teamId = RAI_TEAM_ID, className }: StandingsEvolutionChartProps) {
+  const { teams, leagueMatchdays } = useMasculinoLeagueSeason();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const points = useMemo(() => getTeamStandingsEvolution(teamId, teams, matchdays), [teamId]);
+  const points = useMemo(
+    () => getTeamStandingsEvolution(teamId, teams, leagueMatchdays),
+    [teamId, teams, leagueMatchdays],
+  );
   const teamCount = teams.length;
   const zones = PRIMERA_RFEF_STANDINGS_ZONES;
 

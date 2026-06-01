@@ -10,7 +10,8 @@ import { RAI_TEAM_ID } from "@/data/mock";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { buildMatchDetail } from "@/lib/match-detail";
-import { getPreviaForMatch } from "@/lib/match-articles";
+import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
+import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
 import { scorerLabelForPlayer } from "@/lib/squad-player-resolve";
 import {
   actualAvilesScorer,
@@ -98,9 +99,11 @@ export function PredictionForm({
   onChange: (prediction: Prediction) => void;
 }) {
   const [previewOpen, setPreviewOpen] = useState(false);
+  const { teams } = useMasculinoLeagueSeason();
+  const { getPrevia } = useSeasonMatchArticles();
   const avilesMatch = isAvilesMatch(match);
   const avilesIsHome = match.homeTeamId === RAI_TEAM_ID;
-  const previa = getPreviaForMatch(match.id);
+  const previa = getPrevia(match.id, "masculino");
   const previaHref = previa ? (`${primerEquipoBase("masculino")}/cronicas/${previa.id}` as Route) : undefined;
   const avilesGoalsPick = prediction ? getAvilesGoalsPick(match, prediction) : undefined;
   const scorerLockedToNadie = avilesGoalsPick === 0;
@@ -114,8 +117,8 @@ export function PredictionForm({
   const formReadOnly = readOnly || isDisplayOnly;
   const actual = actualOutcome(match);
   const userOutcome = (outcomeLocked ? derivedOutcome : prediction?.outcome) ?? undefined;
-  const homeCrest = getTeamCrestById(match.homeTeamId, getTeamById(match.homeTeamId)?.crestInitials);
-  const awayCrest = getTeamCrestById(match.awayTeamId, getTeamById(match.awayTeamId)?.crestInitials);
+  const homeCrest = getTeamCrestById(match.homeTeamId, getTeamById(match.homeTeamId, teams)?.crestInitials);
+  const awayCrest = getTeamCrestById(match.awayTeamId, getTeamById(match.awayTeamId, teams)?.crestInitials);
   const actualGoals = getActualGoalsPicks(match);
   const { squad } = useSquadPlayers("masculino");
   const { getValue } = useInlineEditing();
