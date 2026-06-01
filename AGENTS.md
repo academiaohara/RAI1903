@@ -21,8 +21,7 @@ npm run build      # Next.js production build
 ### Key notes
 
 - No test framework is configured (no Jest, Vitest, or Playwright). Validation relies on lint, typecheck, and manual browser testing.
-- Mock data covers most of the site. **Supabase** uses `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Vercel / `.env.local`). Run SQL in `supabase/migrations/` (quiniela, profiles, CMS, API-Football). Login is direct OAuth from the header; `/login` auto-redirects to X. Edición en línea para `rai1903fan@gmail.com` (rol `editor` en `profiles`; ver `supabase/seed-editor-profile.sql`).
-- **API-Football**: datos de partidos/clasificación vía Edge Functions + cron; el frontend solo lee tablas `matches`, `standings`, etc. Ver `supabase/API_FOOTBALL.md`. `video_url` en `matches` es manual (editor o Supabase dashboard).
+- Mock data covers most of the site. **Supabase** uses `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Vercel / `.env.local`). Run SQL in `supabase/migrations/` (quiniela, profiles, CMS). Login is direct OAuth from the header; `/login` auto-redirects to X. Edición en línea para `rai1903fan@gmail.com` (rol `editor` en `profiles`; ver `supabase/seed-editor-profile.sql`).
 - The dev server uses Turbopack for fast refresh.
 - Browser state (Quiniela predictions) persists via `localStorage` only.
 - Package manager is **npm** (lockfile: `package-lock.json`).
