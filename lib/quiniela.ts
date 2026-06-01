@@ -119,17 +119,8 @@ export function getTeamById(teamId: string, teams: Team[] = mockTeams) {
   return teams.find((team) => team.id === teamId);
 }
 
-function zeroedTeams(teams: Team[]): Team[] {
-  return teams.map((team) => ({
-    ...team,
-    position: 0,
-    form: [],
-    stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 },
-  }));
-}
-
 export function getTeamsBeforeRound(matchdays: Matchday[], teams: Team[], round: number): Team[] {
-  return getTeamsAtRound(zeroedTeams(teams), matchdays, round);
+  return getTeamsAtRound(teams, matchdays, round);
 }
 
 export function getTeamByIdBeforeRound(

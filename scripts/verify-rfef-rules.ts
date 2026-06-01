@@ -3,8 +3,9 @@
  * Ejecutar: npm run verify:rfef-rules
  */
 
+import { matchdays, teams } from "@/data/mock";
 import { PRIMERA_RFEF_RULES, PRIMERA_RFEF_STANDINGS_ZONES } from "@/lib/rfef-rules/config";
-import { computeStandings } from "@/lib/standings";
+import { computeStandings, getTeamsAtRound, qualifyingRoundAfterJornada } from "@/lib/standings";
 import { resolveKnockoutTwoLeg } from "@/lib/rfef-rules/knockout";
 import { headToHeadGoalDifference } from "@/lib/rfef-rules/mini-league";
 import { selectPlayoffQualifiers } from "@/lib/rfef-rules/playoff";
@@ -146,6 +147,13 @@ function match(home: string, away: string, hs: number, as: number) {
       PRIMERA_RFEF_RULES.zones.relegation === 5,
     "Reglas exportadas con zonas 1ª RFEF",
   );
+}
+
+{
+  const badMatchdays = matchdays.flatMap((md) => md.matches.map((match) => ({ round: 1, matches: [match] })));
+  const atJ1 = getTeamsAtRound(teams, badMatchdays, qualifyingRoundAfterJornada(1));
+  const played = new Set(atJ1.map((team) => team.stats.played));
+  assert(played.size === 1 && played.has(1), "J1 con matchday.round mal: todos con 1 PJ");
 }
 
 console.log("OK: reglas RFEF verificadas");
