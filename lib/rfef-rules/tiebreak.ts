@@ -115,6 +115,7 @@ function resolveSubgroup(
     if (buckets.length === 1) continue;
 
     const ordered: string[] = [];
+    let pending = false;
     for (const bucket of buckets) {
       if (bucket.teamIds.length === 1) {
         ordered.push(bucket.teamIds[0]!);
@@ -122,11 +123,14 @@ function resolveSubgroup(
         const sub = resolveSubgroup(bucket.teamIds, accumulators, matches, rules, fairPlay);
         ordered.push(...sub.ordered);
         if (sub.pending) {
-          return { ordered, pending: true };
+          pending = true;
+          const included = new Set(sub.ordered);
+          const missing = bucket.teamIds.filter((id) => !included.has(id));
+          ordered.push(...[...missing].sort((a, b) => a.localeCompare(b)));
         }
       }
     }
-    return { ordered, pending: false };
+    return { ordered, pending };
   }
 
   const fallback = [...teamIds].sort((a, b) => a.localeCompare(b));
