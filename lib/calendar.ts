@@ -1,5 +1,6 @@
 import { getAvilesMatchesByGender, getRaiTeamId, getTeamsByGender } from "@/lib/fixtures";
 import { getTeamCrest } from "@/lib/team-crests";
+import { defaultCronicaId, defaultPreviaId } from "@/lib/match-article-factory";
 import { getCronicaForMatch, getPreviaForMatch } from "@/lib/match-articles";
 import { primerEquipoBase, primerEquipoHasCronicas, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { CalendarMatch, Match } from "@/types";
@@ -68,12 +69,12 @@ export function matchToCalendarMatch(
     homeScore: match.homeScore,
     awayScore: match.awayScore,
     chronicleUrl:
-      primerEquipoHasCronicas(gender) && cronica
-        ? (`${primerEquipoBase(gender)}/cronicas/${cronica.id}` as Route)
+      primerEquipoHasCronicas(gender) && played
+        ? (`${primerEquipoBase(gender)}/cronicas/${cronica?.id ?? defaultCronicaId(match.id, gender)}` as Route)
         : null,
     previaUrl:
-      primerEquipoHasCronicas(gender) && !played && previa
-        ? (`${primerEquipoBase(gender)}/cronicas/${previa.id}` as Route)
+      primerEquipoHasCronicas(gender) && !played
+        ? (`${primerEquipoBase(gender)}/cronicas/${previa?.id ?? defaultPreviaId(match.id, gender)}` as Route)
         : null,
   };
 }

@@ -25,6 +25,7 @@ import {
   buildMatchdaysSegundaRfefFemenina,
   buildTeamsSegundaRfefFemenina,
 } from "@/lib/segunda-rfef-femenina-2526";
+import { buildMatchArticlesForClub } from "@/lib/match-article-factory";
 import { applyStandingsToTeams } from "@/lib/standings";
 import type {
   AcademyTeam,
@@ -755,60 +756,6 @@ export const playersFemenino: Player[] = [
   },
 ];
 
-const buildMatchArticlesForClub = (
-  matches: Match[],
-  clubTeamId: string,
-  gender: "masculino" | "femenino",
-  idPrefix: string,
-): MatchArticle[] => {
-  const avilesMatches = matches.filter(
-    (match) => match.homeTeamId === clubTeamId || match.awayTeamId === clubTeamId,
-  );
-  const finished = avilesMatches.filter((match) => match.status === "finished");
-  const scheduled = avilesMatches.filter((match) => match.status === "scheduled").slice(0, 6);
-
-  const cronicas: MatchArticle[] = finished.map((match) => ({
-    id: `${idPrefix}cronica-${match.id}`,
-    matchId: match.id,
-    gender,
-    type: "cronica",
-    title: `Cronica: ${match.homeTeam} ${match.homeScore}-${match.awayScore} ${match.awayTeam}`,
-    date: match.date,
-    source: "RAI1903",
-    excerpt: `Resumen de la jornada ${match.matchday} con lectura tactica, protagonistas y sensaciones del vestuario blanquiazul.`,
-    body: [],
-  }));
-
-  const previas: MatchArticle[] = scheduled.map((match) => ({
-    id: `${idPrefix}previa-${match.id}`,
-    matchId: match.id,
-    gender,
-    type: "previa",
-    title: `Previa: ${match.homeTeam} vs ${match.awayTeam}`,
-    date: match.date,
-    source: gender === "femenino" ? "Futbol Femenino Norte" : "AsturFutbol",
-    excerpt:
-      gender === "femenino"
-        ? `Analisis femenino de la jornada ${match.matchday} con estado de forma y convocatoria.`
-        : `Analisis del duelo de la jornada ${match.matchday}: forma reciente, claves tacticas y estado de la plantilla.`,
-    body:
-      gender === "femenino"
-        ? [
-            `El Avilés Femenino afronta la jornada ${match.matchday} con ambicion de sumar en la parte alta de la tabla.`,
-            "Laura Menendez cuenta con la base titular y rotaciones para mantener la intensidad.",
-            "La clave sera el duelo en bandas y la capacidad de cerrar el partido desde balon parado.",
-          ]
-        : [
-            `El Real Avilés Industrial afronta la jornada ${match.matchday} ante ${match.awayTeamId === clubTeamId ? match.homeTeam : match.awayTeam}.`,
-            "El cuerpo tecnico llega con la plantilla casi completa y rotaciones pensadas para sostener el ritmo competitivo.",
-            "La clave pasara por dominar los duelos en campo abierto y aprovechar las acciones a balon parado.",
-            "El Roman Suarez Puerta busca otro ambiente exigente para empujar al equipo en un tramo decisivo de la liga.",
-          ],
-  }));
-
-  return [...cronicas, ...previas];
-};
-
 const femeninoExtras: MatchArticle[] = [
     {
       id: "cronica-fem-j8",
@@ -843,8 +790,8 @@ const femeninoExtras: MatchArticle[] = [
   ];
 
 export const matchArticles: MatchArticle[] = [
-  ...buildMatchArticlesForClub(leagueMatches, RAI_TEAM_ID, "masculino", ""),
-  ...buildMatchArticlesForClub(leagueMatchesFemenino, RAI_FEM_TEAM_ID, "femenino", "fem-"),
+  ...buildMatchArticlesForClub(leagueMatches, RAI_TEAM_ID, "masculino"),
+  ...buildMatchArticlesForClub(leagueMatchesFemenino, RAI_FEM_TEAM_ID, "femenino"),
   ...femeninoExtras,
 ];
 

@@ -2,10 +2,13 @@
 
 import { notFound } from "next/navigation";
 import type { Route } from "next";
+import { useMemo } from "react";
 import { MatchCenter } from "@/components/match-center/MatchCenter";
+import { useSeason } from "@/components/season/SeasonProvider";
 import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
-import { getMatchDetailForArticle } from "@/lib/match-detail";
+import { buildMatchDetail, getMatchForArticle } from "@/lib/match-detail";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
+import { findMatchInBundles } from "@/lib/season/find-match-in-bundles";
 
 type MatchArticleDetailSeasonProps = {
   gender: PrimerEquipoGender;
@@ -13,13 +16,20 @@ type MatchArticleDetailSeasonProps = {
 };
 
 export function MatchArticleDetailSeason({ gender, articleId }: MatchArticleDetailSeasonProps) {
+  const { bundles } = useSeason();
   const { getById } = useSeasonMatchArticles();
   const article = getById(articleId);
 
+  const detail = useMemo(() => {
+    if (!article || article.gender !== gender) return null;
+    if (article.type !== "cronica" && article.type !== "previa") return null;
+    const match = findMatchInBundles(bundles, article.matchId) ?? getMatchForArticle(article);
+    if (!match) return null;
+    return buildMatchDetail(match, article.gender);
+  }, [article, bundles, gender]);
+
   if (!article || article.gender !== gender) notFound();
   if (article.type !== "cronica" && article.type !== "previa") notFound();
-
-  const detail = getMatchDetailForArticle(article);
   if (!detail) notFound();
 
   return (

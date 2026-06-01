@@ -17,6 +17,7 @@ import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
 import { getTeamByGender } from "@/lib/fixtures";
 import { seasonHasCompetitionBundles } from "@/lib/season/cms-data-policy";
+import { defaultCronicaId, defaultPreviaId } from "@/lib/match-article-factory";
 import { primerEquipoBase } from "@/lib/primer-equipo";
 import { getTeamCrestById } from "@/lib/team-crests";
 import { formatMatchDate } from "@/lib/utils";
@@ -57,9 +58,7 @@ export function HomeCompetitionSection() {
             match={latestMatch}
             label="Ultimo partido"
             href={
-              (latestCronica
-                ? `${primerEquipoBase("masculino")}/cronicas/${latestCronica.id}`
-                : `${primerEquipoBase("masculino")}/cronicas`) as Route
+              `${primerEquipoBase("masculino")}/cronicas/${latestCronica?.id ?? defaultCronicaId(latestMatch.id, "masculino")}` as Route
             }
             action="Entrar en la cronica"
           />
@@ -69,9 +68,7 @@ export function HomeCompetitionSection() {
             match={nextMatch}
             label="Siguiente partido"
             href={
-              (nextPrevia
-                ? `${primerEquipoBase("masculino")}/cronicas/${nextPrevia.id}`
-                : `${primerEquipoBase("masculino")}/cronicas`) as Route
+              `${primerEquipoBase("masculino")}/cronicas/${nextPrevia?.id ?? defaultPreviaId(nextMatch.id, "masculino")}` as Route
             }
             action="Entrar en la previa"
           />

@@ -1,13 +1,37 @@
 import { matchArticles } from "@/data/mock";
 import type { SeasonBundlesMap, SeasonMatchArticlesBundle } from "@/lib/cms/season-bundles";
-import { shouldUseMockCompetitionFallback } from "@/lib/season/cms-data-policy";
 import { getMatchArticlesBundle } from "@/lib/cms/season-bundles";
+import { ensureAvilesMatchArticles } from "@/lib/match-article-factory";
+import { getAvilesMatchesFromSource } from "@/lib/season/aviles-matches";
+import { shouldUseMockCompetitionFallback } from "@/lib/season/cms-data-policy";
+import { fixtureSourceFromBundles } from "@/lib/season/fixture-source";
 import type { MatchArticle, PrimerEquipoGender } from "@/types";
+
+const GENDERS: PrimerEquipoGender[] = ["masculino", "femenino"];
+
+function mergeAvilesPlaceholders(bundles: SeasonBundlesMap, cmsArticles: MatchArticle[]): MatchArticle[] {
+  let merged = cmsArticles;
+  for (const gender of GENDERS) {
+    const source = fixtureSourceFromBundles(bundles, gender);
+    const matches = getAvilesMatchesFromSource(source, gender);
+    merged = ensureAvilesMatchArticles(merged, matches, gender);
+  }
+  return merged;
+}
 
 export function getMatchArticlesForSeason(bundles: SeasonBundlesMap): MatchArticle[] {
   const bundle = getMatchArticlesBundle(bundles);
-  if (bundle?.articles?.length) return bundle.articles;
-  return shouldUseMockCompetitionFallback() ? matchArticles : [];
+  const cmsArticles = bundle?.articles;
+
+  if (cmsArticles !== undefined) {
+    return mergeAvilesPlaceholders(bundles, cmsArticles);
+  }
+
+  if (shouldUseMockCompetitionFallback()) {
+    return matchArticles;
+  }
+
+  return mergeAvilesPlaceholders(bundles, []);
 }
 
 export function getMatchArticlesByType(
