@@ -147,6 +147,8 @@ export type TransferRumor = {
   destinationClub?: string;
   rating: number;
   analysis: string;
+  /** Tipo de movimiento para el carrusel de mercado (fichaje, cesión, renovación). */
+  kind?: TransferKind;
   /** Enlace con jugador de plantilla cuando existe. */
   playerId?: string;
   /** Comunicado oficial del club (mock). */

@@ -18,6 +18,7 @@ import type {
   SeasonMatchArticlesBundle,
   SeasonSquadBundle,
 } from "@/lib/cms/season-bundles";
+import { buildMockTransfersBundle } from "@/lib/season/transfer-source";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 
 export type MockBundleEntry = {
@@ -66,5 +67,6 @@ export function buildMockSeasonBundleEntries(seasonLabel: string): MockBundleEnt
     { scope: "femenino", bundleKey: "fixtures", payload: femeninoFixtures },
     ...squadEntries,
     { scope: "global", bundleKey: "match_articles", payload: articles },
+    { scope: "global", bundleKey: "transfers", payload: buildMockTransfersBundle() },
   ];
 }

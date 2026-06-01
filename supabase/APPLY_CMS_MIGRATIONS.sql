@@ -66,7 +66,8 @@ alter table public.cms_season_bundles
       'match_articles',
       'competition_labels',
       'team_crests',
-      'stadium_photos'
+      'stadium_photos',
+      'transfers'
     )
   );
 

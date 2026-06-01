@@ -14,6 +14,8 @@ import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
 import { fetchSeasonBundles, type SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import { fetchPublishedSeasons, type CmsSeason } from "@/lib/cms/seasons";
 import { fixtureSourceFromBundles } from "@/lib/season/fixture-source";
+import { resolveTransfersFromBundles } from "@/lib/season/transfer-source";
+import type { TransferRumor } from "@/types";
 import type { JornadasFixtureSource } from "@/lib/season/fixture-source";
 import { loadSeasonId, saveSeasonId } from "@/lib/storage";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -26,6 +28,8 @@ type SeasonContextValue = {
   isViewingArchive: boolean;
   bundles: SeasonBundlesMap;
   bundlesLoading: boolean;
+  transfers: TransferRumor[];
+  transfersLoading: boolean;
   setViewedSeasonId: (id: CompetitionSeasonId) => void;
   refreshSeasons: () => Promise<void>;
   refreshBundles: () => Promise<void>;
@@ -51,6 +55,8 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
   const [viewedSeasonId, setViewedSeasonIdState] = useState<CompetitionSeasonId>(defaultSeasonId);
   const [bundles, setBundles] = useState<SeasonBundlesMap>({});
   const [bundlesLoading, setBundlesLoading] = useState(true);
+  const [transfers, setTransfers] = useState<TransferRumor[]>([]);
+  const [transfersLoading, setTransfersLoading] = useState(true);
 
   const refreshSeasons = useCallback(async () => {
     const rows = await fetchPublishedSeasons();
@@ -68,9 +74,12 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
 
   const refreshBundles = useCallback(async () => {
     setBundlesLoading(true);
+    setTransfersLoading(true);
     const map = await fetchSeasonBundles(viewedSeasonId);
     setBundles(map);
+    setTransfers(resolveTransfersFromBundles(map));
     setBundlesLoading(false);
+    setTransfersLoading(false);
   }, [viewedSeasonId]);
 
   useEffect(() => {
@@ -83,11 +92,14 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
     let cancelled = false;
     queueMicrotask(() => {
       setBundlesLoading(true);
+      setTransfersLoading(true);
     });
     void fetchSeasonBundles(viewedSeasonId).then((map) => {
       if (cancelled) return;
       setBundles(map);
+      setTransfers(resolveTransfersFromBundles(map));
       setBundlesLoading(false);
+      setTransfersLoading(false);
     });
     return () => {
       cancelled = true;
@@ -125,6 +137,8 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
       isViewingArchive: viewedSeasonId !== activeSeasonId,
       bundles,
       bundlesLoading,
+      transfers,
+      transfersLoading,
       setViewedSeasonId,
       refreshSeasons,
       refreshBundles,
@@ -134,6 +148,8 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
       activeSeasonId,
       bundles,
       bundlesLoading,
+      transfers,
+      transfersLoading,
       getFixtureSource,
       refreshBundles,
       refreshSeasons,

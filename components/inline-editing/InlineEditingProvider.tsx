@@ -15,6 +15,7 @@ import {
 } from "@/lib/cms/inline-overrides";
 import { SeasonManagerPanel } from "@/components/editor/SeasonManagerPanel";
 import { TeamCrestEditorPanel } from "@/components/editor/TeamCrestEditorPanel";
+import { TransferMarketEditorPanel } from "@/components/editor/TransferMarketEditorPanel";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
@@ -362,6 +363,7 @@ function InlineEditingToolbar({
   const [copied, setCopied] = useState(false);
   const [seasonPanelOpen, setSeasonPanelOpen] = useState(false);
   const [crestPanelOpen, setCrestPanelOpen] = useState(false);
+  const [transfersPanelOpen, setTransfersPanelOpen] = useState(false);
 
   if (!ready || !canEdit) return null;
 
@@ -396,6 +398,9 @@ function InlineEditingToolbar({
       {editMode && crestPanelOpen && (
         <TeamCrestEditorPanel onClose={() => setCrestPanelOpen(false)} />
       )}
+      {editMode && transfersPanelOpen && (
+        <TransferMarketEditorPanel onClose={() => setTransfersPanelOpen(false)} />
+      )}
       <div className="flex flex-wrap justify-end gap-2 rounded-full border border-[#214C9B]/20 bg-white/95 p-2 shadow-2xl backdrop-blur">
         {editMode && (
           <>
@@ -403,6 +408,7 @@ function InlineEditingToolbar({
               type="button"
               onClick={() => {
                 setCrestPanelOpen(false);
+                setTransfersPanelOpen(false);
                 setSeasonPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -413,11 +419,23 @@ function InlineEditingToolbar({
               type="button"
               onClick={() => {
                 setSeasonPanelOpen(false);
+                setTransfersPanelOpen(false);
                 setCrestPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
             >
               Escudos
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSeasonPanelOpen(false);
+                setCrestPanelOpen(false);
+                setTransfersPanelOpen((open) => !open);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+            >
+              Mercado
             </button>
             <button
               type="button"

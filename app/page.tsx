@@ -1,14 +1,11 @@
-import { HomeTransfersSection } from "@/components/fichajes/HomeTransfersSection";
+import { HomeTransfersGate } from "@/components/fichajes/HomeTransfersGate";
 import { HomeCompetitionSection } from "@/components/home/HomeCompetitionSection";
 import { HomeNewsTicker } from "@/components/home/HomeNewsTicker";
 import { Card } from "@/components/Card";
 import { NewsNavButton } from "@/components/NewsNavButton";
 import { PageHero } from "@/components/PageHero";
-import { hasAnyCarouselTransfers } from "@/lib/fichajes";
 
 export default function HomePage() {
-  const showTransfersSection = hasAnyCarouselTransfers();
-
   return (
     <div className="space-y-6">
       <PageHero
@@ -27,7 +24,7 @@ export default function HomePage() {
         <HomeNewsTicker />
       </Card>
 
-      {showTransfersSection && <HomeTransfersSection />}
+      <HomeTransfersGate />
     </div>
   );
 }

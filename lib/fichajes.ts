@@ -1,4 +1,5 @@
-import { players, transfers } from "@/data/mock";
+import { players, transfers as mockTransfers } from "@/data/mock";
+import { inferTransferKind, isLegacyLoanTransfer } from "@/lib/fichajes-kind";
 import {
   getPlayerClubAnnouncementNews,
   getPlayerNews,
@@ -13,16 +14,8 @@ import type { SquadPlayer } from "@/types/squad";
 
 const RAI_CLUB = "Real Avilés Industrial";
 
-/** Altas en calidad de cedidos (carrusel de cesiones en inicio). */
-export const LOAN_TRANSFER_IDS = new Set([
-  "t-alt-eze",
-  "t-alt-uzkudun",
-  "t-alt-nando",
-  "t-alt-ortega",
-]);
-
 export function isLoanTransfer(transfer: TransferRumor): boolean {
-  return LOAN_TRANSFER_IDS.has(transfer.id);
+  return inferTransferKind(transfer) === "cesion";
 }
 
 function normalizeName(value: string): string {
@@ -91,9 +84,7 @@ function rosterPlayerToSquadPlayer(player: Player): SquadPlayer {
 }
 
 export function getTransferKind(transfer: TransferRumor): TransferKind {
-  if (isLoanTransfer(transfer)) return "cesion";
-  if (transfer.category === "Renovaciones") return "renovacion";
-  return "fichaje";
+  return inferTransferKind(transfer);
 }
 
 export function getTransferKindLabel(kind: TransferKind): string {
@@ -102,7 +93,7 @@ export function getTransferKindLabel(kind: TransferKind): string {
   return "Fichaje";
 }
 
-export function getTransferById(id: string): TransferRumor | undefined {
+export function getTransferById(transfers: TransferRumor[], id: string): TransferRumor | undefined {
   return transfers.find((transfer) => transfer.id === id);
 }
 
@@ -117,18 +108,21 @@ export function resolveTransferPlayerId(transfer: TransferRumor): string | undef
   return match?.id;
 }
 
-export function getSquadPlayerForTransfer(transfer: TransferRumor): SquadPlayer | undefined {
-  const squad = getSquadPlayers("masculino");
+export function getSquadPlayerForTransfer(
+  transfer: TransferRumor,
+  squad?: SquadPlayer[],
+): SquadPlayer | undefined {
+  const squadList = squad ?? getSquadPlayers("masculino");
   const rosterPlayer = getRosterPlayerForTransfer(transfer);
   const playerId = rosterPlayer?.id ?? resolveTransferPlayerId(transfer);
 
   if (playerId) {
-    const byId = squad.find((player) => player.id === playerId);
+    const byId = squadList.find((player) => player.id === playerId);
     if (byId) return byId;
   }
 
   const normalized = normalizeName(transfer.playerName);
-  const byName = squad.find((player) => {
+  const byName = squadList.find((player) => {
     const full = normalizeName(`${player.nombre} ${player.apellido}`);
     const shortName = normalizeName(player.apellido || player.nombre);
     return full === normalized || shortName === normalized;
@@ -136,7 +130,7 @@ export function getSquadPlayerForTransfer(transfer: TransferRumor): SquadPlayer 
   if (byName) return byName;
 
   if (rosterPlayer) {
-    const byDorsal = squad.find((player) => player.dorsal === rosterPlayer.number);
+    const byDorsal = squadList.find((player) => player.dorsal === rosterPlayer.number);
     return byDorsal ?? rosterPlayerToSquadPlayer(rosterPlayer);
   }
 
@@ -159,24 +153,36 @@ function filterByMarketWindow(items: TransferRumor[], windowId?: TransferMarketW
 }
 
 function isOfficialMarketTransfer(transfer: TransferRumor): boolean {
+  if (transfer.category === "Bajas") return false;
   return (
     (transfer.category === "Altas" || transfer.category === "Renovaciones") && transfer.status === "Oficial"
   );
 }
 
+function officialMarketTransfers(transfers: TransferRumor[]): TransferRumor[] {
+  return transfers.filter(isOfficialMarketTransfer);
+}
+
 /** Todos los movimientos oficiales del carrusel de inicio (altas, renovaciones y cesiones). */
-export function getAllCarouselTransfers(windowId?: TransferMarketWindowId): TransferRumor[] {
-  return sortTransfersByDate(
-    filterByMarketWindow(transfers.filter(isOfficialMarketTransfer), windowId),
-  );
+export function getAllCarouselTransfers(
+  transfers: TransferRumor[],
+  windowId?: TransferMarketWindowId,
+): TransferRumor[] {
+  return sortTransfersByDate(filterByMarketWindow(officialMarketTransfers(transfers), windowId));
 }
 
 /** Altas oficiales en propiedad (agente libre u otro), sin cesiones. */
-export function getSigningCarouselTransfers(windowId?: TransferMarketWindowId): TransferRumor[] {
+export function getSigningCarouselTransfers(
+  transfers: TransferRumor[],
+  windowId?: TransferMarketWindowId,
+): TransferRumor[] {
   return sortTransfersByDate(
     filterByMarketWindow(
       transfers.filter(
-        (transfer) => transfer.category === "Altas" && transfer.status === "Oficial" && !isLoanTransfer(transfer),
+        (transfer) =>
+          transfer.category === "Altas" &&
+          transfer.status === "Oficial" &&
+          getTransferKind(transfer) === "fichaje",
       ),
       windowId,
     ),
@@ -184,65 +190,71 @@ export function getSigningCarouselTransfers(windowId?: TransferMarketWindowId): 
 }
 
 /** Renovaciones oficiales del carrusel de inicio. */
-export function getRenewalCarouselTransfers(windowId?: TransferMarketWindowId): TransferRumor[] {
+export function getRenewalCarouselTransfers(
+  transfers: TransferRumor[],
+  windowId?: TransferMarketWindowId,
+): TransferRumor[] {
   return sortTransfersByDate(
     filterByMarketWindow(
-      transfers.filter((transfer) => transfer.category === "Renovaciones" && transfer.status === "Oficial"),
+      transfers.filter(
+        (transfer) => transfer.category === "Renovaciones" && transfer.status === "Oficial",
+      ),
       windowId,
     ),
   );
 }
 
-/** Jugadores cedidos al club en la temporada 25/26. */
-export function getLoanTransfers(windowId?: TransferMarketWindowId): TransferRumor[] {
+/** Jugadores cedidos al club. */
+export function getLoanTransfers(transfers: TransferRumor[], windowId?: TransferMarketWindowId): TransferRumor[] {
   return sortTransfersByDate(
     filterByMarketWindow(
-      transfers.filter((transfer) => isLoanTransfer(transfer) && transfer.status === "Oficial"),
+      transfers.filter((transfer) => getTransferKind(transfer) === "cesion" && transfer.status === "Oficial"),
       windowId,
     ),
   );
 }
 
-export function hasCarouselTransfersForWindow(windowId: TransferMarketWindowId): boolean {
-  return getAllCarouselTransfers(windowId).length > 0;
+export function hasCarouselTransfersForWindow(transfers: TransferRumor[], windowId: TransferMarketWindowId): boolean {
+  return getAllCarouselTransfers(transfers, windowId).length > 0;
 }
 
-export function hasAnyCarouselTransfers(): boolean {
-  return getAllCarouselTransfers().length > 0;
+export function hasAnyCarouselTransfers(transfers: TransferRumor[]): boolean {
+  return getAllCarouselTransfers(transfers).length > 0;
 }
 
 export function getCarouselTransfersByMode(
+  transfers: TransferRumor[],
   mode: TransferCarouselMode,
   windowId?: TransferMarketWindowId,
 ): TransferRumor[] {
   switch (mode) {
     case "todos":
-      return getAllCarouselTransfers(windowId);
+      return getAllCarouselTransfers(transfers, windowId);
     case "fichajes":
-      return getSigningCarouselTransfers(windowId);
+      return getSigningCarouselTransfers(transfers, windowId);
     case "renovaciones":
-      return getRenewalCarouselTransfers(windowId);
+      return getRenewalCarouselTransfers(transfers, windowId);
     case "cesiones":
-      return getLoanTransfers(windowId);
+      return getLoanTransfers(transfers, windowId);
   }
 }
 
 /** Altas oficiales y renovaciones para carrusel de inicio (sin cesiones). */
-export function getFeaturedTransfers(): TransferRumor[] {
+export function getFeaturedTransfers(transfers: TransferRumor[]): TransferRumor[] {
   return sortTransfersByDate([
-    ...getSigningCarouselTransfers(),
-    ...getRenewalCarouselTransfers(),
+    ...getSigningCarouselTransfers(transfers),
+    ...getRenewalCarouselTransfers(transfers),
   ]);
 }
 
-/** Todas las altas oficiales de la temporada 25/26. */
-export function getOfficialAltas(): TransferRumor[] {
+/** Todas las altas oficiales (sin salidas ni rumores). */
+export function getOfficialAltas(transfers: TransferRumor[]): TransferRumor[] {
   return transfers
     .filter((transfer) => transfer.category === "Altas" && transfer.status === "Oficial")
     .sort((a, b) => b.date.localeCompare(a.date));
 }
 
-export function getTransferForPlayer(playerId: string): TransferRumor | undefined {
+export function getTransferForPlayer(transfers: TransferRumor[], playerId: string): TransferRumor | undefined {
   return transfers.find((transfer) => {
     if (transfer.playerId === playerId) return true;
     return resolveTransferPlayerId(transfer) === playerId;
@@ -282,8 +294,15 @@ export function getTransferOriginClub(transfer: TransferRumor): string {
   return transfer.originClub ?? "—";
 }
 
-export function getTransferDisplayName(transfer: TransferRumor): string {
-  const squadPlayer = getSquadPlayerForTransfer(transfer);
+export function getTransferDisplayName(transfer: TransferRumor, squad?: SquadPlayer[]): string {
+  const squadPlayer = getSquadPlayerForTransfer(transfer, squad);
   if (squadPlayer) return `${squadPlayer.nombre} ${squadPlayer.apellido}`;
   return transfer.playerName;
 }
+
+/** Mock completo (rumores incluidos); usar resolveTransfersFromBundles en la app. */
+export function getMockTransfersCatalog(): TransferRumor[] {
+  return mockTransfers;
+}
+
+export { isLegacyLoanTransfer };

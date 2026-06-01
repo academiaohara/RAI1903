@@ -13,7 +13,8 @@ import {
   formatPlayerAgeWithUnit,
   getPlayerFullName,
 } from "@/lib/squad-utils";
-import { getTransferForPlayer, getTransferKind } from "@/lib/fichajes";
+import { getTransferKind } from "@/lib/fichajes";
+import { useTransfers } from "@/hooks/useTransfers";
 import { formatFanRating } from "@/lib/format-fan-rating";
 import { usePublishedNews } from "@/hooks/usePublishedNews";
 import { useSeasonPlayerRatings } from "@/hooks/useSeasonPlayerRatings";
@@ -54,7 +55,8 @@ function PlayerModalContent({
   const { items: allNews } = usePublishedNews();
   const fanRating = averages[player.id] ?? null;
   const playerName = getPlayerFullName(player);
-  const transfer = getTransferForPlayer(player.id);
+  const { getForPlayer } = useTransfers();
+  const transfer = getForPlayer(player.id);
 
   const { clubAnnouncementNews, playerNews, announcementTone } = useMemo(() => {
     const announcementNews = getPlayerClubAnnouncementNews(allNews, player.id, {
