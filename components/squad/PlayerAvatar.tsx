@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import type { SquadPlayer } from "@/types/squad";
+import { squadPlayerImageRequiresUnoptimized } from "@/lib/squad-photos";
 import { getPlayerInitials } from "@/lib/squad-utils";
 
 type PlayerAvatarProps = {
@@ -54,6 +55,7 @@ export function PlayerAvatar({
           fill
           className={imageClassName}
           sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 12vw"
+          unoptimized={squadPlayerImageRequiresUnoptimized(player.foto)}
           priority={priority}
           loading={loading ?? (priority ? undefined : "lazy")}
         />

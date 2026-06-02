@@ -16,6 +16,7 @@ import {
 import { SeasonManagerPanel } from "@/components/editor/SeasonManagerPanel";
 import { TeamCrestEditorPanel } from "@/components/editor/TeamCrestEditorPanel";
 import { HomeLayoutEditorPanel } from "@/components/editor/HomeLayoutEditorPanel";
+import { MediaRaiSectionsEditorPanel } from "@/components/editor/MediaRaiSectionsEditorPanel";
 import { TransferMarketEditorPanel } from "@/components/editor/TransferMarketEditorPanel";
 import { SquadEditorPanel } from "@/components/editor/SquadEditorPanel";
 import { CompetitionEditorPanel } from "@/components/editor/CompetitionEditorPanel";
@@ -360,9 +361,21 @@ export function InlineEditingToolbar() {
   const [crestPanelOpen, setCrestPanelOpen] = useState(false);
   const [transfersPanelOpen, setTransfersPanelOpen] = useState(false);
   const [homePanelOpen, setHomePanelOpen] = useState(false);
+  const [mediaRaiPanelOpen, setMediaRaiPanelOpen] = useState(false);
   const [squadPanelOpen, setSquadPanelOpen] = useState(false);
   const [competitionPanelOpen, setCompetitionPanelOpen] = useState(false);
   const [teamsPanelOpen, setTeamsPanelOpen] = useState(false);
+
+  const closeEditorPanels = useCallback(() => {
+    setSeasonPanelOpen(false);
+    setCrestPanelOpen(false);
+    setTransfersPanelOpen(false);
+    setHomePanelOpen(false);
+    setMediaRaiPanelOpen(false);
+    setSquadPanelOpen(false);
+    setCompetitionPanelOpen(false);
+    setTeamsPanelOpen(false);
+  }, []);
 
   if (!ready || !canEdit) return null;
 
@@ -403,6 +416,9 @@ export function InlineEditingToolbar() {
       {editMode && homePanelOpen && (
         <HomeLayoutEditorPanel onClose={() => setHomePanelOpen(false)} />
       )}
+      {editMode && mediaRaiPanelOpen && (
+        <MediaRaiSectionsEditorPanel onClose={() => setMediaRaiPanelOpen(false)} />
+      )}
       {editMode && squadPanelOpen && <SquadEditorPanel onClose={() => setSquadPanelOpen(false)} />}
       {editMode && competitionPanelOpen && (
         <CompetitionEditorPanel onClose={() => setCompetitionPanelOpen(false)} />
@@ -414,12 +430,7 @@ export function InlineEditingToolbar() {
             <button
               type="button"
               onClick={() => {
-                setCrestPanelOpen(false);
-                setTransfersPanelOpen(false);
-                setHomePanelOpen(false);
-                setSquadPanelOpen(false);
-                setCompetitionPanelOpen(false);
-                setTeamsPanelOpen(false);
+                closeEditorPanels();
                 setSeasonPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -429,12 +440,7 @@ export function InlineEditingToolbar() {
             <button
               type="button"
               onClick={() => {
-                setSeasonPanelOpen(false);
-                setCrestPanelOpen(false);
-                setTransfersPanelOpen(false);
-                setHomePanelOpen(false);
-                setCompetitionPanelOpen(false);
-                setTeamsPanelOpen(false);
+                closeEditorPanels();
                 setSquadPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -444,12 +450,7 @@ export function InlineEditingToolbar() {
             <button
               type="button"
               onClick={() => {
-                setSeasonPanelOpen(false);
-                setCrestPanelOpen(false);
-                setTransfersPanelOpen(false);
-                setHomePanelOpen(false);
-                setSquadPanelOpen(false);
-                setTeamsPanelOpen(false);
+                closeEditorPanels();
                 setCompetitionPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -459,12 +460,7 @@ export function InlineEditingToolbar() {
             <button
               type="button"
               onClick={() => {
-                setSeasonPanelOpen(false);
-                setCrestPanelOpen(false);
-                setTransfersPanelOpen(false);
-                setHomePanelOpen(false);
-                setSquadPanelOpen(false);
-                setCompetitionPanelOpen(false);
+                closeEditorPanels();
                 setTeamsPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -474,12 +470,7 @@ export function InlineEditingToolbar() {
             <button
               type="button"
               onClick={() => {
-                setSeasonPanelOpen(false);
-                setTransfersPanelOpen(false);
-                setHomePanelOpen(false);
-                setSquadPanelOpen(false);
-                setCompetitionPanelOpen(false);
-                setTeamsPanelOpen(false);
+                closeEditorPanels();
                 setCrestPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -489,12 +480,7 @@ export function InlineEditingToolbar() {
             <button
               type="button"
               onClick={() => {
-                setSeasonPanelOpen(false);
-                setCrestPanelOpen(false);
-                setTransfersPanelOpen(false);
-                setSquadPanelOpen(false);
-                setCompetitionPanelOpen(false);
-                setTeamsPanelOpen(false);
+                closeEditorPanels();
                 setHomePanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -504,12 +490,17 @@ export function InlineEditingToolbar() {
             <button
               type="button"
               onClick={() => {
-                setSeasonPanelOpen(false);
-                setCrestPanelOpen(false);
-                setHomePanelOpen(false);
-                setSquadPanelOpen(false);
-                setCompetitionPanelOpen(false);
-                setTeamsPanelOpen(false);
+                closeEditorPanels();
+                setMediaRaiPanelOpen((open) => !open);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+            >
+              Media RAI
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                closeEditorPanels();
                 setTransfersPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"

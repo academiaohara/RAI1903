@@ -8,7 +8,8 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { AuthHeaderButton } from "@/components/auth/AuthHeaderButton";
 import { MobileNavDrawer } from "@/components/MobileNavDrawer";
-import { navItems, type NavItem } from "@/lib/navigation";
+import { useNavigationItems } from "@/lib/use-navigation-items";
+import type { NavItem } from "@/lib/navigation";
 import { shouldPrefetchRoute } from "@/lib/should-prefetch-route";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +20,7 @@ function isNavActive(pathname: string, item: NavItem) {
 
 export function Header() {
   const pathname = usePathname();
+  const navItems = useNavigationItems();
   const prefetch = shouldPrefetchRoute(pathname);
   const [open, setOpen] = useState(false);
   const [hoveredNav, setHoveredNav] = useState<NavItem | null>(null);
