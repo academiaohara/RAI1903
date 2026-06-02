@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTransferMarketEditOptional } from "@/components/editor/TransferMarketEditProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
 import {
   getAllCarouselTransfers,
@@ -16,29 +17,39 @@ import {
   hasCarouselTransfersForWindow,
 } from "@/lib/fichajes";
 import type { TransferCarouselMode } from "@/lib/fichajes";
+import { seasonTransfersBundlePayload, transfersFromBundle } from "@/lib/season/transfer-source";
 import type { TransferMarketWindowId } from "@/types";
 
 export function useTransfers() {
   const { transfers, transfersLoading } = useSeason();
+  const marketEdit = useTransferMarketEditOptional();
+
+  const effectiveTransfers = useMemo(() => {
+    if (!marketEdit?.hasDraft) return transfers;
+    return transfersFromBundle(seasonTransfersBundlePayload(marketEdit.entries), marketEdit.squad);
+  }, [marketEdit, transfers]);
 
   return useMemo(
     () => ({
-      transfers,
+      transfers: effectiveTransfers,
       loading: transfersLoading,
-      getById: (id: string) => getTransferById(transfers, id),
-      getForPlayer: (playerId: string) => getTransferForPlayer(transfers, playerId),
-      getAllCarousel: (windowId?: TransferMarketWindowId) => getAllCarouselTransfers(transfers, windowId),
-      getSigningCarousel: (windowId?: TransferMarketWindowId) => getSigningCarouselTransfers(transfers, windowId),
-      getRenewalCarousel: (windowId?: TransferMarketWindowId) => getRenewalCarouselTransfers(transfers, windowId),
-      getLoans: (windowId?: TransferMarketWindowId) => getLoanTransfers(transfers, windowId),
+      getById: (id: string) => getTransferById(effectiveTransfers, id),
+      getForPlayer: (playerId: string) => getTransferForPlayer(effectiveTransfers, playerId),
+      getAllCarousel: (windowId?: TransferMarketWindowId) => getAllCarouselTransfers(effectiveTransfers, windowId),
+      getSigningCarousel: (windowId?: TransferMarketWindowId) =>
+        getSigningCarouselTransfers(effectiveTransfers, windowId),
+      getRenewalCarousel: (windowId?: TransferMarketWindowId) =>
+        getRenewalCarouselTransfers(effectiveTransfers, windowId),
+      getLoans: (windowId?: TransferMarketWindowId) => getLoanTransfers(effectiveTransfers, windowId),
       getByMode: (mode: TransferCarouselMode, windowId?: TransferMarketWindowId) =>
-        getCarouselTransfersByMode(transfers, mode, windowId),
-      getFeatured: () => getFeaturedTransfers(transfers),
-      getOfficialAltas: () => getOfficialAltas(transfers),
-      hasAnyCarousel: () => hasAnyCarouselTransfers(transfers),
-      hasCarouselForWindow: (windowId: TransferMarketWindowId) => hasCarouselTransfersForWindow(transfers, windowId),
+        getCarouselTransfersByMode(effectiveTransfers, mode, windowId),
+      getFeatured: () => getFeaturedTransfers(effectiveTransfers),
+      getOfficialAltas: () => getOfficialAltas(effectiveTransfers),
+      hasAnyCarousel: () => hasAnyCarouselTransfers(effectiveTransfers),
+      hasCarouselForWindow: (windowId: TransferMarketWindowId) =>
+        hasCarouselTransfersForWindow(effectiveTransfers, windowId),
     }),
-    [transfers, transfersLoading],
+    [effectiveTransfers, transfersLoading],
   );
 }
 
