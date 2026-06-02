@@ -11,7 +11,9 @@ import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvi
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { buildMatchDetail } from "@/lib/match-detail";
 import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
-import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
+import { useSeason } from "@/components/season/SeasonProvider";
+import { resolveGroupTeams } from "@/lib/cms/group-teams";
+import { resolveFixtureTeamName } from "@/lib/cms/resolve-fixture-team-name";
 import { scorerLabelForPlayer } from "@/lib/squad-player-resolve";
 import {
   actualAvilesScorer,
@@ -99,7 +101,20 @@ export function PredictionForm({
   onChange: (prediction: Prediction) => void;
 }) {
   const [previewOpen, setPreviewOpen] = useState(false);
-  const { teams } = useMasculinoLeagueSeason();
+  const { bundles } = useSeason();
+  const teams = useMemo(() => resolveGroupTeams(bundles, "masculino", "1"), [bundles]);
+  const homeTeamName = useMemo(
+    () =>
+      getTeamById(match.homeTeamId, teams)?.name ??
+      resolveFixtureTeamName(match.homeTeamId, match.homeTeam, bundles, "masculino", "1"),
+    [bundles, match.homeTeam, match.homeTeamId, teams],
+  );
+  const awayTeamName = useMemo(
+    () =>
+      getTeamById(match.awayTeamId, teams)?.name ??
+      resolveFixtureTeamName(match.awayTeamId, match.awayTeam, bundles, "masculino", "1"),
+    [bundles, match.awayTeam, match.awayTeamId, teams],
+  );
   const { getPrevia } = useSeasonMatchArticles();
   const avilesMatch = isAvilesMatch(match);
   const avilesIsHome = match.homeTeamId === RAI_TEAM_ID;
@@ -190,16 +205,16 @@ export function PredictionForm({
           <div className="min-w-0 flex-1">
             <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4">
               <div className="flex min-w-0 items-center gap-2 rounded-xl bg-slate-50 p-3 sm:bg-transparent sm:p-0">
-                <TeamLink gender="masculino" teamId={match.homeTeamId} teamName={match.homeTeam} className="shrink-0">
-                  <OpponentCrest logo={homeCrest} opponent={match.homeTeam} size="sm" className="shrink-0" />
+                <TeamLink gender="masculino" teamId={match.homeTeamId} teamName={homeTeamName} className="shrink-0">
+                  <OpponentCrest logo={homeCrest} opponent={homeTeamName} size="sm" className="shrink-0" />
                 </TeamLink>
                 <TeamLink
                   gender="masculino"
                   teamId={match.homeTeamId}
-                  teamName={match.homeTeam}
+                  teamName={homeTeamName}
                   className="min-w-0 truncate font-extrabold leading-tight text-slate-800"
                 >
-                  {match.homeTeam}
+                  {homeTeamName}
                 </TeamLink>
                 {avilesMatch && (
                   <GoalsPickButtons
@@ -213,16 +228,16 @@ export function PredictionForm({
               </div>
               <span className="self-center shrink-0 text-xs font-bold uppercase text-slate-400">vs</span>
               <div className="flex min-w-0 items-center gap-2 rounded-xl bg-slate-50 p-3 sm:bg-transparent sm:p-0">
-                <TeamLink gender="masculino" teamId={match.awayTeamId} teamName={match.awayTeam} className="shrink-0">
-                  <OpponentCrest logo={awayCrest} opponent={match.awayTeam} size="sm" className="shrink-0" />
+                <TeamLink gender="masculino" teamId={match.awayTeamId} teamName={awayTeamName} className="shrink-0">
+                  <OpponentCrest logo={awayCrest} opponent={awayTeamName} size="sm" className="shrink-0" />
                 </TeamLink>
                 <TeamLink
                   gender="masculino"
                   teamId={match.awayTeamId}
-                  teamName={match.awayTeam}
+                  teamName={awayTeamName}
                   className="min-w-0 truncate font-extrabold leading-tight text-slate-800"
                 >
-                  {match.awayTeam}
+                  {awayTeamName}
                 </TeamLink>
                 {avilesMatch && (
                   <GoalsPickButtons

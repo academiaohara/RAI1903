@@ -3,9 +3,13 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { Modal } from "@/components/Modal";
+import { useSeason } from "@/components/season/SeasonProvider";
 import { canLinkEquipoLiga, equipoLigaHref } from "@/lib/equipo-liga";
 import { players } from "@/data/mock";
 import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
+import { groupSlotToTeam, resolveGroupTeams } from "@/lib/cms/group-teams";
+import { resolveFixtureTeamName } from "@/lib/cms/resolve-fixture-team-name";
+import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import {
   getTeamHomeAwayRecordBeforeRound,
   getTeamsBeforeRound,
@@ -15,6 +19,21 @@ import type { HomeAwayRecord } from "@/lib/standings";
 import type { FormCode, Match, Team } from "@/types";
 
 const formLabel: Record<FormCode, string> = { G: "G", E: "E", P: "P" };
+
+function resolvePreviewTeam(
+  teamId: string,
+  matchName: string,
+  teamsBeforeRound: Team[],
+  allTeams: Team[],
+  bundles: SeasonBundlesMap,
+): Team {
+  const fromStandings =
+    teamsBeforeRound.find((team) => team.id === teamId) ?? allTeams.find((team) => team.id === teamId);
+  if (fromStandings) return fromStandings;
+
+  const name = resolveFixtureTeamName(teamId, matchName, bundles, "masculino", "1");
+  return groupSlotToTeam({ id: teamId, name }, 0);
+}
 
 function TeamPreviewBlock({
   team,
@@ -88,14 +107,22 @@ function TeamPreviewBlock({
 }
 
 export function MatchPreviewModal({ match, open, onClose }: { match: Match; open: boolean; onClose: () => void }) {
-  const { teams, leagueMatchdays } = useMasculinoLeagueSeason();
+  const { bundles } = useSeason();
+  const { leagueMatchdays } = useMasculinoLeagueSeason();
+  const teams = useMemo(() => resolveGroupTeams(bundles, "masculino", "1"), [bundles]);
   const beforeRound = match.matchday;
   const teamsBeforeRound = useMemo(
     () => getTeamsBeforeRound(leagueMatchdays, teams, beforeRound),
     [beforeRound, leagueMatchdays, teams],
   );
-  const homeTeam = teamsBeforeRound.find((team) => team.id === match.homeTeamId) ?? teams[0];
-  const awayTeam = teamsBeforeRound.find((team) => team.id === match.awayTeamId) ?? teams[0];
+  const homeTeam = useMemo(
+    () => resolvePreviewTeam(match.homeTeamId, match.homeTeam, teamsBeforeRound, teams, bundles),
+    [match.homeTeamId, match.homeTeam, teamsBeforeRound, teams, bundles],
+  );
+  const awayTeam = useMemo(
+    () => resolvePreviewTeam(match.awayTeamId, match.awayTeam, teamsBeforeRound, teams, bundles),
+    [match.awayTeamId, match.awayTeam, teamsBeforeRound, teams, bundles],
+  );
   const homeSideRecord = useMemo(
     () => getTeamHomeAwayRecordBeforeRound(match.homeTeamId, "home", beforeRound, leagueMatchdays),
     [match.homeTeamId, beforeRound, leagueMatchdays],
@@ -108,7 +135,7 @@ export function MatchPreviewModal({ match, open, onClose }: { match: Match; open
   if (isAvilesMatch(match)) return null;
 
   return (
-    <Modal open={open} title={`Previa · ${match.homeTeam} vs ${match.awayTeam}`} onClose={onClose}>
+    <Modal open={open} title={`Previa · ${homeTeam.name} vs ${awayTeam.name}`} onClose={onClose}>
       <div className="grid gap-4 md:grid-cols-2">
         <TeamPreviewBlock team={homeTeam} sideRecord={homeSideRecord} side="home" teamId={match.homeTeamId} />
         <TeamPreviewBlock team={awayTeam} sideRecord={awaySideRecord} side="away" teamId={match.awayTeamId} />
