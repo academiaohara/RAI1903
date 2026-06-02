@@ -1,5 +1,6 @@
 import { players, transfers as mockTransfers } from "@/data/mock";
 import { inferTransferKind, isLegacyLoanTransfer } from "@/lib/fichajes-kind";
+import { parseClubAnnouncementField } from "@/lib/club-announcement";
 import {
   getPlayerClubAnnouncementNews,
   getPlayerNews,
@@ -265,14 +266,24 @@ export function getTransferClubAnnouncementNews(
   transfer: TransferRumor,
   allNews: NewsItem[],
 ): NewsItem | undefined {
-  const playerId = resolveTransferPlayerId(transfer);
-  if (playerId) {
-    return getPlayerClubAnnouncementNews(allNews, playerId, {
+  if (transfer.clubAnnouncementNewsId) {
+    return getPlayerClubAnnouncementNews(allNews, transfer.playerId ?? "", {
       announcementNewsId: transfer.clubAnnouncementNewsId,
       playerName: transfer.playerName,
     });
   }
-  return undefined;
+
+  const parsed = parseClubAnnouncementField(transfer.clubAnnouncement);
+  if (parsed.url) {
+    return undefined;
+  }
+
+  const playerId = resolveTransferPlayerId(transfer);
+  if (!playerId) return undefined;
+
+  return getPlayerClubAnnouncementNews(allNews, playerId, {
+    playerName: transfer.playerName,
+  });
 }
 
 export function getTransferPlayerNews(transfer: TransferRumor, allNews: NewsItem[]): NewsItem[] {

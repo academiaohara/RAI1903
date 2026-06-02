@@ -46,7 +46,16 @@ export function parseClubAnnouncementField(value: string | undefined): {
   return { url: null, legacyText: trimmed };
 }
 
-const INLINE_ANNOUNCEMENT_ID = "club-announcement-inline";
+export const CLUB_ANNOUNCEMENT_INLINE_ID = "club-announcement-inline";
+
+/** Noticia del CMS enlazada explícitamente al movimiento (no autodetección por nombre). */
+export function linkedClubAnnouncementNews(
+  transfer: TransferRumor | undefined,
+  candidate?: NewsItem,
+): NewsItem | undefined {
+  if (!transfer?.clubAnnouncementNewsId || !candidate) return undefined;
+  return candidate.id === transfer.clubAnnouncementNewsId ? candidate : undefined;
+}
 
 /** Noticia para mostrar el comunicado con foto y titular (vinculada o sintetizada). */
 export function clubAnnouncementNewsItem(
@@ -64,7 +73,7 @@ export function clubAnnouncementNewsItem(
       titleEnd > 0 && titleEnd < 100 ? text.slice(0, titleEnd + 1) : text.length > 90 ? `${text.slice(0, 87)}…` : text;
 
     return {
-      id: INLINE_ANNOUNCEMENT_ID,
+      id: CLUB_ANNOUNCEMENT_INLINE_ID,
       channel: "club",
       source,
       date,
@@ -80,7 +89,7 @@ export function clubAnnouncementNewsItem(
     const title = announcement.title?.trim();
     const excerpt = announcement.excerpt?.trim();
     return {
-      id: INLINE_ANNOUNCEMENT_ID,
+      id: CLUB_ANNOUNCEMENT_INLINE_ID,
       channel: "club",
       source,
       date,
@@ -118,7 +127,7 @@ export function clubAnnouncementFromTransfer(
       excerpt: transfer.clubAnnouncementExcerpt,
       imageUrl: transfer.clubAnnouncementImageUrl,
       date: metaDate ?? transfer.date,
-      newsItem: announcementNews,
+      newsItem: linkedClubAnnouncementNews(transfer, announcementNews),
     };
   }
 
