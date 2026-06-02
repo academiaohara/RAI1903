@@ -1,4 +1,4 @@
-import { listStadiumAssets } from "@/lib/asset-catalog";
+import { listStadiumAssets } from "@/lib/stadium-assets";
 import { fetchEditorSeasons } from "@/lib/cms/seasons-editor";
 import {
   bundleMapKey,

@@ -1,29 +1,18 @@
 import { ESCUDO_PATHS } from "@/lib/escudo-manifest";
-import { scanCrestAssetsFromDisk } from "@/lib/escudos-scan";
 import { STADIUM_PATHS } from "@/lib/stadium-manifest";
+import type { AssetCatalogEntry } from "@/lib/asset-catalog-types";
 
-export type AssetCatalogEntry = {
-  slug: string;
-  path: string;
-  kind: "crest" | "stadium";
-};
+export type { AssetCatalogEntry } from "@/lib/asset-catalog-types";
 
-/** Catálogo estático (manifest). En servidor preferir listCrestAssets(). */
+/** Catálogo estático (manifest). Seguro en cliente y servidor. */
 export function listCrestAssetsFromManifest(): AssetCatalogEntry[] {
   return Object.entries(ESCUDO_PATHS)
     .map(([slug, path]) => ({ slug, path, kind: "crest" as const }))
     .sort((a, b) => a.slug.localeCompare(b.slug, "es"));
 }
 
-/** Imágenes en GitHub: public/escudos, Escudos/ y manifest. */
+/** Manifest de escudos (sin lectura de disco). En API usar scanCrestAssetsFromDisk. */
 export function listCrestAssets(): AssetCatalogEntry[] {
-  if (typeof window === "undefined") {
-    try {
-      return scanCrestAssetsFromDisk();
-    } catch {
-      return listCrestAssetsFromManifest();
-    }
-  }
   return listCrestAssetsFromManifest();
 }
 
@@ -38,7 +27,5 @@ export function crestPathFromSlug(slug: string): string | undefined {
 }
 
 export function findCrestAssetByPath(path: string): AssetCatalogEntry | undefined {
-  return listCrestAssets().find((entry) => entry.path === path);
+  return listCrestAssetsFromManifest().find((entry) => entry.path === path);
 }
-
-export { scanCrestAssetsFromDisk };
