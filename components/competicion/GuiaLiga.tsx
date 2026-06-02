@@ -8,11 +8,13 @@ import { Card } from "@/components/Card";
 import { GuiaLigaGroupEditor } from "@/components/competicion/GuiaLigaGroupEditor";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
+import { RAI_TEAM_ID } from "@/data/mock";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { canLinkEquipoLiga, equipoLigaHref } from "@/lib/equipo-liga";
-import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import type { Team } from "@/types";
+import type { Route } from "next";
 
 type GuiaLigaProps = {
   gender: PrimerEquipoGender;
@@ -22,6 +24,13 @@ type GuiaLigaProps = {
 
 function isPlaceholderTeam(team: Team): boolean {
   return /^Equipo \d+$/.test(team.name);
+}
+
+function guiaLigaTeamHref(gender: PrimerEquipoGender, teamId: string): Route {
+  if (teamId === RAI_TEAM_ID) {
+    return `${primerEquipoBase(gender)}/plantilla` as Route;
+  }
+  return equipoLigaHref(gender, teamId);
 }
 
 export function GuiaLiga({ gender, teams, grupo }: GuiaLigaProps) {
@@ -77,9 +86,11 @@ export function GuiaLiga({ gender, teams, grupo }: GuiaLigaProps) {
             return (
               <Link
                 key={team.id}
-                href={equipoLigaHref(gender, team.id)}
+                href={guiaLigaTeamHref(gender, team.id)}
                 className="group flex aspect-square items-center justify-center p-1 transition hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#214C9B]"
-                aria-label={`Ver ficha de ${team.name}`}
+                aria-label={
+                  team.id === RAI_TEAM_ID ? `Ver plantilla de ${team.name}` : `Ver ficha de ${team.name}`
+                }
                 title={team.name}
               >
                 {crest}
