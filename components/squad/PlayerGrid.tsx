@@ -11,9 +11,18 @@ type PlayerGridProps = {
   onSelect: (player: SquadPlayer) => void;
   variant?: "default" | "fichas";
   showEmptyPositions?: boolean;
+  editMode?: boolean;
+  onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
 };
 
-export function PlayerGrid({ players, onSelect, variant = "default", showEmptyPositions = false }: PlayerGridProps) {
+export function PlayerGrid({
+  players,
+  onSelect,
+  variant = "default",
+  showEmptyPositions = false,
+  editMode = false,
+  onQuickUpdate,
+}: PlayerGridProps) {
   const grouped = groupPlayersByPosition(players);
   const isFichas = variant === "fichas";
 
@@ -36,7 +45,15 @@ export function PlayerGrid({ players, onSelect, variant = "default", showEmptyPo
                 <p className="col-span-full text-sm font-semibold text-slate-400">Sin jugadores en esta posición</p>
               ) : (
                 list.map((player, index) => (
-                  <PlayerCard key={player.id} player={player} onSelect={onSelect} index={index} variant={variant} />
+                  <PlayerCard
+                    key={player.id}
+                    player={player}
+                    onSelect={onSelect}
+                    index={index}
+                    variant={variant}
+                    editMode={editMode}
+                    onQuickUpdate={onQuickUpdate}
+                  />
                 ))
               )}
             </div>

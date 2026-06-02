@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
+import { TransferMarketOnPageEditor } from "@/components/editor/TransferMarketOnPageEditor";
 import { TransferFichaCard } from "@/components/fichajes/TransferFichaCard";
 import { TransferFichaCardPlaceholder } from "@/components/fichajes/TransferFichaCardPlaceholder";
 import { TransferMarketWindowSelector } from "@/components/fichajes/TransferMarketWindowSelector";
@@ -61,6 +62,9 @@ export function FichajesPageClient() {
           />
         }
       />
+
+      <TransferMarketOnPageEditor />
+
       {loading ? (
         <p className="text-sm font-bold text-slate-500">Cargando mercado…</p>
       ) : featured.length === 0 ? (

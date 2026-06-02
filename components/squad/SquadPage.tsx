@@ -64,6 +64,13 @@ export function SquadPage({ gender }: SquadPageProps) {
 
   const handleStadiumClick = () => setStadiumOpen(true);
 
+  const handleQuickUpdate = useCallback(
+    (playerId: string, patch: Partial<SquadPlayer>) => {
+      updatePlayer(playerId, patch);
+    },
+    [updatePlayer],
+  );
+
   const handleAddPlayer = useCallback(
     async (position: Parameters<typeof addPlayer>[0]) => {
       setAddBusy(true);
@@ -106,6 +113,8 @@ export function SquadPage({ gender }: SquadPageProps) {
               showMarketValue={!isFemenino}
               showAge={!isFemenino}
               showEmptyPositions={editMode}
+              editMode={editMode}
+              onQuickUpdate={editMode ? handleQuickUpdate : undefined}
             />
           ) : (
             <PlayerGrid
@@ -113,6 +122,8 @@ export function SquadPage({ gender }: SquadPageProps) {
               onSelect={setSelected}
               variant="fichas"
               showEmptyPositions={editMode}
+              editMode={editMode}
+              onQuickUpdate={editMode ? handleQuickUpdate : undefined}
             />
           )}
         </motion.div>

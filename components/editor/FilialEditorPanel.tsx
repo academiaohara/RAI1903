@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { EditorPanelFrame } from "@/components/editor/EditorPanelFrame";
+import { OnPageEditorSection } from "@/components/editor/OnPageEditorSection";
 import { useSeason } from "@/components/season/SeasonProvider";
 import {
   defaultFilialCompetitionConfig,
@@ -27,7 +28,8 @@ const COLOR_PRESETS = [
 type EditorTab = "plantilla" | "calendario" | "competicion";
 
 type FilialEditorPanelProps = {
-  onClose: () => void;
+  onClose?: () => void;
+  variant?: "panel" | "inline";
 };
 
 function newZone(): CompetitionZoneRule {
@@ -69,7 +71,7 @@ function emptyPartido(): FilialFixturePartido {
   };
 }
 
-export function FilialEditorPanel({ onClose }: FilialEditorPanelProps) {
+export function FilialEditorPanel({ onClose, variant = "panel" }: FilialEditorPanelProps) {
   const { viewedSeasonId, viewedSeason, bundles, refreshBundles } = useSeason();
   const [tab, setTab] = useState<EditorTab>("plantilla");
   const [squad, setSquad] = useState<CanteraSquadImport | null>(null);
@@ -181,34 +183,29 @@ export function FilialEditorPanel({ onClose }: FilialEditorPanelProps) {
     });
   };
 
-  return (
-    <EditorPanelFrame
-      title="Filial (Real Avilés B)"
-      subtitle={`${viewedSeason.label} · clasificación calculada desde resultados`}
-      onClose={onClose}
-      busy={busy}
-      message={message}
-      footer={
-        <div className="flex flex-col gap-2">
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => void saveAll()}
-            className="w-full rounded-xl bg-[#214C9B] px-4 py-2.5 text-xs font-extrabold uppercase text-white hover:bg-[#173a78] disabled:opacity-60"
-          >
-            Guardar filial
-          </button>
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => void importMock()}
-            className="w-full rounded-xl border border-[#214C9B]/30 px-4 py-2.5 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50 disabled:opacity-60"
-          >
-            Importar datos 25/26 del repo
-          </button>
-        </div>
-      }
-    >
+  const footer = (
+    <div className="flex flex-col gap-2">
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => void saveAll()}
+        className="w-full rounded-xl bg-[#214C9B] px-4 py-2.5 text-xs font-extrabold uppercase text-white hover:bg-[#173a78] disabled:opacity-60"
+      >
+        Guardar filial
+      </button>
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => void importMock()}
+        className="w-full rounded-xl border border-[#214C9B]/30 px-4 py-2.5 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50 disabled:opacity-60"
+      >
+        Importar datos 25/26 del repo
+      </button>
+    </div>
+  );
+
+  const editorBody = (
+    <>
       <div className="mb-4 flex flex-wrap gap-2">
         {(
           [
@@ -658,6 +655,41 @@ export function FilialEditorPanel({ onClose }: FilialEditorPanelProps) {
           ))}
         </div>
       )}
+    </>
+  );
+
+  if (variant === "inline") {
+    return (
+      <OnPageEditorSection
+        title="Editar filial (Real Avilés B)"
+        description={`${viewedSeason.label} · plantilla, calendario y competición. La clasificación se calcula desde los resultados.`}
+      >
+        {editorBody}
+        {message ? (
+          <p
+            className={`mt-3 text-xs font-bold ${message.includes("Error") ? "text-[#981915]" : "text-emerald-700"}`}
+          >
+            {message}
+          </p>
+        ) : null}
+        <div className="mt-4">{footer}</div>
+        {busy ? (
+          <p className="mt-2 text-xs font-bold text-slate-500">Guardando…</p>
+        ) : null}
+      </OnPageEditorSection>
+    );
+  }
+
+  return (
+    <EditorPanelFrame
+      title="Filial (Real Avilés B)"
+      subtitle={`${viewedSeason.label} · clasificación calculada desde resultados`}
+      onClose={onClose ?? (() => {})}
+      busy={busy}
+      message={message}
+      footer={footer}
+    >
+      {editorBody}
     </EditorPanelFrame>
   );
 }
