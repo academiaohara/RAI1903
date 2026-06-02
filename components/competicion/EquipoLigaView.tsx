@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card } from "@/components/Card";
 import { EquipoLigaSquad } from "@/components/competicion/EquipoLigaSquad";
+import { EquipoLigaTeamSummary } from "@/components/competicion/EquipoLigaTeamSummary";
 import { LeagueTable } from "@/components/LeagueTable";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import { getLeagueZoneStandingsWindow } from "@/lib/standings-window";
@@ -12,9 +13,11 @@ type EquipoLigaViewProps = {
   gender: PrimerEquipoGender;
   team: Team;
   allTeams: Team[];
+  /** Grupo II y similares: sin plantilla de jugadores, solo datos básicos + clasificación. */
+  showDetailedSquad?: boolean;
 };
 
-export function EquipoLigaView({ gender, team, allTeams }: EquipoLigaViewProps) {
+export function EquipoLigaView({ gender, team, allTeams, showDetailedSquad = true }: EquipoLigaViewProps) {
   const windowTeams = getLeagueZoneStandingsWindow(allTeams, team.id);
   const clubHighlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
   const backHref = `${primerEquipoBase(gender)}/competicion` as Route;
@@ -28,7 +31,11 @@ export function EquipoLigaView({ gender, team, allTeams }: EquipoLigaViewProps) 
         ← Volver a competicion
       </Link>
 
-      <EquipoLigaSquad gender={gender} team={team} />
+      {showDetailedSquad ? (
+        <EquipoLigaSquad gender={gender} team={team} />
+      ) : (
+        <EquipoLigaTeamSummary team={team} />
+      )}
 
       <Card eyebrow="Clasificacion" title="Tu zona en la liga" borderlessHeader>
         <LeagueTable

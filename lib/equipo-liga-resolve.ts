@@ -1,5 +1,6 @@
 import { getGroupTeamSlots, groupSlotToTeam } from "@/lib/cms/group-teams";
 import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
+import { isRaiCompetitionTeam } from "@/lib/competicion-squad";
 import { getTeamByGender } from "@/lib/fixtures";
 import { isTeamInRfefGrupo, isTeamInRfefGrupo1, type RfefGrupoId } from "@/lib/rfef-grupos";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -36,6 +37,21 @@ export function resolveEquipoLigaTeam(
   }
 
   return undefined;
+}
+
+
+/** Plantilla detallada solo en el grupo del Avilés (Grupo I); en Grupo II basta la clasificación. */
+export function shouldShowDetailedRivalSquad(
+  gender: PrimerEquipoGender,
+  teamId: string,
+  bundles?: SeasonBundlesMap,
+): boolean {
+  if (gender === "femenino" || isRaiCompetitionTeam(teamId, gender)) {
+    return true;
+  }
+  const grupo = findGrupoForTeamId(teamId, gender, bundles);
+  if (grupo) return grupo === "1";
+  return isTeamInRfefGrupo1(teamId);
 }
 
 export function canLinkEquipoLiga(

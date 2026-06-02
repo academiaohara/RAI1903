@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import { EquipoLigaView } from "@/components/competicion/EquipoLigaView";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
-import { canLinkEquipoLiga, findGrupoForTeamId, resolveEquipoLigaTeam } from "@/lib/equipo-liga-resolve";
+import {
+  canLinkEquipoLiga,
+  findGrupoForTeamId,
+  resolveEquipoLigaTeam,
+  shouldShowDetailedRivalSquad,
+} from "@/lib/equipo-liga-resolve";
 import { getAllTeamsForGender } from "@/lib/fixtures";
 import { getTeamsForRfefGrupo, isTeamInRfefGrupo1 } from "@/lib/rfef-grupos";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -40,6 +45,11 @@ export function EquipoLigaPageClient({ gender, teamId }: EquipoLigaPageClientPro
     return getTeamsForRfefGrupo("2");
   }, [bundles, gender, teamId]);
 
+  const showDetailedSquad = useMemo(
+    () => shouldShowDetailedRivalSquad(gender, teamId, bundles),
+    [bundles, gender, teamId],
+  );
+
   useEffect(() => {
     if (bundlesLoading) return;
     if (!team || !canLinkEquipoLiga(gender, teamId, bundles)) {
@@ -51,5 +61,12 @@ export function EquipoLigaPageClient({ gender, teamId }: EquipoLigaPageClientPro
     return <p className="text-sm font-bold text-slate-500">Cargando ficha del equipo…</p>;
   }
 
-  return <EquipoLigaView gender={gender} team={team} allTeams={allTeams} />;
+  return (
+    <EquipoLigaView
+      gender={gender}
+      team={team}
+      allTeams={allTeams}
+      showDetailedSquad={showDetailedSquad}
+    />
+  );
 }

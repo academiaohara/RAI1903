@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useSeasonOptional } from "@/components/season/SeasonProvider";
 import { canLinkEquipoLiga, equipoLigaHref } from "@/lib/equipo-liga";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { cn } from "@/lib/utils";

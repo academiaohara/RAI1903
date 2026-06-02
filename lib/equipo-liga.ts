@@ -1,12 +1,13 @@
 import {
   canLinkEquipoLiga as canLinkEquipoLigaImpl,
   resolveEquipoLigaTeam,
+  shouldShowDetailedRivalSquad,
 } from "@/lib/equipo-liga-resolve";
 import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Route } from "next";
 
-export { resolveEquipoLigaTeam };
+export { resolveEquipoLigaTeam, shouldShowDetailedRivalSquad };
 
 /** Ruta de la ficha de un rival de liga (Primer Equipo → Competición). */
 export function equipoLigaHref(gender: PrimerEquipoGender, teamId: string): Route {
