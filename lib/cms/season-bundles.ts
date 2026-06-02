@@ -8,7 +8,7 @@ import type { SeasonCompetitionConfigBundle } from "@/lib/cms/competition-config
 import type { SeasonTeamsBundle } from "@/lib/cms/teams-bundle";
 import type { SquadClubInfo, SquadPlayer } from "@/types/squad";
 
-export type SeasonBundleScope = PrimerEquipoGender | "global";
+export type SeasonBundleScope = PrimerEquipoGender | "global" | "filial";
 
 export type SeasonBundleKey =
   | "fixtures"

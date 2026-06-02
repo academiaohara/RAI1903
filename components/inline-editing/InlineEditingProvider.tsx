@@ -21,6 +21,7 @@ import { TransferMarketEditorPanel } from "@/components/editor/TransferMarketEdi
 import { SquadEditorPanel } from "@/components/editor/SquadEditorPanel";
 import { CompetitionEditorPanel } from "@/components/editor/CompetitionEditorPanel";
 import { TeamsEditorPanel } from "@/components/editor/TeamsEditorPanel";
+import { FilialEditorPanel } from "@/components/editor/FilialEditorPanel";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
@@ -391,6 +392,7 @@ export function InlineEditingToolbar() {
   const [squadPanelOpen, setSquadPanelOpen] = useState(false);
   const [competitionPanelOpen, setCompetitionPanelOpen] = useState(false);
   const [teamsPanelOpen, setTeamsPanelOpen] = useState(false);
+  const [filialPanelOpen, setFilialPanelOpen] = useState(false);
 
   const closeEditorPanels = useCallback(() => {
     setSeasonPanelOpen(false);
@@ -401,6 +403,7 @@ export function InlineEditingToolbar() {
     setSquadPanelOpen(false);
     setCompetitionPanelOpen(false);
     setTeamsPanelOpen(false);
+    setFilialPanelOpen(false);
   }, []);
 
   if (!ready || !canEdit) return null;
@@ -462,6 +465,7 @@ export function InlineEditingToolbar() {
         <CompetitionEditorPanel onClose={() => setCompetitionPanelOpen(false)} />
       )}
       {editMode && teamsPanelOpen && <TeamsEditorPanel onClose={() => setTeamsPanelOpen(false)} />}
+      {editMode && filialPanelOpen && <FilialEditorPanel onClose={() => setFilialPanelOpen(false)} />}
       <div className="flex flex-wrap justify-end gap-2 rounded-full border border-[#214C9B]/20 bg-white/95 p-2 shadow-2xl backdrop-blur">
         {editMode && (
           <>
@@ -555,6 +559,16 @@ export function InlineEditingToolbar() {
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
             >
               Mercado
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                closeEditorPanels();
+                setFilialPanelOpen((open) => !open);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+            >
+              Filial
             </button>
             <button
               type="button"

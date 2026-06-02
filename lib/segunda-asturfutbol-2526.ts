@@ -60,7 +60,7 @@ type TeamSeed = {
   colors: [string, string];
 };
 
-const TEAM_SEEDS: TeamSeed[] = [
+export const TEAM_SEEDS: TeamSeed[] = [
   { id: "filial-real-aviles-b", name: "Real Avilés B", shortName: "Avilés B", city: "Avilés", stadium: "Muro de Zaro", crestInitials: "RAB", colors: ["#214C9B", "#FFFFFF"] },
   { id: "cd-treviense", name: "C.D. Treviense", shortName: "Treviense", city: "Trevías", stadium: "El Pando", crestInitials: "TRE", colors: ["#166534", "#FFFFFF"] },
   { id: "navia-cf", name: "Navia CF", shortName: "Navia", city: "Navia", stadium: "Tabiella", crestInitials: "NAV", colors: ["#DC2626", "#FFFFFF"] },
