@@ -81,7 +81,10 @@ export function mergeTransferMarketWindows(
       byId.set(id, { id, label: humanizeWindowId(id) });
     }
   }
-  const orderedIds = [...configured.map((window) => window.id)];
+  const orderedIds: string[] = [];
+  for (const window of configured) {
+    if (!orderedIds.includes(window.id)) orderedIds.push(window.id);
+  }
   for (const id of byId.keys()) {
     if (!orderedIds.includes(id)) orderedIds.push(id);
   }

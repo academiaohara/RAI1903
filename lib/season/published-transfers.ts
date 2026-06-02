@@ -22,15 +22,18 @@ export type PublishedTransfersSnapshot = {
 };
 
 function mergeSeasonTransferWindows(maps: SeasonBundlesMap[]): TransferMarketWindow[] {
-  const configured: CmsTransferMarketWindow[] = [];
+  const configuredById = new Map<string, CmsTransferMarketWindow>();
   const entries: Array<{ date: string; marketWindowId?: string }> = [];
 
   for (const map of maps) {
     const bundle = getTransfersBundle(map);
     if (!bundle) continue;
-    if (bundle.windows?.length) configured.push(...bundle.windows);
+    for (const window of bundle.windows ?? []) {
+      if (!configuredById.has(window.id)) configuredById.set(window.id, window);
+    }
     entries.push(...bundle.entries);
   }
+  const configured = [...configuredById.values()];
 
   if (!configured.length && !entries.length) {
     return resolveTransferMarketWindows(null, []);
