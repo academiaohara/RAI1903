@@ -3,6 +3,7 @@
 import { CanteraContextBar } from "@/components/cantera/CanteraContextBar";
 import { CanteraTeamSections } from "@/components/cantera/CanteraTeamSections";
 import { FilialSeasonProvider } from "@/components/cantera/FilialSeasonContext";
+import { FilialEditorPanel } from "@/components/editor/FilialEditorPanel";
 import { Card } from "@/components/Card";
 import { PageHero } from "@/components/PageHero";
 
@@ -17,6 +18,8 @@ export function FilialCanteraPage() {
         />
 
         <CanteraContextBar showSeasonSelector />
+
+        <FilialEditorPanel variant="inline" />
 
         <Card eyebrow="Filial" title="Real Aviles B">
           <CanteraTeamSections teamId="filial" />

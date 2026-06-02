@@ -1,7 +1,9 @@
 "use client";
 
 import type { User } from "@supabase/supabase-js";
-import { Check, Clipboard, CloudUpload, Pencil, Trash2, X } from "lucide-react";
+import { Check, Clipboard, CloudUpload, ExternalLink, Pencil, Trash2, X } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useSeasonOptional } from "@/components/season/SeasonProvider";
 import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
@@ -17,11 +19,15 @@ import { SeasonManagerPanel } from "@/components/editor/SeasonManagerPanel";
 import { TeamCrestEditorPanel } from "@/components/editor/TeamCrestEditorPanel";
 import { HomeLayoutEditorPanel } from "@/components/editor/HomeLayoutEditorPanel";
 import { MediaRaiSectionsEditorPanel } from "@/components/editor/MediaRaiSectionsEditorPanel";
-import { TransferMarketEditorPanel } from "@/components/editor/TransferMarketEditorPanel";
-import { SquadEditorPanel } from "@/components/editor/SquadEditorPanel";
 import { CompetitionEditorPanel } from "@/components/editor/CompetitionEditorPanel";
 import { TeamsEditorPanel } from "@/components/editor/TeamsEditorPanel";
-import { FilialEditorPanel } from "@/components/editor/FilialEditorPanel";
+import {
+  EDITOR_PAGE_LINKS,
+  isFichajesPath,
+  isFilialPath,
+  isPlantillaPath,
+  plantillaEditorLink,
+} from "@/lib/editor-routes";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
@@ -386,24 +392,19 @@ export function InlineEditingToolbar() {
   const [saveAck, setSaveAck] = useState(false);
   const [seasonPanelOpen, setSeasonPanelOpen] = useState(false);
   const [crestPanelOpen, setCrestPanelOpen] = useState(false);
-  const [transfersPanelOpen, setTransfersPanelOpen] = useState(false);
   const [homePanelOpen, setHomePanelOpen] = useState(false);
   const [mediaRaiPanelOpen, setMediaRaiPanelOpen] = useState(false);
-  const [squadPanelOpen, setSquadPanelOpen] = useState(false);
   const [competitionPanelOpen, setCompetitionPanelOpen] = useState(false);
   const [teamsPanelOpen, setTeamsPanelOpen] = useState(false);
-  const [filialPanelOpen, setFilialPanelOpen] = useState(false);
+  const pathname = usePathname();
 
   const closeEditorPanels = useCallback(() => {
     setSeasonPanelOpen(false);
     setCrestPanelOpen(false);
-    setTransfersPanelOpen(false);
     setHomePanelOpen(false);
     setMediaRaiPanelOpen(false);
-    setSquadPanelOpen(false);
     setCompetitionPanelOpen(false);
     setTeamsPanelOpen(false);
-    setFilialPanelOpen(false);
   }, []);
 
   if (!ready || !canEdit) return null;
@@ -451,21 +452,16 @@ export function InlineEditingToolbar() {
       {editMode && crestPanelOpen && (
         <TeamCrestEditorPanel onClose={() => setCrestPanelOpen(false)} />
       )}
-      {editMode && transfersPanelOpen && (
-        <TransferMarketEditorPanel onClose={() => setTransfersPanelOpen(false)} />
-      )}
       {editMode && homePanelOpen && (
         <HomeLayoutEditorPanel onClose={() => setHomePanelOpen(false)} />
       )}
       {editMode && mediaRaiPanelOpen && (
         <MediaRaiSectionsEditorPanel onClose={() => setMediaRaiPanelOpen(false)} />
       )}
-      {editMode && squadPanelOpen && <SquadEditorPanel onClose={() => setSquadPanelOpen(false)} />}
       {editMode && competitionPanelOpen && (
         <CompetitionEditorPanel onClose={() => setCompetitionPanelOpen(false)} />
       )}
       {editMode && teamsPanelOpen && <TeamsEditorPanel onClose={() => setTeamsPanelOpen(false)} />}
-      {editMode && filialPanelOpen && <FilialEditorPanel onClose={() => setFilialPanelOpen(false)} />}
       <div className="flex flex-wrap justify-end gap-2 rounded-full border border-[#214C9B]/20 bg-white/95 p-2 shadow-2xl backdrop-blur">
         {editMode && (
           <>
@@ -490,16 +486,16 @@ export function InlineEditingToolbar() {
             >
               Temporadas
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                closeEditorPanels();
-                setSquadPanelOpen((open) => !open);
-              }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
-            >
-              Plantilla
-            </button>
+            {!isPlantillaPath(pathname) && (
+              <Link
+                href={plantillaEditorLink(pathname)}
+                onClick={closeEditorPanels}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+              >
+                <ExternalLink size={14} aria-hidden />
+                Plantilla
+              </Link>
+            )}
             <button
               type="button"
               onClick={() => {
@@ -550,26 +546,26 @@ export function InlineEditingToolbar() {
             >
               Media RAI
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                closeEditorPanels();
-                setTransfersPanelOpen((open) => !open);
-              }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
-            >
-              Mercado
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                closeEditorPanels();
-                setFilialPanelOpen((open) => !open);
-              }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
-            >
-              Filial
-            </button>
+            {!isFichajesPath(pathname) && (
+              <Link
+                href={EDITOR_PAGE_LINKS.fichajes}
+                onClick={closeEditorPanels}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+              >
+                <ExternalLink size={14} aria-hidden />
+                Mercado
+              </Link>
+            )}
+            {!isFilialPath(pathname) && (
+              <Link
+                href={EDITOR_PAGE_LINKS.filial}
+                onClick={closeEditorPanels}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+              >
+                <ExternalLink size={14} aria-hidden />
+                Filial
+              </Link>
+            )}
             <button
               type="button"
               onClick={() => void handleExport()}

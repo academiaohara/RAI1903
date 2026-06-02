@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import type { Route } from "next";
 import {
   ClubAnnouncementUrlField,
   clubAnnouncementFieldsFromUrlValue,
@@ -23,7 +25,11 @@ export function PlayerClubAnnouncementEditPanel({ transfer }: PlayerClubAnnounce
   if (!cmsEntry) {
     return (
       <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
-        Este movimiento no está en el bundle de la temporada vista. Edítalo desde Editar → Mercado de fichajes.
+        Este movimiento no está en el bundle de la temporada vista.{" "}
+        <Link href={"/fichajes" as Route} className="font-extrabold text-[#214C9B] underline">
+          Añádelo en la página de fichajes
+        </Link>{" "}
+        (modo edición).
       </p>
     );
   }

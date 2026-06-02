@@ -12,6 +12,7 @@ import {
 } from "@/lib/squad-utils";
 import { PositionSection } from "@/components/squad/PositionSection";
 import { SquadListColGroup } from "@/components/squad/SquadListColGroup";
+import { SquadPlayerQuickEdit } from "@/components/squad/SquadPlayerQuickEdit";
 
 type PlayerTableProps = {
   players: SquadPlayer[];
@@ -19,6 +20,8 @@ type PlayerTableProps = {
   showMarketValue?: boolean;
   showAge?: boolean;
   showEmptyPositions?: boolean;
+  editMode?: boolean;
+  onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
 };
 
 const alignClass = {
@@ -34,6 +37,8 @@ export function PlayerTable({
   showMarketValue = false,
   showAge = true,
   showEmptyPositions = false,
+  editMode = false,
+  onQuickUpdate,
 }: PlayerTableProps) {
   const grouped = groupPlayersByPosition(players);
 
@@ -96,6 +101,8 @@ export function PlayerTable({
                           index={rowIndex}
                           showMarketValue={showMarketValue}
                           showAge={showAge}
+                          editMode={editMode}
+                          onQuickUpdate={onQuickUpdate}
                         />
                       ))
                     )}
@@ -115,6 +122,8 @@ export function PlayerTable({
                       index={rowIndex}
                       showMarketValue={showMarketValue}
                       showAge={showAge}
+                      editMode={editMode}
+                      onQuickUpdate={onQuickUpdate}
                     />
                   ))
                 )}
@@ -127,20 +136,60 @@ export function PlayerTable({
   );
 }
 
+function squadTableColumnCount(showAge: boolean, showMarketValue: boolean) {
+  return 2 + 1 + (showAge ? 1 : 0) + 5 + (showMarketValue ? 1 : 0) + 1;
+}
+
 function PlayerRow({
   player,
   onSelect,
   index,
   showMarketValue,
   showAge,
+  editMode,
+  onQuickUpdate,
 }: {
   player: SquadPlayer;
   onSelect?: (player: SquadPlayer) => void;
   index: number;
   showMarketValue: boolean;
   showAge: boolean;
+  editMode?: boolean;
+  onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
 }) {
   const interactive = Boolean(onSelect);
+  const canQuickEdit = editMode && onQuickUpdate;
+  const columnCount = squadTableColumnCount(showAge, showMarketValue);
+
+  if (canQuickEdit) {
+    return (
+      <motion.tr
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: index * 0.02 }}
+        className="border-b border-slate-50 bg-blue-50/30 text-sm last:border-0"
+      >
+        <td className={cellPad} colSpan={columnCount}>
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+            <SquadPlayerQuickEdit
+              player={player}
+              onUpdate={(patch) => onQuickUpdate(player.id, patch)}
+              layout="row"
+            />
+            {onSelect ? (
+              <button
+                type="button"
+                onClick={() => onSelect(player)}
+                className="shrink-0 text-[10px] font-extrabold uppercase tracking-wide text-[#214C9B] hover:underline"
+              >
+                Ficha completa
+              </button>
+            ) : null}
+          </div>
+        </td>
+      </motion.tr>
+    );
+  }
 
   return (
     <motion.tr
@@ -189,15 +238,46 @@ function PlayerMobileRow({
   index,
   showMarketValue,
   showAge,
+  editMode,
+  onQuickUpdate,
 }: {
   player: SquadPlayer;
   onSelect?: (player: SquadPlayer) => void;
   index: number;
   showMarketValue: boolean;
   showAge: boolean;
+  editMode?: boolean;
+  onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
 }) {
+  const canQuickEdit = editMode && onQuickUpdate;
   const metaParts: string[] = [player.rol];
   if (showAge) metaParts.push(formatPlayerAgeWithUnit(player.edad));
+
+  if (canQuickEdit) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.03 }}
+        className="space-y-2 border-b border-slate-100 bg-blue-50/30 p-4"
+      >
+        <SquadPlayerQuickEdit
+          player={player}
+          onUpdate={(patch) => onQuickUpdate(player.id, patch)}
+          layout="row"
+        />
+        {onSelect ? (
+          <button
+            type="button"
+            onClick={() => onSelect(player)}
+            className="text-[10px] font-extrabold uppercase tracking-wide text-[#214C9B] hover:underline"
+          >
+            Ficha completa
+          </button>
+        ) : null}
+      </motion.div>
+    );
+  }
 
   const content = (
     <div className="min-w-0 flex-1">
