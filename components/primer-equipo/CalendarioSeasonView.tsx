@@ -3,12 +3,9 @@
 import { useMemo } from "react";
 import { Card } from "@/components/Card";
 import { TeamCalendar } from "@/components/TeamCalendar";
-import { useTeamCrestMap } from "@/components/assets/TeamCrestResolverProvider";
-import { useSeason } from "@/components/season/SeasonProvider";
-import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { useEditedCalendarMatches } from "@/components/calendar/CalendarMatchEditor";
-import { getCalendarMatchesFromSource } from "@/lib/calendar";
-import { getAvilesMatchesFromSource } from "@/lib/season/aviles-matches";
+import { useSeason } from "@/components/season/SeasonProvider";
+import { useAllSeasonsCalendarMatches } from "@/hooks/useAllSeasonsCalendarMatches";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 
 type CalendarioSeasonViewProps = {
@@ -16,25 +13,26 @@ type CalendarioSeasonViewProps = {
 };
 
 export function CalendarioSeasonView({ gender }: CalendarioSeasonViewProps) {
-  const { getEnrichedFixtureSource } = useSeason();
-  const crestMap = useTeamCrestMap();
-  const { getCronica, getPrevia } = useSeasonMatchArticles();
-  const baseMatches = useMemo(() => {
-    const source = getEnrichedFixtureSource(gender);
-    const aviles = getAvilesMatchesFromSource(source, gender);
-    return getCalendarMatchesFromSource(aviles, gender, { getCronica, getPrevia, crestMap });
-  }, [gender, getCronica, getEnrichedFixtureSource, getPrevia, crestMap]);
+  const { seasons } = useSeason();
+  const { allMatches, seasonMatches, loading } = useAllSeasonsCalendarMatches(gender);
 
-  const matches = useEditedCalendarMatches(baseMatches, gender);
+  const monthMatches = useEditedCalendarMatches(allMatches, gender);
+  const listMatches = useEditedCalendarMatches(seasonMatches, gender);
 
-  const played = matches.filter((match) => match.played).length;
-  const upcoming = matches.length - played;
+  const seasonIds = useMemo(() => {
+    const published = seasons.filter((row) => row.published);
+    const list = published.length ? published : seasons;
+    return list.map((row) => row.id);
+  }, [seasons]);
+
+  const played = listMatches.filter((match) => match.played).length;
+  const upcoming = listMatches.length - played;
 
   return (
     <Card eyebrow="Temporada" title="Partidos del equipo">
       <div className="mb-6 flex flex-wrap gap-4 text-sm font-bold text-slate-600">
         <span>
-          <span className="text-[#214C9B]">{matches.length}</span> partidos
+          <span className="text-[#214C9B]">{listMatches.length}</span> partidos
         </span>
         <span>
           <span className="text-emerald-700">{played}</span> jugados
@@ -43,12 +41,18 @@ export function CalendarioSeasonView({ gender }: CalendarioSeasonViewProps) {
           <span className="text-[#981915]">{upcoming}</span> pendientes
         </span>
       </div>
-      <TeamCalendar
-        matches={matches}
-        gender={gender}
-        listOnly={gender === "femenino"}
-        showVenue={gender !== "femenino"}
-      />
+      {loading ? (
+        <p className="text-sm font-bold text-slate-500">Cargando calendario…</p>
+      ) : (
+        <TeamCalendar
+          matches={monthMatches}
+          listMatches={listMatches}
+          seasonIds={seasonIds}
+          gender={gender}
+          listOnly={gender === "femenino"}
+          showVenue={gender !== "femenino"}
+        />
+      )}
     </Card>
   );
 }
