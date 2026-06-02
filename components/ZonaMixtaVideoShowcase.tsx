@@ -20,7 +20,7 @@ import type { FanYouTubeVideo } from "@/types";
 type ZonaMixtaVideoShowcaseProps = {
   section: ContenidoFanSlug;
   videos: FanYouTubeVideo[];
-  /** Alcance por equipo en crónicas (masculino/femenino); omitir en contenido fan global. */
+  /** Alcance por equipo en crónicas (masculino/femenino); omitir en Media RAI global. */
   gender?: PrimerEquipoGender;
   featuredLabel?: string;
   carouselLabel?: string;

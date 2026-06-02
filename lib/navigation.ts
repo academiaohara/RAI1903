@@ -16,6 +16,7 @@ import {
   Swords,
   Target,
   Clapperboard,
+  Landmark,
   Trophy,
   Users,
   Video,
@@ -93,15 +94,16 @@ export const navItems: NavItem[] = [
     ],
   },
   {
-    href: "/contenido-fan",
-    label: "Contenido fan",
+    href: "/media-rai",
+    label: "Media RAI",
     icon: Video,
     children: [
-      { href: "/contenido-fan/zona-mixta", label: "Zona Mixta", icon: Radio },
-      { href: "/contenido-fan/previa", label: "Previa", icon: Target },
-      { href: "/contenido-fan/rdp", label: "RDP", icon: Mic2 },
-      { href: "/contenido-fan/resumenes", label: "Resúmenes", icon: Clapperboard },
-      { href: "/contenido-fan/tente-firme", label: "Tente firme", icon: Ship },
+      { href: "/media-rai/zona-mixta", label: "Zona Mixta", icon: Radio },
+      { href: "/media-rai/previa", label: "Previa", icon: Target },
+      { href: "/media-rai/rdp", label: "RDP", icon: Mic2 },
+      { href: "/media-rai/resumenes", label: "Resúmenes", icon: Clapperboard },
+      { href: "/media-rai/del-club", label: "Del club", icon: Landmark },
+      { href: "/media-rai/tente-firme", label: "Tente firme", icon: Ship },
     ],
   },
 ];
@@ -143,7 +145,7 @@ export const mobileNavSections: MobileNavSection[] = [
   },
   {
     title: "APPS",
-    items: [...navChildrenByHref("/quiniela"), ...navChildrenByHref("/contenido-fan")],
+    items: [...navChildrenByHref("/quiniela"), ...navChildrenByHref("/media-rai")],
   },
 ];
 

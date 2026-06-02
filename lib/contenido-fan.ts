@@ -1,5 +1,6 @@
 import type { FanMediaLink, FanYouTubeVideo } from "@/types";
 import {
+  fanDelClubVideos,
   fanPreviaVideos,
   fanRdpVideos,
   fanResumenesVideos,
@@ -8,7 +9,14 @@ import {
   fanZonaMixtaVideos,
 } from "@/data/mock";
 
-export const CONTENIDO_FAN_SLUGS = ["zona-mixta", "previa", "rdp", "resumenes", "tente-firme"] as const;
+export const CONTENIDO_FAN_SLUGS = [
+  "zona-mixta",
+  "previa",
+  "rdp",
+  "resumenes",
+  "del-club",
+  "tente-firme",
+] as const;
 
 export type ContenidoFanSlug = (typeof CONTENIDO_FAN_SLUGS)[number];
 
@@ -67,6 +75,16 @@ export const contenidoFanSections: Record<ContenidoFanSlug, ContenidoFanSectionC
     links: [],
     videos: fanResumenesVideos,
   },
+  "del-club": {
+    slug: "del-club",
+    label: "Del club",
+    heroTitle: "Del club",
+    heroDescription:
+      "Entrevistas, presentaciones de fichajes, actos institucionales y otros vídeos publicados por el Real Avilés Industrial.",
+    cardIntro: "El último vídeo se reproduce arriba; el resto aparece en el carrusel inferior.",
+    links: [],
+    videos: fanDelClubVideos,
+  },
   "tente-firme": {
     slug: "tente-firme",
     label: "Tente firme",
@@ -83,10 +101,11 @@ export const contenidoFanSections: Record<ContenidoFanSlug, ContenidoFanSectionC
 
 export function getContenidoFanTabs() {
   return [
-    { href: "/contenido-fan/zona-mixta", label: "Zona Mixta" },
-    { href: "/contenido-fan/previa", label: "Previa" },
-    { href: "/contenido-fan/rdp", label: "RDP" },
-    { href: "/contenido-fan/resumenes", label: "Resúmenes" },
-    { href: "/contenido-fan/tente-firme", label: "Tente firme" },
+    { href: "/media-rai/zona-mixta", label: "Zona Mixta" },
+    { href: "/media-rai/previa", label: "Previa" },
+    { href: "/media-rai/rdp", label: "RDP" },
+    { href: "/media-rai/resumenes", label: "Resúmenes" },
+    { href: "/media-rai/del-club", label: "Del club" },
+    { href: "/media-rai/tente-firme", label: "Tente firme" },
   ];
 }
