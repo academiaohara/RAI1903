@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { Bus, Home } from "lucide-react";
+import { CalendarMatchEditor, useEditedCalendarMatch } from "@/components/calendar/CalendarMatchEditor";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamLink } from "@/components/TeamLink";
 import { matchCompetitionShortLabel } from "@/lib/competition-labels";
@@ -53,11 +55,13 @@ export function CalendarMatchCell({
   gender = "masculino",
 }: CalendarMatchCellProps) {
   const router = useRouter();
-  const href = match.played ? match.chronicleUrl : match.previaUrl;
-  const opponentTeamId = match.isHome ? match.awayTeamId : match.homeTeamId;
-  const ariaLabel = match.played
-    ? `Crónica: ${match.opponent}${match.result ? ` ${match.result}` : ""}`
-    : `Previa: ${match.opponent}`;
+  const { editMode } = useInlineEditing();
+  const displayMatch = useEditedCalendarMatch(match, gender);
+  const href = editMode ? null : displayMatch.played ? displayMatch.chronicleUrl : displayMatch.previaUrl;
+  const opponentTeamId = displayMatch.isHome ? displayMatch.awayTeamId : displayMatch.homeTeamId;
+  const ariaLabel = displayMatch.played
+    ? `Crónica: ${displayMatch.opponent}${displayMatch.result ? ` ${displayMatch.result}` : ""}`
+    : `Previa: ${displayMatch.opponent}`;
 
   const handleActivate = (event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
     if (!href) return;
@@ -95,46 +99,57 @@ export function CalendarMatchCell({
         >
           {day}
         </span>
-        <span className={detailIconClass} aria-label={match.isHome ? "Partido en casa" : "Partido fuera"}>
-          {match.isHome ? <Home size={13} strokeWidth={2.25} /> : <Bus size={13} strokeWidth={2.25} />}
+        <span className={detailIconClass} aria-label={displayMatch.isHome ? "Partido en casa" : "Partido fuera"}>
+          {displayMatch.isHome ? <Home size={13} strokeWidth={2.25} /> : <Bus size={13} strokeWidth={2.25} />}
         </span>
       </div>
 
-      <div className="space-y-1">
-        <p
-          className={cn(
-            "text-[10px] font-bold uppercase tracking-[0.08em] leading-none",
-            getCompetitionAccentClass(match.competition),
-            "group-hover/card:text-white",
-          )}
-        >
-          {matchCompetitionShortLabel(match)}
-        </p>
-        <TeamLink gender={gender} teamId={opponentTeamId} teamName={match.opponent} className={cn("line-clamp-2 text-xs font-extrabold leading-snug", teamLinkClass)}>
-          {match.opponent}
-        </TeamLink>
-      </div>
+      {editMode ? (
+        <CalendarMatchEditor match={match} gender={gender} compact className="col-span-full" />
+      ) : (
+        <>
+          <div className="space-y-1">
+            <p
+              className={cn(
+                "text-[10px] font-bold uppercase tracking-[0.08em] leading-none",
+                getCompetitionAccentClass(displayMatch.competition),
+                "group-hover/card:text-white",
+              )}
+            >
+              {matchCompetitionShortLabel(displayMatch)}
+            </p>
+            <TeamLink
+              gender={gender}
+              teamId={opponentTeamId}
+              teamName={displayMatch.opponent}
+              className={cn("line-clamp-2 text-xs font-extrabold leading-snug", teamLinkClass)}
+            >
+              {displayMatch.opponent}
+            </TeamLink>
+          </div>
 
-      <div className="flex items-center justify-between gap-2">
-        <p className={cn("text-sm font-extrabold tabular-nums leading-none", detailTextClass)}>{bottomLabel(match)}</p>
-        <TeamLink gender={gender} teamId={opponentTeamId} teamName={match.opponent} className={cn("shrink-0", teamLinkClass)}>
-          <OpponentCrest
-            logo={match.opponentLogo}
-            opponent={match.opponent}
-            size="sm"
-            className="shrink-0 text-[#214C9B] transition group-hover/card:text-white [&_img]:group-hover/card:brightness-0 [&_img]:group-hover/card:invert"
-          />
-        </TeamLink>
-      </div>
+          <div className="flex items-center justify-between gap-2">
+            <p className={cn("text-sm font-extrabold tabular-nums leading-none", detailTextClass)}>{bottomLabel(displayMatch)}</p>
+            <TeamLink gender={gender} teamId={opponentTeamId} teamName={displayMatch.opponent} className={cn("shrink-0", teamLinkClass)}>
+              <OpponentCrest
+                logo={displayMatch.opponentLogo}
+                opponent={displayMatch.opponent}
+                size="sm"
+                className="shrink-0 text-[#214C9B] transition group-hover/card:text-white [&_img]:group-hover/card:brightness-0 [&_img]:group-hover/card:invert"
+              />
+            </TeamLink>
+          </div>
 
-      {href ? (
-        <p className="text-[10px] font-bold text-[#214C9B]/80 transition group-hover/card:text-white">
-          {match.played ? "Leer la crónica" : "Ver la previa"}
-        </p>
-      ) : null}
+          {href ? (
+            <p className="text-[10px] font-bold text-[#214C9B]/80 transition group-hover/card:text-white">
+              {displayMatch.played ? "Leer la crónica" : "Ver la previa"}
+            </p>
+          ) : null}
+        </>
+      )}
 
       <p className="sr-only">
-        {match.opponent}, {matchCompetitionShortLabel(match)}, {match.isHome ? "local" : "visitante"}
+        {displayMatch.opponent}, {matchCompetitionShortLabel(displayMatch)}, {displayMatch.isHome ? "local" : "visitante"}
       </p>
     </article>
   );
