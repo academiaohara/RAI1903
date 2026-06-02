@@ -179,6 +179,7 @@ export function TransferDetailView({ transfer, player: initialPlayer }: Transfer
                   playerNews={playerNews}
                   accentClass={tone.accent}
                   announcementTone={tone.announcement}
+                  transfer={transfer}
                 />
 
                 <div>

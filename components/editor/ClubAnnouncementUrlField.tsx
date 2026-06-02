@@ -18,6 +18,8 @@ type ClubAnnouncementUrlFieldProps = {
   inputClassName?: string;
   labelClassName?: string;
   buttonClassName?: string;
+  /** Muestra campos editables de titular, subtítulo e imagen (ficha del jugador). */
+  showDetailFields?: boolean;
 };
 
 export function ClubAnnouncementUrlField({
@@ -26,11 +28,16 @@ export function ClubAnnouncementUrlField({
   inputClassName = "mt-1 w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-semibold",
   labelClassName = "block text-[10px] font-bold uppercase text-slate-500",
   buttonClassName = "inline-flex shrink-0 items-center justify-center gap-1 rounded-lg bg-[#214C9B] px-2.5 py-1.5 text-[10px] font-extrabold uppercase text-white disabled:opacity-50",
+  showDetailFields = false,
 }: ClubAnnouncementUrlFieldProps) {
   const { fetching, fetchError, fetchMetadata, clearFetchError } = useClubAnnouncementUrlMetadata();
 
   const url = value.url ?? "";
-  const hasPreview = Boolean(value.title?.trim());
+  const hasPreview = Boolean(value.title?.trim()) && !showDetailFields;
+
+  const patchValue = (patch: Partial<ClubAnnouncementUrlValue>) => {
+    onChange({ ...value, ...patch });
+  };
 
   const handleUrlChange = (nextUrl: string) => {
     clearFetchError();
@@ -39,7 +46,7 @@ export function ClubAnnouncementUrlField({
       onChange({});
       return;
     }
-    onChange({ url: trimmed });
+    patchValue({ url: trimmed });
   };
 
   const handleFetch = async () => {
@@ -47,6 +54,7 @@ export function ClubAnnouncementUrlField({
     if (!metadata) return;
 
     onChange({
+      ...value,
       url: normalizeClubAnnouncementUrl(url),
       title: metadata.title,
       excerpt: metadata.excerpt || undefined,
@@ -56,7 +64,7 @@ export function ClubAnnouncementUrlField({
   };
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-3">
       <label className={labelClassName}>
         Enlace al comunicado (opcional)
         <div className="mt-1 flex flex-col gap-1.5 sm:flex-row">
@@ -79,6 +87,42 @@ export function ClubAnnouncementUrlField({
         </div>
       </label>
       {fetchError ? <p className="text-[10px] font-semibold text-[#981915]">{fetchError}</p> : null}
+
+      {showDetailFields ? (
+        <>
+          <label className={labelClassName}>
+            Titular
+            <input
+              type="text"
+              value={value.title ?? ""}
+              onChange={(event) => patchValue({ title: event.target.value })}
+              placeholder="Titular del comunicado"
+              className={inputClassName}
+            />
+          </label>
+          <label className={labelClassName}>
+            Subtítulo
+            <textarea
+              value={value.excerpt ?? ""}
+              onChange={(event) => patchValue({ excerpt: event.target.value })}
+              placeholder="Extracto o subtítulo"
+              rows={3}
+              className={`${inputClassName} min-h-[4.5rem] resize-y`}
+            />
+          </label>
+          <label className={labelClassName}>
+            Enlace a la imagen
+            <input
+              type="url"
+              value={value.imageUrl ?? ""}
+              onChange={(event) => patchValue({ imageUrl: event.target.value })}
+              placeholder="https://…/imagen.jpg"
+              className={inputClassName}
+            />
+          </label>
+        </>
+      ) : null}
+
       {hasPreview ? (
         <div className="rounded-lg border border-[#214C9B]/20 bg-[#214C9B]/5 px-2.5 py-2">
           <p className="text-[10px] font-extrabold uppercase leading-snug text-[#214C9B]">{value.title}</p>
