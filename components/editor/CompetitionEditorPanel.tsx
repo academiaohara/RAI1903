@@ -12,11 +12,13 @@ import {
   type SeasonCompetitionConfigBundle,
 } from "@/lib/cms/competition-config-bundle";
 import { getCompetitionConfigBundle } from "@/lib/cms/competition-config-bundle";
-import { upsertSeasonBundle, getFixturesBundle } from "@/lib/cms/season-bundles";
-import type { SeasonFixturesBundle, SeasonFemeninoFixturesBundle } from "@/lib/cms/season-bundles";
-import { normalizeGrupo2Matchdays, normalizeLeagueMatchdays } from "@/lib/competition/normalize-fixtures";
+import { applyLeagueTemplate, buildFixturesPayloadForConfig } from "@/lib/cms/apply-league-template";
+import { upsertSeasonBundle } from "@/lib/cms/season-bundles";
+import {
+  leagueTemplatesForGender,
+  type LeagueTemplateId,
+} from "@/lib/competition/league-templates";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
-import { fixtureSourceFromBundles } from "@/lib/season/fixture-source";
 
 const COLOR_PRESETS = [
   { label: "Verde", value: "bg-emerald-500" },
@@ -47,6 +49,7 @@ export function CompetitionEditorPanel({ onClose }: CompetitionEditorPanelProps)
   const [draft, setDraft] = useState<SeasonCompetitionConfigBundle | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<LeagueTemplateId | "">("");
 
   const stored = useMemo(
     () => getCompetitionConfigBundle(bundles, gender) ?? defaultCompetitionConfig(gender),
@@ -94,41 +97,35 @@ export function CompetitionEditorPanel({ onClose }: CompetitionEditorPanelProps)
   const generateFixtures = async () => {
     setBusy(true);
     setMessage(null);
-    const source = fixtureSourceFromBundles(bundles, gender);
-    if (gender === "femenino") {
-      const matchdaysFemenino = normalizeLeagueMatchdays(source.matchdaysFemenino, config);
-      const payload: SeasonFemeninoFixturesBundle = {
-        matchdaysFemenino,
-        meta: { lastRound: 0 },
-      };
-      const result = await upsertSeasonBundle(viewedSeasonId, gender, "fixtures", payload);
-      setBusy(false);
-      if (!result.ok) {
-        setMessage(result.error ?? "Error");
-        return;
-      }
-    } else {
-      const matchdays = normalizeLeagueMatchdays(source.matchdays, config);
-      const matchdaysGrupo2 =
-        config.groupCount >= 2 ? normalizeGrupo2Matchdays(source.matchdaysGrupo2, config) : undefined;
-      const existing = getFixturesBundle(bundles, gender) as SeasonFixturesBundle | null;
-      const payload: SeasonFixturesBundle = {
-        matchdays,
-        matchdaysGrupo2,
-        amistosoMatches: existing?.amistosoMatches,
-        copaDelReyMatches: existing?.copaDelReyMatches,
-        meta: { lastRound: 0, definitiveQualifyingLeagueRound: 0 },
-      };
-      const result = await upsertSeasonBundle(viewedSeasonId, gender, "fixtures", payload);
-      setBusy(false);
-      if (!result.ok) {
-        setMessage(result.error ?? "Error");
-        return;
-      }
+    const payload = buildFixturesPayloadForConfig(gender, config, bundles);
+    const result = await upsertSeasonBundle(viewedSeasonId, gender, "fixtures", payload);
+    setBusy(false);
+    if (!result.ok) {
+      setMessage(result.error ?? "Error");
+      return;
     }
     setMessage(`Calendario generado: ${rounds} jornadas × ${matchesPerRound} partidos/grupo`);
     await refreshBundles();
   };
+
+  const applyTemplate = async () => {
+    if (!selectedTemplateId) return;
+    setBusy(true);
+    setMessage(null);
+    const result = await applyLeagueTemplate(viewedSeasonId, selectedTemplateId, {
+      regenerateFixtures: true,
+      bundles,
+    });
+    setBusy(false);
+    if (!result.ok) {
+      setMessage(result.error ?? "Error al aplicar plantilla");
+      return;
+    }
+    setMessage("Plantilla aplicada (reglas y calendario vacío)");
+    await refreshBundles();
+  };
+
+  const genderTemplates = leagueTemplatesForGender(gender);
 
   return (
     <EditorPanelFrame
@@ -158,6 +155,38 @@ export function CompetitionEditorPanel({ onClose }: CompetitionEditorPanelProps)
         </div>
       }
     >
+      <div className="mb-4 space-y-2 rounded-xl border border-slate-100 bg-slate-50/80 p-3">
+        <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Plantilla de liga</p>
+        <select
+          value={selectedTemplateId}
+          onChange={(e) => setSelectedTemplateId(e.target.value as LeagueTemplateId | "")}
+          className="w-full rounded-xl border border-slate-200 px-2 py-1.5 text-xs font-semibold"
+        >
+          <option value="">— Elegir plantilla —</option>
+          {genderTemplates.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.label}
+            </option>
+          ))}
+        </select>
+        {selectedTemplateId && (
+          <p className="text-[10px] leading-relaxed text-slate-500">
+            {genderTemplates.find((t) => t.id === selectedTemplateId)?.description}
+          </p>
+        )}
+        <button
+          type="button"
+          disabled={busy || !selectedTemplateId}
+          onClick={() => void applyTemplate()}
+          className="w-full rounded-xl border border-[#214C9B]/30 px-3 py-2 text-[10px] font-extrabold uppercase text-[#214C9B] hover:bg-white disabled:opacity-50"
+        >
+          Aplicar plantilla
+        </button>
+        <p className="text-[10px] text-slate-400">
+          Sustituye reglas y calendario vacío. Puedes ajustar equipos, zonas y grupos después.
+        </p>
+      </div>
+
       <div className="mb-3 flex gap-2">
         {(["masculino", "femenino"] as const).map((g) => (
           <button

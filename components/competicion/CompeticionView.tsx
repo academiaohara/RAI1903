@@ -9,7 +9,7 @@ import { EditableText } from "@/components/inline-editing/EditableText";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
 import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
-import { zonesToLegacyConfig } from "@/lib/cms/competition-config-bundle";
+import { hasMultipleGrupos, zonesToLegacyConfig } from "@/lib/cms/competition-config-bundle";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { getTeamsByGender } from "@/lib/fixtures";
 import { useSeason } from "@/components/season/SeasonProvider";
@@ -22,7 +22,6 @@ import {
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import { getPlayedLeagueRounds } from "@/lib/standings";
-import { FEMENINA_STANDINGS_ZONES } from "@/lib/segunda-rfef-femenina-2526";
 import type { Route } from "next";
 import type { Match } from "@/types";
 
@@ -72,7 +71,8 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
       ? matchdaysGrupo2
       : leagueMatchdays
     : leagueMatchdays;
-  const showAvilesSidebar = !isMasculino || grupo === "1";
+  const multiGrupo = hasMultipleGrupos(competitionConfig);
+  const showAvilesSidebar = !isMasculino || !multiGrupo || grupo === "1";
   const finishedAviles = avilesMatches.filter((match) => match.status === "finished");
   const scheduledAviles = avilesMatches.filter((match) => match.status === "scheduled");
   const latest = [...finishedAviles]
@@ -83,11 +83,14 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
     .slice(0, 5);
   const copaDelReyMatches = copaMatches;
   const calendarHref = `${primerEquipoBase(gender)}/calendario` as Route;
+  const baseLigaLabel = competitionConfig.ligaLabel ?? "1ª RFEF";
   const competitionLabel =
     panel === "liga"
-      ? grupo === "1"
-        ? "1ª RFEF - Grupo I (Real Avilés)"
-        : "1ª RFEF - Grupo II"
+      ? multiGrupo
+        ? grupo === "1"
+          ? `${baseLigaLabel} - Grupo I (Real Avilés)`
+          : `${baseLigaLabel} - Grupo II`
+        : baseLigaLabel
       : "Copa del Rey 2025/26";
 
   const lastGrupoJornada = useMemo(() => {
@@ -112,7 +115,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
               layoutId="competicion-panel-toggle"
               className="w-full sm:max-w-sm sm:shrink-0"
             />
-            {panel === "liga" && (
+            {panel === "liga" && multiGrupo && (
               <GrupoSwitcher value={grupo} onChange={setGrupo} className="w-fit shrink-0 self-start sm:self-auto" />
             )}
           </div>
@@ -131,7 +134,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
         <p className="text-sm font-bold text-slate-600">
           <EditableText
             storageKey={`competition:${gender}:liga:label`}
-            value="2ª RFEF Femenina · Grupo 1"
+            value={competitionConfig.ligaLabel ?? "2ª RFEF Femenina"}
             aria-label="Editar etiqueta de competición"
             inputClassName="text-sm font-bold text-slate-700"
           />
@@ -160,7 +163,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
               compact
               borderlessHeader
               gender={gender}
-              zones={isMasculino ? standingsZones : FEMENINA_STANDINGS_ZONES}
+              zones={standingsZones}
               zoneRules={competitionConfig.zones}
               {...(isMasculino ? {} : { tiebreak: undefined })}
             />
@@ -196,7 +199,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
                   </Card>
                 </>
               )}
-              {isMasculino && !showAvilesSidebar && lastGrupoJornada && (
+              {isMasculino && multiGrupo && !showAvilesSidebar && lastGrupoJornada && (
                 <Card eyebrow="Grupo II" title={`Ultima jornada · J${lastGrupoJornada.round}`} borderlessHeader>
                   <div className="space-y-3">
                     {lastGrupoJornada.matches.map((match) => (
