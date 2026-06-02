@@ -31,8 +31,66 @@ function getPlayerFullName(player: Player): string {
   return `${player.firstName} ${player.lastName}`.trim();
 }
 
+function dorsalFromTransferPlayerId(playerId: string): number | null {
+  const match = playerId.match(/-d(\d+)$/i);
+  if (!match) return null;
+  const dorsal = Number(match[1]);
+  return Number.isFinite(dorsal) ? dorsal : null;
+}
+
+function squadPlayerMatchesTransferName(player: SquadPlayer, transferName: string): boolean {
+  const normalized = normalizeName(transferName);
+  const full = normalizeName(`${player.nombre} ${player.apellido}`.trim());
+  const shortName = normalizeName(player.apellido || player.nombre);
+
+  if (full === normalized || shortName === normalized) return true;
+
+  const tokens = normalized.split(/\s+/).filter(Boolean);
+  if (tokens.length >= 2) {
+    const lastName = tokens[tokens.length - 1]!;
+    const firstNames = tokens.slice(0, -1).join(" ");
+    if (normalizeName(player.apellido) === lastName && normalizeName(player.nombre) === firstNames) {
+      return true;
+    }
+  }
+
+  return Boolean(shortName && normalized.includes(shortName));
+}
+
+function findSquadPlayerInList(transfer: TransferRumor, squadList: SquadPlayer[]): SquadPlayer | undefined {
+  const playerId = transfer.playerId ?? resolveTransferPlayerId(transfer);
+
+  if (playerId) {
+    const byId = squadList.find((player) => player.id === playerId);
+    if (byId) return byId;
+
+    const dorsal = dorsalFromTransferPlayerId(playerId);
+    if (dorsal != null) {
+      const byDorsal = squadList.find((player) => player.dorsal === dorsal);
+      if (byDorsal) return byDorsal;
+    }
+  }
+
+  const byName = squadList.find((player) => squadPlayerMatchesTransferName(player, transfer.playerName));
+  if (byName) return byName;
+
+  const rosterPlayer = getRosterPlayerForTransfer(transfer);
+  if (rosterPlayer) {
+    const byDorsal = squadList.find((player) => player.dorsal === rosterPlayer.number);
+    return byDorsal ?? rosterPlayerToSquadPlayer(rosterPlayer);
+  }
+
+  return undefined;
+}
+
 function getRosterPlayerForTransfer(transfer: TransferRumor): Player | undefined {
   if (transfer.playerId) {
+    const dorsal = dorsalFromTransferPlayerId(transfer.playerId);
+    if (dorsal != null) {
+      const byNumber = players.find((player) => player.number === dorsal);
+      if (byNumber) return byNumber;
+    }
+
     const byId = players.find((player) => player.id === transfer.playerId);
     if (byId) return byId;
   }
@@ -41,7 +99,7 @@ function getRosterPlayerForTransfer(transfer: TransferRumor): Player | undefined
   return players.find((player) => {
     const full = normalizeName(getPlayerFullName(player));
     const displayName = normalizeName(player.displayName);
-    return full === normalized || displayName === normalized;
+    return full === normalized || displayName === normalized || normalized.includes(displayName);
   });
 }
 
@@ -113,29 +171,14 @@ export function getSquadPlayerForTransfer(
   transfer: TransferRumor,
   squad?: SquadPlayer[],
 ): SquadPlayer | undefined {
-  const squadList = squad ?? getSquadPlayers("masculino");
-  const rosterPlayer = getRosterPlayerForTransfer(transfer);
-  const playerId = rosterPlayer?.id ?? resolveTransferPlayerId(transfer);
+  const importSquad = getSquadPlayers("masculino");
+  const primaryList = squad?.length ? squad : importSquad;
 
-  if (playerId) {
-    const byId = squadList.find((player) => player.id === playerId);
-    if (byId) return withSquadPlayerPhoto(byId);
-  }
+  const player =
+    findSquadPlayerInList(transfer, primaryList) ??
+    (squad?.length ? findSquadPlayerInList(transfer, importSquad) : undefined);
 
-  const normalized = normalizeName(transfer.playerName);
-  const byName = squadList.find((player) => {
-    const full = normalizeName(`${player.nombre} ${player.apellido}`);
-    const shortName = normalizeName(player.apellido || player.nombre);
-    return full === normalized || shortName === normalized;
-  });
-  if (byName) return withSquadPlayerPhoto(byName);
-
-  if (rosterPlayer) {
-    const byDorsal = squadList.find((player) => player.dorsal === rosterPlayer.number);
-    return withSquadPlayerPhoto(byDorsal ?? rosterPlayerToSquadPlayer(rosterPlayer));
-  }
-
-  return undefined;
+  return player ? withSquadPlayerPhoto(player) : undefined;
 }
 
 export type TransferCarouselMode = "todos" | "fichajes" | "renovaciones" | "cesiones";

@@ -10,6 +10,7 @@ import {
 import { upsertSquadPlayer } from "@/lib/cms/players";
 import { mergeSquadPlayerOverrides, squadPlayerOverrideKey } from "@/lib/squad-overrides";
 import { ageFromBirthDate } from "@/lib/squad-age";
+import { getSquadPlayers } from "@/lib/squad-data";
 import { withSquadPlayerPhoto } from "@/lib/squad-photos";
 import { resolveSquadPlayers } from "@/lib/season/squad-source";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -32,7 +33,13 @@ export function useSquadPlayers(gender: PrimerEquipoGender) {
   }, [bundles, gender, viewedSeasonId]);
 
   const squad = useMemo(() => {
-    const withOverrides = mergeSquadPlayerOverrides(baseSquad, getOverride);
+    const source =
+      baseSquad.length > 0
+        ? baseSquad
+        : bundlesLoading && gender === "masculino"
+          ? getSquadPlayers(gender)
+          : baseSquad;
+    const withOverrides = mergeSquadPlayerOverrides(source, getOverride);
     const withAge = withOverrides.map((player) => {
       const withPhoto = withSquadPlayerPhoto(player);
       return {
@@ -45,7 +52,7 @@ export function useSquadPlayers(gender: PrimerEquipoGender) {
 
     const chronicleStats = aggregateAvilesStatsFromChronicles(gender, withAge, getOverride);
     return applyChronicleStatsToSquad(withAge, chronicleStats);
-  }, [baseSquad, gender, getOverride]);
+  }, [baseSquad, bundlesLoading, gender, getOverride]);
 
   const updatePlayer = useCallback(
     (playerId: string, patch: Partial<SquadPlayer>) => {
