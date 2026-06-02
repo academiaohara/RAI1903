@@ -1,4 +1,6 @@
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
+import { getCmsRivalSquad } from "@/lib/cms/rival-squads-bundle";
+import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import {
   buildClubInfoFromImport,
   buildSquadFromImport,
@@ -125,9 +127,11 @@ export function isRaiCompetitionTeam(teamId: string, gender: PrimerEquipoGender)
 export function getCompeticionSquadData(
   gender: PrimerEquipoGender,
   team: Team,
+  bundles?: SeasonBundlesMap,
 ): { club: SquadClubInfo; squad: SquadPlayer[]; isOwnClub: boolean } {
   const isOwnClub = isRaiCompetitionTeam(team.id, gender);
-  const imported = getImportedRivalSquad(team.id);
+  const cmsRival = !isOwnClub ? getCmsRivalSquad(bundles, gender, team.id) : null;
+  const imported = cmsRival ?? getImportedRivalSquad(team.id);
 
   if (imported) {
     const squad =

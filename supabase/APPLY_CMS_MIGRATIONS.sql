@@ -69,7 +69,8 @@ alter table public.cms_season_bundles
       'stadium_photos',
       'transfers',
       'competition_config',
-      'teams'
+      'teams',
+      'rival_squads'
     )
   );
 

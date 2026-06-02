@@ -19,7 +19,8 @@ export type SeasonBundleKey =
   | "stadium_photos"
   | "transfers"
   | "competition_config"
-  | "teams";
+  | "teams"
+  | "rival_squads";
 
 /** Movimiento oficial del mercado (carrusel de inicio). */
 export type CmsTransferEntry = {
