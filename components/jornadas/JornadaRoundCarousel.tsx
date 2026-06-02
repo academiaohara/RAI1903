@@ -38,7 +38,7 @@ function cardStateClass(isSelected: boolean, isCurrent: boolean): string {
 }
 
 export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests = true }: JornadaRoundCarouselProps) {
-  const { editMode } = useInlineEditing();
+  const { editMode, getValue } = useInlineEditing();
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -69,6 +69,7 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests 
         className="no-scrollbar mt-3 flex w-full min-w-0 touch-pan-x flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-1"
       >
         {rounds.map((round) => {
+          const shortDate = getValue(`jornada-round:${round.id}:short-date`, round.shortDate);
           const isSelected = round.id === selectedId;
           const opponent =
             round.opponentTeamId && round.opponentName
@@ -131,14 +132,14 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests 
               {editMode ? (
                 <EditableText
                   storageKey={`jornada-round:${round.id}:short-date`}
-                  value={round.shortDate}
+                  value={shortDate}
                   aria-label={`Editar fecha corta de ${round.label}`}
                   className="text-[10px] font-bold uppercase leading-tight tracking-wide opacity-90"
                   inputClassName="px-1 py-0.5 text-[10px] font-bold uppercase leading-tight"
                 />
               ) : (
                 <span className="text-[10px] font-bold uppercase leading-tight tracking-wide opacity-90">
-                  {round.shortDate}
+                  {shortDate}
                 </span>
               )}
             </button>

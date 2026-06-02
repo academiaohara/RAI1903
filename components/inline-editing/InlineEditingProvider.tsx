@@ -1,7 +1,7 @@
 "use client";
 
 import type { User } from "@supabase/supabase-js";
-import { Check, Clipboard, Pencil, Trash2, X } from "lucide-react";
+import { Check, Clipboard, CloudUpload, Pencil, Trash2, X } from "lucide-react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useSeasonOptional } from "@/components/season/SeasonProvider";
 import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
@@ -36,6 +36,8 @@ type InlineEditingContextValue = {
   ready: boolean;
   localOnly: boolean;
   syncError: string | null;
+  cloudSaving: boolean;
+  saveNow: () => Promise<boolean>;
   setEditMode: (enabled: boolean) => void;
   getOverride: <T,>(key: string) => T | undefined;
   getValue: <T,>(key: string, fallback: T) => T;
@@ -90,6 +92,7 @@ export function InlineEditingProvider({
     configured ? initialOverrides : readLegacyOverrides(),
   );
   const [syncError, setSyncError] = useState<string | null>(null);
+  const [cloudSaving, setCloudSaving] = useState(false);
 
   const userIdRef = useRef<string | null>(null);
   const saveTimersRef = useRef<Map<string, number>>(new Map());
@@ -101,16 +104,17 @@ export function InlineEditingProvider({
   }, [overrides]);
 
   const flushSave = useCallback(
-    async (key: string, value: unknown) => {
-      if (!configured) return;
+    async (key: string, value: unknown): Promise<boolean> => {
+      if (!configured) return true;
 
       pendingValuesRef.current.delete(key);
       const result = await upsertInlineOverride(key, value, userIdRef.current, seasonId);
       if (!result.ok) {
         setSyncError(result.error ?? "No se pudo guardar en Supabase");
-      } else {
-        setSyncError(null);
+        return false;
       }
+      setSyncError(null);
+      return true;
     },
     [configured, seasonId],
   );
@@ -125,6 +129,23 @@ export function InlineEditingProvider({
       void flushSave(key, value);
     }
   }, [flushSave]);
+
+  const saveNow = useCallback(async (): Promise<boolean> => {
+    if (!configured) return true;
+
+    for (const timer of saveTimersRef.current.values()) {
+      window.clearTimeout(timer);
+    }
+    saveTimersRef.current.clear();
+
+    const entries = [...pendingValuesRef.current.entries()];
+    if (!entries.length) return true;
+
+    setCloudSaving(true);
+    const results = await Promise.all(entries.map(([key, value]) => flushSave(key, value)));
+    setCloudSaving(false);
+    return results.every(Boolean);
+  }, [configured, flushSave]);
 
   const scheduleCloudSave = useCallback(
     (key: string, value: unknown) => {
@@ -316,6 +337,8 @@ export function InlineEditingProvider({
       ready,
       localOnly: !configured,
       syncError,
+      cloudSaving,
+      saveNow,
       setEditMode,
       getOverride: <T,>(key: string) => overrides[key] as T | undefined,
       getValue: <T,>(key: string, fallback: T) => (overrides[key] as T | undefined) ?? fallback,
@@ -336,6 +359,8 @@ export function InlineEditingProvider({
       saveValue,
       setEditMode,
       syncError,
+      cloudSaving,
+      saveNow,
     ],
   );
 
@@ -352,11 +377,12 @@ export function useInlineEditing() {
 
 export function InlineEditingToolbar() {
   const seasonContext = useSeasonOptional();
-  const { canEdit, editMode, ready, localOnly, syncError, setEditMode, clearAll, exportJson } =
+  const { canEdit, editMode, ready, localOnly, syncError, cloudSaving, saveNow, setEditMode, clearAll, exportJson } =
     useInlineEditing();
   const seasonLabel = seasonContext?.viewedSeason.label;
   const isArchive = seasonContext?.isViewingArchive;
   const [copied, setCopied] = useState(false);
+  const [saveAck, setSaveAck] = useState(false);
   const [seasonPanelOpen, setSeasonPanelOpen] = useState(false);
   const [crestPanelOpen, setCrestPanelOpen] = useState(false);
   const [transfersPanelOpen, setTransfersPanelOpen] = useState(false);
@@ -389,9 +415,21 @@ export function InlineEditingToolbar() {
     ? syncError
     : localOnly
       ? "Solo en este navegador (sin Supabase)"
-      : isArchive
-        ? `Editando archivo ${seasonLabel ?? ""} · Supabase`
-        : `Temporada ${seasonLabel ?? ""} · Supabase`;
+      : cloudSaving
+        ? "Guardando en Supabase…"
+        : saveAck
+          ? "Cambios guardados en Supabase"
+          : isArchive
+            ? `Editando archivo ${seasonLabel ?? ""}. Pulsa «Guardar en Supabase» para confirmar.`
+            : `Temporada ${seasonLabel ?? ""}. Pulsa «Guardar en Supabase» para confirmar.`;
+
+  const handleSaveNow = async () => {
+    const ok = await saveNow();
+    if (ok) {
+      setSaveAck(true);
+      window.setTimeout(() => setSaveAck(false), 2500);
+    }
+  };
 
   return (
     <div className="fixed bottom-4 right-4 z-[80] flex max-w-[calc(100vw-2rem)] flex-col items-end gap-2">
@@ -427,6 +465,17 @@ export function InlineEditingToolbar() {
       <div className="flex flex-wrap justify-end gap-2 rounded-full border border-[#214C9B]/20 bg-white/95 p-2 shadow-2xl backdrop-blur">
         {editMode && (
           <>
+            {!localOnly && (
+              <button
+                type="button"
+                onClick={() => void handleSaveNow()}
+                disabled={cloudSaving}
+                className="inline-flex items-center gap-1.5 rounded-full border border-emerald-600/30 bg-emerald-50 px-3 py-2 text-xs font-extrabold uppercase text-emerald-800 hover:bg-emerald-100 disabled:opacity-60"
+              >
+                <CloudUpload size={14} />
+                {cloudSaving ? "Guardando…" : saveAck ? "Guardado" : "Guardar en Supabase"}
+              </button>
+            )}
             <button
               type="button"
               onClick={() => {

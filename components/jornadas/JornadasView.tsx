@@ -6,6 +6,7 @@ import { JornadaRoundCarousel } from "@/components/jornadas/JornadaRoundCarousel
 import { JornadasGrupoSwitcher } from "@/components/jornadas/JornadasGrupoSwitcher";
 import { PlayoffAscensoGuia } from "@/components/jornadas/PlayoffAscensoGuia";
 import { useSeason } from "@/components/season/SeasonProvider";
+import { useEditedJornadasDataset } from "@/components/jornadas/useEditedJornadasDataset";
 import { buildJornadasDataset, groupFixturesByCalendarDay } from "@/lib/jornadas-data";
 import { getRaiTeamId } from "@/lib/fixtures";
 import { leagueRoundForQualifyingStandings } from "@/lib/playoff-jornadas";
@@ -20,10 +21,11 @@ type JornadasViewProps = {
 
 export function JornadasView({ gender }: JornadasViewProps) {
   const { getEnrichedFixtureSource } = useSeason();
-  const dataset = useMemo(
+  const baseDataset = useMemo(
     () => buildJornadasDataset(gender, getEnrichedFixtureSource(gender)),
     [gender, getEnrichedFixtureSource],
   );
+  const dataset = useEditedJornadasDataset(baseDataset, gender);
   const raiTeamId = getRaiTeamId(gender);
   const [manualRoundId, setManualRoundId] = useState<JornadaRoundId | null>(null);
   const selectedRoundId = manualRoundId ?? dataset.currentRoundId;

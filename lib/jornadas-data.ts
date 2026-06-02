@@ -12,6 +12,7 @@ import {
   type JornadasFixtureSource,
 } from "@/lib/season/fixture-source";
 import { utcDateInputValue } from "@/lib/calendar-match-overrides";
+import { PLACEHOLDER_MATCH_DATE } from "@/lib/competition/normalize-fixtures";
 import { getTeam } from "@/lib/fixtures";
 import { getLastPlayedLeagueRound } from "@/lib/standings";
 import type { Match, Matchday } from "@/types";
@@ -41,7 +42,7 @@ function raiTeamId(gender: PrimerEquipoGender): string {
   return gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
 }
 
-function formatShortDate(iso: string): string {
+export function formatShortDate(iso: string): string {
   return new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "short" }).format(new Date(iso));
 }
 
@@ -90,10 +91,25 @@ function opponentFromRaiMatch(matches: Match[], raiId: string): { teamId: string
 
 /** Fecha del partido del Real Avilés; si no hay, la del primer partido de la jornada. */
 function representativeDate(matches: Match[], raiId: string): string {
-  const raiMatch = matches.find((match) => match.homeTeamId === raiId || match.awayTeamId === raiId);
-  if (raiMatch) return raiMatch.date;
-  if (matches.length === 0) return new Date().toISOString();
-  const sorted = [...matches].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  return representativeDateFromFixtures(
+    matches.map((match) => ({
+      homeTeamId: match.homeTeamId,
+      awayTeamId: match.awayTeamId,
+      date: match.date,
+    })),
+    raiId,
+  );
+}
+
+/** Igual que representativeDate pero sobre fixtures ya enriquecidos (p. ej. con overrides). */
+export function representativeDateFromFixtures(
+  fixtures: Array<{ homeTeamId: string; awayTeamId: string; date: string }>,
+  raiId: string,
+): string {
+  const raiFixture = fixtures.find((fixture) => fixture.homeTeamId === raiId || fixture.awayTeamId === raiId);
+  if (raiFixture) return raiFixture.date;
+  if (fixtures.length === 0) return PLACEHOLDER_MATCH_DATE;
+  const sorted = [...fixtures].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   return sorted[0].date;
 }
 
