@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { normalizeSinglePrincipalSeason } from "@/lib/cms/season-normalize";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export type CmsSeason = {
@@ -35,11 +36,13 @@ export async function fetchPublishedSeasons(): Promise<CmsSeason[]> {
     return FALLBACK_SEASONS;
   }
 
-  return data.map((row) => ({
-    id: row.id,
-    label: row.label,
-    isDefault: row.is_default,
-    sortOrder: row.sort_order,
-    published: row.published,
-  }));
+  return normalizeSinglePrincipalSeason(
+    data.map((row) => ({
+      id: row.id,
+      label: row.label,
+      isDefault: row.is_default,
+      sortOrder: row.sort_order,
+      published: row.published,
+    })),
+  );
 }

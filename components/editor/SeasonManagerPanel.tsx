@@ -86,9 +86,9 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
       </div>
 
       <p className="mb-3 text-xs leading-relaxed text-slate-600">
-        Puedes tener varias temporadas (25/26, 26/27…). La <strong>principal</strong> es la que ve la
-        web por defecto en el selector. <strong>Ver</strong> cambia qué temporada editas ahora (
-        {viewedSeasonId}). Las publicadas aparecen en el selector del público.
+        Puedes tener varias temporadas (25/26, 26/27…). Solo una puede ser <strong>principal</strong> (por
+        defecto en la web). El resto puede estar <strong>activa</strong> (visible y con mercado en la home) o{" "}
+        <strong>inactiva</strong>. <strong>Ver</strong> cambia qué temporada editas ahora ({viewedSeasonId}).
       </p>
 
       {loading ? (
@@ -115,11 +115,14 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
                     Editando
                   </span>
                 )}
-                {!row.published && (
-                  <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 font-bold text-amber-800">
-                    Borrador
+                {row.published ?
+                  <span className="ml-2 rounded-full bg-sky-100 px-2 py-0.5 font-bold text-sky-800">
+                    Activa
                   </span>
-                )}
+                : <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 font-bold text-slate-600">
+                    Inactiva
+                  </span>
+                }
               </div>
               <div className="flex flex-wrap gap-1">
                 <button
@@ -154,12 +157,12 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
                   onClick={() =>
                     void runAction(
                       () => updateSeason(row.id, { published: !row.published }),
-                      row.published ? "Oculta del selector público" : "Visible en el selector público",
+                      row.published ? "Temporada desactivada" : "Temporada activada",
                     )
                   }
                   className="rounded-lg border border-slate-200 px-2 py-1 font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                 >
-                  {row.published ? "Ocultar" : "Publicar"}
+                  {row.published ? "Desactivar" : "Activar"}
                 </button>
                 {!row.isDefault && (
                   <button

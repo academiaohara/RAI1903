@@ -13,6 +13,8 @@ import { flushSync } from "react-dom";
 import type { Route } from "next";
 import type { TransferMarketWindowId } from "@/types";
 import { TransferFichaCard } from "@/components/fichajes/TransferFichaCard";
+import { TransferFichaCardPlaceholder } from "@/components/fichajes/TransferFichaCardPlaceholder";
+import { EMPTY_TRANSFER_FICHA_SLOT_COUNT } from "@/lib/fichajes-carousel";
 
 const MODE_OPTIONS = [
   { id: "todos" as const, label: "Todos" },
@@ -194,17 +196,21 @@ export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
     resetManualScroll();
   }, [activeMode, marketWindowId, resetManualScroll]);
 
-  if (!hasCarousel) {
-    return (
-      <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 p-4 text-sm font-bold text-slate-500">
-        No hay movimientos oficiales en esta ventana de mercado.
-      </p>
-    );
-  }
+  const showEmptySlots = !hasCarousel || transfers.length === 0;
 
-  if (transfers.length === 0) {
+  if (showEmptySlots) {
     return (
       <div className="space-y-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm font-bold uppercase text-[#214C9B]">Mercado blanquiazul</p>
+          <Link
+            href={"/fichajes" as Route}
+            className="hidden text-xs font-bold uppercase tracking-wide text-[#981915] transition hover:underline sm:inline"
+          >
+            Ver todos
+          </Link>
+        </div>
+
         <QuinielaViewToggle
           value={activeMode}
           onChange={handleModeChange}
@@ -212,9 +218,19 @@ export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
           layoutId="transfers-carousel-mode"
           className="text-[10px] sm:text-xs"
         />
-        <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 p-4 text-sm font-bold text-slate-500">
-          No hay movimientos en esta categoria para la ventana seleccionada.
-        </p>
+
+        <div className="flex gap-4 overflow-x-auto py-1 no-scrollbar">
+          {Array.from({ length: EMPTY_TRANSFER_FICHA_SLOT_COUNT }, (_, index) => (
+            <TransferFichaCardPlaceholder key={`empty-slot-${index}`} />
+          ))}
+        </div>
+
+        <Link
+          href={"/fichajes" as Route}
+          className="text-xs font-bold uppercase tracking-wide text-[#981915] transition hover:underline sm:hidden"
+        >
+          Ver todos los fichajes
+        </Link>
       </div>
     );
   }

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { normalizeSinglePrincipalSeason } from "@/lib/cms/season-normalize";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { copyInlineOverrides } from "@/lib/cms/inline-overrides";
 import { copySeasonBundles } from "@/lib/cms/season-bundles";
@@ -23,13 +24,15 @@ export async function fetchEditorSeasons(): Promise<CmsSeason[]> {
 
   if (error || !data?.length) return [];
 
-  return data.map((row) => ({
-    id: row.id,
-    label: row.label,
-    isDefault: row.is_default,
-    sortOrder: row.sort_order,
-    published: row.published,
-  }));
+  return normalizeSinglePrincipalSeason(
+    data.map((row) => ({
+      id: row.id,
+      label: row.label,
+      isDefault: row.is_default,
+      sortOrder: row.sort_order,
+      published: row.published,
+    })),
+  );
 }
 
 export async function createSeason(input: SeasonEditorInput): Promise<{ ok: boolean; error?: string }> {
@@ -108,7 +111,7 @@ export async function setDefaultSeason(seasonId: string): Promise<{ ok: boolean;
   const { error: clearError } = await supabase
     .from("cms_seasons")
     .update({ is_default: false, updated_at: new Date().toISOString() })
-    .neq("id", "");
+    .eq("is_default", true);
 
   if (clearError) return { ok: false, error: clearError.message };
 
