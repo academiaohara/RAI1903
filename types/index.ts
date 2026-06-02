@@ -48,6 +48,8 @@ export type Team = {
   colors: string[];
   position: number;
   zone?: StandingsZone;
+  /** Clase Tailwind para la columna # cuando hay zonas CMS personalizadas. */
+  zoneColorClass?: string;
   /** Aviso cuando el desempate queda pendiente de resolución oficial. */
   tiebreakNote?: string;
   form: FormCode[];

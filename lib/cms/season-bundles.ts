@@ -4,6 +4,8 @@ import type { MatchArticle } from "@/types";
 import type { Match, Matchday } from "@/types";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { TransferKind, TransferMarketWindowId } from "@/types";
+import type { SeasonCompetitionConfigBundle } from "@/lib/cms/competition-config-bundle";
+import type { SeasonTeamsBundle } from "@/lib/cms/teams-bundle";
 import type { SquadClubInfo, SquadPlayer } from "@/types/squad";
 
 export type SeasonBundleScope = PrimerEquipoGender | "global";
@@ -15,7 +17,9 @@ export type SeasonBundleKey =
   | "competition_labels"
   | "team_crests"
   | "stadium_photos"
-  | "transfers";
+  | "transfers"
+  | "competition_config"
+  | "teams";
 
 /** Movimiento oficial del mercado (carrusel de inicio). */
 export type CmsTransferEntry = {
@@ -84,7 +88,7 @@ type BundleRow = {
   payload: unknown;
 };
 
-function bundleMapKey(scope: SeasonBundleScope, bundleKey: SeasonBundleKey) {
+export function bundleMapKey(scope: SeasonBundleScope, bundleKey: SeasonBundleKey) {
   return `${scope}:${bundleKey}` as const;
 }
 
@@ -205,4 +209,17 @@ export function getMatchArticlesBundle(map: SeasonBundlesMap): SeasonMatchArticl
 export function getTransfersBundle(map: SeasonBundlesMap): SeasonTransfersBundle | null {
   const payload = map[bundleMapKey("global", "transfers")];
   return (payload as SeasonTransfersBundle | undefined) ?? null;
+}
+
+export function getCompetitionConfigFromMap(
+  map: SeasonBundlesMap,
+  gender: PrimerEquipoGender,
+): SeasonCompetitionConfigBundle | null {
+  const payload = map[bundleMapKey(gender, "competition_config")];
+  return (payload as SeasonCompetitionConfigBundle | undefined) ?? null;
+}
+
+export function getTeamsBundleFromMap(map: SeasonBundlesMap, gender: PrimerEquipoGender): SeasonTeamsBundle | null {
+  const payload = map[bundleMapKey(gender, "teams")];
+  return (payload as SeasonTeamsBundle | undefined) ?? null;
 }

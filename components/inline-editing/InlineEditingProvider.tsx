@@ -18,6 +18,9 @@ import { TeamCrestEditorPanel } from "@/components/editor/TeamCrestEditorPanel";
 import { HomeLayoutEditorPanel } from "@/components/editor/HomeLayoutEditorPanel";
 import { MediaRaiSectionsEditorPanel } from "@/components/editor/MediaRaiSectionsEditorPanel";
 import { TransferMarketEditorPanel } from "@/components/editor/TransferMarketEditorPanel";
+import { SquadEditorPanel } from "@/components/editor/SquadEditorPanel";
+import { CompetitionEditorPanel } from "@/components/editor/CompetitionEditorPanel";
+import { TeamsEditorPanel } from "@/components/editor/TeamsEditorPanel";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
@@ -359,6 +362,20 @@ export function InlineEditingToolbar() {
   const [transfersPanelOpen, setTransfersPanelOpen] = useState(false);
   const [homePanelOpen, setHomePanelOpen] = useState(false);
   const [mediaRaiPanelOpen, setMediaRaiPanelOpen] = useState(false);
+  const [squadPanelOpen, setSquadPanelOpen] = useState(false);
+  const [competitionPanelOpen, setCompetitionPanelOpen] = useState(false);
+  const [teamsPanelOpen, setTeamsPanelOpen] = useState(false);
+
+  const closeEditorPanels = useCallback(() => {
+    setSeasonPanelOpen(false);
+    setCrestPanelOpen(false);
+    setTransfersPanelOpen(false);
+    setHomePanelOpen(false);
+    setMediaRaiPanelOpen(false);
+    setSquadPanelOpen(false);
+    setCompetitionPanelOpen(false);
+    setTeamsPanelOpen(false);
+  }, []);
 
   if (!ready || !canEdit) return null;
 
@@ -402,16 +419,18 @@ export function InlineEditingToolbar() {
       {editMode && mediaRaiPanelOpen && (
         <MediaRaiSectionsEditorPanel onClose={() => setMediaRaiPanelOpen(false)} />
       )}
+      {editMode && squadPanelOpen && <SquadEditorPanel onClose={() => setSquadPanelOpen(false)} />}
+      {editMode && competitionPanelOpen && (
+        <CompetitionEditorPanel onClose={() => setCompetitionPanelOpen(false)} />
+      )}
+      {editMode && teamsPanelOpen && <TeamsEditorPanel onClose={() => setTeamsPanelOpen(false)} />}
       <div className="flex flex-wrap justify-end gap-2 rounded-full border border-[#214C9B]/20 bg-white/95 p-2 shadow-2xl backdrop-blur">
         {editMode && (
           <>
             <button
               type="button"
               onClick={() => {
-                setCrestPanelOpen(false);
-                setTransfersPanelOpen(false);
-                setHomePanelOpen(false);
-                setMediaRaiPanelOpen(false);
+                closeEditorPanels();
                 setSeasonPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -421,10 +440,37 @@ export function InlineEditingToolbar() {
             <button
               type="button"
               onClick={() => {
-                setSeasonPanelOpen(false);
-                setTransfersPanelOpen(false);
-                setHomePanelOpen(false);
-                setMediaRaiPanelOpen(false);
+                closeEditorPanels();
+                setSquadPanelOpen((open) => !open);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+            >
+              Plantilla
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                closeEditorPanels();
+                setCompetitionPanelOpen((open) => !open);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+            >
+              Competición
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                closeEditorPanels();
+                setTeamsPanelOpen((open) => !open);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+            >
+              Equipos
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                closeEditorPanels();
                 setCrestPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -434,10 +480,7 @@ export function InlineEditingToolbar() {
             <button
               type="button"
               onClick={() => {
-                setSeasonPanelOpen(false);
-                setCrestPanelOpen(false);
-                setTransfersPanelOpen(false);
-                setMediaRaiPanelOpen(false);
+                closeEditorPanels();
                 setHomePanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -447,10 +490,7 @@ export function InlineEditingToolbar() {
             <button
               type="button"
               onClick={() => {
-                setSeasonPanelOpen(false);
-                setCrestPanelOpen(false);
-                setHomePanelOpen(false);
-                setTransfersPanelOpen(false);
+                closeEditorPanels();
                 setMediaRaiPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -460,10 +500,7 @@ export function InlineEditingToolbar() {
             <button
               type="button"
               onClick={() => {
-                setSeasonPanelOpen(false);
-                setCrestPanelOpen(false);
-                setHomePanelOpen(false);
-                setMediaRaiPanelOpen(false);
+                closeEditorPanels();
                 setTransfersPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"

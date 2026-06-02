@@ -25,10 +25,10 @@ function partitionMatches(matches: JornadaFixture[]) {
 }
 
 export function JornadasView({ gender }: JornadasViewProps) {
-  const { getFixtureSource } = useSeason();
+  const { getEnrichedFixtureSource } = useSeason();
   const dataset = useMemo(
-    () => buildJornadasDataset(gender, getFixtureSource(gender)),
-    [gender, getFixtureSource],
+    () => buildJornadasDataset(gender, getEnrichedFixtureSource(gender)),
+    [gender, getEnrichedFixtureSource],
   );
   const raiTeamId = getRaiTeamId(gender);
   const [manualRoundId, setManualRoundId] = useState<JornadaRoundId | null>(null);

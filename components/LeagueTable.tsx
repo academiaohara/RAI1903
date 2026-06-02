@@ -10,6 +10,7 @@ import {
   getStandingsHighlightRowClass,
   getStandingsRowHighlight,
   isStandingsRowHighlighted,
+  type StandingsLegendItem,
 } from "@/lib/standings-styles";
 import { cn, formatGoalDifference, resultTone } from "@/lib/utils";
 import type { Team } from "@/types";
@@ -25,6 +26,7 @@ type LeagueTableProps = {
   showCrests?: boolean;
   showLegend?: boolean;
   gender?: PrimerEquipoGender;
+  zoneLegend?: StandingsLegendItem[];
 };
 
 export function LeagueTable({
@@ -36,7 +38,9 @@ export function LeagueTable({
   showCrests: showCrestsProp,
   showLegend = true,
   gender = "masculino",
+  zoneLegend,
 }: LeagueTableProps) {
+  const legend = zoneLegend ?? STANDINGS_ZONE_LEGEND;
   const showCrests = showCrestsProp ?? gender !== "femenino";
   const visibleRows = [...teams].sort((a, b) => a.position - b.position);
 
@@ -80,7 +84,7 @@ export function LeagueTable({
               const highlighted = isStandingsRowHighlighted(rowHighlight);
               const rowClassName = getStandingsHighlightRowClass(rowHighlight);
               const highlightCellClassName = getStandingsHighlightCellClass(rowHighlight);
-              const positionClassName = getStandingsHighlightPositionClass(false, team.zone);
+              const positionClassName = getStandingsHighlightPositionClass(false, team.zone, team.zoneColorClass);
               const dataCellClassName = cn(
                 "px-0.5 py-1.5 md:px-2 md:py-2.5",
                 highlightCellClassName,
@@ -191,8 +195,8 @@ export function LeagueTable({
           role="list"
           aria-label="Leyenda de zonas en la clasificacion"
         >
-          {STANDINGS_ZONE_LEGEND.map((item) => (
-            <span key={item.zone} role="listitem" className="inline-flex items-center gap-1.5">
+          {legend.map((item) => (
+            <span key={item.id ?? item.zone} role="listitem" className="inline-flex items-center gap-1.5">
               <span className={cn("h-2.5 w-2.5 shrink-0 rounded-sm", item.className)} aria-hidden />
               {item.label}
             </span>

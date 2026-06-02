@@ -9,6 +9,8 @@ import { EditableText } from "@/components/inline-editing/EditableText";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
 import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
+import { zonesToLegacyConfig } from "@/lib/cms/competition-config-bundle";
+import { getTeamsBundle, mergeTeamsWithCms } from "@/lib/cms/teams-bundle";
 import { getTeamsByGender } from "@/lib/fixtures";
 import { useSeason } from "@/components/season/SeasonProvider";
 import {
@@ -38,8 +40,10 @@ const COMPETICION_OPTIONS = [
 type CompeticionPanel = (typeof COMPETICION_OPTIONS)[number]["id"];
 
 export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }: CompeticionViewProps) {
-  const { getFixtureSource } = useSeason();
-  const fixtureSource = useMemo(() => getFixtureSource(gender), [gender, getFixtureSource]);
+  const { getEnrichedFixtureSource, getCompetitionConfig, bundles } = useSeason();
+  const fixtureSource = useMemo(() => getEnrichedFixtureSource(gender), [gender, getEnrichedFixtureSource]);
+  const competitionConfig = useMemo(() => getCompetitionConfig(gender), [gender, getCompetitionConfig]);
+  const standingsZones = useMemo(() => zonesToLegacyConfig(competitionConfig.zones), [competitionConfig.zones]);
   const leagueMatchdays = useMemo(
     () => getLeagueMatchdaysForGender(fixtureSource, gender),
     [fixtureSource, gender],
@@ -57,7 +61,10 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
   const [grupo, setGrupo] = useState<RfefGrupoId>(initialGrupo);
   const [panel, setPanel] = useState<CompeticionPanel>("liga");
   const isMasculino = gender === "masculino";
-  const teams = isMasculino ? getTeamsForRfefGrupo(grupo) : getTeamsByGender(gender);
+  const teams = useMemo(() => {
+    const base = isMasculino ? getTeamsForRfefGrupo(grupo) : getTeamsByGender(gender);
+    return mergeTeamsWithCms(base, getTeamsBundle(bundles, gender));
+  }, [bundles, gender, grupo, isMasculino]);
   const standingsMatchdays = isMasculino
     ? grupo === "2"
       ? matchdaysGrupo2
@@ -153,9 +160,9 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
               compact
               borderlessHeader
               gender={gender}
-              {...(isMasculino
-                ? {}
-                : { zones: FEMENINA_STANDINGS_ZONES, tiebreak: undefined })}
+              zones={isMasculino ? standingsZones : FEMENINA_STANDINGS_ZONES}
+              zoneRules={competitionConfig.zones}
+              {...(isMasculino ? {} : { tiebreak: undefined })}
             />
             <div className="grid gap-6">
               {showAvilesSidebar && (

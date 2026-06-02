@@ -10,9 +10,10 @@ type PlayerGridProps = {
   players: SquadPlayer[];
   onSelect: (player: SquadPlayer) => void;
   variant?: "default" | "fichas";
+  showEmptyPositions?: boolean;
 };
 
-export function PlayerGrid({ players, onSelect, variant = "default" }: PlayerGridProps) {
+export function PlayerGrid({ players, onSelect, variant = "default", showEmptyPositions = false }: PlayerGridProps) {
   const grouped = groupPlayersByPosition(players);
   const isFichas = variant === "fichas";
 
@@ -20,7 +21,7 @@ export function PlayerGrid({ players, onSelect, variant = "default" }: PlayerGri
     <div className="space-y-10">
       {SQUAD_POSITIONS.map((position, sectionIndex) => {
         const list = grouped[position];
-        if (list.length === 0) return null;
+        if (list.length === 0 && !showEmptyPositions) return null;
 
         return (
           <PositionSection key={position} position={position} delay={sectionIndex * 0.05} variant={variant}>
@@ -31,9 +32,13 @@ export function PlayerGrid({ players, onSelect, variant = "default" }: PlayerGri
                   : "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
               }
             >
-              {list.map((player, index) => (
-                <PlayerCard key={player.id} player={player} onSelect={onSelect} index={index} variant={variant} />
-              ))}
+              {list.length === 0 ? (
+                <p className="col-span-full text-sm font-semibold text-slate-400">Sin jugadores en esta posición</p>
+              ) : (
+                list.map((player, index) => (
+                  <PlayerCard key={player.id} player={player} onSelect={onSelect} index={index} variant={variant} />
+                ))
+              )}
             </div>
           </PositionSection>
         );

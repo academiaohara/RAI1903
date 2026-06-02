@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { AnimatePresence, motion } from "framer-motion";
 import type { SquadPlayer, SquadViewMode } from "@/types/squad";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
@@ -25,15 +26,19 @@ type SquadPageProps = {
 export function SquadPage({ gender }: SquadPageProps) {
   const { squad, updatePlayer } = useSquadPlayers(gender);
   const { bundles, viewedSeason, getFixtureSource } = useSeason();
+  const { editMode, getValue } = useInlineEditing();
   const leagueMatchdays = useMemo(
     () => getLeagueMatchdaysForGender(getFixtureSource(gender), gender),
     [gender, getFixtureSource],
   );
   const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
-  const club = useMemo(
-    () => resolveSquadClubInfo(gender, viewedSeason.label, bundles, squad.length, leagueMatchdays),
-    [bundles, gender, leagueMatchdays, squad.length, viewedSeason.label],
-  );
+  const club = useMemo(() => {
+    const base = resolveSquadClubInfo(gender, viewedSeason.label, bundles, squad.length, leagueMatchdays);
+    return {
+      ...base,
+      entrenador: getValue(`squad-club:${gender}:entrenador`, base.entrenador),
+    };
+  }, [bundles, gender, getValue, leagueMatchdays, squad.length, viewedSeason.label]);
   const isFemenino = gender === "femenino";
 
   const [viewMode, setViewMode] = useState<SquadViewMode>(isFemenino ? "lista" : "fichas");
@@ -45,11 +50,16 @@ export function SquadPage({ gender }: SquadPageProps) {
     return squad.find((player) => player.id === selected.id) ?? selected;
   }, [selected, squad]);
 
-  const handleSelect = isFemenino ? undefined : setSelected;
+  const handleSelect = setSelected;
 
   return (
     <div className="space-y-6">
-      <SquadHeader club={club} stats={club.stats} onStadiumClick={() => setStadiumOpen(true)} />
+      <SquadHeader
+        club={club}
+        stats={club.stats}
+        gender={gender}
+        onStadiumClick={() => setStadiumOpen(true)}
+      />
       <SquadToolbar viewMode={viewMode} onViewModeChange={setViewMode} showViewToggle={!isFemenino} />
 
       <SquadAvailability injured={injured} suspended={suspended} onSelect={handleSelect} />
@@ -68,20 +78,24 @@ export function SquadPage({ gender }: SquadPageProps) {
               onSelect={handleSelect}
               showMarketValue={!isFemenino}
               showAge={!isFemenino}
+              showEmptyPositions={editMode}
             />
           ) : (
-            <PlayerGrid players={available} onSelect={setSelected} variant="fichas" />
+            <PlayerGrid
+              players={available}
+              onSelect={setSelected}
+              variant="fichas"
+              showEmptyPositions={editMode}
+            />
           )}
         </motion.div>
       </AnimatePresence>
 
-      {!isFemenino && (
-        <PlayerModal
-          player={selectedPlayer}
-          onClose={() => setSelected(null)}
-          onUpdate={updatePlayer}
-        />
-      )}
+      <PlayerModal
+        player={selectedPlayer}
+        onClose={() => setSelected(null)}
+        onUpdate={updatePlayer}
+      />
       {!isFemenino && <StandingsEvolutionChart />}
       <StadiumModal stadium={club.estadioInfo} open={stadiumOpen} onClose={() => setStadiumOpen(false)} />
     </div>
