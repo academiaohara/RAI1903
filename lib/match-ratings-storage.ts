@@ -1,4 +1,4 @@
-import { getActiveSeasonId } from "@/lib/quiniela-storage";
+import { loadSeasonId } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -59,7 +59,7 @@ export async function fetchUserMatchRatings(
   if (!isSupabaseConfigured()) return {};
 
   const supabase = createClient();
-  const seasonId = getActiveSeasonId();
+  const seasonId = loadSeasonId();
 
   const { data, error } = await supabase
     .from("match_player_ratings")
@@ -81,7 +81,7 @@ export async function fetchMatchRatingAverages(matchId: string): Promise<Record<
   if (!isSupabaseConfigured()) return {};
 
   const supabase = createClient();
-  const seasonId = getActiveSeasonId();
+  const seasonId = loadSeasonId();
 
   const { data, error } = await supabase
     .from("match_player_ratings")
@@ -122,7 +122,7 @@ export async function submitMatchRatings(params: {
   }
 
   const supabase = createClient();
-  const seasonId = getActiveSeasonId();
+  const seasonId = loadSeasonId();
   const rows = entries.map(([playerId, rating]) => ({
     user_id: params.userId,
     match_id: params.matchId,
@@ -141,7 +141,7 @@ export async function submitMatchRatings(params: {
 }
 
 export async function fetchSeasonPlayerRatingAverages(
-  seasonId = getActiveSeasonId(),
+  seasonId = loadSeasonId(),
 ): Promise<Record<string, PlayerRatingAverage>> {
   if (!isSupabaseConfigured()) return {};
 
@@ -170,7 +170,7 @@ export async function fetchSeasonPlayerRatingAverages(
 
 export async function fetchPlayerSeasonRatingAverage(
   playerId: string,
-  seasonId = getActiveSeasonId(),
+  seasonId = loadSeasonId(),
 ): Promise<PlayerRatingAverage | null> {
   const all = await fetchSeasonPlayerRatingAverages(seasonId);
   return all[playerId] ?? null;

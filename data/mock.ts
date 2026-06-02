@@ -1,9 +1,5 @@
 import { baseTeamsGrupo2 } from "@/data/rfef-grupo2-teams";
-import {
-  buildMatchdaysFromResultados2526,
-  buildMatchdaysGrupo2,
-  RESULTADOS_2526_LAST_ROUND,
-} from "@/lib/resultados-2526";
+import { buildMatchdaysFromResultados2526, buildMatchdaysGrupo2 } from "@/lib/resultados-2526";
 import { PRIMERA_RFEF_RULES, buildPlayoffBracketFromConfig } from "@/lib/rfef-rules";
 import {
   buildFilialCalendar,
@@ -38,9 +34,6 @@ import type {
   PressLink,
   Team,
   TransferRumor,
-  JornadaParticipant,
-  MatchPickStats,
-  UserPredictionSummary,
 } from "@/types";
 
 export const RAI_TEAM_ID = "real-aviles-industrial";
@@ -1319,90 +1312,6 @@ export const pressLinks: PressLink[] = [
   { id: "radio-marca", name: "Radio Marca Asturias", outlet: "Radio", url: "https://example.com/radio-marca-asturias", description: "Audios, tertulias y actualidad de la categoria." },
   { id: "asturfutbol", name: "AsturFutbol", outlet: "Digital", url: "https://example.com/asturfutbol", description: "Calendarios, rivales y mercado de futbol modesto." },
 ];
-
-export const CURRENT_QUINIELA_ROUND = RESULTADOS_2526_LAST_ROUND;
-
-const hashSeed = (value: string) => {
-  let hash = 0;
-  for (let index = 0; index < value.length; index += 1) {
-    hash = (hash << 5) - hash + value.charCodeAt(index);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-};
-
-export const matchPickStats: MatchPickStats[] = matchdays.flatMap((matchday) =>
-  matchday.matches.map((match) => {
-    const seed = hashSeed(match.id);
-    const raw = [
-      { outcome: "1" as const, count: 18 + (seed % 40) },
-      { outcome: "X" as const, count: 12 + ((seed >> 3) % 28) },
-      { outcome: "2" as const, count: 10 + ((seed >> 6) % 32) },
-    ];
-    const total = raw.reduce((sum, item) => sum + item.count, 0);
-    return {
-      matchId: match.id,
-      total,
-      picks: raw.map((item) => ({
-        ...item,
-        percent: Math.round((item.count / total) * 1000) / 10,
-      })),
-    };
-  }),
-);
-
-const participantNames = [
-  "Roman1903",
-  "LaGradaDeRivero",
-  "BlanquiazulData",
-  "VillaDelAdelantado",
-  "RomanSuarez",
-  "PuertaNorte",
-  "AsturFutbolero",
-  "GradaAzul",
-  "Industrial1903",
-  "CaleyaBlanca",
-  "MuelleDeAviles",
-  "Trubia1903",
-];
-
-export const jornadaParticipants: Record<number, JornadaParticipant[]> = Object.fromEntries(
-  matchdays.map((matchday) => {
-    const finished = matchday.round <= RESULTADOS_2526_LAST_ROUND;
-    const entries = participantNames
-      .slice(0, 8 + (matchday.round % 5))
-      .map((user, index) => ({
-        user,
-        submittedAt: new Date(Date.UTC(2026, 7, 20 + matchday.round, 9 + index, (index * 11) % 60)).toISOString(),
-        points: finished ? 4 + ((matchday.round + index * 3) % 12) : 0,
-        hits: finished ? 3 + ((matchday.round + index) % 7) : 0,
-      }))
-      .sort((a, b) => a.submittedAt.localeCompare(b.submittedAt));
-
-    if (finished) {
-      entries.sort((a, b) => b.points - a.points || a.submittedAt.localeCompare(b.submittedAt));
-    }
-
-    return [matchday.round, entries];
-  }),
-);
-
-export const quinielaRanking: UserPredictionSummary[] = [
-  { user: "Roman1903", points: 41, hits: 29, exactScores: 5 },
-  { user: "LaGradaDeRivero", points: 38, hits: 27, exactScores: 4 },
-  { user: "BlanquiazulData", points: 34, hits: 24, exactScores: 3 },
-  { user: "VillaDelAdelantado", points: 31, hits: 22, exactScores: 2 },
-];
-
-export const matchdayResult = {
-  round: RESULTADOS_2526_LAST_ROUND,
-  pointsAvailable: 20,
-  averagePoints: 9.6,
-  bestUser: quinielaRanking[0],
-  highlightedMatch: matchdays
-    .find((matchday) => matchday.round === RESULTADOS_2526_LAST_ROUND)
-    ?.matches.find((match) => match.homeTeamId === RAI_TEAM_ID || match.awayTeamId === RAI_TEAM_ID),
-};
 
 const RAI_YOUTUBE_CHANNEL = "https://www.youtube.com/channel/UCqnlVJmxk-zGSSNCb9noziw";
 const RAI_SPOTIFY_PODCAST = "https://open.spotify.com/show/5kHriw0nbuCDhY5qtLHuQC";
