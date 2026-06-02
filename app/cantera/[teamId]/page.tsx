@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { CanteraTeamSections } from "@/components/cantera/CanteraTeamSections";
 import { FilialCanteraPage } from "@/components/cantera/FilialCanteraPage";
+import { JuvenilCanteraPage } from "@/components/cantera/JuvenilCanteraPage";
 import { Card } from "@/components/Card";
 import { PageHero } from "@/components/PageHero";
 import { academyTeams } from "@/data/mock";
@@ -14,6 +15,10 @@ export default async function CanteraTeamPage({ params }: { params: Promise<{ te
 
   if (teamId === "filial") {
     return <FilialCanteraPage />;
+  }
+
+  if (teamId === "juvenil-a") {
+    return <JuvenilCanteraPage />;
   }
 
   const team = academyTeams.find((item) => item.id === teamId);

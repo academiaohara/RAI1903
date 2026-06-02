@@ -7,7 +7,7 @@ import {
   getCanteraSquadPlayersFromImport,
   type CanteraSquadPlayer,
 } from "@/lib/cantera-squad";
-import type { CanteraSquadImport } from "@/types/cantera-squad-import";
+import type { CanteraSquadImport, CanteraSquadImportPlayer } from "@/types/cantera-squad-import";
 import { SQUAD_POSITIONS, SQUAD_POSITION_LABELS, type SquadPosition } from "@/types/squad";
 import { PositionSection } from "@/components/squad/PositionSection";
 import { SquadListColGroup } from "@/components/squad/SquadListColGroup";
@@ -20,6 +20,21 @@ const alignClass = {
 };
 
 const cellPad = "px-4 py-3";
+
+const statInputClass =
+  "w-full min-w-[2.25rem] max-w-[3.5rem] rounded-md border border-[#214C9B]/25 bg-white px-1 py-0.5 text-center text-sm font-semibold text-slate-800 focus:border-[#214C9B] focus:outline-none focus:ring-1 focus:ring-[#214C9B]/30";
+
+type StatKey = keyof Pick<CanteraSquadImportPlayer, "pc" | "pj" | "pt" | "min" | "goles" | "ta" | "tr">;
+
+const STAT_COLUMNS: Array<{ key: StatKey; label: string }> = [
+  { key: "pc", label: "PC" },
+  { key: "pj", label: "PJ" },
+  { key: "pt", label: "PT" },
+  { key: "min", label: "Min" },
+  { key: "goles", label: "Goles" },
+  { key: "ta", label: "TA" },
+  { key: "tr", label: "TR" },
+];
 
 function groupPlayers(players: CanteraSquadPlayer[]): Map<SquadPosition | typeof OTHER_POSITION, CanteraSquadPlayer[]> {
   const groups = new Map<SquadPosition | typeof OTHER_POSITION, CanteraSquadPlayer[]>();
@@ -43,16 +58,63 @@ function formatDorsal(dorsal: number | null): string {
   return dorsal == null || dorsal === 0 ? "—" : String(dorsal);
 }
 
+function parseStatValue(raw: string): number {
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
+
+function CanteraStatCell({
+  editMode,
+  value,
+  onChange,
+  className = "",
+  goalsDisplay,
+}: {
+  editMode: boolean;
+  value: number;
+  onChange: (value: number) => void;
+  className?: string;
+  goalsDisplay?: string;
+}) {
+  if (!editMode) {
+    return <span className={className}>{goalsDisplay ?? value}</span>;
+  }
+
+  return (
+    <input
+      type="number"
+      min={0}
+      value={value}
+      onChange={(e) => onChange(parseStatValue(e.target.value))}
+      className={statInputClass}
+      aria-label="Estadística"
+    />
+  );
+}
+
 type CanteraSquadTableProps = {
   teamId: CanteraTeamId;
   squadImport: CanteraSquadImport;
   seasonLabel: string;
+  editMode?: boolean;
+  onStatUpdate?: (playerId: string, patch: Partial<CanteraSquadImportPlayer>) => void;
 };
 
-export function CanteraSquadTable({ teamId, squadImport, seasonLabel }: CanteraSquadTableProps) {
+export function CanteraSquadTable({
+  teamId,
+  squadImport,
+  seasonLabel,
+  editMode = false,
+  onStatUpdate,
+}: CanteraSquadTableProps) {
   const players = getCanteraSquadPlayersFromImport(squadImport, teamId);
   const importData = squadImport;
   const grouped = groupPlayers(players);
+  const canEditStats = editMode && Boolean(onStatUpdate);
+
+  const updateStat = (player: CanteraSquadPlayer, patch: Partial<CanteraSquadImportPlayer>) => {
+    onStatUpdate?.(player.id, patch);
+  };
 
   const sections: Array<{ key: string; label: string; list: CanteraSquadPlayer[] }> = [
     ...SQUAD_POSITIONS.map((position) => ({
@@ -69,13 +131,11 @@ export function CanteraSquadTable({ teamId, squadImport, seasonLabel }: CanteraS
         <th className={`${cellPad} ${alignClass.center}`}>#</th>
         <th className={`${cellPad} ${alignClass.left}`}>Jugador</th>
         <th className={`${cellPad} ${alignClass.center}`}>Demarcación</th>
-        <th className={`${cellPad} ${alignClass.center}`}>PC</th>
-        <th className={`${cellPad} ${alignClass.center}`}>PJ</th>
-        <th className={`${cellPad} ${alignClass.center}`}>PT</th>
-        <th className={`${cellPad} ${alignClass.center}`}>Min</th>
-        <th className={`${cellPad} ${alignClass.center}`}>Goles</th>
-        <th className={`${cellPad} ${alignClass.center}`}>TA</th>
-        <th className={`${cellPad} ${alignClass.center}`}>TR</th>
+        {STAT_COLUMNS.map((col) => (
+          <th key={col.key} className={`${cellPad} ${alignClass.center}`}>
+            {col.label}
+          </th>
+        ))}
       </tr>
     </thead>
   );
@@ -87,30 +147,60 @@ export function CanteraSquadTable({ teamId, squadImport, seasonLabel }: CanteraS
           <SquadListColGroup variant="cantera" />
           {tableHeader}
           <tbody>
-            {list.map((player, rowIndex) => (
-              <motion.tr
-                key={player.id}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: rowIndex * 0.02 }}
-                className="border-b border-slate-50 text-slate-800 last:border-0"
-              >
-                <td className={`${cellPad} font-bold text-[#214C9B] ${alignClass.center}`}>
-                  {formatDorsal(player.dorsal)}
-                </td>
-                <td className={`max-w-[11.5rem] ${cellPad} font-semibold ${alignClass.left}`}>
-                  <p className="truncate">{player.jugador}</p>
-                </td>
-                <td className={`${cellPad} truncate text-slate-600 ${alignClass.center}`}>{player.posLabel}</td>
-                <td className={`${cellPad} ${alignClass.center}`}>{player.pc}</td>
-                <td className={`${cellPad} ${alignClass.center}`}>{player.pj}</td>
-                <td className={`${cellPad} ${alignClass.center}`}>{player.pt}</td>
-                <td className={`${cellPad} ${alignClass.center}`}>{player.min}</td>
-                <td className={`${cellPad} font-semibold ${alignClass.center}`}>{formatCanteraGoals(player)}</td>
-                <td className={`${cellPad} ${alignClass.center}`}>{player.ta}</td>
-                <td className={`${cellPad} ${alignClass.center}`}>{player.tr}</td>
-              </motion.tr>
-            ))}
+            {list.map((player, rowIndex) => {
+              const isGoalkeeper = player.posicion === "Portero";
+              return (
+                <motion.tr
+                  key={player.id}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: rowIndex * 0.02 }}
+                  className={`border-b border-slate-50 text-slate-800 last:border-0 ${
+                    canEditStats ? "bg-[#214C9B]/[0.02]" : ""
+                  }`}
+                >
+                  <td className={`${cellPad} font-bold text-[#214C9B] ${alignClass.center}`}>
+                    {formatDorsal(player.dorsal)}
+                  </td>
+                  <td className={`max-w-[11.5rem] ${cellPad} font-semibold ${alignClass.left}`}>
+                    <p className="truncate">{player.jugador}</p>
+                  </td>
+                  <td className={`${cellPad} truncate text-slate-600 ${alignClass.center}`}>{player.posLabel}</td>
+                  {STAT_COLUMNS.map((col) => {
+                    if (col.key === "goles" && isGoalkeeper) {
+                      const conceded = player.golesEncajados ?? player.goles;
+                      return (
+                        <td key={col.key} className={`${cellPad} ${alignClass.center}`}>
+                          <CanteraStatCell
+                            editMode={canEditStats}
+                            value={conceded}
+                            onChange={(value) =>
+                              updateStat(player, { golesEncajados: value, goles: player.goles })
+                            }
+                            className="font-semibold"
+                            goalsDisplay={formatCanteraGoals(player)}
+                          />
+                        </td>
+                      );
+                    }
+
+                    return (
+                      <td
+                        key={col.key}
+                        className={`${cellPad} ${alignClass.center} ${col.key === "goles" ? "font-semibold" : ""}`}
+                      >
+                        <CanteraStatCell
+                          editMode={canEditStats}
+                          value={player[col.key]}
+                          onChange={(value) => updateStat(player, { [col.key]: value })}
+                          goalsDisplay={col.key === "goles" ? formatCanteraGoals(player) : undefined}
+                        />
+                      </td>
+                    );
+                  })}
+                </motion.tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -123,6 +213,12 @@ export function CanteraSquadTable({ teamId, squadImport, seasonLabel }: CanteraS
         <strong className="text-slate-900">{importData.plantilla.length} jugadores</strong>
         {" · "}
         Temporada {seasonLabel}
+        {canEditStats ? (
+          <>
+            {" · "}
+            <span className="text-[#214C9B]">Pulsa en las cifras para editarlas</span>
+          </>
+        ) : null}
       </p>
 
       <div className="space-y-10">

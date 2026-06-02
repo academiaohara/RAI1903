@@ -34,7 +34,7 @@ export function slugifyCanteraTeamName(name: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-function shortNameFromFull(name: string): string {
+export function shortNameFromFull(name: string): string {
   return name
     .replace(/\s+U19$/i, "")
     .replace(/^Real\s+/i, "")

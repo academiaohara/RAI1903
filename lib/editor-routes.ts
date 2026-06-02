@@ -12,10 +12,19 @@ export function isFilialPath(pathname: string) {
   return pathname === "/cantera/filial" || pathname.startsWith("/cantera/filial/");
 }
 
+export function isJuvenilPath(pathname: string) {
+  return pathname === "/cantera/juvenil-a" || pathname.startsWith("/cantera/juvenil-a/");
+}
+
+export function isCanteraCmsPath(pathname: string) {
+  return isFilialPath(pathname) || isJuvenilPath(pathname);
+}
+
 export const EDITOR_PAGE_LINKS = {
   plantilla: "/primer-equipo/masculino/plantilla" as Route,
   fichajes: "/fichajes" as Route,
   filial: "/cantera/filial" as Route,
+  juvenil: "/cantera/juvenil-a" as Route,
 } as const;
 
 export function plantillaEditorLink(pathname: string): Route {
