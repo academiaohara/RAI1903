@@ -65,8 +65,8 @@ export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
   const seasonIdsKey = useMemo(() => publishedList.map((row) => row.id).join(","), [publishedList]);
 
   const mapMatch = useMemo(
-    () => (match: Match) => applyMatchInlineOverride(match, getOverride, gender),
-    [getOverride, gender],
+    () => (match: Match) => applyMatchInlineOverride(match, getOverride, gender, resolveTeamName),
+    [getOverride, gender, resolveTeamName],
   );
 
   const seasonMatches = useMemo(() => {

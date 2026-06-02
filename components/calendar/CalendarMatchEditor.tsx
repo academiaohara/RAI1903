@@ -1,6 +1,7 @@
 "use client";
 
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { useSeason } from "@/components/season/SeasonProvider";
 import {
   applyCalendarMatchOverride,
   applyMatchResultOverride,
@@ -11,7 +12,8 @@ import {
   utcTimeInputValue,
   type MatchResultOverride,
 } from "@/lib/calendar-match-overrides";
-import { getAllTeamsForGender } from "@/lib/fixtures";
+import { getTeamsBundle, resolveFixtureTeamDisplayName } from "@/lib/cms/teams-bundle";
+import { fixtureEditorTeamOptions } from "@/lib/fixtures/editor-team-options";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { cn } from "@/lib/utils";
 import type { CalendarMatch, Match } from "@/types";
@@ -24,10 +26,21 @@ type CalendarMatchEditorProps = {
   className?: string;
 };
 
+function useResolveTeamName(gender: PrimerEquipoGender) {
+  const { bundles } = useSeason();
+  const cmsTeams = useMemo(() => getTeamsBundle(bundles, gender)?.teams ?? [], [bundles, gender]);
+  return useMemo(
+    () => (teamId: string, fallback: string) =>
+      resolveFixtureTeamDisplayName(teamId, fallback, cmsTeams, bundles, gender),
+    [bundles, cmsTeams, gender],
+  );
+}
+
 export function useEditedCalendarMatch(match: CalendarMatch, gender: PrimerEquipoGender = "masculino"): CalendarMatch {
   const { getOverride } = useInlineEditing();
+  const resolveTeamName = useResolveTeamName(gender);
   const override = getOverride<MatchResultOverride>(`match-result:${match.id}`);
-  return applyCalendarMatchOverride(match, override, gender);
+  return applyCalendarMatchOverride(match, override, gender, resolveTeamName);
 }
 
 export function useEditedCalendarMatches(
@@ -35,10 +48,11 @@ export function useEditedCalendarMatches(
   gender: PrimerEquipoGender = "masculino",
 ): CalendarMatch[] {
   const { getOverride } = useInlineEditing();
+  const resolveTeamName = useResolveTeamName(gender);
   return matches
     .map((match) => {
       const override = getOverride<MatchResultOverride>(`match-result:${match.id}`);
-      return applyCalendarMatchOverride(match, override, gender);
+      return applyCalendarMatchOverride(match, override, gender, resolveTeamName);
     })
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }
@@ -49,27 +63,32 @@ export function CalendarMatchEditor({
   compact = false,
   className,
 }: CalendarMatchEditorProps) {
+  const { bundles } = useSeason();
   const { getOverride, saveValue } = useInlineEditing();
+  const resolveTeamName = useResolveTeamName(gender);
   const override = getOverride<MatchResultOverride>(`match-result:${match.id}`) ?? {};
   const baseMatch = calendarMatchToMatch(match);
-  const editedMatch = applyMatchResultOverride(calendarMatchToMatch(match), override, gender);
+  const editedMatch = applyMatchResultOverride(calendarMatchToMatch(match), override, gender, resolveTeamName);
   const status = editedMatch.status;
 
-  const teams = useMemo(
-    () => [...getAllTeamsForGender(gender)].sort((a, b) => a.name.localeCompare(b.name, "es")),
-    [gender],
-  );
+  const teams = useMemo(() => fixtureEditorTeamOptions(bundles, gender), [bundles, gender]);
 
   const savePatch = (patch: MatchResultOverride) => {
     saveValue(`match-result:${match.id}`, { ...override, ...patch });
   };
 
   const onHomeTeamChange = (teamId: string) => {
-    savePatch({ homeTeamId: teamId, homeTeam: teamDisplayName(teamId, gender) });
+    savePatch({
+      homeTeamId: teamId,
+      homeTeam: teamDisplayName(teamId, gender, resolveTeamName, editedMatch.homeTeam),
+    });
   };
 
   const onAwayTeamChange = (teamId: string) => {
-    savePatch({ awayTeamId: teamId, awayTeam: teamDisplayName(teamId, gender) });
+    savePatch({
+      awayTeamId: teamId,
+      awayTeam: teamDisplayName(teamId, gender, resolveTeamName, editedMatch.awayTeam),
+    });
   };
 
   const onDateChange = (dateValue: string) => {
@@ -93,6 +112,25 @@ export function CalendarMatchEditor({
     compact && "min-w-0",
   );
 
+  const teamSelectOptions = (side: "home" | "away") => {
+    const teamId = side === "home" ? editedMatch.homeTeamId : editedMatch.awayTeamId;
+    const teamName = side === "home" ? editedMatch.homeTeam : editedMatch.awayTeam;
+    const inList = teams.some((team) => team.id === teamId);
+    const options = teams.map((team) => (
+      <option key={team.id} value={team.id}>
+        {team.shortName ?? team.name}
+      </option>
+    ));
+    if (!inList && teamId) {
+      options.unshift(
+        <option key={teamId} value={teamId}>
+          {teamName || teamId}
+        </option>,
+      );
+    }
+    return options;
+  };
+
   return (
     <div
       className={cn(
@@ -112,12 +150,16 @@ export function CalendarMatchEditor({
             className={fieldClass}
             aria-label="Equipo local"
           >
-            {teams.map((team) => (
-              <option key={team.id} value={team.id}>
-                {team.shortName ?? team.name}
-              </option>
-            ))}
+            {teamSelectOptions("home")}
           </select>
+          <input
+            type="text"
+            value={editedMatch.homeTeam}
+            onChange={(event) => savePatch({ homeTeam: event.target.value, homeTeamName: event.target.value })}
+            className={fieldClass}
+            placeholder="Nombre visible"
+            aria-label="Nombre equipo local"
+          />
         </label>
         <label className="grid gap-0.5">
           <span className="font-extrabold uppercase tracking-wide text-slate-500">Visitante</span>
@@ -127,12 +169,16 @@ export function CalendarMatchEditor({
             className={fieldClass}
             aria-label="Equipo visitante"
           >
-            {teams.map((team) => (
-              <option key={team.id} value={team.id}>
-                {team.shortName ?? team.name}
-              </option>
-            ))}
+            {teamSelectOptions("away")}
           </select>
+          <input
+            type="text"
+            value={editedMatch.awayTeam}
+            onChange={(event) => savePatch({ awayTeam: event.target.value, awayTeamName: event.target.value })}
+            className={fieldClass}
+            placeholder="Nombre visible"
+            aria-label="Nombre equipo visitante"
+          />
         </label>
       </div>
 

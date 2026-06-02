@@ -86,8 +86,8 @@ export function CalendarListView({
       <div className={showVenue ? "min-w-[44rem]" : "min-w-[38rem]"}>
         {sortedMatches.length === 0 ? (
           <p className="px-4 py-8 text-center text-sm font-bold text-slate-500">
-            Aún no hay partidos en esta temporada. Activa el modo edición para ajustar el calendario o añade amistosos desde el
-            editor de competición.
+            Aún no hay partidos en esta temporada. Activa el modo edición para ajustar el calendario o añade amistosos y copa
+            con el panel «Pretemporada y Copa del Rey» arriba del calendario.
           </p>
         ) : (
           <ul role="rowgroup">

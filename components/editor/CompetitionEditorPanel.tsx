@@ -185,6 +185,10 @@ export function CompetitionEditorPanel({ onClose }: CompetitionEditorPanelProps)
         <p className="text-[10px] text-slate-400">
           Sustituye reglas y calendario vacío. Puedes ajustar equipos, zonas y grupos después.
         </p>
+        <p className="text-[10px] text-slate-400">
+          Pretemporada y Copa del Rey: en modo edición, abre Calendario o Competición → Copa y usa el panel «Pretemporada y
+          Copa del Rey».
+        </p>
       </div>
 
       <div className="mb-3 flex gap-2">
