@@ -8,7 +8,7 @@ import {
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
 import type { TransferCarouselMode } from "@/lib/fichajes";
 import { useTransfers } from "@/hooks/useTransfers";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import type { Route } from "next";
 import type { TransferMarketWindowId } from "@/types";
@@ -28,19 +28,7 @@ type TransfersCarouselProps = {
 };
 
 export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
-  const { getAllCarousel, getSigningCarousel, getRenewalCarousel, getLoans, getByMode } = useTransfers();
-
-  const transfersByMode = useMemo(
-    () => ({
-      todos: getAllCarousel(marketWindowId),
-      fichajes: getSigningCarousel(marketWindowId),
-      renovaciones: getRenewalCarousel(marketWindowId),
-      cesiones: getLoans(marketWindowId),
-    }),
-    [getAllCarousel, getLoans, getRenewalCarousel, getSigningCarousel, marketWindowId],
-  );
-
-  const hasCarousel = transfersByMode.todos.length > 0;
+  const { getByMode } = useTransfers();
 
   const [mode, setMode] = useState<TransferCarouselMode>("todos");
 
@@ -196,7 +184,7 @@ export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
     resetManualScroll();
   }, [activeMode, marketWindowId, resetManualScroll]);
 
-  const showEmptySlots = !hasCarousel || transfers.length === 0;
+  const showEmptySlots = transfers.length === 0;
 
   if (showEmptySlots) {
     return (
