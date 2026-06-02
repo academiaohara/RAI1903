@@ -32,6 +32,10 @@ function entryToTransferRumor(entry: CmsTransferEntry, player: SquadPlayer | und
     analysis: entry.analysis ?? "",
     kind: entry.kind,
     clubAnnouncement: entry.clubAnnouncement,
+    clubAnnouncementTitle: entry.clubAnnouncementTitle,
+    clubAnnouncementExcerpt: entry.clubAnnouncementExcerpt,
+    clubAnnouncementImageUrl: entry.clubAnnouncementImageUrl,
+    clubAnnouncementDate: entry.clubAnnouncementDate,
     clubAnnouncementNewsId: entry.clubAnnouncementNewsId,
     marketWindowId: entry.marketWindowId,
   };
@@ -60,6 +64,10 @@ export function cmsEntryFromTransferRumor(transfer: TransferRumor): CmsTransferE
     originClub: transfer.originClub,
     analysis: transfer.analysis,
     clubAnnouncement: transfer.clubAnnouncement,
+    clubAnnouncementTitle: transfer.clubAnnouncementTitle,
+    clubAnnouncementExcerpt: transfer.clubAnnouncementExcerpt,
+    clubAnnouncementImageUrl: transfer.clubAnnouncementImageUrl,
+    clubAnnouncementDate: transfer.clubAnnouncementDate,
     clubAnnouncementNewsId: transfer.clubAnnouncementNewsId,
   };
 }

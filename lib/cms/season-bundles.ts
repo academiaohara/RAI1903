@@ -28,6 +28,10 @@ export type CmsTransferEntry = {
   analysis?: string;
   /** URL al comunicado oficial del club. */
   clubAnnouncement?: string;
+  clubAnnouncementTitle?: string;
+  clubAnnouncementExcerpt?: string;
+  clubAnnouncementImageUrl?: string;
+  clubAnnouncementDate?: string;
   clubAnnouncementNewsId?: string;
 };
 

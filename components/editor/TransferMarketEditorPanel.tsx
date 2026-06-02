@@ -4,6 +4,11 @@ import { useState } from "react";
 import { Loader2, Plus, X } from "lucide-react";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useTransferMarketEdit } from "@/components/editor/TransferMarketEditProvider";
+import {
+  ClubAnnouncementUrlField,
+  clubAnnouncementFieldsFromUrlValue,
+  type ClubAnnouncementUrlValue,
+} from "@/components/editor/ClubAnnouncementUrlField";
 import { TRANSFER_KIND_OPTIONS, newTransferEntryId } from "@/hooks/useTransferMarketDraft";
 import type { TransferKind, TransferMarketWindowId } from "@/types";
 
@@ -21,7 +26,7 @@ export function TransferMarketEditorPanel({ onClose }: TransferMarketEditorPanel
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [marketWindowId, setMarketWindowId] = useState<TransferMarketWindowId | "">("");
   const [originClub, setOriginClub] = useState("");
-  const [clubAnnouncement, setClubAnnouncement] = useState("");
+  const [clubAnnouncement, setClubAnnouncement] = useState<ClubAnnouncementUrlValue>({});
 
   const handleAdd = () => {
     if (!playerId) return;
@@ -32,12 +37,12 @@ export function TransferMarketEditorPanel({ onClose }: TransferMarketEditorPanel
       date,
       marketWindowId: marketWindowId || inferWindow(date),
       ...(kind !== "renovacion" && originClub.trim() ? { originClub: originClub.trim() } : {}),
-      ...(clubAnnouncement.trim() ? { clubAnnouncement: clubAnnouncement.trim() } : {}),
+      ...clubAnnouncementFieldsFromUrlValue(clubAnnouncement),
     });
     if (!ok) return;
     setPlayerId("");
     setOriginClub("");
-    setClubAnnouncement("");
+    setClubAnnouncement({});
   };
 
   const handleDateChange = (value: string) => {
@@ -140,16 +145,7 @@ export function TransferMarketEditorPanel({ onClose }: TransferMarketEditorPanel
                 />
               </label>
             )}
-            <label className="block text-[10px] font-bold uppercase text-slate-500">
-              Enlace al comunicado (opcional)
-              <input
-                type="url"
-                value={clubAnnouncement}
-                onChange={(event) => setClubAnnouncement(event.target.value)}
-                placeholder="https://realavilesindustrial1903.com/…"
-                className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-semibold"
-              />
-            </label>
+            <ClubAnnouncementUrlField value={clubAnnouncement} onChange={setClubAnnouncement} />
             <button
               type="button"
               onClick={handleAdd}

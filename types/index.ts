@@ -153,6 +153,14 @@ export type TransferRumor = {
   playerId?: string;
   /** Enlace al comunicado oficial del club (URL). Texto legacy en mock antiguo. */
   clubAnnouncement?: string;
+  /** Titular del comunicado (metadatos de la URL en CMS). */
+  clubAnnouncementTitle?: string;
+  /** Extracto del comunicado (metadatos de la URL en CMS). */
+  clubAnnouncementExcerpt?: string;
+  /** Imagen del comunicado (metadatos de la URL en CMS). */
+  clubAnnouncementImageUrl?: string;
+  /** Fecha del comunicado (metadatos de la URL en CMS). */
+  clubAnnouncementDate?: string;
   /** Noticia del club enlazada al comunicado (fichaje, renovacion, etc.). */
   clubAnnouncementNewsId?: string;
   /** Ventana de mercado (verano / invierno de una temporada). */

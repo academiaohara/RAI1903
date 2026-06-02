@@ -2,6 +2,11 @@
 
 import { Loader2, Trash2 } from "lucide-react";
 import { useTransferMarketEdit } from "@/components/editor/TransferMarketEditProvider";
+import {
+  ClubAnnouncementUrlField,
+  clubAnnouncementFieldsFromUrlValue,
+  clubAnnouncementUrlValueFromEntry,
+} from "@/components/editor/ClubAnnouncementUrlField";
 import { TRANSFER_KIND_OPTIONS } from "@/hooks/useTransferMarketDraft";
 import type { CmsTransferEntry } from "@/lib/cms/season-bundles";
 import { getPlayerDisplayName } from "@/lib/squad-utils";
@@ -114,20 +119,13 @@ export function TransferFichaCardEditForm({ entry }: TransferFichaCardEditFormPr
         </label>
       )}
 
-      <label className="block text-[10px] font-bold uppercase text-slate-500">
-        Enlace comunicado
-        <input
-          type="url"
-          value={entry.clubAnnouncement ?? ""}
-          onChange={(event) =>
-            updateEntry(entry.id, {
-              clubAnnouncement: event.target.value.trim() ? event.target.value.trim() : undefined,
-            })
-          }
-          placeholder="https://…"
-          className="mt-0.5 w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11px] font-semibold"
-        />
-      </label>
+      <ClubAnnouncementUrlField
+        value={clubAnnouncementUrlValueFromEntry(entry)}
+        onChange={(value) => updateEntry(entry.id, clubAnnouncementFieldsFromUrlValue(value))}
+        inputClassName="mt-0.5 w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11px] font-semibold"
+        labelClassName="block text-[10px] font-bold uppercase text-slate-500"
+        buttonClassName="inline-flex shrink-0 items-center justify-center gap-1 rounded-lg bg-[#214C9B] px-2 py-1 text-[10px] font-extrabold uppercase text-white disabled:opacity-50"
+      />
 
       <button
         type="button"
