@@ -40,6 +40,7 @@ function legacyZoneFromRuleId(id: string): StandingsZone {
   if (id === "promotion") return "promotion";
   if (id === "playoff") return "playoff";
   if (id === "relegation") return "relegation";
+  if (id === "playout") return "playout";
   return "mid";
 }
 

@@ -21,6 +21,8 @@ export function getStandingsZonePositionClass(zone: StandingsZone | undefined): 
       return "bg-sky-400 text-white";
     case "relegation":
       return "bg-rose-500 text-white";
+    case "playout":
+      return "bg-amber-500 text-white";
     default:
       return "bg-[#214C9B] text-white";
   }

@@ -76,7 +76,7 @@ function zonesSegundaRfef(): SeasonCompetitionConfigBundle["zones"] {
   return [
     {
       id: "promotion",
-      label: "Ascenso",
+      label: "Ascenso directo",
       count: 1,
       from: "top",
       colorClass: DEFAULT_ZONE_COLORS.promotion,
@@ -91,9 +91,16 @@ function zonesSegundaRfef(): SeasonCompetitionConfigBundle["zones"] {
     {
       id: "relegation",
       label: "Descenso",
-      count: 4,
+      count: 5,
       from: "bottom",
       colorClass: DEFAULT_ZONE_COLORS.relegation,
+    },
+    {
+      id: "playout",
+      label: "Playout",
+      count: 1,
+      from: "bottom",
+      colorClass: DEFAULT_ZONE_COLORS.playout,
     },
   ];
 }
@@ -143,7 +150,7 @@ export const LEAGUE_TEMPLATES: LeagueTemplate[] = [
   {
     id: "segunda-division-22",
     label: "Segunda División",
-    description: "Liga única · 22 equipos · sin playoff RFEF en jornadas",
+    description: "LFP · 22 equipos · 2 ascensos directos · playoff 3º–6º · 4 descensos",
     gender: "masculino",
     ligaLabel: "Segunda División",
     matchCompetition: "primera-rfef",
@@ -158,7 +165,7 @@ export const LEAGUE_TEMPLATES: LeagueTemplate[] = [
   {
     id: "segunda-rfef-1x18",
     label: "2ª RFEF (un grupo)",
-    description: "1 grupo × 18 equipos · la web solo gestiona un grupo (no 5×18)",
+    description: "1 grupo × 18 · 1 ascenso · playoff · playout (14º) · 5 descensos",
     gender: "masculino",
     ligaLabel: "2ª RFEF",
     matchCompetition: "primera-rfef",

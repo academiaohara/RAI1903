@@ -34,7 +34,7 @@ export type Player = {
 /** Spanish form badges: G (ganado), E (empatado), P (perdido). */
 export type FormCode = "G" | "E" | "P";
 
-export type StandingsZone = "promotion" | "playoff" | "relegation" | "mid";
+export type StandingsZone = "promotion" | "playoff" | "playout" | "relegation" | "mid";
 
 export type Team = {
   id: string;
