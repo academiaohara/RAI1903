@@ -42,12 +42,24 @@ export function isStandingsRowHighlighted(highlight: StandingsRowHighlight | boo
   return highlight === "club" || highlight === "viewed" || highlight === true;
 }
 
-export function getStandingsHighlightPositionClass(_highlighted: boolean, zone: StandingsZone | undefined): string {
+export function getStandingsHighlightPositionClass(
+  _highlighted: boolean,
+  zone: StandingsZone | undefined,
+  zoneColorClass?: string,
+): string {
+  if (zoneColorClass) return `${zoneColorClass} text-white`;
   return getStandingsZonePositionClass(zone);
 }
 
-export const STANDINGS_ZONE_LEGEND = [
-  { zone: "promotion" as const, label: "Ascenso directo", className: "bg-emerald-500" },
-  { zone: "playoff" as const, label: "Playoff", className: "bg-sky-400" },
-  { zone: "relegation" as const, label: "Descenso", className: "bg-rose-500" },
+export type StandingsLegendItem = {
+  zone: StandingsZone;
+  label: string;
+  className: string;
+  id?: string;
+};
+
+export const STANDINGS_ZONE_LEGEND: StandingsLegendItem[] = [
+  { zone: "promotion", label: "Ascenso directo", className: "bg-emerald-500" },
+  { zone: "playoff", label: "Playoff", className: "bg-sky-400" },
+  { zone: "relegation", label: "Descenso", className: "bg-rose-500" },
 ];

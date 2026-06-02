@@ -15,14 +15,14 @@ type CalendarioSeasonViewProps = {
 };
 
 export function CalendarioSeasonView({ gender }: CalendarioSeasonViewProps) {
-  const { getFixtureSource } = useSeason();
+  const { getEnrichedFixtureSource } = useSeason();
   const crestMap = useTeamCrestMap();
   const { getCronica, getPrevia } = useSeasonMatchArticles();
   const matches = useMemo(() => {
-    const source = getFixtureSource(gender);
+    const source = getEnrichedFixtureSource(gender);
     const aviles = getAvilesMatchesFromSource(source, gender);
     return getCalendarMatchesFromSource(aviles, gender, { getCronica, getPrevia, crestMap });
-  }, [gender, getCronica, getFixtureSource, getPrevia, crestMap]);
+  }, [gender, getCronica, getEnrichedFixtureSource, getPrevia, crestMap]);
 
   const played = matches.filter((match) => match.played).length;
   const upcoming = matches.length - played;

@@ -38,7 +38,7 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
 
   return (
     <div className="space-y-6">
-      <SquadHeader club={club} stats={club.stats} onStadiumClick={() => setStadiumOpen(true)} />
+      <SquadHeader club={club} stats={club.stats} gender={gender} onStadiumClick={() => setStadiumOpen(true)} />
       <SquadToolbar
         viewMode={viewMode}
         onViewModeChange={setViewMode}

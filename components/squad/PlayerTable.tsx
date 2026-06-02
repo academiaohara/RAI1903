@@ -18,6 +18,7 @@ type PlayerTableProps = {
   onSelect?: (player: SquadPlayer) => void;
   showMarketValue?: boolean;
   showAge?: boolean;
+  showEmptyPositions?: boolean;
 };
 
 const alignClass = {
@@ -32,6 +33,7 @@ export function PlayerTable({
   onSelect,
   showMarketValue = false,
   showAge = true,
+  showEmptyPositions = false,
 }: PlayerTableProps) {
   const grouped = groupPlayersByPosition(players);
 
@@ -56,7 +58,7 @@ export function PlayerTable({
     <div className="space-y-10">
       {SQUAD_POSITIONS.map((position, sectionIndex) => {
         const list = grouped[position];
-        if (list.length === 0) return null;
+        if (list.length === 0 && !showEmptyPositions) return null;
 
         return (
           <PositionSection key={position} position={position} delay={sectionIndex * 0.04}>
@@ -79,31 +81,43 @@ export function PlayerTable({
                     </tr>
                   </thead>
                   <tbody>
-                    {list.map((player, rowIndex) => (
-                      <PlayerRow
-                        key={player.id}
-                        player={player}
-                        onSelect={onSelect}
-                        index={rowIndex}
-                        showMarketValue={showMarketValue}
-                        showAge={showAge}
-                      />
-                    ))}
+                    {list.length === 0 ? (
+                      <tr>
+                        <td colSpan={columns.length + 1} className="px-4 py-6 text-center text-sm font-semibold text-slate-400">
+                          Sin jugadores en esta posición
+                        </td>
+                      </tr>
+                    ) : (
+                      list.map((player, rowIndex) => (
+                        <PlayerRow
+                          key={player.id}
+                          player={player}
+                          onSelect={onSelect}
+                          index={rowIndex}
+                          showMarketValue={showMarketValue}
+                          showAge={showAge}
+                        />
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
 
               <div className="divide-y divide-slate-100 md:hidden">
-                {list.map((player, rowIndex) => (
-                  <PlayerMobileRow
-                    key={player.id}
-                    player={player}
-                    onSelect={onSelect}
-                    index={rowIndex}
-                    showMarketValue={showMarketValue}
-                    showAge={showAge}
-                  />
-                ))}
+                {list.length === 0 ? (
+                  <p className="p-4 text-center text-sm font-semibold text-slate-400">Sin jugadores en esta posición</p>
+                ) : (
+                  list.map((player, rowIndex) => (
+                    <PlayerMobileRow
+                      key={player.id}
+                      player={player}
+                      onSelect={onSelect}
+                      index={rowIndex}
+                      showMarketValue={showMarketValue}
+                      showAge={showAge}
+                    />
+                  ))
+                )}
               </div>
             </div>
           </PositionSection>

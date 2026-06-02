@@ -20,6 +20,8 @@ alter table public.cms_season_bundles
       'competition_labels',
       'team_crests',
       'stadium_photos',
-      'transfers'
+      'transfers',
+      'competition_config',
+      'teams'
     )
   );

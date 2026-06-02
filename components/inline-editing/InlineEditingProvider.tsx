@@ -17,6 +17,9 @@ import { SeasonManagerPanel } from "@/components/editor/SeasonManagerPanel";
 import { TeamCrestEditorPanel } from "@/components/editor/TeamCrestEditorPanel";
 import { HomeLayoutEditorPanel } from "@/components/editor/HomeLayoutEditorPanel";
 import { TransferMarketEditorPanel } from "@/components/editor/TransferMarketEditorPanel";
+import { SquadEditorPanel } from "@/components/editor/SquadEditorPanel";
+import { CompetitionEditorPanel } from "@/components/editor/CompetitionEditorPanel";
+import { TeamsEditorPanel } from "@/components/editor/TeamsEditorPanel";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
@@ -357,6 +360,9 @@ export function InlineEditingToolbar() {
   const [crestPanelOpen, setCrestPanelOpen] = useState(false);
   const [transfersPanelOpen, setTransfersPanelOpen] = useState(false);
   const [homePanelOpen, setHomePanelOpen] = useState(false);
+  const [squadPanelOpen, setSquadPanelOpen] = useState(false);
+  const [competitionPanelOpen, setCompetitionPanelOpen] = useState(false);
+  const [teamsPanelOpen, setTeamsPanelOpen] = useState(false);
 
   if (!ready || !canEdit) return null;
 
@@ -397,6 +403,11 @@ export function InlineEditingToolbar() {
       {editMode && homePanelOpen && (
         <HomeLayoutEditorPanel onClose={() => setHomePanelOpen(false)} />
       )}
+      {editMode && squadPanelOpen && <SquadEditorPanel onClose={() => setSquadPanelOpen(false)} />}
+      {editMode && competitionPanelOpen && (
+        <CompetitionEditorPanel onClose={() => setCompetitionPanelOpen(false)} />
+      )}
+      {editMode && teamsPanelOpen && <TeamsEditorPanel onClose={() => setTeamsPanelOpen(false)} />}
       <div className="flex flex-wrap justify-end gap-2 rounded-full border border-[#214C9B]/20 bg-white/95 p-2 shadow-2xl backdrop-blur">
         {editMode && (
           <>
@@ -406,6 +417,9 @@ export function InlineEditingToolbar() {
                 setCrestPanelOpen(false);
                 setTransfersPanelOpen(false);
                 setHomePanelOpen(false);
+                setSquadPanelOpen(false);
+                setCompetitionPanelOpen(false);
+                setTeamsPanelOpen(false);
                 setSeasonPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -416,8 +430,56 @@ export function InlineEditingToolbar() {
               type="button"
               onClick={() => {
                 setSeasonPanelOpen(false);
+                setCrestPanelOpen(false);
                 setTransfersPanelOpen(false);
                 setHomePanelOpen(false);
+                setCompetitionPanelOpen(false);
+                setTeamsPanelOpen(false);
+                setSquadPanelOpen((open) => !open);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+            >
+              Plantilla
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSeasonPanelOpen(false);
+                setCrestPanelOpen(false);
+                setTransfersPanelOpen(false);
+                setHomePanelOpen(false);
+                setSquadPanelOpen(false);
+                setTeamsPanelOpen(false);
+                setCompetitionPanelOpen((open) => !open);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+            >
+              Competición
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSeasonPanelOpen(false);
+                setCrestPanelOpen(false);
+                setTransfersPanelOpen(false);
+                setHomePanelOpen(false);
+                setSquadPanelOpen(false);
+                setCompetitionPanelOpen(false);
+                setTeamsPanelOpen((open) => !open);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+            >
+              Equipos
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSeasonPanelOpen(false);
+                setTransfersPanelOpen(false);
+                setHomePanelOpen(false);
+                setSquadPanelOpen(false);
+                setCompetitionPanelOpen(false);
+                setTeamsPanelOpen(false);
                 setCrestPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -430,6 +492,9 @@ export function InlineEditingToolbar() {
                 setSeasonPanelOpen(false);
                 setCrestPanelOpen(false);
                 setTransfersPanelOpen(false);
+                setSquadPanelOpen(false);
+                setCompetitionPanelOpen(false);
+                setTeamsPanelOpen(false);
                 setHomePanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -442,6 +507,9 @@ export function InlineEditingToolbar() {
                 setSeasonPanelOpen(false);
                 setCrestPanelOpen(false);
                 setHomePanelOpen(false);
+                setSquadPanelOpen(false);
+                setCompetitionPanelOpen(false);
+                setTeamsPanelOpen(false);
                 setTransfersPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"

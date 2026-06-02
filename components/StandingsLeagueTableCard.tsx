@@ -14,7 +14,10 @@ import {
   qualifyingRoundAfterJornada,
   type StandingsVenue,
 } from "@/lib/standings";
+import type { CompetitionZoneRule } from "@/lib/cms/competition-config-bundle";
+import { applyCustomZoneColors, buildZoneLegend } from "@/lib/competition/standings-zones";
 import type { StandingsZonesConfig } from "@/lib/standings";
+import type { StandingsLegendItem } from "@/lib/standings-styles";
 import { cn } from "@/lib/utils";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Matchday } from "@/types";
@@ -41,6 +44,7 @@ type StandingsLeagueTableCardProps = {
   zones?: StandingsZonesConfig;
   tiebreak?: LeagueTiebreakContext;
   gender?: PrimerEquipoGender;
+  zoneRules?: CompetitionZoneRule[];
 };
 
 export function StandingsLeagueTableCard({
@@ -56,7 +60,9 @@ export function StandingsLeagueTableCard({
   zones = PRIMERA_RFEF_RULES.zones,
   tiebreak = PRIMERA_RFEF_RULES.tiebreak,
   gender = "masculino",
+  zoneRules,
 }: StandingsLeagueTableCardProps) {
+  const zoneLegend: StandingsLegendItem[] | undefined = zoneRules ? buildZoneLegend(zoneRules) : undefined;
   const playedRounds = useMemo(() => getPlayedLeagueRounds(matchdays), [matchdays]);
   const lastPlayedRound = useMemo(() => getLastPlayedLeagueRound(matchdays), [matchdays]);
 
@@ -66,10 +72,10 @@ export function StandingsLeagueTableCard({
   const effectiveJornada = Math.min(jornadaOverride ?? lastPlayedRound, lastPlayedRound);
   const qualifyingRound = qualifyingRoundAfterJornada(effectiveJornada);
 
-  const fullTeams = useMemo(
-    () => getTeamsAtRound(sourceTeams, matchdays, qualifyingRound, zones, tiebreak, venue),
-    [sourceTeams, matchdays, qualifyingRound, zones, tiebreak, venue],
-  );
+  const fullTeams = useMemo(() => {
+    const base = getTeamsAtRound(sourceTeams, matchdays, qualifyingRound, zones, tiebreak, venue);
+    return zoneRules ? applyCustomZoneColors(base, zoneRules) : base;
+  }, [sourceTeams, matchdays, qualifyingRound, zones, tiebreak, venue, zoneRules]);
 
   const tableTeams = useMemo(() => {
     if (centerOnHighlight && highlightTeamId) {
@@ -116,6 +122,7 @@ export function StandingsLeagueTableCard({
       borderlessHeader={borderlessHeader}
       toolbar={toolbar}
       gender={gender}
+      zoneLegend={zoneLegend}
     />
   );
 }

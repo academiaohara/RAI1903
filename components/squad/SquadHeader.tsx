@@ -2,16 +2,19 @@
 
 import Image from "next/image";
 import { ChevronRight, Landmark } from "lucide-react";
+import { EditableText } from "@/components/inline-editing/EditableText";
 import { SquadStatsBar } from "@/components/squad/SquadStatsBar";
+import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { SquadClubInfo, SquadClubStats } from "@/types/squad";
 
 type SquadHeaderProps = {
   club: SquadClubInfo;
   stats: SquadClubStats;
+  gender: PrimerEquipoGender;
   onStadiumClick: () => void;
 };
 
-export function SquadHeader({ club, stats, onStadiumClick }: SquadHeaderProps) {
+export function SquadHeader({ club, stats, gender, onStadiumClick }: SquadHeaderProps) {
   return (
     <div className="flex w-full flex-col items-start gap-5">
       <div className="flex w-full min-w-0 flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
@@ -24,7 +27,13 @@ export function SquadHeader({ club, stats, onStadiumClick }: SquadHeaderProps) {
               {club.nombre}
             </h1>
             <p className="mt-2 text-sm font-semibold text-slate-700 sm:text-base">
-              <span className="text-slate-500">Entrenador:</span> {club.entrenador}
+              <span className="text-slate-500">Entrenador:</span>{" "}
+              <EditableText
+                storageKey={`squad-club:${gender}:entrenador`}
+                value={club.entrenador}
+                aria-label="Editar entrenador"
+                inputClassName="text-sm font-semibold text-slate-800"
+              />
             </p>
             <p className="mt-2 text-xs font-semibold text-slate-500">Temporada {club.temporada}</p>
           </div>

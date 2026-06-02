@@ -13,7 +13,9 @@ import type { CompetitionSeasonId } from "@/data/mock";
 import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
 import { fetchSeasonBundles, type SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import { fetchPublishedSeasons, type CmsSeason } from "@/lib/cms/seasons";
+import { enrichFixtureSource, type EnrichedFixtureSource } from "@/lib/season/enriched-fixtures";
 import { fixtureSourceFromBundles } from "@/lib/season/fixture-source";
+import { resolveCompetitionConfig } from "@/lib/cms/competition-config-bundle";
 import { fetchPublishedTransfersSnapshot } from "@/lib/season/published-transfers";
 import type { TransferMarketWindow } from "@/lib/transfer-market-windows";
 import type { TransferRumor } from "@/types";
@@ -37,6 +39,8 @@ type SeasonContextValue = {
   refreshSeasons: () => Promise<void>;
   refreshBundles: () => Promise<void>;
   getFixtureSource: (gender: PrimerEquipoGender) => JornadasFixtureSource;
+  getEnrichedFixtureSource: (gender: PrimerEquipoGender) => EnrichedFixtureSource;
+  getCompetitionConfig: (gender: PrimerEquipoGender) => ReturnType<typeof resolveCompetitionConfig>;
 };
 
 const SeasonContext = createContext<SeasonContextValue | null>(null);
@@ -143,6 +147,16 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
     [bundles],
   );
 
+  const getEnrichedFixtureSource = useCallback(
+    (gender: PrimerEquipoGender) => enrichFixtureSource(getFixtureSource(gender), bundles, gender),
+    [bundles, getFixtureSource],
+  );
+
+  const getCompetitionConfig = useCallback(
+    (gender: PrimerEquipoGender) => resolveCompetitionConfig(bundles, gender),
+    [bundles],
+  );
+
   const value = useMemo<SeasonContextValue>(
     () => ({
       seasons,
@@ -159,6 +173,8 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
       refreshSeasons,
       refreshBundles,
       getFixtureSource,
+      getEnrichedFixtureSource,
+      getCompetitionConfig,
     }),
     [
       activeSeasonId,
@@ -168,6 +184,8 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
       transfersLoading,
       marketWindows,
       getFixtureSource,
+      getEnrichedFixtureSource,
+      getCompetitionConfig,
       refreshBundles,
       refreshSeasons,
       seasons,

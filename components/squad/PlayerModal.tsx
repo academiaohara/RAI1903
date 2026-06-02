@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Calendar, MapPin, Ruler, Scale, Star, X } from "lucide-react";
+import type { PlayerStatus } from "@/types";
 import type { PlayerCareerRecord, SquadModalTab, SquadPlayer } from "@/types/squad";
 import { SQUAD_POSITIONS, SQUAD_ROLE_CODES } from "@/types/squad";
 import { ageFromBirthDate } from "@/lib/squad-age";
@@ -30,6 +31,15 @@ import { PlayerMatchesTable } from "@/components/squad/PlayerMatchesTable";
 import { PlayerCareerTimeline } from "@/components/squad/PlayerCareerTimeline";
 import { PlayerActualidadSection } from "@/components/squad/PlayerActualidadSection";
 import { PlayerResumenSection } from "@/components/squad/PlayerResumenSection";
+
+const PLAYER_ESTADOS: PlayerStatus[] = [
+  "titular",
+  "suplente",
+  "lesionado",
+  "sancionado",
+  "cantera",
+  "nuevo fichaje",
+];
 
 const tabs: Array<{ id: SquadModalTab; label: string }> = [
   { id: "actualidad", label: "Actualidad" },
@@ -279,6 +289,12 @@ function PlayerInlineEditor({
         />
         <EditorSelect label="Rol" value={player.rol} options={SQUAD_ROLE_CODES} onChange={(value) => onUpdate({ rol: value })} />
         <EditorSelect label="Posición" value={player.posicion} options={SQUAD_POSITIONS} onChange={(value) => onUpdate({ posicion: value })} />
+        <EditorSelect
+          label="Estado"
+          value={player.estado}
+          options={PLAYER_ESTADOS}
+          onChange={(value) => onUpdate({ estado: value })}
+        />
         <EditorInput label="Nacionalidad" value={player.nacionalidad} onChange={(value) => onUpdate({ nacionalidad: value })} />
         <EditorInput label="Altura" value={player.altura} onChange={(value) => onUpdate({ altura: value })} />
         <EditorInput label="Peso" value={player.peso} onChange={(value) => onUpdate({ peso: value })} />
