@@ -7,19 +7,21 @@ import {
   applyChronicleStatsToSquad,
   aggregateAvilesStatsFromChronicles,
 } from "@/lib/aviles-chronicle-stats";
-import { upsertSquadPlayer } from "@/lib/cms/players";
+import { deleteSquadPlayer, upsertSquadPlayer, upsertSquadPlayersBatch } from "@/lib/cms/players";
+import { getSquadBundle, upsertSeasonBundle } from "@/lib/cms/season-bundles";
 import { mergeSquadPlayerOverrides, squadPlayerOverrideKey } from "@/lib/squad-overrides";
 import { ageFromBirthDate } from "@/lib/squad-age";
+import { createEmptySquadPlayer } from "@/lib/squad-defaults";
 import { getSquadPlayers } from "@/lib/squad-data";
 import { withSquadPlayerPhoto } from "@/lib/squad-photos";
-import { resolveSquadPlayers } from "@/lib/season/squad-source";
+import { resolveSquadPlayers, seasonSquadBundlePayload } from "@/lib/season/squad-source";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
-import type { SquadPlayer } from "@/types/squad";
+import type { SquadPlayer, SquadPosition } from "@/types/squad";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export function useSquadPlayers(gender: PrimerEquipoGender) {
-  const { getOverride, saveValue } = useInlineEditing();
-  const { viewedSeasonId, bundles, bundlesLoading } = useSeason();
+  const { getOverride, saveValue, clearValue } = useInlineEditing();
+  const { viewedSeasonId, bundles, bundlesLoading, refreshBundles } = useSeason();
   const [baseSquad, setBaseSquad] = useState<SquadPlayer[]>([]);
 
   useEffect(() => {
@@ -54,6 +56,24 @@ export function useSquadPlayers(gender: PrimerEquipoGender) {
     return applyChronicleStatsToSquad(withAge, chronicleStats);
   }, [baseSquad, bundlesLoading, gender, getOverride]);
 
+  const persistSquadToCms = useCallback(
+    async (players: SquadPlayer[]) => {
+      if (!isSupabaseConfigured()) return { ok: true as const };
+
+      const bundle = getSquadBundle(bundles, gender);
+      const payload = seasonSquadBundlePayload(players, bundle?.clubInfo);
+      const batchResult = await upsertSquadPlayersBatch(gender, viewedSeasonId, players);
+      if (!batchResult.ok) return batchResult;
+
+      const bundleResult = await upsertSeasonBundle(viewedSeasonId, gender, "squad", payload);
+      if (!bundleResult.ok) return bundleResult;
+
+      await refreshBundles();
+      return { ok: true as const };
+    },
+    [bundles, gender, refreshBundles, viewedSeasonId],
+  );
+
   const updatePlayer = useCallback(
     (playerId: string, patch: Partial<SquadPlayer>) => {
       const current = getOverride<Partial<SquadPlayer>>(squadPlayerOverrideKey(playerId)) ?? {};
@@ -63,14 +83,48 @@ export function useSquadPlayers(gender: PrimerEquipoGender) {
       }
       saveValue(squadPlayerOverrideKey(playerId), next);
 
+      setBaseSquad((prev) =>
+        prev.map((entry) => (entry.id === playerId ? { ...entry, ...next } : entry)),
+      );
+
       if (isSupabaseConfigured()) {
         const player = squad.find((entry) => entry.id === playerId);
         if (player) {
-          void upsertSquadPlayer(gender, viewedSeasonId, { ...player, ...next });
+          const merged = { ...player, ...next };
+          void upsertSquadPlayer(gender, viewedSeasonId, merged);
+          void persistSquadToCms(
+            baseSquad.map((entry) => (entry.id === playerId ? merged : entry)),
+          );
         }
       }
     },
-    [gender, getOverride, saveValue, squad, viewedSeasonId],
+    [baseSquad, gender, getOverride, persistSquadToCms, saveValue, squad, viewedSeasonId],
+  );
+
+  const addPlayer = useCallback(
+    async (posicion: SquadPosition) => {
+      const newPlayer = createEmptySquadPlayer(posicion);
+      const nextSquad = [...baseSquad, newPlayer];
+      setBaseSquad(nextSquad);
+      const result = await persistSquadToCms(nextSquad);
+      return { player: newPlayer, ...result };
+    },
+    [baseSquad, persistSquadToCms],
+  );
+
+  const removePlayer = useCallback(
+    async (playerId: string) => {
+      const nextSquad = baseSquad.filter((entry) => entry.id !== playerId);
+      setBaseSquad(nextSquad);
+      clearValue(squadPlayerOverrideKey(playerId));
+
+      if (isSupabaseConfigured()) {
+        await deleteSquadPlayer(gender, viewedSeasonId, playerId);
+      }
+
+      return persistSquadToCms(nextSquad);
+    },
+    [baseSquad, clearValue, gender, persistSquadToCms, viewedSeasonId],
   );
 
   const getPlayerById = useCallback(
@@ -78,5 +132,5 @@ export function useSquadPlayers(gender: PrimerEquipoGender) {
     [squad],
   );
 
-  return { squad, updatePlayer, getPlayerById, loading: bundlesLoading };
+  return { squad, updatePlayer, addPlayer, removePlayer, getPlayerById, loading: bundlesLoading };
 }

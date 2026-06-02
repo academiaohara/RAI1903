@@ -39,10 +39,15 @@ export function resolveSquadClubInfo(
   const base = getSquadClubInfo(gender);
   const stats = computeClubLeagueStatsForGender(gender, leagueMatchdays);
 
+  const mergedClubInfo = bundle?.clubInfo ?? {};
+  const estadioInfo = mergedClubInfo.estadioInfo ?? base.estadioInfo;
+
   return {
     ...base,
-    ...(bundle?.clubInfo ?? {}),
-    temporada: bundle?.clubInfo?.temporada ?? seasonLabel,
+    ...mergedClubInfo,
+    estadio: mergedClubInfo.estadio ?? estadioInfo.nombre,
+    estadioInfo,
+    temporada: mergedClubInfo.temporada ?? seasonLabel,
     jugadores: squadSize,
     stats,
   };
