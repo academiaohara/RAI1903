@@ -2,6 +2,22 @@ import { matchesPerLeagueRound, leagueRoundCount } from "@/lib/cms/competition-c
 import type { SeasonCompetitionConfigBundle } from "@/lib/cms/competition-config-bundle";
 import type { Match, Matchday } from "@/types";
 
+/** Fecha lejana para partidos sin asignar; evita bloquear la quiniela antes de fijar horarios. */
+export const PLACEHOLDER_MATCH_DATE = "2099-07-01T12:00:00.000Z";
+
+export function isPlaceholderTeamId(teamId: string): boolean {
+  return teamId.startsWith("cms-slot-");
+}
+
+/** Partido generado automáticamente (aún sin equipos reales del grupo). */
+export function isPlaceholderMatch(match: Match): boolean {
+  return isPlaceholderTeamId(match.homeTeamId) || isPlaceholderTeamId(match.awayTeamId);
+}
+
+export function isSchedulableMatchday(matchday: Matchday): boolean {
+  return matchday.matches.some((match) => !isPlaceholderMatch(match));
+}
+
 function placeholderTeamId(slot: number): string {
   return `cms-slot-${slot}`;
 }
@@ -19,7 +35,7 @@ function createPlaceholderMatch(round: number, matchIndex: number, grupo: "1" | 
     id: `cms-ph-j${round}${suffix}-m${matchIndex}`,
     competition: "primera-rfef",
     matchday: round,
-    date: new Date().toISOString(),
+    date: PLACEHOLDER_MATCH_DATE,
     status: "scheduled",
     homeTeamId: placeholderTeamId(homeSlot),
     awayTeamId: placeholderTeamId(awaySlot),

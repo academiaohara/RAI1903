@@ -1,4 +1,5 @@
 import { RAI_TEAM_ID, teams as mockTeams } from "@/data/mock";
+import { isPlaceholderMatch, isSchedulableMatchday } from "@/lib/competition/normalize-fixtures";
 import { getAvilesScorerFromEvents } from "@/lib/aviles-match-events";
 import type { MatchEvent } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
@@ -42,8 +43,22 @@ export function getMatchdayByRound(matchdays: Matchday[], round: number): Matchd
 }
 
 export function getFirstKickoff(matchday: Matchday): Date {
-  const dates = matchday.matches.map((match) => new Date(match.date).getTime());
+  const schedulable = matchday.matches.filter((match) => !isPlaceholderMatch(match));
+  if (schedulable.length === 0) {
+    return new Date("2099-12-31T23:59:59.000Z");
+  }
+  const dates = schedulable.map((match) => new Date(match.date).getTime());
   return new Date(Math.min(...dates));
+}
+
+/** Jornadas con al menos un partido real (no placeholder del calendario vacío). */
+export function filterQuinielaMatchdays(matchdays: Matchday[]): Matchday[] {
+  return matchdays
+    .filter(isSchedulableMatchday)
+    .map((matchday) => ({
+      ...matchday,
+      matches: matchday.matches.filter((match) => !isPlaceholderMatch(match)),
+    }));
 }
 
 export function hasFirstMatchStarted(matchday: Matchday, now = new Date()): boolean {
