@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { AnimatePresence, motion } from "framer-motion";
 import type { SquadPlayer, SquadViewMode } from "@/types/squad";
@@ -17,16 +17,21 @@ import { PlayerTable } from "@/components/squad/PlayerTable";
 import { PlayerGrid } from "@/components/squad/PlayerGrid";
 import { PlayerModal } from "@/components/squad/PlayerModal";
 import { StadiumModal } from "@/components/squad/StadiumModal";
+import { StadiumEditorModal } from "@/components/squad/StadiumEditorModal";
+import { SquadEditToolbar } from "@/components/squad/SquadEditToolbar";
 import { StandingsEvolutionChart } from "@/components/squad/StandingsEvolutionChart";
+import type { StadiumInfo } from "@/types/squad";
 
 type SquadPageProps = {
   gender: PrimerEquipoGender;
 };
 
 export function SquadPage({ gender }: SquadPageProps) {
-  const { squad, updatePlayer } = useSquadPlayers(gender);
+  const { squad, updatePlayer, addPlayer, removePlayer } = useSquadPlayers(gender);
   const { bundles, viewedSeason, getFixtureSource } = useSeason();
   const { editMode, getValue } = useInlineEditing();
+  const [addBusy, setAddBusy] = useState(false);
+  const [stadiumOverride, setStadiumOverride] = useState<StadiumInfo | null>(null);
   const leagueMatchdays = useMemo(
     () => getLeagueMatchdaysForGender(getFixtureSource(gender), gender),
     [gender, getFixtureSource],
@@ -34,11 +39,16 @@ export function SquadPage({ gender }: SquadPageProps) {
   const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
   const club = useMemo(() => {
     const base = resolveSquadClubInfo(gender, viewedSeason.label, bundles, squad.length, leagueMatchdays);
-    return {
+    const merged = {
       ...base,
       entrenador: getValue(`squad-club:${gender}:entrenador`, base.entrenador),
     };
-  }, [bundles, gender, getValue, leagueMatchdays, squad.length, viewedSeason.label]);
+    if (stadiumOverride) {
+      merged.estadio = stadiumOverride.nombre;
+      merged.estadioInfo = stadiumOverride;
+    }
+    return merged;
+  }, [bundles, gender, getValue, leagueMatchdays, squad.length, stadiumOverride, viewedSeason.label]);
   const isFemenino = gender === "femenino";
 
   const [viewMode, setViewMode] = useState<SquadViewMode>(isFemenino ? "lista" : "fichas");
@@ -52,17 +62,34 @@ export function SquadPage({ gender }: SquadPageProps) {
 
   const handleSelect = setSelected;
 
+  const handleStadiumClick = () => setStadiumOpen(true);
+
+  const handleAddPlayer = useCallback(
+    async (position: Parameters<typeof addPlayer>[0]) => {
+      setAddBusy(true);
+      const result = await addPlayer(position);
+      setAddBusy(false);
+      if (result.ok && result.player) setSelected(result.player);
+    },
+    [addPlayer],
+  );
+
+  const stadiumModalOpen = stadiumOpen && !editMode;
+  const stadiumEditorOpen = stadiumOpen && editMode;
+
   return (
     <div className="space-y-6">
       <SquadHeader
         club={club}
         stats={club.stats}
         gender={gender}
-        onStadiumClick={() => setStadiumOpen(true)}
+        onStadiumClick={handleStadiumClick}
       />
       <SquadToolbar viewMode={viewMode} onViewModeChange={setViewMode} showViewToggle={!isFemenino} />
 
-      <SquadAvailability injured={injured} suspended={suspended} onSelect={handleSelect} />
+      {editMode && <SquadEditToolbar onAddPlayer={(position) => void handleAddPlayer(position)} busy={addBusy} />}
+
+      <SquadAvailability injured={injured} suspended={suspended} onSelect={handleSelect} editMode={editMode} />
 
       <AnimatePresence mode="wait">
         <motion.div
@@ -95,9 +122,18 @@ export function SquadPage({ gender }: SquadPageProps) {
         player={selectedPlayer}
         onClose={() => setSelected(null)}
         onUpdate={updatePlayer}
+        onRemove={editMode ? (playerId) => void removePlayer(playerId).then(() => setSelected(null)) : undefined}
       />
       {!isFemenino && <StandingsEvolutionChart />}
-      <StadiumModal stadium={club.estadioInfo} open={stadiumOpen} onClose={() => setStadiumOpen(false)} />
+      <StadiumModal stadium={club.estadioInfo} open={stadiumModalOpen} onClose={() => setStadiumOpen(false)} />
+      <StadiumEditorModal
+        open={stadiumEditorOpen}
+        onClose={() => setStadiumOpen(false)}
+        gender={gender}
+        clubName={club.nombre}
+        current={club.estadioInfo}
+        onSaved={setStadiumOverride}
+      />
     </div>
   );
 }

@@ -53,16 +53,19 @@ type PlayerModalProps = {
   player: SquadPlayer | null;
   onClose: () => void;
   onUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
+  onRemove?: (playerId: string) => void;
 };
 
 function PlayerModalContent({
   player,
   onClose,
   onUpdate,
+  onRemove,
 }: {
   player: SquadPlayer;
   onClose: () => void;
   onUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
+  onRemove?: (playerId: string) => void;
 }) {
   const [activeTab, setActiveTab] = useState<SquadModalTab>("actualidad");
   const { editMode } = useInlineEditing();
@@ -187,7 +190,11 @@ function PlayerModalContent({
 
       <div className="relative z-0 min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
         {editMode && onUpdate && (
-          <PlayerInlineEditor player={player} onUpdate={(patch) => onUpdate(player.id, patch)} />
+          <PlayerInlineEditor
+            player={player}
+            onUpdate={(patch) => onUpdate(player.id, patch)}
+            onRemove={onRemove ? () => onRemove(player.id) : undefined}
+          />
         )}
         <AnimatePresence mode="wait">
           <motion.div
@@ -235,7 +242,7 @@ function PlayerModalContent({
   );
 }
 
-export function PlayerModal({ player, onClose, onUpdate }: PlayerModalProps) {
+export function PlayerModal({ player, onClose, onUpdate, onRemove }: PlayerModalProps) {
   useEffect(() => {
     if (!player) return;
     const onKeyDown = (event: KeyboardEvent) => {
@@ -261,7 +268,13 @@ export function PlayerModal({ player, onClose, onUpdate }: PlayerModalProps) {
           role="dialog"
           aria-modal="true"
         >
-          <PlayerModalContent key={player.id} player={player} onClose={onClose} onUpdate={onUpdate} />
+          <PlayerModalContent
+            key={player.id}
+            player={player}
+            onClose={onClose}
+            onUpdate={onUpdate}
+            onRemove={onRemove}
+          />
         </motion.div>
       )}
     </AnimatePresence>
@@ -271,13 +284,26 @@ export function PlayerModal({ player, onClose, onUpdate }: PlayerModalProps) {
 function PlayerInlineEditor({
   player,
   onUpdate,
+  onRemove,
 }: {
   player: SquadPlayer;
   onUpdate: (patch: Partial<SquadPlayer>) => void;
+  onRemove?: () => void;
 }) {
   return (
     <section className="mb-6 rounded-2xl border border-[#214C9B]/20 bg-blue-50/60 p-4">
-      <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#214C9B]">Editar ficha</p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#214C9B]">Editar ficha</p>
+        {onRemove && (
+          <button
+            type="button"
+            onClick={onRemove}
+            className="rounded-full border border-[#981915]/30 px-3 py-1 text-[10px] font-extrabold uppercase text-[#981915] hover:bg-red-50"
+          >
+            Eliminar jugador
+          </button>
+        )}
+      </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <EditorInput label="Nombre" value={player.nombre} onChange={(value) => onUpdate({ nombre: value })} />
         <EditorInput label="Apellido" value={player.apellido} onChange={(value) => onUpdate({ apellido: value })} />

@@ -75,3 +75,24 @@ export async function upsertSquadPlayersBatch(
   if (error) return { ok: false, error: error.message };
   return { ok: true };
 }
+
+export async function deleteSquadPlayer(
+  gender: PrimerEquipoGender,
+  seasonId: string,
+  playerId: string,
+): Promise<{ ok: boolean; error?: string }> {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: "Supabase no configurado" };
+  }
+
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("cms_players")
+    .delete()
+    .eq("id", playerId)
+    .eq("season_id", seasonId)
+    .eq("squad", gender);
+
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { ChevronRight, Landmark } from "lucide-react";
 import { EditableText } from "@/components/inline-editing/EditableText";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { SquadStatsBar } from "@/components/squad/SquadStatsBar";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { SquadClubInfo, SquadClubStats } from "@/types/squad";
@@ -15,6 +16,8 @@ type SquadHeaderProps = {
 };
 
 export function SquadHeader({ club, stats, gender, onStadiumClick }: SquadHeaderProps) {
+  const { editMode } = useInlineEditing();
+
   return (
     <div className="flex w-full flex-col items-start gap-5">
       <div className="flex w-full min-w-0 flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
@@ -51,7 +54,7 @@ export function SquadHeader({ club, stats, gender, onStadiumClick }: SquadHeader
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm font-bold text-slate-900 sm:text-base">{club.estadioInfo.nombre}</span>
             <span className="mt-0.5 block text-xs font-semibold text-[#214C9B]/80 group-hover:text-[#214C9B]">
-              Ver informacion del estadio
+              {editMode ? "Editar estadio del club" : "Ver informacion del estadio"}
             </span>
           </span>
           <ChevronRight
