@@ -147,9 +147,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
         />
       ) : (
         <>
-          {isMasculino && showAvilesSidebar && (
-            <GuiaLiga gender={gender} teams={teams} grupo={grupo} />
-          )}
+          {isMasculino && <GuiaLiga gender={gender} teams={teams} grupo={grupo} />}
 
           <section className="grid gap-6 xl:grid-cols-2">
             <StandingsLeagueTableCard

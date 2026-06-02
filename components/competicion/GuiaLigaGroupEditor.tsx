@@ -65,19 +65,38 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
   );
 
   const updateSlotName = (index: number, name: string) => {
+    setSlots((current) =>
+      current.map((slot, slotIndex) => (slotIndex === index ? { ...slot, name } : slot)),
+    );
+  };
+
+  const importFromOtherGroup = () => {
+    const otherGrupo = grupo === "1" ? "2" : "1";
+    const otherNames = getGroupTeamSlots(bundles, gender, otherGrupo)
+      .map((slot) => slot.name.trim())
+      .filter(Boolean);
+    if (!otherNames.length) {
+      setMessage(`No hay equipos con nombre en el Grupo ${otherGrupo}.`);
+      return;
+    }
     setSlots((current) => {
-      const next = current.map((slot, slotIndex) => (slotIndex === index ? { ...slot, name } : slot));
+      const next = current.map((slot) => ({ ...slot }));
+      let sourceIndex = 0;
+      for (let slotIndex = 0; slotIndex < next.length && sourceIndex < otherNames.length; slotIndex += 1) {
+        if (!next[slotIndex]!.name.trim()) {
+          next[slotIndex] = { ...next[slotIndex]!, name: otherNames[sourceIndex]! };
+          sourceIndex += 1;
+        }
+      }
       return syncSlotIds(next, grupo);
     });
+    setMessage(null);
   };
 
   const clearSlot = (index: number) => {
-    setSlots((current) => {
-      const next = current.map((slot, slotIndex) =>
-        slotIndex === index ? { id: slot.id, name: "" } : slot,
-      );
-      return syncSlotIds(next, grupo);
-    });
+    setSlots((current) =>
+      current.map((slot, slotIndex) => (slotIndex === index ? { ...slot, name: "" } : slot)),
+    );
   };
 
   const assignCrest = (index: number, path: string) => {
@@ -158,13 +177,22 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
               {viewedSeason.label} · {config.teamsPerGroup} plazas · deja vacío para «Equipo N»
             </p>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-full border border-slate-200 px-3 py-1 text-[10px] font-extrabold uppercase text-slate-600 hover:bg-white"
-          >
-            Cancelar
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={importFromOtherGroup}
+              className="rounded-full border border-[#214C9B]/30 px-3 py-1 text-[10px] font-extrabold uppercase text-[#214C9B] hover:bg-white"
+            >
+              Rellenar desde Grupo {grupo === "1" ? "2" : "1"}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-full border border-slate-200 px-3 py-1 text-[10px] font-extrabold uppercase text-slate-600 hover:bg-white"
+            >
+              Cancelar
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-5 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10">
@@ -176,7 +204,7 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
 
             return (
               <div
-                key={`${slot.id}-${index}`}
+                key={`slot-${index}`}
                 className={`flex flex-col gap-1 rounded-xl border p-1.5 ${
                   empty ? "border-dashed border-slate-300 bg-slate-50" : "border-slate-200 bg-white"
                 }`}

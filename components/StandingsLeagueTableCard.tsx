@@ -8,6 +8,7 @@ import { PRIMERA_RFEF_RULES } from "@/lib/rfef-rules";
 import { getBalancedStandingsWindow } from "@/lib/standings-window";
 import {
   STANDINGS_VENUE_LABELS,
+  applyPositionZonesToTeams,
   getLastPlayedLeagueRound,
   getPlayedLeagueRounds,
   getTeamsAtRound,
@@ -74,12 +75,13 @@ export function StandingsLeagueTableCard({
 
   const fullTeams = useMemo(() => {
     let base = getTeamsAtRound(sourceTeams, matchdays, qualifyingRound, zones, tiebreak, venue);
-    if (zoneRules) base = applyCustomZoneColors(base, zoneRules);
     if (base.length > 0 && base.every((team) => team.stats.played === 0)) {
-      return [...base]
+      base = [...base]
         .sort((a, b) => a.name.localeCompare(b.name, "es"))
-        .map((team, index) => ({ ...team, position: index + 1 }));
+        .map((team, index) => ({ ...team, position: index + 1, zone: undefined, zoneColorClass: undefined }));
+      base = zoneRules ? base : applyPositionZonesToTeams(base, zones);
     }
+    if (zoneRules) base = applyCustomZoneColors(base, zoneRules);
     return base;
   }, [sourceTeams, matchdays, qualifyingRound, zones, tiebreak, venue, zoneRules]);
 

@@ -1,7 +1,4 @@
-import { EquipoLigaView } from "@/components/competicion/EquipoLigaView";
-import { canLinkEquipoLiga } from "@/lib/equipo-liga";
-import { getAllTeamsForGender, getTeamByGender } from "@/lib/fixtures";
-import { getTeamsForRfefGrupo } from "@/lib/rfef-grupos";
+import { EquipoLigaPageClient } from "@/components/competicion/EquipoLigaPageClient";
 import { isPrimerEquipoGender, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { notFound } from "next/navigation";
 
@@ -12,19 +9,11 @@ export default async function EquipoLigaPage({
 }) {
   const { gender: genderParam, teamId } = await params;
 
-  if (!isPrimerEquipoGender(genderParam)) {
+  if (!isPrimerEquipoGender(genderParam) || !teamId.trim()) {
     notFound();
   }
 
   const gender = genderParam as PrimerEquipoGender;
-  const team = getTeamByGender(teamId, gender);
 
-  if (!team || !canLinkEquipoLiga(gender, teamId)) {
-    notFound();
-  }
-
-  const allTeams =
-    gender === "masculino" ? getTeamsForRfefGrupo("1") : getAllTeamsForGender(gender);
-
-  return <EquipoLigaView gender={gender} team={team} allTeams={allTeams} />;
+  return <EquipoLigaPageClient gender={gender} teamId={teamId} />;
 }

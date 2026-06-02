@@ -97,6 +97,7 @@ export function JornadasView({ gender }: JornadasViewProps) {
                 highlightTeamId={raiTeamId}
                 gender={gender}
                 showCrests={showCrests}
+                grupo={grupo}
               />
             ))}
           </div>

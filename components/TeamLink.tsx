@@ -20,7 +20,8 @@ export const headerLinkHoverClass =
   "underline decoration-white/30 underline-offset-2 transition hover:text-white hover:decoration-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
 export function TeamLink({ gender, teamId, teamName, children, className }: TeamLinkProps) {
-  if (!canLinkEquipoLiga(gender, teamId)) {
+  const season = useSeasonOptional();
+  if (!canLinkEquipoLiga(gender, teamId, season?.bundles)) {
     return <span className={className}>{children}</span>;
   }
 
