@@ -6,7 +6,6 @@ import { TransferFichaCard } from "@/components/fichajes/TransferFichaCard";
 import { TransferFichaCardPlaceholder } from "@/components/fichajes/TransferFichaCardPlaceholder";
 import { TransferMarketWindowSelector } from "@/components/fichajes/TransferMarketWindowSelector";
 import { PageHero } from "@/components/PageHero";
-import { useSeason } from "@/components/season/SeasonProvider";
 import { useTransferMarketWindows } from "@/hooks/useTransferMarketWindows";
 import { useTransfers } from "@/hooks/useTransfers";
 import { useViewedSeasonTransferMarketWindows } from "@/hooks/useViewedSeasonTransferMarketWindows";
@@ -18,7 +17,6 @@ import type { Route } from "next";
 const FICHAJES_GRID_CLASS = "grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-2 sm:gap-2.5";
 
 export function FichajesPageClient() {
-  const { viewedSeason } = useSeason();
   const { getOfficialAltas, loading } = useTransfers();
   const { windows } = useTransferMarketWindows();
   const { defaultWindowId: viewedSeasonDefaultWindowId } = useViewedSeasonTransferMarketWindows();
@@ -53,7 +51,7 @@ export function FichajesPageClient() {
     <div className="space-y-6">
       <PageHero
         eyebrow="Mercado"
-        title={`Fichajes ${viewedSeason.label}`}
+        title="Fichajes"
         description={`Altas oficiales del Real Avilés Industrial (${selectedWindowLabel}): agentes libres y cesiones del mercado.`}
         titleActions={
           <TransferMarketWindowSelector
