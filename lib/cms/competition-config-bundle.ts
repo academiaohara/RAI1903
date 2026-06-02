@@ -6,6 +6,8 @@ import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import { PRIMERA_RFEF_STANDINGS_ZONES } from "@/lib/rfef-rules/config";
 import { FEMENINA_STANDINGS_ZONES } from "@/lib/segunda-rfef-femenina-2526";
 import type { StandingsZonesConfig } from "@/lib/standings";
+import type { CompetitionId } from "@/types";
+import type { LeagueTemplateId } from "@/lib/competition/league-templates";
 
 /** Regla de zona en clasificación (ascenso, playoff, descenso, etc.). */
 export type CompetitionZoneRule = {
@@ -24,9 +26,24 @@ export type SeasonCompetitionConfigBundle = {
   groupCount: 1 | 2;
   zones: CompetitionZoneRule[];
   hasPlayoff: boolean;
+  /** Plantilla aplicada por última vez (referencia; los valores editables mandan). */
+  templateId?: LeagueTemplateId;
+  /** Etiqueta por defecto de la liga en la web. */
+  ligaLabel?: string;
+  /** Valor `competition` en partidos placeholder generados. */
+  matchCompetition?: CompetitionId;
   /** Plazas del grupo editables desde la guía de la liga. */
   groupTeams?: Partial<Record<RfefGrupoId, GroupTeamSlot[]>>;
 };
+
+/** Muestra selector Grupo I / II cuando hay más de un grupo. */
+export function hasMultipleGrupos(config: SeasonCompetitionConfigBundle): boolean {
+  return config.groupCount >= 2;
+}
+
+export function resolveMatchCompetition(config: SeasonCompetitionConfigBundle): CompetitionId {
+  return config.matchCompetition ?? "primera-rfef";
+}
 
 export const DEFAULT_ZONE_COLORS = {
   promotion: "bg-emerald-500",
