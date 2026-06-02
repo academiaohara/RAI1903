@@ -102,9 +102,16 @@ function getCanteraMatchdays(teamId: CanteraTeamId): Matchday[] {
   return matchesToMatchdays(matches);
 }
 
-export function buildCanteraJornadasDataset(teamId: CanteraTeamId): JornadasDataset {
+export function buildCanteraJornadasDatasetFromMatches(
+  teamId: CanteraTeamId,
+  matches: Match[],
+): JornadasDataset {
   const clubTeamId = getCanteraPrimaryAvilesTeamId(teamId);
-  const matchdays = getCanteraMatchdays(teamId);
+  const matchdays = matchesToMatchdays(matches);
+  return buildCanteraJornadasDatasetCore(matchdays, clubTeamId);
+}
+
+function buildCanteraJornadasDatasetCore(matchdays: Matchday[], clubTeamId: string): JornadasDataset {
   const currentRound = getLastPlayedLeagueRound(matchdays);
   const currentRoundId: JornadaRoundId = `j${currentRound}`;
 
@@ -129,4 +136,10 @@ export function buildCanteraJornadasDataset(teamId: CanteraTeamId): JornadasData
       return leagueRoundDataCache.get(roundId) ?? leagueRoundDataCache.get(currentRoundId)!;
     },
   };
+}
+
+export function buildCanteraJornadasDataset(teamId: CanteraTeamId): JornadasDataset {
+  const clubTeamId = getCanteraPrimaryAvilesTeamId(teamId);
+  const matchdays = getCanteraMatchdays(teamId);
+  return buildCanteraJornadasDatasetCore(matchdays, clubTeamId);
 }

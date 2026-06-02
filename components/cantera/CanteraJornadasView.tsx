@@ -4,12 +4,14 @@ import { useCallback, useMemo, useState } from "react";
 import { CanteraJornadaMatchRow } from "@/components/cantera/CanteraJornadaMatchRow";
 import { Card } from "@/components/Card";
 import { JornadaRoundCarousel } from "@/components/jornadas/JornadaRoundCarousel";
-import { buildCanteraJornadasDataset } from "@/lib/cantera-jornadas-data";
+import { buildCanteraJornadasDataset, buildCanteraJornadasDatasetFromMatches } from "@/lib/cantera-jornadas-data";
+import type { Match } from "@/types";
 import { getCanteraPrimaryAvilesTeamId, type CanteraTeamId } from "@/lib/cantera-data";
 import type { JornadaFixture, JornadaRoundId } from "@/types/jornadas";
 
 type CanteraJornadasViewProps = {
   teamId: CanteraTeamId;
+  filialMatches?: Match[];
 };
 
 function partitionMatches(matches: JornadaFixture[], clubTeamId: string) {
@@ -18,8 +20,11 @@ function partitionMatches(matches: JornadaFixture[], clubTeamId: string) {
   return { club, rest };
 }
 
-export function CanteraJornadasView({ teamId }: CanteraJornadasViewProps) {
-  const dataset = useMemo(() => buildCanteraJornadasDataset(teamId), [teamId]);
+export function CanteraJornadasView({ teamId, filialMatches }: CanteraJornadasViewProps) {
+  const dataset = useMemo(() => {
+    if (filialMatches) return buildCanteraJornadasDatasetFromMatches(teamId, filialMatches);
+    return buildCanteraJornadasDataset(teamId);
+  }, [filialMatches, teamId]);
   const clubTeamId = getCanteraPrimaryAvilesTeamId(teamId);
   const [manualRoundId, setManualRoundId] = useState<JornadaRoundId | null>(null);
   const selectedRoundId = manualRoundId ?? dataset.currentRoundId;

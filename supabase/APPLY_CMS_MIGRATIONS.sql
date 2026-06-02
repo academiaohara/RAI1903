@@ -31,7 +31,7 @@ delete from public.cms_seasons where id = '2024-25';
 -- 2) Bundles por temporada (plantilla, calendario, crónicas…)
 create table if not exists public.cms_season_bundles (
   season_id text not null references public.cms_seasons (id) on delete cascade,
-  scope text not null check (scope in ('masculino', 'femenino', 'global')),
+  scope text not null check (scope in ('masculino', 'femenino', 'global', 'filial')),
   bundle_key text not null,
   payload jsonb not null default '{}'::jsonb,
   updated_at timestamptz not null default now(),

@@ -117,8 +117,16 @@ export function getFilialBSquadPlayers(): CanteraSquadPlayer[] {
   return filialBSquadImport2526.plantilla.map((player) => importPlayerToCanteraPlayer(player, "filial"));
 }
 
+export function getCanteraSquadPlayersFromImport(
+  squad: CanteraSquadImport,
+  teamId: CanteraTeamId,
+): CanteraSquadPlayer[] {
+  const prefix = teamId === "filial" ? "filial" : "juvenil";
+  return squad.plantilla.map((player) => importPlayerToCanteraPlayer(player, prefix));
+}
+
 export function getCanteraSquadPlayers(teamId: CanteraTeamId): CanteraSquadPlayer[] {
-  return teamId === "filial" ? getFilialBSquadPlayers() : getJuvenilASquadPlayers();
+  return getCanteraSquadPlayersFromImport(getCanteraSquadImport(teamId), teamId);
 }
 
 export function buildJuvenilAcademyRoster(): Array<Pick<Player, "id" | "displayName" | "number" | "position" | "age">> {

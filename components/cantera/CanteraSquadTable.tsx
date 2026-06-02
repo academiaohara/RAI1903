@@ -4,10 +4,10 @@ import { motion } from "framer-motion";
 import type { CanteraTeamId } from "@/lib/cantera-data";
 import {
   formatCanteraGoals,
-  getCanteraSquadImport,
-  getCanteraSquadPlayers,
+  getCanteraSquadPlayersFromImport,
   type CanteraSquadPlayer,
 } from "@/lib/cantera-squad";
+import type { CanteraSquadImport } from "@/types/cantera-squad-import";
 import { SQUAD_POSITIONS, SQUAD_POSITION_LABELS, type SquadPosition } from "@/types/squad";
 import { PositionSection } from "@/components/squad/PositionSection";
 import { SquadListColGroup } from "@/components/squad/SquadListColGroup";
@@ -45,11 +45,13 @@ function formatDorsal(dorsal: number | null): string {
 
 type CanteraSquadTableProps = {
   teamId: CanteraTeamId;
+  squadImport: CanteraSquadImport;
+  seasonLabel: string;
 };
 
-export function CanteraSquadTable({ teamId }: CanteraSquadTableProps) {
-  const players = getCanteraSquadPlayers(teamId);
-  const importData = getCanteraSquadImport(teamId);
+export function CanteraSquadTable({ teamId, squadImport, seasonLabel }: CanteraSquadTableProps) {
+  const players = getCanteraSquadPlayersFromImport(squadImport, teamId);
+  const importData = squadImport;
   const grouped = groupPlayers(players);
 
   const sections: Array<{ key: string; label: string; list: CanteraSquadPlayer[] }> = [
@@ -120,7 +122,7 @@ export function CanteraSquadTable({ teamId }: CanteraSquadTableProps) {
       <p className="text-sm text-slate-600">
         <strong className="text-slate-900">{importData.plantilla.length} jugadores</strong>
         {" · "}
-        Temporada 2025/26
+        Temporada {seasonLabel}
       </p>
 
       <div className="space-y-10">
