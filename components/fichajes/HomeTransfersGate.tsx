@@ -4,9 +4,9 @@ import { HomeTransfersSection } from "@/components/fichajes/HomeTransfersSection
 import { useTransfers } from "@/hooks/useTransfers";
 
 export function HomeTransfersGate() {
-  const { hasAnyCarousel, loading } = useTransfers();
+  const { loading } = useTransfers();
 
-  if (loading || !hasAnyCarousel()) return null;
+  if (loading) return null;
 
   return <HomeTransfersSection />;
 }

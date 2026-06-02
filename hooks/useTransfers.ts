@@ -26,7 +26,13 @@ export function useTransfers() {
 
   const effectiveTransfers = useMemo(() => {
     if (!marketEdit?.hasDraft) return transfers;
-    return transfersFromBundle(seasonTransfersBundlePayload(marketEdit.entries), marketEdit.squad);
+    const draftTransfers = transfersFromBundle(
+      seasonTransfersBundlePayload(marketEdit.entries),
+      marketEdit.squad,
+    );
+    const viewedEntryIds = new Set(marketEdit.bundleEntries.map((entry) => entry.id));
+    const fromOtherSeasons = transfers.filter((transfer) => !viewedEntryIds.has(transfer.id));
+    return [...draftTransfers, ...fromOtherSeasons];
   }, [marketEdit, transfers]);
 
   return useMemo(
