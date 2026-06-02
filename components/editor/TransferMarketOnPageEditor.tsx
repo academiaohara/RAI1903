@@ -11,10 +11,18 @@ import {
 } from "@/components/editor/ClubAnnouncementUrlField";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useTransferMarketEdit } from "@/components/editor/TransferMarketEditProvider";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { TRANSFER_KIND_OPTIONS, newTransferEntryId } from "@/hooks/useTransferMarketDraft";
 import type { TransferKind, TransferMarketWindowId } from "@/types";
 
+/** Solo monta el editor con contexto cuando el modo edición está activo (evita fallos en SSG). */
 export function TransferMarketOnPageEditor() {
+  const { canEdit, editMode } = useInlineEditing();
+  if (!canEdit || !editMode) return null;
+  return <TransferMarketOnPageEditorBody />;
+}
+
+function TransferMarketOnPageEditorBody() {
   const { viewedSeason } = useSeason();
   const { squad, squadLoading, addEntry, save, busy, message, hasDraft, inferWindow, marketWindows } =
     useTransferMarketEdit();
