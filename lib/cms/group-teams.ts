@@ -1,8 +1,8 @@
 import type { SeasonCompetitionConfigBundle } from "@/lib/cms/competition-config-bundle";
 import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import { resolveCompetitionConfig } from "@/lib/cms/competition-config-bundle";
-import { getTeamsByGender } from "@/lib/fixtures";
-import { getTeamsForRfefGrupo, type RfefGrupoId } from "@/lib/rfef-grupos";
+import { defaultTeamsForLeagueTemplate } from "@/lib/competition/league-team-sources";
+import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getTeam } from "@/lib/fixtures";
 import type { Team } from "@/types";
@@ -74,10 +74,10 @@ export function defaultGroupTeamSlots(
   grupo: RfefGrupoId,
   gender: PrimerEquipoGender,
   count: number,
+  config?: SeasonCompetitionConfigBundle,
 ): GroupTeamSlot[] {
-  const mockTeams =
-    gender === "masculino" ? getTeamsForRfefGrupo(grupo) : getTeamsByGender(gender).slice(0, count);
-  const slots = mockTeams.slice(0, count).map((team) => ({ id: team.id, name: team.name }));
+  const mockTeams = defaultTeamsForLeagueTemplate(config?.templateId, gender, grupo, count);
+  const slots = mockTeams.map((team) => ({ id: team.id, name: team.name }));
   return normalizeGroupTeamSlots(slots, count, grupo);
 }
 
@@ -92,7 +92,7 @@ export function getGroupTeamSlots(
   if (stored?.length) {
     return normalizeGroupTeamSlots(stored, count, grupo);
   }
-  return defaultGroupTeamSlots(grupo, gender, count);
+  return defaultGroupTeamSlots(grupo, gender, count, config);
 }
 
 export function groupSlotToTeam(slot: GroupTeamSlot, index: number): Team {

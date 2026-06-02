@@ -9,9 +9,27 @@ import {
   type SeasonFixturesBundle,
   type SeasonFemeninoFixturesBundle,
 } from "@/lib/cms/season-bundles";
+import { defaultGroupTeamSlots, withGroupTeamsInConfig } from "@/lib/cms/group-teams";
 import { normalizeGrupo2Matchdays, normalizeLeagueMatchdays } from "@/lib/competition/normalize-fixtures";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
+
+function configWithDefaultGroupTeams(
+  config: SeasonCompetitionConfigBundle,
+  gender: PrimerEquipoGender,
+): SeasonCompetitionConfigBundle {
+  const grupos: RfefGrupoId[] = config.groupCount >= 2 ? ["1", "2"] : ["1"];
+  return grupos.reduce(
+    (current, grupo) =>
+      withGroupTeamsInConfig(
+        current,
+        grupo,
+        defaultGroupTeamSlots(grupo, gender, config.teamsPerGroup, config),
+      ),
+    config,
+  );
+}
 
 export type ApplyLeagueTemplateOptions = {
   /** Si true, regenera calendario vacío según la plantilla. */
@@ -61,7 +79,7 @@ export async function applyLeagueTemplate(
     return { ok: false, error: "Plantilla no encontrada" };
   }
 
-  const config = configFromTemplate(template);
+  const config = configWithDefaultGroupTeams(configFromTemplate(template), template.gender);
   const gender = template.gender;
   const bundles = options.bundles ?? {};
 

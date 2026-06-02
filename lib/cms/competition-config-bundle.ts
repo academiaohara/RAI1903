@@ -48,6 +48,7 @@ export function resolveMatchCompetition(config: SeasonCompetitionConfigBundle): 
 export const DEFAULT_ZONE_COLORS = {
   promotion: "bg-emerald-500",
   playoff: "bg-sky-400",
+  playout: "bg-amber-500",
   relegation: "bg-rose-500",
 } as const;
 
@@ -125,7 +126,7 @@ export function zonesToLegacyConfig(zones: CompetitionZoneRule[]): StandingsZone
     if (zone.from === "top") {
       if (zone.id === "promotion" || promotion === 0) promotion += zone.count;
       else playoff += zone.count;
-    } else {
+    } else if (zone.id !== "playout") {
       relegation += zone.count;
     }
   }
