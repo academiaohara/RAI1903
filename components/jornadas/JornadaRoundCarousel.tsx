@@ -70,7 +70,17 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests 
       >
         {rounds.map((round) => {
           const isSelected = round.id === selectedId;
-          const opponent = round.opponentTeamId ? getJornadaTeam(round.opponentTeamId) : undefined;
+          const opponent =
+            round.opponentTeamId && round.opponentName
+              ? getJornadaTeam(round.opponentTeamId)
+              : undefined;
+          const opponentLabel = round.opponentName ?? round.opponentTeamId ?? "Por determinar";
+          const opponentInitials = opponentLabel
+            .split(/\s+/)
+            .filter(Boolean)
+            .map((part) => part[0]?.toUpperCase() ?? "")
+            .join("")
+            .slice(0, 3);
 
           return (
             <button
@@ -90,8 +100,8 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests 
                     <TeamCrest team={opponent} size="md" className="transition group-hover:brightness-110" />
                   ) : round.opponentTeamId ? (
                     <OpponentCrest
-                      logo={getTeamCrestById(round.opponentTeamId)}
-                      opponent={round.opponentTeamId}
+                      logo={getTeamCrestById(round.opponentTeamId, opponentInitials || "EQP")}
+                      opponent={opponentLabel}
                       size="md"
                       className="transition group-hover:brightness-110"
                     />
