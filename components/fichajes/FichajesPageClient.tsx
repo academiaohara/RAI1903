@@ -7,8 +7,10 @@ import { TransferFichaCardPlaceholder } from "@/components/fichajes/TransferFich
 import { TransferMarketWindowSelector } from "@/components/fichajes/TransferMarketWindowSelector";
 import { PageHero } from "@/components/PageHero";
 import { useSeason } from "@/components/season/SeasonProvider";
+import { useTransferMarketWindows } from "@/hooks/useTransferMarketWindows";
 import { useTransfers } from "@/hooks/useTransfers";
 import { useViewedSeasonTransferMarketWindows } from "@/hooks/useViewedSeasonTransferMarketWindows";
+import { getTransferMarketWindowById } from "@/lib/transfer-market-windows";
 import { EMPTY_TRANSFER_FICHA_SLOT_COUNT } from "@/lib/fichajes-carousel";
 import type { TransferMarketWindowId } from "@/types";
 import type { Route } from "next";
@@ -17,9 +19,17 @@ const FICHAJES_GRID_CLASS = "grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))
 
 export function FichajesPageClient() {
   const { viewedSeason } = useSeason();
-  const { getOfficialAltasForViewedSeason, loading } = useTransfers();
-  const { windows, defaultWindowId } = useViewedSeasonTransferMarketWindows();
+  const { getOfficialAltas, loading } = useTransfers();
+  const { windows } = useTransferMarketWindows();
+  const { defaultWindowId: viewedSeasonDefaultWindowId } = useViewedSeasonTransferMarketWindows();
   const [selectedWindowId, setSelectedWindowId] = useState<TransferMarketWindowId | null>(null);
+
+  const defaultWindowId = useMemo(() => {
+    if (windows.some((window) => window.id === viewedSeasonDefaultWindowId)) {
+      return viewedSeasonDefaultWindowId;
+    }
+    return windows[windows.length - 1]?.id ?? viewedSeasonDefaultWindowId;
+  }, [viewedSeasonDefaultWindowId, windows]);
 
   const marketWindowId = useMemo(() => {
     if (selectedWindowId && windows.some((window) => window.id === selectedWindowId)) {
@@ -28,19 +38,23 @@ export function FichajesPageClient() {
     return defaultWindowId;
   }, [defaultWindowId, selectedWindowId, windows]);
 
+  const selectedWindowLabel = useMemo(
+    () => getTransferMarketWindowById(marketWindowId, windows).label,
+    [marketWindowId, windows],
+  );
+
   const handleMarketWindowChange = useCallback((nextWindowId: TransferMarketWindowId) => {
     setSelectedWindowId(nextWindowId);
   }, []);
 
-
-  const featured = getOfficialAltasForViewedSeason(marketWindowId);
+  const featured = getOfficialAltas(marketWindowId);
 
   return (
     <div className="space-y-6">
       <PageHero
         eyebrow="Mercado"
         title={`Fichajes ${viewedSeason.label}`}
-        description={`Altas oficiales del Real Avilés Industrial en la temporada ${viewedSeason.label}: agentes libres y cesiones del mercado.`}
+        description={`Altas oficiales del Real Avilés Industrial (${selectedWindowLabel}): agentes libres y cesiones del mercado.`}
         titleActions={
           <TransferMarketWindowSelector
             value={marketWindowId}
