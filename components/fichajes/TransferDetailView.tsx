@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Building2, Calendar } from "lucide-react";
-import { Badge } from "@/components/Badge";
 import { PlayerActualidadSection } from "@/components/squad/PlayerActualidadSection";
 import { clubAnnouncementFromTransfer } from "@/lib/club-announcement";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
@@ -52,13 +51,6 @@ const toneByKind = {
     pill: "bg-blue-50 text-[#214C9B]",
     announcement: "renovacion" as const,
   },
-  cesion: {
-    hero: "from-amber-800 via-amber-700 to-amber-600",
-    chip: "border-white/25 bg-white/10",
-    accent: "text-amber-200",
-    pill: "bg-amber-50 text-amber-800",
-    announcement: "fichaje" as const,
-  },
 } as const;
 
 type TransferDetailViewProps = {
@@ -74,7 +66,7 @@ export function TransferDetailView({ transfer, player: initialPlayer }: Transfer
     ? getPlayerById(initialPlayer.id) ?? initialPlayer
     : undefined;
   const kind = getTransferKind(transfer);
-  const tone = toneByKind[kind];
+  const tone = toneByKind[kind === "renovacion" ? "renovacion" : "fichaje"];
   const visibleTabs = allTabs.filter((tab) => !tab.requiresPlayer || player);
   const [activeTab, setActiveTab] = useState<TransferDetailTab>("actualidad");
   const clubAnnouncementNews = getTransferClubAnnouncementNews(transfer, allNews);
@@ -173,25 +165,13 @@ export function TransferDetailView({ transfer, player: initialPlayer }: Transfer
             transition={{ duration: 0.22 }}
           >
             {activeTab === "actualidad" && (
-              <div className="space-y-8">
-                <PlayerActualidadSection
-                  clubAnnouncement={clubAnnouncementFromTransfer(transfer, clubAnnouncementNews)}
-                  playerNews={playerNews}
-                  accentClass={tone.accent}
-                  announcementTone={tone.announcement}
-                  transfer={transfer}
-                />
-
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge tone={kind === "fichaje" ? "red" : kind === "cesion" ? "amber" : "blue"}>
-                      {getTransferKindLabel(kind)}
-                    </Badge>
-                    <Badge tone="slate">{transfer.source}</Badge>
-                  </div>
-                  <p className="mt-4 text-sm leading-7 text-slate-600">{transfer.analysis}</p>
-                </div>
-              </div>
+              <PlayerActualidadSection
+                clubAnnouncement={clubAnnouncementFromTransfer(transfer, clubAnnouncementNews)}
+                playerNews={playerNews}
+                accentClass={tone.accent}
+                announcementTone={tone.announcement}
+                transfer={transfer}
+              />
             )}
 
             {player && activeTab === "resumen" && (
