@@ -197,7 +197,8 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
           <div>
             <p className="text-xs font-extrabold uppercase text-[#214C9B]">Editar equipos del grupo</p>
             <p className="text-[10px] font-semibold text-slate-500">
-              {viewedSeason.label} · {config.teamsPerGroup} plazas · deja vacío para «Equipo N»
+              {viewedSeason.label} · {config.teamsPerGroup} plazas · deja vacío para «Equipo N». Nueva temporada:
+              actualiza los 20 clubes aquí; la plantilla de cada rival se edita en su ficha (modo edición).
             </p>
           </div>
           <div className="flex flex-wrap gap-2">

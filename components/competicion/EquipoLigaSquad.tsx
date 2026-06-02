@@ -2,7 +2,9 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { RivalSquadOnPageEditor } from "@/components/editor/RivalSquadOnPageEditor";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { useSeason } from "@/components/season/SeasonProvider";
 import type { SquadPlayer, SquadViewMode, StadiumInfo } from "@/types/squad";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
@@ -25,7 +27,11 @@ type EquipoLigaSquadProps = {
 };
 
 export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
-  const { club: baseClub, squad: baseSquad, isOwnClub } = useMemo(() => getCompeticionSquadData(gender, team), [gender, team]);
+  const { bundles } = useSeason();
+  const { club: baseClub, squad: baseSquad, isOwnClub } = useMemo(
+    () => getCompeticionSquadData(gender, team, bundles),
+    [bundles, gender, team],
+  );
   const { squad: ownSquad, updatePlayer, addPlayer, removePlayer } = useSquadPlayers(gender);
   const { editMode } = useInlineEditing();
   const squad = isOwnClub ? ownSquad : baseSquad;
@@ -66,6 +72,7 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
 
   return (
     <div className="space-y-6">
+      {!isOwnClub && <RivalSquadOnPageEditor gender={gender} team={team} />}
       <SquadHeader club={club} stats={club.stats} gender={gender} onStadiumClick={() => setStadiumOpen(true)} />
       <SquadToolbar
         viewMode={viewMode}

@@ -1,4 +1,4 @@
--- Añade competition_config y teams al CHECK de bundle_key (ejecutar en SQL Editor si falla al guardar).
+-- Añade rival_squads al CHECK de bundle_key (ejecutar en SQL Editor si falla al guardar plantillas rivales).
 
 alter table public.cms_season_bundles
   drop constraint if exists cms_season_bundles_bundle_key_check;
