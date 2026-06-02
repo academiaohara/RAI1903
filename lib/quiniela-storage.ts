@@ -18,19 +18,8 @@ type QuinielaState = {
   savedRounds: Record<number, string>;
 };
 
-function migrationKey(userId: string): string {
-  return `${MIGRATION_FLAG_PREFIX}${userId}`;
-}
-
-export function getActiveSeasonId(): CompetitionSeasonId {
-  if (typeof window === "undefined") return DEFAULT_COMPETITION_SEASON_ID;
-  try {
-    const stored = window.localStorage.getItem("rai1903.season.v1");
-    if (!stored || stored === "2024-25") return DEFAULT_COMPETITION_SEASON_ID;
-    return stored;
-  } catch {
-    return DEFAULT_COMPETITION_SEASON_ID;
-  }
+function migrationKey(userId: string, seasonId: CompetitionSeasonId): string {
+  return `${MIGRATION_FLAG_PREFIX}${userId}.${seasonId}`;
 }
 
 function rowToPrediction(row: {
@@ -53,7 +42,10 @@ function rowToPrediction(row: {
   });
 }
 
-export async function loadQuinielaState(userId: string | null): Promise<QuinielaState> {
+export async function loadQuinielaState(
+  userId: string | null,
+  seasonId: CompetitionSeasonId = DEFAULT_COMPETITION_SEASON_ID,
+): Promise<QuinielaState> {
   const local: QuinielaState = {
     predictions: loadLocalPredictions(),
     savedRounds: loadLocalSavedRounds(),
@@ -64,7 +56,6 @@ export async function loadQuinielaState(userId: string | null): Promise<Quiniela
   }
 
   const supabase = createClient();
-  const seasonId = getActiveSeasonId();
 
   const [{ data: predictionRows, error: predError }, { data: roundRows, error: roundError }] =
     await Promise.all([
@@ -95,7 +86,7 @@ export async function loadQuinielaState(userId: string | null): Promise<Quiniela
   const hasLocalData = Object.keys(local.predictions).length > 0 || Object.keys(local.savedRounds).length > 0;
 
   if (!hasCloudData && hasLocalData) {
-    await migrateLocalQuinielaToCloud(userId, local);
+    await migrateLocalQuinielaToCloud(userId, seasonId, local);
     return local;
   }
 
@@ -107,26 +98,30 @@ export async function loadQuinielaState(userId: string | null): Promise<Quiniela
     return { predictions: cloudPredictions, savedRounds: cloudSavedRounds };
   }
 
-  return local;
+  return { predictions: {}, savedRounds: {} };
 }
 
-async function migrateLocalQuinielaToCloud(userId: string, local: QuinielaState): Promise<void> {
+async function migrateLocalQuinielaToCloud(
+  userId: string,
+  seasonId: CompetitionSeasonId,
+  local: QuinielaState,
+): Promise<void> {
   if (typeof window === "undefined") return;
-  if (window.localStorage.getItem(migrationKey(userId))) return;
+  if (window.localStorage.getItem(migrationKey(userId, seasonId))) return;
 
-  await saveQuinielaState(userId, local.predictions, local.savedRounds);
-  window.localStorage.setItem(migrationKey(userId), new Date().toISOString());
+  await saveQuinielaState(userId, seasonId, local.predictions, local.savedRounds);
+  window.localStorage.setItem(migrationKey(userId, seasonId), new Date().toISOString());
 }
 
 export async function saveQuinielaPredictions(
   userId: string | null,
   predictions: Record<string, Prediction>,
+  seasonId: CompetitionSeasonId = DEFAULT_COMPETITION_SEASON_ID,
 ): Promise<void> {
   saveLocalPredictions(predictions);
   if (!userId || !isSupabaseConfigured()) return;
 
   const supabase = createClient();
-  const seasonId = getActiveSeasonId();
   const rows = Object.values(predictions).map((p) => ({
     user_id: userId,
     match_id: p.matchId,
@@ -153,12 +148,12 @@ export async function saveQuinielaPredictions(
 export async function saveQuinielaRound(
   userId: string | null,
   round: number,
+  seasonId: CompetitionSeasonId = DEFAULT_COMPETITION_SEASON_ID,
 ): Promise<void> {
   saveLocalRoundAsSaved(round);
   if (!userId || !isSupabaseConfigured()) return;
 
   const supabase = createClient();
-  const seasonId = getActiveSeasonId();
   const { error } = await supabase.from("quiniela_saved_rounds").upsert(
     {
       user_id: userId,
@@ -176,13 +171,14 @@ export async function saveQuinielaRound(
 
 async function saveQuinielaState(
   userId: string,
+  seasonId: CompetitionSeasonId,
   predictions: Record<string, Prediction>,
   savedRounds: Record<number, string>,
 ): Promise<void> {
-  await saveQuinielaPredictions(userId, predictions);
+  await saveQuinielaPredictions(userId, predictions, seasonId);
   for (const round of Object.keys(savedRounds).map(Number)) {
     if (!Number.isNaN(round)) {
-      await saveQuinielaRound(userId, round);
+      await saveQuinielaRound(userId, round, seasonId);
     }
   }
 }

@@ -6,6 +6,8 @@ import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
 import { PredictionForm } from "@/components/PredictionForm";
 import { QuinielaHowItWorks } from "@/components/QuinielaHowItWorks";
+import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
+import type { CompetitionSeasonId } from "@/data/mock";
 import {
   countFinishedMatches,
   countOutcomeHits,
@@ -15,15 +17,19 @@ import {
   isMatchdayFullyFinished,
   sortQuinielaMatches,
 } from "@/lib/quiniela";
-import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
 import { loadQuinielaState, saveQuinielaPredictions, saveQuinielaRound } from "@/lib/quiniela-storage";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import type { Prediction } from "@/types";
+import type { Matchday, Prediction } from "@/types";
 import type { User } from "@supabase/supabase-js";
 
-export default function MiQuinielaPage() {
-  const { leagueMatchdays, currentRound } = useMasculinoLeagueSeason();
+type PronosticosBodyProps = {
+  seasonId: CompetitionSeasonId;
+  matchdays: Matchday[];
+  currentRound: number;
+};
+
+function PronosticosBody({ seasonId, matchdays, currentRound }: PronosticosBodyProps) {
   const [round, setRound] = useState(currentRound);
   const [predictions, setPredictions] = useState<Record<string, Prediction>>({});
   const [savedRounds, setSavedRounds] = useState<Record<number, string>>({});
@@ -35,11 +41,12 @@ export default function MiQuinielaPage() {
     let cancelled = false;
 
     const hydrate = async (user: User | null) => {
-      const state = await loadQuinielaState(user?.id ?? null);
+      const state = await loadQuinielaState(user?.id ?? null, seasonId);
       if (cancelled) return;
       setPredictions(state.predictions);
       setSavedRounds(state.savedRounds);
       setUserId(user?.id ?? null);
+      setIsEditing(false);
       setHydrated(true);
     };
 
@@ -63,9 +70,9 @@ export default function MiQuinielaPage() {
       cancelled = true;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [seasonId]);
 
-  const selectedMatchday = useMemo(() => getMatchdayByRound(leagueMatchdays, round), [leagueMatchdays, round]);
+  const selectedMatchday = useMemo(() => getMatchdayByRound(matchdays, round), [matchdays, round]);
   const orderedMatches = useMemo(
     () => sortQuinielaMatches(selectedMatchday.matches),
     [selectedMatchday.matches],
@@ -93,12 +100,12 @@ export default function MiQuinielaPage() {
       setPredictions((current) => {
         const next = { ...current, [prediction.matchId]: prediction };
         if (!isSaved || isEditing) {
-          void saveQuinielaPredictions(userId, next);
+          void saveQuinielaPredictions(userId, next, seasonId);
         }
         return next;
       });
     },
-    [isSaved, isEditing, userId],
+    [isSaved, isEditing, userId, seasonId],
   );
 
   const handleSave = () => {
@@ -106,8 +113,8 @@ export default function MiQuinielaPage() {
       window.alert("Completa los 10 partidos (signo 1-X-2 y porra del Avilés si aplica) antes de guardar.");
       return;
     }
-    void saveQuinielaPredictions(userId, predictions);
-    void saveQuinielaRound(userId, round);
+    void saveQuinielaPredictions(userId, predictions, seasonId);
+    void saveQuinielaRound(userId, round, seasonId);
     setSavedRounds((current) => ({ ...current, [round]: new Date().toISOString() }));
     setIsEditing(false);
   };
@@ -123,16 +130,10 @@ export default function MiQuinielaPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <PageHero
-        eyebrow="Quiniela"
-        title="Pronosticos"
-        description="Rellena tu quiniela de la jornada. Al guardar queda bloqueada hasta que pulses editar. Cuando empiece el primer partido ya no podras cambiarla."
-      />
-      <QuinielaHowItWorks />
+    <>
       <JornadaSelector
         value={round}
-        total={leagueMatchdays.length}
+        total={matchdays.length}
         currentRound={currentRound}
         onChange={handleRoundChange}
       />
@@ -220,6 +221,27 @@ export default function MiQuinielaPage() {
           )}
         </div>
       </Card>
+    </>
+  );
+}
+
+export default function MiQuinielaPage() {
+  const { matchdays, currentRound, seasonId } = useQuinielaSeason();
+
+  return (
+    <div className="space-y-6">
+      <PageHero
+        eyebrow="Quiniela"
+        title="Pronosticos"
+        description="Rellena la quiniela con los 10 partidos del Grupo I de cada jornada. Al guardar queda bloqueada hasta que pulses editar. Cuando empiece el primer partido ya no podras cambiarla."
+      />
+      <QuinielaHowItWorks />
+      <PronosticosBody
+        key={seasonId}
+        seasonId={seasonId}
+        matchdays={matchdays}
+        currentRound={currentRound}
+      />
     </div>
   );
 }

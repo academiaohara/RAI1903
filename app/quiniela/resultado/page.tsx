@@ -5,45 +5,47 @@ import { Card } from "@/components/Card";
 import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
 import { PredictionForm } from "@/components/PredictionForm";
+import { QuinielaRankingList } from "@/components/quiniela/QuinielaRankingList";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
-import { jornadaParticipants } from "@/data/mock";
-import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
+import { useQuinielaRoundRanking } from "@/hooks/useQuinielaRoundRanking";
+import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
+import type { CompetitionSeasonId } from "@/data/mock";
 import {
   getMatchdayByRound,
   hasFirstMatchStarted,
   sortQuinielaMatches,
 } from "@/lib/quiniela";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
+import type { Matchday } from "@/types";
 
 type ResultadoView = "quiniela" | "ranking";
 
-export default function QuinielaResultadoPage() {
-  const { leagueMatchdays, currentRound } = useMasculinoLeagueSeason();
+type ResultadoBodyProps = {
+  seasonId: CompetitionSeasonId;
+  matchdays: Matchday[];
+  currentRound: number;
+};
+
+function ResultadoBody({ seasonId, matchdays, currentRound }: ResultadoBodyProps) {
   const [round, setRound] = useState(currentRound);
   const [view, setView] = useState<ResultadoView>("quiniela");
-  const selectedMatchday = useMemo(() => getMatchdayByRound(leagueMatchdays, round), [leagueMatchdays, round]);
+
+  const selectedMatchday = useMemo(() => getMatchdayByRound(matchdays, round), [matchdays, round]);
   const orderedMatches = useMemo(
     () => sortQuinielaMatches(selectedMatchday.matches),
     [selectedMatchday.matches],
   );
   const started = hasFirstMatchStarted(selectedMatchday);
-  const sortedParticipants = useMemo(() => {
-    const list = [...(jornadaParticipants[round] ?? [])];
-    if (started) {
-      list.sort((a, b) => b.points - a.points || a.submittedAt.localeCompare(b.submittedAt));
-    }
-    return list;
-  }, [round, started]);
+  const { entries: rankingEntries, loading: rankingLoading } = useQuinielaRoundRanking(
+    seasonId,
+    selectedMatchday,
+  );
 
   return (
-    <div className="space-y-6">
-      <PageHero
-        eyebrow="Quiniela"
-        title="Resultado"
-        description="Consulta el resultado oficial de la jornada o la clasificacion de participantes."
-      />
+    <>
       <JornadaSelector
         value={round}
-        total={leagueMatchdays.length}
+        total={matchdays.length}
         currentRound={currentRound}
         onChange={setRound}
       />
@@ -75,26 +77,21 @@ export default function QuinielaResultadoPage() {
               />
             ))}
           </div>
+        ) : rankingLoading ? (
+          <p className="text-sm text-slate-500">Cargando participantes…</p>
         ) : (
           <>
-            <div className="space-y-2">
-              {sortedParticipants.map((row, index) => (
-                <div
-                  key={row.user}
-                  className="flex items-center justify-between gap-3 rounded-2xl border border-[#214C9B]/20 bg-white p-4 text-sm"
-                >
-                  <div className="flex min-w-0 items-center gap-3">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#214C9B]/10 text-xs font-extrabold text-[#214C9B]">
-                      {index + 1}
-                    </span>
-                    <p className="truncate font-extrabold uppercase text-[#214C9B]">{row.user}</p>
-                  </div>
-                  <span className="shrink-0 font-extrabold text-slate-900">{row.points} pts</span>
-                </div>
-              ))}
-            </div>
+            <QuinielaRankingList
+              entries={rankingEntries}
+              showHits={started}
+              emptyMessage={
+                isSupabaseConfigured()
+                  ? "Nadie ha guardado la quiniela de esta jornada todavía."
+                  : "Conecta Supabase e inicia sesión para ver el ranking de participantes."
+              }
+            />
 
-            {!started && (
+            {!started && rankingEntries.length > 0 && (
               <p className="mt-4 text-sm text-slate-500">
                 Todos los participantes aparecen con 0 puntos hasta que empiece el primer partido de la jornada.
               </p>
@@ -102,6 +99,26 @@ export default function QuinielaResultadoPage() {
           </>
         )}
       </Card>
+    </>
+  );
+}
+
+export default function QuinielaResultadoPage() {
+  const { matchdays, currentRound, seasonId } = useQuinielaSeason();
+
+  return (
+    <div className="space-y-6">
+      <PageHero
+        eyebrow="Quiniela"
+        title="Resultado"
+        description="Consulta el resultado oficial de la jornada del Grupo I o la clasificacion de quienes enviaron pronostico."
+      />
+      <ResultadoBody
+        key={seasonId}
+        seasonId={seasonId}
+        matchdays={matchdays}
+        currentRound={currentRound}
+      />
     </div>
   );
 }

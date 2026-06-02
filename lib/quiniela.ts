@@ -1,4 +1,4 @@
-import { CURRENT_QUINIELA_ROUND, RAI_TEAM_ID, teams as mockTeams } from "@/data/mock";
+import { RAI_TEAM_ID, teams as mockTeams } from "@/data/mock";
 import { getAvilesScorerFromEvents } from "@/lib/aviles-match-events";
 import type { MatchEvent } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
@@ -8,8 +8,6 @@ import {
   type HomeAwayRecord,
 } from "@/lib/standings";
 import type { GoalsPick, Match, Matchday, Prediction, PredictionOutcome, Team } from "@/types";
-
-export { CURRENT_QUINIELA_ROUND };
 
 export const QUINIELA_TABS = [
   { href: "/quiniela/quiniela", label: "Pronosticos" },
