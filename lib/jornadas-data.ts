@@ -11,6 +11,7 @@ import {
   getDefaultFixtureSource,
   type JornadasFixtureSource,
 } from "@/lib/season/fixture-source";
+import { utcDateInputValue } from "@/lib/calendar-match-overrides";
 import { getTeam } from "@/lib/fixtures";
 import { getLastPlayedLeagueRound } from "@/lib/standings";
 import type { Match, Matchday } from "@/types";
@@ -87,10 +88,57 @@ function opponentFromRaiMatch(matches: Match[], raiId: string): { teamId: string
   };
 }
 
-function representativeDate(matches: Match[]): string {
+/** Fecha del partido del Real Avilés; si no hay, la del primer partido de la jornada. */
+function representativeDate(matches: Match[], raiId: string): string {
+  const raiMatch = matches.find((match) => match.homeTeamId === raiId || match.awayTeamId === raiId);
+  if (raiMatch) return raiMatch.date;
   if (matches.length === 0) return new Date().toISOString();
   const sorted = [...matches].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   return sorted[0].date;
+}
+
+/** Encabezado de día en jornadas (p. ej. 24/08/2026). */
+export function formatJornadaDayHeading(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "—";
+  return new Intl.DateTimeFormat("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
+
+export type JornadaDayGroup = {
+  dayKey: string;
+  heading: string;
+  fixtures: JornadaFixture[];
+};
+
+/** Agrupa partidos de una jornada por día de calendario (UTC). */
+export function groupFixturesByCalendarDay(fixtures: JornadaFixture[]): JornadaDayGroup[] {
+  const byDay = new Map<string, JornadaFixture[]>();
+
+  for (const fixture of fixtures) {
+    const dayKey = utcDateInputValue(fixture.date) || "sin-fecha";
+    const list = byDay.get(dayKey) ?? [];
+    list.push(fixture);
+    byDay.set(dayKey, list);
+  }
+
+  return [...byDay.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([dayKey, dayFixtures]) => {
+      const sorted = [...dayFixtures].sort((a, b) => {
+        if (a.involvesRai !== b.involvesRai) return a.involvesRai ? -1 : 1;
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      });
+      return {
+        dayKey,
+        heading: formatJornadaDayHeading(sorted[0]?.date ?? ""),
+        fixtures: sorted,
+      };
+    });
 }
 
 function buildLeagueRoundSummary(
@@ -100,7 +148,7 @@ function buildLeagueRoundSummary(
 ): JornadaRoundSummary {
   const id: JornadaRoundId = `j${matchday.round}`;
   const opponent = opponentFromRaiMatch(matchday.matches, raiId);
-  const date = representativeDate(matchday.matches);
+  const date = representativeDate(matchday.matches, raiId);
 
   return {
     id,
