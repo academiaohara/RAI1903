@@ -15,7 +15,7 @@ export function FichajeDetailPageClient({ transferId }: { transferId: string }) 
   const transfer = getById(transferId);
 
   if (!transfersLoading && !squadLoading && !transfer) notFound();
-  if (!transfer) {
+  if (!transfer || squadLoading) {
     return <p className="text-sm font-bold text-slate-500">Cargando ficha…</p>;
   }
 

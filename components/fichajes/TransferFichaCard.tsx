@@ -7,6 +7,7 @@ import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvi
 import { useTransferMarketEditOptional } from "@/components/editor/TransferMarketEditProvider";
 import { TransferFichaCardEditForm } from "@/components/fichajes/TransferFichaCardEditForm";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
+import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { getTransferKind, getTransferKindLabel, getTransferOriginClub, getSquadPlayerForTransfer } from "@/lib/fichajes";
 import { getNationalityFlag, getPlayerDisplayName } from "@/lib/squad-utils";
 import type { TransferRumor } from "@/types";
@@ -44,9 +45,10 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
   const cmsEntry = marketEdit?.getEntry(transfer.id);
   const isCardEditing = Boolean(editMode && marketEdit && cmsEntry);
 
+  const { squad } = useSquadPlayers("masculino");
   const kind = getTransferKind(transfer);
   const styles = toneStyles[kind === "renovacion" ? "renovacion" : "fichaje"];
-  const player = getSquadPlayerForTransfer(transfer);
+  const player = getSquadPlayerForTransfer(transfer, squad);
   const displayName = player ? getPlayerDisplayName(player) : transfer.playerName;
   const fullName = player ? `${player.nombre} ${player.apellido}` : transfer.playerName;
   const wrapperClass =
@@ -86,6 +88,7 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
               <PlayerAvatar
                 player={player}
                 bare
+                loading="eager"
                 placeholderTone="light"
                 imageClassName="object-contain object-bottom"
                 className="mx-auto aspect-[3/4] h-[94%] w-auto max-w-[88%] drop-shadow-[0_4px_12px_rgba(33,76,155,0.2)]"

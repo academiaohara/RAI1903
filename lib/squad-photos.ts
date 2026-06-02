@@ -1,3 +1,4 @@
+import type { SquadPlayer } from "@/types/squad";
 import { STADIUM_PATHS } from "@/lib/stadium-manifest";
 
 /** Dorsales con foto oficial temporada 2025/26 (masculino). */
@@ -8,6 +9,13 @@ export const SQUAD_PHOTO_DORSALS_2526 = new Set([
 export function getSquadPlayerPhoto(dorsal: number): string | null {
   if (!SQUAD_PHOTO_DORSALS_2526.has(dorsal)) return null;
   return `/plantilla/2526/${dorsal}.webp`;
+}
+
+/** Rellena `foto` desde dorsal cuando falta en CMS o datos importados. */
+export function withSquadPlayerPhoto(player: SquadPlayer): SquadPlayer {
+  if (player.foto) return player;
+  const foto = getSquadPlayerPhoto(player.dorsal);
+  return foto ? { ...player, foto } : player;
 }
 
 const GENERIC_STADIUM_IMAGE =
