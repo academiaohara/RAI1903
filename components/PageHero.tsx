@@ -26,9 +26,9 @@ export function PageHero({
       {eyebrow && <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">{eyebrow}</p>}
       <div className={cn("grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end", eyebrow && "mt-2")}>
         <div className="min-w-0 max-w-full">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+          <div className="flex w-full flex-wrap items-center gap-x-4 gap-y-3">
             <AnimatedPageTitle title={title} wrapperClassName={titleWrapperClassName} />
-            {titleActions}
+            {titleActions ? <div className="ml-auto shrink-0">{titleActions}</div> : null}
           </div>
           <p className="mt-3 text-base leading-7 text-slate-600">{description}</p>
         </div>

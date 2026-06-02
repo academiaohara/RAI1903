@@ -31,7 +31,7 @@ export function Card({ eyebrow, title, action, children, className, dense = fals
               </h2>
             )}
           </div>
-          {action}
+          {action ? <div className="ml-auto shrink-0">{action}</div> : null}
         </div>
       )}
       <div className={dense ? "p-4" : "p-5"}>{children}</div>
