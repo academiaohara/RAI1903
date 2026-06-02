@@ -125,6 +125,7 @@ export function TransferFichaCardEditForm({ entry }: TransferFichaCardEditFormPr
         inputClassName="mt-0.5 w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11px] font-semibold"
         labelClassName="block text-[10px] font-bold uppercase text-slate-500"
         buttonClassName="inline-flex shrink-0 items-center justify-center gap-1 rounded-lg bg-[#214C9B] px-2 py-1 text-[10px] font-extrabold uppercase text-white disabled:opacity-50"
+        showDetailFields
       />
 
       <button

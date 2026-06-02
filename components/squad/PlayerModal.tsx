@@ -187,6 +187,7 @@ function PlayerModalContent({
                 clubAnnouncement={clubAnnouncementFromTransfer(transfer, clubAnnouncementNews)}
                 playerNews={playerNews}
                 announcementTone={announcementTone}
+                transfer={transfer}
               />
             )}
             {activeTab === "resumen" && <PlayerResumenSection player={player} fanRating={fanRating} />}
