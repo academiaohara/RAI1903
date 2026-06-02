@@ -60,7 +60,7 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
   const fullName = player ? `${player.nombre} ${player.apellido}` : transfer.playerName;
   const wrapperClass =
     layout === "grid"
-      ? `group w-full max-w-[168px] justify-self-center${isCardEditing ? " max-w-[220px]" : ""}`
+      ? `group w-full${isCardEditing ? " max-w-[220px]" : ""}`
       : `group shrink-0 snap-start${isCardEditing ? " w-[min(100%,220px)]" : " w-[min(100%,168px)] sm:w-[175px]"}`;
   const flag = player ? getNationalityFlag(player.nacionalidad) : "🇪🇸";
   const originClub = getTransferOriginClub(transfer);

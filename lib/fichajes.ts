@@ -249,10 +249,16 @@ export function getFeaturedTransfers(transfers: TransferRumor[]): TransferRumor[
 }
 
 /** Todas las altas oficiales (sin salidas ni rumores). */
-export function getOfficialAltas(transfers: TransferRumor[]): TransferRumor[] {
-  return transfers
-    .filter((transfer) => transfer.category === "Altas" && transfer.status === "Oficial")
-    .sort((a, b) => b.date.localeCompare(a.date));
+export function getOfficialAltas(
+  transfers: TransferRumor[],
+  windowId?: TransferMarketWindowId,
+): TransferRumor[] {
+  return sortTransfersByDate(
+    filterByMarketWindow(
+      transfers.filter((transfer) => transfer.category === "Altas" && transfer.status === "Oficial"),
+      windowId,
+    ),
+  );
 }
 
 export function getTransferForPlayer(transfers: TransferRumor[], playerId: string): TransferRumor | undefined {

@@ -6,9 +6,7 @@ type TransferFichaCardPlaceholderProps = {
 
 export function TransferFichaCardPlaceholder({ layout = "carousel" }: TransferFichaCardPlaceholderProps) {
   const wrapperClass =
-    layout === "grid" ?
-      "w-full max-w-[168px] justify-self-center"
-    : "shrink-0 snap-start w-[min(100%,168px)] sm:w-[175px]";
+    layout === "grid" ? "w-full" : "shrink-0 snap-start w-[min(100%,168px)] sm:w-[175px]";
 
   return (
     <div className={wrapperClass} aria-hidden>
