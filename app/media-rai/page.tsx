@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { MediaRaiIndexRedirect } from "@/components/media-rai/MediaRaiIndexRedirect";
 
 export default function MediaRaiPage() {
-  redirect("/media-rai/zona-mixta");
+  return <MediaRaiIndexRedirect />;
 }

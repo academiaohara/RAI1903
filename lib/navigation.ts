@@ -117,7 +117,7 @@ function navChildren(activePrefix: string) {
   return navItems.find((item) => item.activePrefix === activePrefix)?.children ?? [];
 }
 
-function navChildrenByHref(href: string) {
+export function navChildrenByHref(href: string) {
   return navItems.find((item) => item.href === href)?.children ?? [];
 }
 

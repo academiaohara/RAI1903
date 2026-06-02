@@ -3,7 +3,6 @@
 import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
 import { useSeasonOptional } from "@/components/season/SeasonProvider";
 import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
-import type { ContenidoFanSlug } from "@/lib/contenido-fan";
 import {
   fanVideosStorageKey,
   isDefaultFanVideoTitle,
@@ -18,7 +17,7 @@ import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvi
 import type { FanYouTubeVideo } from "@/types";
 
 type ZonaMixtaVideoShowcaseProps = {
-  section: ContenidoFanSlug;
+  section: string;
   videos: FanYouTubeVideo[];
   /** Alcance por equipo en crónicas (masculino/femenino); omitir en Media RAI global. */
   gender?: PrimerEquipoGender;

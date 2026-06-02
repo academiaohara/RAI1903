@@ -8,24 +8,17 @@ import {
   fanTenteFirmeVideos,
   fanZonaMixtaVideos,
 } from "@/data/mock";
+import {
+  CONTENIDO_FAN_SLUGS,
+  isContenidoFanSlug,
+  type ContenidoFanSlug,
+} from "@/lib/contenido-fan-slugs";
+import { getMediaRaiSectionLabel, type MediaRaiSectionEntry } from "@/lib/media-rai-sections";
 
-export const CONTENIDO_FAN_SLUGS = [
-  "zona-mixta",
-  "previa",
-  "rdp",
-  "resumenes",
-  "del-club",
-  "tente-firme",
-] as const;
-
-export type ContenidoFanSlug = (typeof CONTENIDO_FAN_SLUGS)[number];
-
-export function isContenidoFanSlug(value: string): value is ContenidoFanSlug {
-  return CONTENIDO_FAN_SLUGS.includes(value as ContenidoFanSlug);
-}
+export { CONTENIDO_FAN_SLUGS, isContenidoFanSlug, type ContenidoFanSlug };
 
 type ContenidoFanSectionConfig = {
-  slug: ContenidoFanSlug;
+  slug: string;
   label: string;
   heroTitle: string;
   heroDescription: string;
@@ -99,13 +92,37 @@ export const contenidoFanSections: Record<ContenidoFanSlug, ContenidoFanSectionC
   },
 };
 
-export function getContenidoFanTabs() {
-  return [
-    { href: "/media-rai/zona-mixta", label: "Zona Mixta" },
-    { href: "/media-rai/previa", label: "Previa" },
-    { href: "/media-rai/rdp", label: "RDP" },
-    { href: "/media-rai/resumenes", label: "Resúmenes" },
-    { href: "/media-rai/del-club", label: "Del club" },
-    { href: "/media-rai/tente-firme", label: "Tente firme" },
-  ];
+const CUSTOM_SECTION_INTRO =
+  "El último vídeo se reproduce arriba; el resto aparece en el carrusel inferior.";
+
+/** Config de sección: built-in del mock o plantilla vacía para subsecciones nuevas. */
+export function resolveContenidoFanSection(
+  slug: string,
+  sections?: MediaRaiSectionEntry[],
+): ContenidoFanSectionConfig {
+  if (isContenidoFanSlug(slug)) {
+    const builtIn = contenidoFanSections[slug];
+    const entry = sections?.find((item) => item.slug === slug);
+    if (!entry?.label?.trim()) return builtIn;
+
+    const label = getMediaRaiSectionLabel(entry);
+    return {
+      ...builtIn,
+      label,
+      heroTitle: label,
+    };
+  }
+
+  const entry = sections?.find((item) => item.slug === slug);
+  const label = entry ? getMediaRaiSectionLabel(entry) : slug;
+
+  return {
+    slug,
+    label,
+    heroTitle: label,
+    heroDescription: "",
+    cardIntro: CUSTOM_SECTION_INTRO,
+    links: [],
+    videos: [],
+  };
 }
