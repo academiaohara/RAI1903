@@ -1,19 +1,25 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Card } from "@/components/Card";
-import {
-  DEFAULT_TRANSFER_MARKET_WINDOW_ID,
-  TransferMarketWindowSelector,
-} from "@/components/fichajes/TransferMarketWindowSelector";
+import { TransferMarketWindowSelector } from "@/components/fichajes/TransferMarketWindowSelector";
 import { TransfersCarousel } from "@/components/fichajes/TransfersCarousel";
+import { useTransferMarketWindows } from "@/hooks/useTransferMarketWindows";
 import type { TransferMarketWindowId } from "@/types";
 
 export function HomeTransfersSection() {
-  const [marketWindowId, setMarketWindowId] = useState<TransferMarketWindowId>(DEFAULT_TRANSFER_MARKET_WINDOW_ID);
+  const { windows, defaultWindowId } = useTransferMarketWindows();
+  const [selectedWindowId, setSelectedWindowId] = useState<TransferMarketWindowId | null>(null);
+
+  const marketWindowId = useMemo(() => {
+    if (selectedWindowId && windows.some((window) => window.id === selectedWindowId)) {
+      return selectedWindowId;
+    }
+    return defaultWindowId;
+  }, [defaultWindowId, selectedWindowId, windows]);
 
   const handleMarketWindowChange = useCallback((nextWindowId: TransferMarketWindowId) => {
-    setMarketWindowId(nextWindowId);
+    setSelectedWindowId(nextWindowId);
   }, []);
 
   return (
@@ -22,7 +28,11 @@ export function HomeTransfersSection() {
         eyebrow="Mercado"
         title="Fichajes y renovaciones"
         action={
-          <TransferMarketWindowSelector value={marketWindowId} onChange={handleMarketWindowChange} />
+          <TransferMarketWindowSelector
+            value={marketWindowId}
+            onChange={handleMarketWindowChange}
+            windows={windows}
+          />
         }
       >
         <TransfersCarousel marketWindowId={marketWindowId} />
