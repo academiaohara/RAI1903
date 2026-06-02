@@ -54,6 +54,7 @@ export function PlayerAvatar({
           fill
           className={imageClassName}
           sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 12vw"
+          unoptimized={player.foto.startsWith("/plantilla/")}
           priority={priority}
           loading={loading ?? (priority ? undefined : "lazy")}
         />

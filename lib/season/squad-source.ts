@@ -4,9 +4,14 @@ import { fetchSquadPlayersFromCms } from "@/lib/cms/players";
 import { computeClubLeagueStatsForGender } from "@/lib/season/club-league-stats";
 import { shouldUseMockCompetitionFallback } from "@/lib/season/cms-data-policy";
 import { getSquadClubInfo, getSquadPlayers } from "@/lib/squad-data";
+import { withSquadPlayerPhoto } from "@/lib/squad-photos";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Matchday } from "@/types";
 import type { SquadClubInfo, SquadPlayer } from "@/types/squad";
+
+function enrichSquadPhotos(players: SquadPlayer[]): SquadPlayer[] {
+  return players.map(withSquadPlayerPhoto);
+}
 
 export async function resolveSquadPlayers(
   gender: PrimerEquipoGender,
@@ -14,12 +19,12 @@ export async function resolveSquadPlayers(
   bundles: SeasonBundlesMap,
 ): Promise<SquadPlayer[]> {
   const bundle = getSquadBundle(bundles, gender);
-  if (bundle?.players?.length) return bundle.players;
+  if (bundle?.players?.length) return enrichSquadPhotos(bundle.players);
 
   const fromCms = await fetchSquadPlayersFromCms(gender, seasonId);
-  if (fromCms.length) return fromCms;
+  if (fromCms.length) return enrichSquadPhotos(fromCms);
 
-  if (shouldUseMockCompetitionFallback()) return getSquadPlayers(gender);
+  if (shouldUseMockCompetitionFallback()) return enrichSquadPhotos(getSquadPlayers(gender));
   return [];
 }
 
