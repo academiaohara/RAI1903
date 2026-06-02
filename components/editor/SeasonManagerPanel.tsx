@@ -12,7 +12,12 @@ import {
   setDefaultSeason,
   updateSeason,
 } from "@/lib/cms/seasons-editor";
+import { createSeasonWithLeagueTemplates } from "@/lib/cms/apply-league-template";
 import type { CmsSeason } from "@/lib/cms/seasons";
+import {
+  leagueTemplatesForGender,
+  type LeagueTemplateId,
+} from "@/lib/competition/league-templates";
 
 type SeasonManagerPanelProps = {
   onClose: () => void;
@@ -29,6 +34,9 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
   const [newId, setNewId] = useState("2026-27");
   const [newLabel, setNewLabel] = useState("26/27");
   const [duplicateFrom, setDuplicateFrom] = useState<CompetitionSeasonId>("2025-26");
+  const [masculinoTemplate, setMasculinoTemplate] = useState<LeagueTemplateId | "">("primera-rfef-2x20");
+  const [femeninoTemplate, setFemeninoTemplate] = useState<LeagueTemplateId | "">("segunda-rfef-femenina-14");
+  const [createMode, setCreateMode] = useState<"duplicate" | "templates">("templates");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -208,38 +216,120 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
             />
           </label>
         </div>
-        <label className="block space-y-1">
-          <span className="font-semibold text-slate-600">Duplicar datos desde</span>
-          <select
-            value={duplicateFrom}
-            onChange={(event) => setDuplicateFrom(event.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-2 py-1.5"
+        <div className="flex gap-1 rounded-lg border border-slate-200 p-0.5">
+          <button
+            type="button"
+            onClick={() => setCreateMode("templates")}
+            className={`flex-1 rounded-md px-2 py-1.5 font-bold ${
+              createMode === "templates" ? "bg-[#214C9B] text-white" : "text-slate-600"
+            }`}
           >
-            {rows.map((row) => (
-              <option key={row.id} value={row.id}>
-                {row.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button
-          type="button"
-          disabled={busy || !newId.trim()}
-          onClick={() =>
-            void runAction(
-              () =>
-                duplicateSeason(duplicateFrom, {
-                  id: newId.trim(),
-                  label: newLabel.trim() || newId.trim(),
-                  published: false,
-                }),
-              `Temporada ${newLabel} creada`,
-            )
-          }
-          className="w-full rounded-xl bg-[#214C9B] py-2 font-extrabold uppercase text-white hover:bg-[#173a78] disabled:opacity-50"
-        >
-          Crear y duplicar
-        </button>
+            Con plantillas
+          </button>
+          <button
+            type="button"
+            onClick={() => setCreateMode("duplicate")}
+            className={`flex-1 rounded-md px-2 py-1.5 font-bold ${
+              createMode === "duplicate" ? "bg-[#214C9B] text-white" : "text-slate-600"
+            }`}
+          >
+            Duplicar
+          </button>
+        </div>
+
+        {createMode === "templates" ? (
+          <>
+            <label className="block space-y-1">
+              <span className="font-semibold text-slate-600">Liga masculina</span>
+              <select
+                value={masculinoTemplate}
+                onChange={(e) => setMasculinoTemplate(e.target.value as LeagueTemplateId | "")}
+                className="w-full rounded-lg border border-slate-200 px-2 py-1.5"
+              >
+                <option value="">Sin configurar</option>
+                {leagueTemplatesForGender("masculino").map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.label} — {t.description}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block space-y-1">
+              <span className="font-semibold text-slate-600">Liga femenina</span>
+              <select
+                value={femeninoTemplate}
+                onChange={(e) => setFemeninoTemplate(e.target.value as LeagueTemplateId | "")}
+                className="w-full rounded-lg border border-slate-200 px-2 py-1.5"
+              >
+                <option value="">Sin configurar</option>
+                {leagueTemplatesForGender("femenino").map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.label} — {t.description}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="button"
+              disabled={busy || !newId.trim() || (!masculinoTemplate && !femeninoTemplate)}
+              onClick={() =>
+                void runAction(
+                  () =>
+                    createSeasonWithLeagueTemplates(
+                      {
+                        id: newId.trim(),
+                        label: newLabel.trim() || newId.trim(),
+                        published: false,
+                      },
+                      {
+                        ...(masculinoTemplate ? { masculino: masculinoTemplate } : {}),
+                        ...(femeninoTemplate ? { femenino: femeninoTemplate } : {}),
+                      },
+                    ),
+                  `Temporada ${newLabel} creada con plantillas`,
+                )
+              }
+              className="w-full rounded-xl bg-[#214C9B] py-2 font-extrabold uppercase text-white hover:bg-[#173a78] disabled:opacity-50"
+            >
+              Crear con plantillas
+            </button>
+          </>
+        ) : (
+          <>
+            <label className="block space-y-1">
+              <span className="font-semibold text-slate-600">Duplicar datos desde</span>
+              <select
+                value={duplicateFrom}
+                onChange={(event) => setDuplicateFrom(event.target.value)}
+                className="w-full rounded-lg border border-slate-200 px-2 py-1.5"
+              >
+                {rows.map((row) => (
+                  <option key={row.id} value={row.id}>
+                    {row.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="button"
+              disabled={busy || !newId.trim()}
+              onClick={() =>
+                void runAction(
+                  () =>
+                    duplicateSeason(duplicateFrom, {
+                      id: newId.trim(),
+                      label: newLabel.trim() || newId.trim(),
+                      published: false,
+                    }),
+                  `Temporada ${newLabel} creada`,
+                )
+              }
+              className="w-full rounded-xl bg-[#214C9B] py-2 font-extrabold uppercase text-white hover:bg-[#173a78] disabled:opacity-50"
+            >
+              Crear y duplicar
+            </button>
+          </>
+        )}
 
         <button
           type="button"

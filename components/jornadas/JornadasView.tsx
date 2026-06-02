@@ -6,6 +6,7 @@ import { JornadaRoundCarousel } from "@/components/jornadas/JornadaRoundCarousel
 import { JornadasGrupoSwitcher } from "@/components/jornadas/JornadasGrupoSwitcher";
 import { PlayoffAscensoGuia } from "@/components/jornadas/PlayoffAscensoGuia";
 import { useSeason } from "@/components/season/SeasonProvider";
+import { hasMultipleGrupos } from "@/lib/cms/competition-config-bundle";
 import { buildJornadasDataset, groupFixturesByCalendarDay } from "@/lib/jornadas-data";
 import { getRaiTeamId } from "@/lib/fixtures";
 import { leagueRoundForQualifyingStandings } from "@/lib/playoff-jornadas";
@@ -19,10 +20,14 @@ type JornadasViewProps = {
 };
 
 export function JornadasView({ gender }: JornadasViewProps) {
-  const { getEnrichedFixtureSource } = useSeason();
+  const { getEnrichedFixtureSource, getCompetitionConfig } = useSeason();
+  const competitionConfig = useMemo(() => getCompetitionConfig(gender), [gender, getCompetitionConfig]);
   const dataset = useMemo(
-    () => buildJornadasDataset(gender, getEnrichedFixtureSource(gender)),
-    [gender, getEnrichedFixtureSource],
+    () =>
+      buildJornadasDataset(gender, getEnrichedFixtureSource(gender), {
+        hasPlayoff: competitionConfig.hasPlayoff,
+      }),
+    [gender, getEnrichedFixtureSource, competitionConfig.hasPlayoff],
   );
   const raiTeamId = getRaiTeamId(gender);
   const [manualRoundId, setManualRoundId] = useState<JornadaRoundId | null>(null);
@@ -59,14 +64,16 @@ export function JornadasView({ gender }: JornadasViewProps) {
       : roundData.matchesByGrupo[grupo];
   const matchesByDay = useMemo(() => groupFixturesByCalendarDay(grupoMatches), [grupoMatches]);
   const raiMatches = useMemo(() => grupoMatches.filter((match) => match.involvesRai), [grupoMatches]);
-  const showGrupoSwitcher = gender === "masculino" && summary.kind === "league";
+  const showGrupoSwitcher =
+    gender === "masculino" && summary.kind === "league" && hasMultipleGrupos(competitionConfig);
 
   const title =
     summary.kind === "playoff"
       ? `Playoff de ascenso · ${summary.label}${summary.isProvisional ? " (provisional)" : ""}`
       : `Jornada ${summary.roundNumber}`;
 
-  const showPlayoffGuia = gender === "masculino" && summary.kind === "playoff";
+  const showPlayoffGuia =
+    gender === "masculino" && summary.kind === "playoff" && competitionConfig.hasPlayoff;
   const showCrests = gender !== "femenino";
 
   return (

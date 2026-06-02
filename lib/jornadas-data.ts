@@ -262,9 +262,15 @@ function buildFemeninoJornadasDataset(source: JornadasFixtureSource): JornadasDa
   };
 }
 
+export type JornadasBuildOptions = {
+  /** Si false, no se añaden jornadas de playoff RFEF al carrusel. */
+  hasPlayoff?: boolean;
+};
+
 export function buildJornadasDataset(
   gender: PrimerEquipoGender,
   source: JornadasFixtureSource = getDefaultFixtureSource(),
+  options?: JornadasBuildOptions,
 ): JornadasDataset {
   if (gender === "femenino") {
     return buildFemeninoJornadasDataset(source);
@@ -279,9 +285,10 @@ export function buildJornadasDataset(
     .sort((a, b) => a.round - b.round)
     .map((md) => buildLeagueRoundSummary(md, raiId, currentRound));
 
-  const playoffSummaries = PLAYOFF_ROUNDS.map((po) =>
-    buildPlayoffRoundSummary(po, false, definitiveQualifyingLeagueRound),
-  );
+  const includePlayoff = options?.hasPlayoff !== false;
+  const playoffSummaries = includePlayoff
+    ? PLAYOFF_ROUNDS.map((po) => buildPlayoffRoundSummary(po, false, definitiveQualifyingLeagueRound))
+    : [];
 
   const rounds: JornadaRoundSummary[] = [...leagueSummaries, ...playoffSummaries];
 
