@@ -13,6 +13,8 @@ type PlayerAvatarProps = {
   /** Placeholder initials when the player has no photo. */
   placeholderTone?: "dark" | "light";
   imageClassName?: string;
+  priority?: boolean;
+  loading?: "lazy" | "eager";
 };
 
 const sizeMap = {
@@ -29,6 +31,8 @@ export function PlayerAvatar({
   bare = false,
   placeholderTone = "dark",
   imageClassName = "object-cover",
+  priority = false,
+  loading,
 }: PlayerAvatarProps) {
   const initials = getPlayerInitials(player);
   const hasCustomSize = className.includes("aspect-") || className.includes("h-") || className.includes("w-full");
@@ -50,6 +54,8 @@ export function PlayerAvatar({
           fill
           className={imageClassName}
           sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 12vw"
+          priority={priority}
+          loading={loading ?? (priority ? undefined : "lazy")}
         />
       ) : (
         <div

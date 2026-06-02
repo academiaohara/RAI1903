@@ -21,6 +21,7 @@ import {
 import { usePublishedNews } from "@/hooks/usePublishedNews";
 import { useSeasonPlayerRatings } from "@/hooks/useSeasonPlayerRatings";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
+import { withSquadPlayerPhoto } from "@/lib/squad-photos";
 import { formatBirthDate, formatContractDate, getNationalityFlag } from "@/lib/squad-utils";
 import { formatDate } from "@/lib/utils";
 import type { TransferRumor } from "@/types";
@@ -62,9 +63,7 @@ export function TransferDetailView({ transfer, player: initialPlayer }: Transfer
   const { getPlayerById } = useSquadPlayers("masculino");
   const { items: allNews } = usePublishedNews();
   const { averages } = useSeasonPlayerRatings();
-  const player = initialPlayer
-    ? getPlayerById(initialPlayer.id) ?? initialPlayer
-    : undefined;
+  const player = initialPlayer ? mergeTransferDetailPlayer(initialPlayer, getPlayerById(initialPlayer.id)) : undefined;
   const kind = getTransferKind(transfer);
   const tone = toneByKind[kind === "renovacion" ? "renovacion" : "fichaje"];
   const visibleTabs = allTabs.filter((tab) => !tab.requiresPlayer || player);
@@ -84,8 +83,9 @@ export function TransferDetailView({ transfer, player: initialPlayer }: Transfer
               <PlayerAvatar
                 player={player}
                 size="xl"
+                priority
                 imageClassName="object-contain object-bottom"
-                className="aspect-[4/5] h-auto w-full rounded-[1.5rem] shadow-2xl"
+                className="aspect-[4/5] w-full rounded-[1.5rem] shadow-2xl"
               />
             ) : (
               <div className="flex aspect-[4/5] items-center justify-center rounded-[1.5rem] bg-white/15 text-5xl font-extrabold shadow-2xl">
@@ -185,6 +185,17 @@ export function TransferDetailView({ transfer, player: initialPlayer }: Transfer
       </div>
     </div>
   );
+}
+
+function mergeTransferDetailPlayer(
+  initialPlayer: SquadPlayer,
+  livePlayer?: SquadPlayer,
+): SquadPlayer {
+  if (!livePlayer) return withSquadPlayerPhoto(initialPlayer);
+  return withSquadPlayerPhoto({
+    ...livePlayer,
+    foto: livePlayer.foto ?? initialPlayer.foto,
+  });
 }
 
 function InfoChip({

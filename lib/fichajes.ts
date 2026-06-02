@@ -8,7 +8,7 @@ import {
 } from "@/lib/player-news";
 import { getPlayerRole } from "@/lib/player-roles";
 import { getSquadPlayers } from "@/lib/squad-data";
-import { getSquadPlayerPhoto } from "@/lib/squad-photos";
+import { getSquadPlayerPhoto, withSquadPlayerPhoto } from "@/lib/squad-photos";
 import { resolveTransferMarketWindowId } from "@/lib/transfer-market-windows";
 import type { NewsItem, Player, TransferKind, TransferMarketWindowId, TransferRumor } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
@@ -119,7 +119,7 @@ export function getSquadPlayerForTransfer(
 
   if (playerId) {
     const byId = squadList.find((player) => player.id === playerId);
-    if (byId) return byId;
+    if (byId) return withSquadPlayerPhoto(byId);
   }
 
   const normalized = normalizeName(transfer.playerName);
@@ -128,11 +128,11 @@ export function getSquadPlayerForTransfer(
     const shortName = normalizeName(player.apellido || player.nombre);
     return full === normalized || shortName === normalized;
   });
-  if (byName) return byName;
+  if (byName) return withSquadPlayerPhoto(byName);
 
   if (rosterPlayer) {
     const byDorsal = squadList.find((player) => player.dorsal === rosterPlayer.number);
-    return byDorsal ?? rosterPlayerToSquadPlayer(rosterPlayer);
+    return withSquadPlayerPhoto(byDorsal ?? rosterPlayerToSquadPlayer(rosterPlayer));
   }
 
   return undefined;

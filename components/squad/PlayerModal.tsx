@@ -109,7 +109,12 @@ function PlayerModalContent({
 
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end">
           <div className="relative mx-auto w-[58%] max-w-[220px] sm:mx-0 sm:w-[200px]">
-            <PlayerAvatar player={player} size="xl" className="aspect-[4/5] h-auto w-full rounded-[1.5rem] shadow-2xl" />
+            <PlayerAvatar
+              player={player}
+              size="xl"
+              priority
+              className="aspect-[4/5] w-full rounded-[1.5rem] shadow-2xl"
+            />
             <div className="absolute -bottom-3 -right-2 rounded-2xl bg-white px-4 py-2 text-4xl font-extrabold text-[#214C9B] shadow-xl">
               {player.dorsal}
             </div>

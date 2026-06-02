@@ -10,6 +10,7 @@ import {
 import { upsertSquadPlayer } from "@/lib/cms/players";
 import { mergeSquadPlayerOverrides, squadPlayerOverrideKey } from "@/lib/squad-overrides";
 import { ageFromBirthDate } from "@/lib/squad-age";
+import { withSquadPlayerPhoto } from "@/lib/squad-photos";
 import { resolveSquadPlayers } from "@/lib/season/squad-source";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { SquadPlayer } from "@/types/squad";
@@ -32,10 +33,13 @@ export function useSquadPlayers(gender: PrimerEquipoGender) {
 
   const squad = useMemo(() => {
     const withOverrides = mergeSquadPlayerOverrides(baseSquad, getOverride);
-    const withAge = withOverrides.map((player) => ({
-      ...player,
-      edad: player.fechaNacimiento ? ageFromBirthDate(player.fechaNacimiento) : player.edad,
-    }));
+    const withAge = withOverrides.map((player) => {
+      const withPhoto = withSquadPlayerPhoto(player);
+      return {
+        ...withPhoto,
+        edad: withPhoto.fechaNacimiento ? ageFromBirthDate(withPhoto.fechaNacimiento) : withPhoto.edad,
+      };
+    });
 
     if (gender !== "masculino") return withAge;
 
