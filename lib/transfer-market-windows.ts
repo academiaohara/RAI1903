@@ -34,6 +34,38 @@ function humanizeWindowId(id: string): string {
     .join(" ");
 }
 
+type ParsedTransferMarketWindowId = {
+  seasonStart: number;
+  seasonEnd: number;
+  phaseRank: number;
+};
+
+function parseTransferMarketWindowId(id: string): ParsedTransferMarketWindowId {
+  const match = id.match(/^(verano|invierno)-(\d{1,2})-(\d{1,2})$/);
+  if (!match) {
+    return { seasonStart: 999, seasonEnd: 999, phaseRank: 9 };
+  }
+  const phaseRank = match[1] === "verano" ? 0 : 1;
+  return {
+    seasonStart: Number.parseInt(match[2], 10),
+    seasonEnd: Number.parseInt(match[3], 10),
+    phaseRank,
+  };
+}
+
+/** Orden cronológico (más antigua → más reciente) para el selector ←/→. */
+export function compareTransferMarketWindowIds(a: string, b: string): number {
+  const left = parseTransferMarketWindowId(a);
+  const right = parseTransferMarketWindowId(b);
+  if (left.seasonStart !== right.seasonStart) return left.seasonStart - right.seasonStart;
+  if (left.seasonEnd !== right.seasonEnd) return left.seasonEnd - right.seasonEnd;
+  return left.phaseRank - right.phaseRank;
+}
+
+export function sortTransferMarketWindows(windows: TransferMarketWindow[]): TransferMarketWindow[] {
+  return [...windows].sort((a, b) => compareTransferMarketWindowIds(a.id, b.id));
+}
+
 /** Incluye ventanas usadas en movimientos aunque no estén en la lista CMS (datos legacy). */
 export function mergeTransferMarketWindows(
   configured: TransferMarketWindow[],
@@ -53,7 +85,8 @@ export function mergeTransferMarketWindows(
   for (const id of byId.keys()) {
     if (!orderedIds.includes(id)) orderedIds.push(id);
   }
-  return orderedIds.map((id) => byId.get(id)!);
+  const merged = orderedIds.map((id) => byId.get(id)!);
+  return sortTransferMarketWindows(merged);
 }
 
 export function resolveTransferMarketWindows(
