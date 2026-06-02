@@ -13,7 +13,7 @@ import { buildMatchDetail } from "@/lib/match-detail";
 import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
-import { resolveFixtureTeamName } from "@/lib/cms/resolve-fixture-team-name";
+import { getTeamsBundle, resolveFixtureTeamDisplayName } from "@/lib/cms/teams-bundle";
 import { scorerLabelForPlayer } from "@/lib/squad-player-resolve";
 import {
   actualAvilesScorer,
@@ -103,17 +103,18 @@ export function PredictionForm({
   const [previewOpen, setPreviewOpen] = useState(false);
   const { bundles } = useSeason();
   const teams = useMemo(() => resolveGroupTeams(bundles, "masculino", "1"), [bundles]);
+  const cmsTeams = useMemo(() => getTeamsBundle(bundles, "masculino")?.teams ?? [], [bundles]);
   const homeTeamName = useMemo(
     () =>
       getTeamById(match.homeTeamId, teams)?.name ??
-      resolveFixtureTeamName(match.homeTeamId, match.homeTeam, bundles, "masculino", "1"),
-    [bundles, match.homeTeam, match.homeTeamId, teams],
+      resolveFixtureTeamDisplayName(match.homeTeamId, match.homeTeam, cmsTeams, bundles, "masculino"),
+    [bundles, cmsTeams, match.homeTeam, match.homeTeamId, teams],
   );
   const awayTeamName = useMemo(
     () =>
       getTeamById(match.awayTeamId, teams)?.name ??
-      resolveFixtureTeamName(match.awayTeamId, match.awayTeam, bundles, "masculino", "1"),
-    [bundles, match.awayTeam, match.awayTeamId, teams],
+      resolveFixtureTeamDisplayName(match.awayTeamId, match.awayTeam, cmsTeams, bundles, "masculino"),
+    [bundles, cmsTeams, match.awayTeam, match.awayTeamId, teams],
   );
   const { getPrevia } = useSeasonMatchArticles();
   const avilesMatch = isAvilesMatch(match);

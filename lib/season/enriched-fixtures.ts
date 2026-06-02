@@ -3,9 +3,10 @@ import {
   resolveCompetitionConfig,
   type SeasonCompetitionConfigBundle,
 } from "@/lib/cms/competition-config-bundle";
-import { buildFixtureTeamNameResolver } from "@/lib/cms/resolve-fixture-team-name";
+import { getTeamsBundle, resolveFixtureTeamDisplayName } from "@/lib/cms/teams-bundle";
 import {
   applyFixtureTeamNames,
+  applyFixtureTeamNamesToMatches,
   normalizeGrupo2Matchdays,
   normalizeLeagueMatchdays,
 } from "@/lib/competition/normalize-fixtures";
@@ -24,29 +25,36 @@ export function enrichFixtureSource(
   gender: PrimerEquipoGender,
 ): EnrichedFixtureSource {
   const config = resolveCompetitionConfig(bundles, gender);
-  const resolveGrupo1 = buildFixtureTeamNameResolver(bundles, gender, "1");
-  const resolveGrupo2 = buildFixtureTeamNameResolver(bundles, gender, "2");
+  const cmsTeams = getTeamsBundle(bundles, gender)?.teams ?? [];
+
+  const resolveName = (teamId: string, fallback: string) =>
+    resolveFixtureTeamDisplayName(teamId, fallback, cmsTeams, bundles, gender);
 
   const matchdays = applyFixtureTeamNames(
     normalizeLeagueMatchdays(source.matchdays, config),
-    resolveGrupo1,
+    resolveName,
   );
 
   const matchdaysGrupo2 =
     config.groupCount >= 2
-      ? applyFixtureTeamNames(normalizeGrupo2Matchdays(source.matchdaysGrupo2, config), resolveGrupo2)
+      ? applyFixtureTeamNames(normalizeGrupo2Matchdays(source.matchdaysGrupo2, config), resolveName)
       : source.matchdaysGrupo2;
 
   const matchdaysFemenino = applyFixtureTeamNames(
     normalizeLeagueMatchdays(source.matchdaysFemenino, config),
-    resolveGrupo1,
+    resolveName,
   );
+
+  const amistosoMatches = applyFixtureTeamNamesToMatches(source.amistosoMatches, resolveName);
+  const copaDelReyMatches = applyFixtureTeamNamesToMatches(source.copaDelReyMatches, resolveName);
 
   return {
     ...source,
     matchdays,
     matchdaysGrupo2,
     matchdaysFemenino,
+    amistosoMatches,
+    copaDelReyMatches,
     competitionConfig: config,
   };
 }

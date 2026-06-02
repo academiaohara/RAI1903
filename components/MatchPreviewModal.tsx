@@ -8,7 +8,7 @@ import { canLinkEquipoLiga, equipoLigaHref } from "@/lib/equipo-liga";
 import { players } from "@/data/mock";
 import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
 import { groupSlotToTeam, resolveGroupTeams } from "@/lib/cms/group-teams";
-import { resolveFixtureTeamName } from "@/lib/cms/resolve-fixture-team-name";
+import { getTeamsBundle, resolveFixtureTeamDisplayName } from "@/lib/cms/teams-bundle";
 import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import {
   getTeamHomeAwayRecordBeforeRound,
@@ -31,7 +31,7 @@ function resolvePreviewTeam(
     teamsBeforeRound.find((team) => team.id === teamId) ?? allTeams.find((team) => team.id === teamId);
   if (fromStandings) return fromStandings;
 
-  const name = resolveFixtureTeamName(teamId, matchName, bundles, "masculino", "1");
+  const name = resolveFixtureTeamDisplayName(teamId, matchName, getTeamsBundle(bundles, "masculino")?.teams ?? [], bundles, "masculino");
   return groupSlotToTeam({ id: teamId, name }, 0);
 }
 

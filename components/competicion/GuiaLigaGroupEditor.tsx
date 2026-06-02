@@ -14,6 +14,10 @@ import {
   type GroupTeamSlot,
 } from "@/lib/cms/group-teams";
 import { resolveCompetitionConfig } from "@/lib/cms/competition-config-bundle";
+import {
+  collectFixtureTeamIdChanges,
+  remapSeasonFixturesForTeamIdChanges,
+} from "@/lib/cms/remap-fixture-team-ids";
 import { upsertSeasonBundle, bundleMapKey } from "@/lib/cms/season-bundles";
 import { getTeamCrestsBundle } from "@/lib/cms/team-crests-bundle";
 import type { TeamCrestsBundle } from "@/lib/cms/team-crests-bundle";
@@ -111,6 +115,7 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
     setMessage(null);
 
     const normalized = normalizeGroupTeamSlots(syncSlotIds(slots, grupo), config.teamsPerGroup, grupo);
+    const idChanges = collectFixtureTeamIdChanges(storedSlots, normalized);
     const nextConfig = withGroupTeamsInConfig(config, grupo, normalized);
 
     const existingTeams =
@@ -147,9 +152,27 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
       return;
     }
 
-    if (Object.keys(crests).length > 0) {
+    if (idChanges.length > 0) {
+      const remapped = remapSeasonFixturesForTeamIdChanges(bundles, gender, idChanges);
+      if (remapped) {
+        const fixturesResult = await upsertSeasonBundle(viewedSeasonId, gender, "fixtures", remapped);
+        if (!fixturesResult.ok) {
+          setBusy(false);
+          setMessage(fixturesResult.error ?? "Error al actualizar IDs en el calendario de partidos");
+          return;
+        }
+      }
+    }
+
+    if (Object.keys(crests).length > 0 || idChanges.length > 0) {
+      const remappedCrests = { ...crestsFromBundle, ...crests };
+      for (const change of idChanges) {
+        if (remappedCrests[change.from] && !remappedCrests[change.to]) {
+          remappedCrests[change.to] = remappedCrests[change.from];
+        }
+      }
       const payload: TeamCrestsBundle = {
-        crests: { ...crestsFromBundle, ...crests },
+        crests: remappedCrests,
       };
       const crestResult = await upsertSeasonBundle(viewedSeasonId, "global", "team_crests", payload);
       if (!crestResult.ok) {
