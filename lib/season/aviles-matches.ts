@@ -6,6 +6,7 @@ import type { Match } from "@/types";
 export function getAvilesMatchesFromSource(
   source: JornadasFixtureSource,
   gender: PrimerEquipoGender,
+  options?: { mapMatch?: (match: Match) => Match },
 ): Match[] {
   const raiId = getRaiTeamId(gender);
 
@@ -19,6 +20,7 @@ export function getAvilesMatchesFromSource(
         ];
 
   return league
+    .map((match) => options?.mapMatch?.(match) ?? match)
     .filter((match) => match.homeTeamId === raiId || match.awayTeamId === raiId)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }

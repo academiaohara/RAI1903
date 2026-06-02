@@ -264,6 +264,13 @@ export function getCalendarNavigationBounds(
       minYear = start.year;
       minMonth = start.month;
     }
+    // Temporada futbolística hasta junio del año siguiente (p. ej. 2026-27 → jun 2027).
+    const seasonEndYear = start.year + 1;
+    const seasonEndMonth = 5;
+    if (compareUtcMonth(seasonEndYear, seasonEndMonth, maxYear, maxMonth) > 0) {
+      maxYear = seasonEndYear;
+      maxMonth = seasonEndMonth;
+    }
   }
 
   for (const match of matches) {

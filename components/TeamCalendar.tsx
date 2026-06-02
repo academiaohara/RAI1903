@@ -63,8 +63,8 @@ export function TeamCalendar({
   const [viewMonth, setViewMonth] = useState(initial.month);
 
   const bounds = useMemo(
-    () => getCalendarNavigationBounds(matches, seasonIds),
-    [matches, seasonIds],
+    () => getCalendarNavigationBounds([...matches, ...listData], seasonIds),
+    [matches, listData, seasonIds],
   );
 
   const month = useMemo(() => buildSingleCalendarMonth(viewYear, viewMonth, matches), [viewYear, viewMonth, matches]);

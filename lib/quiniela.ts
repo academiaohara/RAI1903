@@ -39,7 +39,7 @@ export function getActualGoalsPicks(match: Match): { home: GoalsPick | null; awa
 }
 
 export function getMatchdayByRound(matchdays: Matchday[], round: number): Matchday {
-  return matchdays.find((matchday) => matchday.round === round) ?? matchdays[0] ?? { round, matches: [] };
+  return matchdays.find((matchday) => matchday.round === round) ?? { round, matches: [] };
 }
 
 export function getFirstKickoff(matchday: Matchday): Date {

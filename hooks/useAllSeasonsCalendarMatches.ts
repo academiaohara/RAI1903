@@ -1,17 +1,19 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useTeamCrestMap } from "@/components/assets/TeamCrestResolverProvider";
 import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { getCalendarMatchesFromSource } from "@/lib/calendar";
 import { fetchSeasonBundles } from "@/lib/cms/season-bundles";
 import type { CmsSeason } from "@/lib/cms/seasons";
+import { applyMatchInlineOverride } from "@/lib/fixture-overrides";
 import { getAvilesMatchesFromSource } from "@/lib/season/aviles-matches";
 import { enrichFixtureSource } from "@/lib/season/enriched-fixtures";
 import { fixtureSourceFromBundles } from "@/lib/season/fixture-source";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
-import type { CalendarMatch } from "@/types";
+import type { CalendarMatch, Match } from "@/types";
 
 function publishedSeasonList(seasons: CmsSeason[]) {
   const published = seasons.filter((row) => row.published);
@@ -26,11 +28,12 @@ function mergeCalendarMatchesFromBundles(
     getPrevia: ReturnType<typeof useSeasonMatchArticles>["getPrevia"];
     crestMap: Record<string, string>;
   },
+  mapMatch?: (match: Match) => Match,
 ): CalendarMatch[] {
   const byId = new Map<string, CalendarMatch>();
   for (const map of maps) {
     const source = enrichFixtureSource(fixtureSourceFromBundles(map, gender), map, gender);
-    const aviles = getAvilesMatchesFromSource(source, gender);
+    const aviles = getAvilesMatchesFromSource(source, gender, { mapMatch });
     const rows = getCalendarMatchesFromSource(aviles, gender, articles);
     for (const row of rows) {
       byId.set(row.id, row);
@@ -41,6 +44,7 @@ function mergeCalendarMatchesFromBundles(
 
 export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
   const { seasons, bundles, getEnrichedFixtureSource } = useSeason();
+  const { getOverride } = useInlineEditing();
   const crestMap = useTeamCrestMap();
   const { getCronica, getPrevia } = useSeasonMatchArticles();
   const [multiSeasonMatches, setMultiSeasonMatches] = useState<CalendarMatch[]>([]);
@@ -50,11 +54,16 @@ export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
   const needsMultiSeasonFetch = publishedList.length > 1;
   const seasonIdsKey = useMemo(() => publishedList.map((row) => row.id).join(","), [publishedList]);
 
+  const mapMatch = useMemo(
+    () => (match: Match) => applyMatchInlineOverride(match, getOverride, gender),
+    [getOverride, gender],
+  );
+
   const seasonMatches = useMemo(() => {
     const source = getEnrichedFixtureSource(gender);
-    const aviles = getAvilesMatchesFromSource(source, gender);
+    const aviles = getAvilesMatchesFromSource(source, gender, { mapMatch });
     return getCalendarMatchesFromSource(aviles, gender, { getCronica, getPrevia, crestMap });
-  }, [gender, getCronica, getEnrichedFixtureSource, getPrevia, crestMap]);
+  }, [gender, getCronica, getEnrichedFixtureSource, getPrevia, crestMap, mapMatch]);
 
   useEffect(() => {
     if (!needsMultiSeasonFetch) return;
@@ -62,14 +71,16 @@ export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
     let cancelled = false;
     void Promise.all(publishedList.map((row) => fetchSeasonBundles(row.id))).then((maps) => {
       if (cancelled) return;
-      setMultiSeasonMatches(mergeCalendarMatchesFromBundles(maps, gender, { getCronica, getPrevia, crestMap }));
+      setMultiSeasonMatches(
+        mergeCalendarMatchesFromBundles(maps, gender, { getCronica, getPrevia, crestMap }, mapMatch),
+      );
       setFetchedSeasonIdsKey(seasonIdsKey);
     });
 
     return () => {
       cancelled = true;
     };
-  }, [needsMultiSeasonFetch, publishedList, seasonIdsKey, gender, getCronica, getPrevia, crestMap, bundles]);
+  }, [needsMultiSeasonFetch, publishedList, seasonIdsKey, gender, getCronica, getPrevia, crestMap, bundles, mapMatch]);
 
   const allMatches = needsMultiSeasonFetch ? multiSeasonMatches : seasonMatches;
   const loading = needsMultiSeasonFetch && fetchedSeasonIdsKey !== seasonIdsKey;

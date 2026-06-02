@@ -24,9 +24,10 @@ type ResultadoBodyProps = {
   seasonId: CompetitionSeasonId;
   matchdays: Matchday[];
   currentRound: number;
+  totalRounds: number;
 };
 
-function ResultadoBody({ seasonId, matchdays, currentRound }: ResultadoBodyProps) {
+function ResultadoBody({ seasonId, matchdays, currentRound, totalRounds }: ResultadoBodyProps) {
   const [round, setRound] = useState(currentRound);
   const [view, setView] = useState<ResultadoView>("quiniela");
 
@@ -35,6 +36,7 @@ function ResultadoBody({ seasonId, matchdays, currentRound }: ResultadoBodyProps
     () => sortQuinielaMatches(selectedMatchday.matches),
     [selectedMatchday.matches],
   );
+  const hasMatchesForRound = selectedMatchday.matches.length > 0;
   const started = hasFirstMatchStarted(selectedMatchday);
   const { entries: rankingEntries, loading: rankingLoading } = useQuinielaRoundRanking(
     seasonId,
@@ -45,7 +47,7 @@ function ResultadoBody({ seasonId, matchdays, currentRound }: ResultadoBodyProps
     <>
       <JornadaSelector
         value={round}
-        total={matchdays.length}
+        total={totalRounds}
         currentRound={currentRound}
         onChange={setRound}
       />
@@ -67,6 +69,11 @@ function ResultadoBody({ seasonId, matchdays, currentRound }: ResultadoBodyProps
             <p className="text-sm text-slate-600">
               Signos 1-X-2 y goles del Avilés oficiales de la jornada. Las casillas con resultado aparecen en granate.
             </p>
+            {!hasMatchesForRound && (
+              <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700">
+                No hay partidos del Grupo I configurados para la jornada {round}.
+              </p>
+            )}
             {orderedMatches.map((match) => (
               <PredictionForm
                 key={match.id}
@@ -104,7 +111,7 @@ function ResultadoBody({ seasonId, matchdays, currentRound }: ResultadoBodyProps
 }
 
 export default function QuinielaResultadoPage() {
-  const { matchdays, currentRound, seasonId } = useQuinielaSeason();
+  const { matchdays, currentRound, totalRounds, seasonId } = useQuinielaSeason();
 
   return (
     <div className="space-y-6">
@@ -118,6 +125,7 @@ export default function QuinielaResultadoPage() {
         seasonId={seasonId}
         matchdays={matchdays}
         currentRound={currentRound}
+        totalRounds={totalRounds}
       />
     </div>
   );
