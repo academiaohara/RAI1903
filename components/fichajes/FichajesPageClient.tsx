@@ -1,18 +1,39 @@
 "use client";
 
 import Link from "next/link";
+import { useCallback, useMemo, useState } from "react";
 import { TransferFichaCard } from "@/components/fichajes/TransferFichaCard";
 import { TransferFichaCardPlaceholder } from "@/components/fichajes/TransferFichaCardPlaceholder";
+import { TransferMarketWindowSelector } from "@/components/fichajes/TransferMarketWindowSelector";
 import { PageHero } from "@/components/PageHero";
 import { useSeason } from "@/components/season/SeasonProvider";
-import { EMPTY_TRANSFER_FICHA_SLOT_COUNT } from "@/lib/fichajes-carousel";
 import { useTransfers } from "@/hooks/useTransfers";
+import { useViewedSeasonTransferMarketWindows } from "@/hooks/useViewedSeasonTransferMarketWindows";
+import { EMPTY_TRANSFER_FICHA_SLOT_COUNT } from "@/lib/fichajes-carousel";
+import type { TransferMarketWindowId } from "@/types";
 import type { Route } from "next";
+
+const FICHAJES_GRID_CLASS = "grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-2 sm:gap-2.5";
 
 export function FichajesPageClient() {
   const { viewedSeason } = useSeason();
-  const { getOfficialAltas, loading } = useTransfers();
-  const featured = getOfficialAltas();
+  const { getOfficialAltasForViewedSeason, loading } = useTransfers();
+  const { windows, defaultWindowId } = useViewedSeasonTransferMarketWindows();
+  const [selectedWindowId, setSelectedWindowId] = useState<TransferMarketWindowId | null>(null);
+
+  const marketWindowId = useMemo(() => {
+    if (selectedWindowId && windows.some((window) => window.id === selectedWindowId)) {
+      return selectedWindowId;
+    }
+    return defaultWindowId;
+  }, [defaultWindowId, selectedWindowId, windows]);
+
+  const handleMarketWindowChange = useCallback((nextWindowId: TransferMarketWindowId) => {
+    setSelectedWindowId(nextWindowId);
+  }, []);
+
+
+  const featured = getOfficialAltasForViewedSeason(marketWindowId);
 
   return (
     <div className="space-y-6">
@@ -20,17 +41,24 @@ export function FichajesPageClient() {
         eyebrow="Mercado"
         title={`Fichajes ${viewedSeason.label}`}
         description={`Altas oficiales del Real Avilés Industrial en la temporada ${viewedSeason.label}: agentes libres y cesiones del mercado.`}
+        titleActions={
+          <TransferMarketWindowSelector
+            value={marketWindowId}
+            onChange={handleMarketWindowChange}
+            windows={windows}
+          />
+        }
       />
       {loading ? (
         <p className="text-sm font-bold text-slate-500">Cargando mercado…</p>
       ) : featured.length === 0 ? (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        <div className={FICHAJES_GRID_CLASS}>
           {Array.from({ length: EMPTY_TRANSFER_FICHA_SLOT_COUNT }, (_, index) => (
             <TransferFichaCardPlaceholder key={`empty-fichajes-${index}`} layout="grid" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        <div className={FICHAJES_GRID_CLASS}>
           {featured.map((transfer, index) => (
             <TransferFichaCard key={transfer.id} transfer={transfer} index={index} layout="grid" />
           ))}
