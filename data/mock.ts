@@ -1516,6 +1516,9 @@ export const fanRdpVideos: FanYouTubeVideo[] = [
 /** Resúmenes oficiales de partidos de liga del primer equipo masculino (editables en línea). */
 export const fanResumenesVideos: FanYouTubeVideo[] = [];
 
+/** Entrevistas, presentaciones y otros vídeos del club (editables en línea). */
+export const fanDelClubVideos: FanYouTubeVideo[] = [];
+
 export const fanResumenesVideosByGender: Record<"masculino" | "femenino", FanYouTubeVideo[]> = {
   masculino: fanResumenesVideos,
   femenino: [],

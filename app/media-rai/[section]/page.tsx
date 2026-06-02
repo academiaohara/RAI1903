@@ -5,7 +5,7 @@ import { ZonaMixtaVideoShowcase } from "@/components/ZonaMixtaVideoShowcase";
 import { PageHero } from "@/components/PageHero";
 import { contenidoFanSections, isContenidoFanSlug } from "@/lib/contenido-fan";
 
-export default async function ContenidoFanSectionPage({ params }: { params: Promise<{ section: string }> }) {
+export default async function MediaRaiSectionPage({ params }: { params: Promise<{ section: string }> }) {
   const { section } = await params;
   if (!isContenidoFanSlug(section)) notFound();
 
@@ -14,11 +14,7 @@ export default async function ContenidoFanSectionPage({ params }: { params: Prom
 
   return (
     <div className="space-y-6">
-      <PageHero
-        eyebrow="Contenido fan"
-        title={config.heroTitle}
-        description={config.heroDescription}
-      />
+      <PageHero eyebrow="Media RAI" title={config.heroTitle} description={config.heroDescription} />
 
       <Card eyebrow={config.cardEyebrow} borderlessHeader={!config.cardEyebrow}>
         <p className="mb-5 text-sm leading-6 text-slate-600">{config.cardIntro}</p>

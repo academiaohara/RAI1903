@@ -35,7 +35,9 @@ const nextConfig: NextConfig = {
       { source: "/prensa/noticias-externas", destination: "/noticias/prensa", permanent: false },
       { source: "/prensa/medios", destination: "/noticias/prensa", permanent: false },
       { source: "/prensa/archivo", destination: "/noticias/prensa", permanent: false },
-      { source: "/contenido-fan/youtube", destination: "/contenido-fan/zona-mixta", permanent: false },
+      { source: "/contenido-fan/youtube", destination: "/media-rai/zona-mixta", permanent: true },
+      { source: "/contenido-fan", destination: "/media-rai/zona-mixta", permanent: true },
+      { source: "/contenido-fan/:path*", destination: "/media-rai/:path*", permanent: true },
     ];
   },
 };
