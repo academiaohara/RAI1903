@@ -5,13 +5,17 @@ export type ClubAnnouncementDisplay = {
   url?: string;
   /** Texto legacy (mock antiguo); no usar en CMS nuevos. */
   text?: string;
+  /** Metadatos obtenidos de la URL (CMS mercado de fichajes). */
+  title?: string;
+  excerpt?: string;
+  imageUrl?: string;
   date?: string;
   newsItem?: NewsItem;
 };
 
 const URL_PREFIX_RE = /^https?:\/\//i;
 
-function looksLikeUrl(value: string): boolean {
+export function looksLikeClubAnnouncementUrl(value: string): boolean {
   if (URL_PREFIX_RE.test(value)) return true;
   if (/^www\./i.test(value)) return true;
   try {
@@ -36,7 +40,7 @@ export function parseClubAnnouncementField(value: string | undefined): {
 } {
   if (!value?.trim()) return { url: null, legacyText: null };
   const trimmed = value.trim();
-  if (looksLikeUrl(trimmed)) {
+  if (looksLikeClubAnnouncementUrl(trimmed)) {
     return { url: normalizeClubAnnouncementUrl(trimmed), legacyText: null };
   }
   return { url: null, legacyText: trimmed };
@@ -73,14 +77,17 @@ export function clubAnnouncementNewsItem(
   }
 
   if (announcement.url) {
+    const title = announcement.title?.trim();
+    const excerpt = announcement.excerpt?.trim();
     return {
       id: INLINE_ANNOUNCEMENT_ID,
       channel: "club",
       source,
       date,
-      title: "Comunicado oficial",
-      excerpt: "Lee el comunicado del club en la web oficial.",
+      title: title || "Comunicado oficial",
+      excerpt: excerpt || "Lee el comunicado del club en la web oficial.",
       url: announcement.url,
+      imageUrl: announcement.imageUrl,
       tags: ["club"],
       teams: ["masculino"],
     };
@@ -103,10 +110,14 @@ export function clubAnnouncementFromTransfer(
 ): ClubAnnouncementDisplay | undefined {
   if (transfer?.clubAnnouncement) {
     const parsed = parseClubAnnouncementField(transfer.clubAnnouncement);
+    const metaDate = transfer.clubAnnouncementDate;
     return {
       url: parsed.url ?? undefined,
       text: parsed.legacyText ?? undefined,
-      date: transfer.date,
+      title: transfer.clubAnnouncementTitle,
+      excerpt: transfer.clubAnnouncementExcerpt,
+      imageUrl: transfer.clubAnnouncementImageUrl,
+      date: metaDate ?? transfer.date,
       newsItem: announcementNews,
     };
   }
