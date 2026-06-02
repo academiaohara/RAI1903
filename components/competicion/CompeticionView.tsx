@@ -113,7 +113,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
               onChange={setPanel}
               options={COMPETICION_OPTIONS}
               layoutId="competicion-panel-toggle"
-              className="w-full sm:max-w-sm sm:shrink-0"
+              className="w-full sm:w-80 sm:flex-none"
             />
             {panel === "liga" && multiGrupo && (
               <GrupoSwitcher value={grupo} onChange={setGrupo} className="w-fit shrink-0 self-start sm:self-auto" />
