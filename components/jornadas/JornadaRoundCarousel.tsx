@@ -2,6 +2,8 @@
 
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamCrest } from "@/components/TeamCrest";
+import { EditableText } from "@/components/inline-editing/EditableText";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { getJornadaTeam } from "@/lib/jornadas-data";
 import { getTeamCrestById } from "@/lib/team-crests";
 import { scrollElementHorizontally } from "@/lib/scroll-horizontal";
@@ -36,6 +38,7 @@ function cardStateClass(isSelected: boolean, isCurrent: boolean): string {
 }
 
 export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests = true }: JornadaRoundCarouselProps) {
+  const { editMode } = useInlineEditing();
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -115,9 +118,19 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests 
                 </div>
               ) : null}
 
-              <span className="text-[10px] font-bold uppercase leading-tight tracking-wide opacity-90">
-                {round.shortDate}
-              </span>
+              {editMode ? (
+                <EditableText
+                  storageKey={`jornada-round:${round.id}:short-date`}
+                  value={round.shortDate}
+                  aria-label={`Editar fecha corta de ${round.label}`}
+                  className="text-[10px] font-bold uppercase leading-tight tracking-wide opacity-90"
+                  inputClassName="px-1 py-0.5 text-[10px] font-bold uppercase leading-tight"
+                />
+              ) : (
+                <span className="text-[10px] font-bold uppercase leading-tight tracking-wide opacity-90">
+                  {round.shortDate}
+                </span>
+              )}
             </button>
           );
         })}

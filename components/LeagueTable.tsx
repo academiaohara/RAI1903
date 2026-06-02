@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { TeamCrest } from "@/components/TeamCrest";
+import { useSeasonOptional } from "@/components/season/SeasonProvider";
 import { RAI_TEAM_ID } from "@/data/mock";
 import { canLinkEquipoLiga, equipoLigaHref } from "@/lib/equipo-liga";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -40,6 +41,7 @@ export function LeagueTable({
   gender = "masculino",
   zoneLegend,
 }: LeagueTableProps) {
+  const season = useSeasonOptional();
   const legend = zoneLegend ?? STANDINGS_ZONE_LEGEND;
   const showCrests = showCrestsProp ?? gender !== "femenino";
   const visibleRows = [...teams].sort((a, b) => a.position - b.position);
@@ -91,7 +93,7 @@ export function LeagueTable({
                 rowClassName,
               );
               const teamLabel = compact ? team.shortName : team.name;
-              const teamLinkable = canLinkEquipoLiga(gender, team.id);
+              const teamLinkable = canLinkEquipoLiga(gender, team.id, season?.bundles);
               const teamCellContent = (
                 <>
                   {showCrests ? <TeamCrest team={team} size="sm" className="shrink-0" /> : null}

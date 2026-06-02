@@ -130,6 +130,16 @@ function zoneForPosition(position: number, teamCount: number, zones: StandingsZo
   return "mid";
 }
 
+/** Recalcula zonas de ascenso/playoff/descenso según la posición actual en la tabla. */
+export function applyPositionZonesToTeams(teams: Team[], zones: StandingsZonesConfig): Team[] {
+  const count = teams.length;
+  return teams.map((team) => ({
+    ...team,
+    zone: zoneForPosition(team.position, count, zones),
+    zoneColorClass: undefined,
+  }));
+}
+
 export function matchToFinishedLeagueMatch(match: Match): FinishedLeagueMatch | null {
   if (match.status !== "finished" || match.homeScore === undefined || match.awayScore === undefined) {
     return null;

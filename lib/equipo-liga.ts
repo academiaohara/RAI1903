@@ -1,20 +1,23 @@
-import { getTeamByGender } from "@/lib/fixtures";
-import { isTeamInRfefGrupo1 } from "@/lib/rfef-grupos";
+import {
+  canLinkEquipoLiga as canLinkEquipoLigaImpl,
+  resolveEquipoLigaTeam,
+  shouldShowDetailedRivalSquad,
+} from "@/lib/equipo-liga-resolve";
+import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Route } from "next";
+
+export { resolveEquipoLigaTeam, shouldShowDetailedRivalSquad };
 
 /** Ruta de la ficha de un rival de liga (Primer Equipo → Competición). */
 export function equipoLigaHref(gender: PrimerEquipoGender, teamId: string): Route {
   return `${primerEquipoBase(gender)}/competicion/equipo/${teamId}` as Route;
 }
 
-/** Plantillas rivales solo para equipos del Grupo I (masculino). */
-export function canLinkEquipoLiga(gender: PrimerEquipoGender, teamId: string): boolean {
-  if (!getTeamByGender(teamId, gender)) {
-    return false;
-  }
-  if (gender === "masculino") {
-    return isTeamInRfefGrupo1(teamId);
-  }
-  return true;
+export function canLinkEquipoLiga(
+  gender: PrimerEquipoGender,
+  teamId: string,
+  bundles?: SeasonBundlesMap,
+): boolean {
+  return canLinkEquipoLigaImpl(gender, teamId, bundles);
 }

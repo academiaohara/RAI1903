@@ -4,12 +4,21 @@ import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamCrest } from "@/components/TeamCrest";
 import { TeamLink } from "@/components/TeamLink";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { useSeason } from "@/components/season/SeasonProvider";
+import {
+  mergeUtcDateAndTime,
+  utcDateInputValue,
+  utcTimeInputValue,
+} from "@/lib/calendar-match-overrides";
+import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { getJornadaTeam } from "@/lib/jornadas-data";
 import { getTeamCrestById } from "@/lib/team-crests";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import { formatMatchDate } from "@/lib/utils";
 import type { JornadaFixture } from "@/types/jornadas";
 import { cn } from "@/lib/utils";
+import { useMemo } from "react";
 
 type JornadaMatchRowProps = {
   fixture: JornadaFixture;
@@ -17,6 +26,7 @@ type JornadaMatchRowProps = {
   highlightTeamId?: string;
   gender?: PrimerEquipoGender;
   showCrests?: boolean;
+  grupo?: RfefGrupoId;
 };
 
 function scoreOrTime(fixture: JornadaFixture): string {
@@ -33,8 +43,10 @@ export function JornadaMatchRow({
   highlightTeamId,
   gender = "masculino",
   showCrests: showCrestsProp,
+  grupo = "1",
 }: JornadaMatchRowProps) {
   const { editMode, getOverride, saveValue } = useInlineEditing();
+  const { bundles } = useSeason();
   const override = getOverride<Partial<JornadaFixture>>(`match-result:${fixture.id}`) ?? {};
   const editedFixture = { ...fixture, ...override };
   const showCrests = showCrestsProp ?? gender !== "femenino";
@@ -42,8 +54,43 @@ export function JornadaMatchRow({
   const away = getJornadaTeam(editedFixture.awayTeamId);
   const highlightHome = Boolean(highlightTeamId && editedFixture.homeTeamId === highlightTeamId);
   const highlightAway = Boolean(highlightTeamId && editedFixture.awayTeamId === highlightTeamId);
+
+  const groupTeams = useMemo(() => {
+    if (gender === "masculino") {
+      return resolveGroupTeams(bundles, gender, grupo);
+    }
+    return [];
+  }, [bundles, gender, grupo]);
+
   const savePatch = (patch: Partial<JornadaFixture>) => {
     saveValue(`match-result:${fixture.id}`, { ...override, ...patch });
+  };
+
+  const onTeamChange = (side: "home" | "away", teamId: string) => {
+    const team = groupTeams.find((entry) => entry.id === teamId);
+    if (!team) return;
+    if (side === "home") {
+      savePatch({ homeTeamId: teamId, homeTeamName: team.name });
+    } else {
+      savePatch({ awayTeamId: teamId, awayTeamName: team.name });
+    }
+  };
+
+  const onDateChange = (dateValue: string) => {
+    if (!dateValue) return;
+    const timeValue = editedFixture.kickoffTime ?? (utcTimeInputValue(editedFixture.date) || "12:00");
+    savePatch({ date: mergeUtcDateAndTime(fixture.date, dateValue, timeValue) });
+  };
+
+  const onTimeChange = (timeValue: string) => {
+    savePatch({
+      date: mergeUtcDateAndTime(
+        editedFixture.date,
+        utcDateInputValue(editedFixture.date),
+        timeValue || "12:00",
+      ),
+      kickoffTime: timeValue || undefined,
+    });
   };
 
   const nameClass = (isHighlight: boolean) =>
@@ -64,6 +111,21 @@ export function JornadaMatchRow({
     );
   };
 
+  const teamSelect = (side: "home" | "away", teamId: string, label: string) => (
+    <select
+      value={teamId}
+      onChange={(event) => onTeamChange(side, event.target.value)}
+      className="mb-1 w-full rounded-lg border border-slate-200 px-1 py-0.5 text-[10px] font-bold text-slate-700 outline-none"
+      aria-label={label}
+    >
+      {groupTeams.map((team) => (
+        <option key={team.id} value={team.id}>
+          {team.shortName ?? team.name}
+        </option>
+      ))}
+    </select>
+  );
+
   return (
     <article
       className={cn(
@@ -79,13 +141,17 @@ export function JornadaMatchRow({
             {crestForTeam(editedFixture.homeTeamId, editedFixture.homeTeamName, home)}
           </TeamLink>
         ) : null}
-        <TeamLink gender={gender} teamId={editedFixture.homeTeamId} teamName={editedFixture.homeTeamName} className={nameClass(highlightHome)}>
-          {editedFixture.homeTeamName}
-        </TeamLink>
+        {editMode && groupTeams.length > 0 ? (
+          <div className="min-w-0 flex-1">{teamSelect("home", editedFixture.homeTeamId, "Equipo local")}</div>
+        ) : (
+          <TeamLink gender={gender} teamId={editedFixture.homeTeamId} teamName={editedFixture.homeTeamName} className={nameClass(highlightHome)}>
+            {editedFixture.homeTeamName}
+          </TeamLink>
+        )}
       </div>
 
       {editMode ? (
-        <div className="min-w-[7rem] rounded-xl border border-[#214C9B]/20 bg-white p-2 text-center shadow-sm">
+        <div className="min-w-[8rem] rounded-xl border border-[#214C9B]/20 bg-white p-2 text-center shadow-sm">
           <select
             value={editedFixture.status}
             onChange={(event) => savePatch({ status: event.target.value as JornadaFixture["status"] })}
@@ -95,6 +161,16 @@ export function JornadaMatchRow({
             <option value="scheduled">Programado</option>
             <option value="finished">Finalizado</option>
           </select>
+          <label className="mb-1 grid gap-0.5 text-left">
+            <span className="text-[9px] font-extrabold uppercase tracking-wide text-slate-500">Día</span>
+            <input
+              type="date"
+              value={utcDateInputValue(editedFixture.date)}
+              onChange={(event) => onDateChange(event.target.value)}
+              className="w-full rounded-lg border border-slate-200 px-1 py-0.5 text-[10px] font-bold text-slate-700"
+              aria-label="Fecha del partido"
+            />
+          </label>
           {editedFixture.status === "finished" ? (
             <div className="flex items-center gap-1">
               <input
@@ -116,8 +192,8 @@ export function JornadaMatchRow({
           ) : (
             <input
               type="time"
-              value={editedFixture.kickoffTime ?? ""}
-              onChange={(event) => savePatch({ kickoffTime: event.target.value })}
+              value={editedFixture.kickoffTime ?? utcTimeInputValue(editedFixture.date)}
+              onChange={(event) => onTimeChange(event.target.value)}
               className="w-full rounded-lg border border-slate-200 px-2 py-1 text-center text-sm font-extrabold text-[#214C9B]"
               aria-label="Hora del partido"
             />
@@ -135,14 +211,18 @@ export function JornadaMatchRow({
       )}
 
       <div className="flex min-w-0 items-center justify-end gap-2">
-        <TeamLink
-          gender={gender}
-          teamId={editedFixture.awayTeamId}
-          teamName={editedFixture.awayTeamName}
-          className={cn(nameClass(highlightAway), "text-right")}
-        >
-          {editedFixture.awayTeamName}
-        </TeamLink>
+        {editMode && groupTeams.length > 0 ? (
+          <div className="min-w-0 flex-1">{teamSelect("away", editedFixture.awayTeamId, "Equipo visitante")}</div>
+        ) : (
+          <TeamLink
+            gender={gender}
+            teamId={editedFixture.awayTeamId}
+            teamName={editedFixture.awayTeamName}
+            className={cn(nameClass(highlightAway), "text-right")}
+          >
+            {editedFixture.awayTeamName}
+          </TeamLink>
+        )}
         {showCrests ? (
           <TeamLink gender={gender} teamId={editedFixture.awayTeamId} teamName={editedFixture.awayTeamName} className="shrink-0">
             {crestForTeam(editedFixture.awayTeamId, editedFixture.awayTeamName, away)}

@@ -58,7 +58,7 @@ export function GuiaLiga({ gender, teams, grupo }: GuiaLigaProps) {
       ) : (
         <div className="grid grid-cols-5 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10">
           {displayTeams.map((team) => {
-            const linkable = canLinkEquipoLiga(gender, team.id) || !isPlaceholderTeam(team);
+            const linkable = canLinkEquipoLiga(gender, team.id, bundles) && !isPlaceholderTeam(team);
             const crest = <TeamCrest team={team} size="md" className="h-full w-full max-h-14 max-w-14" />;
 
             if (!linkable) {
