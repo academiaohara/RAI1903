@@ -11,11 +11,56 @@ export function getSquadPlayerPhoto(dorsal: number): string | null {
   return `/plantilla/2526/${dorsal}.webp`;
 }
 
-/** Rellena `foto` desde dorsal cuando falta en CMS o datos importados. */
+/** Convierte enlaces tipo /blob/ de GitHub a raw.githubusercontent.com (sirven como src de imagen). */
+export function normalizeSquadPlayerPhotoUrl(url: string): string {
+  const trimmed = url.trim();
+  if (!trimmed) return trimmed;
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.hostname !== "github.com") return trimmed;
+
+    const match = parsed.pathname.match(/^\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+)$/);
+    if (!match) return trimmed;
+
+    const [, owner, repo, branch, filePath] = match;
+    return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${filePath}`;
+  } catch {
+    return trimmed;
+  }
+}
+
+/** Foto efectiva: local en repo por dorsal; si no, URL del CMS normalizada. */
+export function resolveSquadPlayerPhoto(player: SquadPlayer): string | null {
+  const local = getSquadPlayerPhoto(player.dorsal);
+  if (local) return local;
+  if (!player.foto) return null;
+  return normalizeSquadPlayerPhotoUrl(player.foto);
+}
+
+/**
+ * Alinea `foto` con los assets del repo cuando hay dorsal conocido.
+ * Las URLs de GitHub del CMS se ignoran en ese caso (Next/Image no las sirve bien como /blob/).
+ */
 export function withSquadPlayerPhoto(player: SquadPlayer): SquadPlayer {
-  if (player.foto) return player;
-  const foto = getSquadPlayerPhoto(player.dorsal);
-  return foto ? { ...player, foto } : player;
+  const foto = resolveSquadPlayerPhoto(player);
+  return foto ? { ...player, foto } : { ...player, foto: null };
+}
+
+/** Rutas locales y GitHub: cargar sin optimizador de Next (evita 403 / dominio no permitido). */
+export function squadPlayerImageRequiresUnoptimized(src: string): boolean {
+  if (src.startsWith("/")) return true;
+
+  try {
+    const host = new URL(src).hostname;
+    return (
+      host === "github.com" ||
+      host === "raw.githubusercontent.com" ||
+      host.endsWith(".githubusercontent.com")
+    );
+  } catch {
+    return false;
+  }
 }
 
 const GENERIC_STADIUM_IMAGE =
