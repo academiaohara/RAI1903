@@ -148,7 +148,7 @@ export function TransferMarketEditorPanel({ onClose }: TransferMarketEditorPanel
                 />
               </label>
             )}
-            <ClubAnnouncementUrlField value={clubAnnouncement} onChange={setClubAnnouncement} />
+            <ClubAnnouncementUrlField value={clubAnnouncement} onChange={setClubAnnouncement} showDetailFields />
             <button
               type="button"
               onClick={handleAdd}
