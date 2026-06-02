@@ -25,6 +25,7 @@ import {
   EDITOR_PAGE_LINKS,
   isFichajesPath,
   isFilialPath,
+  isJuvenilPath,
   isPlantillaPath,
   plantillaEditorLink,
 } from "@/lib/editor-routes";
@@ -564,6 +565,16 @@ export function InlineEditingToolbar() {
               >
                 <ExternalLink size={14} aria-hidden />
                 Filial
+              </Link>
+            )}
+            {!isJuvenilPath(pathname) && (
+              <Link
+                href={EDITOR_PAGE_LINKS.juvenil}
+                onClick={closeEditorPanels}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+              >
+                <ExternalLink size={14} aria-hidden />
+                Juvenil
               </Link>
             )}
             <button

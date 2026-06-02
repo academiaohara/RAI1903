@@ -5,4 +5,4 @@ alter table public.cms_season_bundles
 
 alter table public.cms_season_bundles
   add constraint cms_season_bundles_scope_check
-  check (scope in ('masculino', 'femenino', 'global', 'filial'));
+  check (scope in ('masculino', 'femenino', 'global', 'filial', 'juvenil'));

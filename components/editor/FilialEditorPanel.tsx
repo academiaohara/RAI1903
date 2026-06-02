@@ -13,9 +13,29 @@ import {
   type FilialTeamSeed,
 } from "@/lib/cms/filial-bundles";
 import { upsertSeasonBundlesBatch } from "@/lib/cms/season-bundles";
-import { buildFilialMockBundleEntries } from "@/lib/cantera/filial-season-data";
+import type { CanteraCmsScope } from "@/lib/cantera/cantera-cms";
+import { buildCanteraMockBundleEntries } from "@/lib/cantera/cantera-season-data";
+import { defaultJuvenilCompetitionConfig } from "@/lib/cantera/juvenil-season-data";
 import type { CompetitionZoneRule } from "@/lib/cms/competition-config-bundle";
 import type { CanteraSquadImport, CanteraSquadImportPlayer } from "@/types/cantera-squad-import";
+
+const CANTERA_EDITOR_META: Record<
+  CanteraCmsScope,
+  { title: string; shortTitle: string; defaultLocal: string; defaultCompeticion: string }
+> = {
+  filial: {
+    title: "Filial (Real Avilés B)",
+    shortTitle: "filial",
+    defaultLocal: "Real Avilés B",
+    defaultCompeticion: "2ª Asturfútbol",
+  },
+  juvenil: {
+    title: "Juvenil A (Real Avilés U19)",
+    shortTitle: "juvenil",
+    defaultLocal: "Real Avilés U19",
+    defaultCompeticion: "Liga Nacional Juvenil",
+  },
+};
 
 const COLOR_PRESETS = [
   { label: "Verde", value: "bg-emerald-500" },
@@ -26,6 +46,12 @@ const COLOR_PRESETS = [
 ];
 
 type EditorTab = "plantilla" | "calendario" | "competicion";
+
+type CanteraEditorPanelProps = {
+  scope: CanteraCmsScope;
+  onClose?: () => void;
+  variant?: "panel" | "inline";
+};
 
 type FilialEditorPanelProps = {
   onClose?: () => void;
@@ -58,12 +84,12 @@ function emptyPlayer(): CanteraSquadImportPlayer {
   };
 }
 
-function emptyPartido(): FilialFixturePartido {
+function emptyPartido(defaultLocal: string): FilialFixturePartido {
   const today = new Date().toISOString().slice(0, 10);
   return {
     fecha: today,
     hora: null,
-    local: "Real Avilés B",
+    local: defaultLocal,
     visitante: "Rival",
     goles_local: null,
     goles_visitante: null,
@@ -71,7 +97,21 @@ function emptyPartido(): FilialFixturePartido {
   };
 }
 
-export function FilialEditorPanel({ onClose, variant = "panel" }: FilialEditorPanelProps) {
+const STAT_FIELDS: Array<{
+  key: keyof Pick<CanteraSquadImportPlayer, "pc" | "pj" | "pt" | "min" | "goles" | "ta" | "tr">;
+  label: string;
+}> = [
+  { key: "pc", label: "PC" },
+  { key: "pj", label: "PJ" },
+  { key: "pt", label: "PT" },
+  { key: "min", label: "Min" },
+  { key: "goles", label: "Goles" },
+  { key: "ta", label: "TA" },
+  { key: "tr", label: "TR" },
+];
+
+export function CanteraEditorPanel({ scope, onClose, variant = "panel" }: CanteraEditorPanelProps) {
+  const meta = CANTERA_EDITOR_META[scope];
   const { viewedSeasonId, viewedSeason, bundles, refreshBundles } = useSeason();
   const [tab, setTab] = useState<EditorTab>("plantilla");
   const [squad, setSquad] = useState<CanteraSquadImport | null>(null);
@@ -81,29 +121,31 @@ export function FilialEditorPanel({ onClose, variant = "panel" }: FilialEditorPa
   const [message, setMessage] = useState<string | null>(null);
 
   const loadFromBundles = useCallback(() => {
-    const mockEntries = buildFilialMockBundleEntries();
+    const mockEntries = buildCanteraMockBundleEntries(scope);
     const mockSquad = mockEntries.find((e) => e.bundleKey === "squad")!.payload as CanteraSquadImport;
     const mockFixtures = mockEntries.find((e) => e.bundleKey === "fixtures")!.payload as FilialFixturesBundle;
     const mockConfig = mockEntries.find((e) => e.bundleKey === "competition_config")!
       .payload as FilialCompetitionConfigBundle;
 
-    const cmsSquad = bundles["filial:squad"] as CanteraSquadImport | undefined;
-    const cmsFixtures = bundles["filial:fixtures"] as FilialFixturesBundle | undefined;
-    const cmsConfig = bundles["filial:competition_config"] as FilialCompetitionConfigBundle | undefined;
+    const cmsSquad = bundles[`${scope}:squad`] as CanteraSquadImport | undefined;
+    const cmsFixtures = bundles[`${scope}:fixtures`] as FilialFixturesBundle | undefined;
+    const cmsConfig = bundles[`${scope}:competition_config`] as FilialCompetitionConfigBundle | undefined;
 
     setSquad(cmsSquad?.plantilla?.length ? structuredClone(cmsSquad) : structuredClone(mockSquad));
     setFixtures(
       cmsFixtures?.jornadas?.length ? structuredClone(cmsFixtures) : structuredClone(mockFixtures),
     );
     setConfig(structuredClone(cmsConfig ?? mockConfig));
-  }, [bundles]);
+  }, [bundles, scope]);
 
   useEffect(() => {
     queueMicrotask(() => loadFromBundles());
   }, [loadFromBundles]);
 
-  const competition = config ?? defaultFilialCompetitionConfig();
-  const fixturesDraft = fixtures ?? { competicion: "2ª Asturfútbol", jornadas: [] };
+  const defaultConfig =
+    scope === "filial" ? defaultFilialCompetitionConfig() : defaultJuvenilCompetitionConfig();
+  const competition = config ?? defaultConfig;
+  const fixturesDraft = fixtures ?? { competicion: meta.defaultCompeticion, jornadas: [] };
   const squadDraft = squad ?? { entrenador: "", mediaEdad: 0, plantilla: [] };
 
   const jornadaNumbers = useMemo(
@@ -116,23 +158,23 @@ export function FilialEditorPanel({ onClose, variant = "panel" }: FilialEditorPa
     setBusy(true);
     setMessage(null);
     const result = await upsertSeasonBundlesBatch(viewedSeasonId, [
-      { scope: "filial", bundleKey: "squad", payload: squad },
-      { scope: "filial", bundleKey: "fixtures", payload: fixtures },
-      { scope: "filial", bundleKey: "competition_config", payload: config },
+      { scope, bundleKey: "squad", payload: squad },
+      { scope, bundleKey: "fixtures", payload: fixtures },
+      { scope, bundleKey: "competition_config", payload: config },
     ]);
     setBusy(false);
     if (!result.ok) {
       setMessage(result.error ?? "Error al guardar");
       return;
     }
-    setMessage(`Filial guardado (${viewedSeason.label})`);
+    setMessage(`${meta.shortTitle} guardado (${viewedSeason.label})`);
     await refreshBundles();
   };
 
   const importMock = async () => {
     setBusy(true);
     setMessage(null);
-    const entries = buildFilialMockBundleEntries();
+    const entries = buildCanteraMockBundleEntries(scope);
     const result = await upsertSeasonBundlesBatch(
       viewedSeasonId,
       entries.map((entry) => ({
@@ -191,7 +233,7 @@ export function FilialEditorPanel({ onClose, variant = "panel" }: FilialEditorPa
         onClick={() => void saveAll()}
         className="w-full rounded-xl bg-[#214C9B] px-4 py-2.5 text-xs font-extrabold uppercase text-white hover:bg-[#173a78] disabled:opacity-60"
       >
-        Guardar filial
+        Guardar {meta.shortTitle}
       </button>
       <button
         type="button"
@@ -325,34 +367,48 @@ export function FilialEditorPanel({ onClose, variant = "panel" }: FilialEditorPa
                     }
                     className="rounded-lg border border-slate-200 px-2 py-1.5 text-xs"
                   />
-                  <input
-                    placeholder="PJ"
-                    type="number"
-                    value={player.pj}
-                    onChange={(e) =>
-                      setSquad((s) => {
-                        if (!s) return s;
-                        const plantilla = [...s.plantilla];
-                        plantilla[index] = { ...plantilla[index]!, pj: Number(e.target.value) || 0 };
-                        return { ...s, plantilla };
-                      })
-                    }
-                    className="rounded-lg border border-slate-200 px-2 py-1.5 text-xs"
-                  />
-                  <input
-                    placeholder="Goles"
-                    type="number"
-                    value={player.goles}
-                    onChange={(e) =>
-                      setSquad((s) => {
-                        if (!s) return s;
-                        const plantilla = [...s.plantilla];
-                        plantilla[index] = { ...plantilla[index]!, goles: Number(e.target.value) || 0 };
-                        return { ...s, plantilla };
-                      })
-                    }
-                    className="rounded-lg border border-slate-200 px-2 py-1.5 text-xs"
-                  />
+                  {STAT_FIELDS.map(({ key, label }) => (
+                    <input
+                      key={key}
+                      placeholder={label}
+                      type="number"
+                      min={0}
+                      value={player[key]}
+                      onChange={(e) =>
+                        setSquad((s) => {
+                          if (!s) return s;
+                          const plantilla = [...s.plantilla];
+                          plantilla[index] = {
+                            ...plantilla[index]!,
+                            [key]: Number(e.target.value) || 0,
+                          };
+                          return { ...s, plantilla };
+                        })
+                      }
+                      className="rounded-lg border border-slate-200 px-2 py-1.5 text-xs"
+                    />
+                  ))}
+                  {player.pos.toLowerCase().includes("portero") ? (
+                    <input
+                      placeholder="Encajados"
+                      type="number"
+                      min={0}
+                      value={player.golesEncajados ?? ""}
+                      onChange={(e) =>
+                        setSquad((s) => {
+                          if (!s) return s;
+                          const plantilla = [...s.plantilla];
+                          plantilla[index] = {
+                            ...plantilla[index]!,
+                            golesEncajados:
+                              e.target.value === "" ? undefined : Number(e.target.value) || 0,
+                          };
+                          return { ...s, plantilla };
+                        })
+                      }
+                      className="col-span-2 rounded-lg border border-slate-200 px-2 py-1.5 text-xs"
+                    />
+                  ) : null}
                 </div>
               </div>
             ))}
@@ -408,7 +464,9 @@ export function FilialEditorPanel({ onClose, variant = "panel" }: FilialEditorPa
                         setFixtures((f) => {
                           if (!f) return f;
                           const jornadas = f.jornadas.map((j) =>
-                            j.jornada === round ? { ...j, partidos: [...j.partidos, emptyPartido()] } : j,
+                            j.jornada === round
+                              ? { ...j, partidos: [...j.partidos, emptyPartido(meta.defaultLocal)] }
+                              : j,
                           );
                           return { ...f, jornadas };
                         })
@@ -661,7 +719,7 @@ export function FilialEditorPanel({ onClose, variant = "panel" }: FilialEditorPa
   if (variant === "inline") {
     return (
       <OnPageEditorSection
-        title="Editar filial (Real Avilés B)"
+        title={`Editar ${meta.title}`}
         description={`${viewedSeason.label} · plantilla, calendario y competición. La clasificación se calcula desde los resultados.`}
       >
         {editorBody}
@@ -682,7 +740,7 @@ export function FilialEditorPanel({ onClose, variant = "panel" }: FilialEditorPa
 
   return (
     <EditorPanelFrame
-      title="Filial (Real Avilés B)"
+      title={meta.title}
       subtitle={`${viewedSeason.label} · clasificación calculada desde resultados`}
       onClose={onClose ?? (() => {})}
       busy={busy}
@@ -692,4 +750,12 @@ export function FilialEditorPanel({ onClose, variant = "panel" }: FilialEditorPa
       {editorBody}
     </EditorPanelFrame>
   );
+}
+
+export function FilialEditorPanel(props: FilialEditorPanelProps) {
+  return <CanteraEditorPanel scope="filial" {...props} />;
+}
+
+export function JuvenilEditorPanel(props: FilialEditorPanelProps) {
+  return <CanteraEditorPanel scope="juvenil" {...props} />;
 }

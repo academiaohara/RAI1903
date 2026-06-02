@@ -20,6 +20,7 @@ import type {
 } from "@/lib/cms/season-bundles";
 import { buildMockTransfersBundle } from "@/lib/season/mock-transfers-bundle";
 import { buildFilialMockBundleEntries } from "@/lib/cantera/filial-season-data";
+import { buildJuvenilMockBundleEntries } from "@/lib/cantera/juvenil-season-data";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 
 export type MockBundleEntry = {
@@ -69,11 +70,18 @@ export function buildMockSeasonBundleEntries(seasonLabel: string): MockBundleEnt
     payload: entry.payload,
   }));
 
+  const juvenilEntries: MockBundleEntry[] = buildJuvenilMockBundleEntries().map((entry) => ({
+    scope: entry.scope,
+    bundleKey: entry.bundleKey,
+    payload: entry.payload,
+  }));
+
   return [
     { scope: "masculino", bundleKey: "fixtures", payload: masculinoFixtures },
     { scope: "femenino", bundleKey: "fixtures", payload: femeninoFixtures },
     ...squadEntries,
     ...filialEntries,
+    ...juvenilEntries,
     { scope: "global", bundleKey: "match_articles", payload: articles },
     { scope: "global", bundleKey: "transfers", payload: buildMockTransfersBundle() },
   ];

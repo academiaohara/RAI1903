@@ -3,10 +3,16 @@
 import { useMemo, useState } from "react";
 import { CanteraJornadasView } from "@/components/cantera/CanteraJornadasView";
 import { CanteraSquadTable } from "@/components/cantera/CanteraSquadTable";
-import { useFilialSeasonOptional } from "@/components/cantera/FilialSeasonContext";
+import { useCanteraSeasonOptional } from "@/components/cantera/CanteraSeasonContext";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { SubsectionFilterNav } from "@/components/SubsectionFilterNav";
 import { LeagueTable } from "@/components/LeagueTable";
 import { TeamCalendar } from "@/components/TeamCalendar";
+import {
+  canteraTeamIdToCmsScope,
+  cmsScopeToCanteraTeamId,
+  type CanteraCmsScope,
+} from "@/lib/cantera/cantera-cms";
 import {
   getCanteraPrimaryAvilesTeamId,
   getCanteraStandings,
@@ -15,7 +21,9 @@ import {
   type CanteraTeamId,
 } from "@/lib/cantera-data";
 import { getCanteraSquadImport } from "@/lib/cantera-squad";
+import { useCanteraSquadStatUpdate } from "@/hooks/useCanteraSquadStatUpdate";
 import { academyTeams } from "@/data/mock";
+
 const baseSections = [
   { id: "plantilla", label: "Plantilla" },
   { id: "calendario", label: "Calendario" },
@@ -29,11 +37,37 @@ type SectionId = BaseSectionId | typeof jornadasSection.id;
 
 type CanteraTeamSectionsProps = {
   teamId: CanteraTeamId;
+  cmsScope?: CanteraCmsScope;
 };
 
-export function CanteraTeamSections({ teamId }: CanteraTeamSectionsProps) {
-  const isFilial = teamId === "filial";
-  const filialSeason = useFilialSeasonOptional();
+function CanteraSquadTableWithEditing({
+  teamId,
+  cmsScope,
+}: {
+  teamId: CanteraTeamId;
+  cmsScope: CanteraCmsScope;
+}) {
+  const canteraSeason = useCanteraSeasonOptional();
+  const { editMode, canEdit } = useInlineEditing();
+  const { updatePlayerStat } = useCanteraSquadStatUpdate(cmsScope);
+
+  if (!canteraSeason) return null;
+
+  return (
+    <CanteraSquadTable
+      teamId={teamId}
+      squadImport={canteraSeason.squad}
+      seasonLabel={canteraSeason.seasonLabel}
+      editMode={editMode && canEdit}
+      onStatUpdate={editMode && canEdit ? updatePlayerStat : undefined}
+    />
+  );
+}
+
+export function CanteraTeamSections({ teamId, cmsScope: cmsScopeProp }: CanteraTeamSectionsProps) {
+  const cmsScope = cmsScopeProp ?? (teamId === "filial" || teamId === "juvenil-a" ? canteraTeamIdToCmsScope(teamId) : null);
+  const isCmsBacked = cmsScope !== null;
+  const canteraSeason = useCanteraSeasonOptional();
   const staticTeam = academyTeams.find((item) => item.id === teamId);
 
   const avilesTeamId = getCanteraPrimaryAvilesTeamId(teamId);
@@ -41,22 +75,28 @@ export function CanteraTeamSections({ teamId }: CanteraTeamSectionsProps) {
 
   const [activeSection, setActiveSection] = useState<SectionId>("plantilla");
 
-  const coach = isFilial ? filialSeason!.squad.entrenador : staticTeam?.coach ?? "—";
-  const category = isFilial ? filialSeason!.summary.category : staticTeam?.category ?? "";
-  const seasonLabel = isFilial ? filialSeason!.seasonLabel : "2025/26";
+  const coach = isCmsBacked && canteraSeason ? canteraSeason.squad.entrenador : staticTeam?.coach ?? "—";
+  const category =
+    isCmsBacked && canteraSeason
+      ? canteraSeason.summary.category
+      : staticTeam?.category ?? "";
+  const seasonLabel = isCmsBacked && canteraSeason ? canteraSeason.seasonLabel : "2025/26";
 
   const standings = useMemo(() => {
-    if (isFilial) return filialSeason!.standings;
+    if (isCmsBacked && canteraSeason) return canteraSeason.standings;
     return getCanteraStandings(teamId);
-  }, [filialSeason, isFilial, teamId]);
+  }, [canteraSeason, isCmsBacked, teamId]);
 
   const calendarMatches = useMemo(() => {
-    const source = isFilial ? filialSeason!.calendar : staticTeam?.calendar ?? [];
+    const source =
+      isCmsBacked && canteraSeason ? canteraSeason.calendar : staticTeam?.calendar ?? [];
     return matchesToCanteraCalendarMatches(source, avilesTeamId);
-  }, [avilesTeamId, filialSeason, isFilial, staticTeam?.calendar]);
+  }, [avilesTeamId, canteraSeason, isCmsBacked, staticTeam?.calendar]);
 
-  if (!isFilial && !staticTeam) return null;
-  if (isFilial && !filialSeason) return null;
+  if (!isCmsBacked && !staticTeam) return null;
+  if (isCmsBacked && !canteraSeason) return null;
+
+  const cmsMatches = isCmsBacked && canteraSeason ? canteraSeason.allMatches : undefined;
 
   return (
     <div className="space-y-5">
@@ -80,13 +120,16 @@ export function CanteraTeamSections({ teamId }: CanteraTeamSectionsProps) {
         <span className="text-slate-500">Temporada {seasonLabel}</span>
       </p>
 
-      {activeSection === "plantilla" && (
-        <CanteraSquadTable
-          teamId={teamId}
-          squadImport={isFilial ? filialSeason!.squad : getCanteraSquadImport(teamId)}
-          seasonLabel={seasonLabel}
-        />
-      )}
+      {activeSection === "plantilla" &&
+        (isCmsBacked && cmsScope ? (
+          <CanteraSquadTableWithEditing teamId={cmsScopeToCanteraTeamId(cmsScope)} cmsScope={cmsScope} />
+        ) : (
+          <CanteraSquadTable
+            teamId={teamId}
+            squadImport={getCanteraSquadImport(teamId)}
+            seasonLabel={seasonLabel}
+          />
+        ))}
 
       {activeSection === "calendario" && (
         <TeamCalendar matches={calendarMatches} listOnly showCrests={false} showVenue={false} />
@@ -100,15 +143,12 @@ export function CanteraTeamSections({ teamId }: CanteraTeamSectionsProps) {
           showLegend
           highlightTeamId={avilesTeamId}
           isClubHighlight={(row) => isCanteraClubTeam(teamId, row.id, row.name)}
-          zoneLegend={isFilial ? filialSeason!.zoneLegend : undefined}
+          zoneLegend={isCmsBacked && canteraSeason ? canteraSeason.zoneLegend : undefined}
         />
       )}
 
       {activeSection === "jornadas" && (
-        <CanteraJornadasView
-          teamId={teamId}
-          filialMatches={isFilial ? filialSeason!.allMatches : undefined}
-        />
+        <CanteraJornadasView teamId={teamId} filialMatches={cmsMatches} />
       )}
     </div>
   );

@@ -1,4 +1,4 @@
--- Si al guardar datos del filial falla el CHECK de scope, ejecuta esto en el SQL Editor.
+-- Permite scope «juvenil» en cms_season_bundles (cantera / Real Avilés U19).
 
 alter table public.cms_season_bundles
   drop constraint if exists cms_season_bundles_scope_check;
