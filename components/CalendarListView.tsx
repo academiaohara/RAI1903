@@ -84,20 +84,27 @@ export function CalendarListView({
   return (
     <div className={cn("overflow-x-auto rounded-xl border border-[#214C9B]/15 bg-white", className)} role="table" aria-label="Calendario de partidos">
       <div className={showVenue ? "min-w-[44rem]" : "min-w-[38rem]"}>
-        <ul role="rowgroup">
-          {sortedMatches.map((match, index) => (
-            <li key={match.id} role="row">
-              <CalendarListRow
-                match={match}
-                scrollTarget={match.id === scrollTargetId}
-                gender={gender}
-                zebra={index % 2 === 1}
-                showCrests={showCrests}
-                showVenue={showVenue}
-              />
-            </li>
-          ))}
-        </ul>
+        {sortedMatches.length === 0 ? (
+          <p className="px-4 py-8 text-center text-sm font-bold text-slate-500">
+            Aún no hay partidos en esta temporada. Activa el modo edición para ajustar el calendario o añade amistosos desde el
+            editor de competición.
+          </p>
+        ) : (
+          <ul role="rowgroup">
+            {sortedMatches.map((match, index) => (
+              <li key={match.id} role="row">
+                <CalendarListRow
+                  match={match}
+                  scrollTarget={match.id === scrollTargetId}
+                  gender={gender}
+                  zebra={index % 2 === 1}
+                  showCrests={showCrests}
+                  showVenue={showVenue}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );

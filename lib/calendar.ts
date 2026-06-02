@@ -220,6 +220,82 @@ export function getListViewScrollTargetId(matches: CalendarMatch[]): string | nu
   return matches[matches.length - 1].id;
 }
 
+/** July (0-based month 6) when season id is e.g. 2025-26. */
+export function seasonIdToUtcStartMonth(seasonId: string): { year: number; month: number } | null {
+  const match = /^(\d{4})-\d{2}$/.exec(seasonId.trim());
+  if (!match) return null;
+  return { year: Number(match[1]), month: 6 };
+}
+
+export type CalendarNavigationBounds = {
+  minYear: number;
+  minMonth: number;
+  maxYear: number;
+  maxMonth: number;
+};
+
+export function shiftUtcCalendarMonth(
+  year: number,
+  month: number,
+  delta: number,
+): { year: number; month: number } {
+  const date = new Date(Date.UTC(year, month + delta, 1));
+  return { year: date.getUTCFullYear(), month: date.getUTCMonth() };
+}
+
+function compareUtcMonth(yearA: number, monthA: number, yearB: number, monthB: number): number {
+  return yearA - yearB || monthA - monthB;
+}
+
+export function getCalendarNavigationBounds(
+  matches: CalendarMatch[],
+  seasonIds: string[],
+): CalendarNavigationBounds {
+  const now = new Date();
+  let minYear = now.getUTCFullYear();
+  let minMonth = now.getUTCMonth();
+  let maxYear = minYear;
+  let maxMonth = minMonth;
+
+  for (const seasonId of seasonIds) {
+    const start = seasonIdToUtcStartMonth(seasonId);
+    if (!start) continue;
+    if (compareUtcMonth(start.year, start.month, minYear, minMonth) < 0) {
+      minYear = start.year;
+      minMonth = start.month;
+    }
+  }
+
+  for (const match of matches) {
+    const date = new Date(match.date);
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth();
+    if (compareUtcMonth(year, month, minYear, minMonth) < 0) {
+      minYear = year;
+      minMonth = month;
+    }
+    if (compareUtcMonth(year, month, maxYear, maxMonth) > 0) {
+      maxYear = year;
+      maxMonth = month;
+    }
+  }
+
+  return { minYear, minMonth, maxYear, maxMonth };
+}
+
+export function canNavigateCalendarMonth(
+  year: number,
+  month: number,
+  delta: number,
+  bounds: CalendarNavigationBounds,
+): boolean {
+  const next = shiftUtcCalendarMonth(year, month, delta);
+  if (delta < 0) {
+    return compareUtcMonth(next.year, next.month, bounds.minYear, bounds.minMonth) >= 0;
+  }
+  return compareUtcMonth(next.year, next.month, bounds.maxYear, bounds.maxMonth) <= 0;
+}
+
 export function buildCalendarMonths(matches: CalendarMatch[]): CalendarMonth[] {
   if (matches.length === 0) return [];
 

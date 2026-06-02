@@ -5,7 +5,14 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { CalendarListView } from "@/components/CalendarListView";
 import { CalendarMatchCell } from "@/components/CalendarMatchCell";
 import { CalendarViewToggle } from "@/components/CalendarViewToggle";
-import { buildSingleCalendarMonth, isUtcToday, WEEKDAY_LABELS } from "@/lib/calendar";
+import {
+  buildSingleCalendarMonth,
+  canNavigateCalendarMonth,
+  getCalendarNavigationBounds,
+  isUtcToday,
+  shiftUtcCalendarMonth,
+  WEEKDAY_LABELS,
+} from "@/lib/calendar";
 import { matchCompetitionShortLabel } from "@/lib/competition-labels";
 import { getCompetitionAccentClass } from "@/lib/competition-styles";
 import { cn } from "@/lib/utils";
@@ -13,7 +20,12 @@ import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { CalendarMatch, CalendarViewMode } from "@/types";
 
 type TeamCalendarProps = {
+  /** Partidos mostrados en la vista mes (puede abarcar varias temporadas). */
   matches: CalendarMatch[];
+  /** Partidos de la vista lista; por defecto los mismos que `matches`. */
+  listMatches?: CalendarMatch[];
+  /** IDs de temporada publicados para acotar la navegación hacia atrás. */
+  seasonIds?: string[];
   className?: string;
   gender?: PrimerEquipoGender;
   /** When true, only the list view is shown (no month toggle). */
@@ -28,11 +40,6 @@ const EMPTY_CELL_CLASS = "flex items-start rounded-xl px-2 py-2.5";
 
 const PLACEHOLDER_CELL_CLASS = "px-2 py-2.5";
 
-function shiftMonth(year: number, month: number, delta: number): { year: number; month: number } {
-  const date = new Date(Date.UTC(year, month + delta, 1));
-  return { year: date.getUTCFullYear(), month: date.getUTCMonth() };
-}
-
 function initialViewDate(): { year: number; month: number } {
   const now = new Date();
   return { year: now.getUTCFullYear(), month: now.getUTCMonth() };
@@ -40,6 +47,8 @@ function initialViewDate(): { year: number; month: number } {
 
 export function TeamCalendar({
   matches,
+  listMatches,
+  seasonIds = [],
   className,
   gender = "masculino",
   listOnly = false,
@@ -47,10 +56,16 @@ export function TeamCalendar({
   showVenue = true,
 }: TeamCalendarProps) {
   const showCrests = showCrestsProp ?? gender !== "femenino";
+  const listData = listMatches ?? matches;
   const initial = initialViewDate();
   const [viewMode, setViewMode] = useState<CalendarViewMode>(listOnly ? "lista" : "mes");
   const [viewYear, setViewYear] = useState(initial.year);
   const [viewMonth, setViewMonth] = useState(initial.month);
+
+  const bounds = useMemo(
+    () => getCalendarNavigationBounds(matches, seasonIds),
+    [matches, seasonIds],
+  );
 
   const month = useMemo(() => buildSingleCalendarMonth(viewYear, viewMonth, matches), [viewYear, viewMonth, matches]);
 
@@ -60,56 +75,67 @@ export function TeamCalendar({
     );
   }, [month.month, month.year]);
 
+  const canGoPrev = canNavigateCalendarMonth(viewYear, viewMonth, -1, bounds);
+  const canGoNext = canNavigateCalendarMonth(viewYear, viewMonth, 1, bounds);
+
   const goPrev = () => {
-    const next = shiftMonth(viewYear, viewMonth, -1);
+    if (!canGoPrev) return;
+    const next = shiftUtcCalendarMonth(viewYear, viewMonth, -1);
     setViewYear(next.year);
     setViewMonth(next.month);
   };
 
   const goNext = () => {
-    const next = shiftMonth(viewYear, viewMonth, 1);
+    if (!canGoNext) return;
+    const next = shiftUtcCalendarMonth(viewYear, viewMonth, 1);
     setViewYear(next.year);
     setViewMonth(next.month);
   };
 
-  if (matches.length === 0) {
-    return <p className="text-sm font-bold text-slate-500">No hay partidos en el calendario de esta temporada.</p>;
-  }
-
   return (
     <div className={cn("space-y-4", className)}>
-      <div className={cn("flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between", listOnly && "hidden")}>
-        <CalendarViewToggle value={viewMode} onChange={setViewMode} />
-        {viewMode === "mes" && (
-          <div className="flex items-center justify-center gap-1 sm:gap-2 sm:justify-end" role="group" aria-label="Navegación del calendario">
-            <button
-              type="button"
-              onClick={goPrev}
-              className="inline-flex shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 p-2 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
-              aria-label="Mes anterior"
-            >
-              <ChevronLeft size={18} />
-            </button>
-            <h3
-              id={`cal-month-${month.key}`}
-              className="min-w-[9rem] flex-1 text-center text-base font-extrabold capitalize tracking-tight text-[#214C9B] sm:min-w-[11rem] sm:flex-none sm:text-lg"
-            >
-              {monthLabel}
-            </h3>
-            <button
-              type="button"
-              onClick={goNext}
-              className="inline-flex shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 p-2 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
-              aria-label="Mes siguiente"
-            >
-              <ChevronRight size={18} />
-            </button>
-          </div>
-        )}
-      </div>
+      {!listOnly ? (
+        <div className="space-y-3">
+          <CalendarViewToggle value={viewMode} onChange={setViewMode} />
+          {viewMode === "mes" ? (
+            <div className="flex items-center justify-center gap-1 sm:gap-2" role="group" aria-label="Navegación del calendario">
+              <button
+                type="button"
+                onClick={goPrev}
+                disabled={!canGoPrev}
+                className="inline-flex shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 p-2 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-35"
+                aria-label="Mes anterior"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <h3
+                id={`cal-month-${month.key}`}
+                className="min-w-[9rem] px-2 text-center text-base font-extrabold capitalize tracking-tight text-[#214C9B] sm:min-w-[11rem] sm:text-lg"
+              >
+                {monthLabel}
+              </h3>
+              <button
+                type="button"
+                onClick={goNext}
+                disabled={!canGoNext}
+                className="inline-flex shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 p-2 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-35"
+                aria-label="Mes siguiente"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
 
       {viewMode === "lista" ? (
-        <CalendarListView key="lista" matches={matches} gender={gender} showCrests={showCrests} showVenue={showVenue} />
+        <CalendarListView
+          key="lista"
+          matches={listData}
+          gender={gender}
+          showCrests={showCrests}
+          showVenue={showVenue}
+        />
       ) : (
         <>
           <div className="hidden lg:block">
