@@ -73,8 +73,14 @@ export function StandingsLeagueTableCard({
   const qualifyingRound = qualifyingRoundAfterJornada(effectiveJornada);
 
   const fullTeams = useMemo(() => {
-    const base = getTeamsAtRound(sourceTeams, matchdays, qualifyingRound, zones, tiebreak, venue);
-    return zoneRules ? applyCustomZoneColors(base, zoneRules) : base;
+    let base = getTeamsAtRound(sourceTeams, matchdays, qualifyingRound, zones, tiebreak, venue);
+    if (zoneRules) base = applyCustomZoneColors(base, zoneRules);
+    if (base.length > 0 && base.every((team) => team.stats.played === 0)) {
+      return [...base]
+        .sort((a, b) => a.name.localeCompare(b.name, "es"))
+        .map((team, index) => ({ ...team, position: index + 1 }));
+    }
+    return base;
   }, [sourceTeams, matchdays, qualifyingRound, zones, tiebreak, venue, zoneRules]);
 
   const tableTeams = useMemo(() => {

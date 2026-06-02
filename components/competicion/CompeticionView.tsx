@@ -10,7 +10,7 @@ import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
 import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
 import { MatchCard } from "@/components/MatchCard";
 import { zonesToLegacyConfig } from "@/lib/cms/competition-config-bundle";
-import { getTeamsBundle, mergeTeamsWithCms } from "@/lib/cms/teams-bundle";
+import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { getTeamsByGender } from "@/lib/fixtures";
 import { useSeason } from "@/components/season/SeasonProvider";
 import {
@@ -20,7 +20,7 @@ import {
   getLeagueMatchdaysForGender,
 } from "@/lib/season/aviles-matches";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
-import { getTeamsForRfefGrupo, type RfefGrupoId } from "@/lib/rfef-grupos";
+import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import { getPlayedLeagueRounds } from "@/lib/standings";
 import { FEMENINA_STANDINGS_ZONES } from "@/lib/segunda-rfef-femenina-2526";
 import type { Route } from "next";
@@ -62,8 +62,10 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
   const [panel, setPanel] = useState<CompeticionPanel>("liga");
   const isMasculino = gender === "masculino";
   const teams = useMemo(() => {
-    const base = isMasculino ? getTeamsForRfefGrupo(grupo) : getTeamsByGender(gender);
-    return mergeTeamsWithCms(base, getTeamsBundle(bundles, gender));
+    if (isMasculino) {
+      return resolveGroupTeams(bundles, gender, grupo);
+    }
+    return getTeamsByGender(gender);
   }, [bundles, gender, grupo, isMasculino]);
   const standingsMatchdays = isMasculino
     ? grupo === "2"
