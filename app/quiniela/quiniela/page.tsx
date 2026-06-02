@@ -27,9 +27,11 @@ type PronosticosBodyProps = {
   seasonId: CompetitionSeasonId;
   matchdays: Matchday[];
   currentRound: number;
+  totalRounds: number;
+  bundlesLoading: boolean;
 };
 
-function PronosticosBody({ seasonId, matchdays, currentRound }: PronosticosBodyProps) {
+function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundlesLoading }: PronosticosBodyProps) {
   const [round, setRound] = useState(currentRound);
   const [predictions, setPredictions] = useState<Record<string, Prediction>>({});
   const [savedRounds, setSavedRounds] = useState<Record<number, string>>({});
@@ -77,6 +79,7 @@ function PronosticosBody({ seasonId, matchdays, currentRound }: PronosticosBodyP
     () => sortQuinielaMatches(selectedMatchday.matches),
     [selectedMatchday.matches],
   );
+  const hasMatchesForRound = selectedMatchday.matches.length > 0;
   const isSaved = Boolean(savedRounds[round]);
   const isLocked = hasFirstMatchStarted(selectedMatchday);
   const readOnly = isLocked || (isSaved && !isEditing);
@@ -133,7 +136,7 @@ function PronosticosBody({ seasonId, matchdays, currentRound }: PronosticosBodyP
     <>
       <JornadaSelector
         value={round}
-        total={matchdays.length}
+        total={totalRounds}
         currentRound={currentRound}
         onChange={handleRoundChange}
       />
@@ -163,6 +166,13 @@ function PronosticosBody({ seasonId, matchdays, currentRound }: PronosticosBodyP
       )}
 
       <Card eyebrow={`Jornada ${selectedMatchday.round}`} title="Tu quiniela">
+        {!bundlesLoading && !hasMatchesForRound && (
+          <p className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700">
+            No hay partidos del Grupo I configurados para la jornada {round}. Asigna equipos reales en Jornadas o
+            guarda el calendario en Editar → Competición.
+          </p>
+        )}
+
         {hydrated && isSaved && finishedMatches > 0 && (
           <p className="mb-4 text-sm font-bold text-slate-700">
             Aciertos:{" "}
@@ -226,7 +236,7 @@ function PronosticosBody({ seasonId, matchdays, currentRound }: PronosticosBodyP
 }
 
 export default function MiQuinielaPage() {
-  const { matchdays, currentRound, seasonId } = useQuinielaSeason();
+  const { matchdays, currentRound, totalRounds, seasonId, bundlesLoading } = useQuinielaSeason();
 
   return (
     <div className="space-y-6">
@@ -236,11 +246,16 @@ export default function MiQuinielaPage() {
         description="Rellena la quiniela con los 10 partidos del Grupo I de cada jornada. Al guardar queda bloqueada hasta que pulses editar. Cuando empiece el primer partido ya no podras cambiarla."
       />
       <QuinielaHowItWorks />
+      {bundlesLoading ? (
+        <p className="text-sm font-bold text-slate-500">Cargando partidos…</p>
+      ) : null}
       <PronosticosBody
         key={seasonId}
         seasonId={seasonId}
         matchdays={matchdays}
         currentRound={currentRound}
+        totalRounds={totalRounds}
+        bundlesLoading={bundlesLoading}
       />
     </div>
   );
