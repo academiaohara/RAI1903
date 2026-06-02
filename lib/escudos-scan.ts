@@ -1,6 +1,6 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import type { AssetCatalogEntry } from "@/lib/asset-catalog";
+import type { AssetCatalogEntry } from "@/lib/asset-catalog-types";
 import { ESCUDO_PATHS } from "@/lib/escudo-manifest";
 
 const IMAGE_EXT = /\.(png|jpe?g|webp|gif|svg)$/i;
