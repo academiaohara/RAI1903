@@ -2,10 +2,12 @@
 
 import { SeasonSelector } from "@/components/SeasonSelector";
 import { SectionTabs } from "@/components/SectionTabs";
-import { getContenidoFanTabs } from "@/lib/contenido-fan";
+import { mediaRaiTabsFromSections } from "@/lib/media-rai-sections";
+import { useMediaRaiSections } from "@/components/media-rai/MediaRaiSectionsProvider";
 
 export function MediaRaiContextBar() {
-  const tabs = getContenidoFanTabs();
+  const { sections } = useMediaRaiSections();
+  const tabs = mediaRaiTabsFromSections(sections);
 
   return (
     <section aria-label="Contexto de Media RAI" className="space-y-3">

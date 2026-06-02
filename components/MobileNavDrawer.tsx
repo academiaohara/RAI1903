@@ -6,7 +6,8 @@ import { usePathname } from "next/navigation";
 import type { Route } from "next";
 import { ChevronRight, X } from "lucide-react";
 import { useEffect } from "react";
-import { isMobileNavItemActive, mobileNavSections } from "@/lib/navigation";
+import { isMobileNavItemActive } from "@/lib/navigation";
+import { useMobileNavSections } from "@/lib/use-navigation-items";
 import { shouldPrefetchRoute } from "@/lib/should-prefetch-route";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +18,7 @@ type MobileNavDrawerProps = {
 
 export function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps) {
   const pathname = usePathname();
+  const mobileNavSections = useMobileNavSections();
   const prefetch = shouldPrefetchRoute(pathname);
 
   useEffect(() => {

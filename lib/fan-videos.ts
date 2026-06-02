@@ -1,10 +1,9 @@
-import type { ContenidoFanSlug } from "@/lib/contenido-fan";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { FanYouTubeVideo } from "@/types";
 
 /** Clave CMS para la lista completa de vídeos de una sección. */
 export function fanVideosStorageKey(
-  section: ContenidoFanSlug,
+  section: string,
   seasonId: string,
   gender?: PrimerEquipoGender,
 ): string {
@@ -39,7 +38,7 @@ export function sortFanVideosByDate(videos: FanYouTubeVideo[]): FanYouTubeVideo[
   });
 }
 
-export function createFanVideoId(section: ContenidoFanSlug): string {
+export function createFanVideoId(section: string): string {
   return `${section}-video-${Date.now()}`;
 }
 
@@ -49,7 +48,7 @@ export function isDefaultFanVideoTitle(title: string): boolean {
   return title.trim() === DEFAULT_FAN_VIDEO_TITLE;
 }
 
-export function newFanVideo(section: ContenidoFanSlug): FanYouTubeVideo {
+export function newFanVideo(section: string): FanYouTubeVideo {
   const today = new Intl.DateTimeFormat("es-ES", {
     day: "2-digit",
     month: "2-digit",

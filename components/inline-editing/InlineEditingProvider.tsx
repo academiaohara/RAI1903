@@ -16,6 +16,7 @@ import {
 import { SeasonManagerPanel } from "@/components/editor/SeasonManagerPanel";
 import { TeamCrestEditorPanel } from "@/components/editor/TeamCrestEditorPanel";
 import { HomeLayoutEditorPanel } from "@/components/editor/HomeLayoutEditorPanel";
+import { MediaRaiSectionsEditorPanel } from "@/components/editor/MediaRaiSectionsEditorPanel";
 import { TransferMarketEditorPanel } from "@/components/editor/TransferMarketEditorPanel";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -357,6 +358,7 @@ export function InlineEditingToolbar() {
   const [crestPanelOpen, setCrestPanelOpen] = useState(false);
   const [transfersPanelOpen, setTransfersPanelOpen] = useState(false);
   const [homePanelOpen, setHomePanelOpen] = useState(false);
+  const [mediaRaiPanelOpen, setMediaRaiPanelOpen] = useState(false);
 
   if (!ready || !canEdit) return null;
 
@@ -397,6 +399,9 @@ export function InlineEditingToolbar() {
       {editMode && homePanelOpen && (
         <HomeLayoutEditorPanel onClose={() => setHomePanelOpen(false)} />
       )}
+      {editMode && mediaRaiPanelOpen && (
+        <MediaRaiSectionsEditorPanel onClose={() => setMediaRaiPanelOpen(false)} />
+      )}
       <div className="flex flex-wrap justify-end gap-2 rounded-full border border-[#214C9B]/20 bg-white/95 p-2 shadow-2xl backdrop-blur">
         {editMode && (
           <>
@@ -406,6 +411,7 @@ export function InlineEditingToolbar() {
                 setCrestPanelOpen(false);
                 setTransfersPanelOpen(false);
                 setHomePanelOpen(false);
+                setMediaRaiPanelOpen(false);
                 setSeasonPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -418,6 +424,7 @@ export function InlineEditingToolbar() {
                 setSeasonPanelOpen(false);
                 setTransfersPanelOpen(false);
                 setHomePanelOpen(false);
+                setMediaRaiPanelOpen(false);
                 setCrestPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -430,6 +437,7 @@ export function InlineEditingToolbar() {
                 setSeasonPanelOpen(false);
                 setCrestPanelOpen(false);
                 setTransfersPanelOpen(false);
+                setMediaRaiPanelOpen(false);
                 setHomePanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
@@ -442,6 +450,20 @@ export function InlineEditingToolbar() {
                 setSeasonPanelOpen(false);
                 setCrestPanelOpen(false);
                 setHomePanelOpen(false);
+                setTransfersPanelOpen(false);
+                setMediaRaiPanelOpen((open) => !open);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+            >
+              Media RAI
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSeasonPanelOpen(false);
+                setCrestPanelOpen(false);
+                setHomePanelOpen(false);
+                setMediaRaiPanelOpen(false);
                 setTransfersPanelOpen((open) => !open);
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"

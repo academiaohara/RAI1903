@@ -3,11 +3,10 @@
 import { TenteFirmeSpaceCard } from "@/components/TenteFirmeSpaceCard";
 import { ZonaMixtaVideoShowcase } from "@/components/ZonaMixtaVideoShowcase";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
-import type { ContenidoFanSlug } from "@/lib/contenido-fan";
 import type { FanMediaLink, FanYouTubeVideo } from "@/types";
 
 type TenteFirmeShowcaseProps = {
-  section: ContenidoFanSlug;
+  section: string;
   spaces: FanMediaLink[];
   videos?: FanYouTubeVideo[];
 };
