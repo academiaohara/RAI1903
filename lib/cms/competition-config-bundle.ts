@@ -1,6 +1,8 @@
+import type { GroupTeamSlot } from "@/lib/cms/group-teams";
 import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import { bundleMapKey } from "@/lib/cms/season-bundles";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import { PRIMERA_RFEF_STANDINGS_ZONES } from "@/lib/rfef-rules/config";
 import { FEMENINA_STANDINGS_ZONES } from "@/lib/segunda-rfef-femenina-2526";
 import type { StandingsZonesConfig } from "@/lib/standings";
@@ -22,6 +24,8 @@ export type SeasonCompetitionConfigBundle = {
   groupCount: 1 | 2;
   zones: CompetitionZoneRule[];
   hasPlayoff: boolean;
+  /** Plazas del grupo editables desde la guía de la liga. */
+  groupTeams?: Partial<Record<RfefGrupoId, GroupTeamSlot[]>>;
 };
 
 export const DEFAULT_ZONE_COLORS = {
