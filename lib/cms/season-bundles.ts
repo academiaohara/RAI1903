@@ -35,8 +35,15 @@ export type CmsTransferEntry = {
   clubAnnouncementNewsId?: string;
 };
 
+export type CmsTransferMarketWindow = {
+  id: string;
+  label: string;
+};
+
 export type SeasonTransfersBundle = {
   entries: CmsTransferEntry[];
+  /** Ventanas de mercado de la temporada (más antigua → más reciente). */
+  windows?: CmsTransferMarketWindow[];
 };
 
 export type SeasonFixturesBundle = {

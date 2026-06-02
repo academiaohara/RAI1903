@@ -86,6 +86,9 @@ export function resolveTransfersFromBundles(
   return [];
 }
 
-export function seasonTransfersBundlePayload(entries: CmsTransferEntry[]): SeasonTransfersBundle {
-  return { entries };
+export function seasonTransfersBundlePayload(
+  entries: CmsTransferEntry[],
+  windows?: SeasonTransfersBundle["windows"],
+): SeasonTransfersBundle {
+  return windows?.length ? { entries, windows } : { entries };
 }

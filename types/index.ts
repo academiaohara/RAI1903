@@ -127,11 +127,8 @@ export type TransferCategory = "Rumores" | "Altas" | "Bajas" | "Renovaciones";
 
 export type TransferKind = "fichaje" | "renovacion" | "cesion";
 
-export type TransferMarketWindowId =
-  | "verano-24-25"
-  | "invierno-24-25"
-  | "verano-25-26"
-  | "invierno-25-26";
+/** Identificador de ventana de mercado (p. ej. verano-25-26). Definido en CMS por temporada. */
+export type TransferMarketWindowId = string;
 
 export type TransferRumor = {
   id: string;

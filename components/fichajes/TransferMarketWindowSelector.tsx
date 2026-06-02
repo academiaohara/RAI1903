@@ -2,32 +2,39 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
-  DEFAULT_TRANSFER_MARKET_WINDOW_ID,
-  TRANSFER_MARKET_WINDOWS,
+  getDefaultTransferMarketWindowId,
   getTransferMarketWindowIndex,
 } from "@/lib/transfer-market-windows";
 import { cn } from "@/lib/utils";
 import type { TransferMarketWindowId } from "@/types";
+import type { TransferMarketWindow } from "@/lib/transfer-market-windows";
 
 type TransferMarketWindowSelectorProps = {
   value: TransferMarketWindowId;
   onChange: (windowId: TransferMarketWindowId) => void;
+  windows: TransferMarketWindow[];
   className?: string;
 };
 
-export function TransferMarketWindowSelector({ value, onChange, className }: TransferMarketWindowSelectorProps) {
-  const currentIndex = getTransferMarketWindowIndex(value);
-  const current = TRANSFER_MARKET_WINDOWS[currentIndex] ?? TRANSFER_MARKET_WINDOWS[TRANSFER_MARKET_WINDOWS.length - 1];
+export function TransferMarketWindowSelector({
+  value,
+  onChange,
+  windows,
+  className,
+}: TransferMarketWindowSelectorProps) {
+  const safeWindows = windows.length ? windows : [{ id: getDefaultTransferMarketWindowId([]), label: "Mercado" }];
+  const currentIndex = getTransferMarketWindowIndex(value, safeWindows);
+  const current = safeWindows[currentIndex] ?? safeWindows[safeWindows.length - 1];
 
   const goOlder = () => {
     const nextIndex = Math.max(0, currentIndex - 1);
-    const next = TRANSFER_MARKET_WINDOWS[nextIndex];
+    const next = safeWindows[nextIndex];
     if (next) onChange(next.id);
   };
 
   const goNewer = () => {
-    const nextIndex = Math.min(TRANSFER_MARKET_WINDOWS.length - 1, currentIndex + 1);
-    const next = TRANSFER_MARKET_WINDOWS[nextIndex];
+    const nextIndex = Math.min(safeWindows.length - 1, currentIndex + 1);
+    const next = safeWindows[nextIndex];
     if (next) onChange(next.id);
   };
 
@@ -55,7 +62,7 @@ export function TransferMarketWindowSelector({ value, onChange, className }: Tra
       <button
         type="button"
         onClick={goNewer}
-        disabled={currentIndex === TRANSFER_MARKET_WINDOWS.length - 1}
+        disabled={currentIndex === safeWindows.length - 1}
         className="rounded-full p-2 text-[#214C9B] transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-35"
         aria-label="Mercado más reciente"
       >
@@ -64,5 +71,3 @@ export function TransferMarketWindowSelector({ value, onChange, className }: Tra
     </div>
   );
 }
-
-export { DEFAULT_TRANSFER_MARKET_WINDOW_ID };

@@ -9,6 +9,7 @@ import {
   clubAnnouncementFieldsFromUrlValue,
   type ClubAnnouncementUrlValue,
 } from "@/components/editor/ClubAnnouncementUrlField";
+import { TransferMarketWindowsEditor } from "@/components/editor/TransferMarketWindowsEditor";
 import { TRANSFER_KIND_OPTIONS, newTransferEntryId } from "@/hooks/useTransferMarketDraft";
 import type { TransferKind, TransferMarketWindowId } from "@/types";
 
@@ -66,9 +67,11 @@ export function TransferMarketEditorPanel({ onClose }: TransferMarketEditorPanel
       </div>
 
       <p className="mb-3 text-xs leading-relaxed text-slate-600">
-        Altas, cesiones y renovaciones del carrusel para <strong>{viewedSeason.label}</strong>. Edita cada ficha en el
-        carrusel; aquí solo añades movimientos nuevos.
+        Ventanas de mercado y movimientos del carrusel para <strong>{viewedSeason.label}</strong>. Edita cada ficha en el
+        carrusel; aquí gestionas ventanas y altas nuevas.
       </p>
+
+      <TransferMarketWindowsEditor />
 
       <div className="mb-4 space-y-2 rounded-xl border border-slate-100 bg-slate-50/80 p-3">
         <p className="text-[10px] font-extrabold uppercase tracking-wide text-[#214C9B]">Añadir movimiento</p>

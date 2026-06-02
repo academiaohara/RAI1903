@@ -1,3 +1,4 @@
+import type { CmsTransferEntry, CmsTransferMarketWindow } from "@/lib/cms/season-bundles";
 import type { TransferMarketWindowId } from "@/types";
 
 export type TransferMarketWindow = {
@@ -5,23 +6,87 @@ export type TransferMarketWindow = {
   label: string;
 };
 
-/** Ventanas de mercado ordenadas de la más antigua a la más reciente. */
-export const TRANSFER_MARKET_WINDOWS: TransferMarketWindow[] = [
+/** Ventanas por defecto cuando el bundle CMS no define ninguna. */
+export const DEFAULT_TRANSFER_MARKET_WINDOWS: TransferMarketWindow[] = [
   { id: "verano-25-26", label: "Verano 25/26" },
   { id: "invierno-25-26", label: "Invierno 25/26" },
 ];
 
-export const DEFAULT_TRANSFER_MARKET_WINDOW_ID: TransferMarketWindowId = "invierno-25-26";
+/** @deprecated Usa DEFAULT_TRANSFER_MARKET_WINDOWS o resolveTransferMarketWindows. */
+export const TRANSFER_MARKET_WINDOWS = DEFAULT_TRANSFER_MARKET_WINDOWS;
 
-export function getTransferMarketWindowIndex(windowId: TransferMarketWindowId): number {
-  const index = TRANSFER_MARKET_WINDOWS.findIndex((window) => window.id === windowId);
-  return index >= 0 ? index : TRANSFER_MARKET_WINDOWS.length - 1;
+export const DEFAULT_TRANSFER_MARKET_WINDOW_ID: TransferMarketWindowId =
+  DEFAULT_TRANSFER_MARKET_WINDOWS[DEFAULT_TRANSFER_MARKET_WINDOWS.length - 1].id;
+
+export function slugifyTransferMarketWindowId(label: string): string {
+  return label
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
-export function getTransferMarketWindowById(windowId: TransferMarketWindowId): TransferMarketWindow {
+function humanizeWindowId(id: string): string {
+  return id
+    .split("-")
+    .map((part) => (part.length <= 2 ? part : part.charAt(0).toUpperCase() + part.slice(1)))
+    .join(" ");
+}
+
+/** Incluye ventanas usadas en movimientos aunque no estén en la lista CMS (datos legacy). */
+export function mergeTransferMarketWindows(
+  configured: TransferMarketWindow[],
+  entries: Array<{ date: string; marketWindowId?: TransferMarketWindowId }>,
+): TransferMarketWindow[] {
+  const byId = new Map<string, TransferMarketWindow>();
+  for (const window of configured) {
+    byId.set(window.id, window);
+  }
+  for (const entry of entries) {
+    const id = resolveTransferMarketWindowId(entry);
+    if (!byId.has(id)) {
+      byId.set(id, { id, label: humanizeWindowId(id) });
+    }
+  }
+  const orderedIds = [...configured.map((window) => window.id)];
+  for (const id of byId.keys()) {
+    if (!orderedIds.includes(id)) orderedIds.push(id);
+  }
+  return orderedIds.map((id) => byId.get(id)!);
+}
+
+export function resolveTransferMarketWindows(
+  cmsWindows?: CmsTransferMarketWindow[] | null,
+  entries: Array<{ date: string; marketWindowId?: TransferMarketWindowId }> = [],
+): TransferMarketWindow[] {
+  const base =
+    cmsWindows?.length ?
+      cmsWindows.map((window) => ({ id: window.id, label: window.label }))
+    : DEFAULT_TRANSFER_MARKET_WINDOWS;
+  return mergeTransferMarketWindows(base, entries);
+}
+
+export function getDefaultTransferMarketWindowId(windows: TransferMarketWindow[]): TransferMarketWindowId {
+  return windows[windows.length - 1]?.id ?? DEFAULT_TRANSFER_MARKET_WINDOW_ID;
+}
+
+export function getTransferMarketWindowIndex(
+  windowId: TransferMarketWindowId,
+  windows: TransferMarketWindow[],
+): number {
+  const index = windows.findIndex((window) => window.id === windowId);
+  return index >= 0 ? index : Math.max(0, windows.length - 1);
+}
+
+export function getTransferMarketWindowById(
+  windowId: TransferMarketWindowId,
+  windows: TransferMarketWindow[],
+): TransferMarketWindow {
   return (
-    TRANSFER_MARKET_WINDOWS.find((window) => window.id === windowId) ??
-    TRANSFER_MARKET_WINDOWS[TRANSFER_MARKET_WINDOWS.length - 1]
+    windows.find((window) => window.id === windowId) ??
+    windows[windows.length - 1] ??
+    DEFAULT_TRANSFER_MARKET_WINDOWS[DEFAULT_TRANSFER_MARKET_WINDOWS.length - 1]
   );
 }
 
@@ -33,26 +98,38 @@ export function inferTransferMarketWindowId(date: string): TransferMarketWindowI
   if (month >= 7 && month <= 9) {
     const seasonStart = year % 100;
     const seasonEnd = (year + 1) % 100;
-    return `verano-${seasonStart}-${seasonEnd}` as TransferMarketWindowId;
+    return `verano-${seasonStart}-${seasonEnd}`;
   }
 
   if (month === 1 || month === 2) {
     const seasonStart = (year - 1) % 100;
     const seasonEnd = year % 100;
-    return `invierno-${seasonStart}-${seasonEnd}` as TransferMarketWindowId;
+    return `invierno-${seasonStart}-${seasonEnd}`;
   }
 
   if (month >= 10) {
     const seasonStart = year % 100;
     const seasonEnd = (year + 1) % 100;
-    return `invierno-${seasonStart}-${seasonEnd}` as TransferMarketWindowId;
+    return `invierno-${seasonStart}-${seasonEnd}`;
   }
 
   return DEFAULT_TRANSFER_MARKET_WINDOW_ID;
 }
 
-export function resolveTransferMarketWindowId(
-  transfer: { date: string; marketWindowId?: TransferMarketWindowId },
-): TransferMarketWindowId {
+export function resolveTransferMarketWindowId(transfer: {
+  date: string;
+  marketWindowId?: TransferMarketWindowId;
+}): TransferMarketWindowId {
   return transfer.marketWindowId ?? inferTransferMarketWindowId(transfer.date);
+}
+
+export function isTransferMarketWindowIdValid(id: string): boolean {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id);
+}
+
+export function countEntriesForMarketWindow(
+  entries: CmsTransferEntry[],
+  windowId: TransferMarketWindowId,
+): number {
+  return entries.filter((entry) => resolveTransferMarketWindowId(entry) === windowId).length;
 }
