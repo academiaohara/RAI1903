@@ -35,6 +35,8 @@ type MatchArticleLookup = {
   getPrevia?: (matchId: string, gender: PrimerEquipoGender) => { id: string } | undefined;
   /** When CMS crests load, pass the map so calendar rows re-resolve opponent logos. */
   crestMap?: Record<string, string>;
+  /** Resuelve nombres desde guía de liga / bundle teams (p. ej. sustituye «Equipo 42»). */
+  resolveTeamName?: (teamId: string, fallback: string) => string;
 };
 
 export function matchToCalendarMatch(
@@ -54,10 +56,14 @@ export function matchToCalendarMatch(
     ? getTeamCrest(rival)
     : getTeamCrestById(rivalId, rivalId.slice(0, 3).toUpperCase());
 
+  const opponentFallback = avilesHome ? match.awayTeam : match.homeTeam;
+  const opponent =
+    articles?.resolveTeamName?.(rivalId, opponentFallback) ?? opponentFallback;
+
   return {
     id: match.id,
     date: match.date,
-    opponent: avilesHome ? match.awayTeam : match.homeTeam,
+    opponent,
     opponentLogo,
     homeTeam: match.homeTeam,
     awayTeam: match.awayTeam,

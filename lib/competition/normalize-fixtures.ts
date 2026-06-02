@@ -99,16 +99,23 @@ export function normalizeGrupo2Matchdays(
   }));
 }
 
+export function applyFixtureTeamNamesToMatches(
+  matches: Match[],
+  resolveName: (teamId: string, fallback: string) => string,
+): Match[] {
+  return matches.map((m) => ({
+    ...m,
+    homeTeam: resolveName(m.homeTeamId, m.homeTeam),
+    awayTeam: resolveName(m.awayTeamId, m.awayTeam),
+  }));
+}
+
 export function applyFixtureTeamNames(
   matchdays: Matchday[],
   resolveName: (teamId: string, fallback: string) => string,
 ): Matchday[] {
   return matchdays.map((md) => ({
     ...md,
-    matches: md.matches.map((m) => ({
-      ...m,
-      homeTeam: resolveName(m.homeTeamId, m.homeTeam),
-      awayTeam: resolveName(m.awayTeamId, m.awayTeam),
-    })),
+    matches: applyFixtureTeamNamesToMatches(md.matches, resolveName),
   }));
 }

@@ -6,6 +6,7 @@ import { useSeason } from "@/components/season/SeasonProvider";
 import { useTeamCrestMap } from "@/components/assets/TeamCrestResolverProvider";
 import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { getCalendarMatchesFromSource } from "@/lib/calendar";
+import { getTeamsBundle, resolveFixtureTeamDisplayName } from "@/lib/cms/teams-bundle";
 import { fetchSeasonBundles } from "@/lib/cms/season-bundles";
 import type { CmsSeason } from "@/lib/cms/seasons";
 import { applyMatchInlineOverride } from "@/lib/fixture-overrides";
@@ -32,9 +33,12 @@ function mergeCalendarMatchesFromBundles(
 ): CalendarMatch[] {
   const byId = new Map<string, CalendarMatch>();
   for (const map of maps) {
+    const cmsTeams = getTeamsBundle(map, gender)?.teams ?? [];
+    const resolveTeamName = (teamId: string, fallback: string) =>
+      resolveFixtureTeamDisplayName(teamId, fallback, cmsTeams, map, gender);
     const source = enrichFixtureSource(fixtureSourceFromBundles(map, gender), map, gender);
     const aviles = getAvilesMatchesFromSource(source, gender, { mapMatch });
-    const rows = getCalendarMatchesFromSource(aviles, gender, articles);
+    const rows = getCalendarMatchesFromSource(aviles, gender, { ...articles, resolveTeamName });
     for (const row of rows) {
       byId.set(row.id, row);
     }
@@ -44,6 +48,12 @@ function mergeCalendarMatchesFromBundles(
 
 export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
   const { seasons, bundles, getEnrichedFixtureSource } = useSeason();
+  const cmsTeams = useMemo(() => getTeamsBundle(bundles, gender)?.teams ?? [], [bundles, gender]);
+  const resolveTeamName = useMemo(
+    () => (teamId: string, fallback: string) =>
+      resolveFixtureTeamDisplayName(teamId, fallback, cmsTeams, bundles, gender),
+    [bundles, cmsTeams, gender],
+  );
   const { getOverride } = useInlineEditing();
   const crestMap = useTeamCrestMap();
   const { getCronica, getPrevia } = useSeasonMatchArticles();
@@ -62,8 +72,13 @@ export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
   const seasonMatches = useMemo(() => {
     const source = getEnrichedFixtureSource(gender);
     const aviles = getAvilesMatchesFromSource(source, gender, { mapMatch });
-    return getCalendarMatchesFromSource(aviles, gender, { getCronica, getPrevia, crestMap });
-  }, [gender, getCronica, getEnrichedFixtureSource, getPrevia, crestMap, mapMatch]);
+    return getCalendarMatchesFromSource(aviles, gender, {
+      getCronica,
+      getPrevia,
+      crestMap,
+      resolveTeamName,
+    });
+  }, [gender, getCronica, getEnrichedFixtureSource, getPrevia, crestMap, mapMatch, resolveTeamName]);
 
   useEffect(() => {
     if (!needsMultiSeasonFetch) return;
@@ -71,16 +86,23 @@ export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
     let cancelled = false;
     void Promise.all(publishedList.map((row) => fetchSeasonBundles(row.id))).then((maps) => {
       if (cancelled) return;
-      setMultiSeasonMatches(
-        mergeCalendarMatchesFromBundles(maps, gender, { getCronica, getPrevia, crestMap }, mapMatch),
-      );
+      setMultiSeasonMatches(mergeCalendarMatchesFromBundles(maps, gender, { getCronica, getPrevia, crestMap }, mapMatch));
       setFetchedSeasonIdsKey(seasonIdsKey);
     });
 
     return () => {
       cancelled = true;
     };
-  }, [needsMultiSeasonFetch, publishedList, seasonIdsKey, gender, getCronica, getPrevia, crestMap, bundles, mapMatch]);
+  }, [
+    needsMultiSeasonFetch,
+    publishedList,
+    seasonIdsKey,
+    gender,
+    getCronica,
+    getPrevia,
+    crestMap,
+    mapMatch,
+  ]);
 
   const allMatches = needsMultiSeasonFetch ? multiSeasonMatches : seasonMatches;
   const loading = needsMultiSeasonFetch && fetchedSeasonIdsKey !== seasonIdsKey;
