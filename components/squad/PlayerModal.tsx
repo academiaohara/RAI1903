@@ -13,7 +13,12 @@ import {
   formatPlayerAgeWithUnit,
   getPlayerFullName,
 } from "@/lib/squad-utils";
-import { getTransferKind } from "@/lib/fichajes";
+import { getTransferKind, getTransferClubAnnouncementNews } from "@/lib/fichajes";
+import {
+  clubAnnouncementFromTransfer,
+  clubAnnouncementNewsItem,
+  CLUB_ANNOUNCEMENT_INLINE_ID,
+} from "@/lib/club-announcement";
 import { useTransfers } from "@/hooks/useTransfers";
 import { formatFanRating } from "@/lib/format-fan-rating";
 import { usePublishedNews } from "@/hooks/usePublishedNews";
@@ -24,7 +29,6 @@ import { PlayerStats } from "@/components/squad/PlayerStats";
 import { PlayerMatchesTable } from "@/components/squad/PlayerMatchesTable";
 import { PlayerCareerTimeline } from "@/components/squad/PlayerCareerTimeline";
 import { PlayerActualidadSection } from "@/components/squad/PlayerActualidadSection";
-import { clubAnnouncementFromTransfer } from "@/lib/club-announcement";
 import { PlayerResumenSection } from "@/components/squad/PlayerResumenSection";
 
 const tabs: Array<{ id: SquadModalTab; label: string }> = [
@@ -60,12 +64,17 @@ function PlayerModalContent({
   const transfer = getForPlayer(player.id);
 
   const { clubAnnouncementNews, playerNews, announcementTone } = useMemo(() => {
-    const announcementNews = getPlayerClubAnnouncementNews(allNews, player.id, {
-      announcementNewsId: transfer?.clubAnnouncementNewsId,
-      playerName,
-    });
+    const announcementNews = transfer
+      ? getTransferClubAnnouncementNews(transfer, allNews)
+      : getPlayerClubAnnouncementNews(allNews, player.id, { playerName });
+
+    const clubAnnouncement = clubAnnouncementFromTransfer(transfer, announcementNews);
+    const cardNews = clubAnnouncement ? clubAnnouncementNewsItem(clubAnnouncement) : null;
+    const excludeNewsId =
+      cardNews && cardNews.id !== CLUB_ANNOUNCEMENT_INLINE_ID ? cardNews.id : announcementNews?.id;
+
     const news = getPlayerNews(allNews, player.id, {
-      excludeNewsId: announcementNews?.id,
+      excludeNewsId,
       playerName,
     });
     const kind = transfer ? getTransferKind(transfer) : null;
