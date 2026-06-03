@@ -44,7 +44,7 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
       estadioInfo: stadiumOverride,
     };
   }, [baseClub, stadiumOverride]);
-  const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
+  const { injured, suspended } = useMemo(() => splitSquadByAvailability(squad), [squad]);
   const isFemenino = gender === "femenino";
   const showPlayerModal = isOwnClub && !isFemenino;
   const listOnlyView = !isOwnClub || isFemenino;
@@ -101,7 +101,7 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
         >
           {viewMode === "lista" ? (
             <PlayerTable
-              players={available}
+              players={squad}
               onSelect={handleSelect}
               showMarketValue={!isFemenino}
               showAge={!isFemenino}
@@ -109,7 +109,7 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
             />
           ) : (
             <PlayerGrid
-              players={available}
+              players={squad}
               onSelect={showPlayerModal ? setSelected : () => {}}
               variant="fichas"
               showEmptyPositions={editMode && isOwnClub}

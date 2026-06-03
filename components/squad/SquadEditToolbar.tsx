@@ -14,7 +14,7 @@ export function SquadEditToolbar({ onAddPlayer, busy = false }: SquadEditToolbar
     <section className="rounded-2xl border border-dashed border-[#214C9B]/35 bg-blue-50/40 p-4">
       <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#214C9B]">Añadir jugador</p>
       <p className="mt-1 text-sm text-slate-600">
-        Edita nombre, dorsal y estado en cada ficha o fila. Pulsa la foto o «Ficha completa» para el resto de campos.
+        Edita nombre, dorsal y rol en cada ficha o fila. Lesionado y sancionado se marcan en «Bajas» dentro de la ficha completa.
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
         {SQUAD_POSITIONS.map((position) => (
