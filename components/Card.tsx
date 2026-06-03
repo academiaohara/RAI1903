@@ -18,7 +18,7 @@ export function Card({ eyebrow, title, action, children, className, dense = fals
       {(eyebrow || title || action) && (
         <div
           className={cn(
-            "flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-3 md:gap-4",
+            "flex flex-row flex-wrap items-center gap-2 sm:items-start sm:justify-between sm:gap-3 md:gap-4",
             !borderlessHeader && "border-b border-[#214C9B]/15",
             dense ? "p-3 sm:p-4" : "p-3 sm:p-5",
           )}
@@ -33,7 +33,7 @@ export function Card({ eyebrow, title, action, children, className, dense = fals
               </h2>
             )}
           </div>
-          {action ? <div className="w-full shrink-0 sm:ml-auto sm:w-auto">{action}</div> : null}
+          {action ? <div className="ml-auto shrink-0 sm:ml-auto">{action}</div> : null}
         </div>
       )}
       <div className={dense ? "p-3 sm:p-4" : "p-3 sm:p-5"}>{children}</div>
