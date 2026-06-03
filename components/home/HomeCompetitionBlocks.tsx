@@ -25,9 +25,15 @@ import type { Route } from "next";
 import type { Match } from "@/types";
 
 export function useHomeCompetitionEmptyHint(): boolean {
-  const { leagueMatchdays, bundlesLoading } = useMasculinoLeagueSeason();
-  const { bundles } = useSeason();
-  return !bundlesLoading && !seasonHasCompetitionBundles(bundles) && leagueMatchdays.length === 0;
+  const { leagueMatchdays, bundlesLoading } = useMasculinoLeagueSeason("active");
+  const { activeSeasonId, getBundles, isBundlesLoading } = useSeason();
+  const bundles = getBundles(activeSeasonId);
+  return (
+    !bundlesLoading &&
+    !isBundlesLoading(activeSeasonId) &&
+    !seasonHasCompetitionBundles(bundles) &&
+    leagueMatchdays.length === 0
+  );
 }
 
 export function HomeCompetitionEmptyHint() {
@@ -41,7 +47,7 @@ export function HomeCompetitionEmptyHint() {
 }
 
 export function HomeMatchBannersBlock() {
-  const { latestMatches, nextMatch } = useMasculinoLeagueSeason();
+  const { latestMatches, nextMatch } = useMasculinoLeagueSeason("active");
   const { getForMatch } = useSeasonMatchArticles();
 
   const latestMatch = latestMatches[0];
@@ -78,7 +84,7 @@ export function HomeMatchBannersBlock() {
 }
 
 export function HomeStandingsStatsBlock() {
-  const { teams, leagueMatchdays, highlightTeamId } = useMasculinoLeagueSeason();
+  const { teams, leagueMatchdays, highlightTeamId } = useMasculinoLeagueSeason("active");
 
   return (
     <section className="grid gap-6 xl:grid-cols-[1fr_0.42fr]">
@@ -109,7 +115,7 @@ export function HomeStandingsStatsBlock() {
 }
 
 export function HomeRecentUpcomingBlock() {
-  const { latestMatches, upcomingMatches } = useMasculinoLeagueSeason();
+  const { latestMatches, upcomingMatches } = useMasculinoLeagueSeason("active");
 
   return (
     <>

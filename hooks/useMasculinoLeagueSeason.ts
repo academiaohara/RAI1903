@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useSeason } from "@/components/season/SeasonProvider";
+import { useSeason, type SeasonDataScope } from "@/components/season/SeasonProvider";
 import { RAI_TEAM_ID } from "@/data/mock";
 import { useEditedMatchdays, useEditedMatches } from "@/hooks/useEditedMatchdays";
 import {
@@ -13,9 +13,14 @@ import { getLastPlayedLeagueRound } from "@/lib/standings";
 import { isMatchPlayed } from "@/lib/match-result";
 import type { Match, Matchday, Team } from "@/types";
 
-export function useMasculinoLeagueSeason() {
-  const { getFixtureSource, bundlesLoading } = useSeason();
-  const fixtureSource = useMemo(() => getFixtureSource("masculino"), [getFixtureSource]);
+export function useMasculinoLeagueSeason(seasonScope: SeasonDataScope = "viewed") {
+  const { getFixtureSource, isBundlesLoading, resolveSeasonId } = useSeason();
+  const seasonId = resolveSeasonId(seasonScope);
+  const fixtureSource = useMemo(
+    () => getFixtureSource("masculino", seasonScope),
+    [getFixtureSource, seasonScope],
+  );
+  const bundlesLoading = isBundlesLoading(seasonId);
   const baseLeagueMatchdays = useMemo(
     () => getLeagueMatchdaysForGender(fixtureSource, "masculino"),
     [fixtureSource],

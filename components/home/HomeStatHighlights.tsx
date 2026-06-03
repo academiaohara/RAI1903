@@ -30,7 +30,7 @@ export function HomeStatHighlights() {
   const { averages, loading: ratingsLoading } = useSeasonPlayerRatings();
   const { getFixtureSource } = useSeason();
   const leagueMatchdays = useMemo(
-    () => getLeagueMatchdaysForGender(getFixtureSource("masculino"), "masculino"),
+    () => getLeagueMatchdaysForGender(getFixtureSource("masculino", "active"), "masculino"),
     [getFixtureSource],
   );
 
