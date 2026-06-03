@@ -575,7 +575,7 @@ export function InlineEditingToolbar() {
       <div className="relative min-w-0 sm:max-w-[min(100vw-2rem,42rem)]">
         {editMode && scrollHint.right && (
           <p
-            className="pointer-events-none absolute -top-5 right-0 z-10 flex items-center gap-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[#214C9B]/80 sm:hidden"
+            className="pointer-events-none absolute -top-5 right-0 z-10 flex items-center gap-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[#214C9B]/80"
             aria-hidden
           >
             Desliza
@@ -597,7 +597,7 @@ export function InlineEditingToolbar() {
         <div
           ref={toolbarScrollRef}
           onWheel={handleToolbarWheel}
-          className="no-scrollbar flex min-w-0 touch-pan-x flex-nowrap items-center justify-end gap-2 overflow-x-auto overscroll-x-contain rounded-2xl border border-[#214C9B]/20 bg-white/95 p-2 shadow-2xl backdrop-blur sm:max-w-[min(100vw-2rem,42rem)] sm:rounded-full"
+          className="no-scrollbar flex min-w-0 touch-pan-x flex-nowrap items-center justify-start gap-2 overflow-x-auto overscroll-x-contain rounded-2xl border border-[#214C9B]/20 bg-white/95 p-2 shadow-2xl backdrop-blur sm:max-w-[min(100vw-2rem,42rem)] sm:flex-wrap sm:justify-end sm:rounded-full"
         >
           {editMode && (
             <>
