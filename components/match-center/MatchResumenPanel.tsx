@@ -1,14 +1,14 @@
-import { MatchVideoBlock } from "@/components/match-center/MatchVideoBlock";
+import { EditableMatchVideoBlock } from "@/components/match-center/EditableMatchVideoBlock";
 import type { MatchDetail } from "@/types";
 
 export function MatchResumenPanel({ detail }: { detail: MatchDetail }) {
-  if (!detail.resumenVideo) {
-    return <p className="text-sm text-slate-500">Sin resumen del partido.</p>;
-  }
-
   return (
-    <div className="space-y-8">
-      <MatchVideoBlock video={detail.resumenVideo} />
-    </div>
+    <EditableMatchVideoBlock
+      matchId={detail.match.id}
+      field="resumenVideo"
+      videoLabel="Resumen del partido"
+      fallback={detail.resumenVideo}
+      emptyMessage="Sin resumen del partido."
+    />
   );
 }
