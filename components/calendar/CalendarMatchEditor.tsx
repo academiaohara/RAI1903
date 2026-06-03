@@ -64,7 +64,7 @@ export function CalendarMatchEditor({
   className,
 }: CalendarMatchEditorProps) {
   const { bundles } = useSeason();
-  const { getOverride, saveValue } = useInlineEditing();
+  const { getOverride, mergeSaveValue } = useInlineEditing();
   const resolveTeamName = useResolveTeamName(gender);
   const override = getOverride<MatchResultOverride>(`match-result:${match.id}`) ?? {};
   const baseMatch = calendarMatchToMatch(match);
@@ -78,7 +78,7 @@ export function CalendarMatchEditor({
     if (next.homeScore !== undefined && next.awayScore !== undefined) {
       next.status = "finished";
     }
-    saveValue(`match-result:${match.id}`, { ...override, ...next });
+    mergeSaveValue(`match-result:${match.id}`, next);
   };
 
   const onHomeTeamChange = (teamId: string) => {

@@ -50,6 +50,7 @@ type InlineEditingContextValue = {
   getOverride: <T,>(key: string) => T | undefined;
   getValue: <T,>(key: string, fallback: T) => T;
   saveValue: <T,>(key: string, value: T) => void;
+  mergeSaveValue: <T extends Record<string, unknown>>(key: string, patch: Partial<T>) => void;
   clearValue: (key: string) => void;
   clearAll: () => void;
   exportJson: () => Promise<boolean>;
@@ -285,6 +286,21 @@ export function InlineEditingProvider({
     [configured, scheduleCloudSave],
   );
 
+  const mergeSaveValue = useCallback(
+    <T extends Record<string, unknown>>(key: string, patch: Partial<T>) => {
+      const previous = (overridesRef.current[key] as T | undefined) ?? ({} as T);
+      const merged = { ...previous, ...patch } as T;
+
+      setOverrides((current) => {
+        const next = { ...current, [key]: merged };
+        if (!configured) persistLegacyOverrides(next);
+        return next;
+      });
+      scheduleCloudSave(key, merged);
+    },
+    [configured, scheduleCloudSave],
+  );
+
   const clearValue = useCallback(
     (key: string) => {
       const pending = saveTimersRef.current.get(key);
@@ -351,6 +367,7 @@ export function InlineEditingProvider({
       getOverride: <T,>(key: string) => overrides[key] as T | undefined,
       getValue: <T,>(key: string, fallback: T) => (overrides[key] as T | undefined) ?? fallback,
       saveValue,
+      mergeSaveValue,
       clearValue,
       clearAll,
       exportJson,
@@ -362,6 +379,7 @@ export function InlineEditingProvider({
       configured,
       editMode,
       exportJson,
+      mergeSaveValue,
       overrides,
       ready,
       saveValue,
