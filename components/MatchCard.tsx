@@ -22,12 +22,12 @@ export function MatchCard({
   highlightTeamId?: string;
   gender?: PrimerEquipoGender;
 }) {
-  const { editMode, getOverride, saveValue } = useInlineEditing();
+  const { editMode, getOverride, mergeSaveValue } = useInlineEditing();
   const override = getOverride<Partial<Match>>(`match-result:${match.id}`) ?? {};
   const editedMatch = { ...match, ...override };
   const scoreLabel = editedMatch.status === "finished" ? `${editedMatch.homeScore} - ${editedMatch.awayScore}` : "vs";
   const savePatch = (patch: Partial<Match>) => {
-    saveValue(`match-result:${match.id}`, { ...override, ...patch });
+    mergeSaveValue(`match-result:${match.id}`, patch);
   };
 
   return (

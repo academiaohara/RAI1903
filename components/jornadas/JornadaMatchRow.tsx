@@ -10,6 +10,7 @@ import {
   utcDateInputValue,
   utcTimeInputValue,
 } from "@/lib/calendar-match-overrides";
+import { applyJornadaFixtureOverride } from "@/lib/jornada-fixture-overrides";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { getJornadaTeam } from "@/lib/jornadas-data";
 import { getTeamCrestById } from "@/lib/team-crests";
@@ -46,10 +47,10 @@ export function JornadaMatchRow({
   showCrests: showCrestsProp,
   grupo = "1",
 }: JornadaMatchRowProps) {
-  const { editMode, getOverride, saveValue } = useInlineEditing();
+  const { editMode, getOverride, mergeSaveValue } = useInlineEditing();
   const { bundles } = useSeason();
   const override = getOverride<Partial<JornadaFixture>>(`match-result:${fixture.id}`) ?? {};
-  const editedFixture = { ...fixture, ...override };
+  const editedFixture = applyJornadaFixtureOverride(fixture, override);
   const showCrests = showCrestsProp ?? gender !== "femenino";
   const home = getJornadaTeam(editedFixture.homeTeamId);
   const away = getJornadaTeam(editedFixture.awayTeamId);
@@ -71,12 +72,14 @@ export function JornadaMatchRow({
     }
     if (next.status === "finished") {
       next.kickoffTime = undefined;
+      if (next.homeScore === undefined) next.homeScore = editedFixture.homeScore ?? 0;
+      if (next.awayScore === undefined) next.awayScore = editedFixture.awayScore ?? 0;
     }
     if (next.status === "scheduled") {
       next.homeScore = undefined;
       next.awayScore = undefined;
     }
-    saveValue(`match-result:${fixture.id}`, { ...override, ...next });
+    mergeSaveValue(`match-result:${fixture.id}`, next);
   };
 
   const onTeamChange = (side: "home" | "away", teamId: string) => {
@@ -187,7 +190,18 @@ export function JornadaMatchRow({
         <div className="min-w-[8rem] rounded-xl border border-[#214C9B]/20 bg-white p-2 text-center shadow-sm">
           <select
             value={editedFixture.status}
-            onChange={(event) => savePatch({ status: event.target.value as JornadaFixture["status"] })}
+            onChange={(event) => {
+              const status = event.target.value as JornadaFixture["status"];
+              if (status === "finished") {
+                savePatch({
+                  status,
+                  homeScore: editedFixture.homeScore ?? 0,
+                  awayScore: editedFixture.awayScore ?? 0,
+                });
+                return;
+              }
+              savePatch({ status });
+            }}
             className="mb-1 w-full rounded-lg border border-slate-200 px-2 py-1 text-[11px] font-bold text-slate-700 outline-none"
             aria-label="Editar estado del partido"
           >

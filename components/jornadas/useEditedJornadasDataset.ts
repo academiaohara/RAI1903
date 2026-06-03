@@ -1,6 +1,7 @@
 "use client";
 
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { applyJornadaFixtureOverride } from "@/lib/jornada-fixture-overrides";
 import { formatShortDate, representativeDateFromFixtures } from "@/lib/jornadas-data";
 import { getRaiTeamId } from "@/lib/fixtures";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -12,14 +13,6 @@ import type {
   JornadasGetRoundOptions,
 } from "@/types/jornadas";
 import { useMemo } from "react";
-
-function applyJornadaFixtureOverride(
-  fixture: JornadaFixture,
-  override: Partial<JornadaFixture> | undefined,
-): JornadaFixture {
-  if (!override || Object.keys(override).length === 0) return fixture;
-  return { ...fixture, ...override };
-}
 
 function opponentFromFixtures(
   fixtures: JornadaFixture[],
