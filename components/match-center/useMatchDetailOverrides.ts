@@ -19,6 +19,7 @@ export function useMatchDetailOverrides(detail: MatchDetail): MatchDetail {
   const events = getValue(storageKey(matchId, "events"), detail.events);
   const homeLineup = getValue(storageKey(matchId, "homeLineup"), detail.homeLineup);
   const awayLineup = getValue(storageKey(matchId, "awayLineup"), detail.awayLineup);
+  const availability = getValue(storageKey(matchId, "availability"), detail.availability);
 
   return {
     ...detail,
@@ -33,6 +34,7 @@ export function useMatchDetailOverrides(detail: MatchDetail): MatchDetail {
     events,
     homeLineup,
     awayLineup,
+    availability,
   };
 }
 
@@ -46,5 +48,6 @@ export function useMatchDetailStorageKeys(matchId: string) {
     events: storageKey(matchId, "events"),
     homeLineup: storageKey(matchId, "homeLineup"),
     awayLineup: storageKey(matchId, "awayLineup"),
+    availability: storageKey(matchId, "availability"),
   };
 }

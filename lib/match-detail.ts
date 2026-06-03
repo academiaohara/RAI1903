@@ -70,9 +70,10 @@ function buildAvailability(teamId: string, gender: PrimerEquipoGender): MatchAva
   return squad
     .filter((player) => player.status === "lesionado" || player.status === "sancionado")
     .map((player) => ({
+      playerId: player.id,
       name: player.displayName,
       reason: player.status === "lesionado" ? "lesionado" : "sancionado",
-      detail: player.status === "lesionado" ? "Lesion en competicion" : "Sancion disciplinaria",
+      detail: "",
     }));
 }
 
