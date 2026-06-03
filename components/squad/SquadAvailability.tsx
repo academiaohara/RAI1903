@@ -24,7 +24,7 @@ export function SquadAvailability({
       {editMode && (
         <p className="flex items-center gap-2 rounded-xl border border-[#214C9B]/20 bg-blue-50/50 px-3 py-2 text-xs font-semibold text-slate-600">
           <Pencil size={14} className="shrink-0 text-[#214C9B]" aria-hidden />
-          Pulsa un jugador para editar su ficha o cambia su estado a lesionado/sancionado en la ficha.
+          Abre la ficha del jugador y marca lesionado o sancionado en el panel «Bajas».
         </p>
       )}
       <div className="grid gap-4 sm:grid-cols-2">

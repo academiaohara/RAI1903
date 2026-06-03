@@ -2,15 +2,7 @@
 
 import type { SquadPlayer } from "@/types/squad";
 import type { PlayerStatus } from "@/types";
-
-const ESTADOS: PlayerStatus[] = [
-  "titular",
-  "suplente",
-  "lesionado",
-  "sancionado",
-  "cantera",
-  "nuevo fichaje",
-];
+import { SQUAD_ROSTER_ESTADOS } from "@/components/squad/PlayerAvailabilityPanel";
 
 type SquadPlayerQuickEditProps = {
   player: SquadPlayer;
@@ -49,12 +41,12 @@ export function SquadPlayerQuickEdit({ player, onUpdate, layout = "card" }: Squa
           aria-label="Apellido"
         />
         <select
-          value={player.estado}
+          value={SQUAD_ROSTER_ESTADOS.includes(player.estado) ? player.estado : "titular"}
           onChange={(event) => onUpdate({ estado: event.target.value as PlayerStatus })}
           className={`${fieldClass} max-w-[9rem] text-[10px] font-bold uppercase`}
           aria-label="Estado"
         >
-          {ESTADOS.map((estado) => (
+          {SQUAD_ROSTER_ESTADOS.map((estado) => (
             <option key={estado} value={estado}>
               {estado}
             </option>
@@ -90,12 +82,12 @@ export function SquadPlayerQuickEdit({ player, onUpdate, layout = "card" }: Squa
         />
       </div>
       <select
-        value={player.estado}
+        value={SQUAD_ROSTER_ESTADOS.includes(player.estado) ? player.estado : "titular"}
         onChange={(event) => onUpdate({ estado: event.target.value as PlayerStatus })}
         className={`${fieldClass} w-full text-[10px] font-bold uppercase`}
         aria-label="Estado"
       >
-        {ESTADOS.map((estado) => (
+        {SQUAD_ROSTER_ESTADOS.map((estado) => (
           <option key={estado} value={estado}>
             {estado}
           </option>

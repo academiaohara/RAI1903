@@ -36,7 +36,7 @@ export function SquadPage({ gender }: SquadPageProps) {
     () => getLeagueMatchdaysForGender(getFixtureSource(gender), gender),
     [gender, getFixtureSource],
   );
-  const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
+  const { injured, suspended } = useMemo(() => splitSquadByAvailability(squad), [squad]);
   const club = useMemo(() => {
     const base = resolveSquadClubInfo(gender, viewedSeason.label, bundles, squad.length, leagueMatchdays);
     const merged = {
@@ -108,7 +108,7 @@ export function SquadPage({ gender }: SquadPageProps) {
         >
           {viewMode === "lista" ? (
             <PlayerTable
-              players={available}
+              players={squad}
               onSelect={handleSelect}
               showMarketValue={!isFemenino}
               showAge={!isFemenino}
@@ -118,7 +118,7 @@ export function SquadPage({ gender }: SquadPageProps) {
             />
           ) : (
             <PlayerGrid
-              players={available}
+              players={squad}
               onSelect={setSelected}
               variant="fichas"
               showEmptyPositions={editMode}

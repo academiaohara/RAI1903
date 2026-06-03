@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Calendar, MapPin, Ruler, Scale, Star, X } from "lucide-react";
-import type { PlayerStatus } from "@/types";
 import type { PlayerCareerRecord, SquadModalTab, SquadPlayer } from "@/types/squad";
 import { SQUAD_POSITIONS, SQUAD_ROLE_CODES } from "@/types/squad";
 import { ageFromBirthDate } from "@/lib/squad-age";
@@ -31,15 +30,10 @@ import { PlayerMatchesTable } from "@/components/squad/PlayerMatchesTable";
 import { PlayerCareerTimeline } from "@/components/squad/PlayerCareerTimeline";
 import { PlayerActualidadSection } from "@/components/squad/PlayerActualidadSection";
 import { PlayerResumenSection } from "@/components/squad/PlayerResumenSection";
-
-const PLAYER_ESTADOS: PlayerStatus[] = [
-  "titular",
-  "suplente",
-  "lesionado",
-  "sancionado",
-  "cantera",
-  "nuevo fichaje",
-];
+import {
+  PlayerAvailabilityPanel,
+  SQUAD_ROSTER_ESTADOS,
+} from "@/components/squad/PlayerAvailabilityPanel";
 
 const tabs: Array<{ id: SquadModalTab; label: string }> = [
   { id: "actualidad", label: "Actualidad" },
@@ -189,6 +183,11 @@ function PlayerModalContent({
       </div>
 
       <div className="relative z-0 min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+        <PlayerAvailabilityPanel
+          player={player}
+          editMode={editMode}
+          onUpdate={onUpdate ? (patch) => onUpdate(player.id, patch) : undefined}
+        />
         {editMode && onUpdate && (
           <PlayerInlineEditor
             player={player}
@@ -317,8 +316,8 @@ function PlayerInlineEditor({
         <EditorSelect label="Posición" value={player.posicion} options={SQUAD_POSITIONS} onChange={(value) => onUpdate({ posicion: value })} />
         <EditorSelect
           label="Estado"
-          value={player.estado}
-          options={PLAYER_ESTADOS}
+          value={SQUAD_ROSTER_ESTADOS.includes(player.estado) ? player.estado : "titular"}
+          options={SQUAD_ROSTER_ESTADOS}
           onChange={(value) => onUpdate({ estado: value })}
         />
         <EditorInput label="Nacionalidad" value={player.nacionalidad} onChange={(value) => onUpdate({ nacionalidad: value })} />
