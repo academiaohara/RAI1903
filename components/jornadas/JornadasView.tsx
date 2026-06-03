@@ -4,13 +4,12 @@ import { Card } from "@/components/Card";
 import { JornadaMatchesByDay } from "@/components/jornadas/JornadaMatchesByDay";
 import { JornadaRoundCarousel } from "@/components/jornadas/JornadaRoundCarousel";
 import { JornadasGrupoSwitcher } from "@/components/jornadas/JornadasGrupoSwitcher";
-import { PlayoffAscensoGuia } from "@/components/jornadas/PlayoffAscensoGuia";
 import { useEditedJornadasDataset } from "@/components/jornadas/useEditedJornadasDataset";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { hasMultipleGrupos } from "@/lib/cms/competition-config-bundle";
-import { buildJornadasDataset, groupFixturesByCalendarDay } from "@/lib/jornadas-data";
+import { buildJornadasDataset, groupFixturesByCalendarDay, jornadaSectionTitle } from "@/lib/jornadas-data";
 import { getRaiTeamId } from "@/lib/fixtures";
-import { leagueRoundForQualifyingStandings } from "@/lib/playoff-jornadas";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import type { JornadaRoundId } from "@/types/jornadas";
@@ -22,60 +21,31 @@ type JornadasViewProps = {
 
 export function JornadasView({ gender }: JornadasViewProps) {
   const { getEnrichedFixtureSource, getCompetitionConfig } = useSeason();
+  const { getValue } = useInlineEditing();
   const competitionConfig = useMemo(() => getCompetitionConfig(gender), [gender, getCompetitionConfig]);
   const baseDataset = useMemo(
-    () =>
-      buildJornadasDataset(gender, getEnrichedFixtureSource(gender), {
-        hasPlayoff: competitionConfig.hasPlayoff,
-      }),
-    [gender, getEnrichedFixtureSource, competitionConfig.hasPlayoff],
+    () => buildJornadasDataset(gender, getEnrichedFixtureSource(gender)),
+    [gender, getEnrichedFixtureSource],
   );
   const dataset = useEditedJornadasDataset(baseDataset, gender);
   const raiTeamId = getRaiTeamId(gender);
   const [manualRoundId, setManualRoundId] = useState<JornadaRoundId | null>(null);
   const selectedRoundId = manualRoundId ?? dataset.currentRoundId;
-  const [lastLeagueQualifyingRound, setLastLeagueQualifyingRound] = useState(
-    dataset.definitiveQualifyingLeagueRound,
-  );
   const [grupo, setGrupo] = useState<RfefGrupoId>("1");
 
-  const qualifyingLeagueRound = useMemo(() => {
-    const summary = dataset.getRound(selectedRoundId).summary;
-    if (summary.kind === "league" && summary.roundNumber) {
-      return leagueRoundForQualifyingStandings(summary.roundNumber);
-    }
-    return lastLeagueQualifyingRound;
-  }, [dataset, lastLeagueQualifyingRound, selectedRoundId]);
+  const handleSelectRound = useCallback((roundId: JornadaRoundId) => {
+    setManualRoundId(roundId);
+  }, []);
 
-  const handleSelectRound = useCallback(
-    (roundId: JornadaRoundId) => {
-      setManualRoundId(roundId);
-      const summary = dataset.getRound(roundId).summary;
-      if (summary.kind === "league" && summary.roundNumber) {
-        setLastLeagueQualifyingRound(leagueRoundForQualifyingStandings(summary.roundNumber));
-      }
-    },
-    [dataset],
-  );
-
-  const roundData = dataset.getRound(selectedRoundId, { qualifyingLeagueRound });
+  const roundData = dataset.getRound(selectedRoundId);
   const { summary } = roundData;
-  const grupoMatches =
-    summary.kind === "playoff"
-      ? roundData.matchesByGrupo["1"]
-      : roundData.matchesByGrupo[grupo];
-  const matchesByDay = useMemo(() => groupFixturesByCalendarDay(grupoMatches), [grupoMatches]);
-  const raiMatches = useMemo(() => grupoMatches.filter((match) => match.involvesRai), [grupoMatches]);
+  const grupoMatches = roundData.matchesByGrupo[grupo];
+  const matchesByDay = groupFixturesByCalendarDay(grupoMatches);
   const showGrupoSwitcher =
     gender === "masculino" && summary.kind === "league" && hasMultipleGrupos(competitionConfig);
 
-  const title =
-    summary.kind === "playoff"
-      ? `Playoff de ascenso · ${summary.label}${summary.isProvisional ? " (provisional)" : ""}`
-      : `Jornada ${summary.roundNumber}`;
-
-  const showPlayoffGuia =
-    gender === "masculino" && summary.kind === "playoff" && competitionConfig.hasPlayoff;
+  const customLabel = getValue(`jornada-round:${summary.id}:label`, summary.label);
+  const title = jornadaSectionTitle(summary, customLabel === summary.label ? undefined : customLabel);
   const showCrests = gender !== "femenino";
 
   return (
@@ -87,8 +57,6 @@ export function JornadasView({ gender }: JornadasViewProps) {
         showCrests={showCrests}
       />
 
-      {showPlayoffGuia && <PlayoffAscensoGuia isProvisional={summary.isProvisional} />}
-
       <Card
         eyebrow="Resultados"
         title={title}
@@ -99,20 +67,7 @@ export function JornadasView({ gender }: JornadasViewProps) {
           ) : undefined
         }
       >
-        {summary.kind === "playoff" && summary.isProvisional && (
-          <p className="mb-6 text-sm font-bold text-slate-600">
-            Cruces calculados según la clasificación tras la jornada de liga que tenías seleccionada. Al cerrar
-            la temporada se muestran los equipos definitivos.
-          </p>
-        )}
-
-        {summary.kind === "playoff" && raiMatches.length === 0 && matchesByDay.length === 0 && (
-          <p className="text-sm font-bold text-slate-600">
-            No hay partidos del Real Avilés en esta fase del playoff de ascenso.
-          </p>
-        )}
-
-        {matchesByDay.length > 0 && (
+        {matchesByDay.length > 0 ? (
           <div className="space-y-4">
             <JornadaMatchesByDay
               groups={matchesByDay}
@@ -122,6 +77,8 @@ export function JornadasView({ gender }: JornadasViewProps) {
               grupo={grupo}
             />
           </div>
+        ) : (
+          <p className="text-sm font-bold text-slate-600">Sin partidos en esta jornada.</p>
         )}
       </Card>
     </div>

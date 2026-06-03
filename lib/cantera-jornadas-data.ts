@@ -131,7 +131,6 @@ function buildCanteraJornadasDatasetCore(matchdays: Matchday[], clubTeamId: stri
   return {
     rounds: leagueSummaries,
     currentRoundId,
-    definitiveQualifyingLeagueRound: currentRound,
     getRound(roundId) {
       return leagueRoundDataCache.get(roundId) ?? leagueRoundDataCache.get(currentRoundId)!;
     },

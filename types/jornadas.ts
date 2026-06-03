@@ -1,16 +1,16 @@
 import type { MatchStatus } from "@/types";
 
-export type JornadaPhaseKind = "league" | "playoff";
+export type JornadaPhaseKind = "league";
 
 export type JornadaGrupo = "1" | "2";
 
-/** Identificador estable de jornada o fase (p. ej. j12, po-sf-ida). */
+/** Identificador estable de jornada (p. ej. j12). */
 export type JornadaRoundId = string;
 
 export type JornadaFixture = {
   id: string;
   jornadaId: JornadaRoundId;
-  /** Número de jornada de liga (1–38) o undefined en playoff. */
+  /** Número de jornada de liga (1–38). */
   roundNumber?: number;
   homeTeamId: string;
   awayTeamId: string;
@@ -38,8 +38,6 @@ export type JornadaRoundSummary = {
   opponentTeamId?: string;
   opponentName?: string;
   isCurrent: boolean;
-  /** Clasificados al playoff calculados con tabla parcial (no temporada cerrada). */
-  isProvisional?: boolean;
 };
 
 export type JornadaRoundData = {
@@ -47,15 +45,8 @@ export type JornadaRoundData = {
   matchesByGrupo: Record<JornadaGrupo, JornadaFixture[]>;
 };
 
-export type JornadasGetRoundOptions = {
-  /** Jornada de liga tras la que calcular los cruces de playoff (incluye esa jornada). */
-  qualifyingLeagueRound?: number;
-};
-
 export type JornadasDataset = {
   rounds: JornadaRoundSummary[];
   currentRoundId: JornadaRoundId;
-  /** Jornada de liga con la que se fijan los clasificados definitivos al playoff. */
-  definitiveQualifyingLeagueRound: number;
-  getRound: (roundId: JornadaRoundId, options?: JornadasGetRoundOptions) => JornadaRoundData;
+  getRound: (roundId: JornadaRoundId) => JornadaRoundData;
 };

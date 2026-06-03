@@ -146,12 +146,12 @@ function ExtraMatchEditor({
 
       {showStage ? (
         <label className="block text-xs font-semibold text-slate-600">
-          Fase / ronda
+          Nombre de la fase
           <input
             value={match.competitionStage ?? ""}
             onChange={(e) => onChange({ ...match, competitionStage: e.target.value })}
             className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-            placeholder="Primera eliminatoria"
+            placeholder="Pretemporada, Playoff ascenso semis, Playout…"
           />
         </label>
       ) : null}
@@ -255,7 +255,7 @@ export function ExtraFixturesOnPageEditor() {
   return (
     <OnPageEditorSection
       title="Pretemporada y Copa del Rey"
-      description="Añade, edita o elimina amistosos y partidos de copa. Los cambios se guardan en el calendario de la temporada (no solo en edición en línea)."
+      description="Añade amistosos, copa o fases extra (playoff de ascenso, playout, etc.) con el nombre que quieras. Los cambios se guardan en el calendario de la temporada."
     >
       <div className="space-y-4">
         <section className="space-y-2">
@@ -277,6 +277,7 @@ export function ExtraFixturesOnPageEditor() {
               <ExtraMatchEditor
                 key={match.id}
                 match={match}
+                showStage
                 onChange={(next) =>
                   setAmistosos((rows) => rows.map((row, i) => (i === index ? next : row)))
                 }

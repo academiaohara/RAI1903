@@ -1,11 +1,4 @@
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
-import {
-  buildPlayoffBracketThroughLeagueRound,
-  buildPlayoffFixturesForRound,
-  isDefinitiveQualifyingRound,
-  playoffFixturesForBothGrupos,
-  type PlayoffRoundKey,
-} from "@/lib/playoff-jornadas";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import {
   getDefaultFixtureSource,
@@ -24,20 +17,7 @@ import type {
   JornadaRoundId,
   JornadaRoundSummary,
   JornadasDataset,
-  JornadasGetRoundOptions,
 } from "@/types/jornadas";
-
-const PLAYOFF_ROUNDS: Array<{
-  id: JornadaRoundId;
-  label: string;
-  /** Fecha placeholder hasta que haya datos reales. */
-  date: string;
-}> = [
-  { id: "po-sf-ida", label: "SF Ida", date: "2026-05-30T16:00:00.000Z" },
-  { id: "po-sf-vuelta", label: "SF Vta", date: "2026-06-06T18:30:00.000Z" },
-  { id: "po-f-ida", label: "Final Ida", date: "2026-06-13T18:30:00.000Z" },
-  { id: "po-f-vuelta", label: "Final Vta", date: "2026-06-20T20:00:00.000Z" },
-];
 
 function raiTeamId(gender: PrimerEquipoGender): string {
   return gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
@@ -180,46 +160,6 @@ function buildLeagueRoundSummary(
   };
 }
 
-function buildPlayoffRoundSummary(
-  playoff: (typeof PLAYOFF_ROUNDS)[number],
-  isCurrent: boolean,
-  qualifyingLeagueRound: number,
-): JornadaRoundSummary {
-  return {
-    id: playoff.id,
-    label: playoff.label,
-    kind: "playoff",
-    date: playoff.date,
-    shortDate: formatShortDate(playoff.date),
-    isCurrent,
-    isProvisional: !isDefinitiveQualifyingRound(qualifyingLeagueRound),
-  };
-}
-
-function buildPlayoffRoundData(
-  summary: JornadaRoundSummary,
-  qualifyingLeagueRound: number,
-  raiId: string,
-): JornadaRoundData {
-  const playoffMeta = PLAYOFF_ROUNDS.find((round) => round.id === summary.id);
-  if (!playoffMeta) {
-    return { summary, matchesByGrupo: { "1": [], "2": [] } };
-  }
-
-  const bracket = buildPlayoffBracketThroughLeagueRound(qualifyingLeagueRound);
-  const fixtures = buildPlayoffFixturesForRound(
-    summary.id as PlayoffRoundKey,
-    playoffMeta.date,
-    bracket,
-    raiId,
-  );
-
-  return {
-    summary,
-    matchesByGrupo: playoffFixturesForBothGrupos(fixtures),
-  };
-}
-
 function sortFixtures(matches: JornadaFixture[]): JornadaFixture[] {
   return [...matches].sort((a, b) => {
     if (a.involvesRai !== b.involvesRai) return a.involvesRai ? -1 : 1;
@@ -248,8 +188,7 @@ function matchdayByRound(matchdaysList: Matchday[], round: number): Matchday | u
 
 /**
  * Construye el dataset de jornadas para la UI.
- * Los partidos de liga provienen de los JSON de resultados; el playoff de ascenso
- * se genera desde el cuadro RFEF (clasificados definitivos o provisionales por jornada).
+ * Los partidos de liga provienen del calendario de la temporada (CMS o mock).
  */
 function buildFemeninoJornadasDataset(source: JornadasFixtureSource): JornadasDataset {
   const raiId = RAI_FEM_TEAM_ID;
@@ -272,22 +211,15 @@ function buildFemeninoJornadasDataset(source: JornadasFixtureSource): JornadasDa
   return {
     rounds,
     currentRoundId,
-    definitiveQualifyingLeagueRound: currentRound,
     getRound(roundId) {
       return leagueRoundDataCache.get(roundId) ?? leagueRoundDataCache.get(currentRoundId)!;
     },
   };
 }
 
-export type JornadasBuildOptions = {
-  /** Si false, no se añaden jornadas de playoff RFEF al carrusel. */
-  hasPlayoff?: boolean;
-};
-
 export function buildJornadasDataset(
   gender: PrimerEquipoGender,
   source: JornadasFixtureSource = getDefaultFixtureSource(),
-  options?: JornadasBuildOptions,
 ): JornadasDataset {
   if (gender === "femenino") {
     return buildFemeninoJornadasDataset(source);
@@ -296,19 +228,12 @@ export function buildJornadasDataset(
   const raiId = raiTeamId(gender);
   const currentRound = getLastPlayedLeagueRound(source.matchdays);
   const currentRoundId: JornadaRoundId = `j${currentRound}`;
-  const definitiveQualifyingLeagueRound = source.definitiveQualifyingLeagueRound;
 
   const leagueSummaries = [...source.matchdays]
     .sort((a, b) => a.round - b.round)
     .map((md) => buildLeagueRoundSummary(md, raiId, currentRound));
 
-  const includePlayoff = options?.hasPlayoff !== false;
-  const playoffSummaries = includePlayoff
-    ? PLAYOFF_ROUNDS.map((po) => buildPlayoffRoundSummary(po, false, definitiveQualifyingLeagueRound))
-    : [];
-
-  const rounds: JornadaRoundSummary[] = [...leagueSummaries, ...playoffSummaries];
-
+  const rounds: JornadaRoundSummary[] = leagueSummaries;
   const leagueRoundDataCache = new Map<JornadaRoundId, JornadaRoundData>();
 
   for (const summary of leagueSummaries) {
@@ -321,29 +246,12 @@ export function buildJornadasDataset(
   return {
     rounds,
     currentRoundId,
-    definitiveQualifyingLeagueRound,
-    getRound(roundId, options?: JornadasGetRoundOptions) {
-      const qualifyingLeagueRound =
-        options?.qualifyingLeagueRound ?? definitiveQualifyingLeagueRound;
-
+    getRound(roundId) {
       const leagueData = leagueRoundDataCache.get(roundId);
       if (leagueData) return leagueData;
 
-      const playoffMeta = PLAYOFF_ROUNDS.find((round) => round.id === roundId);
-      if (playoffMeta) {
-        const summary = buildPlayoffRoundSummary(playoffMeta, false, qualifyingLeagueRound);
-        return buildPlayoffRoundData(summary, qualifyingLeagueRound, raiId);
-      }
-
       const fallback = rounds[0];
-      return (
-        leagueRoundDataCache.get(fallback.id) ??
-        buildPlayoffRoundData(
-          buildPlayoffRoundSummary(PLAYOFF_ROUNDS[0], false, qualifyingLeagueRound),
-          qualifyingLeagueRound,
-          raiId,
-        )
-      );
+      return leagueRoundDataCache.get(fallback.id) ?? leagueRoundDataCache.get(currentRoundId)!;
     },
   };
 }
@@ -352,4 +260,12 @@ export function getJornadaTeam(teamId: string) {
   return getTeam(teamId);
 }
 
-export { PLAYOFF_ROUNDS };
+/** Título de la tarjeta de resultados: respeta etiqueta personalizada si difiere del J{n} por defecto. */
+export function jornadaSectionTitle(
+  summary: JornadaRoundSummary,
+  customLabel: string | undefined,
+): string {
+  if (customLabel && customLabel !== summary.label) return customLabel;
+  if (summary.roundNumber !== undefined) return `Jornada ${summary.roundNumber}`;
+  return summary.label;
+}

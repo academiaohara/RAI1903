@@ -25,7 +25,8 @@ export type SeasonCompetitionConfigBundle = {
   teamsPerGroup: number;
   groupCount: 1 | 2;
   zones: CompetitionZoneRule[];
-  hasPlayoff: boolean;
+  /** @deprecated Ignorado: los playoffs se gestionan en calendario, no en jornadas. */
+  hasPlayoff?: boolean;
   /** Plantilla aplicada por última vez (referencia; los valores editables mandan). */
   templateId?: LeagueTemplateId;
   /** Etiqueta por defecto de la liga en la web. */
@@ -91,7 +92,6 @@ export function defaultCompetitionConfig(gender: PrimerEquipoGender): SeasonComp
     teamsPerGroup,
     groupCount: gender === "masculino" ? 2 : 1,
     zones: defaultZonesFromLegacy(legacy),
-    hasPlayoff: gender === "masculino",
   };
 }
 

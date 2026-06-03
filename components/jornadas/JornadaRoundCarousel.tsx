@@ -69,6 +69,7 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests 
         className="no-scrollbar mt-3 flex w-full min-w-0 touch-pan-x flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-1"
       >
         {rounds.map((round) => {
+          const label = getValue(`jornada-round:${round.id}:label`, round.label);
           const shortDate = getValue(`jornada-round:${round.id}:short-date`, round.shortDate);
           const isSelected = round.id === selectedId;
           const opponent =
@@ -93,7 +94,17 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests 
               onClick={() => onSelect(round.id)}
               className={cn(cardBaseClass(showCrests), cardStateClass(isSelected, round.isCurrent))}
             >
-              <span className="text-sm font-extrabold leading-none">{round.label}</span>
+              {editMode ? (
+                <EditableText
+                  storageKey={`jornada-round:${round.id}:label`}
+                  value={label}
+                  aria-label={`Editar nombre de ${round.label}`}
+                  className="max-w-full text-sm font-extrabold leading-tight"
+                  inputClassName="px-1 py-0.5 text-center text-sm font-extrabold leading-tight"
+                />
+              ) : (
+                <span className="max-w-full text-sm font-extrabold leading-tight">{label}</span>
+              )}
 
               {showCrests ? (
                 <div className="flex h-12 w-12 items-center justify-center">
@@ -106,18 +117,6 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests 
                       size="md"
                       className="transition group-hover:brightness-110"
                     />
-                  ) : round.kind === "playoff" ? (
-                    <span
-                      className={cn(
-                        "flex h-11 w-11 items-center justify-center rounded-full border text-[11px] font-extrabold uppercase",
-                        isSelected
-                          ? "border-white/40 bg-white/15 text-white"
-                          : "border-[#214C9B]/25 bg-white text-[#214C9B] group-hover:border-white/40 group-hover:bg-white/15 group-hover:text-white",
-                      )}
-                      aria-hidden
-                    >
-                      PO
-                    </span>
                   ) : (
                     <OpponentCrest
                       logo="?"
@@ -133,7 +132,7 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests 
                 <EditableText
                   storageKey={`jornada-round:${round.id}:short-date`}
                   value={shortDate}
-                  aria-label={`Editar fecha corta de ${round.label}`}
+                  aria-label={`Editar fecha corta de ${label}`}
                   className="text-[10px] font-bold uppercase leading-tight tracking-wide opacity-90"
                   inputClassName="px-1 py-0.5 text-[10px] font-bold uppercase leading-tight"
                 />
