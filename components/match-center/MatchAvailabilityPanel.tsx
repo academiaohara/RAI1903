@@ -3,13 +3,9 @@
 import { Plus, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
-import { useSeason } from "@/components/season/SeasonProvider";
 import { useMatchDetailStorageKeys } from "@/components/match-center/useMatchDetailOverrides";
-import {
-  availabilityPlayerKey,
-  getMatchTeamSquadOptions,
-  type MatchSquadOption,
-} from "@/lib/match-availability-squad";
+import { useMatchTeamSquadOptions } from "@/hooks/useMatchTeamSquadOptions";
+import { availabilityPlayerKey, type MatchSquadOption } from "@/lib/match-availability-squad";
 import type { MatchAvailability, MatchAvailabilityPlayer, PrimerEquipoGender } from "@/types";
 
 const REASONS: MatchAvailabilityPlayer["reason"][] = ["lesionado", "sancionado"];
@@ -208,18 +204,12 @@ export function MatchAvailabilityPanel({
   awayLabel: string;
 }) {
   const { editMode, getValue, saveValue } = useInlineEditing();
-  const { bundles } = useSeason();
   const keys = useMatchDetailStorageKeys(matchId);
   const current = getValue(keys.availability, availability);
+  const { getOptions } = useMatchTeamSquadOptions(gender);
 
-  const homeSquadOptions = useMemo(
-    () => getMatchTeamSquadOptions(homeTeamId, gender, bundles),
-    [bundles, gender, homeTeamId],
-  );
-  const awaySquadOptions = useMemo(
-    () => getMatchTeamSquadOptions(awayTeamId, gender, bundles),
-    [bundles, gender, awayTeamId],
-  );
+  const homeSquadOptions = useMemo(() => getOptions(homeTeamId), [getOptions, homeTeamId]);
+  const awaySquadOptions = useMemo(() => getOptions(awayTeamId), [getOptions, awayTeamId]);
 
   const saveAvailability = (next: MatchAvailability) => saveValue(keys.availability, next);
 

@@ -1,9 +1,13 @@
 "use client";
 
 import { ArrowDownRight, ArrowUpLeft, Footprints, Plus, Trash2 } from "lucide-react";
+import { useMemo } from "react";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { MatchSquadPlayerSelect } from "@/components/match-center/MatchSquadPlayerSelect";
+import { useMatchTeamSquadOptions } from "@/hooks/useMatchTeamSquadOptions";
 import { createMatchEventId, matchEventTypeLabels } from "@/lib/match-events";
-import type { MatchEvent, MatchEventType } from "@/types";
+import { getRaiTeamId } from "@/lib/fixtures";
+import type { MatchEvent, MatchEventType, PrimerEquipoGender } from "@/types";
 import { useMatchDetailStorageKeys } from "@/components/match-center/useMatchDetailOverrides";
 
 const eventTypes: MatchEventType[] = ["goal", "goal_disallowed", "yellow", "red", "substitution"];
@@ -174,20 +178,135 @@ function EventSection({
   );
 }
 
+function eventTeamId(
+  team: "home" | "away",
+  homeTeamId: string,
+  awayTeamId: string,
+): string {
+  return team === "home" ? homeTeamId : awayTeamId;
+}
+
+function EventPlayerField({
+  event,
+  homeTeamId,
+  awayTeamId,
+  squadHelpers,
+  onUpdate,
+}: {
+  event: MatchEvent;
+  homeTeamId: string;
+  awayTeamId: string;
+  squadHelpers: ReturnType<typeof useMatchTeamSquadOptions>;
+  onUpdate: (patch: Partial<MatchEvent>) => void;
+}) {
+  const { getOptions, getQuinielaScorerOptions, isOwnClub, ownSquad } = squadHelpers;
+  const teamId = eventTeamId(event.team, homeTeamId, awayTeamId);
+  const ownClub = isOwnClub(teamId);
+
+  const playerOptions = useMemo(() => {
+    if (!ownClub) return [];
+    if (event.type === "goal") return getQuinielaScorerOptions(teamId);
+    return getOptions(teamId);
+  }, [event.type, getOptions, getQuinielaScorerOptions, ownClub, teamId]);
+
+  if (!ownClub) {
+    return (
+      <input
+        value={event.player}
+        onChange={(change) => onUpdate({ player: change.target.value })}
+        placeholder="Jugador (entra / autor)"
+        aria-label="Jugador del evento"
+        className="rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm font-semibold text-slate-800 outline-none focus:border-[#214C9B] sm:col-span-2"
+      />
+    );
+  }
+
+  return (
+    <MatchSquadPlayerSelect
+      options={playerOptions}
+      value={event.player}
+      onChange={(name) => onUpdate({ player: name })}
+      squadForResolve={ownSquad}
+      placeholder="Jugador de la plantilla…"
+      aria-label="Jugador del evento"
+      className="rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm font-semibold text-slate-800 outline-none focus:border-[#214C9B] sm:col-span-2"
+    />
+  );
+}
+
+function EventDetailField({
+  event,
+  homeTeamId,
+  awayTeamId,
+  squadHelpers,
+  onUpdate,
+}: {
+  event: MatchEvent;
+  homeTeamId: string;
+  awayTeamId: string;
+  squadHelpers: ReturnType<typeof useMatchTeamSquadOptions>;
+  onUpdate: (patch: Partial<MatchEvent>) => void;
+}) {
+  const { getOptions, isOwnClub, ownSquad } = squadHelpers;
+  const teamId = eventTeamId(event.team, homeTeamId, awayTeamId);
+  const ownClub = isOwnClub(teamId);
+  const detailOptions = useMemo(
+    () => (ownClub ? getOptions(teamId) : []),
+    [getOptions, ownClub, teamId],
+  );
+
+  const placeholder =
+    event.type === "substitution" ? "Jugador que sale" : "Asistencia (opcional)";
+
+  if (!ownClub || detailOptions.length === 0) {
+    return (
+      <input
+        value={event.detail ?? ""}
+        onChange={(change) => onUpdate({ detail: change.target.value || undefined })}
+        placeholder={placeholder}
+        aria-label="Detalle del evento"
+        className="rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm text-slate-600 outline-none focus:border-[#214C9B] sm:col-span-2 lg:col-span-4"
+      />
+    );
+  }
+
+  return (
+    <MatchSquadPlayerSelect
+      options={detailOptions}
+      value={event.detail ?? ""}
+      onChange={(name) => onUpdate({ detail: name || undefined })}
+      squadForResolve={ownSquad}
+      allowEmpty
+      placeholder={placeholder}
+      aria-label="Detalle del evento"
+      className="rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm text-slate-600 outline-none focus:border-[#214C9B] sm:col-span-2 lg:col-span-4"
+    />
+  );
+}
+
 export function MatchEventsPanel({
   matchId,
   events,
   homeLabel,
   awayLabel,
+  homeTeamId,
+  awayTeamId,
+  gender,
 }: {
   matchId: string;
   events: MatchEvent[];
   homeLabel: string;
   awayLabel: string;
+  homeTeamId: string;
+  awayTeamId: string;
+  gender: PrimerEquipoGender;
 }) {
   const { editMode, getValue, saveValue } = useInlineEditing();
   const keys = useMatchDetailStorageKeys(matchId);
   const currentEvents = getValue(keys.events, events);
+  const raiTeamId = getRaiTeamId(gender);
+  const hasAviles = homeTeamId === raiTeamId || awayTeamId === raiTeamId;
+  const squadHelpers = useMatchTeamSquadOptions(gender);
 
   const updateEvents = (next: MatchEvent[]) => {
     saveValue(keys.events, next);
@@ -230,7 +349,14 @@ export function MatchEventsPanel({
     <section className="space-y-6">
       {editMode && (
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs font-semibold uppercase text-slate-500">Modo edición de eventos</p>
+          <p className="text-xs font-semibold uppercase text-slate-500">
+            Modo edición de eventos
+            {hasAviles && (
+              <span className="ml-2 font-medium normal-case text-slate-600">
+                — jugadores del Avilés desde la plantilla (goles: mismos nombres que la quiniela)
+              </span>
+            )}
+          </p>
           <button
             type="button"
             onClick={addEvent}
@@ -285,19 +411,19 @@ export function MatchEventsPanel({
                   <option value="home">{homeLabel}</option>
                   <option value="away">{awayLabel}</option>
                 </select>
-                <input
-                  value={event.player}
-                  onChange={(change) => updateEvent(event.id, { player: change.target.value })}
-                  placeholder="Jugador (entra / autor)"
-                  aria-label="Jugador del evento"
-                  className="rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm font-semibold text-slate-800 outline-none focus:border-[#214C9B] sm:col-span-2"
+                <EventPlayerField
+                  event={event}
+                  homeTeamId={homeTeamId}
+                  awayTeamId={awayTeamId}
+                  squadHelpers={squadHelpers}
+                  onUpdate={(patch) => updateEvent(event.id, patch)}
                 />
-                <input
-                  value={event.detail ?? ""}
-                  onChange={(change) => updateEvent(event.id, { detail: change.target.value || undefined })}
-                  placeholder="Asistencia o jugador que sale"
-                  aria-label="Detalle del evento"
-                  className="rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm text-slate-600 outline-none focus:border-[#214C9B] sm:col-span-2 lg:col-span-4"
+                <EventDetailField
+                  event={event}
+                  homeTeamId={homeTeamId}
+                  awayTeamId={awayTeamId}
+                  squadHelpers={squadHelpers}
+                  onUpdate={(patch) => updateEvent(event.id, patch)}
                 />
               </div>
 
