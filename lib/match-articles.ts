@@ -11,12 +11,18 @@ export function getMatchArticleById(id: string) {
   return matchArticles.find((article) => article.id === id);
 }
 
-export function getCronicaForMatch(matchId: string, gender: PrimerEquipoGender = "masculino") {
-  return matchArticles.find((article) => article.matchId === matchId && article.type === "cronica" && article.gender === gender);
+export function getMatchArticleForMatch(matchId: string, gender: PrimerEquipoGender = "masculino") {
+  return matchArticles.find((article) => article.matchId === matchId && article.gender === gender);
 }
 
+/** @deprecated Usar getMatchArticleForMatch */
+export function getCronicaForMatch(matchId: string, gender: PrimerEquipoGender = "masculino") {
+  return getMatchArticleForMatch(matchId, gender);
+}
+
+/** @deprecated Usar getMatchArticleForMatch */
 export function getPreviaForMatch(matchId: string, gender: PrimerEquipoGender = "masculino") {
-  return matchArticles.find((article) => article.matchId === matchId && article.type === "previa" && article.gender === gender);
+  return getMatchArticleForMatch(matchId, gender);
 }
 
 export function getClubChronicleNews(article: MatchArticle, items: NewsItem[] = newsItems): NewsItem | null {

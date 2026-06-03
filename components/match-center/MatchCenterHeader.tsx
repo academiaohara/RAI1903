@@ -99,8 +99,6 @@ type MatchCenterHeaderProps = {
   detail: MatchDetail;
   backHref: Route;
   backLabel: string;
-  /** Previa: sin marcador ni asistencia (solo VS y metadatos básicos). */
-  variant?: "match" | "preview";
 };
 
 function ScoreInput({
@@ -127,9 +125,8 @@ function ScoreInput({
   );
 }
 
-export function MatchCenterHeader({ detail, backHref, backLabel, variant = "match" }: MatchCenterHeaderProps) {
+export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHeaderProps) {
   const { match, gender, referee, attendance, kickoffTime, kickoffDateLabel, seasonLabel } = detail;
-  const isPreview = variant === "preview";
   const { editMode, getValue, saveValue } = useInlineEditing();
   const keys = useMatchDetailStorageKeys(match.id);
   const [selectedPlayer, setSelectedPlayer] = useState<SquadPlayer | null>(null);
@@ -160,11 +157,11 @@ export function MatchCenterHeader({ detail, backHref, backLabel, variant = "matc
   const awayGoals = currentEvents
     .filter((event) => event.type === "goal" && event.team === "away")
     .sort((a, b) => a.minute - b.minute);
-  const isFinished = match.status === "finished" && !isPreview;
+  const isFinished = match.status === "finished";
   const jornada = matchJornadaLabel(match);
   const meta = [matchCompetitionShortLabel(match), jornada, seasonLabel].filter(Boolean).join(" · ");
-  const showAttendance = !isPreview && (currentAttendance !== null || editMode);
-  const showReferee = !isPreview && (currentReferee || editMode);
+  const showReferee = Boolean(currentReferee) || editMode;
+  const showAttendance = isFinished && (currentAttendance !== null || editMode);
 
   return (
     <header className="overflow-hidden rounded-[2rem] bg-[#214C9B] text-white shadow-[0_20px_50px_rgba(33,76,155,0.35)]">
