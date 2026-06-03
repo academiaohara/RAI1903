@@ -2,10 +2,13 @@
 
 import { notFound } from "next/navigation";
 import type { Route } from "next";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { MatchCenter } from "@/components/match-center/MatchCenter";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
+import { getTeamsBundle, resolveFixtureTeamDisplayName } from "@/lib/cms/teams-bundle";
+import { applyMatchInlineOverride } from "@/lib/fixture-overrides";
 import {
   buildPlaceholderCronica,
   buildPlaceholderUpcomingMatch,
@@ -22,7 +25,23 @@ type MatchArticleDetailSeasonProps = {
 
 export function MatchArticleDetailSeason({ gender, articleId }: MatchArticleDetailSeasonProps) {
   const { bundles, bundlesLoading } = useSeason();
+  const { getOverride } = useInlineEditing();
   const { getById } = useSeasonMatchArticles();
+  const cmsTeams = useMemo(() => getTeamsBundle(bundles, gender)?.teams ?? [], [bundles, gender]);
+  const resolveTeamName = useMemo(
+    () => (teamId: string, fallback: string) =>
+      resolveFixtureTeamDisplayName(teamId, fallback, cmsTeams, bundles, gender),
+    [bundles, cmsTeams, gender],
+  );
+  const mapMatch = useCallback(
+    (match: Parameters<typeof applyMatchInlineOverride>[0]) =>
+      applyMatchInlineOverride(match, getOverride, gender, resolveTeamName),
+    [gender, getOverride, resolveTeamName],
+  );
+  const findMatch = useCallback(
+    (matchId: string) => findMatchInBundles(bundles, matchId, { gender, mapMatch }),
+    [bundles, gender, mapMatch],
+  );
 
   const article = useMemo(() => {
     const fromBundles = getById(articleId);
@@ -31,20 +50,20 @@ export function MatchArticleDetailSeason({ gender, articleId }: MatchArticleDeta
     const matchId = matchIdFromCronicaArticleId(articleId, gender);
     if (!matchId) return undefined;
 
-    const match = findMatchInBundles(bundles, matchId);
+    const match = findMatch(matchId);
     if (!match) return undefined;
 
     return match.status === "finished"
       ? buildPlaceholderCronica(match, gender)
       : buildPlaceholderUpcomingMatch(match, gender);
-  }, [articleId, bundles, gender, getById]);
+  }, [articleId, findMatch, gender, getById]);
 
   const detail = useMemo(() => {
     if (!article || article.gender !== gender) return null;
-    const match = findMatchInBundles(bundles, article.matchId) ?? getMatchForArticle(article);
+    const match = findMatch(article.matchId) ?? getMatchForArticle(article);
     if (!match) return null;
     return buildMatchDetail(match, article.gender);
-  }, [article, bundles, gender]);
+  }, [article, findMatch, gender]);
 
   if (bundlesLoading) {
     return (
