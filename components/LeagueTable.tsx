@@ -193,13 +193,13 @@ export function LeagueTable({
 
       {showLegend && (
         <div
-          className="flex flex-wrap justify-center gap-x-4 gap-y-2 px-1 text-[10px] font-bold uppercase tracking-[0.08em] text-slate-500 md:justify-start"
+          className="flex flex-nowrap justify-center gap-x-2 overflow-x-auto px-1 text-[8px] font-bold uppercase tracking-[0.04em] text-slate-500 md:flex-wrap md:justify-start md:gap-x-4 md:gap-y-2 md:overflow-visible md:text-[10px] md:tracking-[0.08em]"
           role="list"
           aria-label="Leyenda de zonas en la clasificacion"
         >
           {legend.map((item) => (
-            <span key={item.id ?? item.zone} role="listitem" className="inline-flex items-center gap-1.5">
-              <span className={cn("h-2.5 w-2.5 shrink-0 rounded-sm", item.className)} aria-hidden />
+            <span key={item.id ?? item.zone} role="listitem" className="inline-flex shrink-0 items-center gap-1">
+              <span className={cn("h-2 w-2 shrink-0 rounded-sm md:h-2.5 md:w-2.5", item.className)} aria-hidden />
               {item.label}
             </span>
           ))}
