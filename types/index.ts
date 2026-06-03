@@ -388,4 +388,5 @@ export type MatchDetail = {
   availability: MatchAvailability;
   rdpPrevia: MatchVideo | null;
   rdpPostpartido: MatchVideo | null;
+  resumenVideo: MatchVideo | null;
 };
