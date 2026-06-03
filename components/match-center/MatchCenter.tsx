@@ -101,6 +101,9 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
           events={resolvedDetail.events}
           homeLabel={resolvedDetail.match.homeTeam}
           awayLabel={resolvedDetail.match.awayTeam}
+          homeTeamId={resolvedDetail.match.homeTeamId}
+          awayTeamId={resolvedDetail.match.awayTeamId}
+          gender={resolvedDetail.gender}
         />
       );
     }
@@ -122,6 +125,9 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
           awayLabel={resolvedDetail.match.awayTeam}
           homeLineup={resolvedDetail.homeLineup}
           awayLineup={resolvedDetail.awayLineup}
+          homeTeamId={resolvedDetail.match.homeTeamId}
+          awayTeamId={resolvedDetail.match.awayTeamId}
+          gender={resolvedDetail.gender}
         />
       );
     }
