@@ -161,13 +161,13 @@ function PlayerFichaCard({
   const photoBlock = (
     <div className="relative aspect-[3/4] overflow-hidden">
       <div
-        className="absolute left-1.5 top-1.5 z-10 flex flex-col items-center gap-1 rounded-md bg-white px-1.5 py-1.5 shadow-sm"
+        className="absolute left-1 top-1 z-10 flex flex-col items-center gap-0.5 rounded-md bg-white px-1 py-1 shadow-sm sm:left-1.5 sm:top-1.5 sm:gap-1 sm:px-1.5 sm:py-1.5"
         aria-label={`${player.nacionalidad}, dorsal ${player.dorsal}`}
       >
-        <span className="text-sm leading-none" role="img" aria-hidden>
+        <span className="text-xs leading-none sm:text-sm" role="img" aria-hidden>
           {flag}
         </span>
-        <span className="text-sm font-black tabular-nums leading-none text-[#214C9B]">{player.dorsal}</span>
+        <span className="text-xs font-black tabular-nums leading-none text-[#214C9B] sm:text-sm">{player.dorsal}</span>
       </div>
 
       <div className="relative flex h-full items-end justify-center px-1 pb-0 pt-1">
@@ -198,8 +198,8 @@ function PlayerFichaCard({
         <article className={articleClass}>
           <button type="button" onClick={() => onSelect(player)} className="flex min-h-0 flex-1 flex-col text-left">
             {photoBlock}
-            <div className="mt-auto min-h-[2rem] shrink-0 bg-[#214C9B] px-1.5 py-1 sm:px-2 sm:py-1.5">
-              <p className="truncate text-center text-[10px] font-bold leading-tight text-white sm:text-xs">
+            <div className="mt-auto h-7 shrink-0 bg-[#214C9B] px-1 py-1 sm:h-8 sm:px-2 sm:py-1.5">
+              <p className="truncate text-center text-[9px] font-bold leading-tight text-white sm:text-xs">
                 {displayName}
               </p>
             </div>
@@ -234,8 +234,8 @@ function PlayerFichaCard({
     >
       <article className={articleClass}>
         {photoBlock}
-        <div className="mt-auto min-h-[2rem] shrink-0 rounded-br-[0.65rem] bg-[#214C9B] px-1.5 py-1 sm:px-2 sm:py-1.5">
-          <p className="truncate text-center text-[10px] font-bold leading-tight text-white sm:text-xs">{displayName}</p>
+        <div className="mt-auto h-7 shrink-0 rounded-br-[0.65rem] bg-[#214C9B] px-1 py-1 sm:h-8 sm:px-2 sm:py-1.5">
+          <p className="truncate text-center text-[9px] font-bold leading-tight text-white sm:text-xs">{displayName}</p>
         </div>
       </article>
     </motion.button>

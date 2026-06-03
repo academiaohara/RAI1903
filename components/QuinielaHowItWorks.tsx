@@ -34,44 +34,44 @@ const rules = [
 
 export function QuinielaHowItWorks() {
   return (
-    <section className="space-y-5" aria-labelledby="quiniela-how-it-works-title">
+    <section className="space-y-3 sm:space-y-5" aria-labelledby="quiniela-how-it-works-title">
       <div>
         <h2
           id="quiniela-how-it-works-title"
-          className="text-2xl font-extrabold uppercase leading-tight text-[#214C9B] sm:text-3xl"
+          className="text-lg font-extrabold uppercase leading-tight text-[#214C9B] sm:text-3xl"
         >
           ¿Cómo funciona la quiniela?
         </h2>
-        <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">
+        <p className="mt-2 max-w-3xl text-sm leading-5 text-slate-600 sm:mt-3 sm:text-base sm:leading-7">
           La quiniela de Rai1903 es el juego semanal donde demuestras tu instinto azulón. Rellena los 10 partidos de
           la jornada antes del pitido inicial y compite por el mejor puesto del ranking.
         </p>
       </div>
 
-      <ul className="grid gap-3 lg:grid-cols-3">
+      <ul className="grid gap-2 sm:gap-3 lg:grid-cols-3">
         {rules.map((rule) => (
           <li
             key={rule.title}
-            className="flex items-center gap-4 rounded-2xl border border-[#214C9B]/15 bg-white p-4 shadow-[0_10px_24px_rgba(17,24,39,0.05)]"
+            className="flex items-center gap-2.5 rounded-xl border border-[#214C9B]/15 bg-white p-2.5 shadow-[0_10px_24px_rgba(17,24,39,0.05)] sm:gap-4 sm:rounded-2xl sm:p-4"
           >
             <div
-              className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${rule.iconBg}`}
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:h-14 sm:w-14 sm:rounded-2xl ${rule.iconBg}`}
               aria-hidden
             >
               {rule.icon}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="font-extrabold text-slate-900">{rule.title}</p>
-              <p className="mt-1 text-sm leading-snug text-slate-600">{rule.description}</p>
+              <p className="text-sm font-extrabold text-slate-900 sm:text-base">{rule.title}</p>
+              <p className="mt-0.5 text-[11px] leading-snug text-slate-600 sm:mt-1 sm:text-sm">{rule.description}</p>
             </div>
             <p className="shrink-0 text-right">
-              <span className="block text-lg font-extrabold text-[#981915]">{rule.points}</span>
+              <span className="block text-sm font-extrabold text-[#981915] sm:text-lg">{rule.points}</span>
             </p>
           </li>
         ))}
       </ul>
 
-      <p className="flex items-start gap-2 text-sm text-slate-500">
+      <p className="flex items-start gap-2 text-xs text-slate-500 sm:text-sm">
         <LayoutGrid className="mt-0.5 h-4 w-4 shrink-0 text-[#214C9B]" aria-hidden />
         <span>
           En el partido del Avilés el signo 1-X-2 se calcula solo a partir de los goles que elijas. Hasta 12 puntos por

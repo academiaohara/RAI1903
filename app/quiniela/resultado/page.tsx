@@ -61,16 +61,16 @@ function ResultadoBody({ seasonId, matchdays, currentRound, totalRounds }: Resul
             { id: "quiniela", label: "Resultado quiniela" },
             { id: "ranking", label: "Ranking jornada" },
           ]}
-          className="mb-5"
+          className="mb-3 sm:mb-5"
         />
 
         {view === "quiniela" ? (
           <div className="space-y-4">
-            <p className="text-sm text-slate-600">
+            <p className="text-xs leading-5 text-slate-600 sm:text-sm">
               Signos 1-X-2 y goles del Avilés oficiales de la jornada. Las casillas con resultado aparecen en granate.
             </p>
             {!hasMatchesForRound && (
-              <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700">
+              <p className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
                 No hay partidos del Grupo I configurados para la jornada {round}.
               </p>
             )}
@@ -99,7 +99,7 @@ function ResultadoBody({ seasonId, matchdays, currentRound, totalRounds }: Resul
             />
 
             {!started && rankingEntries.length > 0 && (
-              <p className="mt-4 text-sm text-slate-500">
+              <p className="mt-3 text-xs text-slate-500 sm:mt-4 sm:text-sm">
                 Todos los participantes aparecen con 0 puntos hasta que empiece el primer partido de la jornada.
               </p>
             )}

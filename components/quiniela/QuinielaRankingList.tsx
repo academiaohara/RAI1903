@@ -12,20 +12,20 @@ export function QuinielaRankingList({ entries, emptyMessage, showHits = false }:
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5 sm:space-y-2">
       {entries.map((row, index) => (
         <div
           key={row.userId}
-          className="flex items-center justify-between gap-3 rounded-2xl border border-[#214C9B]/20 bg-white p-4 text-sm"
+          className="flex items-center justify-between gap-2 rounded-xl border border-[#214C9B]/20 bg-white p-2.5 text-xs sm:gap-3 sm:rounded-2xl sm:p-4 sm:text-sm"
         >
-          <div className="flex min-w-0 items-center gap-3">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#214C9B]/10 text-xs font-extrabold text-[#214C9B]">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#214C9B]/10 text-[11px] font-extrabold text-[#214C9B] sm:h-8 sm:w-8 sm:text-xs">
               {index + 1}
             </span>
             <div className="min-w-0">
               <p className="truncate font-extrabold uppercase text-[#214C9B]">{row.user}</p>
               {showHits && row.hits > 0 && (
-                <p className="text-xs font-semibold text-slate-500">{row.hits} aciertos 1-X-2</p>
+                <p className="text-[10px] font-semibold text-slate-500 sm:text-xs">{row.hits} aciertos 1-X-2</p>
               )}
             </div>
           </div>

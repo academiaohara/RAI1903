@@ -29,8 +29,13 @@ export function SeasonSelector({ className }: SeasonSelectorProps) {
 
   if (!current) return null;
 
+  const compactLabel = (label: string) => {
+    const match = label.match(/(?:\d{2})?(\d{2})\D+(\d{2})$/);
+    return match ? `${match[1]}/${match[2]}` : label.replace(/^temporada\s+/i, "");
+  };
+
   return (
-    <div className="flex flex-col items-end gap-1">
+    <div className="flex min-w-0 flex-col items-end gap-1">
       <label className="sr-only" htmlFor="season-select-mobile">
         Temporada
       </label>
@@ -39,14 +44,14 @@ export function SeasonSelector({ className }: SeasonSelectorProps) {
         value={viewedSeasonId}
         onChange={(event) => setViewedSeasonId(event.target.value as CompetitionSeasonId)}
         className={cn(
-          "max-w-full rounded-lg border bg-white px-2 py-1.5 text-[11px] font-bold uppercase tracking-normal text-[#214C9B] outline-none focus:border-[#214C9B] focus:ring-1 focus:ring-[#214C9B]/30 sm:hidden",
+          "w-auto max-w-full rounded-lg border bg-white px-2 py-1.5 text-[11px] font-extrabold uppercase tracking-normal text-[#214C9B] outline-none focus:border-[#214C9B] focus:ring-1 focus:ring-[#214C9B]/30 sm:hidden",
           className,
         )}
         aria-label="Seleccionar temporada"
       >
         {list.map((season) => (
           <option key={season.id} value={season.id}>
-            {season.label}
+            {compactLabel(season.label)}
           </option>
         ))}
       </select>

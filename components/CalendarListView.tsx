@@ -162,7 +162,7 @@ function CalendarListRow({
   );
 
   const mobileRowClassName = cn(
-    "flex w-full min-w-0 items-center gap-1.5 px-2 py-2 text-[10px] md:hidden",
+    "flex w-full min-w-0 items-center gap-1 px-1.5 py-1.5 text-[9.5px] md:hidden",
     rowSurface,
   );
 
@@ -196,7 +196,7 @@ function CalendarListRow({
       <time
         dateTime={displayMatch.date}
         className={cn(
-          "w-[2.75rem] shrink-0 truncate font-bold capitalize tabular-nums",
+          "w-[2.35rem] shrink-0 truncate font-bold capitalize tabular-nums",
           today ? "font-extrabold text-[#214C9B]" : "text-slate-700",
         )}
       >
@@ -204,7 +204,7 @@ function CalendarListRow({
       </time>
       <span
         className={cn(
-          "w-4 shrink-0 text-center font-bold",
+          "w-3.5 shrink-0 text-center font-bold",
           displayMatch.isHome ? "text-[#214C9B]" : "text-[#981915]",
         )}
         title={displayMatch.isHome ? "Local" : "Visitante"}
@@ -213,7 +213,7 @@ function CalendarListRow({
       </span>
       <span
         className={cn(
-          "w-8 shrink-0 text-center font-extrabold tabular-nums",
+          "w-7 shrink-0 text-center font-extrabold tabular-nums",
           displayMatch.played ? "text-slate-900" : "text-slate-400",
         )}
       >
@@ -225,7 +225,7 @@ function CalendarListRow({
         ) : null}
         <span className="min-w-0 truncate font-extrabold text-[#214C9B]">{displayMatch.opponent}</span>
       </span>
-      <span className={cn("max-w-[4.5rem] shrink-0 truncate text-right font-bold", accent)} title={competitionLabel}>
+      <span className={cn("max-w-[3.75rem] shrink-0 truncate text-right text-[8.5px] font-bold sm:text-[10px]", accent)} title={competitionLabel}>
         {matchCompetitionShortLabel(displayMatch)}
       </span>
     </>

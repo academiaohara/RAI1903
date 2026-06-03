@@ -84,7 +84,7 @@ export function StandingsEvolutionChart({ teamId = RAI_TEAM_ID, className }: Sta
       className={className}
       borderlessHeader
       action={
-        <p className="text-[11px] font-bold leading-snug text-slate-600 sm:text-sm">
+        <p className="text-[10px] font-bold leading-snug text-slate-600 sm:text-sm">
           <span className="text-slate-500">Pos. actual:</span>{" "}
           <span className="text-[#214C9B]">
             {lastPoint.position}º · J{lastPoint.round}
@@ -95,7 +95,7 @@ export function StandingsEvolutionChart({ teamId = RAI_TEAM_ID, className }: Sta
       <div className="relative overflow-x-auto">
         <svg
           viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
-          className="relative z-0 h-auto w-full min-w-[320px]"
+          className="relative z-0 h-auto w-full min-w-[300px]"
           role="img"
           aria-label={`Evolución de la posición en liga por jornada. Posición actual ${lastPoint.position} en la jornada ${lastPoint.round}`}
         >
@@ -189,17 +189,17 @@ export function StandingsEvolutionChart({ teamId = RAI_TEAM_ID, className }: Sta
         )}
       </div>
 
-      <ul className="mt-3 flex flex-wrap gap-x-3 gap-y-1.5 text-[10px] font-bold text-slate-600 sm:mt-4 sm:gap-4 sm:text-[11px]">
-        <li className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-sm bg-emerald-500/80" aria-hidden />
+      <ul className="mt-2 grid grid-cols-3 gap-1.5 text-[9px] font-bold text-slate-600 sm:mt-4 sm:flex sm:flex-wrap sm:gap-4 sm:text-[11px]">
+        <li className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-sm bg-emerald-500/80 sm:h-2.5 sm:w-2.5" aria-hidden />
           Ascenso directo
         </li>
-        <li className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-sm bg-sky-400/80" aria-hidden />
+        <li className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-sm bg-sky-400/80 sm:h-2.5 sm:w-2.5" aria-hidden />
           Playoff
         </li>
-        <li className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-sm bg-rose-500/80" aria-hidden />
+        <li className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-sm bg-rose-500/80 sm:h-2.5 sm:w-2.5" aria-hidden />
           Descenso
         </li>
       </ul>

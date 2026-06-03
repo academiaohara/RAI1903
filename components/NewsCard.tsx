@@ -60,9 +60,9 @@ export function NewsCard({ item, onUpdated }: NewsCardProps) {
   const content = (
     <>
       <NewsMedia item={item} variant="card" />
-      <div className="flex min-w-0 flex-1 flex-col justify-center p-3 sm:justify-between sm:p-5">
+      <div className="flex min-w-0 flex-1 flex-col justify-center p-2.5 sm:justify-between sm:p-5">
         <div>
-          <h3 className="news-card-title line-clamp-3 text-sm font-extrabold uppercase leading-snug text-[#214C9B] sm:line-clamp-none sm:text-lg sm:leading-tight">
+          <h3 className="news-card-title line-clamp-2 text-[13px] font-extrabold uppercase leading-snug text-[#214C9B] sm:line-clamp-none sm:text-lg sm:leading-tight">
             <EditableText
               storageKey={`news:${item.id}:title`}
               value={item.title}
@@ -111,7 +111,7 @@ export function NewsCard({ item, onUpdated }: NewsCardProps) {
 
   if (editMode) {
     return (
-      <article className="news-card-item group relative flex min-h-[4.25rem] overflow-hidden rounded-xl border border-[#214C9B] bg-white sm:min-h-[8.5rem]">
+      <article className="news-card-item group relative flex min-h-[3.75rem] overflow-hidden rounded-xl border border-[#214C9B] bg-white sm:min-h-[8.5rem]">
         {editButton}
         {content}
       </article>
@@ -123,7 +123,7 @@ export function NewsCard({ item, onUpdated }: NewsCardProps) {
       href={item.url}
       target="_blank"
       rel="noreferrer"
-      className="news-card-item group relative flex min-h-[4.25rem] overflow-hidden rounded-xl border border-[#214C9B] bg-white sm:min-h-[8.5rem]"
+      className="news-card-item group relative flex min-h-[3.75rem] overflow-hidden rounded-xl border border-[#214C9B] bg-white sm:min-h-[8.5rem]"
     >
       {content}
     </a>

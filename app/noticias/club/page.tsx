@@ -49,7 +49,7 @@ export default function NoticiasClubPage() {
           placeholder="Buscar titulares o extractos..."
           className="w-full rounded-2xl border border-[#214C9B]/25 bg-white px-4 py-3 text-slate-800 outline-none placeholder:text-slate-400 focus:border-[#214C9B]"
         />
-        <div className="-mx-1 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+        <div className="-mx-1 flex touch-pan-x flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-1 no-scrollbar">
           {tags.map((item) => (
             <button
               key={item}

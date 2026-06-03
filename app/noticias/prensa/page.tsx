@@ -65,7 +65,7 @@ export default function NoticiasPrensaPage() {
             className="rounded-2xl border border-[#214C9B]/25 bg-white px-4 py-3 text-slate-800 outline-none placeholder:text-slate-400 focus:border-[#214C9B]"
           />
         </div>
-        <div className="-mx-1 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+        <div className="-mx-1 flex touch-pan-x flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-1 no-scrollbar">
           {tags.map((item) => (
             <button
               key={item}
@@ -107,12 +107,12 @@ export default function NoticiasPrensaPage() {
         <div className="overflow-hidden rounded-2xl border border-[#214C9B]/20 bg-white">
           <div className="divide-y divide-slate-100 md:hidden">
             {archivePagination.paginatedItems.map((item) => (
-              <article key={item.id} className="p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="min-w-0 break-words text-sm font-extrabold leading-snug text-slate-900">{item.title}</h3>
-                  <span className="shrink-0 text-right text-[11px] font-bold uppercase text-slate-500">{item.date}</span>
+              <article key={item.id} className="p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="min-w-0 line-clamp-2 text-[13px] font-extrabold leading-snug text-slate-900">{item.title}</h3>
+                  <span className="shrink-0 text-right text-[10px] font-bold uppercase text-slate-500">{item.date}</span>
                 </div>
-                <p className="mt-2 text-xs font-bold uppercase tracking-[0.06em] text-[#214C9B]">{item.source}</p>
+                <p className="mt-1.5 text-[10px] font-bold uppercase tracking-[0.06em] text-[#214C9B]">{item.source}</p>
               </article>
             ))}
           </div>

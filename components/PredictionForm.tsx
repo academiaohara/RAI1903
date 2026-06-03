@@ -54,7 +54,7 @@ function outcomeButtonClass({
   selected: boolean;
 }): string {
   const base =
-    "h-10 flex-1 rounded-xl border text-base font-extrabold transition disabled:cursor-not-allowed sm:h-12 sm:w-12 sm:flex-none sm:rounded-2xl sm:text-lg";
+    "h-9 flex-1 rounded-xl border text-sm font-extrabold transition disabled:cursor-not-allowed sm:h-12 sm:w-12 sm:flex-none sm:rounded-2xl sm:text-lg";
 
   if (mode === "results") {
     const isActual = actual === outcome;
@@ -201,11 +201,11 @@ export function PredictionForm({
 
   return (
     <>
-      <div className="rounded-xl border border-[#214C9B]/20 bg-white p-3 shadow-[0_10px_24px_rgba(17,24,39,0.05)] sm:rounded-2xl sm:p-4">
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:gap-4">
+      <div className="rounded-xl border border-[#214C9B]/20 bg-white p-2.5 shadow-[0_10px_24px_rgba(17,24,39,0.05)] sm:rounded-2xl sm:p-4">
+        <div className="flex flex-col gap-2.5 xl:flex-row xl:items-center xl:gap-4">
           <div className="min-w-0 flex-1">
-            <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-2">
-              <div className="flex min-w-0 items-center gap-1.5 rounded-lg bg-slate-50 p-2 sm:gap-2 sm:rounded-xl sm:bg-transparent sm:p-0">
+            <div className="flex flex-col items-stretch gap-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-2">
+              <div className="flex min-w-0 items-center gap-1 rounded-lg bg-slate-50 p-1.5 sm:gap-2 sm:rounded-xl sm:bg-transparent sm:p-0">
                 <TeamLink gender="masculino" teamId={match.homeTeamId} teamName={homeTeamName} className="shrink-0">
                   <OpponentCrest logo={homeCrest} opponent={homeTeamName} size="sm" className="shrink-0" />
                 </TeamLink>
@@ -213,7 +213,7 @@ export function PredictionForm({
                   gender="masculino"
                   teamId={match.homeTeamId}
                   teamName={homeTeamName}
-                  className="min-w-0 truncate text-xs font-extrabold leading-tight text-slate-800 sm:text-sm"
+                  className="min-w-0 truncate text-[11px] font-extrabold leading-tight text-slate-800 sm:text-sm"
                 >
                   {homeTeamName}
                 </TeamLink>
@@ -228,7 +228,7 @@ export function PredictionForm({
                 )}
               </div>
               <span className="hidden shrink-0 self-center text-xs font-bold uppercase text-slate-400 sm:inline">vs</span>
-              <div className="flex min-w-0 items-center gap-1.5 rounded-lg bg-slate-50 p-2 sm:gap-2 sm:rounded-xl sm:bg-transparent sm:p-0">
+              <div className="flex min-w-0 items-center gap-1 rounded-lg bg-slate-50 p-1.5 sm:gap-2 sm:rounded-xl sm:bg-transparent sm:p-0">
                 <TeamLink gender="masculino" teamId={match.awayTeamId} teamName={awayTeamName} className="shrink-0">
                   <OpponentCrest logo={awayCrest} opponent={awayTeamName} size="sm" className="shrink-0" />
                 </TeamLink>
@@ -236,7 +236,7 @@ export function PredictionForm({
                   gender="masculino"
                   teamId={match.awayTeamId}
                   teamName={awayTeamName}
-                  className="min-w-0 truncate text-xs font-extrabold leading-tight text-slate-800 sm:text-sm"
+                  className="min-w-0 truncate text-[11px] font-extrabold leading-tight text-slate-800 sm:text-sm"
                 >
                   {awayTeamName}
                 </TeamLink>
@@ -253,7 +253,7 @@ export function PredictionForm({
               {avilesMatch && previaHref ? (
                 <Link
                   href={previaHref}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#214C9B]/25 px-3 py-1.5 text-xs font-bold text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#214C9B]/25 px-2.5 py-1.5 text-[11px] font-bold text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50 sm:px-3 sm:text-xs"
                 >
                   <Eye size={14} /> Previa
                 </Link>
@@ -261,7 +261,7 @@ export function PredictionForm({
                 <button
                   type="button"
                   onClick={() => setPreviewOpen(true)}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#214C9B]/25 px-3 py-1.5 text-xs font-bold text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#214C9B]/25 px-2.5 py-1.5 text-[11px] font-bold text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50 sm:px-3 sm:text-xs"
                 >
                   <Eye size={14} /> Previa
                 </button>
@@ -280,7 +280,7 @@ export function PredictionForm({
             </div>
           </div>
 
-          <div className="flex shrink-0 flex-wrap items-center gap-2">
+          <div className="flex shrink-0 flex-wrap items-center gap-1.5 sm:gap-2">
             <div className="flex w-full items-center gap-2 sm:w-auto" aria-label="Prediccion 1 X 2">
               {outcomes.map((outcome) => {
                 const selected = userOutcome === outcome;
@@ -345,7 +345,7 @@ function ScorerCombobox({
   }, [options, query]);
 
   const inputClassName = cn(
-    "min-w-0 flex-1 rounded-xl border px-3 py-1.5 text-sm font-semibold outline-none transition disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-70",
+    "min-w-0 flex-1 rounded-xl border px-2.5 py-1.5 text-xs font-semibold outline-none transition disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-70 sm:px-3 sm:text-sm",
     mode === "results" && actualScorer
       ? "border-[#981915] bg-[#981915]/10 text-[#981915]"
       : mode === "compare" && isCorrect
@@ -376,8 +376,8 @@ function ScorerCombobox({
   };
 
   return (
-    <div ref={rootRef} className="relative flex w-full min-w-0 flex-col gap-2 sm:max-w-xs sm:flex-row sm:items-center">
-      <label htmlFor={inputId} className="shrink-0 text-sm font-bold text-slate-700">
+    <div ref={rootRef} className="relative flex w-full min-w-0 flex-col gap-1 sm:max-w-xs sm:flex-row sm:items-center sm:gap-2">
+      <label htmlFor={inputId} className="shrink-0 text-xs font-bold text-slate-700 sm:text-sm">
         Goleador:
       </label>
       <input
@@ -452,7 +452,7 @@ function goalsButtonClass({
   actual: GoalsPick | null;
 }): string {
   const base =
-    "h-8 w-8 rounded-lg border text-[11px] font-extrabold transition disabled:cursor-not-allowed sm:h-9 sm:w-9 sm:rounded-xl sm:text-xs";
+    "h-7 w-7 rounded-lg border text-[10px] font-extrabold transition disabled:cursor-not-allowed sm:h-9 sm:w-9 sm:rounded-xl sm:text-xs";
 
   const isUser = value === option;
   const isActual = actual === option;
@@ -503,7 +503,7 @@ function GoalsPickButtons({
   const resolvedActual = actual ?? null;
 
   return (
-    <div className="ml-auto grid shrink-0 grid-cols-4 gap-1 sm:ml-0 sm:flex" aria-label="Goles">
+    <div className="ml-auto grid shrink-0 grid-cols-4 gap-0.5 sm:ml-0 sm:flex sm:gap-1" aria-label="Goles">
       {goalOptions.map((option) => (
         <button
           key={String(option)}

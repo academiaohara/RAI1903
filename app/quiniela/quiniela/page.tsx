@@ -182,7 +182,7 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
         )}
 
         {hydrated && isSaved && finishedMatches > 0 && (
-          <p className="mb-4 text-sm font-bold text-slate-700">
+          <p className="mb-3 text-xs font-bold text-slate-700 sm:mb-4 sm:text-sm">
             Aciertos:{" "}
             <span className="text-[#214C9B]">
               {hits} de {finishedMatches}
@@ -192,7 +192,7 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
         )}
 
         {hydrated && showCompare && (
-          <div className="mb-4 flex flex-wrap gap-4 text-xs font-bold uppercase tracking-wide text-slate-600">
+          <div className="mb-3 flex flex-wrap gap-3 text-[10px] font-bold uppercase tracking-wide text-slate-600 sm:mb-4 sm:gap-4 sm:text-xs">
             <span className="inline-flex items-center gap-2">
               <span className="h-3 w-3 rounded bg-[#214C9B]" aria-hidden />
               Tu pronostico
@@ -204,7 +204,7 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
           </div>
         )}
 
-        <div className="space-y-4">
+        <div className="space-y-2.5 sm:space-y-4">
           {orderedMatches.map((match) => (
             <PredictionForm
               key={match.id}
@@ -217,7 +217,7 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
           ))}
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2 border-t border-[#214C9B]/15 pt-4 sm:mt-6 sm:gap-3 sm:pt-5">
+        <div className="mt-4 flex flex-wrap gap-2 border-t border-[#214C9B]/15 pt-3 sm:mt-6 sm:gap-3 sm:pt-5">
           {canSave && (
             <button
               type="button"

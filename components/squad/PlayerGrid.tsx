@@ -27,7 +27,7 @@ export function PlayerGrid({
   const isFichas = variant === "fichas";
 
   const content = (
-    <div className="space-y-10">
+    <div className="space-y-7 sm:space-y-10">
       {SQUAD_POSITIONS.map((position, sectionIndex) => {
         const list = grouped[position];
         if (list.length === 0 && !showEmptyPositions) return null;
@@ -37,8 +37,8 @@ export function PlayerGrid({
             <div
               className={
                 isFichas
-                  ? "grid auto-rows-fr grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6"
-                  : "grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                  ? "grid auto-rows-fr grid-cols-3 gap-1.5 sm:grid-cols-4 sm:gap-2 md:grid-cols-5 lg:grid-cols-6"
+                  : "grid auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4"
               }
             >
               {list.length === 0 ? (

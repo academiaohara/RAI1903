@@ -280,18 +280,18 @@ function PlayerMobileRow({
   }
 
   const statLine = [
-    `PJ ${player.partidos}`,
-    `G ${player.goles}`,
-    `A ${player.asistencias}`,
+    `PJ${player.partidos}`,
+    `G${player.goles}`,
+    `A${player.asistencias}`,
     ...(showMarketValue && player.valorMercado ? [player.valorMercado] : []),
-  ].join(" · ");
+  ].join(" ");
 
   const content = (
     <>
-      <span className="w-5 shrink-0 text-center text-[11px] font-extrabold tabular-nums text-[#214C9B]">{player.dorsal}</span>
-      <span className="min-w-0 flex-1 truncate text-[11px] font-extrabold uppercase text-slate-900">{getPlayerFullName(player)}</span>
+      <span className="w-4 shrink-0 text-center text-[10px] font-extrabold tabular-nums text-[#214C9B] sm:w-5 sm:text-[11px]">{player.dorsal}</span>
+      <span className="min-w-0 flex-1 truncate text-[10px] font-extrabold uppercase text-slate-900 sm:text-[11px]">{getPlayerFullName(player)}</span>
       <span className="hidden shrink-0 text-[10px] font-semibold text-slate-500 sm:inline">{metaParts.join(" · ")}</span>
-      <span className="shrink-0 text-[9px] font-bold tabular-nums text-slate-600 sm:text-[10px]">{statLine}</span>
+      <span className="max-w-[6.75rem] shrink-0 truncate text-right text-[8.5px] font-bold tabular-nums text-slate-600 sm:max-w-none sm:text-[10px]">{statLine}</span>
     </>
   );
 
