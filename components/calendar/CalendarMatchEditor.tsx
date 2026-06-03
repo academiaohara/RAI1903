@@ -74,7 +74,11 @@ export function CalendarMatchEditor({
   const teams = useMemo(() => fixtureEditorTeamOptions(bundles, gender), [bundles, gender]);
 
   const savePatch = (patch: MatchResultOverride) => {
-    saveValue(`match-result:${match.id}`, { ...override, ...patch });
+    const next: MatchResultOverride = { ...patch };
+    if (next.homeScore !== undefined && next.awayScore !== undefined) {
+      next.status = "finished";
+    }
+    saveValue(`match-result:${match.id}`, { ...override, ...next });
   };
 
   const onHomeTeamChange = (teamId: string) => {

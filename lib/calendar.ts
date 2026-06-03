@@ -1,4 +1,5 @@
 import { getAvilesMatchesByGender, getRaiTeamId, getTeamsByGender } from "@/lib/fixtures";
+import { isMatchPlayed } from "@/lib/match-result";
 import { getTeamCrest, getTeamCrestById } from "@/lib/team-crests";
 import { defaultCronicaId, defaultPreviaId } from "@/lib/match-article-factory";
 import { getCronicaForMatch, getPreviaForMatch } from "@/lib/match-articles";
@@ -20,7 +21,7 @@ function formatKickoffTime(date: string): string | null {
 }
 
 function avilesResult(match: Match, raiId: string): string | null {
-  if (match.status !== "finished" || match.homeScore === undefined || match.awayScore === undefined) {
+  if (!isMatchPlayed(match) || match.homeScore === undefined || match.awayScore === undefined) {
     return null;
   }
 
@@ -50,7 +51,7 @@ export function matchToCalendarMatch(
   const rival = getTeamsByGender(gender).find((team) => team.id === rivalId);
   const cronica = articles?.getCronica?.(match.id, gender) ?? getCronicaForMatch(match.id, gender);
   const previa = articles?.getPrevia?.(match.id, gender) ?? getPreviaForMatch(match.id, gender);
-  const played = match.status === "finished";
+  const played = isMatchPlayed(match);
   const hasTime = !NO_TIME_COMPETITIONS.has(match.competition);
   const opponentLogo = rival
     ? getTeamCrest(rival)

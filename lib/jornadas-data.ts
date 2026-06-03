@@ -13,6 +13,7 @@ import {
 } from "@/lib/season/fixture-source";
 import { utcDateInputValue } from "@/lib/calendar-match-overrides";
 import { PLACEHOLDER_MATCH_DATE } from "@/lib/competition/normalize-fixtures";
+import { isMatchPlayed } from "@/lib/match-result";
 import { getTeam } from "@/lib/fixtures";
 import { getLastPlayedLeagueRound } from "@/lib/standings";
 import type { Match, Matchday } from "@/types";
@@ -75,7 +76,7 @@ function matchToFixture(
     status: match.status,
     homeScore: match.homeScore,
     awayScore: match.awayScore,
-    kickoffTime: match.status === "scheduled" ? extractKickoffTime(match.date) : undefined,
+    kickoffTime: !isMatchPlayed(match) ? extractKickoffTime(match.date) : undefined,
   };
 }
 

@@ -1,5 +1,6 @@
 import { matchToCalendarMatch } from "@/lib/calendar";
 import { getTeamByGender } from "@/lib/fixtures";
+import { isMatchPlayed } from "@/lib/match-result";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { CalendarMatch, Match } from "@/types";
 
@@ -46,7 +47,7 @@ export function calendarMatchToMatch(calendarMatch: CalendarMatch): Match {
     competition: calendarMatch.competition,
     competitionStage: calendarMatch.competitionStage,
     venue: calendarMatch.venue,
-    status: calendarMatch.played ? "finished" : "scheduled",
+    status: isMatchPlayed(calendarMatch) ? "finished" : "scheduled",
     homeScore: calendarMatch.homeScore,
     awayScore: calendarMatch.awayScore,
   };
@@ -99,6 +100,17 @@ export function applyMatchResultOverride(
   }
   if (patch.awayTeamId && !patch.awayTeam) {
     merged.awayTeam = resolveTeamLabel(patch.awayTeamId, merged.awayTeam, gender, resolveName);
+  }
+
+  if (patch.homeScore !== undefined && patch.awayScore !== undefined) {
+    merged.status = "finished";
+  }
+
+  if (patch.status === "scheduled") {
+    merged.homeScore = undefined;
+    merged.awayScore = undefined;
+  } else if (isMatchPlayed(merged) && merged.status !== "finished") {
+    merged.status = "finished";
   }
 
   return merged;
