@@ -1,11 +1,15 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { useCallback } from "react";
 import { useSeasonOptional } from "@/components/season/SeasonProvider";
 import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
+import { deleteMediaRaiVideoOverrides } from "@/lib/cms/inline-overrides";
 import {
+  collectMediaRaiVideos,
   fanVideosStorageKey,
   isDefaultFanVideoTitle,
+  isLegacyMediaRaiVideoKey,
   newFanVideo,
   sortFanVideosByDate,
 } from "@/lib/fan-videos";
@@ -43,10 +47,30 @@ export function ZonaMixtaVideoShowcase({
 }: ZonaMixtaVideoShowcaseProps) {
   const seasonContext = useSeasonOptional();
   const seasonId = seasonContext?.viewedSeasonId ?? DEFAULT_COMPETITION_SEASON_ID;
-  const { editMode, getValue, saveValue, getOverride, clearValue } = useInlineEditing();
+  const isGlobalMediaRai = !gender;
+  const { editMode, getValue, saveValue, clearValue, overrides } = useInlineEditing();
   const storageKey = fanVideosStorageKey(section, seasonId, gender);
-  const hasCustomList = getOverride<FanYouTubeVideo[]>(storageKey) !== undefined;
-  const currentVideos = getValue(storageKey, videos);
+
+  const collected = isGlobalMediaRai ? collectMediaRaiVideos(section, overrides, videos) : null;
+  const hasCustomList = isGlobalMediaRai
+    ? collected!.hasCustomList || overrides[storageKey] !== undefined
+    : overrides[storageKey] !== undefined;
+
+  const currentVideos = isGlobalMediaRai
+    ? ((overrides[storageKey] as FanYouTubeVideo[] | undefined) ?? collected!.videos)
+    : getValue(storageKey, videos);
+
+  const restoreDefaultVideos = useCallback(() => {
+    if (isGlobalMediaRai) {
+      clearValue(storageKey);
+      for (const key of Object.keys(overrides)) {
+        if (isLegacyMediaRaiVideoKey(key, section)) clearValue(key);
+      }
+      void deleteMediaRaiVideoOverrides(section);
+      return;
+    }
+    clearValue(storageKey);
+  }, [clearValue, isGlobalMediaRai, overrides, section, storageKey]);
   const sorted = sortFanVideosByDate(currentVideos);
   const resolved = sorted.map(resolveVideo).filter((video): video is NonNullable<typeof video> => video !== null);
   const unresolved = sorted.filter((video) => resolveVideo(video) === null);
@@ -117,7 +141,7 @@ export function ZonaMixtaVideoShowcase({
               {hasCustomList && (
                 <button
                   type="button"
-                  onClick={() => clearValue(storageKey)}
+                  onClick={restoreDefaultVideos}
                   className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-extrabold uppercase text-slate-600 hover:bg-slate-50"
                 >
                   Restaurar lista por defecto

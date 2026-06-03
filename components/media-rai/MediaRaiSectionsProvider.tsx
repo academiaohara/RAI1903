@@ -10,8 +10,8 @@ import {
   type ReactNode,
 } from "react";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
-import { useSeason } from "@/components/season/SeasonProvider";
 import { upsertInlineOverride } from "@/lib/cms/inline-overrides";
+import { MEDIA_RAI_INLINE_SEASON_ID } from "@/lib/fan-videos";
 import {
   DEFAULT_MEDIA_RAI_SECTIONS,
   MEDIA_RAI_SECTIONS_KEY,
@@ -46,7 +46,6 @@ function writeLocalSections(sections: MediaRaiSectionEntry[]) {
 
 export function MediaRaiSectionsProvider({ children }: { children: ReactNode }) {
   const { getValue, ready } = useInlineEditing();
-  const { activeSeasonId } = useSeason();
   const [sections, setSectionsState] = useState<MediaRaiSectionEntry[]>(DEFAULT_MEDIA_RAI_SECTIONS);
   const [hydrated, setHydrated] = useState(false);
 
@@ -75,8 +74,8 @@ export function MediaRaiSectionsProvider({ children }: { children: ReactNode }) 
       return { ok: true };
     }
 
-    return upsertInlineOverride(MEDIA_RAI_SECTIONS_KEY, normalized, null, activeSeasonId);
-  }, [activeSeasonId]);
+    return upsertInlineOverride(MEDIA_RAI_SECTIONS_KEY, normalized, null, MEDIA_RAI_INLINE_SEASON_ID);
+  }, []);
 
   const value = useMemo<MediaRaiSectionsContextValue>(
     () => ({
