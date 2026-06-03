@@ -1,12 +1,11 @@
 "use client";
 
 import { useMemo } from "react";
-import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { RAI_TEAM_ID } from "@/data/mock";
 import { getCompetitionConfigBundle, leagueRoundCount } from "@/lib/cms/competition-config-bundle";
 import { getTeamsBundle, mergeTeamsWithCms } from "@/lib/cms/teams-bundle";
-import { applyMatchdayOverrides } from "@/lib/fixture-overrides";
+import { useEditedMatchdays } from "@/hooks/useEditedMatchdays";
 import { filterQuinielaMatchdays } from "@/lib/quiniela";
 import { getLeagueMatchdaysEnriched } from "@/lib/season/enriched-fixtures";
 import { getTeamsForRfefGrupo } from "@/lib/rfef-grupos";
@@ -17,13 +16,16 @@ import type { Matchday, Team } from "@/types";
 /** Partidos de liga del Grupo I (donde juega el Real Avilés) para la quiniela. */
 export function useQuinielaSeason() {
   const { getEnrichedFixtureSource, viewedSeasonId, bundles, bundlesLoading } = useSeason();
-  const { getOverride } = useInlineEditing();
   const fixtureSource = useMemo(() => getEnrichedFixtureSource("masculino"), [getEnrichedFixtureSource]);
-  const matchdays = useMemo(() => {
-    const league = getLeagueMatchdaysEnriched(fixtureSource, "masculino");
-    const withOverrides = applyMatchdayOverrides(league, getOverride, "masculino");
-    return filterQuinielaMatchdays(withOverrides);
-  }, [fixtureSource, getOverride]);
+  const baseMatchdays = useMemo(
+    () => getLeagueMatchdaysEnriched(fixtureSource, "masculino"),
+    [fixtureSource],
+  );
+  const editedMatchdays = useEditedMatchdays(baseMatchdays, "masculino");
+  const matchdays = useMemo(
+    () => filterQuinielaMatchdays(editedMatchdays),
+    [editedMatchdays],
+  );
   const teams = useMemo(() => {
     const base = getTeamsForRfefGrupo("1");
     return mergeTeamsWithCms(base, getTeamsBundle(bundles, "masculino"));

@@ -14,6 +14,7 @@ import { hasMultipleGrupos, zonesToLegacyConfig } from "@/lib/cms/competition-co
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { getTeamsByGender } from "@/lib/fixtures";
 import { useSeason } from "@/components/season/SeasonProvider";
+import { useEditedMatchdays, useEditedMatches } from "@/hooks/useEditedMatchdays";
 import {
   getAvilesMatchesFromSource,
   getCopaDelReyMatchesFromSource,
@@ -23,6 +24,7 @@ import {
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import { getPlayedLeagueRounds } from "@/lib/standings";
+import { isMatchPlayed } from "@/lib/match-result";
 import type { Route } from "next";
 import type { Match } from "@/types";
 
@@ -48,11 +50,14 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
     () => getLeagueMatchdaysForGender(fixtureSource, gender),
     [fixtureSource, gender],
   );
-  const matchdaysGrupo2 = useMemo(() => getGrupo2Matchdays(fixtureSource), [fixtureSource]);
-  const avilesMatches = useMemo(
+  const baseMatchdaysGrupo2 = useMemo(() => getGrupo2Matchdays(fixtureSource), [fixtureSource]);
+  const editedLeagueMatchdays = useEditedMatchdays(leagueMatchdays, gender);
+  const editedMatchdaysGrupo2 = useEditedMatchdays(baseMatchdaysGrupo2, gender);
+  const baseAvilesMatches = useMemo(
     () => getAvilesMatchesFromSource(fixtureSource, gender),
     [fixtureSource, gender],
   );
+  const avilesMatches = useEditedMatches(baseAvilesMatches, gender);
   const copaMatches = useMemo(
     () => getCopaDelReyMatchesFromSource(fixtureSource, gender),
     [fixtureSource, gender],
@@ -67,15 +72,20 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
     }
     return getTeamsByGender(gender);
   }, [bundles, gender, grupo, isMasculino]);
-  const standingsMatchdays = isMasculino
+  const tableMatchdays = isMasculino
     ? grupo === "2"
-      ? matchdaysGrupo2
+      ? baseMatchdaysGrupo2
       : leagueMatchdays
     : leagueMatchdays;
+  const editedStandingsMatchdays = isMasculino
+    ? grupo === "2"
+      ? editedMatchdaysGrupo2
+      : editedLeagueMatchdays
+    : editedLeagueMatchdays;
   const multiGrupo = hasMultipleGrupos(competitionConfig);
   const showAvilesSidebar = !isMasculino || !multiGrupo || grupo === "1";
-  const finishedAviles = avilesMatches.filter((match) => match.status === "finished");
-  const scheduledAviles = avilesMatches.filter((match) => match.status === "scheduled");
+  const finishedAviles = avilesMatches.filter((match) => isMatchPlayed(match));
+  const scheduledAviles = avilesMatches.filter((match) => !isMatchPlayed(match));
   const latest = [...finishedAviles]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5);
@@ -96,13 +106,13 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
 
   const lastGrupoJornada = useMemo(() => {
     if (showAvilesSidebar) return null;
-    const playedRounds = getPlayedLeagueRounds(standingsMatchdays);
+    const playedRounds = getPlayedLeagueRounds(editedStandingsMatchdays);
     const lastRound = playedRounds[playedRounds.length - 1];
     if (!lastRound) return null;
-    const matchday = standingsMatchdays.find((round) => round.round === lastRound);
+    const matchday = editedStandingsMatchdays.find((round) => round.round === lastRound);
     if (!matchday) return null;
     return { round: lastRound, matches: matchday.matches };
-  }, [showAvilesSidebar, standingsMatchdays]);
+  }, [showAvilesSidebar, editedStandingsMatchdays]);
 
   return (
     <div className="space-y-6">
@@ -161,7 +171,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
               key={`${gender}-${grupo}`}
               eyebrow="Liga"
               sourceTeams={teams}
-              matchdays={standingsMatchdays}
+              matchdays={tableMatchdays}
               highlightTeamId={showAvilesSidebar ? highlightTeamId : ""}
               centerOnHighlight={showAvilesSidebar}
               compact
