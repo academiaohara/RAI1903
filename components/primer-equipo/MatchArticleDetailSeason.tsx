@@ -17,6 +17,7 @@ import {
 import { buildMatchDetail, getMatchForArticle } from "@/lib/match-detail";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { findMatchInBundles } from "@/lib/season/find-match-in-bundles";
+import { getLeagueMatchdaysForGender } from "@/lib/season/aviles-matches";
 
 type MatchArticleDetailSeasonProps = {
   gender: PrimerEquipoGender;
@@ -24,7 +25,7 @@ type MatchArticleDetailSeasonProps = {
 };
 
 export function MatchArticleDetailSeason({ gender, articleId }: MatchArticleDetailSeasonProps) {
-  const { bundles, bundlesLoading } = useSeason();
+  const { bundles, bundlesLoading, getFixtureSource } = useSeason();
   const { getOverride } = useInlineEditing();
   const { getById } = useSeasonMatchArticles();
   const cmsTeams = useMemo(() => getTeamsBundle(bundles, gender)?.teams ?? [], [bundles, gender]);
@@ -58,12 +59,17 @@ export function MatchArticleDetailSeason({ gender, articleId }: MatchArticleDeta
       : buildPlaceholderUpcomingMatch(match, gender);
   }, [articleId, findMatch, gender, getById]);
 
+  const leagueMatchdays = useMemo(
+    () => getLeagueMatchdaysForGender(getFixtureSource(gender), gender),
+    [gender, getFixtureSource],
+  );
+
   const detail = useMemo(() => {
     if (!article || article.gender !== gender) return null;
     const match = findMatch(article.matchId) ?? getMatchForArticle(article);
     if (!match) return null;
-    return buildMatchDetail(match, article.gender);
-  }, [article, findMatch, gender]);
+    return buildMatchDetail(match, article.gender, { leagueMatchdays });
+  }, [article, findMatch, gender, leagueMatchdays]);
 
   if (bundlesLoading) {
     return (

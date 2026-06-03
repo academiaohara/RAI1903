@@ -1,6 +1,8 @@
-import { players, playersFemenino } from "@/data/mock";
-import { matchCompetitionShortLabel } from "@/lib/competition-labels";
+import { matchdays, matchdaysFemenino, players, playersFemenino } from "@/data/mock";
+import { isLeagueCompetition, matchCompetitionShortLabel } from "@/lib/competition-labels";
 import { getMatchById, getRaiTeamId, getTeamMatches } from "@/lib/fixtures";
+import { isMatchPlayed } from "@/lib/match-result";
+import { getMatchesBeforeRound, leagueRoundForMatch } from "@/lib/standings";
 import type {
   FormCode,
   Match,
@@ -8,9 +10,15 @@ import type {
   MatchAvailabilityPlayer,
   MatchDetail,
   MatchLineup,
+  Matchday,
   PrimerEquipoGender,
   RecentFormMatch,
 } from "@/types";
+
+export type BuildMatchDetailOptions = {
+  /** Jornadas de liga de la temporada (CMS o mock). Si faltan, se usa el calendario mock del género. */
+  leagueMatchdays?: Matchday[];
+};
 
 const EMPTY_LINEUP: MatchLineup = { formation: "", starters: [], bench: [] };
 
@@ -62,18 +70,52 @@ function buildAvailability(teamId: string, gender: PrimerEquipoGender): MatchAva
     }));
 }
 
-export function buildMatchDetail(match: Match, gender: PrimerEquipoGender): MatchDetail {
-  const homeRecent = getTeamMatches(match.homeTeamId)
-    .filter((item) => item.status === "finished" && item.id !== match.id)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 5)
-    .map((item) => toRecentFormMatch(match.homeTeamId, item));
+function resolveLeagueMatchdays(gender: PrimerEquipoGender, options?: BuildMatchDetailOptions): Matchday[] {
+  if (options?.leagueMatchdays?.length) return options.leagueMatchdays;
+  return gender === "femenino" ? matchdaysFemenino : matchdays;
+}
 
-  const awayRecent = getTeamMatches(match.awayTeamId)
-    .filter((item) => item.status === "finished" && item.id !== match.id)
+/** Ultimos 5 partidos del equipo antes del partido de referencia (en liga: jornadas anteriores a la suya). */
+export function collectTeamRecentMatchesForPrevia(
+  teamId: string,
+  referenceMatch: Match,
+  gender: PrimerEquipoGender,
+  options?: BuildMatchDetailOptions,
+): Match[] {
+  if (isLeagueCompetition(referenceMatch.competition)) {
+    const beforeRound = leagueRoundForMatch(referenceMatch);
+    return getMatchesBeforeRound(resolveLeagueMatchdays(gender, options), beforeRound)
+      .filter((item) => item.homeTeamId === teamId || item.awayTeamId === teamId)
+      .filter((item) => isMatchPlayed(item) && item.id !== referenceMatch.id)
+      .filter((item) => isLeagueCompetition(item.competition) && item.competition === referenceMatch.competition)
+      .sort((a, b) => {
+        const roundDiff = leagueRoundForMatch(b) - leagueRoundForMatch(a);
+        if (roundDiff !== 0) return roundDiff;
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      })
+      .slice(0, 5);
+  }
+
+  const referenceTime = new Date(referenceMatch.date).getTime();
+  return getTeamMatches(teamId)
+    .filter((item) => isMatchPlayed(item) && item.id !== referenceMatch.id)
+    .filter((item) => new Date(item.date).getTime() < referenceTime)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 5)
-    .map((item) => toRecentFormMatch(match.awayTeamId, item));
+    .slice(0, 5);
+}
+
+export function buildMatchDetail(
+  match: Match,
+  gender: PrimerEquipoGender,
+  options?: BuildMatchDetailOptions,
+): MatchDetail {
+  const homeRecent = collectTeamRecentMatchesForPrevia(match.homeTeamId, match, gender, options).map((item) =>
+    toRecentFormMatch(match.homeTeamId, item),
+  );
+
+  const awayRecent = collectTeamRecentMatchesForPrevia(match.awayTeamId, match, gender, options).map((item) =>
+    toRecentFormMatch(match.awayTeamId, item),
+  );
 
   const homeLineup = EMPTY_LINEUP;
   const awayLineup = EMPTY_LINEUP;
