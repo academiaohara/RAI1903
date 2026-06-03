@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, ListOrdered, Megaphone, Shirt, Star, Target } from "lucide-react";
+import { BarChart3, Clapperboard, ListOrdered, Megaphone, Shirt, Star, Target } from "lucide-react";
 import { useMemo, useState } from "react";
 import { MatchArticleNewsLinker } from "@/components/editor/MatchArticleNewsLinker";
 import { MatchArticleClubNewsBlock } from "@/components/match-articles/MatchArticleClubNewsBlock";
@@ -12,6 +12,7 @@ import { MatchEventsPanel } from "@/components/match-center/MatchEventsPanel";
 import { MatchLineupsPanel } from "@/components/match-center/MatchLineupsPanel";
 import { useMatchDetailOverrides } from "@/components/match-center/useMatchDetailOverrides";
 import { MatchPressPanel } from "@/components/match-center/MatchPressPanel";
+import { MatchResumenPanel } from "@/components/match-center/MatchResumenPanel";
 import { MatchRatingsPanel } from "@/components/match-center/MatchRatingsPanel";
 import { getRaiTeamId } from "@/lib/fixtures";
 import { hasMatchLineups } from "@/lib/match-lineups";
@@ -34,6 +35,7 @@ const FINISHED_TABS_BASE = [
   { id: "previa", label: "Previa", icon: Target },
   { id: "valoraciones", label: "Valoraciones", icon: Star },
   { id: "prensa", label: "Post partido", icon: Megaphone },
+  { id: "resumen", label: "Resumen", icon: Clapperboard },
 ] as const;
 
 const UPCOMING_PREVIA_TAB = { id: "previa", label: "Previa", icon: Target } as const;
@@ -139,6 +141,7 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
       return <MatchRatingsPanel key={`${resolvedDetail.match.id}-ratings`} detail={resolvedDetail} />;
     }
     if (activeTab === "prensa") return <MatchPressPanel detail={resolvedDetail} />;
+    if (activeTab === "resumen") return <MatchResumenPanel detail={resolvedDetail} />;
     return null;
   })();
 

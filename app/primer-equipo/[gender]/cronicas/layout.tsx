@@ -1,6 +1,4 @@
-import { SectionTabs } from "@/components/SectionTabs";
-import { getCronicasTabs } from "@/lib/cronicas";
-import { isPrimerEquipoGender, type PrimerEquipoGender } from "@/lib/primer-equipo";
+import { isPrimerEquipoGender } from "@/lib/primer-equipo";
 import { notFound } from "next/navigation";
 
 export default async function CronicasLayout({
@@ -13,10 +11,5 @@ export default async function CronicasLayout({
   const { gender } = await params;
   if (!isPrimerEquipoGender(gender)) notFound();
 
-  return (
-    <div className="space-y-6">
-      <SectionTabs tabs={getCronicasTabs(gender as PrimerEquipoGender)} />
-      {children}
-    </div>
-  );
+  return <div className="space-y-6">{children}</div>;
 }
