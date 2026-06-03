@@ -15,6 +15,7 @@ import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { getTeamsByGender } from "@/lib/fixtures";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useEditedMatchdays, useEditedMatches } from "@/hooks/useEditedMatchdays";
+import { resolveClubTeamIds } from "@/lib/season/club-team-ids";
 import {
   getAvilesMatchesFromSource,
   getCopaDelReyMatchesFromSource,
@@ -53,11 +54,6 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
   const baseMatchdaysGrupo2 = useMemo(() => getGrupo2Matchdays(fixtureSource), [fixtureSource]);
   const editedLeagueMatchdays = useEditedMatchdays(leagueMatchdays, gender);
   const editedMatchdaysGrupo2 = useEditedMatchdays(baseMatchdaysGrupo2, gender);
-  const baseAvilesMatches = useMemo(
-    () => getAvilesMatchesFromSource(fixtureSource, gender),
-    [fixtureSource, gender],
-  );
-  const avilesMatches = useEditedMatches(baseAvilesMatches, gender);
   const copaMatches = useMemo(
     () => getCopaDelReyMatchesFromSource(fixtureSource, gender),
     [fixtureSource, gender],
@@ -72,6 +68,12 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
     }
     return getTeamsByGender(gender);
   }, [bundles, gender, grupo, isMasculino]);
+  const clubTeamIds = useMemo(() => resolveClubTeamIds(bundles, gender, grupo), [bundles, gender, grupo]);
+  const baseAvilesMatches = useMemo(
+    () => getAvilesMatchesFromSource(fixtureSource, gender, { clubTeamIds }),
+    [fixtureSource, gender, clubTeamIds],
+  );
+  const avilesMatches = useEditedMatches(baseAvilesMatches, gender);
   const tableMatchdays = isMasculino
     ? grupo === "2"
       ? baseMatchdaysGrupo2

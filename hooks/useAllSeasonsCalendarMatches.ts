@@ -10,6 +10,7 @@ import { getTeamsBundle, resolveFixtureTeamDisplayName } from "@/lib/cms/teams-b
 import { fetchSeasonBundles } from "@/lib/cms/season-bundles";
 import type { CmsSeason } from "@/lib/cms/seasons";
 import { applyMatchInlineOverride } from "@/lib/fixture-overrides";
+import { resolveClubTeamIds } from "@/lib/season/club-team-ids";
 import { getAvilesMatchesFromSource } from "@/lib/season/aviles-matches";
 import { enrichFixtureSource } from "@/lib/season/enriched-fixtures";
 import { fixtureSourceFromBundles } from "@/lib/season/fixture-source";
@@ -36,7 +37,8 @@ function mergeCalendarMatchesFromBundles(
     const resolveTeamName = (teamId: string, fallback: string) =>
       resolveFixtureTeamDisplayName(teamId, fallback, cmsTeams, map, gender);
     const source = enrichFixtureSource(fixtureSourceFromBundles(map, gender), map, gender);
-    const aviles = getAvilesMatchesFromSource(source, gender, { mapMatch });
+    const clubTeamIds = resolveClubTeamIds(map, gender);
+    const aviles = getAvilesMatchesFromSource(source, gender, { mapMatch, clubTeamIds });
     const rows = getCalendarMatchesFromSource(aviles, gender, { ...articles, resolveTeamName });
     for (const row of rows) {
       byId.set(row.id, row);
@@ -68,15 +70,17 @@ export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
     [getOverride, gender, resolveTeamName],
   );
 
+  const clubTeamIds = useMemo(() => resolveClubTeamIds(bundles, gender), [bundles, gender]);
+
   const seasonMatches = useMemo(() => {
     const source = getEnrichedFixtureSource(gender);
-    const aviles = getAvilesMatchesFromSource(source, gender, { mapMatch });
+    const aviles = getAvilesMatchesFromSource(source, gender, { mapMatch, clubTeamIds });
     return getCalendarMatchesFromSource(aviles, gender, {
       getForMatch,
       crestMap,
       resolveTeamName,
     });
-  }, [gender, getForMatch, getEnrichedFixtureSource, crestMap, mapMatch, resolveTeamName]);
+  }, [gender, getForMatch, getEnrichedFixtureSource, crestMap, mapMatch, resolveTeamName, clubTeamIds]);
 
   useEffect(() => {
     if (!needsMultiSeasonFetch) return;
