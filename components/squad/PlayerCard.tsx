@@ -155,8 +155,8 @@ function PlayerFichaCard({
   const canQuickEdit = editMode && onQuickUpdate;
 
   const articleClass = canQuickEdit
-    ? "mx-auto w-full max-w-[11rem] overflow-hidden rounded-tl-xl rounded-br-xl rounded-tr-sm rounded-bl-sm border-2 border-dashed border-[#214C9B] bg-gradient-to-b from-sky-100 via-blue-50/90 to-white shadow-[0_6px_18px_rgba(33,76,155,0.1)] sm:max-w-none"
-    : "mx-auto w-full max-w-[11rem] overflow-hidden rounded-tl-xl rounded-br-xl rounded-tr-sm rounded-bl-sm border-2 border-[#214C9B] bg-gradient-to-b from-sky-100 via-blue-50/90 to-white shadow-[0_6px_18px_rgba(33,76,155,0.1)] transition-shadow group-hover:shadow-[0_10px_24px_rgba(33,76,155,0.18)] sm:max-w-none";
+    ? "mx-auto flex h-full w-full max-w-[11rem] flex-col overflow-hidden rounded-tl-xl rounded-br-xl rounded-tr-sm rounded-bl-sm border-2 border-dashed border-[#214C9B] bg-gradient-to-b from-sky-100 via-blue-50/90 to-white shadow-[0_6px_18px_rgba(33,76,155,0.1)] sm:max-w-none"
+    : "mx-auto flex h-full w-full max-w-[11rem] flex-col overflow-hidden rounded-tl-xl rounded-br-xl rounded-tr-sm rounded-bl-sm border-2 border-[#214C9B] bg-gradient-to-b from-sky-100 via-blue-50/90 to-white shadow-[0_6px_18px_rgba(33,76,155,0.1)] transition-shadow group-hover:shadow-[0_10px_24px_rgba(33,76,155,0.18)] sm:max-w-none";
 
   const photoBlock = (
     <div className="relative aspect-[3/4] overflow-hidden">
@@ -193,13 +193,13 @@ function PlayerFichaCard({
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.03, duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full"
+        className="h-full w-full"
       >
         <article className={articleClass}>
-          <button type="button" onClick={() => onSelect(player)} className="block w-full text-left">
+          <button type="button" onClick={() => onSelect(player)} className="flex min-h-0 flex-1 flex-col text-left">
             {photoBlock}
-            <div className="bg-[#214C9B] px-2 py-1.5">
-              <p className="line-clamp-2 text-center text-[11px] font-bold leading-tight text-white sm:text-xs">
+            <div className="mt-auto min-h-[2rem] shrink-0 bg-[#214C9B] px-1.5 py-1 sm:px-2 sm:py-1.5">
+              <p className="truncate text-center text-[10px] font-bold leading-tight text-white sm:text-xs">
                 {displayName}
               </p>
             </div>
@@ -230,12 +230,12 @@ function PlayerFichaCard({
       whileHover={{ y: -4 }}
       whileTap={{ scale: 0.99 }}
       onClick={() => onSelect(player)}
-      className="group w-full text-left"
+      className="group h-full w-full text-left"
     >
       <article className={articleClass}>
         {photoBlock}
-        <div className="rounded-br-[0.65rem] bg-[#214C9B] px-2 py-1.5">
-          <p className="line-clamp-2 text-center text-[11px] font-bold leading-tight text-white sm:text-xs">{displayName}</p>
+        <div className="mt-auto min-h-[2rem] shrink-0 rounded-br-[0.65rem] bg-[#214C9B] px-1.5 py-1 sm:px-2 sm:py-1.5">
+          <p className="truncate text-center text-[10px] font-bold leading-tight text-white sm:text-xs">{displayName}</p>
         </div>
       </article>
     </motion.button>

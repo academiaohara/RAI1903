@@ -54,7 +54,7 @@ function outcomeButtonClass({
   selected: boolean;
 }): string {
   const base =
-    "h-12 flex-1 rounded-2xl border text-lg font-extrabold transition disabled:cursor-not-allowed sm:w-12 sm:flex-none";
+    "h-10 flex-1 rounded-xl border text-base font-extrabold transition disabled:cursor-not-allowed sm:h-12 sm:w-12 sm:flex-none sm:rounded-2xl sm:text-lg";
 
   if (mode === "results") {
     const isActual = actual === outcome;
@@ -201,11 +201,11 @@ export function PredictionForm({
 
   return (
     <>
-      <div className="rounded-2xl border border-[#214C9B]/20 bg-white p-4 shadow-[0_10px_24px_rgba(17,24,39,0.05)]">
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
+      <div className="rounded-xl border border-[#214C9B]/20 bg-white p-3 shadow-[0_10px_24px_rgba(17,24,39,0.05)] sm:rounded-2xl sm:p-4">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:gap-4">
           <div className="min-w-0 flex-1">
-            <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4">
-              <div className="flex min-w-0 items-center gap-2 rounded-xl bg-slate-50 p-3 sm:bg-transparent sm:p-0">
+            <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-2">
+              <div className="flex min-w-0 items-center gap-1.5 rounded-lg bg-slate-50 p-2 sm:gap-2 sm:rounded-xl sm:bg-transparent sm:p-0">
                 <TeamLink gender="masculino" teamId={match.homeTeamId} teamName={homeTeamName} className="shrink-0">
                   <OpponentCrest logo={homeCrest} opponent={homeTeamName} size="sm" className="shrink-0" />
                 </TeamLink>
@@ -213,7 +213,7 @@ export function PredictionForm({
                   gender="masculino"
                   teamId={match.homeTeamId}
                   teamName={homeTeamName}
-                  className="min-w-0 truncate font-extrabold leading-tight text-slate-800"
+                  className="min-w-0 truncate text-xs font-extrabold leading-tight text-slate-800 sm:text-sm"
                 >
                   {homeTeamName}
                 </TeamLink>
@@ -227,8 +227,8 @@ export function PredictionForm({
                   />
                 )}
               </div>
-              <span className="self-center shrink-0 text-xs font-bold uppercase text-slate-400">vs</span>
-              <div className="flex min-w-0 items-center gap-2 rounded-xl bg-slate-50 p-3 sm:bg-transparent sm:p-0">
+              <span className="hidden shrink-0 self-center text-xs font-bold uppercase text-slate-400 sm:inline">vs</span>
+              <div className="flex min-w-0 items-center gap-1.5 rounded-lg bg-slate-50 p-2 sm:gap-2 sm:rounded-xl sm:bg-transparent sm:p-0">
                 <TeamLink gender="masculino" teamId={match.awayTeamId} teamName={awayTeamName} className="shrink-0">
                   <OpponentCrest logo={awayCrest} opponent={awayTeamName} size="sm" className="shrink-0" />
                 </TeamLink>
@@ -236,7 +236,7 @@ export function PredictionForm({
                   gender="masculino"
                   teamId={match.awayTeamId}
                   teamName={awayTeamName}
-                  className="min-w-0 truncate font-extrabold leading-tight text-slate-800"
+                  className="min-w-0 truncate text-xs font-extrabold leading-tight text-slate-800 sm:text-sm"
                 >
                   {awayTeamName}
                 </TeamLink>
@@ -452,7 +452,7 @@ function goalsButtonClass({
   actual: GoalsPick | null;
 }): string {
   const base =
-    "h-9 w-9 rounded-xl border text-xs font-extrabold transition disabled:cursor-not-allowed sm:w-9";
+    "h-8 w-8 rounded-lg border text-[11px] font-extrabold transition disabled:cursor-not-allowed sm:h-9 sm:w-9 sm:rounded-xl sm:text-xs";
 
   const isUser = value === option;
   const isActual = actual === option;

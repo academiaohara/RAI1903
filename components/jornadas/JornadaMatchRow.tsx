@@ -111,7 +111,7 @@ export function JornadaMatchRow({
 
   const nameClass = (isHighlight: boolean) =>
     cn(
-      "min-w-0 truncate text-sm font-extrabold",
+      "min-w-0 truncate text-[11px] font-extrabold sm:text-sm",
       isHighlight ? (highlighted ? "text-[#981915]" : "text-[#214C9B]") : "text-slate-800",
     );
 
@@ -163,7 +163,7 @@ export function JornadaMatchRow({
   return (
     <article
       className={cn(
-        "grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 rounded-2xl border p-3 sm:gap-3 sm:p-4",
+        "grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1 rounded-xl border p-2 sm:gap-3 sm:rounded-2xl sm:p-4",
         highlighted
           ? "border-[#981915]/40 bg-gradient-to-br from-[#981915]/6 via-white to-[#214C9B]/5 shadow-[0_10px_28px_rgba(152,25,21,0.12)]"
           : "border-[#214C9B]/12 bg-slate-50/80",
@@ -249,7 +249,7 @@ export function JornadaMatchRow({
       ) : (
         <div
           className={cn(
-            "min-w-[4.5rem] rounded-xl px-3 py-2 text-center text-sm font-extrabold tabular-nums",
+            "min-w-[3.25rem] rounded-lg px-2 py-1 text-center text-xs font-extrabold tabular-nums sm:min-w-[4.5rem] sm:rounded-xl sm:px-3 sm:py-2 sm:text-sm",
             highlighted ? "bg-[#981915] text-white shadow-sm" : "bg-[#214C9B] text-white",
           )}
         >

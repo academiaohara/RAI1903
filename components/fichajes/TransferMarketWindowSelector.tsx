@@ -56,7 +56,7 @@ export function TransferMarketWindowSelector({
       >
         <ChevronLeft size={16} aria-hidden />
       </button>
-      <span className="min-w-[8.5rem] px-1 text-center text-[10px] font-bold uppercase tracking-normal text-[#214C9B] sm:min-w-[9rem] sm:px-2 sm:text-xs">
+      <span className="max-w-[5.5rem] truncate px-1 text-center text-[10px] font-bold uppercase tracking-normal text-[#214C9B] sm:max-w-none sm:min-w-[9rem] sm:px-2 sm:text-xs">
         {current.label}
       </span>
       <button

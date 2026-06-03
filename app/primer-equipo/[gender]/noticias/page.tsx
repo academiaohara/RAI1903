@@ -41,13 +41,13 @@ export default function PrimerEquipoNoticiasPage({ params }: { params: Promise<{
         description={`Actualidad del primer equipo ${genderLabels[gender].club.toLowerCase()} filtrada por categorias.`}
       />
 
-      <div className="flex flex-wrap gap-2">
+      <div className="-mx-1 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
         {tags.map((item) => (
           <button
             key={item}
             type="button"
             onClick={() => setTag(item)}
-            className={`rounded-full border px-3 py-2 text-xs font-bold uppercase tracking-normal transition ${tag === item ? "border-[#214C9B] bg-[#214C9B] text-white" : "border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50"}`}
+            className={`shrink-0 rounded-full border px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-normal transition sm:px-3 sm:py-2 sm:text-xs ${tag === item ? "border-[#214C9B] bg-[#214C9B] text-white" : "border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50"}`}
           >
             {item}
           </button>

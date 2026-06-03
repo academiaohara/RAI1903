@@ -188,9 +188,9 @@ export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
 
   if (showEmptySlots) {
     return (
-      <div className="space-y-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm font-bold uppercase text-[#214C9B]">Mercado blanquiazul</p>
+      <div className="space-y-2 sm:space-y-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+          <p className="text-xs font-bold uppercase text-[#214C9B] sm:text-sm">Mercado blanquiazul</p>
           <Link
             href={"/fichajes" as Route}
             className="hidden text-xs font-bold uppercase tracking-wide text-[#981915] transition hover:underline sm:inline"
@@ -204,10 +204,10 @@ export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
           onChange={handleModeChange}
           options={MODE_OPTIONS}
           layoutId="transfers-carousel-mode"
-          className="text-[10px] sm:text-xs"
+          className="text-[9px] sm:text-xs"
         />
 
-        <div className="flex gap-4 overflow-x-auto py-1 no-scrollbar">
+        <div className="flex gap-2 overflow-x-auto py-1 no-scrollbar sm:gap-4">
           {Array.from({ length: EMPTY_TRANSFER_FICHA_SLOT_COUNT }, (_, index) => (
             <TransferFichaCardPlaceholder key={`empty-slot-${index}`} />
           ))}
@@ -224,9 +224,9 @@ export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm font-bold uppercase text-[#214C9B]">Mercado blanquiazul</p>
+    <div className="space-y-2 sm:space-y-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+        <p className="text-xs font-bold uppercase text-[#214C9B] sm:text-sm">Mercado blanquiazul</p>
         <Link
           href={"/fichajes" as Route}
           className="hidden text-xs font-bold uppercase tracking-wide text-[#981915] transition hover:underline sm:inline"
@@ -240,7 +240,7 @@ export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
         onChange={handleModeChange}
         options={MODE_OPTIONS}
         layoutId="transfers-carousel-mode"
-        className="text-[10px] sm:text-xs"
+        className="text-[9px] sm:text-xs"
       />
 
       <div
@@ -256,7 +256,7 @@ export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
       >
         <div
           ref={trackRef}
-          className={`flex gap-4${
+          className={`flex gap-2 sm:gap-4${
             useTicker
               ? ` w-max${!manualScroll ? " news-ticker-track" : ""}`
               : " w-full justify-start"

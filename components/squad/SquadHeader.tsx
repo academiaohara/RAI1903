@@ -20,16 +20,16 @@ export function SquadHeader({ club, stats, gender, onStadiumClick }: SquadHeader
 
   return (
     <div className="flex w-full flex-col items-start gap-5">
-      <div className="flex w-full min-w-0 flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
-        <div className="flex w-full min-w-0 flex-col items-start gap-4 text-left sm:w-auto sm:flex-row sm:items-center sm:gap-5 sm:text-left">
-          <div className="relative h-16 w-16 shrink-0 sm:h-20 sm:w-20">
+      <div className="flex w-full min-w-0 flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+        <div className="flex w-full min-w-0 flex-row items-center gap-3 text-left sm:w-auto sm:gap-5">
+          <div className="relative h-12 w-12 shrink-0 sm:h-20 sm:w-20">
             <Image src={club.escudo} alt={club.nombre} width={80} height={80} className="h-full w-full object-contain" priority />
           </div>
-          <div className="min-w-0">
-            <h1 className="break-words text-2xl font-extrabold uppercase tracking-tight text-slate-950 sm:text-4xl">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-lg font-extrabold uppercase leading-tight tracking-tight text-slate-950 sm:break-words sm:text-4xl">
               {club.nombre}
             </h1>
-            <p className="mt-2 text-sm font-semibold text-slate-700 sm:text-base">
+            <p className="mt-1 text-xs font-semibold text-slate-700 sm:mt-2 sm:text-base">
               <span className="text-slate-500">Entrenador:</span>{" "}
               <EditableText
                 storageKey={`squad-club:${gender}:entrenador`}
@@ -38,7 +38,7 @@ export function SquadHeader({ club, stats, gender, onStadiumClick }: SquadHeader
                 inputClassName="text-sm font-semibold text-slate-800"
               />
             </p>
-            <p className="mt-2 text-xs font-semibold text-slate-500">Temporada {club.temporada}</p>
+            <p className="mt-1 text-[10px] font-semibold text-slate-500 sm:mt-2 sm:text-xs">Temporada {club.temporada}</p>
           </div>
         </div>
 

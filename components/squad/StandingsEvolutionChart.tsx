@@ -84,8 +84,8 @@ export function StandingsEvolutionChart({ teamId = RAI_TEAM_ID, className }: Sta
       className={className}
       borderlessHeader
       action={
-        <p className="text-sm font-bold text-slate-600">
-          Posición actual:{" "}
+        <p className="text-[11px] font-bold leading-snug text-slate-600 sm:text-sm">
+          <span className="text-slate-500">Pos. actual:</span>{" "}
           <span className="text-[#214C9B]">
             {lastPoint.position}º · J{lastPoint.round}
           </span>
@@ -189,7 +189,7 @@ export function StandingsEvolutionChart({ teamId = RAI_TEAM_ID, className }: Sta
         )}
       </div>
 
-      <ul className="mt-4 flex flex-wrap gap-4 text-[11px] font-bold text-slate-600">
+      <ul className="mt-3 flex flex-wrap gap-x-3 gap-y-1.5 text-[10px] font-bold text-slate-600 sm:mt-4 sm:gap-4 sm:text-[11px]">
         <li className="flex items-center gap-2">
           <span className="h-2.5 w-2.5 rounded-sm bg-emerald-500/80" aria-hidden />
           Ascenso directo

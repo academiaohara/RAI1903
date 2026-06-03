@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { CalendarListView } from "@/components/CalendarListView";
 import { CalendarMatchCell } from "@/components/CalendarMatchCell";
@@ -58,9 +58,21 @@ export function TeamCalendar({
   const showCrests = showCrestsProp ?? gender !== "femenino";
   const listData = listMatches ?? matches;
   const initial = initialViewDate();
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [viewMode, setViewMode] = useState<CalendarViewMode>(listOnly ? "lista" : "mes");
   const [viewYear, setViewYear] = useState(initial.year);
   const [viewMonth, setViewMonth] = useState(initial.month);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 767px)");
+    const sync = () => setIsMobileViewport(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, []);
+
+  const forceListView = listOnly || isMobileViewport;
+  const effectiveViewMode: CalendarViewMode = forceListView ? "lista" : viewMode;
 
   const bounds = useMemo(
     () => getCalendarNavigationBounds([...matches, ...listData], seasonIds),
@@ -94,10 +106,10 @@ export function TeamCalendar({
 
   return (
     <div className={cn("space-y-4", className)}>
-      {!listOnly ? (
+      {!forceListView ? (
         <div className="space-y-3">
           <CalendarViewToggle value={viewMode} onChange={setViewMode} />
-          {viewMode === "mes" ? (
+          {effectiveViewMode === "mes" ? (
             <div className="flex items-center justify-center gap-1 sm:gap-2" role="group" aria-label="Navegación del calendario">
               <button
                 type="button"
@@ -128,7 +140,7 @@ export function TeamCalendar({
         </div>
       ) : null}
 
-      {viewMode === "lista" ? (
+      {effectiveViewMode === "lista" ? (
         <CalendarListView
           key="lista"
           matches={listData}

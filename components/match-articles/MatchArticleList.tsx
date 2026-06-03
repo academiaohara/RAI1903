@@ -42,10 +42,10 @@ function MatchArticleCard({
   const typeLabel = article.type === "cronica" ? "Crónica" : "Previa";
   const content = (
     <>
-      <p className="text-xs font-bold uppercase tracking-normal text-slate-500">
+      <p className="text-[10px] font-bold uppercase tracking-normal text-slate-500 sm:text-xs">
         {typeLabel} · {formatDate(article.date)} · {article.source}
       </p>
-      <h2 className="mt-2 text-lg font-extrabold uppercase text-[#214C9B]">
+      <h2 className="mt-1.5 text-sm font-extrabold uppercase leading-snug text-[#214C9B] sm:mt-2 sm:text-lg">
         <EditableText
           storageKey={`match-article:${article.id}:title`}
           value={article.title}
@@ -53,7 +53,7 @@ function MatchArticleCard({
           inputClassName="font-extrabold uppercase"
         />
       </h2>
-      <p className="mt-2 text-sm leading-6 text-slate-600">
+      <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-slate-600 sm:mt-2 sm:text-sm sm:leading-6">
         <EditableText
           storageKey={`match-article:${article.id}:excerpt`}
           value={article.excerpt}
@@ -67,7 +67,7 @@ function MatchArticleCard({
 
   if (editMode) {
     return (
-      <article className="rounded-2xl border border-[#214C9B]/20 bg-white p-4">
+      <article className="rounded-xl border border-[#214C9B]/20 bg-white p-3 sm:rounded-2xl sm:p-4">
         {content}
         <MatchArticleNewsLinker article={article} newsItems={newsItems} />
         <Link
@@ -84,7 +84,7 @@ function MatchArticleCard({
   return (
     <Link
       href={href}
-      className="block rounded-2xl border border-[#214C9B]/20 bg-white p-4 transition hover:border-[#214C9B] hover:bg-blue-50"
+      className="block rounded-xl border border-[#214C9B]/20 bg-white p-3 transition hover:border-[#214C9B] hover:bg-blue-50 sm:rounded-2xl sm:p-4"
     >
       {content}
     </Link>

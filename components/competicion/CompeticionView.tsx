@@ -117,8 +117,8 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
   return (
     <div className="space-y-6">
       {isMasculino && (
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
             <QuinielaViewToggle
               value={panel}
               onChange={setPanel}
@@ -130,7 +130,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
               <GrupoSwitcher value={grupo} onChange={setGrupo} className="w-fit shrink-0 self-start sm:self-auto" />
             )}
           </div>
-          <p className="text-sm font-bold text-slate-600">
+          <p className="text-xs font-bold text-slate-600 sm:text-sm">
             <EditableText
               storageKey={`competition:${gender}:${panel}:${grupo}:label`}
               value={competitionLabel}
@@ -185,7 +185,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
               {showAvilesSidebar && (
                 <>
                   <Card eyebrow="Forma reciente" title="Ultimos resultados" borderlessHeader>
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                       {latest.length > 0 ? (
                         latest.map((match) => (
                           <MatchCard key={match.id} match={match} compact highlightTeamId={highlightTeamId} gender={gender} />
@@ -257,12 +257,12 @@ function CopaDelReyPanel({
     >
       {matches.length > 0 ? (
         <div className="space-y-5">
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
             <CupStat label="Partidos" value={matches.length.toString()} />
             <CupStat label="Victorias" value={wins.toString()} />
             <CupStat label="Estado" value={status} />
           </div>
-          <div className="grid gap-3 lg:grid-cols-2">
+          <div className="grid gap-2 sm:gap-3 lg:grid-cols-2">
             {matches.map((match) => (
               <MatchCard key={match.id} match={match} highlightTeamId={highlightTeamId} gender={gender} />
             ))}
@@ -277,9 +277,9 @@ function CopaDelReyPanel({
 
 function CupStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[#214C9B]/15 bg-white p-4 shadow-[0_8px_24px_rgba(17,24,39,0.05)]">
-      <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-slate-500">{label}</p>
-      <p className="mt-1 text-lg font-extrabold text-[#214C9B]">{value}</p>
+    <div className="rounded-xl border border-[#214C9B]/15 bg-white p-2.5 shadow-[0_8px_24px_rgba(17,24,39,0.05)] sm:rounded-2xl sm:p-4">
+      <p className="text-[9px] font-bold uppercase tracking-[0.08em] text-slate-500 sm:text-[11px] sm:tracking-[0.1em]">{label}</p>
+      <p className="mt-0.5 truncate text-sm font-extrabold text-[#214C9B] sm:mt-1 sm:text-lg">{value}</p>
     </div>
   );
 }

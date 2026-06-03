@@ -32,9 +32,11 @@ export function MatchCard({
 
   return (
     <article className={matchFixtureCardClassName}>
-      <div className="mb-1 flex items-start justify-between gap-2">
-        <Badge tone={editedMatch.status === "finished" ? "slate" : "blue"}>{editedMatch.status === "finished" ? "Finalizado" : "Programado"}</Badge>
-        <span className="flex shrink-0 items-center justify-end gap-1.5 text-right text-[11px] font-bold uppercase leading-tight tracking-[0.06em] text-[#981915]">
+      <div className="mb-0.5 flex items-start justify-between gap-1 sm:mb-1 sm:gap-2">
+        <Badge tone={editedMatch.status === "finished" ? "slate" : "blue"} className="text-[9px] sm:text-[10px]">
+          {editedMatch.status === "finished" ? "Finalizado" : "Programado"}
+        </Badge>
+        <span className="flex shrink-0 items-center justify-end gap-1 text-right text-[9px] font-bold uppercase leading-tight tracking-[0.04em] text-[#981915] sm:gap-1.5 sm:text-[11px] sm:tracking-[0.06em]">
           <CompetitionLogo competition={editedMatch.competition} alt={matchCompetitionShortLabel(editedMatch)} size="xs" />
           {matchFixtureMeta(editedMatch)}
         </span>
