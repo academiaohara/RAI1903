@@ -187,7 +187,7 @@ export function JornadaMatchRow({
       </div>
 
       {editMode ? (
-        <div className="min-w-[8rem] rounded-xl border border-[#214C9B]/20 bg-white p-2 text-center shadow-sm">
+        <div className="relative z-[1] min-w-[8rem] rounded-xl border border-[#214C9B]/20 bg-white p-2 text-center shadow-sm">
           <select
             value={editedFixture.status}
             onChange={(event) => {

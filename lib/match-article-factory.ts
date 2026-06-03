@@ -26,6 +26,12 @@ export function defaultPreviaId(matchId: string, gender: PrimerEquipoGender = "m
   return defaultCronicaId(matchId, gender);
 }
 
+export function matchIdFromCronicaArticleId(articleId: string, gender: PrimerEquipoGender = "masculino"): string | null {
+  const prefix = `${matchArticleIdPrefix(gender)}cronica-`;
+  if (!articleId.startsWith(prefix)) return null;
+  return articleId.slice(prefix.length);
+}
+
 export function matchIdFromPreviaArticleId(articleId: string, gender: PrimerEquipoGender = "masculino"): string | null {
   const prefix = `${matchArticleIdPrefix(gender)}previa-`;
   if (!articleId.startsWith(prefix)) return null;
