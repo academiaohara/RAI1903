@@ -26,6 +26,9 @@ type LeagueTableCardProps = {
   toolbar?: ReactNode;
   gender?: PrimerEquipoGender;
   zoneLegend?: StandingsLegendItem[];
+  showCrests?: boolean;
+  showLegend?: boolean;
+  isClubHighlight?: (team: Team) => boolean;
 };
 
 export function LeagueTableCard({
@@ -41,6 +44,9 @@ export function LeagueTableCard({
   toolbar,
   gender = "masculino",
   zoneLegend,
+  showCrests,
+  showLegend,
+  isClubHighlight,
 }: LeagueTableCardProps) {
   const modalTeams = fullTeams ?? teams;
   const [open, setOpen] = useState(false);
@@ -71,6 +77,9 @@ export function LeagueTableCard({
           compact={compact}
           gender={gender}
           zoneLegend={zoneLegend}
+          showCrests={showCrests}
+          showLegend={showLegend}
+          isClubHighlight={isClubHighlight}
         />
       </Card>
 
@@ -80,6 +89,9 @@ export function LeagueTableCard({
           highlightTeamId={highlightTeamId}
           gender={gender}
           zoneLegend={zoneLegend}
+          showCrests={showCrests}
+          showLegend={showLegend}
+          isClubHighlight={isClubHighlight}
         />
       </Modal>
     </>
