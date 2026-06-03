@@ -22,11 +22,11 @@ function formatPointLabel(round: number, position: number) {
 }
 
 export function StandingsEvolutionChart({ teamId = RAI_TEAM_ID, className }: StandingsEvolutionChartProps) {
-  const { teams, leagueMatchdays } = useMasculinoLeagueSeason();
+  const { teams, editedLeagueMatchdays } = useMasculinoLeagueSeason();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const points = useMemo(
-    () => getTeamStandingsEvolution(teamId, teams, leagueMatchdays),
-    [teamId, teams, leagueMatchdays],
+    () => getTeamStandingsEvolution(teamId, teams, editedLeagueMatchdays),
+    [teamId, teams, editedLeagueMatchdays],
   );
   const teamCount = teams.length;
   const zones = PRIMERA_RFEF_STANDINGS_ZONES;

@@ -3,26 +3,30 @@
 import { useMemo } from "react";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { RAI_TEAM_ID } from "@/data/mock";
+import { useEditedMatchdays, useEditedMatches } from "@/hooks/useEditedMatchdays";
 import {
   getAvilesMatchesFromSource,
   getLeagueMatchdaysForGender,
 } from "@/lib/season/aviles-matches";
 import { getTeamsForRfefGrupo } from "@/lib/rfef-grupos";
 import { getLastPlayedLeagueRound } from "@/lib/standings";
+import { isMatchPlayed } from "@/lib/match-result";
 import type { Match, Matchday, Team } from "@/types";
 
 export function useMasculinoLeagueSeason() {
   const { getFixtureSource, bundlesLoading } = useSeason();
   const fixtureSource = useMemo(() => getFixtureSource("masculino"), [getFixtureSource]);
-  const leagueMatchdays = useMemo(
+  const baseLeagueMatchdays = useMemo(
     () => getLeagueMatchdaysForGender(fixtureSource, "masculino"),
     [fixtureSource],
   );
+  const leagueMatchdays = useEditedMatchdays(baseLeagueMatchdays, "masculino");
   const teams = useMemo(() => getTeamsForRfefGrupo("1"), []);
-  const avilesMatches = useMemo(
+  const baseAvilesMatches = useMemo(
     () => getAvilesMatchesFromSource(fixtureSource, "masculino"),
     [fixtureSource],
   );
+  const avilesMatches = useEditedMatches(baseAvilesMatches, "masculino");
   const currentRound = useMemo(
     () => getLastPlayedLeagueRound(leagueMatchdays),
     [leagueMatchdays],
@@ -31,7 +35,7 @@ export function useMasculinoLeagueSeason() {
   const latestMatches = useMemo(
     () =>
       avilesMatches
-        .filter((match) => match.status === "finished")
+        .filter((match) => isMatchPlayed(match))
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         .slice(0, 5),
     [avilesMatches],
@@ -40,7 +44,7 @@ export function useMasculinoLeagueSeason() {
   const upcomingMatches = useMemo(
     () =>
       avilesMatches
-        .filter((match) => match.status === "scheduled")
+        .filter((match) => !isMatchPlayed(match))
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
         .slice(0, 5),
     [avilesMatches],
@@ -50,7 +54,8 @@ export function useMasculinoLeagueSeason() {
 
   return {
     teams,
-    leagueMatchdays,
+    leagueMatchdays: baseLeagueMatchdays,
+    editedLeagueMatchdays: leagueMatchdays,
     avilesMatches,
     latestMatches,
     upcomingMatches,
@@ -64,6 +69,7 @@ export function useMasculinoLeagueSeason() {
 export type MasculinoLeagueSeason = {
   teams: Team[];
   leagueMatchdays: Matchday[];
+  editedLeagueMatchdays: Matchday[];
   avilesMatches: Match[];
   latestMatches: Match[];
   upcomingMatches: Match[];

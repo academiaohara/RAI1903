@@ -1,4 +1,5 @@
 import { isLeagueCompetition, type LeagueCompetitionId } from "@/lib/competition-labels";
+import { isMatchPlayed } from "@/lib/match-result";
 import { RESULTADOS_2526_LAST_ROUND } from "@/lib/resultados-2526";
 import { sortStandingsByRfefRules } from "@/lib/rfef-rules/tiebreak";
 import type { LeagueTiebreakContext } from "@/lib/rfef-rules/types";
@@ -141,7 +142,7 @@ export function applyPositionZonesToTeams(teams: Team[], zones: StandingsZonesCo
 }
 
 export function matchToFinishedLeagueMatch(match: Match): FinishedLeagueMatch | null {
-  if (match.status !== "finished" || match.homeScore === undefined || match.awayScore === undefined) {
+  if (!isMatchPlayed(match) || match.homeScore === undefined || match.awayScore === undefined) {
     return null;
   }
   if (!isLeagueCompetition(match.competition)) return null;
@@ -298,7 +299,7 @@ export function getPlayedLeagueRounds(matchdays: Array<{ round: number; matches:
   const rounds = new Set<number>();
   for (const matchday of matchdays) {
     for (const match of matchday.matches) {
-      if (match.status !== "finished") continue;
+      if (!isMatchPlayed(match)) continue;
       const round = leagueRoundForMatch(match, matchday.round);
       if (round > 0) rounds.add(round);
     }

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { JornadaSelector } from "@/components/JornadaSelector";
 import { LeagueTableCard } from "@/components/LeagueTableCard";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
+import { useEditedMatchdays } from "@/hooks/useEditedMatchdays";
 import { PRIMERA_RFEF_RULES } from "@/lib/rfef-rules";
 import { getBalancedStandingsWindow } from "@/lib/standings-window";
 import {
@@ -63,9 +64,10 @@ export function StandingsLeagueTableCard({
   gender = "masculino",
   zoneRules,
 }: StandingsLeagueTableCardProps) {
+  const editedMatchdays = useEditedMatchdays(matchdays, gender);
   const zoneLegend: StandingsLegendItem[] | undefined = zoneRules ? buildZoneLegend(zoneRules) : undefined;
-  const playedRounds = useMemo(() => getPlayedLeagueRounds(matchdays), [matchdays]);
-  const lastPlayedRound = useMemo(() => getLastPlayedLeagueRound(matchdays), [matchdays]);
+  const playedRounds = useMemo(() => getPlayedLeagueRounds(editedMatchdays), [editedMatchdays]);
+  const lastPlayedRound = useMemo(() => getLastPlayedLeagueRound(editedMatchdays), [editedMatchdays]);
 
   const [jornadaOverride, setJornadaOverride] = useState<number | null>(null);
   const [venue, setVenue] = useState<StandingsVenue>("all");
@@ -74,7 +76,7 @@ export function StandingsLeagueTableCard({
   const qualifyingRound = qualifyingRoundAfterJornada(effectiveJornada);
 
   const fullTeams = useMemo(() => {
-    let base = getTeamsAtRound(sourceTeams, matchdays, qualifyingRound, zones, tiebreak, venue);
+    let base = getTeamsAtRound(sourceTeams, editedMatchdays, qualifyingRound, zones, tiebreak, venue);
     if (base.length > 0 && base.every((team) => team.stats.played === 0)) {
       base = [...base]
         .sort((a, b) => a.name.localeCompare(b.name, "es"))
@@ -83,7 +85,7 @@ export function StandingsLeagueTableCard({
     }
     if (zoneRules) base = applyCustomZoneColors(base, zoneRules);
     return base;
-  }, [sourceTeams, matchdays, qualifyingRound, zones, tiebreak, venue, zoneRules]);
+  }, [sourceTeams, editedMatchdays, qualifyingRound, zones, tiebreak, venue, zoneRules]);
 
   const tableTeams = useMemo(() => {
     if (centerOnHighlight && highlightTeamId) {
