@@ -478,7 +478,16 @@ function useHorizontalScrollHint(
 }
 
 const editorToolbarButtonClass =
-  "inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50";
+  "inline-flex shrink-0 items-center gap-1 rounded-full border border-[#214C9B]/20 px-2.5 py-1.5 text-[11px] font-extrabold uppercase leading-none text-[#214C9B] hover:bg-blue-50 sm:px-3 sm:py-1.5 sm:text-xs";
+
+const editorToolbarDangerButtonClass =
+  "inline-flex shrink-0 items-center gap-1 rounded-full border border-[#981915]/20 px-2.5 py-1.5 text-[11px] font-extrabold uppercase leading-none text-[#981915] hover:bg-red-50 sm:px-3 sm:py-1.5 sm:text-xs";
+
+const editorToolbarSaveButtonClass =
+  "inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-600/30 bg-emerald-50 px-2.5 py-1.5 text-[11px] font-extrabold uppercase leading-none text-emerald-800 hover:bg-emerald-100 disabled:opacity-60 sm:px-3 sm:py-1.5 sm:text-xs";
+
+const editorToolbarToggleClass =
+  "inline-flex shrink-0 items-center gap-1 rounded-full bg-[#214C9B] px-3 py-1.5 text-[11px] font-extrabold uppercase leading-none text-white shadow-lg shadow-blue-950/20 hover:bg-[#173a78] sm:px-4 sm:text-xs";
 
 export function InlineEditingToolbar() {
   const seasonContext = useSeasonOptional();
@@ -572,10 +581,10 @@ export function InlineEditingToolbar() {
         <CompetitionEditorPanel onClose={() => setCompetitionPanelOpen(false)} />
       )}
       {editMode && teamsPanelOpen && <TeamsEditorPanel onClose={() => setTeamsPanelOpen(false)} />}
-      <div className="relative min-w-0 sm:max-w-[min(100vw-2rem,42rem)]">
+      <div className="relative min-w-0 sm:max-w-[calc(100vw-2rem)]">
         {editMode && scrollHint.right && (
           <p
-            className="pointer-events-none absolute -top-5 right-0 z-10 flex items-center gap-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[#214C9B]/80"
+            className="pointer-events-none absolute -top-5 right-14 z-10 flex items-center gap-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[#214C9B]/80"
             aria-hidden
           >
             Desliza
@@ -584,149 +593,142 @@ export function InlineEditingToolbar() {
         )}
         {scrollHint.left && (
           <div
-            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-6 rounded-l-2xl bg-gradient-to-r from-white/95 to-transparent sm:rounded-l-full"
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-6 rounded-l-full bg-gradient-to-r from-white/95 to-transparent"
             aria-hidden
           />
         )}
         {scrollHint.right && (
           <div
-            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 rounded-r-2xl bg-gradient-to-l from-white/95 to-transparent sm:rounded-r-full"
+            className="pointer-events-none absolute inset-y-0 right-12 z-10 w-8 rounded-r-full bg-gradient-to-l from-white/95 to-transparent"
             aria-hidden
           />
         )}
-        <div
-          ref={toolbarScrollRef}
-          onWheel={handleToolbarWheel}
-          className="no-scrollbar flex min-w-0 touch-pan-x flex-nowrap items-center justify-start gap-2 overflow-x-auto overscroll-x-contain rounded-2xl border border-[#214C9B]/20 bg-white/95 p-2 shadow-2xl backdrop-blur sm:max-w-[min(100vw-2rem,42rem)] sm:flex-wrap sm:justify-end sm:rounded-full"
-        >
-          {editMode && (
-            <>
-              {!localOnly && (
+        {editMode ? (
+          <div className="flex min-w-0 items-center gap-1.5 rounded-full border border-[#214C9B]/20 bg-white/95 p-1.5 shadow-2xl backdrop-blur">
+            <div
+              ref={toolbarScrollRef}
+              onWheel={handleToolbarWheel}
+              className="no-scrollbar flex min-w-0 flex-1 touch-pan-x flex-nowrap items-center gap-1.5 overflow-x-auto overscroll-x-contain"
+            >
+                {!localOnly && (
+                  <button
+                    type="button"
+                    onClick={() => void handleSaveNow()}
+                    disabled={cloudSaving}
+                    className={editorToolbarSaveButtonClass}
+                  >
+                    <CloudUpload size={13} />
+                    {cloudSaving ? "Guardando…" : saveAck ? "Guardado" : "Guardar"}
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={() => void handleSaveNow()}
-                  disabled={cloudSaving}
-                  className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-600/30 bg-emerald-50 px-3 py-2 text-xs font-extrabold uppercase text-emerald-800 hover:bg-emerald-100 disabled:opacity-60"
-                >
-                  <CloudUpload size={14} />
-                  {cloudSaving ? "Guardando…" : saveAck ? "Guardado" : "Guardar en Supabase"}
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() => {
-                  closeEditorPanels();
-                  setSeasonPanelOpen((open) => !open);
-                }}
-                className={editorToolbarButtonClass}
-              >
-                Temporadas
-              </button>
-              {!isPlantillaPath(pathname) && (
-                <Link
-                  href={plantillaEditorLink(pathname)}
-                  onClick={closeEditorPanels}
+                  onClick={() => {
+                    closeEditorPanels();
+                    setSeasonPanelOpen((open) => !open);
+                  }}
                   className={editorToolbarButtonClass}
                 >
-                  <ExternalLink size={14} aria-hidden />
-                  Plantilla
-                </Link>
-              )}
-              <button
-                type="button"
-                onClick={() => {
-                  closeEditorPanels();
-                  setCompetitionPanelOpen((open) => !open);
-                }}
-                className={editorToolbarButtonClass}
-              >
-                Competición
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  closeEditorPanels();
-                  setTeamsPanelOpen((open) => !open);
-                }}
-                className={editorToolbarButtonClass}
-              >
-                Equipos
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  closeEditorPanels();
-                  setCrestPanelOpen((open) => !open);
-                }}
-                className={editorToolbarButtonClass}
-              >
-                Escudos
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  closeEditorPanels();
-                  setHomePanelOpen((open) => !open);
-                }}
-                className={editorToolbarButtonClass}
-              >
-                Inicio
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  closeEditorPanels();
-                  setMediaRaiPanelOpen((open) => !open);
-                }}
-                className={editorToolbarButtonClass}
-              >
-                Media RAI
-              </button>
-              {!isFichajesPath(pathname) && (
-                <Link href={EDITOR_PAGE_LINKS.fichajes} onClick={closeEditorPanels} className={editorToolbarButtonClass}>
-                  <ExternalLink size={14} aria-hidden />
-                  Mercado
-                </Link>
-              )}
-              {!isFilialPath(pathname) && (
-                <Link href={EDITOR_PAGE_LINKS.filial} onClick={closeEditorPanels} className={editorToolbarButtonClass}>
-                  <ExternalLink size={14} aria-hidden />
-                  Filial
-                </Link>
-              )}
-              {!isJuvenilPath(pathname) && (
-                <Link href={EDITOR_PAGE_LINKS.juvenil} onClick={closeEditorPanels} className={editorToolbarButtonClass}>
-                  <ExternalLink size={14} aria-hidden />
-                  Juvenil
-                </Link>
-              )}
-              <button
-                type="button"
-                onClick={() => void handleExport()}
-                className={editorToolbarButtonClass}
-              >
-                {copied ? <Check size={14} /> : <Clipboard size={14} />}
-                {copied ? "Copiado" : "Exportar"}
-              </button>
-              <button
-                type="button"
-                onClick={clearAll}
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#981915]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#981915] hover:bg-red-50"
-              >
-                <Trash2 size={14} />
-                Limpiar
-              </button>
-            </>
-          )}
-          <button
-            type="button"
-            onClick={() => setEditMode(!editMode)}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#214C9B] px-4 py-2 text-xs font-extrabold uppercase text-white shadow-lg shadow-blue-950/20 hover:bg-[#173a78]"
-          >
-            {editMode ? <X size={14} /> : <Pencil size={14} />}
-            {editMode ? "Salir" : "Editar"}
+                  Temporadas
+                </button>
+                {!isPlantillaPath(pathname) && (
+                  <Link
+                    href={plantillaEditorLink(pathname)}
+                    onClick={closeEditorPanels}
+                    className={editorToolbarButtonClass}
+                  >
+                    <ExternalLink size={13} aria-hidden />
+                    Plantilla
+                  </Link>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeEditorPanels();
+                    setCompetitionPanelOpen((open) => !open);
+                  }}
+                  className={editorToolbarButtonClass}
+                >
+                  Competición
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeEditorPanels();
+                    setTeamsPanelOpen((open) => !open);
+                  }}
+                  className={editorToolbarButtonClass}
+                >
+                  Equipos
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeEditorPanels();
+                    setCrestPanelOpen((open) => !open);
+                  }}
+                  className={editorToolbarButtonClass}
+                >
+                  Escudos
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeEditorPanels();
+                    setHomePanelOpen((open) => !open);
+                  }}
+                  className={editorToolbarButtonClass}
+                >
+                  Inicio
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeEditorPanels();
+                    setMediaRaiPanelOpen((open) => !open);
+                  }}
+                  className={editorToolbarButtonClass}
+                >
+                  Media RAI
+                </button>
+                {!isFichajesPath(pathname) && (
+                  <Link href={EDITOR_PAGE_LINKS.fichajes} onClick={closeEditorPanels} className={editorToolbarButtonClass}>
+                    <ExternalLink size={13} aria-hidden />
+                    Mercado
+                  </Link>
+                )}
+                {!isFilialPath(pathname) && (
+                  <Link href={EDITOR_PAGE_LINKS.filial} onClick={closeEditorPanels} className={editorToolbarButtonClass}>
+                    <ExternalLink size={13} aria-hidden />
+                    Filial
+                  </Link>
+                )}
+                {!isJuvenilPath(pathname) && (
+                  <Link href={EDITOR_PAGE_LINKS.juvenil} onClick={closeEditorPanels} className={editorToolbarButtonClass}>
+                    <ExternalLink size={13} aria-hidden />
+                    Juvenil
+                  </Link>
+                )}
+                <button type="button" onClick={() => void handleExport()} className={editorToolbarButtonClass}>
+                  {copied ? <Check size={13} /> : <Clipboard size={13} />}
+                  {copied ? "Copiado" : "Exportar"}
+                </button>
+                <button type="button" onClick={clearAll} className={editorToolbarDangerButtonClass}>
+                  <Trash2 size={13} />
+                  Limpiar
+                </button>
+            </div>
+            <button type="button" onClick={() => setEditMode(false)} className={editorToolbarToggleClass}>
+              <X size={13} />
+              Salir
+            </button>
+          </div>
+        ) : (
+          <button type="button" onClick={() => setEditMode(true)} className={editorToolbarToggleClass}>
+            <Pencil size={13} />
+            Editar
           </button>
-        </div>
+        )}
         {editMode && scrollHint.right && (
           <span className="sr-only">Desliza horizontalmente para ver más opciones del editor</span>
         )}
