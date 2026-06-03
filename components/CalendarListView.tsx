@@ -47,6 +47,7 @@ function resultLabel(match: CalendarMatch): string {
 }
 
 function timeLabel(match: CalendarMatch): string {
+  if (match.played) return "—";
   if (match.time) return match.time;
   const parsed = new Date(match.date);
   if (Number.isNaN(parsed.getTime())) return "—";

@@ -15,6 +15,7 @@ import { getJornadaTeam } from "@/lib/jornadas-data";
 import { getTeamCrestById } from "@/lib/team-crests";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { RfefGrupoId } from "@/lib/rfef-grupos";
+import { formatMatchScore, isMatchPlayed } from "@/lib/match-result";
 import { formatMatchDate } from "@/lib/utils";
 import type { JornadaFixture } from "@/types/jornadas";
 import { cn } from "@/lib/utils";
@@ -30,10 +31,10 @@ type JornadaMatchRowProps = {
 };
 
 function scoreOrTime(fixture: JornadaFixture): string {
-  if (fixture.status === "finished" && fixture.homeScore !== undefined && fixture.awayScore !== undefined) {
-    return `${fixture.homeScore} - ${fixture.awayScore}`;
+  if (isMatchPlayed(fixture) && fixture.homeScore !== undefined && fixture.awayScore !== undefined) {
+    return formatMatchScore(fixture.homeScore, fixture.awayScore);
   }
-  if (fixture.kickoffTime) return fixture.kickoffTime;
+  if (!isMatchPlayed(fixture) && fixture.kickoffTime) return fixture.kickoffTime;
   return formatMatchDate(fixture.date).split(",").pop()?.trim() ?? "—";
 }
 
@@ -63,7 +64,19 @@ export function JornadaMatchRow({
   }, [bundles, gender, grupo]);
 
   const savePatch = (patch: Partial<JornadaFixture>) => {
-    saveValue(`match-result:${fixture.id}`, { ...override, ...patch });
+    const next: Partial<JornadaFixture> = { ...patch };
+    if (next.homeScore !== undefined && next.awayScore !== undefined) {
+      next.status = "finished";
+      next.kickoffTime = undefined;
+    }
+    if (next.status === "finished") {
+      next.kickoffTime = undefined;
+    }
+    if (next.status === "scheduled") {
+      next.homeScore = undefined;
+      next.awayScore = undefined;
+    }
+    saveValue(`match-result:${fixture.id}`, { ...override, ...next });
   };
 
   const onTeamChange = (side: "home" | "away", teamId: string) => {

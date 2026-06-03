@@ -1,3 +1,4 @@
+import { formatMatchScore, isMatchPlayed } from "@/lib/match-result";
 import { formatMatchDate } from "@/lib/utils";
 import type { JornadaFixture } from "@/types/jornadas";
 import { cn } from "@/lib/utils";
@@ -9,10 +10,10 @@ type CanteraJornadaMatchRowProps = {
 };
 
 function scoreOrTime(fixture: JornadaFixture): string {
-  if (fixture.status === "finished" && fixture.homeScore !== undefined && fixture.awayScore !== undefined) {
-    return `${fixture.homeScore} - ${fixture.awayScore}`;
+  if (isMatchPlayed(fixture) && fixture.homeScore !== undefined && fixture.awayScore !== undefined) {
+    return formatMatchScore(fixture.homeScore, fixture.awayScore);
   }
-  if (fixture.kickoffTime) return fixture.kickoffTime;
+  if (!isMatchPlayed(fixture) && fixture.kickoffTime) return fixture.kickoffTime;
   return formatMatchDate(fixture.date).split(",").pop()?.trim() ?? "—";
 }
 
