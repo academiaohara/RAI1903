@@ -1,10 +1,20 @@
 "use client";
 
 import type { User } from "@supabase/supabase-js";
-import { Check, Clipboard, CloudUpload, ExternalLink, Pencil, Trash2, X } from "lucide-react";
+import { Check, ChevronRight, Clipboard, CloudUpload, ExternalLink, Pencil, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+  type WheelEvent,
+} from "react";
 import { useSeasonOptional } from "@/components/season/SeasonProvider";
 import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
 import { isEditorSession } from "@/lib/auth/editor";
@@ -428,6 +438,48 @@ export function useInlineEditing() {
   return context;
 }
 
+function useHorizontalScrollHint(
+  scrollRef: RefObject<HTMLDivElement | null>,
+  editMode: boolean,
+  pathname: string,
+) {
+  const [hint, setHint] = useState({ left: false, right: false });
+
+  const refresh = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) {
+      setHint({ left: false, right: false });
+      return;
+    }
+
+    const overflow = el.scrollWidth - el.clientWidth > 4;
+    setHint({
+      left: overflow && el.scrollLeft > 4,
+      right: overflow && el.scrollLeft < el.scrollWidth - el.clientWidth - 4,
+    });
+  }, [scrollRef]);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    refresh();
+    el.addEventListener("scroll", refresh, { passive: true });
+    const observer = new ResizeObserver(refresh);
+    observer.observe(el);
+
+    return () => {
+      el.removeEventListener("scroll", refresh);
+      observer.disconnect();
+    };
+  }, [editMode, pathname, refresh, scrollRef]);
+
+  return hint;
+}
+
+const editorToolbarButtonClass =
+  "inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50";
+
 export function InlineEditingToolbar() {
   const seasonContext = useSeasonOptional();
   const { canEdit, editMode, ready, localOnly, syncError, cloudSaving, saveNow, setEditMode, clearAll, exportJson } =
@@ -443,6 +495,18 @@ export function InlineEditingToolbar() {
   const [competitionPanelOpen, setCompetitionPanelOpen] = useState(false);
   const [teamsPanelOpen, setTeamsPanelOpen] = useState(false);
   const pathname = usePathname();
+  const toolbarScrollRef = useRef<HTMLDivElement>(null);
+  const scrollHint = useHorizontalScrollHint(toolbarScrollRef, editMode, pathname);
+
+  const handleToolbarWheel = (event: WheelEvent<HTMLDivElement>) => {
+    if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+
+    const list = event.currentTarget;
+    if (list.scrollWidth <= list.clientWidth) return;
+
+    event.preventDefault();
+    list.scrollLeft += event.deltaY;
+  };
 
   const closeEditorPanels = useCallback(() => {
     setSeasonPanelOpen(false);
@@ -482,10 +546,10 @@ export function InlineEditingToolbar() {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-[80] flex max-w-[calc(100vw-2rem)] flex-col items-end gap-2">
+    <div className="fixed bottom-0 left-0 right-0 z-[80] flex flex-col items-stretch gap-2 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 sm:bottom-4 sm:left-auto sm:right-4 sm:w-auto sm:max-w-[calc(100vw-2rem)] sm:items-end sm:px-0 sm:pb-0 sm:pt-0">
       {editMode && (
         <div
-          className={`max-w-xs rounded-2xl border bg-white/95 p-2 text-xs font-bold shadow-xl backdrop-blur ${
+          className={`rounded-2xl border bg-white/95 p-2 text-xs font-bold shadow-xl backdrop-blur sm:max-w-xs ${
             syncError ? "border-[#981915]/30 text-[#981915]" : "border-[#214C9B]/20 text-slate-600"
           }`}
         >
@@ -508,146 +572,164 @@ export function InlineEditingToolbar() {
         <CompetitionEditorPanel onClose={() => setCompetitionPanelOpen(false)} />
       )}
       {editMode && teamsPanelOpen && <TeamsEditorPanel onClose={() => setTeamsPanelOpen(false)} />}
-      <div className="flex flex-wrap justify-end gap-2 rounded-full border border-[#214C9B]/20 bg-white/95 p-2 shadow-2xl backdrop-blur">
-        {editMode && (
-          <>
-            {!localOnly && (
+      <div className="relative min-w-0 sm:max-w-[min(100vw-2rem,42rem)]">
+        {editMode && scrollHint.right && (
+          <p
+            className="pointer-events-none absolute -top-5 right-0 z-10 flex items-center gap-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[#214C9B]/80 sm:hidden"
+            aria-hidden
+          >
+            Desliza
+            <ChevronRight size={12} className="animate-pulse" aria-hidden />
+          </p>
+        )}
+        {scrollHint.left && (
+          <div
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-6 rounded-l-2xl bg-gradient-to-r from-white/95 to-transparent sm:rounded-l-full"
+            aria-hidden
+          />
+        )}
+        {scrollHint.right && (
+          <div
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 rounded-r-2xl bg-gradient-to-l from-white/95 to-transparent sm:rounded-r-full"
+            aria-hidden
+          />
+        )}
+        <div
+          ref={toolbarScrollRef}
+          onWheel={handleToolbarWheel}
+          className="no-scrollbar flex min-w-0 touch-pan-x flex-nowrap items-center gap-2 overflow-x-auto overscroll-x-contain rounded-2xl border border-[#214C9B]/20 bg-white/95 p-2 shadow-2xl backdrop-blur sm:max-w-[min(100vw-2rem,42rem)] sm:flex-wrap sm:justify-end sm:rounded-full"
+        >
+          {editMode && (
+            <>
+              {!localOnly && (
+                <button
+                  type="button"
+                  onClick={() => void handleSaveNow()}
+                  disabled={cloudSaving}
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-600/30 bg-emerald-50 px-3 py-2 text-xs font-extrabold uppercase text-emerald-800 hover:bg-emerald-100 disabled:opacity-60"
+                >
+                  <CloudUpload size={14} />
+                  {cloudSaving ? "Guardando…" : saveAck ? "Guardado" : "Guardar en Supabase"}
+                </button>
+              )}
               <button
                 type="button"
-                onClick={() => void handleSaveNow()}
-                disabled={cloudSaving}
-                className="inline-flex items-center gap-1.5 rounded-full border border-emerald-600/30 bg-emerald-50 px-3 py-2 text-xs font-extrabold uppercase text-emerald-800 hover:bg-emerald-100 disabled:opacity-60"
+                onClick={() => {
+                  closeEditorPanels();
+                  setSeasonPanelOpen((open) => !open);
+                }}
+                className={editorToolbarButtonClass}
               >
-                <CloudUpload size={14} />
-                {cloudSaving ? "Guardando…" : saveAck ? "Guardado" : "Guardar en Supabase"}
+                Temporadas
               </button>
-            )}
-            <button
-              type="button"
-              onClick={() => {
-                closeEditorPanels();
-                setSeasonPanelOpen((open) => !open);
-              }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
-            >
-              Temporadas
-            </button>
-            {!isPlantillaPath(pathname) && (
-              <Link
-                href={plantillaEditorLink(pathname)}
-                onClick={closeEditorPanels}
-                className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+              {!isPlantillaPath(pathname) && (
+                <Link
+                  href={plantillaEditorLink(pathname)}
+                  onClick={closeEditorPanels}
+                  className={editorToolbarButtonClass}
+                >
+                  <ExternalLink size={14} aria-hidden />
+                  Plantilla
+                </Link>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  closeEditorPanels();
+                  setCompetitionPanelOpen((open) => !open);
+                }}
+                className={editorToolbarButtonClass}
               >
-                <ExternalLink size={14} aria-hidden />
-                Plantilla
-              </Link>
-            )}
-            <button
-              type="button"
-              onClick={() => {
-                closeEditorPanels();
-                setCompetitionPanelOpen((open) => !open);
-              }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
-            >
-              Competición
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                closeEditorPanels();
-                setTeamsPanelOpen((open) => !open);
-              }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
-            >
-              Equipos
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                closeEditorPanels();
-                setCrestPanelOpen((open) => !open);
-              }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
-            >
-              Escudos
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                closeEditorPanels();
-                setHomePanelOpen((open) => !open);
-              }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
-            >
-              Inicio
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                closeEditorPanels();
-                setMediaRaiPanelOpen((open) => !open);
-              }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
-            >
-              Media RAI
-            </button>
-            {!isFichajesPath(pathname) && (
-              <Link
-                href={EDITOR_PAGE_LINKS.fichajes}
-                onClick={closeEditorPanels}
-                className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+                Competición
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  closeEditorPanels();
+                  setTeamsPanelOpen((open) => !open);
+                }}
+                className={editorToolbarButtonClass}
               >
-                <ExternalLink size={14} aria-hidden />
-                Mercado
-              </Link>
-            )}
-            {!isFilialPath(pathname) && (
-              <Link
-                href={EDITOR_PAGE_LINKS.filial}
-                onClick={closeEditorPanels}
-                className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+                Equipos
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  closeEditorPanels();
+                  setCrestPanelOpen((open) => !open);
+                }}
+                className={editorToolbarButtonClass}
               >
-                <ExternalLink size={14} aria-hidden />
-                Filial
-              </Link>
-            )}
-            {!isJuvenilPath(pathname) && (
-              <Link
-                href={EDITOR_PAGE_LINKS.juvenil}
-                onClick={closeEditorPanels}
-                className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+                Escudos
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  closeEditorPanels();
+                  setHomePanelOpen((open) => !open);
+                }}
+                className={editorToolbarButtonClass}
               >
-                <ExternalLink size={14} aria-hidden />
-                Juvenil
-              </Link>
-            )}
-            <button
-              type="button"
-              onClick={() => void handleExport()}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
-            >
-              {copied ? <Check size={14} /> : <Clipboard size={14} />}
-              {copied ? "Copiado" : "Exportar"}
-            </button>
-            <button
-              type="button"
-              onClick={clearAll}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#981915]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#981915] hover:bg-red-50"
-            >
-              <Trash2 size={14} />
-              Limpiar
-            </button>
-          </>
+                Inicio
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  closeEditorPanels();
+                  setMediaRaiPanelOpen((open) => !open);
+                }}
+                className={editorToolbarButtonClass}
+              >
+                Media RAI
+              </button>
+              {!isFichajesPath(pathname) && (
+                <Link href={EDITOR_PAGE_LINKS.fichajes} onClick={closeEditorPanels} className={editorToolbarButtonClass}>
+                  <ExternalLink size={14} aria-hidden />
+                  Mercado
+                </Link>
+              )}
+              {!isFilialPath(pathname) && (
+                <Link href={EDITOR_PAGE_LINKS.filial} onClick={closeEditorPanels} className={editorToolbarButtonClass}>
+                  <ExternalLink size={14} aria-hidden />
+                  Filial
+                </Link>
+              )}
+              {!isJuvenilPath(pathname) && (
+                <Link href={EDITOR_PAGE_LINKS.juvenil} onClick={closeEditorPanels} className={editorToolbarButtonClass}>
+                  <ExternalLink size={14} aria-hidden />
+                  Juvenil
+                </Link>
+              )}
+              <button
+                type="button"
+                onClick={() => void handleExport()}
+                className={editorToolbarButtonClass}
+              >
+                {copied ? <Check size={14} /> : <Clipboard size={14} />}
+                {copied ? "Copiado" : "Exportar"}
+              </button>
+              <button
+                type="button"
+                onClick={clearAll}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#981915]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#981915] hover:bg-red-50"
+              >
+                <Trash2 size={14} />
+                Limpiar
+              </button>
+            </>
+          )}
+          <button
+            type="button"
+            onClick={() => setEditMode(!editMode)}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#214C9B] px-4 py-2 text-xs font-extrabold uppercase text-white shadow-lg shadow-blue-950/20 hover:bg-[#173a78]"
+          >
+            {editMode ? <X size={14} /> : <Pencil size={14} />}
+            {editMode ? "Salir" : "Editar"}
+          </button>
+        </div>
+        {editMode && scrollHint.right && (
+          <span className="sr-only">Desliza horizontalmente para ver más opciones del editor</span>
         )}
-        <button
-          type="button"
-          onClick={() => setEditMode(!editMode)}
-          className="inline-flex items-center gap-1.5 rounded-full bg-[#214C9B] px-4 py-2 text-xs font-extrabold uppercase text-white shadow-lg shadow-blue-950/20 hover:bg-[#173a78]"
-        >
-          {editMode ? <X size={14} /> : <Pencil size={14} />}
-          {editMode ? "Salir" : "Editar"}
-        </button>
       </div>
     </div>
   );
