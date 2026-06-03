@@ -12,7 +12,10 @@ import { RAI_TEAM_ID } from "@/data/mock";
 import { useEditedMatchdays, useEditedMatches } from "@/hooks/useEditedMatchdays";
 import { getLeagueMatchdaysForGender } from "@/lib/season/aviles-matches";
 import { getLastPlayedLeagueRound } from "@/lib/standings";
-import { isMatchPlayed } from "@/lib/match-result";
+import {
+  latestMatchesBeforeToday,
+  upcomingMatchesAfterToday,
+} from "@/lib/match-calendar-dates";
 import type { StandingsZonesConfig } from "@/lib/standings";
 import type { Match, Matchday, Team } from "@/types";
 
@@ -55,20 +58,12 @@ export function useMasculinoLeagueSeason(seasonScope: SeasonDataScope = "viewed"
   );
 
   const latestMatches = useMemo(
-    () =>
-      avilesMatches
-        .filter((match) => isMatchPlayed(match))
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-        .slice(0, 5),
+    () => latestMatchesBeforeToday(avilesMatches, 5),
     [avilesMatches],
   );
 
   const upcomingMatches = useMemo(
-    () =>
-      avilesMatches
-        .filter((match) => !isMatchPlayed(match))
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-        .slice(0, 5),
+    () => upcomingMatchesAfterToday(avilesMatches, 5),
     [avilesMatches],
   );
 
