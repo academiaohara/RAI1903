@@ -1,7 +1,6 @@
-import { fanPreviaVideos, fanRdpVideos, players, playersFemenino } from "@/data/mock";
+import { players, playersFemenino } from "@/data/mock";
 import { matchCompetitionShortLabel } from "@/lib/competition-labels";
 import { getMatchById, getRaiTeamId, getTeamMatches } from "@/lib/fixtures";
-import { youtubeVideoId } from "@/lib/youtube";
 import type {
   FormCode,
   Match,
@@ -9,25 +8,11 @@ import type {
   MatchAvailabilityPlayer,
   MatchDetail,
   MatchLineup,
-  MatchVideo,
   PrimerEquipoGender,
   RecentFormMatch,
 } from "@/types";
 
 const EMPTY_LINEUP: MatchLineup = { formation: "", starters: [], bench: [] };
-
-function hashSeed(value: string): number {
-  let hash = 0;
-  for (let index = 0; index < value.length; index += 1) {
-    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
-  }
-  return hash;
-}
-
-function seeded(seed: number, offset = 0): number {
-  const x = Math.sin(seed + offset) * 10000;
-  return x - Math.floor(x);
-}
 
 function formatKickoffTime(date: string): string {
   return new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(date));
@@ -77,16 +62,7 @@ function buildAvailability(teamId: string, gender: PrimerEquipoGender): MatchAva
     }));
 }
 
-function pickVideo(videos: { id: string; title: string; url: string }[], seed: number, label: string): MatchVideo | null {
-  if (videos.length === 0) return null;
-  const video = videos[Math.floor(seeded(seed, 30) * videos.length)];
-  if (!youtubeVideoId(video.url)) return null;
-  return { ...video, label };
-}
-
 export function buildMatchDetail(match: Match, gender: PrimerEquipoGender): MatchDetail {
-  const seed = hashSeed(`${match.id}-${gender}`);
-
   const homeRecent = getTeamMatches(match.homeTeamId)
     .filter((item) => item.status === "finished" && item.id !== match.id)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -122,8 +98,8 @@ export function buildMatchDetail(match: Match, gender: PrimerEquipoGender): Matc
       home: buildAvailability(match.homeTeamId, gender),
       away: buildAvailability(match.awayTeamId, gender),
     },
-    rdpPrevia: pickVideo(fanPreviaVideos, seed, "RDP Previa"),
-    rdpPostpartido: match.status === "finished" ? pickVideo(fanRdpVideos, seed + 3, "RDP Postpartido") : null,
+    rdpPrevia: null,
+    rdpPostpartido: null,
   };
 }
 
