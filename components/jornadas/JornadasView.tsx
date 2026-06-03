@@ -89,7 +89,16 @@ export function JornadasView({ gender }: JornadasViewProps) {
 
       {showPlayoffGuia && <PlayoffAscensoGuia isProvisional={summary.isProvisional} />}
 
-      <Card eyebrow="Resultados" title={title} borderlessHeader>
+      <Card
+        eyebrow="Resultados"
+        title={title}
+        borderlessHeader
+        action={
+          showGrupoSwitcher ? (
+            <JornadasGrupoSwitcher value={grupo} onChange={setGrupo} />
+          ) : undefined
+        }
+      >
         {summary.kind === "playoff" && summary.isProvisional && (
           <p className="mb-6 text-sm font-bold text-slate-600">
             Cruces calculados según la clasificación tras la jornada de liga que tenías seleccionada. Al cerrar
@@ -103,14 +112,8 @@ export function JornadasView({ gender }: JornadasViewProps) {
           </p>
         )}
 
-        {(matchesByDay.length > 0 || showGrupoSwitcher) && (
+        {matchesByDay.length > 0 && (
           <div className="space-y-4">
-            {showGrupoSwitcher && (
-              <div className="flex justify-end">
-                <JornadasGrupoSwitcher value={grupo} onChange={setGrupo} />
-              </div>
-            )}
-
             <JornadaMatchesByDay
               groups={matchesByDay}
               highlightTeamId={raiTeamId}
