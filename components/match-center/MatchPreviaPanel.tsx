@@ -5,6 +5,17 @@ import { cn, resultTone } from "@/lib/utils";
 import { MatchAvailabilityPanel } from "@/components/match-center/MatchAvailabilityPanel";
 import type { MatchDetail, MatchVideo, RecentFormMatch } from "@/types";
 
+const RECENT_MATCHES_TABLE_COLGROUP = (
+  <colgroup>
+    <col className="w-[5.25rem]" />
+    <col />
+    <col className="w-[4.75rem]" />
+    <col />
+    <col className="w-[5.5rem]" />
+    <col className="w-[2.25rem]" />
+  </colgroup>
+);
+
 function RecentMatchesTable({ title, matches }: { title: string; matches: RecentFormMatch[] }) {
   if (matches.length === 0) {
     return (
@@ -16,7 +27,8 @@ function RecentMatchesTable({ title, matches }: { title: string; matches: Recent
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[28rem] text-left text-sm">
+      <table className="w-full min-w-[28rem] table-fixed border-collapse text-left text-sm">
+        {RECENT_MATCHES_TABLE_COLGROUP}
         <thead>
           <tr className="border-b border-[#214C9B]/15 text-xs font-bold uppercase text-slate-500">
             <th className="py-2 pr-2">Fecha</th>
@@ -30,11 +42,11 @@ function RecentMatchesTable({ title, matches }: { title: string; matches: Recent
         <tbody>
           {matches.map((row) => (
             <tr key={`${row.date}-${row.homeTeam}-${row.score}`} className="border-b border-slate-100">
-              <td className="py-2 pr-2 font-semibold text-slate-600">{row.date}</td>
-              <td className="py-2 pr-2 font-semibold text-slate-800">{row.homeTeam}</td>
-              <td className="py-2 pr-2 font-extrabold text-[#214C9B]">{row.score}</td>
-              <td className="py-2 pr-2 font-semibold text-slate-800">{row.awayTeam}</td>
-              <td className="py-2 pr-2 text-slate-500">{row.competition}</td>
+              <td className="py-2 pr-2 font-semibold tabular-nums text-slate-600">{row.date}</td>
+              <td className="max-w-0 truncate py-2 pr-2 font-semibold text-slate-800">{row.homeTeam}</td>
+              <td className="py-2 pr-2 font-extrabold tabular-nums text-[#214C9B]">{row.score}</td>
+              <td className="max-w-0 truncate py-2 pr-2 font-semibold text-slate-800">{row.awayTeam}</td>
+              <td className="truncate py-2 pr-2 text-slate-500">{row.competition}</td>
               <td className="py-2">
                 <span className={cn("inline-flex h-6 w-6 items-center justify-center rounded text-xs font-extrabold", resultTone(row.resultCode))}>
                   {row.resultCode === "G" ? "V" : row.resultCode === "E" ? "E" : "D"}

@@ -55,9 +55,7 @@ export function primerEquipoPathForGender(pathname: string, gender: PrimerEquipo
     PRIMER_EQUIPO_SECTIONS.includes(section as PrimerEquipoSection) &&
     (section !== "cronicas" || primerEquipoHasCronicas(gender))
   ) {
-    const subPath =
-      section === "cronicas" && segments[1] === "resumenes" ? "/cronicas/resumenes" : `/${section}`;
-    return `${primerEquipoBase(gender)}${subPath}`;
+    return `${primerEquipoBase(gender)}/${section}`;
   }
 
   return `${primerEquipoBase(gender)}/plantilla`;
