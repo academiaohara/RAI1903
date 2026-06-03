@@ -156,7 +156,7 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
       )}
 
       {hydrated && statusBanner === "saved" && (
-        <p className="rounded-2xl border border-[#214C9B]/20 bg-blue-50 px-4 py-3 text-sm font-bold text-[#214C9B]">
+        <p className="rounded-xl border border-[#214C9B]/20 bg-blue-50 px-3 py-2 text-xs font-bold text-[#214C9B] sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
           Quiniela guardada. Pulsa Editar si quieres modificar algo antes del pitido inicial.
         </p>
       )}
@@ -169,7 +169,7 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
 
       <Card eyebrow={`Jornada ${selectedMatchday.round}`} title="Tu quiniela">
         {!bundlesLoading && !hasMatchesForRound && (
-          <p className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700">
+          <p className="mb-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 sm:mb-4 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
             {isCmsEditor ? (
               <>
                 No hay partidos del Grupo I configurados para la jornada {round}. Asigna equipos reales en Jornadas o
