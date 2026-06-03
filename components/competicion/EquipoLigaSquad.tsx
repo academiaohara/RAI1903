@@ -9,7 +9,10 @@ import type { SquadPlayer, SquadViewMode, StadiumInfo } from "@/types/squad";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { useRivalSquadAvailability } from "@/hooks/useRivalSquadAvailability";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
+import { getRivalSquadsBundle } from "@/lib/cms/rival-squads-bundle";
+import { saveRivalStadiumForSeason } from "@/lib/cms/stadium-catalog";
 import { getCompeticionSquadData } from "@/lib/competicion-squad";
+import { buildDefaultRivalSquadImport } from "@/lib/rival-squad-defaults";
 import { defaultRosterEstado, splitSquadByAvailability } from "@/lib/squad-utils";
 import { SquadHeader } from "@/components/squad/SquadHeader";
 import { SquadToolbar } from "@/components/squad/SquadToolbar";
@@ -28,7 +31,7 @@ type EquipoLigaSquadProps = {
 };
 
 export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
-  const { bundles, viewedSeason } = useSeason();
+  const { bundles, viewedSeason, viewedSeasonId } = useSeason();
   const { club: baseClub, squad: baseSquad, isOwnClub } = useMemo(
     () => getCompeticionSquadData(gender, team, bundles, viewedSeason.label),
     [bundles, gender, team, viewedSeason.label],
@@ -109,8 +112,19 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
     [addPlayer, isOwnClub],
   );
 
-  const stadiumModalOpen = stadiumOpen && !(editMode && isOwnClub);
-  const stadiumEditorOpen = stadiumOpen && editMode && isOwnClub;
+  const stadiumModalOpen = stadiumOpen && !editMode;
+  const stadiumEditorOpen = stadiumOpen && editMode;
+
+  const rivalImportFallback = useMemo(() => {
+    if (isOwnClub) return undefined;
+    return getRivalSquadsBundle(bundles, gender).squads[team.id] ?? buildDefaultRivalSquadImport(team);
+  }, [bundles, gender, isOwnClub, team]);
+
+  const handleSaveRivalStadium = useCallback(
+    (stadium: StadiumInfo) =>
+      saveRivalStadiumForSeason(viewedSeasonId, gender, bundles, team.id, stadium, rivalImportFallback),
+    [bundles, gender, rivalImportFallback, team.id, viewedSeasonId],
+  );
 
   return (
     <div className="space-y-6">
@@ -182,16 +196,15 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
         />
       )}
       <StadiumModal stadium={club.estadioInfo} open={stadiumModalOpen} onClose={() => setStadiumOpen(false)} />
-      {isOwnClub && (
-        <StadiumEditorModal
-          open={stadiumEditorOpen}
-          onClose={() => setStadiumOpen(false)}
-          gender={gender}
-          clubName={club.nombre}
-          current={club.estadioInfo}
-          onSaved={setStadiumOverride}
-        />
-      )}
+      <StadiumEditorModal
+        open={stadiumEditorOpen}
+        onClose={() => setStadiumOpen(false)}
+        gender={gender}
+        clubName={club.nombre}
+        current={club.estadioInfo}
+        onSaved={setStadiumOverride}
+        onSave={!isOwnClub ? handleSaveRivalStadium : undefined}
+      />
     </div>
   );
 }
