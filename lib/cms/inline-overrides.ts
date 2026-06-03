@@ -107,6 +107,37 @@ export function resolveInlineOverrideSeasonId(
   return isMediaRaiGlobalInlineKey(key) ? MEDIA_RAI_INLINE_SEASON_ID : viewedSeasonId;
 }
 
+export async function deleteMediaRaiSpaceOverrides(section: string): Promise<{ ok: boolean; error?: string }> {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: "Supabase no configurado" };
+  }
+
+  const supabase = createBrowserClient();
+  const globalKey = `media-rai:${section}:spaces`;
+
+  const { data, error } = await supabase
+    .from("cms_inline_overrides")
+    .select("season_id, key")
+    .eq("key", globalKey);
+
+  if (error) return { ok: false, error: error.message };
+  if (!data?.length) return { ok: true };
+
+  const results = await Promise.all(
+    data.map((row) =>
+      supabase
+        .from("cms_inline_overrides")
+        .delete()
+        .eq("season_id", row.season_id ?? MEDIA_RAI_INLINE_SEASON_ID)
+        .eq("key", row.key),
+    ),
+  );
+
+  const failed = results.find(({ error: deleteError }) => deleteError);
+  if (failed?.error) return { ok: false, error: failed.error.message };
+  return { ok: true };
+}
+
 export async function deleteMediaRaiVideoOverrides(section: string): Promise<{ ok: boolean; error?: string }> {
   if (!isSupabaseConfigured()) {
     return { ok: false, error: "Supabase no configurado" };
