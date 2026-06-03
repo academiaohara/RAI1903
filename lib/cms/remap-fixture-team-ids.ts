@@ -53,6 +53,7 @@ export function remapFixturesBundleTeamIds(
   const matchdaysGrupo2 = bundle.matchdaysGrupo2?.map((md) => remapMatchday(md, changes));
   const amistosoMatches = bundle.amistosoMatches?.map((match) => remapMatch(match, changes));
   const copaDelReyMatches = bundle.copaDelReyMatches?.map((match) => remapMatch(match, changes));
+  const calendarExtraMatches = bundle.calendarExtraMatches?.map((match) => remapMatch(match, changes));
 
   return {
     ...bundle,
@@ -60,6 +61,7 @@ export function remapFixturesBundleTeamIds(
     matchdaysGrupo2,
     amistosoMatches,
     copaDelReyMatches,
+    calendarExtraMatches,
   };
 }
 
