@@ -20,6 +20,8 @@ type StadiumEditorModalProps = {
   clubName: string;
   current: StadiumInfo;
   onSaved: (stadium: StadiumInfo) => void;
+  /** Si se define, sustituye el guardado en el bundle `squad` del Avilés. */
+  onSave?: (stadium: StadiumInfo) => Promise<{ ok: boolean; error?: string }>;
 };
 
 const EMPTY_STADIUM: StadiumInfo = {
@@ -39,6 +41,7 @@ export function StadiumEditorModal({
   clubName,
   current,
   onSaved,
+  onSave,
 }: StadiumEditorModalProps) {
   const { viewedSeasonId, bundles, refreshBundles } = useSeason();
   const [catalog, setCatalog] = useState<StadiumCatalogEntry[]>([]);
@@ -84,7 +87,9 @@ export function StadiumEditorModal({
     }
     setBusy(true);
     setMessage(null);
-    const result = await saveClubStadiumForSeason(viewedSeasonId, gender, bundles, stadium, clubName);
+    const result = onSave
+      ? await onSave(stadium)
+      : await saveClubStadiumForSeason(viewedSeasonId, gender, bundles, stadium, clubName);
     setBusy(false);
     if (!result.ok) {
       setMessage(result.error ?? "No se pudo guardar el estadio");

@@ -167,6 +167,29 @@ export function buildClubInfoFromImport(
   data: RivalSquadImport,
   seasonLabel = "2025/26",
 ): SquadClubInfo {
+  if (data.estadioInfo?.nombre?.trim()) {
+    const info = data.estadioInfo;
+    const shortStadiumName = info.nombre.replace(/^Estadio\s+/i, "");
+    return {
+      nombre: team.name,
+      temporada: seasonLabel,
+      estadio: shortStadiumName,
+      estadioInfo: info,
+      escudo: getTeamCrestById(team.id, team.crestInitials),
+      entrenador: data.entrenador,
+      jugadores: data.plantilla.length,
+      stats: {
+        partidos: team.stats.played,
+        victorias: team.stats.won,
+        empates: team.stats.drawn,
+        derrotas: team.stats.lost,
+        golesFavor: team.stats.goalsFor,
+        golesContra: team.stats.goalsAgainst,
+        porteriasImbatidas: Math.max(0, Math.floor(team.stats.won / 2)),
+      },
+    };
+  }
+
   const stadiumImage = getStadiumPhoto(team.id);
   const shortStadiumName = data.estadio.replace(/^Estadio\s+/i, "");
 

@@ -1,5 +1,6 @@
 import { listStadiumAssets } from "@/lib/stadium-assets";
 import { fetchEditorSeasons } from "@/lib/cms/seasons-editor";
+import { getRivalSquadsBundle, withRivalSquadInBundle } from "@/lib/cms/rival-squads-bundle";
 import {
   bundleMapKey,
   fetchSeasonBundles,
@@ -7,6 +8,7 @@ import {
   upsertSeasonBundle,
   type SeasonBundlesMap,
 } from "@/lib/cms/season-bundles";
+import type { RivalSquadImport } from "@/types/rival-squad-import";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { StadiumInfo } from "@/types/squad";
@@ -140,4 +142,37 @@ export async function saveClubStadiumForSeason(
   if (!catalogResult.ok) return catalogResult;
 
   return upsertSeasonBundle(seasonId, gender, "squad", { players, clubInfo });
+}
+
+export async function saveRivalStadiumForSeason(
+  seasonId: string,
+  gender: PrimerEquipoGender,
+  bundles: SeasonBundlesMap,
+  teamId: string,
+  stadium: StadiumInfo,
+  fallbackImport?: RivalSquadImport,
+): Promise<{ ok: boolean; error?: string }> {
+  const catalogEntry = catalogEntryFromStadium(stadium, { teamLabel: teamId });
+  const catalogResult = await upsertStadiumCatalogEntry(catalogEntry);
+  if (!catalogResult.ok) return catalogResult;
+
+  const rivalBundle = getRivalSquadsBundle(bundles, gender);
+  const current = rivalBundle.squads[teamId] ?? fallbackImport;
+  if (!current) {
+    return { ok: false, error: "No hay plantilla rival para asociar el estadio" };
+  }
+
+  const next: RivalSquadImport = {
+    ...current,
+    estadio: stadium.nombre,
+    capacidad: stadium.capacidad,
+    estadioInfo: stadium,
+  };
+
+  return upsertSeasonBundle(
+    seasonId,
+    gender,
+    "rival_squads",
+    withRivalSquadInBundle(rivalBundle, teamId, next),
+  );
 }

@@ -1,4 +1,5 @@
 import type { PlayerStatus } from "@/types";
+import type { StadiumInfo } from "@/types/squad";
 
 export type RivalSquadImportPlayer = {
   dorsal: number;
@@ -21,4 +22,6 @@ export type RivalSquadImport = {
   capacidad: number;
   entrenador: string;
   plantilla: RivalSquadImportPlayer[];
+  /** Datos completos del estadio (imagen, dirección, etc.) cuando se elige desde el editor. */
+  estadioInfo?: StadiumInfo;
 };
