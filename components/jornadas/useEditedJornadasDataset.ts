@@ -10,7 +10,6 @@ import type {
   JornadaRoundData,
   JornadaRoundSummary,
   JornadasDataset,
-  JornadasGetRoundOptions,
 } from "@/types/jornadas";
 import { useMemo } from "react";
 
@@ -73,8 +72,8 @@ export function useEditedJornadasDataset(
       return enrichRoundSummary(summary, grupo1, grupo2, raiId);
     });
 
-    const getRound = (roundId: Parameters<JornadasDataset["getRound"]>[0], options?: JornadasGetRoundOptions) => {
-      const base = dataset.getRound(roundId, options);
+    const getRound = (roundId: Parameters<JornadasDataset["getRound"]>[0]) => {
+      const base = dataset.getRound(roundId);
       const { grupo1, grupo2 } = applyOverridesToRound(base, getOverride);
       const summary =
         editedRounds.find((round) => round.id === roundId) ??

@@ -144,7 +144,6 @@ export const LEAGUE_TEMPLATES: LeagueTemplate[] = [
       teamsPerGroup: 20,
       groupCount: 2,
       zones: zonesPrimeraRfef(),
-      hasPlayoff: true,
     },
   },
   {
@@ -159,7 +158,6 @@ export const LEAGUE_TEMPLATES: LeagueTemplate[] = [
       teamsPerGroup: 22,
       groupCount: 1,
       zones: zonesSegundaDivision(),
-      hasPlayoff: false,
     },
   },
   {
@@ -174,7 +172,6 @@ export const LEAGUE_TEMPLATES: LeagueTemplate[] = [
       teamsPerGroup: 18,
       groupCount: 1,
       zones: zonesSegundaRfef(),
-      hasPlayoff: false,
     },
   },
   {
@@ -189,7 +186,6 @@ export const LEAGUE_TEMPLATES: LeagueTemplate[] = [
       teamsPerGroup: 14,
       groupCount: 1,
       zones: zonesFemenina(),
-      hasPlayoff: false,
     },
   },
 ];

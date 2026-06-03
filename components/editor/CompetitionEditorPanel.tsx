@@ -186,8 +186,8 @@ export function CompetitionEditorPanel({ onClose }: CompetitionEditorPanelProps)
           Sustituye reglas y calendario vacío. Puedes ajustar equipos, zonas y grupos después.
         </p>
         <p className="text-[10px] text-slate-400">
-          Pretemporada y Copa del Rey: en modo edición, abre Calendario o Competición → Copa y usa el panel «Pretemporada y
-          Copa del Rey».
+          Pretemporada, Copa del Rey y fases extra (playoff, playout…): en modo edición, abre Calendario o Competición → Copa
+          y usa el panel «Pretemporada y Copa del Rey». En Jornadas puedes renombrar cada jornada (p. ej. «Playoff semis»).
         </p>
       </div>
 
@@ -237,16 +237,6 @@ export function CompetitionEditorPanel({ onClose }: CompetitionEditorPanelProps)
           </select>
         </label>
       </div>
-
-      <label className="mb-4 flex items-center gap-2 text-xs font-bold uppercase text-slate-600">
-        <input
-          type="checkbox"
-          checked={config.hasPlayoff}
-          onChange={(e) => setDraft((c) => ({ ...(c ?? config), hasPlayoff: e.target.checked }))}
-          className="rounded border-slate-300"
-        />
-        Hay playoff de ascenso
-      </label>
 
       <p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-slate-400">
         Jornadas = (equipos − 1) × 2 = {rounds}
