@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 type PageHeroProps = {
   eyebrow?: string;
   title: string;
+  /** Shorter hero title on viewports below 640px. */
+  titleMobile?: string;
   description: string;
   children?: ReactNode;
   titleActions?: ReactNode;
@@ -15,6 +17,7 @@ type PageHeroProps = {
 export function PageHero({
   eyebrow,
   title,
+  titleMobile,
   description,
   children,
   titleActions,
@@ -27,7 +30,11 @@ export function PageHero({
       <div className={cn("grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end", eyebrow && "mt-2")}>
         <div className="min-w-0 max-w-full">
           <div className="flex w-full flex-wrap items-center gap-x-4 gap-y-3">
-            <AnimatedPageTitle title={title} wrapperClassName={titleWrapperClassName} />
+            <AnimatedPageTitle
+              title={title}
+              mobileTitle={titleMobile}
+              wrapperClassName={titleWrapperClassName}
+            />
             {titleActions ? <div className="ml-auto shrink-0">{titleActions}</div> : null}
           </div>
           <p className="mt-3 text-base leading-7 text-slate-600">{description}</p>

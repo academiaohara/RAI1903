@@ -22,9 +22,17 @@ export function MediaRaiSectionPage({ sectionSlug }: MediaRaiSectionPageProps) {
 
   const config = resolveContenidoFanSection(sectionSlug, sections);
   const isTenteFirme = sectionSlug === "tente-firme";
+  const heroTitleMobile =
+    sectionSlug === "rdp" || sectionSlug === "resumenes" ? config.label : undefined;
+
   return (
     <div className="space-y-6">
-      <PageHero eyebrow="Media RAI" title={config.heroTitle} description={config.heroDescription} />
+      <PageHero
+        eyebrow="Media RAI"
+        title={config.heroTitle}
+        titleMobile={heroTitleMobile}
+        description={config.heroDescription}
+      />
 
       <Card eyebrow={config.cardEyebrow} borderlessHeader={!config.cardEyebrow}>
         <p className="mb-5 text-sm leading-6 text-slate-600">{config.cardIntro}</p>
