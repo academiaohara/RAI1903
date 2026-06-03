@@ -1,6 +1,6 @@
 import { TeamLink } from "@/components/TeamLink";
 import { MatchCaraACaraSection } from "@/components/match-center/MatchCaraACaraSection";
-import { MatchVideoBlock } from "@/components/match-center/MatchVideoBlock";
+import { EditableMatchVideoBlock } from "@/components/match-center/EditableMatchVideoBlock";
 import { cn, resultTone } from "@/lib/utils";
 import { MatchAvailabilityPanel } from "@/components/match-center/MatchAvailabilityPanel";
 import type { MatchDetail, MatchVideo, RecentFormMatch } from "@/types";
@@ -121,7 +121,12 @@ export function MatchPreviaPanel({
         />
       )}
 
-      {video && <MatchVideoBlock video={video} />}
+      <EditableMatchVideoBlock
+        matchId={match.id}
+        field="rdpPrevia"
+        videoLabel="RDP Previa"
+        fallback={video}
+      />
     </div>
   );
 }

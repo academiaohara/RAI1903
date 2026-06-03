@@ -1,7 +1,7 @@
 "use client";
 
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
-import type { MatchDetail } from "@/types";
+import type { MatchDetail, MatchVideo } from "@/types";
 
 function storageKey(matchId: string, field: string) {
   return `match:${matchId}:${field}`;
@@ -20,6 +20,11 @@ export function useMatchDetailOverrides(detail: MatchDetail): MatchDetail {
   const homeLineup = getValue(storageKey(matchId, "homeLineup"), detail.homeLineup);
   const awayLineup = getValue(storageKey(matchId, "awayLineup"), detail.awayLineup);
   const availability = getValue(storageKey(matchId, "availability"), detail.availability);
+  const rdpPrevia = getValue<MatchVideo | null>(storageKey(matchId, "rdpPrevia"), detail.rdpPrevia);
+  const rdpPostpartido = getValue<MatchVideo | null>(
+    storageKey(matchId, "rdpPostpartido"),
+    detail.rdpPostpartido,
+  );
 
   return {
     ...detail,
@@ -35,6 +40,8 @@ export function useMatchDetailOverrides(detail: MatchDetail): MatchDetail {
     homeLineup,
     awayLineup,
     availability,
+    rdpPrevia,
+    rdpPostpartido,
   };
 }
 
@@ -49,5 +56,7 @@ export function useMatchDetailStorageKeys(matchId: string) {
     homeLineup: storageKey(matchId, "homeLineup"),
     awayLineup: storageKey(matchId, "awayLineup"),
     availability: storageKey(matchId, "availability"),
+    rdpPrevia: storageKey(matchId, "rdpPrevia"),
+    rdpPostpartido: storageKey(matchId, "rdpPostpartido"),
   };
 }

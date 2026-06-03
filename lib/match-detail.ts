@@ -1,4 +1,4 @@
-import { fanPreviaVideos, fanRdpVideos, fanResumenesVideosByGender, players, playersFemenino } from "@/data/mock";
+import { fanResumenesVideosByGender, players, playersFemenino } from "@/data/mock";
 import { matchCompetitionShortLabel } from "@/lib/competition-labels";
 import { getMatchById, getRaiTeamId, getTeamMatches } from "@/lib/fixtures";
 import { youtubeVideoId } from "@/lib/youtube";
@@ -122,8 +122,8 @@ export function buildMatchDetail(match: Match, gender: PrimerEquipoGender): Matc
       home: buildAvailability(match.homeTeamId, gender),
       away: buildAvailability(match.awayTeamId, gender),
     },
-    rdpPrevia: pickVideo(fanPreviaVideos, seed, "RDP Previa"),
-    rdpPostpartido: match.status === "finished" ? pickVideo(fanRdpVideos, seed + 3, "RDP Postpartido") : null,
+    rdpPrevia: null,
+    rdpPostpartido: null,
     resumenVideo:
       match.status === "finished"
         ? pickVideo(fanResumenesVideosByGender[gender], seed + 7, "Resumen")

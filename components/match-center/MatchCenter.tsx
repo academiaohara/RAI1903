@@ -56,10 +56,6 @@ function isRaiMatch(detail: MatchDetail): boolean {
   return detail.match.homeTeamId === raiId || detail.match.awayTeamId === raiId;
 }
 
-function hasArticleBody(article: MatchArticle): boolean {
-  return article.body.length > 0 || article.excerpt.trim().length > 0;
-}
-
 const panelClassName =
   "min-w-0 rounded-[2rem] border border-[#214C9B]/20 bg-white p-5 shadow-[0_12px_30px_rgba(17,24,39,0.06)] sm:p-8";
 
@@ -93,14 +89,7 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
     <MatchPreviaPanel detail={resolvedDetail} rdpVideo={resolvedDetail.rdpPrevia} showCaraACara />
   );
 
-  const previaTabContent = (
-    <div className="space-y-8">
-      {isFinished && article && hasArticleBody(article) && (
-        <MatchArticleInlineBlock article={article} sectionLabel="Previa" />
-      )}
-      {previaPanel}
-    </div>
-  );
+  const previaTabContent = <div className="space-y-8">{previaPanel}</div>;
 
   const panelContent = (() => {
     if (!isFinished && tabs.length === 1) return previaPanel;
