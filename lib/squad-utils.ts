@@ -1,5 +1,14 @@
+import type { PlayerStatus } from "@/types";
 import type { SquadPlayer, SquadPosition, SquadRoleCode } from "@/types/squad";
 import { SQUAD_POSITIONS } from "@/types/squad";
+
+const ROSTER_ESTADOS: PlayerStatus[] = ["titular", "suplente", "cantera", "nuevo fichaje"];
+
+/** Estado de plantilla al quitar lesionado/sancionado. */
+export function defaultRosterEstado(player: SquadPlayer): PlayerStatus {
+  if (ROSTER_ESTADOS.includes(player.estado)) return player.estado;
+  return "titular";
+}
 
 export function getPlayerFullName(player: SquadPlayer): string {
   return `${player.nombre} ${player.apellido}`;

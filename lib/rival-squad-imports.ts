@@ -96,11 +96,8 @@ function mapRivalPosition(pos: string): { posicion: SquadPosition; rol: SquadRol
   return { posicion: "Centrocampista", rol: "MC" };
 }
 
-function importPlayerToSquadPlayer(
-  team: Team,
-  player: RivalSquadImportPlayer,
-  status: PlayerStatus = "titular",
-): SquadPlayer {
+function importPlayerToSquadPlayer(team: Team, player: RivalSquadImportPlayer): SquadPlayer {
+  const status: PlayerStatus = player.estado ?? "titular";
   const { nombre, apellido } = parsePlayerName(player.jugador);
   const { posicion, rol } = mapRivalPosition(player.pos);
   const birthYear =
