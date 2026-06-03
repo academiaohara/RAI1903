@@ -111,20 +111,38 @@ export function JornadaMatchRow({
     );
   };
 
-  const teamSelect = (side: "home" | "away", teamId: string, label: string) => (
-    <select
-      value={teamId}
-      onChange={(event) => onTeamChange(side, event.target.value)}
-      className="mb-1 w-full rounded-lg border border-slate-200 px-1 py-0.5 text-[10px] font-bold text-slate-700 outline-none"
-      aria-label={label}
-    >
-      {groupTeams.map((team) => (
-        <option key={team.id} value={team.id}>
-          {team.shortName ?? team.name}
-        </option>
-      ))}
-    </select>
-  );
+  const teamSelect = (side: "home" | "away", teamId: string, teamName: string, label: string) => {
+    const inList = groupTeams.some((team) => team.id === teamId);
+    return (
+      <div className="space-y-1">
+        <select
+          value={teamId}
+          onChange={(event) => onTeamChange(side, event.target.value)}
+          className="w-full rounded-lg border border-slate-200 px-1 py-0.5 text-[10px] font-bold text-slate-700 outline-none"
+          aria-label={label}
+        >
+          {!inList && teamId ? (
+            <option value={teamId}>{teamName || teamId}</option>
+          ) : null}
+          {groupTeams.map((team) => (
+            <option key={team.id} value={team.id}>
+              {team.shortName ?? team.name}
+            </option>
+          ))}
+        </select>
+        <input
+          type="text"
+          value={teamName}
+          onChange={(event) =>
+            savePatch(side === "home" ? { homeTeamName: event.target.value } : { awayTeamName: event.target.value })
+          }
+          className="w-full rounded-lg border border-slate-200 px-1 py-0.5 text-[10px] font-bold text-slate-700 outline-none"
+          placeholder="Nombre visible"
+          aria-label={`${label} (nombre)`}
+        />
+      </div>
+    );
+  };
 
   return (
     <article
@@ -142,7 +160,9 @@ export function JornadaMatchRow({
           </TeamLink>
         ) : null}
         {editMode && groupTeams.length > 0 ? (
-          <div className="min-w-0 flex-1">{teamSelect("home", editedFixture.homeTeamId, "Equipo local")}</div>
+          <div className="min-w-0 flex-1">
+            {teamSelect("home", editedFixture.homeTeamId, editedFixture.homeTeamName, "Equipo local")}
+          </div>
         ) : (
           <TeamLink gender={gender} teamId={editedFixture.homeTeamId} teamName={editedFixture.homeTeamName} className={nameClass(highlightHome)}>
             {editedFixture.homeTeamName}
@@ -212,7 +232,9 @@ export function JornadaMatchRow({
 
       <div className="flex min-w-0 items-center justify-end gap-2">
         {editMode && groupTeams.length > 0 ? (
-          <div className="min-w-0 flex-1">{teamSelect("away", editedFixture.awayTeamId, "Equipo visitante")}</div>
+          <div className="min-w-0 flex-1">
+            {teamSelect("away", editedFixture.awayTeamId, editedFixture.awayTeamName, "Equipo visitante")}
+          </div>
         ) : (
           <TeamLink
             gender={gender}

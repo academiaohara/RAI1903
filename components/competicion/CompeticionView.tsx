@@ -8,6 +8,7 @@ import { GuiaLiga } from "@/components/competicion/GuiaLiga";
 import { EditableText } from "@/components/inline-editing/EditableText";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
 import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
+import { ExtraFixturesOnPageEditor } from "@/components/editor/ExtraFixturesOnPageEditor";
 import { MatchCard } from "@/components/MatchCard";
 import { hasMultipleGrupos, zonesToLegacyConfig } from "@/lib/cms/competition-config-bundle";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
@@ -142,12 +143,15 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
       )}
 
       {panel === "copa-rey" ? (
-        <CopaDelReyPanel
-          matches={copaDelReyMatches}
-          highlightTeamId={highlightTeamId}
-          gender={gender}
-          calendarHref={calendarHref}
-        />
+        <>
+          {isMasculino ? <ExtraFixturesOnPageEditor /> : null}
+          <CopaDelReyPanel
+            matches={copaDelReyMatches}
+            highlightTeamId={highlightTeamId}
+            gender={gender}
+            calendarHref={calendarHref}
+          />
+        </>
       ) : (
         <>
           {isMasculino && <GuiaLiga gender={gender} teams={teams} grupo={grupo} />}

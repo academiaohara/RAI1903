@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { Card } from "@/components/Card";
 import { TeamCalendar } from "@/components/TeamCalendar";
+import { ExtraFixturesOnPageEditor } from "@/components/editor/ExtraFixturesOnPageEditor";
 import { useEditedCalendarMatches } from "@/components/calendar/CalendarMatchEditor";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useAllSeasonsCalendarMatches } from "@/hooks/useAllSeasonsCalendarMatches";
@@ -30,6 +31,7 @@ export function CalendarioSeasonView({ gender }: CalendarioSeasonViewProps) {
 
   return (
     <Card eyebrow="Temporada" title="Partidos del equipo">
+      {gender === "masculino" ? <ExtraFixturesOnPageEditor /> : null}
       <div className="mb-6 flex flex-wrap gap-4 text-sm font-bold text-slate-600">
         <span>
           <span className="text-[#214C9B]">{listMatches.length}</span> partidos
