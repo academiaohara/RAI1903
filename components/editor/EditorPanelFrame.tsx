@@ -23,7 +23,7 @@ export function EditorPanelFrame({
   message,
 }: EditorPanelFrameProps) {
   return (
-    <div className="fixed bottom-20 right-4 z-[85] flex max-h-[min(82vh,720px)] w-[min(100vw-2rem,28rem)] flex-col overflow-hidden rounded-2xl border border-[#214C9B]/25 bg-white shadow-2xl">
+    <div className="fixed bottom-28 left-3 right-3 z-[85] flex max-h-[min(72vh,640px)] w-auto flex-col overflow-hidden rounded-2xl border border-[#214C9B]/25 bg-white shadow-2xl sm:bottom-20 sm:left-auto sm:right-4 sm:max-h-[min(82vh,720px)] sm:w-[min(100vw-2rem,28rem)]">
       <div className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-100 px-4 py-3">
         <div>
           <h2 className="text-sm font-extrabold uppercase tracking-tight text-[#214C9B]">{title}</h2>
