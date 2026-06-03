@@ -25,12 +25,12 @@ import type { Route } from "next";
 import type { Match } from "@/types";
 
 export function useHomeCompetitionEmptyHint(): boolean {
-  const { leagueMatchdays, bundlesLoading } = useMasculinoLeagueSeason("active");
-  const { activeSeasonId, getBundles, isBundlesLoading } = useSeason();
-  const bundles = getBundles(activeSeasonId);
+  const { leagueMatchdays, bundlesLoading } = useMasculinoLeagueSeason();
+  const { viewedSeasonId, getBundles, isBundlesLoading } = useSeason();
+  const bundles = getBundles(viewedSeasonId);
   return (
     !bundlesLoading &&
-    !isBundlesLoading(activeSeasonId) &&
+    !isBundlesLoading(viewedSeasonId) &&
     !seasonHasCompetitionBundles(bundles) &&
     leagueMatchdays.length === 0
   );
@@ -47,7 +47,7 @@ export function HomeCompetitionEmptyHint() {
 }
 
 export function HomeMatchBannersBlock() {
-  const { latestMatches, nextMatch } = useMasculinoLeagueSeason("active");
+  const { latestMatches, nextMatch } = useMasculinoLeagueSeason();
   const { getForMatch } = useSeasonMatchArticles();
 
   const latestMatch = latestMatches[0];
@@ -84,7 +84,7 @@ export function HomeMatchBannersBlock() {
 }
 
 export function HomeStandingsStatsBlock() {
-  const { teams, leagueMatchdays, highlightTeamId } = useMasculinoLeagueSeason("active");
+  const { teams, leagueMatchdays, highlightTeamId } = useMasculinoLeagueSeason();
 
   return (
     <section className="grid gap-6 xl:grid-cols-[1fr_0.42fr]">
@@ -115,16 +115,30 @@ export function HomeStandingsStatsBlock() {
 }
 
 export function HomeRecentUpcomingBlock() {
-  const { latestMatches, upcomingMatches } = useMasculinoLeagueSeason("active");
+  const { latestMatches, upcomingMatches, bundlesLoading } = useMasculinoLeagueSeason();
+
+  if (bundlesLoading) {
+    return (
+      <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 px-4 py-3 text-sm font-semibold text-slate-600">
+        Cargando calendario de la temporada…
+      </p>
+    );
+  }
 
   return (
     <>
       <section className="grid gap-6 xl:hidden">
         <Card eyebrow="Resultados" title="Ultimos 5 partidos">
           <div className="space-y-2">
-            {latestMatches.map((match) => (
-              <HomeMobileCrestMatchRow key={match.id} match={match} accent="blue" />
-            ))}
+            {latestMatches.length > 0 ? (
+              latestMatches.map((match) => (
+                <HomeMobileCrestMatchRow key={match.id} match={match} accent="blue" />
+              ))
+            ) : (
+              <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 p-4 text-sm font-bold text-slate-500">
+                No hay partidos finalizados en esta temporada.
+              </p>
+            )}
           </div>
         </Card>
         <Card
@@ -160,9 +174,13 @@ export function HomeRecentUpcomingBlock() {
         </div>
         <div className="grid grid-cols-2 items-start gap-6">
           <div className="flex flex-col gap-3">
-            {latestMatches.map((match) => (
-              <RecentMatchCard key={match.id} match={match} />
-            ))}
+            {latestMatches.length > 0 ? (
+              latestMatches.map((match) => <RecentMatchCard key={match.id} match={match} />)
+            ) : (
+              <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 p-4 text-sm font-bold text-slate-500">
+                No hay partidos finalizados en esta temporada.
+              </p>
+            )}
           </div>
           <div className="flex flex-col gap-3">
             {upcomingMatches.length > 0 ? (
