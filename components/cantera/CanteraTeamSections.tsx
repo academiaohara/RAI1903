@@ -6,7 +6,7 @@ import { CanteraSquadTable } from "@/components/cantera/CanteraSquadTable";
 import { useCanteraSeasonOptional } from "@/components/cantera/CanteraSeasonContext";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { SubsectionFilterNav } from "@/components/SubsectionFilterNav";
-import { LeagueTable } from "@/components/LeagueTable";
+import { CanteraCompeticionSection } from "@/components/cantera/CanteraCompeticionSection";
 import { TeamCalendar } from "@/components/TeamCalendar";
 import {
   canteraTeamIdToCmsScope,
@@ -14,6 +14,7 @@ import {
   type CanteraCmsScope,
 } from "@/lib/cantera/cantera-cms";
 import {
+  getCanteraCalendar,
   getCanteraPrimaryAvilesTeamId,
   getCanteraStandings,
   isCanteraClubTeam,
@@ -93,6 +94,13 @@ export function CanteraTeamSections({ teamId, cmsScope: cmsScopeProp }: CanteraT
     return matchesToCanteraCalendarMatches(source, avilesTeamId);
   }, [avilesTeamId, canteraSeason, isCmsBacked, staticTeam?.calendar]);
 
+  const clasificacionCalendar = useMemo(() => {
+    if (isCmsBacked && canteraSeason) {
+      return canteraSeason.calendar;
+    }
+    return getCanteraCalendar(teamId);
+  }, [canteraSeason, isCmsBacked, teamId]);
+
   if (!isCmsBacked && !staticTeam) return null;
   if (isCmsBacked && !canteraSeason) return null;
 
@@ -136,14 +144,12 @@ export function CanteraTeamSections({ teamId, cmsScope: cmsScopeProp }: CanteraT
       )}
 
       {activeSection === "clasificacion" && (
-        <LeagueTable
-          teams={standings}
-          compact={false}
-          showCrests={false}
-          showLegend
+        <CanteraCompeticionSection
+          standings={standings}
           highlightTeamId={avilesTeamId}
-          isClubHighlight={(row) => isCanteraClubTeam(teamId, row.id, row.name)}
+          calendarMatches={clasificacionCalendar}
           zoneLegend={isCmsBacked && canteraSeason ? canteraSeason.zoneLegend : undefined}
+          isClubHighlight={(row) => isCanteraClubTeam(teamId, row.id, row.name)}
         />
       )}
 
