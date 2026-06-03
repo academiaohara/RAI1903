@@ -25,6 +25,7 @@ export function useMatchDetailOverrides(detail: MatchDetail): MatchDetail {
     storageKey(matchId, "rdpPostpartido"),
     detail.rdpPostpartido,
   );
+  const resumenVideo = getValue<MatchVideo | null>(storageKey(matchId, "resumenVideo"), detail.resumenVideo);
 
   return {
     ...detail,
@@ -42,6 +43,7 @@ export function useMatchDetailOverrides(detail: MatchDetail): MatchDetail {
     availability,
     rdpPrevia,
     rdpPostpartido,
+    resumenVideo,
   };
 }
 
@@ -58,5 +60,6 @@ export function useMatchDetailStorageKeys(matchId: string) {
     availability: storageKey(matchId, "availability"),
     rdpPrevia: storageKey(matchId, "rdpPrevia"),
     rdpPostpartido: storageKey(matchId, "rdpPostpartido"),
+    resumenVideo: storageKey(matchId, "resumenVideo"),
   };
 }

@@ -9,7 +9,7 @@ import type { MatchVideo } from "@/types";
 const fieldClassName =
   "w-full rounded-lg border border-[#214C9B]/25 px-3 py-2 text-sm outline-none focus:border-[#214C9B]";
 
-type MatchVideoField = "rdpPrevia" | "rdpPostpartido";
+type MatchVideoField = "rdpPrevia" | "rdpPostpartido" | "resumenVideo";
 
 function matchVideoStorageKey(matchId: string, field: MatchVideoField) {
   return `match:${matchId}:${field}`;
@@ -24,11 +24,13 @@ export function EditableMatchVideoBlock({
   field,
   videoLabel,
   fallback,
+  emptyMessage,
 }: {
   matchId: string;
   field: MatchVideoField;
   videoLabel: string;
   fallback: MatchVideo | null;
+  emptyMessage?: string;
 }) {
   const { editMode, getValue, saveValue, clearValue } = useInlineEditing();
   const storageKey = matchVideoStorageKey(matchId, field);
@@ -78,7 +80,9 @@ export function EditableMatchVideoBlock({
   };
 
   if (!editMode) {
-    if (!resolved || !videoId) return null;
+    if (!resolved || !videoId) {
+      return emptyMessage ? <p className="text-sm text-slate-500">{emptyMessage}</p> : null;
+    }
     return <MatchVideoBlock video={resolved} />;
   }
 
