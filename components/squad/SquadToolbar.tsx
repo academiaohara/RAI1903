@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { SeasonSelector } from "@/components/SeasonSelector";
 import type { SquadViewMode } from "@/types/squad";
 import { ViewToggle } from "@/components/squad/ViewToggle";
 
@@ -20,7 +21,14 @@ export function SquadToolbar({
       transition={{ delay: 0.1, duration: 0.35 }}
       className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
     >
-      <h2 className="text-lg font-extrabold uppercase tracking-tight text-[#214C9B] sm:text-2xl">Plantilla oficial</h2>
+      <div className="flex min-w-0 items-center justify-between gap-3">
+        <h2 className="min-w-0 text-lg font-extrabold uppercase tracking-tight text-[#214C9B] sm:text-2xl">
+          Plantilla oficial
+        </h2>
+        <div className="shrink-0 sm:hidden">
+          <SeasonSelector className="border-[#214C9B]/15 bg-[#214C9B]/5" />
+        </div>
+      </div>
       {showViewToggle && (
         <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
           <ViewToggle value={viewMode} onChange={onViewModeChange} />

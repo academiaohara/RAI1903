@@ -10,11 +10,13 @@ export function PositionSection({
   children,
   delay = 0,
   variant = "default",
+  hideHeadingOnMobile = false,
 }: {
   position: SquadPosition;
   children: ReactNode;
   delay?: number;
   variant?: "default" | "fichas";
+  hideHeadingOnMobile?: boolean;
 }) {
   const isFichas = variant === "fichas";
 
@@ -25,7 +27,7 @@ export function PositionSection({
       transition={{ delay, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       className="space-y-4"
     >
-      <div className={isFichas ? "space-y-2" : "flex items-end gap-4"}>
+      <div className={`${hideHeadingOnMobile ? "hidden md:flex" : ""} ${isFichas ? "space-y-2" : "flex items-end gap-4"}`}>
         <h2 className="text-2xl font-extrabold uppercase tracking-tight text-[#214C9B] sm:text-3xl">
           {SQUAD_POSITION_LABELS[position]}
         </h2>
