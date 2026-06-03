@@ -132,10 +132,10 @@ export function getMatchForArticle(article: MatchArticle): Match | null {
 
   if (!article.matchId.startsWith("fem-")) return null;
 
-  const isFinished = article.type === "cronica";
   const scoreMatch = article.title.match(/(\d+)\s*-\s*(\d+)/);
   const homeScore = scoreMatch ? Number(scoreMatch[1]) : undefined;
   const awayScore = scoreMatch ? Number(scoreMatch[2]) : undefined;
+  const isFinished = homeScore !== undefined && awayScore !== undefined;
 
   return {
     id: article.matchId,

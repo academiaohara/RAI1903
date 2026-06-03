@@ -5,7 +5,13 @@ import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvi
 import { formatDate } from "@/lib/utils";
 import type { MatchArticle } from "@/types";
 
-export function MatchArticleInlineBlock({ article }: { article: MatchArticle }) {
+export function MatchArticleInlineBlock({
+  article,
+  sectionLabel,
+}: {
+  article: MatchArticle;
+  sectionLabel?: string;
+}) {
   const { editMode, getValue, saveValue } = useInlineEditing();
   const bodyKey = `match-article:${article.id}:body`;
   const fallbackBody = article.body.join("\n\n");
@@ -14,11 +20,13 @@ export function MatchArticleInlineBlock({ article }: { article: MatchArticle }) 
     .split(/\n{2,}/)
     .map((paragraph) => paragraph.trim())
     .filter(Boolean);
+  const label =
+    sectionLabel ?? (article.type === "cronica" ? "Crónica" : "Previa");
 
   return (
     <article>
       <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
-        {article.type === "cronica" ? "Crónica" : "Previa"} · {formatDate(article.date)} · {article.source}
+        {label} · {formatDate(article.date)} · {article.source}
       </p>
       <h1 className="mt-3 text-2xl font-extrabold uppercase leading-tight text-[#214C9B] sm:text-4xl">
         <EditableText

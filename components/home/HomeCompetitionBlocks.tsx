@@ -17,7 +17,7 @@ import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
 import { getTeamByGender } from "@/lib/fixtures";
 import { seasonHasCompetitionBundles } from "@/lib/season/cms-data-policy";
-import { defaultCronicaId, defaultPreviaId } from "@/lib/match-article-factory";
+import { defaultCronicaId } from "@/lib/match-article-factory";
 import { primerEquipoBase } from "@/lib/primer-equipo";
 import { getTeamCrestById } from "@/lib/team-crests";
 import { formatMatchDate } from "@/lib/utils";
@@ -42,11 +42,11 @@ export function HomeCompetitionEmptyHint() {
 
 export function HomeMatchBannersBlock() {
   const { latestMatches, nextMatch } = useMasculinoLeagueSeason();
-  const { getCronica, getPrevia } = useSeasonMatchArticles();
+  const { getForMatch } = useSeasonMatchArticles();
 
   const latestMatch = latestMatches[0];
-  const latestCronica = latestMatch ? getCronica(latestMatch.id, "masculino") : undefined;
-  const nextPrevia = nextMatch ? getPrevia(nextMatch.id, "masculino") : undefined;
+  const latestArticle = latestMatch ? getForMatch(latestMatch.id, "masculino") : undefined;
+  const nextArticle = nextMatch ? getForMatch(nextMatch.id, "masculino") : undefined;
 
   if (!latestMatch && !nextMatch) return null;
 
@@ -57,9 +57,9 @@ export function HomeMatchBannersBlock() {
           match={latestMatch}
           label="Ultimo partido"
           href={
-            `${primerEquipoBase("masculino")}/cronicas/${latestCronica?.id ?? defaultCronicaId(latestMatch.id, "masculino")}` as Route
+            `${primerEquipoBase("masculino")}/cronicas/${latestArticle?.id ?? defaultCronicaId(latestMatch.id, "masculino")}` as Route
           }
-          action="Entrar en la cronica"
+          action="Entrar en la ficha del partido"
         />
       )}
       {nextMatch && (
@@ -67,9 +67,9 @@ export function HomeMatchBannersBlock() {
           match={nextMatch}
           label="Siguiente partido"
           href={
-            `${primerEquipoBase("masculino")}/cronicas/${nextPrevia?.id ?? defaultPreviaId(nextMatch.id, "masculino")}` as Route
+            `${primerEquipoBase("masculino")}/cronicas/${nextArticle?.id ?? defaultCronicaId(nextMatch.id, "masculino")}` as Route
           }
-          action="Entrar en la previa"
+          action="Entrar en la ficha del partido"
         />
       )}
     </section>

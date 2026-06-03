@@ -25,8 +25,7 @@ function mergeCalendarMatchesFromBundles(
   maps: Awaited<ReturnType<typeof fetchSeasonBundles>>[],
   gender: PrimerEquipoGender,
   articles: {
-    getCronica: ReturnType<typeof useSeasonMatchArticles>["getCronica"];
-    getPrevia: ReturnType<typeof useSeasonMatchArticles>["getPrevia"];
+    getForMatch: ReturnType<typeof useSeasonMatchArticles>["getForMatch"];
     crestMap: Record<string, string>;
   },
   mapMatch?: (match: Match) => Match,
@@ -56,7 +55,7 @@ export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
   );
   const { getOverride } = useInlineEditing();
   const crestMap = useTeamCrestMap();
-  const { getCronica, getPrevia } = useSeasonMatchArticles();
+  const { getForMatch } = useSeasonMatchArticles();
   const [multiSeasonMatches, setMultiSeasonMatches] = useState<CalendarMatch[]>([]);
   const [fetchedSeasonIdsKey, setFetchedSeasonIdsKey] = useState<string | null>(null);
 
@@ -73,12 +72,11 @@ export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
     const source = getEnrichedFixtureSource(gender);
     const aviles = getAvilesMatchesFromSource(source, gender, { mapMatch });
     return getCalendarMatchesFromSource(aviles, gender, {
-      getCronica,
-      getPrevia,
+      getForMatch,
       crestMap,
       resolveTeamName,
     });
-  }, [gender, getCronica, getEnrichedFixtureSource, getPrevia, crestMap, mapMatch, resolveTeamName]);
+  }, [gender, getForMatch, getEnrichedFixtureSource, crestMap, mapMatch, resolveTeamName]);
 
   useEffect(() => {
     if (!needsMultiSeasonFetch) return;
@@ -86,7 +84,7 @@ export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
     let cancelled = false;
     void Promise.all(publishedList.map((row) => fetchSeasonBundles(row.id))).then((maps) => {
       if (cancelled) return;
-      setMultiSeasonMatches(mergeCalendarMatchesFromBundles(maps, gender, { getCronica, getPrevia, crestMap }, mapMatch));
+      setMultiSeasonMatches(mergeCalendarMatchesFromBundles(maps, gender, { getForMatch, crestMap }, mapMatch));
       setFetchedSeasonIdsKey(seasonIdsKey);
     });
 
@@ -98,8 +96,7 @@ export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
     publishedList,
     seasonIdsKey,
     gender,
-    getCronica,
-    getPrevia,
+    getForMatch,
     crestMap,
     mapMatch,
   ]);

@@ -6,7 +6,9 @@ import { MatchArticleNewsLinker } from "@/components/editor/MatchArticleNewsLink
 import { EditableText } from "@/components/inline-editing/EditableText";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { usePublishedNews } from "@/hooks/usePublishedNews";
+import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
+import { findMatchInBundles } from "@/lib/season/find-match-in-bundles";
 import { formatDate } from "@/lib/utils";
 import type { MatchArticle, NewsItem } from "@/types";
 import type { Route } from "next";
@@ -14,32 +16,48 @@ import type { Route } from "next";
 type MatchArticleListProps = {
   articles: MatchArticle[];
   gender: PrimerEquipoGender;
+  bundles?: SeasonBundlesMap;
 };
 
-export function MatchArticleList({ articles, gender }: MatchArticleListProps) {
+export function MatchArticleList({ articles, gender, bundles }: MatchArticleListProps) {
   const { items: newsItems } = usePublishedNews();
 
   return (
     <div className="space-y-2 sm:space-y-3">
       {articles.map((article) => (
-        <MatchArticleCard key={article.id} article={article} gender={gender} newsItems={newsItems} />
+        <MatchArticleCard
+          key={article.id}
+          article={article}
+          gender={gender}
+          newsItems={newsItems}
+          bundles={bundles}
+        />
       ))}
     </div>
   );
+}
+
+function matchArticleLabel(article: MatchArticle, bundles?: SeasonBundlesMap): string {
+  const match = bundles ? findMatchInBundles(bundles, article.matchId) : undefined;
+  if (match?.status === "finished") return "Crónica";
+  if (match?.status === "scheduled") return "Próximo partido";
+  return article.type === "cronica" ? "Partido" : "Previa";
 }
 
 function MatchArticleCard({
   article,
   gender,
   newsItems,
+  bundles,
 }: {
   article: MatchArticle;
   gender: PrimerEquipoGender;
   newsItems: NewsItem[];
+  bundles?: SeasonBundlesMap;
 }) {
   const { editMode } = useInlineEditing();
   const href = `${primerEquipoBase(gender)}/cronicas/${article.id}` as Route;
-  const typeLabel = article.type === "cronica" ? "Crónica" : "Previa";
+  const typeLabel = matchArticleLabel(article, bundles);
   const content = (
     <>
       <p className="text-[9px] font-bold uppercase tracking-normal text-slate-500 sm:text-xs">

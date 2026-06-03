@@ -14,6 +14,7 @@ import { useMatchDetailOverrides } from "@/components/match-center/useMatchDetai
 import { MatchPressPanel } from "@/components/match-center/MatchPressPanel";
 import { MatchRatingsPanel } from "@/components/match-center/MatchRatingsPanel";
 import { getRaiTeamId } from "@/lib/fixtures";
+import { hasMatchLineups } from "@/lib/match-lineups";
 import { MatchPreviaPanel } from "@/components/match-center/MatchPreviaPanel";
 import { MatchStatsPanel } from "@/components/match-center/MatchStatsPanel";
 import type { MatchArticle, MatchDetail } from "@/types";
@@ -35,15 +36,26 @@ const FINISHED_TABS_BASE = [
   { id: "prensa", label: "Post partido", icon: Megaphone },
 ] as const;
 
-const PREVIA_ONLY_TABS = [{ id: "previa", label: "Previa", icon: Target }] as const;
+const UPCOMING_PREVIA_TAB = { id: "previa", label: "Previa", icon: Target } as const;
+const UPCOMING_LINEUPS_TAB = { id: "lineups", label: "Alineaciones", icon: Shirt } as const;
+
+type TabDefinition = {
+  id: string;
+  label: string;
+  icon: typeof Target;
+};
 
 type FinishedTabId = (typeof FINISHED_TABS_BASE)[number]["id"];
-type PreviaTabId = (typeof PREVIA_ONLY_TABS)[number]["id"];
-type ActiveTabId = FinishedTabId | PreviaTabId;
+type UpcomingTabId = typeof UPCOMING_PREVIA_TAB.id | typeof UPCOMING_LINEUPS_TAB.id;
+type ActiveTabId = FinishedTabId | UpcomingTabId;
 
 function isRaiMatch(detail: MatchDetail): boolean {
   const raiId = getRaiTeamId(detail.gender);
   return detail.match.homeTeamId === raiId || detail.match.awayTeamId === raiId;
+}
+
+function hasArticleBody(article: MatchArticle): boolean {
+  return article.body.length > 0 || article.excerpt.trim().length > 0;
 }
 
 const panelClassName =
@@ -53,108 +65,109 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
   const { items: newsItems } = usePublishedNews();
   const { editMode } = useInlineEditing();
   const resolvedDetail = useMatchDetailOverrides(detail);
-  const isPreviaArticle = article?.type === "previa";
-  const isFinished = resolvedDetail.match.status === "finished" && !isPreviaArticle;
+  const isFinished = resolvedDetail.match.status === "finished";
   const showRatings = isFinished && isRaiMatch(resolvedDetail);
-  const [activeTab, setActiveTab] = useState<ActiveTabId>(isPreviaArticle ? "previa" : "eventos");
+  const lineupsAvailable = hasMatchLineups(resolvedDetail);
 
-  const tabs = useMemo(() => {
-    if (isPreviaArticle) return [...PREVIA_ONLY_TABS];
-    if (!isFinished) return [];
-    return showRatings
-      ? [...FINISHED_TABS_BASE]
-      : FINISHED_TABS_BASE.filter((tab) => tab.id !== "valoraciones");
-  }, [isFinished, isPreviaArticle, showRatings]);
+  const tabs = useMemo((): TabDefinition[] => {
+    if (isFinished) {
+      return showRatings
+        ? [...FINISHED_TABS_BASE]
+        : FINISHED_TABS_BASE.filter((tab) => tab.id !== "valoraciones");
+    }
 
-  const showArticleBody = article?.type === "previa";
-  const showClubNews = article && (article.type === "cronica" || article.type === "previa");
+    const upcomingTabs: TabDefinition[] = [UPCOMING_PREVIA_TAB];
+    if (lineupsAvailable) upcomingTabs.push(UPCOMING_LINEUPS_TAB);
+    return upcomingTabs;
+  }, [isFinished, lineupsAvailable, showRatings]);
+
+  const [activeTab, setActiveTab] = useState<ActiveTabId>(isFinished ? "eventos" : "previa");
+  const showTabBar = isFinished || tabs.length > 1;
+
+  const showArticleBodyAboveTabs = !isFinished && article !== undefined;
+  const showClubNews = article !== undefined;
 
   const previaPanel = (
     <MatchPreviaPanel detail={resolvedDetail} rdpVideo={resolvedDetail.rdpPrevia} showCaraACara />
   );
 
+  const previaTabContent = (
+    <div className="space-y-8">
+      {isFinished && article && hasArticleBody(article) && (
+        <MatchArticleInlineBlock article={article} sectionLabel="Previa" />
+      )}
+      {previaPanel}
+    </div>
+  );
+
+  const panelContent = (() => {
+    if (!isFinished && tabs.length === 1) return previaPanel;
+
+    if (activeTab === "eventos") {
+      return (
+        <MatchEventsPanel
+          matchId={resolvedDetail.match.id}
+          events={resolvedDetail.events}
+          homeLabel={resolvedDetail.match.homeTeam}
+          awayLabel={resolvedDetail.match.awayTeam}
+        />
+      );
+    }
+    if (activeTab === "stats") {
+      return (
+        <MatchStatsPanel
+          matchId={resolvedDetail.match.id}
+          categories={resolvedDetail.stats}
+          homeLabel={resolvedDetail.match.homeTeam}
+          awayLabel={resolvedDetail.match.awayTeam}
+        />
+      );
+    }
+    if (activeTab === "lineups") {
+      return (
+        <MatchLineupsPanel
+          matchId={resolvedDetail.match.id}
+          homeLabel={resolvedDetail.match.homeTeam}
+          awayLabel={resolvedDetail.match.awayTeam}
+          homeLineup={resolvedDetail.homeLineup}
+          awayLineup={resolvedDetail.awayLineup}
+        />
+      );
+    }
+    if (activeTab === "previa") return previaTabContent;
+    if (activeTab === "valoraciones" && showRatings) {
+      return <MatchRatingsPanel key={`${resolvedDetail.match.id}-ratings`} detail={resolvedDetail} />;
+    }
+    if (activeTab === "prensa") return <MatchPressPanel detail={resolvedDetail} />;
+    return null;
+  })();
+
   return (
     <div className="space-y-6">
-      <MatchCenterHeader
-        detail={resolvedDetail}
-        backHref={backHref}
-        backLabel={backLabel}
-        variant={isPreviaArticle ? "preview" : "match"}
-      />
+      <MatchCenterHeader detail={resolvedDetail} backHref={backHref} backLabel={backLabel} />
 
-      {isPreviaArticle ? (
+      {showArticleBodyAboveTabs && article && (
         <div className={panelClassName}>
-          <div className="space-y-8">
-            {showArticleBody && article && <MatchArticleInlineBlock article={article} />}
-            {showClubNews &&
-              (editMode ? (
-                <MatchArticleNewsLinker article={article} newsItems={newsItems} />
-              ) : (
-                <MatchArticleClubNewsBlock article={article} newsItems={newsItems} />
-              ))}
-            <MatchCenterTabs
-              tabs={tabs}
-              active={activeTab}
-              onChange={(id) => setActiveTab(id as ActiveTabId)}
-            />
-            {activeTab === "previa" && previaPanel}
-          </div>
+          <MatchArticleInlineBlock article={article} sectionLabel="Previa" />
         </div>
-      ) : (
-        <>
-          {showClubNews &&
-            (editMode ? (
-              <MatchArticleNewsLinker article={article} newsItems={newsItems} />
-            ) : (
-              <MatchArticleClubNewsBlock article={article} newsItems={newsItems} />
-            ))}
-
-          {isFinished ? (
-            <>
-              <MatchCenterTabs
-                tabs={tabs}
-                active={activeTab}
-                onChange={(id) => setActiveTab(id as ActiveTabId)}
-              />
-
-              <div className={panelClassName}>
-                {activeTab === "eventos" && (
-                  <MatchEventsPanel
-                    matchId={resolvedDetail.match.id}
-                    events={resolvedDetail.events}
-                    homeLabel={resolvedDetail.match.homeTeam}
-                    awayLabel={resolvedDetail.match.awayTeam}
-                  />
-                )}
-                {activeTab === "stats" && (
-                  <MatchStatsPanel
-                    matchId={resolvedDetail.match.id}
-                    categories={resolvedDetail.stats}
-                    homeLabel={resolvedDetail.match.homeTeam}
-                    awayLabel={resolvedDetail.match.awayTeam}
-                  />
-                )}
-                {activeTab === "lineups" && (
-                  <MatchLineupsPanel
-                    matchId={resolvedDetail.match.id}
-                    homeLabel={resolvedDetail.match.homeTeam}
-                    awayLabel={resolvedDetail.match.awayTeam}
-                    homeLineup={resolvedDetail.homeLineup}
-                    awayLineup={resolvedDetail.awayLineup}
-                  />
-                )}
-                {activeTab === "previa" && previaPanel}
-                {activeTab === "valoraciones" && showRatings && (
-                  <MatchRatingsPanel key={`${resolvedDetail.match.id}-ratings`} detail={resolvedDetail} />
-                )}
-                {activeTab === "prensa" && <MatchPressPanel detail={resolvedDetail} />}
-              </div>
-            </>
-          ) : (
-            <div className={panelClassName}>{previaPanel}</div>
-          )}
-        </>
       )}
+
+      {showClubNews &&
+        (editMode ? (
+          <MatchArticleNewsLinker article={article} newsItems={newsItems} />
+        ) : (
+          <MatchArticleClubNewsBlock article={article} newsItems={newsItems} />
+        ))}
+
+      {showTabBar && tabs.length > 0 && (
+        <MatchCenterTabs
+          tabs={tabs}
+          active={activeTab}
+          onChange={(id) => setActiveTab(id as ActiveTabId)}
+        />
+      )}
+
+      {panelContent && <div className={panelClassName}>{panelContent}</div>}
     </div>
   );
 }

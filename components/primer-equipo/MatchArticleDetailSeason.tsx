@@ -22,14 +22,12 @@ export function MatchArticleDetailSeason({ gender, articleId }: MatchArticleDeta
 
   const detail = useMemo(() => {
     if (!article || article.gender !== gender) return null;
-    if (article.type !== "cronica" && article.type !== "previa") return null;
     const match = findMatchInBundles(bundles, article.matchId) ?? getMatchForArticle(article);
     if (!match) return null;
     return buildMatchDetail(match, article.gender);
   }, [article, bundles, gender]);
 
   if (!article || article.gender !== gender) notFound();
-  if (article.type !== "cronica" && article.type !== "previa") notFound();
   if (!detail) notFound();
 
   return (
