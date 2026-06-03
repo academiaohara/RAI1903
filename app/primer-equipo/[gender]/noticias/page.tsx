@@ -4,6 +4,7 @@ import { use, useCallback, useEffect, useMemo, useState } from "react";
 import { NewsCard } from "@/components/NewsCard";
 import { Pagination } from "@/components/Pagination";
 import { PrimerEquipoPageHero } from "@/components/PrimerEquipoPageHero";
+import { useNewsDateRangeFilter } from "@/hooks/useNewsDateRangeFilter";
 import { usePagination } from "@/hooks/usePagination";
 import { fetchPublishedNewsItems } from "@/lib/cms/news";
 import { newsForTeam } from "@/lib/noticias";
@@ -16,6 +17,8 @@ export default function PrimerEquipoNoticiasPage({ params }: { params: Promise<{
   const { gender } = use(params) as { gender: PrimerEquipoGender };
   const [tag, setTag] = useState<NewsTag | "todas">("todas");
   const [allNews, setAllNews] = useState<NewsItem[]>([]);
+  const { dateFrom, dateTo, setDateFrom, setDateTo, clearDateRange, hasDateRange, matchesDateRange } =
+    useNewsDateRangeFilter();
 
   const loadNews = useCallback(() => {
     void fetchPublishedNewsItems().then(setAllNews);
@@ -28,8 +31,11 @@ export default function PrimerEquipoNoticiasPage({ params }: { params: Promise<{
   const teamNews = useMemo(() => newsForTeam(allNews, gender), [allNews, gender]);
 
   const filtered = useMemo(
-    () => teamNews.filter((item) => tag === "todas" || item.tags.includes(tag)),
-    [teamNews, tag],
+    () =>
+      teamNews.filter(
+        (item) => (tag === "todas" || item.tags.includes(tag)) && matchesDateRange(item),
+      ),
+    [teamNews, tag, matchesDateRange],
   );
 
   const pagination = usePagination(filtered);
@@ -59,12 +65,19 @@ export default function PrimerEquipoNoticiasPage({ params }: { params: Promise<{
           pagination.paginatedItems.map((item) => <NewsCard key={item.id} item={item} onUpdated={loadNews} />)
         ) : (
           <p className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm font-bold text-slate-500">
-            Sin noticias en esta categoria para {genderLabels[gender].title.toLowerCase()}.
+            {hasDateRange
+              ? "Sin noticias con los filtros seleccionados."
+              : `Sin noticias en esta categoria para ${genderLabels[gender].title.toLowerCase()}.`}
           </p>
         )}
       </div>
 
       <Pagination
+        dateFrom={dateFrom}
+        dateTo={dateTo}
+        onDateFromChange={setDateFrom}
+        onDateToChange={setDateTo}
+        onClearDateRange={clearDateRange}
         pageSize={pagination.pageSize}
         pageSizes={pagination.pageSizes}
         totalItems={pagination.totalItems}

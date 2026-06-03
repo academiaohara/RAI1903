@@ -21,7 +21,16 @@ type PaginationProps = {
   className?: string;
   /** Etiqueta del selector de tamaño (por defecto: "Noticias por página") */
   pageSizeLabel?: string;
+  /** Filtro opcional por rango de fechas (YYYY-MM-DD). */
+  dateFrom?: string;
+  dateTo?: string;
+  onDateFromChange?: (value: string) => void;
+  onDateToChange?: (value: string) => void;
+  onClearDateRange?: () => void;
 };
+
+const dateInputClassName =
+  "rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-slate-800 outline-none focus:border-[#214C9B] focus:ring-1 focus:ring-[#214C9B]/30";
 
 function NavIconButton({
   label,
@@ -64,50 +73,98 @@ export function Pagination({
   onLast,
   className,
   pageSizeLabel = "Noticias por página",
+  dateFrom = "",
+  dateTo = "",
+  onDateFromChange,
+  onDateToChange,
+  onClearDateRange,
 }: PaginationProps) {
-  if (totalItems === 0) {
+  const hasDateFilter = onDateFromChange != null && onDateToChange != null;
+  const hasActiveDateRange = Boolean(dateFrom || dateTo);
+
+  if (totalItems === 0 && !hasDateFilter) {
     return null;
   }
 
   return (
     <nav
       aria-label="Paginación"
-      className={`flex flex-wrap items-center justify-end gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 ${className ?? ""}`}
+      className={`flex flex-wrap items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 ${hasDateFilter ? "justify-between" : "justify-end"} ${className ?? ""}`}
     >
-      <label className="flex items-center gap-2">
-        <span className="whitespace-nowrap text-slate-600">{pageSizeLabel}:</span>
-        <select
-          value={pageSize}
-          onChange={(event) => onPageSizeChange(Number(event.target.value))}
-          className="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-slate-800 outline-none focus:border-[#214C9B] focus:ring-1 focus:ring-[#214C9B]/30"
-          aria-label="Noticias por página"
-        >
-          {pageSizes.map((size) => (
-            <option key={size} value={size}>
-              {size}
-            </option>
-          ))}
-        </select>
-      </label>
+      {hasDateFilter ? (
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="flex items-center gap-2">
+            <span className="whitespace-nowrap text-slate-600">Desde:</span>
+            <input
+              type="date"
+              value={dateFrom}
+              max={dateTo || undefined}
+              onChange={(event) => onDateFromChange(event.target.value)}
+              className={dateInputClassName}
+              aria-label="Fecha desde"
+            />
+          </label>
+          <label className="flex items-center gap-2">
+            <span className="whitespace-nowrap text-slate-600">Hasta:</span>
+            <input
+              type="date"
+              value={dateTo}
+              min={dateFrom || undefined}
+              onChange={(event) => onDateToChange(event.target.value)}
+              className={dateInputClassName}
+              aria-label="Fecha hasta"
+            />
+          </label>
+          {hasActiveDateRange && onClearDateRange ? (
+            <button
+              type="button"
+              onClick={onClearDateRange}
+              className="whitespace-nowrap rounded-lg px-2 py-1.5 text-xs font-bold uppercase tracking-normal text-[#214C9B] transition hover:bg-white"
+            >
+              Limpiar fechas
+            </button>
+          ) : null}
+        </div>
+      ) : null}
 
-      <p className="whitespace-nowrap tabular-nums text-slate-600" aria-live="polite">
-        {rangeStart} – {rangeEnd} de {totalItems}
-      </p>
+      {totalItems > 0 ? (
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-4">
+          <label className="flex items-center gap-2">
+            <span className="whitespace-nowrap text-slate-600">{pageSizeLabel}:</span>
+            <select
+              value={pageSize}
+              onChange={(event) => onPageSizeChange(Number(event.target.value))}
+              className="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-slate-800 outline-none focus:border-[#214C9B] focus:ring-1 focus:ring-[#214C9B]/30"
+              aria-label="Noticias por página"
+            >
+              {pageSizes.map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+          </label>
 
-      <div className="flex items-center">
-        <NavIconButton label="Primera página" disabled={!canGoFirst} onClick={onFirst}>
-          <ChevronsLeft size={18} aria-hidden />
-        </NavIconButton>
-        <NavIconButton label="Página anterior" disabled={!canGoPrevious} onClick={onPrevious}>
-          <ChevronLeft size={18} aria-hidden />
-        </NavIconButton>
-        <NavIconButton label="Página siguiente" disabled={!canGoNext} onClick={onNext}>
-          <ChevronRight size={18} aria-hidden />
-        </NavIconButton>
-        <NavIconButton label="Última página" disabled={!canGoLast} onClick={onLast}>
-          <ChevronsRight size={18} aria-hidden />
-        </NavIconButton>
-      </div>
+          <p className="whitespace-nowrap tabular-nums text-slate-600" aria-live="polite">
+            {rangeStart} – {rangeEnd} de {totalItems}
+          </p>
+
+          <div className="flex items-center">
+            <NavIconButton label="Primera página" disabled={!canGoFirst} onClick={onFirst}>
+              <ChevronsLeft size={18} aria-hidden />
+            </NavIconButton>
+            <NavIconButton label="Página anterior" disabled={!canGoPrevious} onClick={onPrevious}>
+              <ChevronLeft size={18} aria-hidden />
+            </NavIconButton>
+            <NavIconButton label="Página siguiente" disabled={!canGoNext} onClick={onNext}>
+              <ChevronRight size={18} aria-hidden />
+            </NavIconButton>
+            <NavIconButton label="Última página" disabled={!canGoLast} onClick={onLast}>
+              <ChevronsRight size={18} aria-hidden />
+            </NavIconButton>
+          </div>
+        </div>
+      ) : null}
     </nav>
   );
 }
