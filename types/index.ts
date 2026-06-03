@@ -349,9 +349,12 @@ export type HeadToHeadEntry = {
 };
 
 export type MatchAvailabilityPlayer = {
+  /** Id de plantilla; permite elegir solo jugadores del equipo en el editor. */
+  playerId?: string;
   name: string;
   reason: "lesionado" | "sancionado";
-  detail: string;
+  /** Motivo o nota opcional; si está vacío no se muestra en la previa. */
+  detail?: string;
 };
 
 export type MatchAvailability = {

@@ -2,7 +2,8 @@ import { TeamLink } from "@/components/TeamLink";
 import { MatchCaraACaraSection } from "@/components/match-center/MatchCaraACaraSection";
 import { MatchVideoBlock } from "@/components/match-center/MatchVideoBlock";
 import { cn, resultTone } from "@/lib/utils";
-import type { MatchAvailability, MatchDetail, MatchVideo, RecentFormMatch } from "@/types";
+import { MatchAvailabilityPanel } from "@/components/match-center/MatchAvailabilityPanel";
+import type { MatchDetail, MatchVideo, RecentFormMatch } from "@/types";
 
 function RecentMatchesTable({ title, matches }: { title: string; matches: RecentFormMatch[] }) {
   if (matches.length === 0) {
@@ -43,37 +44,6 @@ function RecentMatchesTable({ title, matches }: { title: string; matches: Recent
           ))}
         </tbody>
       </table>
-    </div>
-  );
-}
-
-function AvailabilityBlock({ availability, homeLabel, awayLabel }: { availability: MatchAvailability; homeLabel: string; awayLabel: string }) {
-  const renderList = (players: MatchAvailability["home"], label: string) => (
-    <div className="rounded-2xl border border-[#214C9B]/15 bg-white p-4">
-      <h4 className="text-sm font-extrabold uppercase text-[#214C9B]">{label}</h4>
-      {players.length === 0 ? (
-        <p className="mt-2 text-sm text-slate-500">Sin bajas confirmadas.</p>
-      ) : (
-        <ul className="mt-3 space-y-2">
-          {players.map((player) => (
-            <li key={`${label}-${player.name}`} className="text-sm">
-              <span className="font-bold text-slate-800">{player.name}</span>{" "}
-              <span className="text-xs font-bold uppercase text-[#981915]">({player.reason})</span>
-              <p className="text-xs text-slate-500">{player.detail}</p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-
-  return (
-    <div className="space-y-3">
-      <h3 className="text-sm font-extrabold uppercase tracking-normal text-[#214C9B]">Sancionados y lesionados</h3>
-      <div className="grid gap-4 md:grid-cols-2">
-        {renderList(availability.home, homeLabel)}
-        {renderList(availability.away, awayLabel)}
-      </div>
     </div>
   );
 }
@@ -127,7 +97,17 @@ export function MatchPreviaPanel({
         </section>
       )}
 
-      {!compact && <AvailabilityBlock availability={availability} homeLabel={match.homeTeam} awayLabel={match.awayTeam} />}
+      {!compact && (
+        <MatchAvailabilityPanel
+          matchId={match.id}
+          gender={gender}
+          homeTeamId={match.homeTeamId}
+          awayTeamId={match.awayTeamId}
+          availability={availability}
+          homeLabel={match.homeTeam}
+          awayLabel={match.awayTeam}
+        />
+      )}
 
       {video && <MatchVideoBlock video={video} />}
     </div>
