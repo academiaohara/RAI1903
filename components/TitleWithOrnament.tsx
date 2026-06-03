@@ -10,6 +10,8 @@ const gearTextOverlapClass = "-ml-[0.74em]";
 
 type TitleWithOrnamentProps = {
   title: string;
+  /** Shorter label below the `sm` breakpoint (640px). */
+  mobileTitle?: string;
   as?: ElementType;
   animated?: boolean;
   className?: string;
@@ -18,13 +20,15 @@ type TitleWithOrnamentProps = {
 
 export function TitleWithOrnament({
   title,
+  mobileTitle,
   as: Tag = "h1",
   animated = false,
   className,
   wrapperClassName,
 }: TitleWithOrnamentProps) {
   const cutoutId = `title-gear-cutout-${useId().replaceAll(":", "")}`;
-  const startsWithC = /^c/i.test(title.trim());
+  const startsWithC =
+    /^c/i.test(title.trim()) || (mobileTitle != null && /^c/i.test(mobileTitle.trim()));
 
   return (
     <div
@@ -57,7 +61,14 @@ export function TitleWithOrnament({
             className,
           )}
         >
-          {title}
+          {mobileTitle ? (
+            <>
+              <span className="sm:hidden">{mobileTitle}</span>
+              <span className="hidden sm:inline">{title}</span>
+            </>
+          ) : (
+            title
+          )}
         </Tag>
       </div>
     </div>
