@@ -44,6 +44,21 @@ export const NOTICIAS_TABS: { href: Route; label: string }[] = [
 export const sortNewsByDate = <T extends { date: string; id: string }>(items: T[]) =>
   [...items].sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
 
+/** Fecha de noticia en YYYY-MM-DD (comparable lexicográficamente). */
+export const normalizeNewsDate = (date: string) => date.trim().slice(0, 10);
+
+export const matchesNewsDateRange = (
+  item: Pick<NewsItem, "date">,
+  from: string,
+  to: string,
+): boolean => {
+  const day = normalizeNewsDate(item.date);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return true;
+  if (from && day < from) return false;
+  if (to && day > to) return false;
+  return true;
+};
+
 /** Máximo de noticias en el carrusel animado de inicio y fichas. */
 export const NEWS_TICKER_LIMIT = 10;
 

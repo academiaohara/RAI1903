@@ -6,6 +6,7 @@ import { AddNewsPanel } from "@/components/editor/AddNewsPanel";
 import { NewsCard } from "@/components/NewsCard";
 import { PageHero } from "@/components/PageHero";
 import { Pagination } from "@/components/Pagination";
+import { useNewsDateRangeFilter } from "@/hooks/useNewsDateRangeFilter";
 import { usePagination } from "@/hooks/usePagination";
 import { fetchPublishedNewsItems } from "@/lib/cms/news";
 import { newsByChannel } from "@/lib/noticias";
@@ -17,6 +18,7 @@ export default function NoticiasPrensaPage() {
   const [query, setQuery] = useState("");
   const [tag, setTag] = useState<NewsTag | "todas">("todas");
   const [allNews, setAllNews] = useState<NewsItem[]>([]);
+  const { dateFrom, dateTo, setDateFrom, setDateTo, clearDateRange, matchesDateRange } = useNewsDateRangeFilter();
 
   const loadNews = () => {
     void fetchPublishedNewsItems().then(setAllNews);
@@ -35,9 +37,9 @@ export default function NoticiasPrensaPage() {
         const matchesSource = source === "Todos" || item.source === source;
         const matchesQuery = `${item.title} ${item.excerpt}`.toLowerCase().includes(query.toLowerCase());
         const matchesTag = tag === "todas" || item.tags.includes(tag);
-        return matchesSource && matchesQuery && matchesTag;
+        return matchesSource && matchesQuery && matchesTag && matchesDateRange(item);
       }),
-    [pressNews, query, source, tag],
+    [pressNews, query, source, tag, matchesDateRange],
   );
 
   const pagination = usePagination(filtered);
@@ -81,12 +83,21 @@ export default function NoticiasPrensaPage() {
       <AddNewsPanel defaultChannel="prensa" onCreated={loadNews} />
 
       <div className="grid gap-3 sm:gap-4">
-        {pagination.paginatedItems.map((item) => (
-          <NewsCard key={item.id} item={item} onUpdated={loadNews} />
-        ))}
+        {pagination.paginatedItems.length > 0 ? (
+          pagination.paginatedItems.map((item) => <NewsCard key={item.id} item={item} onUpdated={loadNews} />)
+        ) : (
+          <p className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm font-bold text-slate-500">
+            Sin noticias con los filtros seleccionados.
+          </p>
+        )}
       </div>
 
       <Pagination
+        dateFrom={dateFrom}
+        dateTo={dateTo}
+        onDateFromChange={setDateFrom}
+        onDateToChange={setDateTo}
+        onClearDateRange={clearDateRange}
         pageSize={pagination.pageSize}
         pageSizes={pagination.pageSizes}
         totalItems={pagination.totalItems}
