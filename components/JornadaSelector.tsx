@@ -44,19 +44,19 @@ export function JornadaSelector({
     <div
       className={cn(
         "min-w-0",
-        !compact && "rounded-3xl border border-[#214C9B]/20 bg-white p-4 shadow-[0_12px_30px_rgba(17,24,39,0.06)]",
+        !compact && "rounded-2xl border border-[#214C9B]/20 bg-white p-3 shadow-[0_12px_30px_rgba(17,24,39,0.06)] sm:rounded-3xl sm:p-4",
       )}
     >
       <div className={cn("flex flex-wrap items-end justify-between", compact ? "gap-2" : "gap-3")}>
         <div>
-          <p className={cn("font-bold uppercase tracking-normal text-[#214C9B]", compact ? "text-[10px]" : "text-xs")}>
+          <p className={cn("font-bold uppercase tracking-normal text-[#214C9B]", compact ? "text-[10px]" : "text-[10px] sm:text-xs")}>
             Jornadas
           </p>
-          <p className={cn("font-bold text-slate-600", compact ? "mt-0.5 text-xs" : "mt-1 text-sm")}>
+          <p className={cn("font-bold text-slate-600", compact ? "mt-0.5 text-xs" : "mt-0.5 text-xs sm:mt-1 sm:text-sm")}>
             Jornada <span className="text-[#214C9B]">{value}</span> de {total}
           </p>
         </div>
-        <p className={cn("font-bold uppercase tracking-normal text-[#981915]", compact ? "text-[10px]" : "text-xs")}>
+        <p className={cn("font-bold uppercase tracking-normal text-[#981915]", compact ? "text-[10px]" : "text-[10px] sm:text-xs")}>
           Actual: J{currentRound}
         </p>
       </div>
@@ -69,7 +69,7 @@ export function JornadaSelector({
         onChange={(event) => onChange(Number(event.target.value))}
         className={cn(
           "h-2 w-full min-w-0 cursor-pointer appearance-none rounded-full bg-[#214C9B]/15 accent-[#214C9B]",
-          compact ? "mt-2" : "mt-4",
+          compact ? "mt-2" : "mt-3 sm:mt-4",
         )}
         aria-label="Barra de jornadas"
       />
@@ -79,7 +79,7 @@ export function JornadaSelector({
         onWheel={handleWheel}
         className={cn(
           "no-scrollbar flex w-full min-w-0 touch-pan-x flex-nowrap overflow-x-auto overscroll-x-contain pb-1",
-          compact ? "mt-2 gap-1.5" : "mt-3 gap-2",
+          compact ? "mt-2 gap-1.5" : "mt-2 gap-1.5 sm:mt-3 sm:gap-2",
         )}
       >
         {Array.from({ length: total }, (_, index) => {
@@ -95,7 +95,7 @@ export function JornadaSelector({
               onClick={() => onChange(round)}
               className={cn(
                 "shrink-0 rounded-2xl border font-extrabold transition",
-                compact ? "h-9 min-w-9 text-xs" : "h-11 min-w-11 text-sm",
+                compact ? "h-9 min-w-9 text-xs" : "h-9 min-w-9 text-xs sm:h-11 sm:min-w-11 sm:text-sm",
                 isSelected
                   ? isCurrent
                     ? "border-[#981915] bg-[#981915] text-white"

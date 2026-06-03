@@ -33,7 +33,7 @@ export function QuinielaViewToggle<T extends string>({
             aria-selected={active}
             onClick={() => onChange(option.id)}
             className={cn(
-              "relative z-10 flex flex-1 items-center justify-center rounded-xl px-3 py-2.5 text-xs font-bold uppercase tracking-wide transition sm:px-4",
+              "relative z-10 flex flex-1 items-center justify-center rounded-xl px-2 py-2 text-[10px] font-bold uppercase tracking-wide transition sm:px-4 sm:py-2.5 sm:text-xs",
               active ? "text-white" : "text-slate-600 hover:text-[#214C9B]",
             )}
           >

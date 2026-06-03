@@ -20,7 +20,7 @@ export function MatchArticleList({ articles, gender }: MatchArticleListProps) {
   const { items: newsItems } = usePublishedNews();
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2 sm:space-y-3">
       {articles.map((article) => (
         <MatchArticleCard key={article.id} article={article} gender={gender} newsItems={newsItems} />
       ))}
@@ -42,10 +42,10 @@ function MatchArticleCard({
   const typeLabel = article.type === "cronica" ? "Crónica" : "Previa";
   const content = (
     <>
-      <p className="text-[10px] font-bold uppercase tracking-normal text-slate-500 sm:text-xs">
+      <p className="text-[9px] font-bold uppercase tracking-normal text-slate-500 sm:text-xs">
         {typeLabel} · {formatDate(article.date)} · {article.source}
       </p>
-      <h2 className="mt-1.5 text-sm font-extrabold uppercase leading-snug text-[#214C9B] sm:mt-2 sm:text-lg">
+      <h2 className="mt-1 text-[13px] font-extrabold uppercase leading-snug text-[#214C9B] sm:mt-2 sm:text-lg">
         <EditableText
           storageKey={`match-article:${article.id}:title`}
           value={article.title}
@@ -53,7 +53,7 @@ function MatchArticleCard({
           inputClassName="font-extrabold uppercase"
         />
       </h2>
-      <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-slate-600 sm:mt-2 sm:text-sm sm:leading-6">
+      <p className="mt-1 line-clamp-2 text-[11px] leading-4 text-slate-600 sm:mt-2 sm:text-sm sm:leading-6">
         <EditableText
           storageKey={`match-article:${article.id}:excerpt`}
           value={article.excerpt}
@@ -67,7 +67,7 @@ function MatchArticleCard({
 
   if (editMode) {
     return (
-      <article className="rounded-xl border border-[#214C9B]/20 bg-white p-3 sm:rounded-2xl sm:p-4">
+      <article className="rounded-xl border border-[#214C9B]/20 bg-white p-2.5 sm:rounded-2xl sm:p-4">
         {content}
         <MatchArticleNewsLinker article={article} newsItems={newsItems} />
         <Link
@@ -84,7 +84,7 @@ function MatchArticleCard({
   return (
     <Link
       href={href}
-      className="block rounded-xl border border-[#214C9B]/20 bg-white p-3 transition hover:border-[#214C9B] hover:bg-blue-50 sm:rounded-2xl sm:p-4"
+      className="block rounded-xl border border-[#214C9B]/20 bg-white p-2.5 transition hover:border-[#214C9B] hover:bg-blue-50 sm:rounded-2xl sm:p-4"
     >
       {content}
     </Link>

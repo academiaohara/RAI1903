@@ -41,7 +41,7 @@ export default function PrimerEquipoNoticiasPage({ params }: { params: Promise<{
         description={`Actualidad del primer equipo ${genderLabels[gender].club.toLowerCase()} filtrada por categorias.`}
       />
 
-      <div className="-mx-1 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+      <div className="-mx-1 flex touch-pan-x flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-1 no-scrollbar">
         {tags.map((item) => (
           <button
             key={item}

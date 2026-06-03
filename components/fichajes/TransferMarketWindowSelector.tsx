@@ -41,7 +41,7 @@ export function TransferMarketWindowSelector({
   return (
     <div
       className={cn(
-        "inline-flex shrink-0 items-center gap-0.5 rounded-xl border border-[#214C9B]/15 bg-[#214C9B]/5 p-1",
+        "inline-flex shrink-0 items-center gap-0.5 rounded-xl border border-[#214C9B]/15 bg-[#214C9B]/5 p-0.5 sm:p-1",
         className,
       )}
       role="group"
@@ -51,19 +51,19 @@ export function TransferMarketWindowSelector({
         type="button"
         onClick={goOlder}
         disabled={currentIndex === 0}
-        className="rounded-full p-2 text-[#214C9B] transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-35"
+        className="rounded-full p-1.5 text-[#214C9B] transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-35 sm:p-2"
         aria-label="Mercado anterior"
       >
         <ChevronLeft size={16} aria-hidden />
       </button>
-      <span className="max-w-[5.5rem] truncate px-1 text-center text-[10px] font-bold uppercase tracking-normal text-[#214C9B] sm:max-w-none sm:min-w-[9rem] sm:px-2 sm:text-xs">
+      <span className="max-w-[4.75rem] truncate px-0.5 text-center text-[9px] font-extrabold uppercase tracking-normal text-[#214C9B] sm:max-w-none sm:min-w-[9rem] sm:px-2 sm:text-xs">
         {current.label}
       </span>
       <button
         type="button"
         onClick={goNewer}
         disabled={currentIndex === safeWindows.length - 1}
-        className="rounded-full p-2 text-[#214C9B] transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-35"
+        className="rounded-full p-1.5 text-[#214C9B] transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-35 sm:p-2"
         aria-label="Mercado más reciente"
       >
         <ChevronRight size={16} aria-hidden />

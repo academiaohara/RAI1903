@@ -108,7 +108,10 @@ a {
   .title-gear-rai-home h5,
   .title-gear-rai-home h6 {
     font-size: 24px;
-    font-weight: 800;
+    font-family: "Arial Black", Arial, sans-serif;
+    font-weight: 900;
+    letter-spacing: -0.035em;
+    text-shadow: 0 0 0 #214c9b;
   }
 }
 

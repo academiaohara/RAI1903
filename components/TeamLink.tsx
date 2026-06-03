@@ -54,7 +54,7 @@ export function MatchTeamLink({
 }: MatchTeamLinkProps) {
   const tone = highlighted ? "text-[#214C9B]" : "text-slate-700";
   const base = cn(
-    "min-w-0 truncate text-[11px] font-extrabold leading-snug sm:break-words sm:text-sm",
+    "min-w-0 truncate text-[10px] font-extrabold leading-snug sm:break-words sm:text-sm",
     align === "right" && "text-right",
     tone,
     className,
