@@ -25,6 +25,7 @@ export type JornadasFixtureSource = {
   matchdaysFemenino: Matchday[];
   amistosoMatches: Match[];
   copaDelReyMatches: Match[];
+  calendarExtraMatches: Match[];
   lastRoundMasculino: number;
   lastRoundFemenino: number;
   definitiveQualifyingLeagueRound: number;
@@ -37,6 +38,7 @@ export function getDefaultFixtureSource(): JornadasFixtureSource {
     matchdaysFemenino,
     amistosoMatches,
     copaDelReyMatches,
+    calendarExtraMatches: [],
     lastRoundMasculino: RESULTADOS_2526_LAST_ROUND,
     lastRoundFemenino: SEGUNDA_RFEF_FEMENINA_LAST_ROUND,
     definitiveQualifyingLeagueRound: DEFINITIVE_QUALIFYING_LEAGUE_ROUND,
@@ -70,6 +72,7 @@ export function fixtureSourceFromBundles(
     matchdaysGrupo2: bundle.matchdaysGrupo2 ?? defaults.matchdaysGrupo2,
     amistosoMatches: bundle.amistosoMatches ?? defaults.amistosoMatches,
     copaDelReyMatches: bundle.copaDelReyMatches ?? defaults.copaDelReyMatches,
+    calendarExtraMatches: bundle.calendarExtraMatches ?? defaults.calendarExtraMatches,
     lastRoundMasculino: bundle.meta?.lastRound ?? defaults.lastRoundMasculino,
     definitiveQualifyingLeagueRound:
       bundle.meta?.definitiveQualifyingLeagueRound ?? defaults.definitiveQualifyingLeagueRound,

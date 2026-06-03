@@ -6,14 +6,16 @@ import { OnPageEditorSection } from "@/components/editor/OnPageEditorSection";
 import { useSeason } from "@/components/season/SeasonProvider";
 import {
   emptyAmistosoMatch,
+  emptyCalendarExtraMatch,
   emptyCopaMatch,
+  EXTRA_FIXTURE_COMPETITION_OPTIONS,
   mergeExtraFixturesIntoBundle,
 } from "@/lib/cms/extra-fixtures";
 import { getFixturesBundle, upsertSeasonBundle, type SeasonFixturesBundle } from "@/lib/cms/season-bundles";
 import { slugFromTeamName } from "@/lib/cms/group-teams";
 import { RAI_TEAM_ID } from "@/data/mock";
 import { fixtureSourceFromBundles } from "@/lib/season/fixture-source";
-import type { Match } from "@/types";
+import type { CompetitionId, Match } from "@/types";
 
 function matchDateInput(iso: string): string {
   const date = new Date(iso);
@@ -40,12 +42,12 @@ function ExtraMatchEditor({
   match,
   onChange,
   onDelete,
-  showStage,
+  defaultCompetitionName,
 }: {
   match: Match;
   onChange: (next: Match) => void;
   onDelete: () => void;
-  showStage?: boolean;
+  defaultCompetitionName: string;
 }) {
   const isRaiHome = match.homeTeamId === RAI_TEAM_ID;
   const rivalName = isRaiHome ? match.awayTeam : match.homeTeam;
@@ -80,6 +82,8 @@ function ExtraMatchEditor({
     }
   };
 
+  const competitionName = match.competitionStage?.trim() || defaultCompetitionName;
+
   return (
     <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-3 space-y-2">
       <div className="flex items-start justify-between gap-2">
@@ -92,6 +96,32 @@ function ExtraMatchEditor({
           <Trash2 size={12} aria-hidden />
           Eliminar
         </button>
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-2">
+        <label className="block text-xs font-semibold text-slate-600">
+          Tipo de competición
+          <select
+            value={match.competition}
+            onChange={(e) => onChange({ ...match, competition: e.target.value as CompetitionId })}
+            className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+          >
+            {EXTRA_FIXTURE_COMPETITION_OPTIONS.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block text-xs font-semibold text-slate-600">
+          Nombre de la competición
+          <input
+            value={competitionName}
+            onChange={(e) => onChange({ ...match, competitionStage: e.target.value })}
+            className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            placeholder={defaultCompetitionName}
+          />
+        </label>
       </div>
 
       <label className="block text-xs font-semibold text-slate-600">
@@ -144,18 +174,6 @@ function ExtraMatchEditor({
         </label>
       </div>
 
-      {showStage ? (
-        <label className="block text-xs font-semibold text-slate-600">
-          Nombre de la fase
-          <input
-            value={match.competitionStage ?? ""}
-            onChange={(e) => onChange({ ...match, competitionStage: e.target.value })}
-            className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-            placeholder="Pretemporada, Playoff ascenso semis, Playout…"
-          />
-        </label>
-      ) : null}
-
       <label className="block text-xs font-semibold text-slate-600">
         Estado
         <select
@@ -206,10 +224,60 @@ function ExtraMatchEditor({
   );
 }
 
+type ExtraSectionProps = {
+  title: string;
+  emptyLabel: string;
+  addLabel: string;
+  defaultCompetitionName: string;
+  matches: Match[];
+  onChange: (rows: Match[]) => void;
+  onAdd: () => void;
+};
+
+function ExtraMatchSection({
+  title,
+  emptyLabel,
+  addLabel,
+  defaultCompetitionName,
+  matches,
+  onChange,
+  onAdd,
+}: ExtraSectionProps) {
+  return (
+    <section className="space-y-2">
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="text-xs font-extrabold uppercase text-[#214C9B]">{title}</h3>
+        <button
+          type="button"
+          onClick={onAdd}
+          className="inline-flex items-center gap-1 rounded-lg border border-[#214C9B]/25 px-2 py-1 text-[10px] font-bold uppercase text-[#214C9B]"
+        >
+          <Plus size={12} aria-hidden />
+          {addLabel}
+        </button>
+      </div>
+      {matches.length === 0 ? (
+        <p className="text-xs font-bold text-slate-500">{emptyLabel}</p>
+      ) : (
+        matches.map((match, index) => (
+          <ExtraMatchEditor
+            key={match.id}
+            match={match}
+            defaultCompetitionName={defaultCompetitionName}
+            onChange={(next) => onChange(matches.map((row, i) => (i === index ? next : row)))}
+            onDelete={() => onChange(matches.filter((_, i) => i !== index))}
+          />
+        ))
+      )}
+    </section>
+  );
+}
+
 export function ExtraFixturesOnPageEditor() {
   const { viewedSeasonId, viewedSeason, bundles, refreshBundles } = useSeason();
   const [amistosos, setAmistosos] = useState<Match[]>([]);
   const [copa, setCopa] = useState<Match[]>([]);
+  const [extras, setExtras] = useState<Match[]>([]);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -217,6 +285,7 @@ export function ExtraFixturesOnPageEditor() {
     const source = fixtureSourceFromBundles(bundles, "masculino");
     setAmistosos(structuredClone(source.amistosoMatches));
     setCopa(structuredClone(source.copaDelReyMatches));
+    setExtras(structuredClone(source.calendarExtraMatches));
   }, [bundles]);
 
   useEffect(() => {
@@ -241,6 +310,7 @@ export function ExtraFixturesOnPageEditor() {
       existingBundle.matchdaysGrupo2,
       amistosos,
       copa,
+      extras,
     );
     const result = await upsertSeasonBundle(viewedSeasonId, "masculino", "fixtures", payload);
     setBusy(false);
@@ -248,71 +318,46 @@ export function ExtraFixturesOnPageEditor() {
       setMessage(result.error ?? "Error al guardar");
       return;
     }
-    setMessage(`Pretemporada y Copa guardadas (${viewedSeason.label})`);
+    const total = amistosos.length + copa.length + extras.length;
+    setMessage(`Partidos extra guardados (${total} en ${viewedSeason.label})`);
     await refreshBundles();
   };
 
   return (
     <OnPageEditorSection
-      title="Pretemporada y Copa del Rey"
-      description="Añade amistosos, copa o fases extra (playoff de ascenso, playout, etc.) con el nombre que quieras. Los cambios se guardan en el calendario de la temporada."
+      title="Partidos extra del calendario"
+      description="Añade amistosos, copa, playoff, playout u otros partidos del Avilés. El nombre de competición es el que verán los aficionados en el calendario."
     >
       <div className="space-y-4">
-        <section className="space-y-2">
-          <div className="flex items-center justify-between gap-2">
-            <h3 className="text-xs font-extrabold uppercase text-[#214C9B]">Pretemporada (amistosos)</h3>
-            <button
-              type="button"
-              onClick={() => setAmistosos((rows) => [...rows, emptyAmistosoMatch()])}
-              className="inline-flex items-center gap-1 rounded-lg border border-[#214C9B]/25 px-2 py-1 text-[10px] font-bold uppercase text-[#214C9B]"
-            >
-              <Plus size={12} aria-hidden />
-              Añadir amistoso
-            </button>
-          </div>
-          {amistosos.length === 0 ? (
-            <p className="text-xs font-bold text-slate-500">Sin amistosos en esta temporada.</p>
-          ) : (
-            amistosos.map((match, index) => (
-              <ExtraMatchEditor
-                key={match.id}
-                match={match}
-                showStage
-                onChange={(next) =>
-                  setAmistosos((rows) => rows.map((row, i) => (i === index ? next : row)))
-                }
-                onDelete={() => setAmistosos((rows) => rows.filter((_, i) => i !== index))}
-              />
-            ))
-          )}
-        </section>
+        <ExtraMatchSection
+          title="Pretemporada (amistosos)"
+          emptyLabel="Sin amistosos en esta temporada."
+          addLabel="Añadir amistoso"
+          defaultCompetitionName="Pretemporada"
+          matches={amistosos}
+          onChange={setAmistosos}
+          onAdd={() => setAmistosos((rows) => [...rows, emptyAmistosoMatch()])}
+        />
 
-        <section className="space-y-2">
-          <div className="flex items-center justify-between gap-2">
-            <h3 className="text-xs font-extrabold uppercase text-[#214C9B]">Copa del Rey</h3>
-            <button
-              type="button"
-              onClick={() => setCopa((rows) => [...rows, emptyCopaMatch()])}
-              className="inline-flex items-center gap-1 rounded-lg border border-[#214C9B]/25 px-2 py-1 text-[10px] font-bold uppercase text-[#214C9B]"
-            >
-              <Plus size={12} aria-hidden />
-              Añadir partido de copa
-            </button>
-          </div>
-          {copa.length === 0 ? (
-            <p className="text-xs font-bold text-slate-500">Sin partidos de copa en esta temporada.</p>
-          ) : (
-            copa.map((match, index) => (
-              <ExtraMatchEditor
-                key={match.id}
-                match={match}
-                showStage
-                onChange={(next) => setCopa((rows) => rows.map((row, i) => (i === index ? next : row)))}
-                onDelete={() => setCopa((rows) => rows.filter((_, i) => i !== index))}
-              />
-            ))
-          )}
-        </section>
+        <ExtraMatchSection
+          title="Copa del Rey"
+          emptyLabel="Sin partidos de copa en esta temporada."
+          addLabel="Añadir partido de copa"
+          defaultCompetitionName="Copa del Rey"
+          matches={copa}
+          onChange={setCopa}
+          onAdd={() => setCopa((rows) => [...rows, emptyCopaMatch()])}
+        />
+
+        <ExtraMatchSection
+          title="Otros partidos del Avilés"
+          emptyLabel="Sin otros partidos extra (playoff, torneos, etc.)."
+          addLabel="Añadir partido"
+          defaultCompetitionName="Torneo / fase extra"
+          matches={extras}
+          onChange={setExtras}
+          onAdd={() => setExtras((rows) => [...rows, emptyCalendarExtraMatch()])}
+        />
 
         {message ? (
           <p
@@ -328,11 +373,11 @@ export function ExtraFixturesOnPageEditor() {
           onClick={() => void saveExtraFixtures()}
           className="w-full rounded-xl bg-[#214C9B] px-4 py-2.5 text-xs font-extrabold uppercase text-white hover:bg-[#173a78] disabled:opacity-60"
         >
-          {busy ? "Guardando…" : "Guardar pretemporada y copa en Supabase"}
+          {busy ? "Guardando…" : "Guardar partidos extra en Supabase"}
         </button>
         <p className="text-[10px] leading-relaxed text-slate-500">
           Para partidos de liga (jornadas), usa el modo edición en Jornadas o Calendario y pulsa «Guardar en Supabase» para
-          los ajustes en línea. Aquí los cambios de copa y amistosos se escriben directamente en el bundle de calendario.
+          los ajustes en línea. Los partidos de este panel se escriben directamente en el bundle de calendario.
         </p>
       </div>
     </OnPageEditorSection>

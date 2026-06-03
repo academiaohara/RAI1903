@@ -47,6 +47,7 @@ export function enrichFixtureSource(
 
   const amistosoMatches = applyFixtureTeamNamesToMatches(source.amistosoMatches, resolveName);
   const copaDelReyMatches = applyFixtureTeamNamesToMatches(source.copaDelReyMatches, resolveName);
+  const calendarExtraMatches = applyFixtureTeamNamesToMatches(source.calendarExtraMatches, resolveName);
 
   return {
     ...source,
@@ -55,6 +56,7 @@ export function enrichFixtureSource(
     matchdaysFemenino,
     amistosoMatches,
     copaDelReyMatches,
+    calendarExtraMatches,
     competitionConfig: config,
   };
 }

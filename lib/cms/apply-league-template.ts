@@ -65,6 +65,7 @@ export function buildFixturesPayloadForConfig(
     matchdaysGrupo2,
     amistosoMatches: existing?.amistosoMatches,
     copaDelReyMatches: existing?.copaDelReyMatches,
+    calendarExtraMatches: existing?.calendarExtraMatches,
     meta: { lastRound: 0, definitiveQualifyingLeagueRound: 0 },
   };
 }

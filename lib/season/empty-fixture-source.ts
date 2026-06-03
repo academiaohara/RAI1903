@@ -7,6 +7,7 @@ export const EMPTY_FIXTURE_SOURCE: JornadasFixtureSource = {
   matchdaysFemenino: [],
   amistosoMatches: [],
   copaDelReyMatches: [],
+  calendarExtraMatches: [],
   lastRoundMasculino: 1,
   lastRoundFemenino: 1,
   definitiveQualifyingLeagueRound: 38,

@@ -56,6 +56,8 @@ export type SeasonFixturesBundle = {
   matchdaysGrupo2?: Matchday[];
   amistosoMatches?: Match[];
   copaDelReyMatches?: Match[];
+  /** Partidos del Avilés fuera de liga/copa estándar (playoff, torneos, etc.). */
+  calendarExtraMatches?: Match[];
   meta?: {
     lastRound?: number;
     definitiveQualifyingLeagueRound?: number;

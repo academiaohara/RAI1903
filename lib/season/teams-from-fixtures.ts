@@ -32,6 +32,7 @@ export function collectTeamsFromBundles(bundles: SeasonBundlesMap): TeamRef[] {
   if (masc?.matchdaysGrupo2) masc.matchdaysGrupo2.forEach((md) => addFromMatchday(map, md));
   if (masc?.amistosoMatches) addFromMatches(map, masc.amistosoMatches);
   if (masc?.copaDelReyMatches) addFromMatches(map, masc.copaDelReyMatches);
+  if (masc?.calendarExtraMatches) addFromMatches(map, masc.calendarExtraMatches);
 
   const fem = getFixturesBundle(bundles, "femenino") as SeasonFemeninoFixturesBundle | null;
   if (fem?.matchdaysFemenino) fem.matchdaysFemenino.forEach((md) => addFromMatchday(map, md));

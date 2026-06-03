@@ -97,8 +97,8 @@ export function CalendarListView({
           <p className="px-4 py-8 text-center text-sm font-bold text-slate-500">
             {canEdit ? (
               <>
-                Aún no hay partidos en esta temporada. Activa el modo edición para ajustar el calendario o añade amistosos y
-                copa con el panel «Pretemporada y Copa del Rey» arriba del calendario.
+                Aún no hay partidos en esta temporada. Activa el modo edición para ajustar el calendario o añade partidos
+                extra con el panel «Partidos extra del calendario» arriba del calendario.
               </>
             ) : (
               <>Aún no hay partidos en esta temporada.</>

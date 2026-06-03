@@ -38,13 +38,14 @@ export function isLeagueCompetition(competitionId: string): competitionId is Lea
 
 /** Short label shown on match cards (corner badge). */
 export function matchCompetitionShortLabel(match: FixtureMetaSource): string {
+  const customStage = match.competitionStage?.trim();
   if (match.competition === "copa-rey") {
     const round = match.matchday !== undefined ? COPA_ROUND_BY_MATCHDAY[match.matchday] : undefined;
-    return match.competitionStage ?? round ?? "Copa del Rey";
+    return customStage || round || "Copa del Rey";
   }
-  if (match.competition === "primera-rfef") return "1ª RFEF";
-  if (match.competition === "liga-raij903") return "Liga";
-  if (match.competition === "amistoso") return "Amistoso";
+  if (match.competition === "primera-rfef") return customStage || "1ª RFEF";
+  if (match.competition === "liga-raij903") return customStage || "Liga";
+  if (match.competition === "amistoso") return customStage || "Amistoso";
   if (match.competition === "liga-femenina") return "2ª RFEF Fem.";
   if (match.competition === "primera-asturfutbol") return "Primera Asturfutbol";
   if (match.competition === "segunda-asturfutbol") return "2ª Asturfutbol";
