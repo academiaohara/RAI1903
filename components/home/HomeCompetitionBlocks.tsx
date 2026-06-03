@@ -84,7 +84,16 @@ export function HomeMatchBannersBlock() {
 }
 
 export function HomeStandingsStatsBlock() {
-  const { teams, leagueMatchdays, highlightTeamId } = useMasculinoLeagueSeason();
+  const { teams, leagueMatchdays, highlightTeamId, standingsZones, competitionConfig, bundlesLoading } =
+    useMasculinoLeagueSeason();
+
+  if (bundlesLoading) {
+    return (
+      <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 px-4 py-3 text-sm font-semibold text-slate-600">
+        Cargando clasificación de la temporada…
+      </p>
+    );
+  }
 
   return (
     <section className="grid gap-6 xl:grid-cols-[1fr_0.42fr]">
@@ -94,6 +103,8 @@ export function HomeStandingsStatsBlock() {
         matchdays={leagueMatchdays}
         highlightTeamId={highlightTeamId}
         compact
+        zones={standingsZones}
+        zoneRules={competitionConfig.zones}
       />
       <Card
         eyebrow="Jugadores destacados"
