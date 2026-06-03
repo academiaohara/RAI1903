@@ -14,11 +14,11 @@ import { isMatchPlayed } from "@/lib/match-result";
 import type { Match, Matchday, Team } from "@/types";
 
 export function useMasculinoLeagueSeason(seasonScope: SeasonDataScope = "viewed") {
-  const { getFixtureSource, isBundlesLoading, resolveSeasonId } = useSeason();
+  const { getEnrichedFixtureSource, isBundlesLoading, resolveSeasonId } = useSeason();
   const seasonId = resolveSeasonId(seasonScope);
   const fixtureSource = useMemo(
-    () => getFixtureSource("masculino", seasonScope),
-    [getFixtureSource, seasonScope],
+    () => getEnrichedFixtureSource("masculino", seasonScope),
+    [getEnrichedFixtureSource, seasonScope],
   );
   const bundlesLoading = isBundlesLoading(seasonId);
   const baseLeagueMatchdays = useMemo(
