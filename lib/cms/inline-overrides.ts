@@ -2,6 +2,7 @@ import { createClient as createBrowserClient } from "@/lib/supabase/client";
 import { isMissingSeasonIdColumnError } from "@/lib/cms/inline-overrides-compat";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
+import { isMediaRaiGlobalInlineKey, MEDIA_RAI_INLINE_SEASON_ID } from "@/lib/fan-videos";
 
 export type InlineOverridesMap = Record<string, unknown>;
 
@@ -45,6 +46,100 @@ export async function fetchInlineOverrides(seasonId = DEFAULT_COMPETITION_SEASON
   if (!data?.length) return { overrides: {} };
 
   return { overrides: rowsToMap(data as InlineOverrideRow[]) };
+}
+
+type InlineOverrideSeasonRow = InlineOverrideRow & {
+  season_id?: string;
+  updated_at?: string;
+};
+
+/** Overrides de Media RAI guardados en cualquier temporada (vídeos y secciones globales). */
+export async function fetchMediaRaiInlineOverrides(): Promise<{
+  overrides: InlineOverridesMap;
+  error?: string;
+}> {
+  if (!isSupabaseConfigured()) return { overrides: {} };
+
+  const supabase = createBrowserClient();
+  let { data, error } = await supabase
+    .from("cms_inline_overrides")
+    .select("season_id, key, value, updated_at")
+    .or("key.like.media-rai:%,key.like.contenido-fan:%");
+
+  if (error && isMissingSeasonIdColumnError(error.message)) {
+    const legacy = await supabase.from("cms_inline_overrides").select("key, value");
+    data = legacy.data?.map((row) => ({ ...row, season_id: MEDIA_RAI_INLINE_SEASON_ID, updated_at: undefined })) ?? null;
+    error = legacy.error;
+  }
+
+  if (error) {
+    return {
+      overrides: {},
+      error: `${error.message} — Ejecuta supabase/APPLY_CMS_MIGRATIONS.sql en el SQL Editor de Supabase.`,
+    };
+  }
+  if (!data?.length) return { overrides: {} };
+
+  const latestByKey = new Map<string, InlineOverrideSeasonRow>();
+  for (const row of data as InlineOverrideSeasonRow[]) {
+    if (!isMediaRaiGlobalInlineKey(row.key)) continue;
+
+    const existing = latestByKey.get(row.key);
+    if (!existing) {
+      latestByKey.set(row.key, row);
+      continue;
+    }
+
+    const existingTime = existing.updated_at ? Date.parse(existing.updated_at) : 0;
+    const rowTime = row.updated_at ? Date.parse(row.updated_at) : 0;
+    if (rowTime >= existingTime) {
+      latestByKey.set(row.key, row);
+    }
+  }
+
+  return { overrides: rowsToMap([...latestByKey.values()]) };
+}
+
+export function resolveInlineOverrideSeasonId(
+  key: string,
+  viewedSeasonId = DEFAULT_COMPETITION_SEASON_ID,
+): string {
+  return isMediaRaiGlobalInlineKey(key) ? MEDIA_RAI_INLINE_SEASON_ID : viewedSeasonId;
+}
+
+export async function deleteMediaRaiVideoOverrides(section: string): Promise<{ ok: boolean; error?: string }> {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: "Supabase no configurado" };
+  }
+
+  const supabase = createBrowserClient();
+  const globalKey = `media-rai:${section}:videos`;
+
+  const { data, error } = await supabase
+    .from("cms_inline_overrides")
+    .select("season_id, key")
+    .or(`key.eq.${globalKey},key.like.contenido-fan:%:${section}:videos`);
+
+  if (error) return { ok: false, error: error.message };
+  if (!data?.length) return { ok: true };
+
+  const targets = data.filter(
+    (row) => row.key === globalKey || (row.key.endsWith(`:${section}:videos`) && !row.key.includes("primer-equipo")),
+  );
+
+  const results = await Promise.all(
+    targets.map((row) =>
+      supabase
+        .from("cms_inline_overrides")
+        .delete()
+        .eq("season_id", row.season_id ?? MEDIA_RAI_INLINE_SEASON_ID)
+        .eq("key", row.key),
+    ),
+  );
+
+  const failed = results.find(({ error: deleteError }) => deleteError);
+  if (failed?.error) return { ok: false, error: failed.error.message };
+  return { ok: true };
 }
 
 export async function upsertInlineOverride(

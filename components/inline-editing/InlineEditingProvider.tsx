@@ -12,6 +12,8 @@ import {
   clearInlineOverrides,
   deleteInlineOverride,
   fetchInlineOverrides,
+  fetchMediaRaiInlineOverrides,
+  resolveInlineOverrideSeasonId,
   upsertInlineOverride,
   upsertInlineOverridesBatch,
 } from "@/lib/cms/inline-overrides";
@@ -47,6 +49,7 @@ type InlineEditingContextValue = {
   cloudSaving: boolean;
   saveNow: () => Promise<boolean>;
   setEditMode: (enabled: boolean) => void;
+  overrides: InlineOverrides;
   getOverride: <T,>(key: string) => T | undefined;
   getValue: <T,>(key: string, fallback: T) => T;
   saveValue: <T,>(key: string, value: T) => void;
@@ -117,7 +120,7 @@ export function InlineEditingProvider({
       if (!configured) return true;
 
       pendingValuesRef.current.delete(key);
-      const result = await upsertInlineOverride(key, value, userIdRef.current, seasonId);
+      const result = await upsertInlineOverride(key, value, userIdRef.current, resolveInlineOverrideSeasonId(key, seasonId));
       if (!result.ok) {
         setSyncError(result.error ?? "No se pudo guardar en Supabase");
         return false;
@@ -192,7 +195,20 @@ export function InlineEditingProvider({
       return;
     }
 
-    const result = await upsertInlineOverridesBatch(toUpload, userIdRef.current, seasonId);
+    const bySeason = new Map<string, InlineOverrides>();
+    for (const [key, value] of Object.entries(toUpload)) {
+      const targetSeasonId = resolveInlineOverrideSeasonId(key, seasonId);
+      const bucket = bySeason.get(targetSeasonId) ?? {};
+      bucket[key] = value;
+      bySeason.set(targetSeasonId, bucket);
+    }
+
+    const results = await Promise.all(
+      [...bySeason.entries()].map(([targetSeasonId, entries]) =>
+        upsertInlineOverridesBatch(entries, userIdRef.current, targetSeasonId),
+      ),
+    );
+    const result = results.find((item) => !item.ok) ?? { ok: true };
     if (result.ok) {
       setOverrides((prev) => ({ ...prev, ...toUpload }));
       clearLegacyOverrides();
@@ -216,14 +232,24 @@ export function InlineEditingProvider({
       return;
     }
 
-    void fetchInlineOverrides(seasonId).then(({ overrides: cloud, error }) => {
-      const legacy = readLegacyOverrides();
-      setOverrides(mergeOverrideMaps(legacy, seasonId === DEFAULT_COMPETITION_SEASON_ID ? initialOverrides : {}, cloud));
-      if (error) {
-        setSyncError(`No se pudieron cargar cambios de Supabase: ${error}`);
-      }
-      setReady(true);
-    });
+    void Promise.all([fetchInlineOverrides(seasonId), fetchMediaRaiInlineOverrides()]).then(
+      ([seasonResult, mediaRaiResult]) => {
+        const legacy = readLegacyOverrides();
+        setOverrides(
+          mergeOverrideMaps(
+            legacy,
+            seasonId === DEFAULT_COMPETITION_SEASON_ID ? initialOverrides : {},
+            seasonResult.overrides,
+            mediaRaiResult.overrides,
+          ),
+        );
+        const error = seasonResult.error ?? mediaRaiResult.error;
+        if (error) {
+          setSyncError(`No se pudieron cargar cambios de Supabase: ${error}`);
+        }
+        setReady(true);
+      },
+    );
   }, [configured, initialOverrides, seasonId]);
 
   useEffect(() => {
@@ -317,7 +343,7 @@ export function InlineEditingProvider({
       });
 
       if (configured) {
-        void deleteInlineOverride(key, seasonId).then((result) => {
+        void deleteInlineOverride(key, resolveInlineOverrideSeasonId(key, seasonId)).then((result) => {
           if (!result.ok) setSyncError(result.error ?? "No se pudo borrar en Supabase");
           else setSyncError(null);
         });
@@ -364,6 +390,7 @@ export function InlineEditingProvider({
       cloudSaving,
       saveNow,
       setEditMode,
+      overrides,
       getOverride: <T,>(key: string) => overrides[key] as T | undefined,
       getValue: <T,>(key: string, fallback: T) => (overrides[key] as T | undefined) ?? fallback,
       saveValue,
