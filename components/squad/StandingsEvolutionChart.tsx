@@ -3,9 +3,14 @@
 import { useMemo, useState } from "react";
 import { Card } from "@/components/Card";
 import { RAI_TEAM_ID } from "@/data/mock";
+import { useEditedMatchdays } from "@/hooks/useEditedMatchdays";
 import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
+import { PRIMERA_RFEF_RULES } from "@/lib/rfef-rules";
+import type { LeagueTiebreakContext } from "@/lib/rfef-rules/types";
+import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getTeamStandingsEvolution } from "@/lib/standings-evolution";
-import { PRIMERA_RFEF_STANDINGS_ZONES } from "@/lib/rfef-rules";
+import type { StandingsZonesConfig } from "@/lib/standings";
+import type { Matchday, Team } from "@/types";
 
 const CHART_WIDTH = 800;
 const CHART_HEIGHT = 280;
@@ -15,21 +20,44 @@ const MAROON = "#981915";
 type StandingsEvolutionChartProps = {
   teamId?: string;
   className?: string;
+  gender?: PrimerEquipoGender;
+  teams?: Team[];
+  matchdays?: Matchday[];
+  zones?: StandingsZonesConfig;
+  tiebreak?: LeagueTiebreakContext;
+  subtitle?: string;
 };
 
 function formatPointLabel(round: number, position: number) {
   return `J${round} · ${position}º`;
 }
 
-export function StandingsEvolutionChart({ teamId = RAI_TEAM_ID, className }: StandingsEvolutionChartProps) {
-  const { teams, editedLeagueMatchdays } = useMasculinoLeagueSeason();
+export function StandingsEvolutionChart({
+  teamId = RAI_TEAM_ID,
+  className,
+  gender = "masculino",
+  teams: teamsProp,
+  matchdays: matchdaysProp,
+  zones: zonesProp,
+  tiebreak: tiebreakProp,
+  subtitle: subtitleProp,
+}: StandingsEvolutionChartProps) {
+  const masculinoSeason = useMasculinoLeagueSeason();
+  const editedExternalMatchdays = useEditedMatchdays(matchdaysProp ?? [], gender);
+  const useExternalData = teamsProp !== undefined && matchdaysProp !== undefined;
+
+  const teams = useExternalData ? teamsProp : masculinoSeason.teams;
+  const editedLeagueMatchdays = useExternalData ? editedExternalMatchdays : masculinoSeason.editedLeagueMatchdays;
+  const zones = zonesProp ?? PRIMERA_RFEF_RULES.zones;
+  const tiebreak = tiebreakProp ?? PRIMERA_RFEF_RULES.tiebreak;
+  const subtitle = subtitleProp ?? "Liga · 1ª RFEF Grupo I";
+
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const points = useMemo(
-    () => getTeamStandingsEvolution(teamId, teams, editedLeagueMatchdays),
-    [teamId, teams, editedLeagueMatchdays],
+    () => getTeamStandingsEvolution(teamId, teams, editedLeagueMatchdays, zones, tiebreak),
+    [teamId, teams, editedLeagueMatchdays, zones, tiebreak],
   );
   const teamCount = teams.length;
-  const zones = PRIMERA_RFEF_STANDINGS_ZONES;
 
   if (points.length < 2) {
     return (
@@ -61,25 +89,36 @@ export function StandingsEvolutionChart({ teamId = RAI_TEAM_ID, className }: Sta
 
   const zoneRects = [
     { from: 1, to: zones.promotion, fill: "rgba(16,185,129,0.08)" },
-    {
-      from: zones.promotion + 1,
-      to: zones.promotion + zones.playoff,
-      fill: "rgba(56,189,248,0.08)",
-    },
-    {
-      from: teamCount - zones.relegation + 1,
-      to: teamCount,
-      fill: "rgba(244,63,94,0.08)",
-    },
+    ...(zones.playoff > 0
+      ? [
+          {
+            from: zones.promotion + 1,
+            to: zones.promotion + zones.playoff,
+            fill: "rgba(56,189,248,0.08)",
+          },
+        ]
+      : []),
+    ...(zones.relegation > 0
+      ? [
+          {
+            from: teamCount - zones.relegation + 1,
+            to: teamCount,
+            fill: "rgba(244,63,94,0.08)",
+          },
+        ]
+      : []),
   ];
 
-  const yTicks = [1, zones.promotion + 1, zones.promotion + zones.playoff + 1, teamCount].filter(
-    (value, index, arr) => arr.indexOf(value) === index,
-  );
+  const yTicks = [
+    1,
+    ...(zones.playoff > 0 ? [zones.promotion + 1, zones.promotion + zones.playoff + 1] : []),
+    ...(zones.relegation > 0 ? [teamCount - zones.relegation + 1] : []),
+    teamCount,
+  ].filter((value, index, arr) => arr.indexOf(value) === index);
 
   return (
     <Card
-      eyebrow="Liga · 1ª RFEF Grupo I"
+      eyebrow={subtitle}
       title="Evolución de la clasificación"
       className={className}
       borderlessHeader
@@ -189,20 +228,26 @@ export function StandingsEvolutionChart({ teamId = RAI_TEAM_ID, className }: Sta
         )}
       </div>
 
-      <ul className="mt-2 grid grid-cols-3 gap-1.5 text-[9px] font-bold text-slate-600 sm:mt-4 sm:flex sm:flex-wrap sm:gap-4 sm:text-[11px]">
-        <li className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-sm bg-emerald-500/80 sm:h-2.5 sm:w-2.5" aria-hidden />
-          Ascenso directo
-        </li>
-        <li className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-sm bg-sky-400/80 sm:h-2.5 sm:w-2.5" aria-hidden />
-          Playoff
-        </li>
-        <li className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-sm bg-rose-500/80 sm:h-2.5 sm:w-2.5" aria-hidden />
-          Descenso
-        </li>
-      </ul>
+      {(zones.playoff > 0 || zones.relegation > 0) && (
+        <ul className="mt-2 grid grid-cols-3 gap-1.5 text-[9px] font-bold text-slate-600 sm:mt-4 sm:flex sm:flex-wrap sm:gap-4 sm:text-[11px]">
+          <li className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-sm bg-emerald-500/80 sm:h-2.5 sm:w-2.5" aria-hidden />
+            Ascenso directo
+          </li>
+          {zones.playoff > 0 ? (
+            <li className="flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-sm bg-sky-400/80 sm:h-2.5 sm:w-2.5" aria-hidden />
+              Playoff
+            </li>
+          ) : null}
+          {zones.relegation > 0 ? (
+            <li className="flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-sm bg-rose-500/80 sm:h-2.5 sm:w-2.5" aria-hidden />
+              Descenso
+            </li>
+          ) : null}
+        </ul>
+      )}
     </Card>
   );
 }
