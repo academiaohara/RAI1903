@@ -1,4 +1,5 @@
 import { getRaiTeamId } from "@/lib/fixtures";
+import { isClubTeamMatch } from "@/lib/season/club-team-ids";
 import type { JornadasFixtureSource } from "@/lib/season/fixture-source";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Match } from "@/types";
@@ -6,9 +7,9 @@ import type { Match } from "@/types";
 export function getAvilesMatchesFromSource(
   source: JornadasFixtureSource,
   gender: PrimerEquipoGender,
-  options?: { mapMatch?: (match: Match) => Match },
+  options?: { mapMatch?: (match: Match) => Match; clubTeamIds?: readonly string[] },
 ): Match[] {
-  const raiId = getRaiTeamId(gender);
+  const clubTeamIds = options?.clubTeamIds ?? [getRaiTeamId(gender)];
 
   const league =
     gender === "femenino"
@@ -22,7 +23,7 @@ export function getAvilesMatchesFromSource(
 
   return league
     .map((match) => options?.mapMatch?.(match) ?? match)
-    .filter((match) => match.homeTeamId === raiId || match.awayTeamId === raiId)
+    .filter((match) => isClubTeamMatch(match, clubTeamIds))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }
 

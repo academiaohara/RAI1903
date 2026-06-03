@@ -7,6 +7,7 @@ import {
   type SeasonCompetitionConfigBundle,
 } from "@/lib/cms/competition-config-bundle";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
+import { resolveClubTeamIds } from "@/lib/season/club-team-ids";
 import { RAI_TEAM_ID } from "@/data/mock";
 import { useEditedMatchdays, useEditedMatches } from "@/hooks/useEditedMatchdays";
 import {
@@ -42,9 +43,10 @@ export function useMasculinoLeagueSeason(seasonScope: SeasonDataScope = "viewed"
   );
   const editedLeagueMatchdays = useEditedMatchdays(baseLeagueMatchdays, "masculino");
   const teams = useMemo(() => resolveGroupTeams(bundles, "masculino", "1"), [bundles]);
+  const clubTeamIds = useMemo(() => resolveClubTeamIds(bundles, "masculino", "1"), [bundles]);
   const baseAvilesMatches = useMemo(
-    () => getAvilesMatchesFromSource(fixtureSource, "masculino"),
-    [fixtureSource],
+    () => getAvilesMatchesFromSource(fixtureSource, "masculino", { clubTeamIds }),
+    [fixtureSource, clubTeamIds],
   );
   const avilesMatches = useEditedMatches(baseAvilesMatches, "masculino");
   const currentRound = useMemo(
