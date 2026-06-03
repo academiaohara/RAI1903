@@ -8,13 +8,11 @@ import {
   formatContractDate,
   formatPlayerAge,
   getPlayerFullName,
-  getNationalityFlag,
   groupPlayersByPosition,
 } from "@/lib/squad-utils";
 import { PositionSection } from "@/components/squad/PositionSection";
 import { SquadListColGroup } from "@/components/squad/SquadListColGroup";
 import { SquadPlayerQuickEdit } from "@/components/squad/SquadPlayerQuickEdit";
-import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 
 type PlayerTableProps = {
   players: SquadPlayer[];
@@ -291,17 +289,8 @@ function PlayerMobileRow({
   const content = (
     <>
       <span className="flex min-w-0 items-center gap-1.5">
-        <span className="w-4 shrink-0 text-center text-[10px] font-bold tabular-nums text-slate-500">{player.dorsal}</span>
-        <PlayerAvatar
-          player={player}
-          bare
-          className="h-8 w-8 shrink-0 rounded-full bg-slate-100 ring-1 ring-slate-200"
-          imageClassName="object-cover object-top"
-        />
-        <span className="min-w-0">
-          <span className="block truncate text-[10.5px] font-extrabold text-slate-900">{getPlayerFullName(player)}</span>
-          <span className="mt-0.5 block text-[10px] leading-none">{getNationalityFlag(player.nacionalidad)}</span>
-        </span>
+        <span className="w-4 shrink-0 text-center text-[10px] font-bold tabular-nums text-[#214C9B]">{player.dorsal}</span>
+        <span className="min-w-0 truncate text-[10.5px] font-extrabold text-slate-900">{getPlayerFullName(player)}</span>
       </span>
       {view === "stats" ? (
         <>
@@ -407,7 +396,7 @@ function MobileSectionHeader({
 }) {
   return (
     <div
-      className={`grid items-center gap-1.5 bg-[#EAF5E8] px-2 py-2 text-[10px] font-extrabold uppercase tracking-wide text-[#2B7A1F] ${mobileGridClass[view]}`}
+      className={`grid items-center gap-1.5 border-b border-slate-100 bg-slate-50/90 px-2 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 ${mobileGridClass[view]}`}
     >
       <span>{SQUAD_POSITION_LABELS[position]}</span>
       {view === "stats" ? (
