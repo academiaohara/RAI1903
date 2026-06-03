@@ -1,8 +1,10 @@
 import { PRIMERA_RFEF_RULES } from "@/lib/rfef-rules";
+import type { LeagueTiebreakContext } from "@/lib/rfef-rules/types";
 import {
   getPlayedLeagueRounds,
   getTeamsAtRound,
   qualifyingRoundAfterJornada,
+  type StandingsZonesConfig,
 } from "@/lib/standings";
 import type { Matchday, Team } from "@/types";
 
@@ -16,8 +18,9 @@ export function getTeamStandingsEvolution(
   teamId: string,
   sourceTeams: Team[],
   matchdays: Matchday[],
+  zones: StandingsZonesConfig = PRIMERA_RFEF_RULES.zones,
+  tiebreak: LeagueTiebreakContext = PRIMERA_RFEF_RULES.tiebreak,
 ): StandingsEvolutionPoint[] {
-  const { zones, tiebreak } = PRIMERA_RFEF_RULES;
   const playedRounds = getPlayedLeagueRounds(matchdays);
 
   return playedRounds.map((round) => {
