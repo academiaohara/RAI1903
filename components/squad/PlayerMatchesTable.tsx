@@ -14,7 +14,7 @@ export function PlayerMatchesTable({ player }: { player: SquadPlayer }) {
   if (matches.length === 0) {
     return (
       <p className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-semibold text-slate-500">
-        Sin partidos registrados en mock.
+        Sin partidos registrados en esta temporada.
       </p>
     );
   }

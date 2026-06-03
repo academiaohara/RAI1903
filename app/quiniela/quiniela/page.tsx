@@ -5,6 +5,7 @@ import { Card } from "@/components/Card";
 import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
 import { PredictionForm } from "@/components/PredictionForm";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { QuinielaHowItWorks } from "@/components/QuinielaHowItWorks";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
 import type { CompetitionSeasonId } from "@/data/mock";
@@ -32,6 +33,7 @@ type PronosticosBodyProps = {
 };
 
 function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundlesLoading }: PronosticosBodyProps) {
+  const { canEdit: isCmsEditor } = useInlineEditing();
   const [round, setRound] = useState(currentRound);
   const [predictions, setPredictions] = useState<Record<string, Prediction>>({});
   const [savedRounds, setSavedRounds] = useState<Record<number, string>>({});
@@ -168,8 +170,14 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
       <Card eyebrow={`Jornada ${selectedMatchday.round}`} title="Tu quiniela">
         {!bundlesLoading && !hasMatchesForRound && (
           <p className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700">
-            No hay partidos del Grupo I configurados para la jornada {round}. Asigna equipos reales en Jornadas o
-            guarda el calendario en Editar → Competición.
+            {isCmsEditor ? (
+              <>
+                No hay partidos del Grupo I configurados para la jornada {round}. Asigna equipos reales en Jornadas o
+                guarda el calendario en Editar → Competición.
+              </>
+            ) : (
+              <>No hay partidos del Grupo I disponibles para la jornada {round}.</>
+            )}
           </p>
         )}
 
