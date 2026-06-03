@@ -2,39 +2,54 @@
 
 import { useMemo } from "react";
 import { useSeason, type SeasonDataScope } from "@/components/season/SeasonProvider";
+import {
+  zonesToLegacyConfig,
+  type SeasonCompetitionConfigBundle,
+} from "@/lib/cms/competition-config-bundle";
+import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { RAI_TEAM_ID } from "@/data/mock";
 import { useEditedMatchdays, useEditedMatches } from "@/hooks/useEditedMatchdays";
 import {
   getAvilesMatchesFromSource,
   getLeagueMatchdaysForGender,
 } from "@/lib/season/aviles-matches";
-import { getTeamsForRfefGrupo } from "@/lib/rfef-grupos";
 import { getLastPlayedLeagueRound } from "@/lib/standings";
 import { isMatchPlayed } from "@/lib/match-result";
+import type { StandingsZonesConfig } from "@/lib/standings";
 import type { Match, Matchday, Team } from "@/types";
 
 export function useMasculinoLeagueSeason(seasonScope: SeasonDataScope = "viewed") {
-  const { getEnrichedFixtureSource, isBundlesLoading, resolveSeasonId } = useSeason();
+  const { getEnrichedFixtureSource, getBundles, getCompetitionConfig, isBundlesLoading, resolveSeasonId } =
+    useSeason();
   const seasonId = resolveSeasonId(seasonScope);
+  const bundles = useMemo(() => getBundles(seasonId), [getBundles, seasonId]);
   const fixtureSource = useMemo(
     () => getEnrichedFixtureSource("masculino", seasonScope),
     [getEnrichedFixtureSource, seasonScope],
+  );
+  const competitionConfig = useMemo(
+    () => getCompetitionConfig("masculino", seasonScope),
+    [getCompetitionConfig, seasonScope],
+  );
+  const standingsZones = useMemo(
+    () => zonesToLegacyConfig(competitionConfig.zones),
+    [competitionConfig.zones],
   );
   const bundlesLoading = isBundlesLoading(seasonId);
   const baseLeagueMatchdays = useMemo(
     () => getLeagueMatchdaysForGender(fixtureSource, "masculino"),
     [fixtureSource],
   );
-  const leagueMatchdays = useEditedMatchdays(baseLeagueMatchdays, "masculino");
-  const teams = useMemo(() => getTeamsForRfefGrupo("1"), []);
+  const editedLeagueMatchdays = useEditedMatchdays(baseLeagueMatchdays, "masculino");
+  const teams = useMemo(() => resolveGroupTeams(bundles, "masculino", "1"), [bundles]);
   const baseAvilesMatches = useMemo(
     () => getAvilesMatchesFromSource(fixtureSource, "masculino"),
     [fixtureSource],
   );
   const avilesMatches = useEditedMatches(baseAvilesMatches, "masculino");
   const currentRound = useMemo(
-    () => getLastPlayedLeagueRound(leagueMatchdays),
-    [leagueMatchdays],
+    () => getLastPlayedLeagueRound(editedLeagueMatchdays),
+    [editedLeagueMatchdays],
   );
 
   const latestMatches = useMemo(
@@ -59,8 +74,8 @@ export function useMasculinoLeagueSeason(seasonScope: SeasonDataScope = "viewed"
 
   return {
     teams,
-    leagueMatchdays: baseLeagueMatchdays,
-    editedLeagueMatchdays: leagueMatchdays,
+    leagueMatchdays: editedLeagueMatchdays,
+    editedLeagueMatchdays,
     avilesMatches,
     latestMatches,
     upcomingMatches,
@@ -68,6 +83,8 @@ export function useMasculinoLeagueSeason(seasonScope: SeasonDataScope = "viewed"
     currentRound,
     highlightTeamId: RAI_TEAM_ID,
     bundlesLoading,
+    standingsZones,
+    competitionConfig,
   };
 }
 
@@ -82,4 +99,6 @@ export type MasculinoLeagueSeason = {
   currentRound: number;
   highlightTeamId: string;
   bundlesLoading: boolean;
+  standingsZones: StandingsZonesConfig;
+  competitionConfig: SeasonCompetitionConfigBundle;
 };
