@@ -23,6 +23,8 @@ import type { JornadasFixtureSource } from "@/lib/season/fixture-source";
 import { loadSeasonId, saveSeasonId } from "@/lib/storage";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 
+export type SeasonDataScope = "viewed" | "active";
+
 type SeasonContextValue = {
   seasons: CmsSeason[];
   activeSeasonId: CompetitionSeasonId;
@@ -38,9 +40,15 @@ type SeasonContextValue = {
   setViewedSeasonId: (id: CompetitionSeasonId) => void;
   refreshSeasons: () => Promise<void>;
   refreshBundles: () => Promise<void>;
-  getFixtureSource: (gender: PrimerEquipoGender) => JornadasFixtureSource;
-  getEnrichedFixtureSource: (gender: PrimerEquipoGender) => EnrichedFixtureSource;
-  getCompetitionConfig: (gender: PrimerEquipoGender) => ReturnType<typeof resolveCompetitionConfig>;
+  getBundles: (seasonId: CompetitionSeasonId) => SeasonBundlesMap;
+  isBundlesLoading: (seasonId: CompetitionSeasonId) => boolean;
+  resolveSeasonId: (scope?: SeasonDataScope) => CompetitionSeasonId;
+  getFixtureSource: (gender: PrimerEquipoGender, scope?: SeasonDataScope) => JornadasFixtureSource;
+  getEnrichedFixtureSource: (gender: PrimerEquipoGender, scope?: SeasonDataScope) => EnrichedFixtureSource;
+  getCompetitionConfig: (
+    gender: PrimerEquipoGender,
+    scope?: SeasonDataScope,
+  ) => ReturnType<typeof resolveCompetitionConfig>;
 };
 
 const SeasonContext = createContext<SeasonContextValue | null>(null);
@@ -60,8 +68,8 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
   const [seasons, setSeasons] = useState<CmsSeason[]>([]);
   const [activeSeasonId, setActiveSeasonId] = useState<CompetitionSeasonId>(defaultSeasonId);
   const [viewedSeasonId, setViewedSeasonIdState] = useState<CompetitionSeasonId>(defaultSeasonId);
-  const [bundles, setBundles] = useState<SeasonBundlesMap>({});
-  const [bundlesLoading, setBundlesLoading] = useState(true);
+  const [bundleCache, setBundleCache] = useState<Partial<Record<CompetitionSeasonId, SeasonBundlesMap>>>({});
+  const [pendingBundleLoads, setPendingBundleLoads] = useState<Set<CompetitionSeasonId>>(() => new Set());
   const [transfers, setTransfers] = useState<TransferRumor[]>([]);
   const [transfersLoading, setTransfersLoading] = useState(true);
   const [marketWindows, setMarketWindows] = useState<TransferMarketWindow[]>([]);
@@ -84,19 +92,24 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
     const active = rows.find((row) => row.isDefault) ?? rows[rows.length - 1];
     if (!active) return;
     const activeId = active.id as CompetitionSeasonId;
+    const previousActiveId = activeSeasonId;
+
     setActiveSeasonId(activeId);
     setViewedSeasonIdState((current) => {
+      const stored = loadSeasonId();
+      if (stored === previousActiveId && activeId !== previousActiveId) {
+        saveSeasonId(activeId);
+        return activeId;
+      }
       if (rows.some((row) => row.id === current)) return current;
       return pickViewedSeasonId(rows, activeId);
     });
     await refreshPublishedTransfers(rows);
-  }, [refreshPublishedTransfers]);
+  }, [activeSeasonId, refreshPublishedTransfers]);
 
   const refreshBundles = useCallback(async () => {
-    setBundlesLoading(true);
     const map = await fetchSeasonBundles(viewedSeasonId);
-    setBundles(map);
-    setBundlesLoading(false);
+    setBundleCache((current) => ({ ...current, [viewedSeasonId]: map }));
     const publishedRows = seasons.length > 0 ? seasons : await fetchPublishedSeasons();
     if (publishedRows.length > 0) {
       if (!seasons.length) setSeasons(publishedRows);
@@ -110,20 +123,72 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
     });
   }, [refreshSeasons]);
 
+  const viewedBundlesLoaded = bundleCache[viewedSeasonId] !== undefined;
+  const activeBundlesLoaded = bundleCache[activeSeasonId] !== undefined;
+
   useEffect(() => {
+    if (viewedBundlesLoaded) return;
+
     let cancelled = false;
+    const seasonId = viewedSeasonId;
+
     queueMicrotask(() => {
-      setBundlesLoading(true);
-    });
-    void fetchSeasonBundles(viewedSeasonId).then((map) => {
       if (cancelled) return;
-      setBundles(map);
-      setBundlesLoading(false);
+      setPendingBundleLoads((current) => {
+        if (current.has(seasonId)) return current;
+        const next = new Set(current);
+        next.add(seasonId);
+        return next;
+      });
     });
+
+    void fetchSeasonBundles(seasonId).then((map) => {
+      if (cancelled) return;
+      setBundleCache((current) => ({ ...current, [seasonId]: map }));
+      setPendingBundleLoads((current) => {
+        if (!current.has(seasonId)) return current;
+        const next = new Set(current);
+        next.delete(seasonId);
+        return next;
+      });
+    });
+
     return () => {
       cancelled = true;
     };
-  }, [viewedSeasonId]);
+  }, [viewedBundlesLoaded, viewedSeasonId]);
+
+  useEffect(() => {
+    if (activeSeasonId === viewedSeasonId || activeBundlesLoaded) return;
+
+    let cancelled = false;
+    const seasonId = activeSeasonId;
+
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setPendingBundleLoads((current) => {
+        if (current.has(seasonId)) return current;
+        const next = new Set(current);
+        next.add(seasonId);
+        return next;
+      });
+    });
+
+    void fetchSeasonBundles(seasonId).then((map) => {
+      if (cancelled) return;
+      setBundleCache((current) => ({ ...current, [seasonId]: map }));
+      setPendingBundleLoads((current) => {
+        if (!current.has(seasonId)) return current;
+        const next = new Set(current);
+        next.delete(seasonId);
+        return next;
+      });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeBundlesLoaded, activeSeasonId, viewedSeasonId]);
 
   const setViewedSeasonId = useCallback((id: CompetitionSeasonId) => {
     setViewedSeasonIdState(id);
@@ -142,19 +207,43 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
     );
   }, [activeSeasonId, seasons, viewedSeasonId]);
 
+  const bundles = useMemo(() => bundleCache[viewedSeasonId] ?? {}, [bundleCache, viewedSeasonId]);
+  const bundlesLoading = pendingBundleLoads.has(viewedSeasonId) || !viewedBundlesLoaded;
+
+  const getBundles = useCallback(
+    (seasonId: CompetitionSeasonId) => bundleCache[seasonId] ?? {},
+    [bundleCache],
+  );
+
+  const isBundlesLoading = useCallback(
+    (seasonId: CompetitionSeasonId) => pendingBundleLoads.has(seasonId) || bundleCache[seasonId] === undefined,
+    [bundleCache, pendingBundleLoads],
+  );
+
+  const resolveSeasonId = useCallback(
+    (scope: SeasonDataScope = "viewed") => (scope === "active" ? activeSeasonId : viewedSeasonId),
+    [activeSeasonId, viewedSeasonId],
+  );
+
   const getFixtureSource = useCallback(
-    (gender: PrimerEquipoGender) => fixtureSourceFromBundles(bundles, gender),
-    [bundles],
+    (gender: PrimerEquipoGender, scope: SeasonDataScope = "viewed") =>
+      fixtureSourceFromBundles(getBundles(resolveSeasonId(scope)), gender),
+    [getBundles, resolveSeasonId],
   );
 
   const getEnrichedFixtureSource = useCallback(
-    (gender: PrimerEquipoGender) => enrichFixtureSource(getFixtureSource(gender), bundles, gender),
-    [bundles, getFixtureSource],
+    (gender: PrimerEquipoGender, scope: SeasonDataScope = "viewed") => {
+      const seasonId = resolveSeasonId(scope);
+      const seasonBundles = getBundles(seasonId);
+      return enrichFixtureSource(fixtureSourceFromBundles(seasonBundles, gender), seasonBundles, gender);
+    },
+    [getBundles, resolveSeasonId],
   );
 
   const getCompetitionConfig = useCallback(
-    (gender: PrimerEquipoGender) => resolveCompetitionConfig(bundles, gender),
-    [bundles],
+    (gender: PrimerEquipoGender, scope: SeasonDataScope = "viewed") =>
+      resolveCompetitionConfig(getBundles(resolveSeasonId(scope)), gender),
+    [getBundles, resolveSeasonId],
   );
 
   const value = useMemo<SeasonContextValue>(
@@ -172,6 +261,9 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
       setViewedSeasonId,
       refreshSeasons,
       refreshBundles,
+      getBundles,
+      isBundlesLoading,
+      resolveSeasonId,
       getFixtureSource,
       getEnrichedFixtureSource,
       getCompetitionConfig,
@@ -186,8 +278,11 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
       getFixtureSource,
       getEnrichedFixtureSource,
       getCompetitionConfig,
+      getBundles,
+      isBundlesLoading,
       refreshBundles,
       refreshSeasons,
+      resolveSeasonId,
       seasons,
       setViewedSeasonId,
       viewedSeason,

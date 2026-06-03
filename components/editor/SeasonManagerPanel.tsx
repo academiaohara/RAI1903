@@ -149,10 +149,13 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
                     type="button"
                     disabled={busy}
                     onClick={() =>
-                      void runAction(
-                        () => setDefaultSeason(row.id),
-                        `${row.label} es ahora la temporada principal`,
-                      )
+                      void runAction(async () => {
+                        const result = await setDefaultSeason(row.id);
+                        if (result.ok) {
+                          setViewedSeasonId(row.id as CompetitionSeasonId);
+                        }
+                        return result;
+                      }, `${row.label} es ahora la temporada principal`)
                     }
                     className="rounded-lg bg-[#214C9B] px-2 py-1 font-bold text-white hover:bg-[#173a78] disabled:opacity-50"
                   >
