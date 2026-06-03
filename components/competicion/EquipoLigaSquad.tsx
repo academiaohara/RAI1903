@@ -7,9 +7,10 @@ import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvi
 import { useSeason } from "@/components/season/SeasonProvider";
 import type { SquadPlayer, SquadViewMode, StadiumInfo } from "@/types/squad";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import { useRivalSquadAvailability } from "@/hooks/useRivalSquadAvailability";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { getCompeticionSquadData } from "@/lib/competicion-squad";
-import { splitSquadByAvailability } from "@/lib/squad-utils";
+import { defaultRosterEstado, splitSquadByAvailability } from "@/lib/squad-utils";
 import { SquadHeader } from "@/components/squad/SquadHeader";
 import { SquadToolbar } from "@/components/squad/SquadToolbar";
 import { SquadAvailability } from "@/components/squad/SquadAvailability";
@@ -33,8 +34,9 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
     [bundles, gender, team],
   );
   const { squad: ownSquad, updatePlayer, addPlayer, removePlayer } = useSquadPlayers(gender);
+  const { squad: rivalSquad, setPlayerEstado: setRivalPlayerEstado } = useRivalSquadAvailability(gender, team);
   const { editMode } = useInlineEditing();
-  const squad = isOwnClub ? ownSquad : baseSquad;
+  const squad = isOwnClub ? ownSquad : rivalSquad.length > 0 ? rivalSquad : baseSquad;
   const [stadiumOverride, setStadiumOverride] = useState<StadiumInfo | null>(null);
   const club = useMemo(() => {
     if (!stadiumOverride) return baseClub;
@@ -44,7 +46,33 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
       estadioInfo: stadiumOverride,
     };
   }, [baseClub, stadiumOverride]);
-  const { injured, suspended } = useMemo(() => splitSquadByAvailability(squad), [squad]);
+  const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
+
+  const handleMarkUnavailable = useCallback(
+    (playerId: string, estado: "lesionado" | "sancionado") => {
+      if (isOwnClub) {
+        updatePlayer(playerId, { estado });
+        return;
+      }
+      setRivalPlayerEstado(playerId, estado);
+    },
+    [isOwnClub, setRivalPlayerEstado, updatePlayer],
+  );
+
+  const handleMarkAvailable = useCallback(
+    (playerId: string) => {
+      const player = squad.find((entry) => entry.id === playerId);
+      if (!player) return;
+      const estado = defaultRosterEstado(player);
+      if (isOwnClub) {
+        updatePlayer(playerId, { estado });
+        return;
+      }
+      setRivalPlayerEstado(playerId, estado);
+    },
+    [isOwnClub, setRivalPlayerEstado, squad, updatePlayer],
+  );
+
   const isFemenino = gender === "femenino";
   const showPlayerModal = isOwnClub && !isFemenino;
   const listOnlyView = !isOwnClub || isFemenino;
@@ -87,8 +115,11 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
       <SquadAvailability
         injured={injured}
         suspended={suspended}
+        available={available}
         onSelect={handleSelect}
-        editMode={editMode && isOwnClub}
+        editMode={editMode}
+        onMarkUnavailable={editMode ? handleMarkUnavailable : undefined}
+        onMarkAvailable={editMode ? handleMarkAvailable : undefined}
       />
 
       <AnimatePresence mode="wait">

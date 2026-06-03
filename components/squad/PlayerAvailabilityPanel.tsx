@@ -4,17 +4,11 @@ import type { ReactNode } from "react";
 import type { PlayerStatus } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
 import { InjuryIcon, RedCardIcon } from "@/components/competicion/AvailabilityIcons";
+import { defaultRosterEstado } from "@/lib/squad-utils";
 import { cn } from "@/lib/utils";
 
 const CARD_CLASS =
   "rounded-2xl border border-[#214C9B]/15 bg-white p-4 shadow-[0_8px_20px_rgba(17,24,39,0.04)]";
-
-const ROSTER_ESTADOS: PlayerStatus[] = ["titular", "suplente", "cantera", "nuevo fichaje"];
-
-function defaultRosterEstado(player: SquadPlayer): PlayerStatus {
-  if (ROSTER_ESTADOS.includes(player.estado)) return player.estado;
-  return "titular";
-}
 
 type PlayerAvailabilityPanelProps = {
   player: SquadPlayer;

@@ -9,7 +9,7 @@ import { useSeason } from "@/components/season/SeasonProvider";
 import { getLeagueMatchdaysForGender } from "@/lib/season/aviles-matches";
 import { resolveSquadClubInfo } from "@/lib/season/squad-source";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
-import { splitSquadByAvailability } from "@/lib/squad-utils";
+import { defaultRosterEstado, splitSquadByAvailability } from "@/lib/squad-utils";
 import { SquadHeader } from "@/components/squad/SquadHeader";
 import { SquadToolbar } from "@/components/squad/SquadToolbar";
 import { SquadAvailability } from "@/components/squad/SquadAvailability";
@@ -36,7 +36,24 @@ export function SquadPage({ gender }: SquadPageProps) {
     () => getLeagueMatchdaysForGender(getFixtureSource(gender), gender),
     [gender, getFixtureSource],
   );
-  const { injured, suspended } = useMemo(() => splitSquadByAvailability(squad), [squad]);
+  const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
+
+  const handleMarkUnavailable = useCallback(
+    (playerId: string, estado: "lesionado" | "sancionado") => {
+      updatePlayer(playerId, { estado });
+    },
+    [updatePlayer],
+  );
+
+  const handleMarkAvailable = useCallback(
+    (playerId: string) => {
+      const player = squad.find((entry) => entry.id === playerId);
+      if (!player) return;
+      updatePlayer(playerId, { estado: defaultRosterEstado(player) });
+    },
+    [squad, updatePlayer],
+  );
+
   const club = useMemo(() => {
     const base = resolveSquadClubInfo(gender, viewedSeason.label, bundles, squad.length, leagueMatchdays);
     const merged = {
@@ -96,7 +113,15 @@ export function SquadPage({ gender }: SquadPageProps) {
 
       {editMode && <SquadEditToolbar onAddPlayer={(position) => void handleAddPlayer(position)} busy={addBusy} />}
 
-      <SquadAvailability injured={injured} suspended={suspended} onSelect={handleSelect} editMode={editMode} />
+      <SquadAvailability
+        injured={injured}
+        suspended={suspended}
+        available={available}
+        onSelect={handleSelect}
+        editMode={editMode}
+        onMarkUnavailable={editMode ? handleMarkUnavailable : undefined}
+        onMarkAvailable={editMode ? handleMarkAvailable : undefined}
+      />
 
       <AnimatePresence mode="wait">
         <motion.div

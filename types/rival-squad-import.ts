@@ -1,3 +1,5 @@
+import type { PlayerStatus } from "@/types";
+
 export type RivalSquadImportPlayer = {
   dorsal: number;
   jugador: string;
@@ -10,6 +12,8 @@ export type RivalSquadImportPlayer = {
   tr: number;
   valor: string | null;
   contrato: number | null;
+  /** lesionado | sancionado en plantilla rival; por defecto titular */
+  estado?: PlayerStatus;
 };
 
 export type RivalSquadImport = {
