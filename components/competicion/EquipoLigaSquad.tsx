@@ -28,24 +28,38 @@ type EquipoLigaSquadProps = {
 };
 
 export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
-  const { bundles } = useSeason();
+  const { bundles, viewedSeason } = useSeason();
   const { club: baseClub, squad: baseSquad, isOwnClub } = useMemo(
-    () => getCompeticionSquadData(gender, team, bundles),
-    [bundles, gender, team],
+    () => getCompeticionSquadData(gender, team, bundles, viewedSeason.label),
+    [bundles, gender, team, viewedSeason.label],
   );
   const { squad: ownSquad, updatePlayer, addPlayer, removePlayer } = useSquadPlayers(gender);
-  const { squad: rivalSquad, setPlayerEstado: setRivalPlayerEstado } = useRivalSquadAvailability(gender, team);
+  const {
+    squad: rivalSquad,
+    entrenador: rivalEntrenador,
+    setPlayerEstado: setRivalPlayerEstado,
+    setEntrenador: setRivalEntrenador,
+  } = useRivalSquadAvailability(gender, team);
   const { editMode } = useInlineEditing();
   const squad = isOwnClub ? ownSquad : rivalSquad.length > 0 ? rivalSquad : baseSquad;
   const [stadiumOverride, setStadiumOverride] = useState<StadiumInfo | null>(null);
   const club = useMemo(() => {
-    if (!stadiumOverride) return baseClub;
+    const withStadium = stadiumOverride
+      ? {
+          ...baseClub,
+          estadio: stadiumOverride.nombre,
+          estadioInfo: stadiumOverride,
+        }
+      : baseClub;
+
+    if (isOwnClub) return withStadium;
+
     return {
-      ...baseClub,
-      estadio: stadiumOverride.nombre,
-      estadioInfo: stadiumOverride,
+      ...withStadium,
+      temporada: viewedSeason.label,
+      entrenador: rivalEntrenador,
     };
-  }, [baseClub, stadiumOverride]);
+  }, [baseClub, isOwnClub, rivalEntrenador, stadiumOverride, viewedSeason.label]);
   const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
 
   const handleMarkUnavailable = useCallback(
@@ -101,7 +115,13 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
   return (
     <div className="space-y-6">
       {!isOwnClub && <RivalSquadOnPageEditor gender={gender} team={team} />}
-      <SquadHeader club={club} stats={club.stats} gender={gender} onStadiumClick={() => setStadiumOpen(true)} />
+      <SquadHeader
+        club={club}
+        stats={club.stats}
+        gender={gender}
+        onStadiumClick={() => setStadiumOpen(true)}
+        onEntrenadorChange={!isOwnClub && editMode ? setRivalEntrenador : undefined}
+      />
       <SquadToolbar
         viewMode={viewMode}
         onViewModeChange={setViewMode}

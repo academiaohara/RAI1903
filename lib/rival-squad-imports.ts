@@ -162,13 +162,17 @@ export function buildSquadFromImport(team: Team, data: RivalSquadImport): SquadP
   return data.plantilla.map((player) => importPlayerToSquadPlayer(team, player));
 }
 
-export function buildClubInfoFromImport(team: Team, data: RivalSquadImport): SquadClubInfo {
+export function buildClubInfoFromImport(
+  team: Team,
+  data: RivalSquadImport,
+  seasonLabel = "2025/26",
+): SquadClubInfo {
   const stadiumImage = getStadiumPhoto(team.id);
   const shortStadiumName = data.estadio.replace(/^Estadio\s+/i, "");
 
   return {
     nombre: team.name,
-    temporada: "2025/26",
+    temporada: seasonLabel,
     estadio: shortStadiumName,
     estadioInfo: {
       nombre: data.estadio,

@@ -13,9 +13,10 @@ type SquadHeaderProps = {
   stats: SquadClubStats;
   gender: PrimerEquipoGender;
   onStadiumClick: () => void;
+  onEntrenadorChange?: (value: string) => void;
 };
 
-export function SquadHeader({ club, stats, gender, onStadiumClick }: SquadHeaderProps) {
+export function SquadHeader({ club, stats, gender, onStadiumClick, onEntrenadorChange }: SquadHeaderProps) {
   const { editMode } = useInlineEditing();
 
   return (
@@ -31,12 +32,21 @@ export function SquadHeader({ club, stats, gender, onStadiumClick }: SquadHeader
             </h1>
             <p className="mt-1 truncate text-[11px] font-semibold text-slate-700 sm:mt-2 sm:text-base">
               <span className="text-slate-500">Entrenador:</span>{" "}
-              <EditableText
-                storageKey={`squad-club:${gender}:entrenador`}
-                value={club.entrenador}
-                aria-label="Editar entrenador"
-                inputClassName="text-sm font-semibold text-slate-800"
-              />
+              {editMode && onEntrenadorChange ? (
+                <input
+                  value={club.entrenador}
+                  onChange={(event) => onEntrenadorChange(event.target.value)}
+                  aria-label="Editar entrenador"
+                  className="inline-block max-w-[min(100%,14rem)] rounded-xl border border-[#214C9B]/25 bg-white px-2 py-1 text-sm font-semibold text-slate-800 outline-none ring-2 ring-transparent transition focus:border-[#214C9B] focus:ring-[#214C9B]/15 sm:max-w-xs"
+                />
+              ) : (
+                <EditableText
+                  storageKey={`squad-club:${gender}:entrenador`}
+                  value={club.entrenador}
+                  aria-label="Editar entrenador"
+                  inputClassName="text-sm font-semibold text-slate-800"
+                />
+              )}
             </p>
             <p className="mt-0.5 text-[10px] font-semibold text-slate-500 sm:mt-2 sm:text-xs">Temporada {club.temporada}</p>
           </div>

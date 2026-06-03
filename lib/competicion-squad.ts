@@ -89,12 +89,12 @@ function rivalToSquadPlayer(player: RivalPlayer, team: Team, index: number): Squ
   };
 }
 
-function buildClubInfoFromTeam(team: Team, playerCount: number): SquadClubInfo {
+function buildClubInfoFromTeam(team: Team, playerCount: number, seasonLabel: string): SquadClubInfo {
   const stadiumImage = getStadiumPhoto(team.id);
 
   return {
     nombre: team.name,
-    temporada: "2025/26",
+    temporada: seasonLabel,
     estadio: team.stadium,
     estadioInfo: {
       nombre: team.stadium,
@@ -128,6 +128,7 @@ export function getCompeticionSquadData(
   gender: PrimerEquipoGender,
   team: Team,
   bundles?: SeasonBundlesMap,
+  seasonLabel = "2025/26",
 ): { club: SquadClubInfo; squad: SquadPlayer[]; isOwnClub: boolean } {
   const isOwnClub = isRaiCompetitionTeam(team.id, gender);
   const cmsRival = !isOwnClub ? getCmsRivalSquad(bundles, gender, team.id) : null;
@@ -143,7 +144,7 @@ export function getCompeticionSquadData(
         : buildSquadFromImport(team, imported);
 
     return {
-      club: isOwnClub ? getSquadClubInfo(gender) : buildClubInfoFromImport(team, imported),
+      club: isOwnClub ? getSquadClubInfo(gender) : buildClubInfoFromImport(team, imported, seasonLabel),
       squad,
       isOwnClub,
     };
@@ -161,7 +162,7 @@ export function getCompeticionSquadData(
   const squad = rivalSquad.map((player, index) => rivalToSquadPlayer(player, team, index));
 
   return {
-    club: buildClubInfoFromTeam(team, squad.length),
+    club: buildClubInfoFromTeam(team, squad.length, seasonLabel),
     squad,
     isOwnClub: false,
   };

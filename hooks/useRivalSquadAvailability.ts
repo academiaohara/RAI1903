@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSeason } from "@/components/season/SeasonProvider";
 import {
   getRivalSquadsBundle,
@@ -21,6 +21,8 @@ function parseRivalPlayerDorsal(teamId: string, playerId: string): number | null
   return Number.isFinite(dorsal) ? dorsal : null;
 }
 
+const ENTRADOR_SAVE_DEBOUNCE_MS = 450;
+
 export function useRivalSquadAvailability(gender: PrimerEquipoGender, team: Team) {
   const { viewedSeasonId, bundles, refreshBundles } = useSeason();
 
@@ -31,17 +33,26 @@ export function useRivalSquadAvailability(gender: PrimerEquipoGender, team: Team
   }, [bundles, gender, team]);
 
   const [importDraft, setImportDraft] = useState<RivalSquadImport>(storedImport);
+  const entrenadorSaveTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     queueMicrotask(() => setImportDraft(storedImport));
   }, [storedImport]);
+
+  useEffect(() => {
+    return () => {
+      if (entrenadorSaveTimerRef.current != null) {
+        window.clearTimeout(entrenadorSaveTimerRef.current);
+      }
+    };
+  }, []);
 
   const squad = useMemo(
     () => buildSquadFromImport(team, importDraft),
     [importDraft, team],
   );
 
-  const persistEstado = useCallback(
+  const persistImport = useCallback(
     async (nextImport: RivalSquadImport) => {
       const bundle = withRivalSquadInBundle(getRivalSquadsBundle(bundles, gender), team.id, nextImport);
       const result = await upsertSeasonBundle(viewedSeasonId, gender, "rival_squads", bundle);
@@ -61,12 +72,31 @@ export function useRivalSquadAvailability(gender: PrimerEquipoGender, team: Team
           entry.dorsal === dorsal ? { ...entry, estado } : entry,
         );
         const next = { ...prev, plantilla };
-        void persistEstado(next);
+        void persistImport(next);
         return next;
       });
     },
-    [persistEstado, team.id],
+    [persistImport, team.id],
   );
 
-  return { squad, setPlayerEstado };
+  const setEntrenador = useCallback(
+    (entrenador: string) => {
+      setImportDraft((prev) => {
+        const next = { ...prev, entrenador };
+
+        if (entrenadorSaveTimerRef.current != null) {
+          window.clearTimeout(entrenadorSaveTimerRef.current);
+        }
+        entrenadorSaveTimerRef.current = window.setTimeout(() => {
+          entrenadorSaveTimerRef.current = null;
+          void persistImport(next);
+        }, ENTRADOR_SAVE_DEBOUNCE_MS);
+
+        return next;
+      });
+    },
+    [persistImport],
+  );
+
+  return { squad, entrenador: importDraft.entrenador, setPlayerEstado, setEntrenador };
 }

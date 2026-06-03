@@ -15,10 +15,14 @@ type EquipoLigaTeamInfoProps = {
 
 /** Datos básicos del club (escudo, entrenador, estadio, estadísticas de temporada). Sin plantilla. */
 export function EquipoLigaTeamInfo({ gender, team }: EquipoLigaTeamInfoProps) {
-  const { bundles } = useSeason();
-  const { club } = useMemo(
-    () => getCompeticionSquadData(gender, team, bundles),
-    [bundles, gender, team],
+  const { bundles, viewedSeason } = useSeason();
+  const { club: baseClub } = useMemo(
+    () => getCompeticionSquadData(gender, team, bundles, viewedSeason.label),
+    [bundles, gender, team, viewedSeason.label],
+  );
+  const club = useMemo(
+    () => ({ ...baseClub, temporada: viewedSeason.label }),
+    [baseClub, viewedSeason.label],
   );
   const [stadiumOpen, setStadiumOpen] = useState(false);
 
