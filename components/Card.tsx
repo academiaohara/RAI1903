@@ -18,23 +18,25 @@ export function Card({ eyebrow, title, action, children, className, dense = fals
       {(eyebrow || title || action) && (
         <div
           className={cn(
-            "flex flex-wrap items-start justify-between gap-3 sm:gap-4",
+            "flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-3 md:gap-4",
             !borderlessHeader && "border-b border-[#214C9B]/15",
-            dense ? "p-4" : "p-5",
+            dense ? "p-3 sm:p-4" : "p-4 sm:p-5",
           )}
         >
           <div className="min-w-0 flex-1">
-            {eyebrow && <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">{eyebrow}</p>}
+            {eyebrow && (
+              <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#981915] sm:text-xs">{eyebrow}</p>
+            )}
             {title && (
-              <h2 className="mt-1 text-xl font-extrabold uppercase leading-tight text-[#214C9B] sm:text-2xl lg:text-4xl">
+              <h2 className="mt-0.5 text-lg font-extrabold uppercase leading-tight text-[#214C9B] sm:mt-1 sm:text-2xl lg:text-4xl">
                 {title}
               </h2>
             )}
           </div>
-          {action ? <div className="ml-auto shrink-0">{action}</div> : null}
+          {action ? <div className="w-full shrink-0 sm:ml-auto sm:w-auto">{action}</div> : null}
         </div>
       )}
-      <div className={dense ? "p-4" : "p-5"}>{children}</div>
+      <div className={dense ? "p-3 sm:p-4" : "p-4 sm:p-5"}>{children}</div>
     </section>
   );
 }

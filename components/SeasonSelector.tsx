@@ -31,8 +31,28 @@ export function SeasonSelector({ className }: SeasonSelectorProps) {
 
   return (
     <div className="flex flex-col items-end gap-1">
+      <label className="sr-only" htmlFor="season-select-mobile">
+        Temporada
+      </label>
+      <select
+        id="season-select-mobile"
+        value={viewedSeasonId}
+        onChange={(event) => setViewedSeasonId(event.target.value as CompetitionSeasonId)}
+        className={cn(
+          "max-w-full rounded-lg border bg-white px-2 py-1.5 text-[11px] font-bold uppercase tracking-normal text-[#214C9B] outline-none focus:border-[#214C9B] focus:ring-1 focus:ring-[#214C9B]/30 sm:hidden",
+          className,
+        )}
+        aria-label="Seleccionar temporada"
+      >
+        {list.map((season) => (
+          <option key={season.id} value={season.id}>
+            {season.label}
+          </option>
+        ))}
+      </select>
+
       <div
-        className={cn("inline-flex items-center gap-0.5 rounded-xl border p-1", className)}
+        className={cn("hidden items-center gap-0.5 rounded-xl border p-1 sm:inline-flex", className)}
         role="group"
         aria-label="Temporada"
       >

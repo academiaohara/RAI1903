@@ -32,6 +32,7 @@ export function HomeTransfersSection() {
             value={marketWindowId}
             onChange={handleMarketWindowChange}
             windows={windows}
+            className="w-full max-w-full sm:w-auto"
           />
         }
       >

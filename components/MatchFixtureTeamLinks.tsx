@@ -32,7 +32,7 @@ export function MatchFixtureTeamLinks({
   const avilesAway = match.awayTeamId === highlightTeamId;
 
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
+    <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1 sm:gap-2">
       <div className="pointer-events-auto relative z-10 min-w-0">
         <MatchTeamLink
           gender={gender}

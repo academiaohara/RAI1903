@@ -144,13 +144,13 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
       />
 
       {hydrated && statusBanner === "unsaved" && (
-        <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900">
+        <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
           No has hecho la quiniela de la jornada {round}. Rellena los partidos y pulsa Guardar.
         </p>
       )}
 
       {hydrated && statusBanner === "locked" && (
-        <p className="rounded-2xl border border-[#981915]/30 bg-[#981915]/10 px-4 py-3 text-sm font-bold text-[#981915]">
+        <p className="rounded-xl border border-[#981915]/30 bg-[#981915]/10 px-3 py-2 text-xs font-bold text-[#981915] sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
           La jornada {round} ya ha empezado: tu quiniela queda cerrada.
         </p>
       )}
@@ -162,7 +162,7 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
       )}
 
       {hydrated && statusBanner === "finished" && (
-        <p className="rounded-2xl border border-[#981915]/30 bg-[#981915]/10 px-4 py-3 text-sm font-bold text-[#981915]">
+        <p className="rounded-xl border border-[#981915]/30 bg-[#981915]/10 px-3 py-2 text-xs font-bold text-[#981915] sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
           La jornada {round} esta finalizada: todos los partidos tienen resultado oficial.
         </p>
       )}
@@ -217,12 +217,12 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
           ))}
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-3 border-t border-[#214C9B]/15 pt-5">
+        <div className="mt-4 flex flex-wrap gap-2 border-t border-[#214C9B]/15 pt-4 sm:mt-6 sm:gap-3 sm:pt-5">
           {canSave && (
             <button
               type="button"
               onClick={handleSave}
-              className="rounded-2xl bg-[#214C9B] px-6 py-3 text-sm font-extrabold uppercase text-white transition hover:bg-[#173a78]"
+              className="rounded-xl bg-[#214C9B] px-4 py-2.5 text-xs font-extrabold uppercase text-white transition hover:bg-[#173a78] sm:rounded-2xl sm:px-6 sm:py-3 sm:text-sm"
             >
               Guardar
             </button>
@@ -232,7 +232,7 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
               type="button"
               onClick={handleEdit}
               disabled={isEditing}
-              className="rounded-2xl border border-[#214C9B]/30 bg-white px-6 py-3 text-sm font-extrabold uppercase text-[#214C9B] transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-xl border border-[#214C9B]/30 bg-white px-4 py-2.5 text-xs font-extrabold uppercase text-[#214C9B] transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50 sm:rounded-2xl sm:px-6 sm:py-3 sm:text-sm"
             >
               Editar
             </button>

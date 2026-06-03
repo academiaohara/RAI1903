@@ -54,7 +54,7 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
   const wrapperClass =
     layout === "grid"
       ? `group w-full${isCardEditing ? " max-w-[220px]" : ""}`
-      : `group shrink-0 snap-start${isCardEditing ? " w-[min(100%,220px)]" : " w-[min(100%,168px)] sm:w-[175px]"}`;
+      : `group shrink-0 snap-start${isCardEditing ? " w-[min(100%,220px)]" : " w-[min(100%,140px)] sm:w-[175px]"}`;
   const flag = player ? getNationalityFlag(player.nacionalidad) : "🇪🇸";
   const originClub = getTransferOriginClub(transfer);
   const initials = transfer.playerName
@@ -68,7 +68,7 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
         <article
           className={`overflow-hidden rounded-tl-[1.25rem] rounded-br-[1.25rem] rounded-tr-sm rounded-bl-sm border-2 bg-gradient-to-b ${styles.gradient} ${styles.border} ${styles.shadow} transition-shadow ${styles.hoverShadow}`}
         >
-          <div className="relative flex h-[132px] items-center justify-center overflow-hidden sm:h-[140px]">
+          <div className="relative flex h-[118px] items-center justify-center overflow-hidden sm:h-[140px]">
             <div className="absolute left-2 top-2 z-10 flex flex-col items-center gap-1 rounded-lg bg-white px-1.5 py-1.5 shadow-sm">
               <span className="text-sm leading-none" role="img" aria-hidden>
                 {flag}
@@ -100,9 +100,9 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
             )}
           </div>
 
-          <div className={`px-3 py-2 ${styles.footer}`}>
-            <p className="truncate text-sm font-bold text-white sm:text-[15px]">{displayName}</p>
-            <p className="mt-0.5 truncate text-[10px] font-semibold uppercase tracking-wide text-white/85">{originClub}</p>
+          <div className={`px-2 py-1.5 sm:px-3 sm:py-2 ${styles.footer}`}>
+            <p className="truncate text-xs font-bold text-white sm:text-[15px]">{displayName}</p>
+            <p className="mt-0.5 truncate text-[9px] font-semibold uppercase tracking-wide text-white/85 sm:text-[10px]">{originClub}</p>
           </div>
         </article>
   );

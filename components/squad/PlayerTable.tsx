@@ -279,23 +279,24 @@ function PlayerMobileRow({
     );
   }
 
+  const statLine = [
+    `PJ ${player.partidos}`,
+    `G ${player.goles}`,
+    `A ${player.asistencias}`,
+    ...(showMarketValue && player.valorMercado ? [player.valorMercado] : []),
+  ].join(" · ");
+
   const content = (
-    <div className="min-w-0 flex-1">
-      <div className="flex items-center gap-2">
-        <span className="text-lg font-extrabold text-[#214C9B]">#{player.dorsal}</span>
-        <p className="truncate font-extrabold uppercase text-slate-900">{getPlayerFullName(player)}</p>
-      </div>
-      <p className="text-xs font-semibold text-slate-500">{metaParts.join(" · ")}</p>
-      <div className="mt-2 flex flex-wrap gap-2 text-xs font-bold text-slate-600">
-        {showMarketValue && player.valorMercado && (
-          <span className="rounded-lg bg-blue-50 px-2 py-1 text-[#214C9B]">{player.valorMercado}</span>
-        )}
-        <span className="rounded-lg bg-slate-100 px-2 py-1">PJ {player.partidos}</span>
-        <span className="rounded-lg bg-slate-100 px-2 py-1">G {player.goles}</span>
-        <span className="rounded-lg bg-slate-100 px-2 py-1">A {player.asistencias}</span>
-      </div>
-    </div>
+    <>
+      <span className="w-5 shrink-0 text-center text-[11px] font-extrabold tabular-nums text-[#214C9B]">{player.dorsal}</span>
+      <span className="min-w-0 flex-1 truncate text-[11px] font-extrabold uppercase text-slate-900">{getPlayerFullName(player)}</span>
+      <span className="hidden shrink-0 text-[10px] font-semibold text-slate-500 sm:inline">{metaParts.join(" · ")}</span>
+      <span className="shrink-0 text-[9px] font-bold tabular-nums text-slate-600 sm:text-[10px]">{statLine}</span>
+    </>
   );
+
+  const rowClassName =
+    "flex w-full min-w-0 items-center gap-1.5 px-2 py-2 sm:gap-3 sm:p-4";
 
   if (!onSelect) {
     return (
@@ -303,7 +304,7 @@ function PlayerMobileRow({
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.03 }}
-        className="flex w-full items-center gap-3 p-4"
+        className={rowClassName}
       >
         {content}
       </motion.div>
@@ -317,7 +318,7 @@ function PlayerMobileRow({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.03 }}
       onClick={() => onSelect(player)}
-      className="flex w-full items-center gap-3 p-4 text-left transition hover:bg-blue-50/70"
+      className={`${rowClassName} text-left transition hover:bg-blue-50/70`}
     >
       {content}
     </motion.button>

@@ -23,7 +23,7 @@ export function MatchFixtureScorePill({
   return (
     <div
       className={cn(
-        "flex shrink-0 items-center gap-2 rounded-2xl bg-[#214C9B] px-2 py-2 text-sm font-extrabold text-white shadow-md shadow-blue-950/10",
+        "flex shrink-0 items-center gap-1 rounded-xl bg-[#214C9B] px-1.5 py-1 text-xs font-extrabold text-white shadow-md shadow-blue-950/10 sm:gap-2 sm:rounded-2xl sm:px-2 sm:py-2 sm:text-sm",
         !showCrests && "px-3",
         className,
       )}
