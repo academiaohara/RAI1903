@@ -597,7 +597,7 @@ export function InlineEditingToolbar() {
         <div
           ref={toolbarScrollRef}
           onWheel={handleToolbarWheel}
-          className="no-scrollbar flex min-w-0 touch-pan-x flex-nowrap items-center gap-2 overflow-x-auto overscroll-x-contain rounded-2xl border border-[#214C9B]/20 bg-white/95 p-2 shadow-2xl backdrop-blur sm:max-w-[min(100vw-2rem,42rem)] sm:flex-wrap sm:justify-end sm:rounded-full"
+          className="no-scrollbar flex min-w-0 touch-pan-x flex-nowrap items-center justify-end gap-2 overflow-x-auto overscroll-x-contain rounded-2xl border border-[#214C9B]/20 bg-white/95 p-2 shadow-2xl backdrop-blur sm:max-w-[min(100vw-2rem,42rem)] sm:rounded-full"
         >
           {editMode && (
             <>
