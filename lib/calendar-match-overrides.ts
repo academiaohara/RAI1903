@@ -124,7 +124,12 @@ export function applyCalendarMatchOverride(
 ): CalendarMatch {
   if (!override || Object.keys(override).length === 0) return calendarMatch;
   const match = applyMatchResultOverride(calendarMatchToMatch(calendarMatch), override, gender, resolveName);
-  return matchToCalendarMatch(match, gender, { resolveTeamName: resolveName });
+  const rebuilt = matchToCalendarMatch(match, gender, { resolveTeamName: resolveName });
+  return {
+    ...rebuilt,
+    chronicleUrl: calendarMatch.chronicleUrl,
+    previaUrl: calendarMatch.previaUrl,
+  };
 }
 
 export function teamDisplayName(

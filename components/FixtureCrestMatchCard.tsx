@@ -6,6 +6,9 @@ import { MatchFixtureWideScoreRow } from "@/components/MatchFixtureWideScoreRow"
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import { matchRoundBadgeLabel } from "@/lib/competition-labels";
 import { fixtureCrestMatchCardClassName, matchFixtureCardMobileWidthClassName } from "@/lib/match-card-styles";
+import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
+import { defaultCronicaId } from "@/lib/match-article-factory";
+import { getMatchArticlePageHref } from "@/lib/match-article-url";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { primerEquipoBase } from "@/lib/primer-equipo";
 import { cn, formatMatchDate, formatMatchDay, formatMatchTime } from "@/lib/utils";
@@ -30,7 +33,11 @@ export function FixtureCrestMatchCard({
   href,
   linkable = true,
 }: FixtureCrestMatchCardProps) {
-  const defaultHref = `${primerEquipoBase(gender)}/calendario` as Route;
+  const { getForMatch } = useSeasonMatchArticles();
+  const article = getForMatch(match.id, gender);
+  const defaultHref =
+    getMatchArticlePageHref(match.id, gender, article?.id ?? defaultCronicaId(match.id, gender)) ??
+    (`${primerEquipoBase(gender)}/calendario` as Route);
   const linkHref = href ?? defaultHref;
   const scoreLabel = match.status === "finished" ? `${match.homeScore}-${match.awayScore}` : formatMatchTime(match.date);
   const highlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;

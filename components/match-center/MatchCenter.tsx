@@ -15,7 +15,6 @@ import { MatchPressPanel } from "@/components/match-center/MatchPressPanel";
 import { MatchResumenPanel } from "@/components/match-center/MatchResumenPanel";
 import { MatchRatingsPanel } from "@/components/match-center/MatchRatingsPanel";
 import { getRaiTeamId } from "@/lib/fixtures";
-import { hasMatchLineups } from "@/lib/match-lineups";
 import { MatchPreviaPanel } from "@/components/match-center/MatchPreviaPanel";
 import { MatchStatsPanel } from "@/components/match-center/MatchStatsPanel";
 import type { MatchArticle, MatchDetail } from "@/types";
@@ -40,11 +39,15 @@ const FINISHED_TABS_BASE = [
 
 const UPCOMING_PREVIA_TAB = { id: "previa", label: "Previa", icon: Target } as const;
 const UPCOMING_LINEUPS_TAB = { id: "lineups", label: "Alineaciones", icon: Shirt } as const;
+const UNLOCKED_UPCOMING_TAB_IDS = new Set<string>([UPCOMING_PREVIA_TAB.id, UPCOMING_LINEUPS_TAB.id]);
+const LOCKED_TAB_REASON = "Disponible cuando haya resultado";
 
 type TabDefinition = {
   id: string;
   label: string;
   icon: typeof Target;
+  disabled?: boolean;
+  disabledReason?: string;
 };
 
 type FinishedTabId = (typeof FINISHED_TABS_BASE)[number]["id"];
@@ -64,23 +67,26 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
   const { editMode } = useInlineEditing();
   const resolvedDetail = useMatchDetailOverrides(detail);
   const isFinished = resolvedDetail.match.status === "finished";
-  const showRatings = isFinished && isRaiMatch(resolvedDetail);
-  const lineupsAvailable = hasMatchLineups(resolvedDetail);
+  const showRatingsTab = isRaiMatch(resolvedDetail);
+  const showRatings = isFinished && showRatingsTab;
 
   const tabs = useMemo((): TabDefinition[] => {
-    if (isFinished) {
-      return showRatings
-        ? [...FINISHED_TABS_BASE]
-        : FINISHED_TABS_BASE.filter((tab) => tab.id !== "valoraciones");
-    }
+    const availableTabs = showRatingsTab
+      ? [...FINISHED_TABS_BASE]
+      : FINISHED_TABS_BASE.filter((tab) => tab.id !== "valoraciones");
 
-    const upcomingTabs: TabDefinition[] = [UPCOMING_PREVIA_TAB];
-    if (lineupsAvailable) upcomingTabs.push(UPCOMING_LINEUPS_TAB);
-    return upcomingTabs;
-  }, [isFinished, lineupsAvailable, showRatings]);
+    if (isFinished) return availableTabs;
+
+    return availableTabs.map((tab) =>
+      UNLOCKED_UPCOMING_TAB_IDS.has(tab.id)
+        ? tab
+        : { ...tab, disabled: true, disabledReason: LOCKED_TAB_REASON },
+    );
+  }, [isFinished, showRatingsTab]);
 
   const [activeTab, setActiveTab] = useState<ActiveTabId>(isFinished ? "eventos" : "previa");
-  const showTabBar = isFinished || tabs.length > 1;
+  const showTabBar = tabs.length > 0;
+  const safeActiveTab = !isFinished && !UNLOCKED_UPCOMING_TAB_IDS.has(activeTab) ? "previa" : activeTab;
 
   const showArticleBodyAboveTabs = !isFinished && article !== undefined;
   const showClubNews = article !== undefined;
@@ -92,9 +98,7 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
   const previaTabContent = <div className="space-y-8">{previaPanel}</div>;
 
   const panelContent = (() => {
-    if (!isFinished && tabs.length === 1) return previaPanel;
-
-    if (activeTab === "eventos") {
+    if (safeActiveTab === "eventos") {
       return (
         <MatchEventsPanel
           matchId={resolvedDetail.match.id}
@@ -107,7 +111,7 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
         />
       );
     }
-    if (activeTab === "stats") {
+    if (safeActiveTab === "stats") {
       return (
         <MatchStatsPanel
           matchId={resolvedDetail.match.id}
@@ -117,7 +121,7 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
         />
       );
     }
-    if (activeTab === "lineups") {
+    if (safeActiveTab === "lineups") {
       return (
         <MatchLineupsPanel
           matchId={resolvedDetail.match.id}
@@ -131,12 +135,12 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
         />
       );
     }
-    if (activeTab === "previa") return previaTabContent;
-    if (activeTab === "valoraciones" && showRatings) {
+    if (safeActiveTab === "previa") return previaTabContent;
+    if (safeActiveTab === "valoraciones" && showRatings) {
       return <MatchRatingsPanel key={`${resolvedDetail.match.id}-ratings`} detail={resolvedDetail} />;
     }
-    if (activeTab === "prensa") return <MatchPressPanel detail={resolvedDetail} />;
-    if (activeTab === "resumen") return <MatchResumenPanel detail={resolvedDetail} />;
+    if (safeActiveTab === "prensa") return <MatchPressPanel detail={resolvedDetail} />;
+    if (safeActiveTab === "resumen") return <MatchResumenPanel detail={resolvedDetail} />;
     return null;
   })();
 
@@ -160,8 +164,12 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
       {showTabBar && tabs.length > 0 && (
         <MatchCenterTabs
           tabs={tabs}
-          active={activeTab}
-          onChange={(id) => setActiveTab(id as ActiveTabId)}
+          active={safeActiveTab}
+          onChange={(id) => {
+            const tab = tabs.find((item) => item.id === id);
+            if (tab?.disabled) return;
+            setActiveTab(id as ActiveTabId);
+          }}
         />
       )}
 
