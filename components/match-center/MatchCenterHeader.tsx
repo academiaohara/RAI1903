@@ -8,12 +8,19 @@ import { OpponentCrest } from "@/components/OpponentCrest";
 import { headerLinkHoverClass, TeamLink } from "@/components/TeamLink";
 import { EditableText } from "@/components/inline-editing/EditableText";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { useSeason } from "@/components/season/SeasonProvider";
 import { useMatchDetailStorageKeys } from "@/components/match-center/useMatchDetailOverrides";
 import { PlayerModal } from "@/components/squad/PlayerModal";
 import { StadiumModal } from "@/components/squad/StadiumModal";
+import {
+  applyMatchResultOverride,
+  type MatchResultOverride,
+} from "@/lib/calendar-match-overrides";
 import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
 import { getCompeticionSquadData } from "@/lib/competicion-squad";
+import { matchResultOverrideKey, readMatchResultOverride } from "@/lib/fixture-inline-keys";
 import { getRaiTeamId, getTeamByGender } from "@/lib/fixtures";
+import { resolveMatchVenue } from "@/lib/match-venue";
 import { resolveSquadPlayerByName } from "@/lib/squad-player-resolve";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { getTeamCrest, getTeamCrestById } from "@/lib/team-crests";
@@ -127,8 +134,22 @@ function ScoreInput({
 
 export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHeaderProps) {
   const { match, gender, referee, attendance, kickoffTime, kickoffDateLabel, seasonLabel } = detail;
-  const { editMode, getValue, saveValue } = useInlineEditing();
+  const { bundles, viewedSeason } = useSeason();
+  const { editMode, getValue, saveValue, getOverride, mergeSaveValue } = useInlineEditing();
   const keys = useMatchDetailStorageKeys(match.id);
+  const venueOptions = useMemo(
+    () => ({ bundles, seasonLabel: viewedSeason.label }),
+    [bundles, viewedSeason.label],
+  );
+  const venueOverride = readMatchResultOverride<MatchResultOverride>(getOverride, gender, match.id);
+  const matchWithOverrides = useMemo(
+    () => applyMatchResultOverride(match, venueOverride ?? {}, gender),
+    [gender, match, venueOverride],
+  );
+  const venueLabel = useMemo(
+    () => resolveMatchVenue(matchWithOverrides, gender, venueOptions),
+    [gender, matchWithOverrides, venueOptions],
+  );
   const [selectedPlayer, setSelectedPlayer] = useState<SquadPlayer | null>(null);
   const [stadiumOpen, setStadiumOpen] = useState(false);
 
@@ -146,8 +167,8 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
   const avilesSquadForMatch = isHomeAviles || isAwayAviles ? avilesSquad : [];
   const homeStadiumInfo = useMemo(() => {
     if (!homeTeam) return null;
-    return getCompeticionSquadData(gender, homeTeam).club.estadioInfo;
-  }, [gender, homeTeam]);
+    return getCompeticionSquadData(gender, homeTeam, bundles, viewedSeason.label).club.estadioInfo;
+  }, [bundles, gender, homeTeam, viewedSeason.label]);
   const showPlayerModal = gender === "masculino";
 
   const currentEvents = getValue(keys.events, detail.events);
@@ -270,16 +291,31 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
           </li>
           <li className="inline-flex items-center gap-1.5">
             <MapPin size={14} aria-hidden />
-            {homeStadiumInfo ? (
+            {editMode ? (
+              <input
+                type="text"
+                value={matchWithOverrides.venue ?? ""}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  mergeSaveValue(matchResultOverrideKey(gender, match.id), {
+                    ...venueOverride,
+                    venue: value,
+                  });
+                }}
+                placeholder={venueLabel || "Estadio"}
+                aria-label="Editar estadio"
+                className="w-44 rounded-lg border border-white/35 bg-white/10 px-2 py-1 text-xs font-bold text-white outline-none focus:border-white sm:w-52 sm:text-sm"
+              />
+            ) : homeStadiumInfo ? (
               <button
                 type="button"
                 onClick={() => setStadiumOpen(true)}
                 className="cursor-pointer transition hover:text-white"
               >
-                {match.venue}
+                {venueLabel}
               </button>
             ) : (
-              match.venue
+              venueLabel
             )}
           </li>
           {showAttendance && (
