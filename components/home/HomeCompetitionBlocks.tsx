@@ -13,6 +13,9 @@ import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard"
 import { UpcomingMatchCard } from "@/components/UpcomingMatchCard";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
+import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
+import { defaultCronicaId } from "@/lib/match-article-factory";
+import { getMatchArticlePageHref } from "@/lib/match-article-url";
 import { matchCompetitionShortLabel, matchFixtureMeta, matchRoundBadgeLabel } from "@/lib/competition-labels";
 import { getTeamByGender } from "@/lib/fixtures";
 import { seasonHasCompetitionBundles } from "@/lib/season/cms-data-policy";
@@ -52,9 +55,11 @@ export function HomeCompetitionEmptyHint() {
 
 export function HomeMatchBannersBlock() {
   const { latestMatches, nextMatch } = useMasculinoLeagueSeason();
+  const { getForMatch } = useSeasonMatchArticles();
 
   const latestMatch = latestMatches[0];
-  const calendarioHref = `${primerEquipoBase("masculino")}/calendario` as Route;
+  const latestArticle = latestMatch ? getForMatch(latestMatch.id, "masculino") : undefined;
+  const nextArticle = nextMatch ? getForMatch(nextMatch.id, "masculino") : undefined;
 
   if (!latestMatch && !nextMatch) return null;
 
@@ -64,14 +69,26 @@ export function HomeMatchBannersBlock() {
         <MatchBanner
           match={latestMatch}
           label="Ultimo partido"
-          href={calendarioHref}
+          href={
+            getMatchArticlePageHref(
+              latestMatch.id,
+              "masculino",
+              latestArticle?.id ?? defaultCronicaId(latestMatch.id, "masculino"),
+            ) ?? (`${primerEquipoBase("masculino")}/calendario` as Route)
+          }
         />
       )}
       {nextMatch && (
         <MatchBanner
           match={nextMatch}
           label="Proximo partido"
-          href={calendarioHref}
+          href={
+            getMatchArticlePageHref(
+              nextMatch.id,
+              "masculino",
+              nextArticle?.id ?? defaultCronicaId(nextMatch.id, "masculino"),
+            ) ?? (`${primerEquipoBase("masculino")}/calendario` as Route)
+          }
           accent="granate"
         />
       )}

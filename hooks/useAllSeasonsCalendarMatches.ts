@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useTeamCrestMap } from "@/components/assets/TeamCrestResolverProvider";
+import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { getCalendarMatchesFromSource } from "@/lib/calendar";
 import { getTeamsBundle, resolveFixtureTeamDisplayName } from "@/lib/cms/teams-bundle";
 import { fetchSeasonBundles } from "@/lib/cms/season-bundles";
@@ -24,7 +25,8 @@ function publishedSeasonList(seasons: CmsSeason[]) {
 function mergeCalendarMatchesFromBundles(
   maps: Awaited<ReturnType<typeof fetchSeasonBundles>>[],
   gender: PrimerEquipoGender,
-  options: {
+  articles: {
+    getForMatch: ReturnType<typeof useSeasonMatchArticles>["getForMatch"];
     crestMap: Record<string, string>;
   },
   mapMatch?: (match: Match) => Match,
@@ -37,7 +39,7 @@ function mergeCalendarMatchesFromBundles(
     const source = enrichFixtureSource(fixtureSourceFromBundles(map, gender), map, gender);
     const clubTeamIds = resolveClubTeamIds(map, gender);
     const aviles = getAvilesMatchesFromSource(source, gender, { mapMatch, clubTeamIds });
-    const rows = getCalendarMatchesFromSource(aviles, gender, { ...options, resolveTeamName });
+    const rows = getCalendarMatchesFromSource(aviles, gender, { ...articles, resolveTeamName });
     for (const row of rows) {
       byId.set(row.id, row);
     }
@@ -55,6 +57,7 @@ export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
   );
   const { getOverride } = useInlineEditing();
   const crestMap = useTeamCrestMap();
+  const { getForMatch } = useSeasonMatchArticles();
   const [multiSeasonMatches, setMultiSeasonMatches] = useState<CalendarMatch[]>([]);
   const [fetchedSeasonIdsKey, setFetchedSeasonIdsKey] = useState<string | null>(null);
 
@@ -73,10 +76,11 @@ export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
     const source = getEnrichedFixtureSource(gender);
     const aviles = getAvilesMatchesFromSource(source, gender, { mapMatch, clubTeamIds });
     return getCalendarMatchesFromSource(aviles, gender, {
+      getForMatch,
       crestMap,
       resolveTeamName,
     });
-  }, [gender, getEnrichedFixtureSource, crestMap, mapMatch, resolveTeamName, clubTeamIds]);
+  }, [gender, getForMatch, getEnrichedFixtureSource, crestMap, mapMatch, resolveTeamName, clubTeamIds]);
 
   useEffect(() => {
     if (!needsMultiSeasonFetch) return;
@@ -84,7 +88,7 @@ export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
     let cancelled = false;
     void Promise.all(publishedList.map((row) => fetchSeasonBundles(row.id))).then((maps) => {
       if (cancelled) return;
-      setMultiSeasonMatches(mergeCalendarMatchesFromBundles(maps, gender, { crestMap }, mapMatch));
+      setMultiSeasonMatches(mergeCalendarMatchesFromBundles(maps, gender, { getForMatch, crestMap }, mapMatch));
       setFetchedSeasonIdsKey(seasonIdsKey);
     });
 
@@ -96,6 +100,7 @@ export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
     publishedList,
     seasonIdsKey,
     gender,
+    getForMatch,
     crestMap,
     mapMatch,
   ]);

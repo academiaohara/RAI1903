@@ -25,9 +25,10 @@ export const PRIMER_EQUIPO_SECTIONS = [
 
 export type PrimerEquipoSection = (typeof PRIMER_EQUIPO_SECTIONS)[number];
 
+/** Fichas de partido (sin subsección «Crónicas» en el menú). */
 export function primerEquipoHasCronicas(gender: PrimerEquipoGender) {
   void gender;
-  return false;
+  return true;
 }
 
 export function getPrimerEquipoTabs(gender: PrimerEquipoGender) {

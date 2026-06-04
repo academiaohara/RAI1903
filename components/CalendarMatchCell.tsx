@@ -57,7 +57,7 @@ export function CalendarMatchCell({
   const router = useRouter();
   const { editMode } = useInlineEditing();
   const displayMatch = useEditedCalendarMatch(match, gender);
-  const href = editMode ? null : displayMatch.played ? displayMatch.chronicleUrl : displayMatch.previaUrl;
+  const href = editMode ? null : displayMatch.chronicleUrl ?? displayMatch.previaUrl;
   const opponentTeamId = displayMatch.isHome ? displayMatch.awayTeamId : displayMatch.homeTeamId;
   const ariaLabel = displayMatch.played
     ? `Crónica: ${displayMatch.opponent}${displayMatch.result ? ` ${displayMatch.result}` : ""}`

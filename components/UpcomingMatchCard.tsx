@@ -8,6 +8,9 @@ import { MatchFixtureJerseyMobile } from "@/components/MatchFixtureJerseyMobile"
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import { matchCompetitionShortLabel, matchFixtureMeta, matchRoundBadgeLabel } from "@/lib/competition-labels";
 import { matchFixtureCardClassName, matchFixtureDesktopCardMinHeightClassName } from "@/lib/match-card-styles";
+import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
+import { defaultCronicaId } from "@/lib/match-article-factory";
+import { getMatchArticlePageHref } from "@/lib/match-article-url";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { primerEquipoBase } from "@/lib/primer-equipo";
 import { cn, formatMatchDate, formatMatchTime } from "@/lib/utils";
@@ -50,7 +53,11 @@ const upcomingFooterHoverClass = cn(
 );
 
 export function UpcomingMatchCard({ match, gender = "masculino" }: UpcomingMatchCardProps) {
-  const matchHref = `${primerEquipoBase(gender)}/calendario` as Route;
+  const { getForMatch } = useSeasonMatchArticles();
+  const article = getForMatch(match.id, gender);
+  const matchHref =
+    getMatchArticlePageHref(match.id, gender, article?.id ?? defaultCronicaId(match.id, gender)) ??
+    (`${primerEquipoBase(gender)}/calendario` as Route);
   const competicionHref = `${primerEquipoBase(gender)}/competicion` as Route;
   const timeLabel = formatMatchTime(match.date);
   const dateLabel = formatMatchDate(match.date);

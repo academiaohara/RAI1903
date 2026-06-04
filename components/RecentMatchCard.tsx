@@ -8,6 +8,9 @@ import { MatchFixtureJerseyMobile } from "@/components/MatchFixtureJerseyMobile"
 import { matchCompetitionShortLabel, matchFixtureMeta, matchRoundBadgeLabel } from "@/lib/competition-labels";
 import { getAvilesMatchResult } from "@/lib/fixtures";
 import { matchFixtureCardClassName, matchFixtureDesktopCardMinHeightClassName } from "@/lib/match-card-styles";
+import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
+import { defaultCronicaId } from "@/lib/match-article-factory";
+import { getMatchArticlePageHref } from "@/lib/match-article-url";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { primerEquipoBase } from "@/lib/primer-equipo";
 import { cn, formatMatchDate } from "@/lib/utils";
@@ -55,8 +58,12 @@ function recentResultBadgeLabel(hasScore: boolean, result: ReturnType<typeof get
 }
 
 export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCardProps) {
+  const { getForMatch } = useSeasonMatchArticles();
+  const article = getForMatch(match.id, gender);
   const result = getAvilesMatchResult(match, gender);
-  const cronicaHref = `${primerEquipoBase(gender)}/calendario` as Route;
+  const cronicaHref =
+    getMatchArticlePageHref(match.id, gender, article?.id ?? defaultCronicaId(match.id, gender)) ??
+    (`${primerEquipoBase(gender)}/calendario` as Route);
   const competicionHref = `${primerEquipoBase(gender)}/competicion` as Route;
   const hasScore = match.homeScore !== undefined && match.awayScore !== undefined;
   const scoreLabel = hasScore ? `${match.homeScore} - ${match.awayScore}` : "Sin resultado";
