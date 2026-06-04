@@ -46,15 +46,25 @@ const cronicaCardHoverClass = cn(
   "has-[a.cronica-overlay:hover]:[&_.recent-card-competicion_img]:invert",
 );
 
+function recentResultBadgeLabel(hasScore: boolean, result: ReturnType<typeof getAvilesMatchResult>): string {
+  if (!hasScore) return "Sin resultado";
+  if (result === "W") return "Victoria";
+  if (result === "D") return "Empate";
+  if (result === "L") return "Derrota";
+  return "Finalizado";
+}
+
 export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCardProps) {
   const result = getAvilesMatchResult(match, gender);
   const cronicaHref = `${primerEquipoBase(gender)}/calendario` as Route;
   const competicionHref = `${primerEquipoBase(gender)}/competicion` as Route;
-  const scoreLabel = `${match.homeScore} - ${match.awayScore}`;
+  const hasScore = match.homeScore !== undefined && match.awayScore !== undefined;
+  const scoreLabel = hasScore ? `${match.homeScore} - ${match.awayScore}` : "Sin resultado";
   const competitionLabel = matchCompetitionShortLabel(match);
   const highlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
   const dateLabel = formatMatchDate(match.date);
   const roundLabel = matchRoundBadgeLabel(match) ?? matchCompetitionShortLabel(match);
+  const badgeLabel = recentResultBadgeLabel(hasScore, result);
 
   const badge = (
     <Badge
@@ -64,7 +74,7 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
         "group-has-[a.cronica-overlay:hover]/card:border-white/35 group-has-[a.cronica-overlay:hover]/card:bg-white/20 group-has-[a.cronica-overlay:hover]/card:text-white",
       )}
     >
-      {result === "W" ? "Victoria" : result === "D" ? "Empate" : result === "L" ? "Derrota" : "Finalizado"}
+      {badgeLabel}
     </Badge>
   );
 

@@ -12,13 +12,13 @@ import { ExtraFixturesOnPageEditor } from "@/components/editor/ExtraFixturesOnPa
 import { MatchCard } from "@/components/MatchCard";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
 import { UpcomingMatchCard } from "@/components/UpcomingMatchCard";
+import { useAllSeasonsCalendarMatches } from "@/hooks/useAllSeasonsCalendarMatches";
 import { hasMultipleGrupos, zonesToLegacyConfig } from "@/lib/cms/competition-config-bundle";
+import { getCompetitionSidebarMatches } from "@/lib/competition-match-sections";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { useSeason } from "@/components/season/SeasonProvider";
-import { useEditedMatchdays, useEditedMatches } from "@/hooks/useEditedMatchdays";
-import { resolveClubTeamIds } from "@/lib/season/club-team-ids";
+import { useEditedMatchdays } from "@/hooks/useEditedMatchdays";
 import {
-  getAvilesMatchesFromSource,
   getCopaDelReyMatchesFromSource,
   getGrupo2Matchdays,
   getLeagueMatchdaysForGender,
@@ -69,12 +69,11 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
     }
     return resolveGroupTeams(bundles, gender, "1");
   }, [bundles, gender, grupo, isMasculino]);
-  const clubTeamIds = useMemo(() => resolveClubTeamIds(bundles, gender, grupo), [bundles, gender, grupo]);
-  const baseAvilesMatches = useMemo(
-    () => getAvilesMatchesFromSource(fixtureSource, gender, { clubTeamIds }),
-    [fixtureSource, gender, clubTeamIds],
+  const { seasonMatches: calendarListMatches } = useAllSeasonsCalendarMatches(gender);
+  const { latest, upcoming } = useMemo(
+    () => getCompetitionSidebarMatches(calendarListMatches, gender),
+    [calendarListMatches, gender],
   );
-  const avilesMatches = useEditedMatches(baseAvilesMatches, gender);
   const tableMatchdays = isMasculino
     ? grupo === "2"
       ? baseMatchdaysGrupo2
@@ -87,14 +86,6 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
     : editedLeagueMatchdays;
   const multiGrupo = hasMultipleGrupos(competitionConfig);
   const showAvilesSidebar = !isMasculino || !multiGrupo || grupo === "1";
-  const finishedAviles = avilesMatches.filter((match) => isMatchPlayed(match));
-  const scheduledAviles = avilesMatches.filter((match) => !isMatchPlayed(match));
-  const latest = [...finishedAviles]
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 5);
-  const upcoming = [...scheduledAviles]
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    .slice(0, 5);
   const copaDelReyMatches = copaMatches;
   const calendarHref = `${primerEquipoBase(gender)}/calendario` as Route;
   const baseLigaLabel = competitionConfig.ligaLabel ?? "1ª RFEF";
