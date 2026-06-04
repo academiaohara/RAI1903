@@ -9,6 +9,7 @@ import { EditableText } from "@/components/inline-editing/EditableText";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
 import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
 import { ExtraFixturesOnPageEditor } from "@/components/editor/ExtraFixturesOnPageEditor";
+import { FixtureCrestMatchCard } from "@/components/FixtureCrestMatchCard";
 import { MatchCard } from "@/components/MatchCard";
 import { hasMultipleGrupos, zonesToLegacyConfig } from "@/lib/cms/competition-config-bundle";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
@@ -187,10 +188,10 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
               {showAvilesSidebar && (
                 <>
                   <Card eyebrow="Forma reciente" title="Ultimos resultados" borderlessHeader>
-                    <div className="space-y-2 sm:space-y-3">
+                    <div className="space-y-2">
                       {latest.length > 0 ? (
                         latest.map((match) => (
-                          <MatchCard key={match.id} match={match} compact highlightTeamId={highlightTeamId} gender={gender} />
+                          <FixtureCrestMatchCard key={match.id} match={match} accent="blue" gender={gender} />
                         ))
                       ) : (
                         <p className="text-sm font-bold text-slate-500">Sin partidos finalizados.</p>
@@ -203,10 +204,10 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
                     borderlessHeader
                     action={<CalendarNavButton href={calendarHref} />}
                   >
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {upcoming.length > 0 ? (
                         upcoming.map((match) => (
-                          <MatchCard key={match.id} match={match} compact highlightTeamId={highlightTeamId} gender={gender} />
+                          <FixtureCrestMatchCard key={match.id} match={match} accent="granate" gender={gender} />
                         ))
                       ) : (
                         <p className="text-sm font-bold text-slate-500">Sin partidos programados.</p>
