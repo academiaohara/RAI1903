@@ -61,7 +61,7 @@ export function JornadaMatchRow({
     if (gender === "masculino") {
       return resolveGroupTeams(bundles, gender, grupo);
     }
-    return [];
+    return resolveGroupTeams(bundles, gender, "1");
   }, [bundles, gender, grupo]);
 
   const savePatch = (patch: Partial<JornadaFixture>) => {

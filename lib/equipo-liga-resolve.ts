@@ -43,10 +43,10 @@ export function canLinkEquipoLiga(
   teamId: string,
   bundles?: SeasonBundlesMap,
 ): boolean {
+  if (gender === "femenino") return false;
   if (!resolveEquipoLigaTeam(teamId, gender, bundles)) {
     return false;
   }
-  if (gender === "femenino") return true;
   if (bundles) return true;
   return isTeamInRfefGrupo1(teamId) || isTeamInRfefGrupo(teamId, "2");
 }

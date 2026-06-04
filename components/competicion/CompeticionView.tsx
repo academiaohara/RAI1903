@@ -13,7 +13,6 @@ import { FixtureCrestMatchCard } from "@/components/FixtureCrestMatchCard";
 import { MatchCard } from "@/components/MatchCard";
 import { hasMultipleGrupos, zonesToLegacyConfig } from "@/lib/cms/competition-config-bundle";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
-import { getTeamsByGender } from "@/lib/fixtures";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useEditedMatchdays, useEditedMatches } from "@/hooks/useEditedMatchdays";
 import { resolveClubTeamIds } from "@/lib/season/club-team-ids";
@@ -67,7 +66,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
     if (isMasculino) {
       return resolveGroupTeams(bundles, gender, grupo);
     }
-    return getTeamsByGender(gender);
+    return resolveGroupTeams(bundles, gender, "1");
   }, [bundles, gender, grupo, isMasculino]);
   const clubTeamIds = useMemo(() => resolveClubTeamIds(bundles, gender, grupo), [bundles, gender, grupo]);
   const baseAvilesMatches = useMemo(

@@ -15,5 +15,9 @@ export default async function EquipoLigaPage({
 
   const gender = genderParam as PrimerEquipoGender;
 
+  if (gender === "femenino") {
+    notFound();
+  }
+
   return <EquipoLigaPageClient gender={gender} teamId={teamId} />;
 }
