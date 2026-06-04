@@ -4,7 +4,9 @@ import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamCrest } from "@/components/TeamCrest";
 import { EditableText } from "@/components/inline-editing/EditableText";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { jornadaRoundOverrideKey, readJornadaRoundOverride } from "@/lib/fixture-inline-keys";
 import { getJornadaTeam } from "@/lib/jornadas-data";
+import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getTeamCrestById } from "@/lib/team-crests";
 import { scrollElementHorizontally } from "@/lib/scroll-horizontal";
 import { cn } from "@/lib/utils";
@@ -16,6 +18,7 @@ type JornadaRoundCarouselProps = {
   selectedId: JornadaRoundId;
   onSelect: (roundId: JornadaRoundId) => void;
   showCrests?: boolean;
+  gender?: PrimerEquipoGender;
 };
 
 function cardBaseClass(showCrests: boolean): string {
@@ -37,8 +40,14 @@ function cardStateClass(isSelected: boolean, isCurrent: boolean): string {
   return "border-[#214C9B]/15 bg-slate-50 text-slate-800 hover:border-[#214C9B] hover:bg-[#214C9B] hover:text-white";
 }
 
-export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests = true }: JornadaRoundCarouselProps) {
-  const { editMode, getValue } = useInlineEditing();
+export function JornadaRoundCarousel({
+  rounds,
+  selectedId,
+  onSelect,
+  showCrests = true,
+  gender = "masculino",
+}: JornadaRoundCarouselProps) {
+  const { editMode, getOverride, getValue } = useInlineEditing();
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -69,8 +78,15 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests 
         className="no-scrollbar mt-3 flex w-full min-w-0 touch-pan-x flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-1"
       >
         {rounds.map((round) => {
-          const label = getValue(`jornada-round:${round.id}:label`, round.label);
-          const shortDate = getValue(`jornada-round:${round.id}:short-date`, round.shortDate);
+          const label = readJornadaRoundOverride(getOverride, getValue, gender, round.id, "label", round.label);
+          const shortDate = readJornadaRoundOverride(
+            getOverride,
+            getValue,
+            gender,
+            round.id,
+            "short-date",
+            round.shortDate,
+          );
           const isSelected = round.id === selectedId;
           const opponent =
             round.opponentTeamId && round.opponentName
@@ -96,7 +112,7 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests 
             >
               {editMode ? (
                 <EditableText
-                  storageKey={`jornada-round:${round.id}:label`}
+                  storageKey={jornadaRoundOverrideKey(gender, round.id, "label")}
                   value={label}
                   aria-label={`Editar nombre de ${round.label}`}
                   className="max-w-full text-sm font-extrabold leading-tight"
@@ -130,7 +146,7 @@ export function JornadaRoundCarousel({ rounds, selectedId, onSelect, showCrests 
 
               {editMode ? (
                 <EditableText
-                  storageKey={`jornada-round:${round.id}:short-date`}
+                  storageKey={jornadaRoundOverrideKey(gender, round.id, "short-date")}
                   value={shortDate}
                   aria-label={`Editar fecha corta de ${label}`}
                   className="text-[10px] font-bold uppercase leading-tight tracking-wide opacity-90"

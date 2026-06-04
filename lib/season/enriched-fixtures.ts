@@ -31,17 +31,20 @@ export function enrichFixtureSource(
     resolveFixtureTeamDisplayName(teamId, fallback, cmsTeams, bundles, gender);
 
   const matchdays = applyFixtureTeamNames(
-    normalizeLeagueMatchdays(source.matchdays, config),
+    normalizeLeagueMatchdays(source.matchdays, config, undefined, "masculino"),
     resolveName,
   );
 
   const matchdaysGrupo2 =
     config.groupCount >= 2
-      ? applyFixtureTeamNames(normalizeGrupo2Matchdays(source.matchdaysGrupo2, config), resolveName)
+      ? applyFixtureTeamNames(
+          normalizeGrupo2Matchdays(source.matchdaysGrupo2, config, undefined, "masculino"),
+          resolveName,
+        )
       : source.matchdaysGrupo2;
 
   const matchdaysFemenino = applyFixtureTeamNames(
-    normalizeLeagueMatchdays(source.matchdaysFemenino, config),
+    normalizeLeagueMatchdays(source.matchdaysFemenino, config, undefined, "femenino"),
     resolveName,
   );
 

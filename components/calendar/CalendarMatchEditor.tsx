@@ -13,6 +13,7 @@ import {
   type MatchResultOverride,
 } from "@/lib/calendar-match-overrides";
 import { getTeamsBundle, resolveFixtureTeamDisplayName } from "@/lib/cms/teams-bundle";
+import { matchResultOverrideKey, readMatchResultOverride } from "@/lib/fixture-inline-keys";
 import { fixtureEditorTeamOptions } from "@/lib/fixtures/editor-team-options";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { cn } from "@/lib/utils";
@@ -39,7 +40,7 @@ function useResolveTeamName(gender: PrimerEquipoGender) {
 export function useEditedCalendarMatch(match: CalendarMatch, gender: PrimerEquipoGender = "masculino"): CalendarMatch {
   const { getOverride } = useInlineEditing();
   const resolveTeamName = useResolveTeamName(gender);
-  const override = getOverride<MatchResultOverride>(`match-result:${match.id}`);
+  const override = readMatchResultOverride<MatchResultOverride>(getOverride, gender, match.id);
   return applyCalendarMatchOverride(match, override, gender, resolveTeamName);
 }
 
@@ -51,7 +52,7 @@ export function useEditedCalendarMatches(
   const resolveTeamName = useResolveTeamName(gender);
   return matches
     .map((match) => {
-      const override = getOverride<MatchResultOverride>(`match-result:${match.id}`);
+      const override = readMatchResultOverride<MatchResultOverride>(getOverride, gender, match.id);
       return applyCalendarMatchOverride(match, override, gender, resolveTeamName);
     })
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -66,7 +67,7 @@ export function CalendarMatchEditor({
   const { bundles } = useSeason();
   const { getOverride, mergeSaveValue } = useInlineEditing();
   const resolveTeamName = useResolveTeamName(gender);
-  const override = getOverride<MatchResultOverride>(`match-result:${match.id}`) ?? {};
+  const override = readMatchResultOverride<MatchResultOverride>(getOverride, gender, match.id) ?? {};
   const baseMatch = calendarMatchToMatch(match);
   const editedMatch = applyMatchResultOverride(calendarMatchToMatch(match), override, gender, resolveTeamName);
   const status = editedMatch.status;
@@ -78,7 +79,7 @@ export function CalendarMatchEditor({
     if (next.homeScore !== undefined && next.awayScore !== undefined) {
       next.status = "finished";
     }
-    mergeSaveValue(`match-result:${match.id}`, next);
+    mergeSaveValue(matchResultOverrideKey(gender, match.id), next);
   };
 
   const onHomeTeamChange = (teamId: string) => {

@@ -2,6 +2,7 @@ import { createClient as createBrowserClient } from "@/lib/supabase/client";
 import { isMissingSeasonIdColumnError } from "@/lib/cms/inline-overrides-compat";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
+import { shouldCopyInlineOverrideKey } from "@/lib/fixture-inline-keys";
 import { isMediaRaiGlobalInlineKey, MEDIA_RAI_INLINE_SEASON_ID } from "@/lib/fan-videos";
 
 export type InlineOverridesMap = Record<string, unknown>;
@@ -288,13 +289,17 @@ export async function copyInlineOverrides(
   if (!data?.length) return { ok: true };
 
   const now = new Date().toISOString();
-  const rows = data.map((row) => ({
-    season_id: toSeasonId,
-    key: row.key,
-    value: row.value,
-    updated_at: now,
-    updated_by: row.updated_by,
-  }));
+  const rows = data
+    .filter((row) => shouldCopyInlineOverrideKey(row.key))
+    .map((row) => ({
+      season_id: toSeasonId,
+      key: row.key,
+      value: row.value,
+      updated_at: now,
+      updated_by: row.updated_by,
+    }));
+
+  if (!rows.length) return { ok: true };
 
   const { error: upsertError } = await supabase.from("cms_inline_overrides").upsert(rows);
   if (upsertError) return { ok: false, error: upsertError.message };
