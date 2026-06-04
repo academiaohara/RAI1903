@@ -51,6 +51,7 @@ export function NewsEditorForm({
   const [title, setTitle] = useState(initialItem?.title ?? "");
   const [excerpt, setExcerpt] = useState(initialItem?.excerpt ?? "");
   const [date, setDate] = useState(initialItem?.date ?? "");
+  const [time, setTime] = useState(initialItem?.time ?? "");
   const [imageUrl, setImageUrl] = useState(initialItem?.imageUrl ?? "");
   const [channel, setChannel] = useState<NewsChannel>(initialItem?.channel ?? defaultChannel);
   const [teamScope, setTeamScope] = useState<TeamScope>(teamScopeFromItem(initialItem?.teams));
@@ -131,11 +132,13 @@ export function NewsEditorForm({
     const teams: PrimerEquipoGender[] | undefined =
       teamScope === "general" ? undefined : [teamScope];
 
+    const trimmedTime = time.trim();
     const item: NewsItem = {
       id: newsId,
       channel,
       source: sourceFromUrl(trimmedUrl),
       date: trimmedDate,
+      time: trimmedTime || undefined,
       title: trimmedTitle,
       excerpt: trimmedExcerpt,
       url: trimmedUrl,
@@ -157,6 +160,7 @@ export function NewsEditorForm({
   }, [
     channel,
     date,
+    time,
     excerpt,
     imageUrl,
     initialItem?.featured,
@@ -207,12 +211,26 @@ export function NewsEditorForm({
           rows={3}
           className="w-full rounded-xl border border-[#214C9B]/25 px-3 py-2.5 text-sm outline-none focus:border-[#214C9B]"
         />
-        <input
-          type="date"
-          value={date}
-          onChange={(event) => setDate(event.target.value)}
-          className="w-full rounded-xl border border-[#214C9B]/25 px-3 py-2.5 text-sm outline-none focus:border-[#214C9B] sm:max-w-xs"
-        />
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <label className="flex min-w-0 flex-1 flex-col gap-1.5">
+            <span className="text-xs font-bold uppercase text-slate-500">Fecha</span>
+            <input
+              type="date"
+              value={date}
+              onChange={(event) => setDate(event.target.value)}
+              className="w-full rounded-xl border border-[#214C9B]/25 px-3 py-2.5 text-sm outline-none focus:border-[#214C9B]"
+            />
+          </label>
+          <label className="flex w-full flex-col gap-1.5 sm:w-auto sm:min-w-[9rem]">
+            <span className="text-xs font-bold uppercase text-slate-500">Hora (opcional)</span>
+            <input
+              type="time"
+              value={time}
+              onChange={(event) => setTime(event.target.value)}
+              className="w-full rounded-xl border border-[#214C9B]/25 px-3 py-2.5 text-sm outline-none focus:border-[#214C9B]"
+            />
+          </label>
+        </div>
         <input
           value={imageUrl}
           onChange={(event) => setImageUrl(event.target.value)}

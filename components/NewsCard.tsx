@@ -10,7 +10,7 @@ import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvi
 import { NewsMedia } from "@/components/NewsMedia";
 import { deleteNewsItem, updateNewsItem } from "@/lib/cms/news";
 import { newsCategoryBadge } from "@/lib/noticias";
-import { formatDate } from "@/lib/utils";
+import { formatNewsPublishedLabel } from "@/lib/utils";
 import type { NewsItem } from "@/types";
 
 const categoryIcons: Record<string, LucideIcon> = {
@@ -82,7 +82,7 @@ export function NewsCard({ item, onUpdated }: NewsCardProps) {
         </div>
         <div className="mt-3 hidden flex-wrap items-center justify-between gap-2 sm:flex sm:mt-4">
           <span className="news-card-date text-xs font-medium text-[#214C9B]/65">
-            {formatDate(item.date, { day: "numeric", month: "long" })} | {item.source}
+            {formatNewsPublishedLabel(item.date, item.time, { day: "numeric", month: "long" })} | {item.source}
           </span>
           <Badge tone={category.tone} className="news-card-badge shrink-0 gap-1.5 px-3 py-1.5">
             <CategoryIcon className="size-3.5 shrink-0" aria-hidden />

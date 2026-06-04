@@ -41,11 +41,49 @@ export const NOTICIAS_TABS: { href: Route; label: string }[] = [
   { href: "/noticias/prensa", label: "Prensa" },
 ];
 
-export const sortNewsByDate = <T extends { date: string; id: string }>(items: T[]) =>
-  [...items].sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
-
 /** Fecha de noticia en YYYY-MM-DD (comparable lexicográficamente). */
 export const normalizeNewsDate = (date: string) => date.trim().slice(0, 10);
+
+const NEWS_TIME_RE = /^(\d{1,2}):(\d{2})$/;
+
+/** Hora en HH:MM (24 h) o undefined si no es válida. */
+export const normalizeNewsTime = (time: string | undefined): string | undefined => {
+  if (!time?.trim()) return undefined;
+  const match = time.trim().match(NEWS_TIME_RE);
+  if (!match) return undefined;
+  const hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return undefined;
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+};
+
+/** Clave lexicográfica para ordenar por fecha y hora (más reciente primero). */
+export const newsPublishedSortKey = (item: { date: string; time?: string }) => {
+  const day = normalizeNewsDate(item.date);
+  const time = normalizeNewsTime(item.time) ?? "00:00";
+  return `${day}T${time}`;
+};
+
+export const sortNewsByDate = <T extends { date: string; time?: string; id: string }>(items: T[]) =>
+  [...items].sort(
+    (a, b) => newsPublishedSortKey(b).localeCompare(newsPublishedSortKey(a)) || a.id.localeCompare(b.id),
+  );
+
+/** Hora HH:MM extraída de published_at ISO; omite medianoche (solo fecha). */
+export const newsTimeFromPublishedAt = (publishedAt: string): string | undefined => {
+  const match = publishedAt.match(/T(\d{2}):(\d{2})/);
+  if (!match) return undefined;
+  const normalized = normalizeNewsTime(`${match[1]}:${match[2]}`);
+  if (!normalized || normalized === "00:00") return undefined;
+  return normalized;
+};
+
+/** ISO timestamptz para Supabase a partir de fecha y hora opcional. */
+export const newsItemToPublishedAt = (date: string, time?: string): string => {
+  const day = normalizeNewsDate(date);
+  const normalizedTime = normalizeNewsTime(time) ?? "00:00";
+  return `${day}T${normalizedTime}:00.000Z`;
+};
 
 export const matchesNewsDateRange = (
   item: Pick<NewsItem, "date">,
