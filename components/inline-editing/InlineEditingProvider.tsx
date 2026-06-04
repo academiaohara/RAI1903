@@ -1,7 +1,7 @@
 "use client";
 
 import type { User } from "@supabase/supabase-js";
-import { Check, ChevronRight, Clipboard, CloudUpload, ExternalLink, Pencil, Trash2, X } from "lucide-react";
+import { Check, ChevronRight, Clipboard, CloudUpload, ExternalLink, Pencil, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -482,9 +482,6 @@ function useHorizontalScrollHint(
 const editorToolbarButtonClass =
   "inline-flex shrink-0 items-center gap-1 rounded-full border border-[#214C9B]/20 px-2.5 py-1.5 text-[11px] font-extrabold uppercase leading-none text-[#214C9B] hover:bg-blue-50 sm:px-3 sm:py-1.5 sm:text-xs";
 
-const editorToolbarDangerButtonClass =
-  "inline-flex shrink-0 items-center gap-1 rounded-full border border-[#981915]/20 px-2.5 py-1.5 text-[11px] font-extrabold uppercase leading-none text-[#981915] hover:bg-red-50 sm:px-3 sm:py-1.5 sm:text-xs";
-
 const editorToolbarSaveButtonClass =
   "inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-600/30 bg-emerald-50 px-2.5 py-1.5 text-[11px] font-extrabold uppercase leading-none text-emerald-800 hover:bg-emerald-100 disabled:opacity-60 sm:px-3 sm:py-1.5 sm:text-xs";
 
@@ -493,7 +490,7 @@ const editorToolbarToggleClass =
 
 export function InlineEditingToolbar() {
   const seasonContext = useSeasonOptional();
-  const { canEdit, editMode, ready, localOnly, syncError, cloudSaving, saveNow, setEditMode, clearAll, exportJson } =
+  const { canEdit, editMode, ready, localOnly, syncError, cloudSaving, saveNow, setEditMode, exportJson } =
     useInlineEditing();
   const seasonLabel = seasonContext?.viewedSeason.label;
   const isArchive = seasonContext?.isViewingArchive;
@@ -740,10 +737,6 @@ export function InlineEditingToolbar() {
                 <button type="button" onClick={() => void handleExport()} className={editorToolbarButtonClass}>
                   {copied ? <Check size={13} /> : <Clipboard size={13} />}
                   {copied ? "Copiado" : "Exportar"}
-                </button>
-                <button type="button" onClick={clearAll} className={editorToolbarDangerButtonClass}>
-                  <Trash2 size={13} />
-                  Limpiar
                 </button>
             </div>
             <button type="button" onClick={() => setEditMode(false)} className={editorToolbarToggleClass}>
