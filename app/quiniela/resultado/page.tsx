@@ -96,7 +96,8 @@ function ResultadoBody({ seasonId, matchdays, currentRound, totalRounds }: Resul
 
             {!started && rankingEntries.length > 0 && (
               <p className="mt-3 text-xs text-slate-500 sm:mt-4 sm:text-sm">
-                Todos los participantes aparecen con 0 puntos hasta que empiece el primer partido de la jornada.
+                Los puntos se publican cuando empiece la jornada o haya resultados oficiales cargados en el
+                calendario.
               </p>
             )}
           </>

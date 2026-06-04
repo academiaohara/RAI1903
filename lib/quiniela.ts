@@ -75,6 +75,11 @@ export function hasFirstMatchStarted(matchday: Matchday, now = new Date()): bool
   return now.getTime() >= getFirstKickoff(matchday).getTime();
 }
 
+/** Suma puntos si la jornada ya empezó o hay al menos un resultado oficial cargado. */
+export function shouldCountQuinielaPoints(matchday: Matchday, now = new Date()): boolean {
+  return hasFirstMatchStarted(matchday, now) || countFinishedMatches(matchday) > 0;
+}
+
 export function isAvilesMatch(match: Match): boolean {
   return match.homeTeamId === RAI_TEAM_ID || match.awayTeamId === RAI_TEAM_ID;
 }
