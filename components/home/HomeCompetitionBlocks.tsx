@@ -10,7 +10,6 @@ import { MatchScoreCenter } from "@/components/MatchScoreCenter";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { FixtureCrestMatchCard } from "@/components/FixtureCrestMatchCard";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
-import { MatchCard } from "@/components/MatchCard";
 import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
@@ -196,7 +195,7 @@ export function HomeRecentUpcomingBlock() {
           </div>
           <div className="flex flex-col gap-3">
             {upcomingMatches.length > 0 ? (
-              upcomingMatches.map((match) => <MatchCard key={match.id} match={match} compact />)
+              upcomingMatches.map((match) => <FixtureCrestMatchCard key={match.id} match={match} accent="granate" />)
             ) : (
               <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 p-4 text-sm font-bold text-slate-500">
                 No hay proximos partidos actualmente.
@@ -283,9 +282,9 @@ function MatchBanner({
             centerLabel={scoreLabel}
             sublabel={formatMatchDate(match.date)}
           />
-          <div className="flex min-w-0 items-center justify-between gap-3 p-4 lg:gap-4 lg:p-5">
-            <div className="min-w-0">
-              <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-normal text-[#981915]">
+          <div className="flex min-w-0 items-center justify-between gap-3 p-4 text-right lg:gap-4 lg:p-5">
+            <div className="min-w-0 flex-1">
+              <p className="flex items-center justify-end gap-1.5 text-xs font-bold uppercase tracking-normal text-[#981915]">
                 <CompetitionLogo competition={match.competition} alt={competitionLabel} size="xs" />
                 {competitionLabel}
               </p>

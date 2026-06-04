@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/Badge";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
-import { MatchFixtureTeamLinks } from "@/components/MatchFixtureTeamLinks";
+import { MatchFixtureWideScoreRow } from "@/components/MatchFixtureWideScoreRow";
 import { matchCompetitionShortLabel, matchFixtureMeta } from "@/lib/competition-labels";
 import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { defaultCronicaId } from "@/lib/match-article-factory";
@@ -14,7 +14,7 @@ import { primerEquipoBase, primerEquipoHasCronicas } from "@/lib/primer-equipo";
 import { cn, formatMatchDate } from "@/lib/utils";
 import type { Match } from "@/types";
 import type { Route } from "next";
-import { RAI_TEAM_ID } from "@/data/mock";
+import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 
 type RecentMatchCardProps = {
   match: Match;
@@ -62,6 +62,7 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
   const competicionHref = `${primerEquipoBase(gender)}/competicion` as Route;
   const scoreLabel = `${match.homeScore} - ${match.awayScore}`;
   const competitionLabel = matchCompetitionShortLabel(match);
+  const highlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
 
   return (
     <article
@@ -105,16 +106,15 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
           </Link>
         </div>
         <div className="relative z-[1]">
-          <MatchFixtureTeamLinks
+          <MatchFixtureWideScoreRow
             match={match}
             gender={gender}
-            highlightTeamId={RAI_TEAM_ID}
+            highlightTeamId={highlightTeamId}
             scoreLabel={scoreLabel}
-            homeTeamLinkClassName={cn(teamLinkHoverClass, "hover:translate-x-0.5")}
-            awayTeamLinkClassName={cn(teamLinkHoverClass, "hover:-translate-x-0.5")}
-            scorePillClassName={cn(
+            homeTeamClassName={cn(teamLinkHoverClass, "hover:translate-x-0.5")}
+            awayTeamClassName={cn(teamLinkHoverClass, "hover:-translate-x-0.5")}
+            scoreStripeClassName={cn(
               "transition-colors duration-200",
-              "group-has-[a.cronica-overlay:hover]/card:border group-has-[a.cronica-overlay:hover]/card:border-white/40",
               "group-has-[a.cronica-overlay:hover]/card:bg-white group-has-[a.cronica-overlay:hover]/card:text-[#214C9B]",
               "group-has-[a.cronica-overlay:hover]/card:shadow-white/20",
             )}
