@@ -15,17 +15,9 @@
     "import:assets": "node --experimental-strip-types scripts/import-uploaded-assets.ts && npm run sync:escudos && npm run sync:estadios",
     "seed:cms": "npx --yes tsx scripts/seed-cms-season.ts"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/academiaohara/RAI1903.git"
-  },
   "keywords": [],
   "author": "",
   "license": "UNLICENSED",
-  "bugs": {
-    "url": "https://github.com/academiaohara/RAI1903/issues"
-  },
-  "homepage": "https://github.com/academiaohara/RAI1903#readme",
   "dependencies": {
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.106.2",
