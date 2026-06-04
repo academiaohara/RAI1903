@@ -12,13 +12,13 @@ import { ExtraFixturesOnPageEditor } from "@/components/editor/ExtraFixturesOnPa
 import { MatchCard } from "@/components/MatchCard";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
 import { UpcomingMatchCard } from "@/components/UpcomingMatchCard";
+import { useAllSeasonsCalendarMatches } from "@/hooks/useAllSeasonsCalendarMatches";
 import { hasMultipleGrupos, zonesToLegacyConfig } from "@/lib/cms/competition-config-bundle";
+import { getCompetitionSidebarMatches } from "@/lib/competition-match-sections";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { useSeason } from "@/components/season/SeasonProvider";
-import { useEditedMatchdays, useEditedMatches } from "@/hooks/useEditedMatchdays";
-import { resolveClubTeamIds } from "@/lib/season/club-team-ids";
+import { useEditedMatchdays } from "@/hooks/useEditedMatchdays";
 import {
-  getAvilesMatchesFromSource,
   getCopaDelReyMatchesFromSource,
   getGrupo2Matchdays,
   getLeagueMatchdaysForGender,
@@ -26,7 +26,6 @@ import {
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import { getPlayedLeagueRounds } from "@/lib/standings";
-import { isMatchPlayed } from "@/lib/match-result";
 import type { Route } from "next";
 import type { Match } from "@/types";
 
