@@ -44,7 +44,7 @@ const COMPETICION_OPTIONS = [
 type CompeticionPanel = (typeof COMPETICION_OPTIONS)[number]["id"];
 
 export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }: CompeticionViewProps) {
-  const { getEnrichedFixtureSource, getCompetitionConfig, bundles } = useSeason();
+  const { getEnrichedFixtureSource, getCompetitionConfig, bundles, viewedSeason } = useSeason();
   const fixtureSource = useMemo(() => getEnrichedFixtureSource(gender), [gender, getEnrichedFixtureSource]);
   const competitionConfig = useMemo(() => getCompetitionConfig(gender), [gender, getCompetitionConfig]);
   const standingsZones = useMemo(() => zonesToLegacyConfig(competitionConfig.zones), [competitionConfig.zones]);
@@ -105,7 +105,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
           ? `${baseLigaLabel} - Grupo I (Real Avilés)`
           : `${baseLigaLabel} - Grupo II`
         : baseLigaLabel
-      : "Copa del Rey 2025/26";
+      : `Copa del Rey ${viewedSeason.label}`;
 
   const lastGrupoJornada = useMemo(() => {
     if (showAvilesSidebar) return null;
