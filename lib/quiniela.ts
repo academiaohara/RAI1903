@@ -95,6 +95,18 @@ export function isOutcomeLockedByGoals(
   return outcomeFromGoalsPicks(goalsHome, goalsAway) !== null;
 }
 
+/** Signo efectivo del pronóstico (en el Avilés, prioriza el derivado de la porra). */
+export function getEffectivePredictionOutcome(
+  match: Match,
+  prediction: Prediction,
+): PredictionOutcome | undefined {
+  if (isAvilesMatch(match)) {
+    const fromGoals = outcomeFromGoalsPicks(prediction.goalsHome, prediction.goalsAway);
+    if (fromGoals !== null) return fromGoals;
+  }
+  return prediction.outcome;
+}
+
 export function getAvilesScore(match: Match): number | null {
   if (!isAvilesMatch(match) || match.homeScore === undefined || match.awayScore === undefined) {
     return null;
@@ -184,17 +196,27 @@ export function areGoalsPredictionCorrect(match: Match, prediction: Prediction):
 
 export function scorePredictionPoints(match: Match, prediction?: Prediction): number {
   const outcome = actualOutcome(match);
-  if (!outcome || !prediction?.outcome) return 0;
+  if (!outcome || !prediction) return 0;
+
+  const predictedOutcome = getEffectivePredictionOutcome(match, prediction);
+  if (!predictedOutcome) return 0;
 
   if (isAvilesMatch(match)) {
     let points = 0;
-    if (prediction.outcome === outcome) points += 1;
+    if (predictedOutcome === outcome) points += 1;
     if (areGoalsPredictionCorrect(match, prediction)) points += 1;
     if (isScorerPredictionCorrect(match, prediction)) points += 1;
     return points;
   }
 
-  return prediction.outcome === outcome ? 1 : 0;
+  return predictedOutcome === outcome ? 1 : 0;
+}
+
+export function scoreMatchdayPoints(matchday: Matchday, predictions: Record<string, Prediction>): number {
+  return matchday.matches.reduce((total, match) => {
+    const prediction = predictions[match.id];
+    return total + scorePredictionPoints(match, prediction);
+  }, 0);
 }
 
 export function sortQuinielaMatches(matches: Match[]): Match[] {
@@ -226,8 +248,10 @@ export function countOutcomeHits(matchday: Matchday, predictions: Record<string,
   return matchday.matches.reduce((total, match) => {
     const outcome = actualOutcome(match);
     const prediction = predictions[match.id];
-    if (!outcome || !prediction?.outcome) return total;
-    return total + (prediction.outcome === outcome ? 1 : 0);
+    if (!outcome || !prediction) return total;
+    const predictedOutcome = getEffectivePredictionOutcome(match, prediction);
+    if (!predictedOutcome) return total;
+    return total + (predictedOutcome === outcome ? 1 : 0);
   }, 0);
 }
 
