@@ -7,9 +7,9 @@ import { MatchFixtureDesktopPanels } from "@/components/MatchFixtureDesktopPanel
 import { MatchFixtureJerseyMobile } from "@/components/MatchFixtureJerseyMobile";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
-import { matchCompetitionShortLabel, matchFixtureMeta, matchJornadaLabel } from "@/lib/competition-labels";
+import { matchCompetitionShortLabel, matchFixtureMeta, matchRoundBadgeLabel } from "@/lib/competition-labels";
 import { defaultCronicaId } from "@/lib/match-article-factory";
-import { matchFixtureCardClassName } from "@/lib/match-card-styles";
+import { matchFixtureCardClassName, matchFixtureDesktopCardMinHeightClassName } from "@/lib/match-card-styles";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { primerEquipoBase, primerEquipoHasCronicas } from "@/lib/primer-equipo";
 import { cn, formatMatchDate, formatMatchTime } from "@/lib/utils";
@@ -65,7 +65,7 @@ export function UpcomingMatchCard({ match, gender = "masculino" }: UpcomingMatch
   const dateLabel = formatMatchDate(match.date);
   const competitionLabel = matchCompetitionShortLabel(match);
   const highlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
-  const roundLabel = matchJornadaLabel(match) ?? matchCompetitionShortLabel(match);
+  const roundLabel = matchRoundBadgeLabel(match) ?? matchCompetitionShortLabel(match);
 
   const badge = (
     <Badge
@@ -98,7 +98,8 @@ export function UpcomingMatchCard({ match, gender = "masculino" }: UpcomingMatch
     <article
       className={cn(
         matchFixtureCardClassName,
-        "group/card relative p-0 transition-[transform,background-color,border-color,box-shadow] duration-200 md:p-3",
+        "group/card relative p-0 transition-[transform,background-color,border-color,box-shadow] duration-200",
+        matchFixtureDesktopCardMinHeightClassName,
         upcomingCardHoverClass,
       )}
     >

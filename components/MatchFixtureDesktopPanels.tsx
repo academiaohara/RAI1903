@@ -1,5 +1,6 @@
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { MatchTeamLink } from "@/components/TeamLink";
+import { matchFixtureDesktopGridClassName } from "@/lib/match-card-styles";
 import { getTeamByGender } from "@/lib/fixtures";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getTeamCrestById } from "@/lib/team-crests";
@@ -54,10 +55,10 @@ export function MatchFixtureDesktopPanels({
   const awayClassName = teamTextClassName(awayHighlighted, "right", awayTeamClassName);
 
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_minmax(10.5rem,12rem)_minmax(0,1fr)] items-stretch">
-      <div className="flex min-w-0 flex-col justify-between gap-2 py-3 pl-3 pr-2">
+    <div className={cn(matchFixtureDesktopGridClassName, "h-full min-h-[7.5rem]")}>
+      <div className="flex min-h-0 min-w-0 flex-col justify-between gap-2 px-3 py-3">
         <div>{badge}</div>
-        <div className="pointer-events-auto flex min-h-0 min-w-0 flex-1 flex-col justify-center py-1">
+        <div className="pointer-events-auto flex min-h-0 min-w-0 flex-1 flex-col justify-center">
           <MatchTeamLink
             gender={gender}
             teamId={match.homeTeamId}
@@ -66,12 +67,12 @@ export function MatchFixtureDesktopPanels({
             className={homeClassName}
           />
         </div>
-        {footerLeft ? <div className="pointer-events-auto">{footerLeft}</div> : null}
+        <div className="pointer-events-auto min-h-[1.125rem]">{footerLeft ?? <span className="sr-only"> </span>}</div>
       </div>
 
       <div
         className={cn(
-          "flex min-h-[4.5rem] flex-col items-center justify-center gap-1 self-stretch bg-[#214C9B] px-2.5 py-2.5 text-center text-white shadow-md shadow-blue-950/10",
+          "flex h-full min-h-0 flex-col items-center justify-center gap-1 self-stretch bg-[#214C9B] px-2.5 py-2 text-center text-white",
           scoreStripeClassName,
         )}
       >
@@ -97,9 +98,9 @@ export function MatchFixtureDesktopPanels({
         ) : null}
       </div>
 
-      <div className="flex min-w-0 flex-col justify-between gap-2 py-3 pl-2 pr-3 text-right">
+      <div className="flex min-h-0 min-w-0 flex-col justify-between gap-2 px-3 py-3 text-right">
         <div className="flex justify-end">{competitionSlot}</div>
-        <div className="pointer-events-auto flex min-h-0 min-w-0 flex-1 flex-col justify-center py-1">
+        <div className="pointer-events-auto flex min-h-0 min-w-0 flex-1 flex-col justify-center">
           <MatchTeamLink
             gender={gender}
             teamId={match.awayTeamId}
@@ -109,6 +110,7 @@ export function MatchFixtureDesktopPanels({
             className={awayClassName}
           />
         </div>
+        <div className="min-h-[1.125rem]" aria-hidden />
       </div>
     </div>
   );

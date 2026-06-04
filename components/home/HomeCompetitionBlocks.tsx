@@ -14,12 +14,13 @@ import { UpcomingMatchCard } from "@/components/UpcomingMatchCard";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
 import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
-import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
+import { matchCompetitionShortLabel, matchFixtureMeta, matchRoundBadgeLabel } from "@/lib/competition-labels";
 import { getTeamByGender } from "@/lib/fixtures";
 import { seasonHasCompetitionBundles } from "@/lib/season/cms-data-policy";
 import { defaultCronicaId } from "@/lib/match-article-factory";
 import { primerEquipoBase } from "@/lib/primer-equipo";
 import { getTeamCrestById } from "@/lib/team-crests";
+import { matchFixtureDesktopGridClassName } from "@/lib/match-card-styles";
 import { cn, formatMatchDate, formatMatchDay, formatMatchTime } from "@/lib/utils";
 import type { Route } from "next";
 import type { Match } from "@/types";
@@ -232,9 +233,9 @@ function MatchBanner({
   action: string;
   accent?: MatchBannerAccent;
 }) {
-  const jornadaLabel = matchJornadaLabel(match);
+  const roundBadgeLabel = matchRoundBadgeLabel(match);
   const competitionLabel = matchCompetitionShortLabel(match);
-  const centerRoundLabel = jornadaLabel ?? (match.competition === "copa-rey" ? competitionLabel : null);
+  const centerRoundLabel = roundBadgeLabel;
   const scoreLabel = match.status === "finished" ? `${match.homeScore}-${match.awayScore}` : formatMatchTime(match.date);
   const dateLabel = match.status === "finished" ? formatMatchDate(match.date) : formatMatchDay(match.date);
   const centerAccent = matchCenterAccentClass(accent);
@@ -263,11 +264,11 @@ function MatchBanner({
           </div>
         </div>
 
-        <div className="hidden grid-cols-[1fr_auto_1fr] items-stretch md:grid">
+        <div className={cn("hidden min-h-[7.5rem] md:grid", matchFixtureDesktopGridClassName)}>
           <div className="flex min-w-0 items-center gap-2 p-4 lg:gap-4 lg:p-5">
-            {jornadaLabel && (
+            {roundBadgeLabel && (
               <span className="flex h-12 min-w-12 shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 bg-blue-50 px-2 text-center text-xs font-extrabold leading-tight text-[#214C9B] transition group-hover:border-[#214C9B] group-hover:bg-[#214C9B] group-hover:text-white lg:h-14 lg:min-w-14 lg:text-sm">
-                {jornadaLabel}
+                {roundBadgeLabel}
               </span>
             )}
             <div className="min-w-0">
@@ -287,7 +288,7 @@ function MatchBanner({
             <div className="min-w-0 flex-1">
               <p className="flex items-center justify-end gap-1.5 text-xs font-bold uppercase tracking-normal text-[#981915]">
                 <CompetitionLogo competition={match.competition} alt={competitionLabel} size="xs" />
-                {competitionLabel}
+                {matchFixtureMeta(match)}
               </p>
               <p className="mt-1 break-words text-lg font-extrabold leading-tight text-slate-900 lg:text-xl">{match.awayTeam}</p>
             </div>
