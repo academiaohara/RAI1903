@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { LucideIcon } from "lucide-react";
-import { Calendar, ChevronLeft, Clock, MapPin, User, Users } from "lucide-react";
+import { Calendar, ChevronLeft, Clock, Lock, MapPin, User, Users } from "lucide-react";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { headerLinkHoverClass, TeamLink } from "@/components/TeamLink";
 import { EditableText } from "@/components/inline-editing/EditableText";
@@ -326,7 +326,7 @@ export function MatchCenterTabs({
   active,
   onChange,
 }: {
-  tabs: Array<{ id: string; label: string; icon: LucideIcon }>;
+  tabs: Array<{ id: string; label: string; icon: LucideIcon; disabled?: boolean; disabledReason?: string }>;
   active: string;
   onChange: (id: string) => void;
 }) {
@@ -334,22 +334,39 @@ export function MatchCenterTabs({
     <nav className="flex flex-nowrap justify-between gap-2 sm:flex-wrap sm:justify-start" aria-label="Secciones del partido">
       {tabs.map((tab) => {
         const isActive = tab.id === active;
+        const disabled = Boolean(tab.disabled);
         const Icon = tab.icon;
         return (
           <button
             key={tab.id}
             type="button"
             onClick={() => onChange(tab.id)}
+            disabled={disabled}
+            title={disabled ? tab.disabledReason ?? "Bloqueado" : tab.label}
             className={cn(
-              "inline-flex shrink-0 items-center justify-center rounded-full transition",
+              "relative inline-flex shrink-0 items-center justify-center rounded-full transition",
               "size-11 sm:size-auto sm:px-4 sm:py-2 sm:text-xs sm:font-extrabold sm:uppercase sm:tracking-normal sm:text-sm",
-              isActive ? "bg-[#214C9B] text-white shadow-md" : "border border-[#214C9B]/20 bg-white text-[#214C9B] hover:border-[#214C9B]",
+              isActive
+                ? "bg-[#214C9B] text-white shadow-md"
+                : "border border-[#214C9B]/20 bg-white text-[#214C9B] hover:border-[#214C9B]",
+              disabled && "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400 hover:border-slate-200",
             )}
-            aria-label={tab.label}
+            aria-label={disabled ? `${tab.label} bloqueado` : tab.label}
             aria-pressed={isActive}
+            aria-disabled={disabled}
           >
             <Icon size={20} className="sm:hidden" aria-hidden />
-            <span className="hidden sm:inline">{tab.label}</span>
+            <span className="hidden items-center gap-1.5 sm:inline-flex">
+              {tab.label}
+              {disabled ? <Lock size={13} aria-hidden /> : null}
+            </span>
+            {disabled ? (
+              <Lock
+                size={12}
+                className="absolute -right-0.5 -top-0.5 rounded-full bg-white p-0.5 text-slate-400 shadow-sm sm:hidden"
+                aria-hidden
+              />
+            ) : null}
           </button>
         );
       })}
