@@ -33,12 +33,14 @@ import { HomeLayoutEditorPanel } from "@/components/editor/HomeLayoutEditorPanel
 import { MediaRaiSectionsEditorPanel } from "@/components/editor/MediaRaiSectionsEditorPanel";
 import { CompetitionEditorPanel } from "@/components/editor/CompetitionEditorPanel";
 import { FemeninoEditorPanel } from "@/components/editor/FemeninoEditorPanel";
+import { PublishFixturesBundleButton } from "@/components/editor/PublishFixturesBundleButton";
 import { TeamsEditorPanel } from "@/components/editor/TeamsEditorPanel";
 import {
   EDITOR_PAGE_LINKS,
   isFemeninoPath,
   isFichajesPath,
   isFilialPath,
+  isJornadasPath,
   isJuvenilPath,
   isPlantillaPath,
   plantillaEditorLink,
@@ -625,6 +627,7 @@ export function InlineEditingToolbar() {
                     {cloudSaving ? "Guardando…" : saveAck ? "Guardado" : "Guardar"}
                   </button>
                 )}
+                {isJornadasPath(pathname) && <PublishFixturesBundleButton />}
                 <button
                   type="button"
                   onClick={() => {
