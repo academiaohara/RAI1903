@@ -246,11 +246,11 @@ function MatchBanner({
         href={href}
         className="group block overflow-hidden rounded-xl border border-[#214C9B]/25 bg-white shadow-[0_10px_28px_rgba(17,24,39,0.06)] transition hover:-translate-y-1 hover:border-[#214C9B] md:rounded-[1.5rem] md:shadow-[0_18px_45px_rgba(17,24,39,0.08)] lg:rounded-[2rem]"
       >
-        <div className="grid grid-cols-[1fr_auto_1fr] items-stretch md:hidden">
-          <div className="flex items-center justify-center p-3">
+        <div className="mx-auto grid w-[288px] max-w-full grid-cols-3 items-stretch md:hidden">
+          <div className="flex items-center justify-center bg-white p-3">
             <OpponentCrest logo={teamCrestLogo(match.homeTeamId)} opponent={match.homeTeam} size="md" className="mx-auto" />
           </div>
-          <div className={cn("flex w-32 shrink-0 flex-col items-center justify-center px-2 py-3 text-center text-white", centerAccent)}>
+          <div className={cn("flex min-w-0 flex-col items-center justify-center px-2 py-3 text-center text-white", centerAccent)}>
             {centerRoundLabel && (
               <p className="w-full break-words text-xs font-extrabold uppercase tracking-normal text-white/90">{centerRoundLabel}</p>
             )}

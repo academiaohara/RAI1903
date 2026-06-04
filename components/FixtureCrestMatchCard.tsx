@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { MatchFixtureJerseyMobile } from "@/components/MatchFixtureJerseyMobile";
 import { MatchFixtureWideScoreRow } from "@/components/MatchFixtureWideScoreRow";
 import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { defaultCronicaId } from "@/lib/match-article-factory";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
-import { fixtureCrestMatchCardClassName } from "@/lib/match-card-styles";
+import { matchJornadaLabel } from "@/lib/competition-labels";
+import { fixtureCrestMatchCardClassName, matchFixtureCardMobileWidthClassName } from "@/lib/match-card-styles";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { primerEquipoBase, primerEquipoHasCronicas } from "@/lib/primer-equipo";
 import { cn, formatMatchDate, formatMatchDay, formatMatchTime } from "@/lib/utils";
@@ -41,28 +43,40 @@ export function FixtureCrestMatchCard({
   const linkHref = href ?? defaultHref;
   const scoreLabel = match.status === "finished" ? `${match.homeScore}-${match.awayScore}` : formatMatchTime(match.date);
   const highlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
-  const timeOrDate =
-    match.status === "scheduled"
-      ? formatMatchDay(match.date)
-      : formatMatchDate(match.date);
+  const dateLabel = match.status === "scheduled" ? formatMatchDay(match.date) : formatMatchDate(match.date);
+  const roundLabel = matchJornadaLabel(match);
+  const centerAccent = accent === "granate" ? "bg-[#981915]" : "bg-[#214C9B]";
   const cardClassName = cn(
     fixtureCrestMatchCardClassName,
     accent === "granate" && "hover:border-[#981915]/70",
   );
 
   const inner = (
-    <MatchFixtureWideScoreRow
-      match={match}
-      gender={gender}
-      highlightTeamId={highlightTeamId}
-      scoreLabel={scoreLabel}
-      sublabel={timeOrDate}
-      linkTeams={false}
-      className="gap-0 sm:gap-0"
-      scoreStripeClassName="rounded-none shadow-none"
-      homeTeamClassName="text-[10px] sm:text-xs"
-      awayTeamClassName="text-[10px] sm:text-xs"
-    />
+    <>
+      <div className="md:hidden">
+        <MatchFixtureJerseyMobile
+          match={match}
+          gender={gender}
+          scoreLabel={scoreLabel}
+          roundLabel={roundLabel}
+          dateLabel={dateLabel}
+          centerClassName={centerAccent}
+          className={matchFixtureCardMobileWidthClassName}
+        />
+      </div>
+      <MatchFixtureWideScoreRow
+        match={match}
+        gender={gender}
+        highlightTeamId={highlightTeamId}
+        scoreLabel={scoreLabel}
+        sublabel={dateLabel}
+        linkTeams={false}
+        className="hidden gap-0 md:grid md:gap-0"
+        scoreStripeClassName={cn("rounded-none shadow-none", centerAccent)}
+        homeTeamClassName="text-[10px] md:text-xs"
+        awayTeamClassName="text-[10px] md:text-xs"
+      />
+    </>
   );
 
   if (!linkable) {
