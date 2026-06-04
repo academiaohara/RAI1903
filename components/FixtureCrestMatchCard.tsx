@@ -6,7 +6,7 @@ import { MatchFixtureWideScoreRow } from "@/components/MatchFixtureWideScoreRow"
 import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { defaultCronicaId } from "@/lib/match-article-factory";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
-import { matchJornadaLabel } from "@/lib/competition-labels";
+import { matchRoundBadgeLabel } from "@/lib/competition-labels";
 import { fixtureCrestMatchCardClassName, matchFixtureCardMobileWidthClassName } from "@/lib/match-card-styles";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { primerEquipoBase, primerEquipoHasCronicas } from "@/lib/primer-equipo";
@@ -44,7 +44,7 @@ export function FixtureCrestMatchCard({
   const scoreLabel = match.status === "finished" ? `${match.homeScore}-${match.awayScore}` : formatMatchTime(match.date);
   const highlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
   const dateLabel = match.status === "scheduled" ? formatMatchDay(match.date) : formatMatchDate(match.date);
-  const roundLabel = matchJornadaLabel(match);
+  const roundLabel = matchRoundBadgeLabel(match);
   const centerAccent = accent === "granate" ? "bg-[#981915]" : "bg-[#214C9B]";
   const cardClassName = cn(
     fixtureCrestMatchCardClassName,

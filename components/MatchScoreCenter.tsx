@@ -23,7 +23,7 @@ export function MatchScoreCenter({
   return (
     <div
       className={cn(
-        "flex min-w-40 flex-col items-center justify-center bg-[#214C9B] px-5 py-4 text-white lg:px-8 lg:py-5",
+        "flex h-full w-[12rem] shrink-0 flex-col items-center justify-center self-stretch bg-[#214C9B] px-4 py-4 text-white lg:px-6",
         className,
       )}
     >
