@@ -111,8 +111,8 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
             gender={gender}
             highlightTeamId={highlightTeamId}
             scoreLabel={scoreLabel}
-            homeTeamLinkClassName={cn(teamLinkHoverClass, "hover:translate-x-0.5")}
-            awayTeamLinkClassName={cn(teamLinkHoverClass, "hover:-translate-x-0.5")}
+            homeTeamClassName={cn(teamLinkHoverClass, "hover:translate-x-0.5")}
+            awayTeamClassName={cn(teamLinkHoverClass, "hover:-translate-x-0.5")}
             scoreStripeClassName={cn(
               "transition-colors duration-200",
               "group-has-[a.cronica-overlay:hover]/card:bg-white group-has-[a.cronica-overlay:hover]/card:text-[#214C9B]",
