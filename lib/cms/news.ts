@@ -1,5 +1,10 @@
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import {
+  newsItemToPublishedAt,
+  newsTimeFromPublishedAt,
+  normalizeNewsDate,
+} from "@/lib/noticias";
 import type { NewsItem, NewsTag } from "@/types";
 
 const LOCAL_NEWS_KEY = "rai1903:cms-news:v1";
@@ -22,11 +27,13 @@ type CmsNewsRow = {
 };
 
 function rowToNewsItem(row: CmsNewsRow): NewsItem {
+  const time = newsTimeFromPublishedAt(row.published_at);
   return {
     id: row.id,
     channel: row.channel,
     source: row.source,
-    date: row.published_at.slice(0, 10),
+    date: normalizeNewsDate(row.published_at),
+    time,
     title: row.title,
     excerpt: row.excerpt,
     url: row.url,
@@ -97,7 +104,7 @@ export function newsItemToRow(item: NewsItem): Omit<CmsNewsRow, "published"> & {
     id: item.id,
     channel: item.channel,
     source: item.source,
-    published_at: item.date,
+    published_at: newsItemToPublishedAt(item.date, item.time),
     title: item.title,
     excerpt: item.excerpt,
     url: item.url,

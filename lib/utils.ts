@@ -10,6 +10,16 @@ export const formatDate = (date: string, options?: Intl.DateTimeFormatOptions) =
     ...options,
   }).format(new Date(date));
 
+/** Fecha de noticia con hora opcional (HH:MM). */
+export const formatNewsPublishedLabel = (
+  date: string,
+  time: string | undefined,
+  dateOptions?: Intl.DateTimeFormatOptions,
+) => {
+  const dateLabel = formatDate(date, dateOptions);
+  return time ? `${dateLabel}, ${time}` : dateLabel;
+};
+
 export const formatMatchDate = (date: string) =>
   new Intl.DateTimeFormat("es-ES", {
     weekday: "short",

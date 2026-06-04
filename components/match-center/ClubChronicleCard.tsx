@@ -1,6 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import { NewsMedia } from "@/components/NewsMedia";
-import { formatDate } from "@/lib/utils";
+import { formatNewsPublishedLabel } from "@/lib/utils";
 import type { NewsItem } from "@/types";
 
 export function ClubChronicleCard({ item }: { item: NewsItem }) {
@@ -15,7 +15,7 @@ export function ClubChronicleCard({ item }: { item: NewsItem }) {
       <div className="flex min-w-0 flex-1 flex-col justify-center p-3 sm:justify-between sm:p-5">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-normal text-[#981915] sm:text-xs">
-            Web oficial · {formatDate(item.date, { day: "numeric", month: "long" })}
+            Web oficial · {formatNewsPublishedLabel(item.date, item.time, { day: "numeric", month: "long" })}
           </p>
           <h3 className="mt-1 line-clamp-3 text-sm font-extrabold uppercase leading-snug text-[#214C9B] sm:line-clamp-none sm:text-lg sm:leading-tight">
             {item.title}

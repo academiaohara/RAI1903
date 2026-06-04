@@ -109,7 +109,10 @@ export type NewsItem = {
   id: string;
   channel: NewsChannel;
   source: string;
+  /** Fecha de publicación (YYYY-MM-DD). */
   date: string;
+  /** Hora de publicación (HH:MM, 24 h). Ordena noticias del mismo día. */
+  time?: string;
   title: string;
   excerpt: string;
   url: string;

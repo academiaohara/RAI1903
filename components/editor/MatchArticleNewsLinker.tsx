@@ -202,7 +202,7 @@ export function MatchArticleNewsLinker({ article, newsItems }: MatchArticleNewsL
                 >
                   <span className="font-bold text-slate-900">{item.title}</span>
                   <span className="mt-1 block text-xs text-slate-500">
-                    {item.date} · {item.source} · {item.channel}
+                    {item.time ? `${item.date}, ${item.time}` : item.date} · {item.source} · {item.channel}
                     {item.tags.length > 0 ? ` · ${item.tags.map((t) => newsTagLabels[t]).join(", ")}` : ""}
                   </span>
                 </button>
