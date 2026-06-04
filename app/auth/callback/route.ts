@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { syncUserProfile } from "@/lib/auth/sync-profile";
 import { getSupabaseAnonKey, getSupabaseUrl, isSupabaseConfigured } from "@/lib/supabase/env";
 
 function safeNextPath(next: string | null): string {
@@ -55,6 +56,13 @@ export async function GET(request: NextRequest) {
     const params = new URLSearchParams({ error: "auth" });
     params.set("reason", error.message.slice(0, 200));
     return NextResponse.redirect(`${origin}/login?${params.toString()}`);
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    await syncUserProfile(supabase, user);
   }
 
   return response;

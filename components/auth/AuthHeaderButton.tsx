@@ -1,11 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { LogIn, LogOut } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { UserAvatar } from "@/components/auth/UserAvatar";
 import { signInWithX } from "@/lib/auth/sign-in-with-x";
+import { syncUserProfile } from "@/lib/auth/sync-profile";
 import { getUserAvatarUrl } from "@/lib/auth/user-display";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -29,6 +30,9 @@ export function AuthHeaderButton({ className }: { className?: string }) {
     const syncUser = (next: User | null) => {
       setUser(next);
       setReady(true);
+      if (next) {
+        void syncUserProfile(supabase, next);
+      }
     };
 
     void supabase.auth.getUser().then(({ data }) => syncUser(data.user));
@@ -101,24 +105,10 @@ export function AuthHeaderButton({ className }: { className?: string }) {
       <button
         type="button"
         onClick={() => setMenuOpen((open) => !open)}
-        className="rounded-full border-2 border-white/60 p-0.5 transition hover:border-white"
         aria-expanded={menuOpen}
         aria-label="Cuenta"
       >
-        {avatarUrl ? (
-          <Image
-            src={avatarUrl}
-            alt=""
-            width={36}
-            height={36}
-            className="h-9 w-9 rounded-full object-cover"
-            unoptimized
-          />
-        ) : (
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-xs font-bold uppercase">
-            ?
-          </span>
-        )}
+        <UserAvatar avatarUrl={avatarUrl} label="?" size="md" fallback="header" />
       </button>
 
       {menuOpen ? (
