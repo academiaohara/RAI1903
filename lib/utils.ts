@@ -19,6 +19,19 @@ export const formatMatchDate = (date: string) =>
     minute: "2-digit",
   }).format(new Date(date));
 
+export const formatMatchDay = (date: string) =>
+  new Intl.DateTimeFormat("es-ES", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+  }).format(new Date(date));
+
+export const formatMatchTime = (date: string) =>
+  new Intl.DateTimeFormat("es-ES", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(date));
+
 export const resultTone = (result: ResultCode | FormCode) => {
   if (result === "W" || result === "G") return "bg-emerald-500 text-white";
   if (result === "D" || result === "E") return "bg-orange-400 text-orange-950";

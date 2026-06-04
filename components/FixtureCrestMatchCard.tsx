@@ -8,7 +8,7 @@ import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import { fixtureCrestMatchCardClassName } from "@/lib/match-card-styles";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { primerEquipoBase, primerEquipoHasCronicas } from "@/lib/primer-equipo";
-import { cn, formatMatchDate } from "@/lib/utils";
+import { cn, formatMatchDate, formatMatchDay, formatMatchTime } from "@/lib/utils";
 import type { Match } from "@/types";
 import type { Route } from "next";
 
@@ -39,11 +39,11 @@ export function FixtureCrestMatchCard({
       : `${primerEquipoBase(gender)}/calendario`
   ) as Route;
   const linkHref = href ?? defaultHref;
-  const scoreLabel = match.status === "finished" ? `${match.homeScore}-${match.awayScore}` : "vs";
+  const scoreLabel = match.status === "finished" ? `${match.homeScore}-${match.awayScore}` : formatMatchTime(match.date);
   const highlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
   const timeOrDate =
     match.status === "scheduled"
-      ? new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "short" }).format(new Date(match.date))
+      ? formatMatchDay(match.date)
       : formatMatchDate(match.date);
   const cardClassName = cn(
     fixtureCrestMatchCardClassName,
