@@ -13,7 +13,11 @@ export function getAvilesMatchesFromSource(
 
   const league =
     gender === "femenino"
-      ? source.matchdaysFemenino.flatMap((matchday) => matchday.matches)
+      ? [
+          ...source.matchdaysFemenino.flatMap((matchday) => matchday.matches),
+          ...source.amistosoMatches,
+          ...source.calendarExtraMatches,
+        ]
       : [
           ...source.matchdays.flatMap((matchday) => matchday.matches),
           ...source.amistosoMatches,

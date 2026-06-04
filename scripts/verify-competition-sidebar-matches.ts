@@ -60,7 +60,9 @@ const femenino = getCompetitionSidebarMatches(
   [
     calendarMatch("fem-past", "2026-10-01T18:00:00.000Z", "liga-femenina", { homeScore: 2, awayScore: 0 }),
     calendarMatch("fem-future", "2026-10-20T18:00:00.000Z", "liga-femenina"),
-    calendarMatch("male-league", "2026-10-10T18:00:00.000Z", "primera-rfef", { homeScore: 1, awayScore: 1 }),
+    calendarMatch("fem-friendly", "2026-10-05T18:00:00.000Z", "amistoso", { homeScore: 3, awayScore: 1 }),
+    calendarMatch("fem-friendly-future", "2026-10-25T18:00:00.000Z", "amistoso"),
+    calendarMatch("wrong-tag-league", "2026-10-10T18:00:00.000Z", "primera-rfef", { homeScore: 1, awayScore: 1 }),
   ],
   "femenino",
   now,
@@ -68,11 +70,11 @@ const femenino = getCompetitionSidebarMatches(
 
 assert.deepEqual(
   femenino.latest.map((match) => match.id),
-  ["fem-past"],
+  ["wrong-tag-league", "fem-friendly", "fem-past"],
 );
 assert.deepEqual(
   femenino.upcoming.map((match) => match.id),
-  ["fem-future"],
+  ["fem-future", "fem-friendly-future"],
 );
 
 console.log("competition sidebar match sections verified");

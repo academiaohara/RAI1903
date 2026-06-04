@@ -59,6 +59,8 @@ export function fixtureSourceFromBundles(
     return {
       ...EMPTY_FIXTURE_SOURCE,
       matchdaysFemenino: bundle.matchdaysFemenino,
+      amistosoMatches: bundle.amistosoMatches ?? [],
+      calendarExtraMatches: bundle.calendarExtraMatches ?? [],
       lastRoundFemenino: bundle.meta?.lastRound ?? defaults.lastRoundFemenino,
     };
   }

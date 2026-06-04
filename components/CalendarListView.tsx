@@ -3,13 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { CalendarMatchEditor, useEditedCalendarMatch } from "@/components/calendar/CalendarMatchEditor";
-import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { useLigaCompetitionLabel } from "@/hooks/useLigaCompetitionLabel";
+import { calendarCompetitionDisplayLabel } from "@/lib/calendar-competition-label";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamLink } from "@/components/TeamLink";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getListViewScrollTargetId, isUtcToday } from "@/lib/calendar";
-import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
 import { getCompetitionAccentClass } from "@/lib/competition-styles";
 import { cn } from "@/lib/utils";
 import type { CalendarMatch } from "@/types";
@@ -142,16 +142,14 @@ function CalendarListRow({
 }) {
   const router = useRouter();
   const { editMode } = useInlineEditing();
+  const ligaLabel = useLigaCompetitionLabel(gender);
   const displayMatch = useEditedCalendarMatch(match, gender);
   const href = editMode ? null : displayMatch.chronicleUrl ?? displayMatch.previaUrl;
   const opponentTeamId = displayMatch.isHome ? displayMatch.awayTeamId : displayMatch.homeTeamId;
   const date = new Date(displayMatch.date);
   const today = isUtcToday(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
   const accent = getCompetitionAccentClass(displayMatch.competition);
-  const jornada = matchJornadaLabel(displayMatch);
-  const competitionLabel = jornada
-    ? `${matchCompetitionShortLabel(displayMatch)} · ${jornada}`
-    : matchCompetitionShortLabel(displayMatch);
+  const competitionLabel = calendarCompetitionDisplayLabel(displayMatch, { gender, ligaLabel });
 
   const rowSurface = cn(
     "relative border-b border-[#214C9B]/8 transition last:border-b-0",
@@ -226,7 +224,7 @@ function CalendarListRow({
         <span className="min-w-0 truncate font-extrabold text-[#214C9B]">{displayMatch.opponent}</span>
       </span>
       <span className={cn("max-w-[3.75rem] shrink-0 truncate text-right text-[8.5px] font-bold sm:text-[10px]", accent)} title={competitionLabel}>
-        {matchCompetitionShortLabel(displayMatch)}
+        {competitionLabel}
       </span>
     </>
   );
@@ -307,8 +305,10 @@ function CalendarListRow({
         )}
       </span>
 
-      <span className={cn("flex min-w-0 items-center justify-end gap-1.5", clickableCellClass)} onClick={openMatchArticle}>
-        <CompetitionLogo competition={displayMatch.competition} alt="" size="xs" className="shrink-0" />
+      <span
+        className={cn("flex min-w-0 items-center justify-end", clickableCellClass)}
+        onClick={openMatchArticle}
+      >
         <span className={cn("min-w-0 truncate text-xs font-bold", accent)} title={competitionLabel}>
           {competitionLabel}
         </span>
