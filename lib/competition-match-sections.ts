@@ -4,20 +4,18 @@ import type { CalendarMatch, CompetitionId, Match } from "@/types";
 
 const SIDEBAR_MATCH_LIMIT = 5;
 
-const LEAGUE_COMPETITIONS_BY_GENDER: Record<PrimerEquipoGender, readonly CompetitionId[]> = {
-  masculino: ["primera-rfef", "liga-raij903"],
-  femenino: ["liga-femenina"],
-};
+const MASCULINO_SIDEBAR_LEAGUE_COMPETITIONS: readonly CompetitionId[] = ["primera-rfef", "liga-raij903"];
 
 function matchTime(match: Pick<CalendarMatch, "date">): number {
   return new Date(match.date).getTime();
 }
 
-function isLeagueMatchForGender(
+function isSidebarMatch(
   match: Pick<CalendarMatch, "competition">,
   gender: PrimerEquipoGender,
 ): boolean {
-  return LEAGUE_COMPETITIONS_BY_GENDER[gender].includes(match.competition);
+  if (gender === "femenino") return true;
+  return MASCULINO_SIDEBAR_LEAGUE_COMPETITIONS.includes(match.competition);
 }
 
 export function getCompetitionSidebarMatches(
@@ -29,7 +27,7 @@ export function getCompetitionSidebarMatches(
   const nowTime = now.getTime();
   const leagueMatches = calendarMatches.filter((match) => {
     const time = matchTime(match);
-    return Number.isFinite(time) && isLeagueMatchForGender(match, gender);
+    return Number.isFinite(time) && isSidebarMatch(match, gender);
   });
 
   const latest = leagueMatches

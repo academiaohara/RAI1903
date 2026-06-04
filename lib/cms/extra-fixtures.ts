@@ -1,6 +1,7 @@
-import { RAI_TEAM_ID } from "@/data/mock";
+import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import { slugFromTeamName } from "@/lib/cms/group-teams";
-import type { SeasonFixturesBundle } from "@/lib/cms/season-bundles";
+import type { SeasonFemeninoFixturesBundle, SeasonFixturesBundle } from "@/lib/cms/season-bundles";
+import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { CompetitionId, Match, Matchday } from "@/types";
 
 export const EXTRA_FIXTURE_COMPETITION_OPTIONS: { id: CompetitionId; label: string }[] = [
@@ -9,19 +10,35 @@ export const EXTRA_FIXTURE_COMPETITION_OPTIONS: { id: CompetitionId; label: stri
   { id: "primera-rfef", label: "Liga / RFEF (sin jornada)" },
 ];
 
+export const FEMENINO_EXTRA_FIXTURE_COMPETITION_OPTIONS: { id: CompetitionId; label: string }[] = [
+  { id: "amistoso", label: "Amistoso / pretemporada" },
+  { id: "liga-femenina", label: "Liga (sin jornada)" },
+  { id: "primera-rfef", label: "Torneo / competición RFEF" },
+];
+
+export function extraFixtureCompetitionOptions(gender: PrimerEquipoGender) {
+  return gender === "femenino" ? FEMENINO_EXTRA_FIXTURE_COMPETITION_OPTIONS : EXTRA_FIXTURE_COMPETITION_OPTIONS;
+}
+
+function raiTeamId(gender: PrimerEquipoGender): string {
+  return gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
+}
+
 export function newExtraMatchId(prefix: string): string {
   return `${prefix}-${Date.now()}`;
 }
 
-export function emptyAmistosoMatch(rivalName = "Rival"): Match {
+export function emptyAmistosoMatch(rivalName = "Rival", gender: PrimerEquipoGender = "masculino"): Match {
   const rivalId = slugFromTeamName(rivalName) || `rival-${Date.now()}`;
+  const avilesId = raiTeamId(gender);
+  const avilesName = gender === "femenino" ? "Real Avilés Industrial Femenino" : "Real Avilés Industrial";
   return {
     id: newExtraMatchId("amistoso"),
     matchday: 1,
     homeTeamId: rivalId,
-    awayTeamId: RAI_TEAM_ID,
+    awayTeamId: avilesId,
     homeTeam: rivalName,
-    awayTeam: "Real Avilés Industrial",
+    awayTeam: avilesName,
     date: new Date().toISOString(),
     competition: "amistoso",
     competitionStage: "Pretemporada",
@@ -30,14 +47,20 @@ export function emptyAmistosoMatch(rivalName = "Rival"): Match {
   };
 }
 
-export function emptyCopaMatch(rivalName = "Rival", stage = "Eliminatoria"): Match {
+export function emptyCopaMatch(
+  rivalName = "Rival",
+  stage = "Eliminatoria",
+  gender: PrimerEquipoGender = "masculino",
+): Match {
   const rivalId = slugFromTeamName(rivalName) || `rival-${Date.now()}`;
+  const avilesId = raiTeamId(gender);
+  const avilesName = gender === "femenino" ? "Real Avilés Industrial Femenino" : "Real Avilés Industrial";
   return {
     id: newExtraMatchId("copa-rey"),
     matchday: 1,
-    homeTeamId: RAI_TEAM_ID,
+    homeTeamId: avilesId,
     awayTeamId: rivalId,
-    homeTeam: "Real Avilés Industrial",
+    homeTeam: avilesName,
     awayTeam: rivalName,
     date: new Date().toISOString(),
     competition: "copa-rey",
@@ -47,14 +70,20 @@ export function emptyCopaMatch(rivalName = "Rival", stage = "Eliminatoria"): Mat
   };
 }
 
-export function emptyCalendarExtraMatch(rivalName = "Rival", competitionName = "Torneo / fase extra"): Match {
+export function emptyCalendarExtraMatch(
+  rivalName = "Rival",
+  competitionName = "Torneo / fase extra",
+  gender: PrimerEquipoGender = "masculino",
+): Match {
   const rivalId = slugFromTeamName(rivalName) || `rival-${Date.now()}`;
+  const avilesId = raiTeamId(gender);
+  const avilesName = gender === "femenino" ? "Real Avilés Industrial Femenino" : "Real Avilés Industrial";
   return {
     id: newExtraMatchId("cal-extra"),
     matchday: 1,
-    homeTeamId: RAI_TEAM_ID,
+    homeTeamId: avilesId,
     awayTeamId: rivalId,
-    homeTeam: "Real Avilés Industrial",
+    homeTeam: avilesName,
     awayTeam: rivalName,
     date: new Date().toISOString(),
     competition: "amistoso",
@@ -77,6 +106,20 @@ export function mergeExtraFixturesIntoBundle(
     matchdaysGrupo2: matchdaysGrupo2 ?? bundle?.matchdaysGrupo2,
     amistosoMatches,
     copaDelReyMatches,
+    calendarExtraMatches,
+    meta: bundle?.meta,
+  };
+}
+
+export function mergeFemeninoExtraFixturesIntoBundle(
+  bundle: SeasonFemeninoFixturesBundle | null,
+  matchdaysFemenino: Matchday[],
+  amistosoMatches: Match[],
+  calendarExtraMatches: Match[],
+): SeasonFemeninoFixturesBundle {
+  return {
+    matchdaysFemenino,
+    amistosoMatches,
     calendarExtraMatches,
     meta: bundle?.meta,
   };

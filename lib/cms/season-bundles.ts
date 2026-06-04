@@ -66,6 +66,9 @@ export type SeasonFixturesBundle = {
 
 export type SeasonFemeninoFixturesBundle = {
   matchdaysFemenino: Matchday[];
+  amistosoMatches?: Match[];
+  /** Partidos del Avilés fuera de liga estándar (torneos, copa regional, etc.). */
+  calendarExtraMatches?: Match[];
   meta?: { lastRound?: number };
 };
 

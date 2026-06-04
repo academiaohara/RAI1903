@@ -42,8 +42,12 @@ export function hasMultipleGrupos(config: SeasonCompetitionConfigBundle): boolea
   return config.groupCount >= 2;
 }
 
-export function resolveMatchCompetition(config: SeasonCompetitionConfigBundle): CompetitionId {
-  return config.matchCompetition ?? "primera-rfef";
+export function resolveMatchCompetition(
+  config: SeasonCompetitionConfigBundle,
+  gender: PrimerEquipoGender = "masculino",
+): CompetitionId {
+  if (config.matchCompetition) return config.matchCompetition;
+  return gender === "femenino" ? "liga-femenina" : "primera-rfef";
 }
 
 export const DEFAULT_ZONE_COLORS = {
@@ -92,6 +96,9 @@ export function defaultCompetitionConfig(gender: PrimerEquipoGender): SeasonComp
     teamsPerGroup,
     groupCount: gender === "masculino" ? 2 : 1,
     zones: defaultZonesFromLegacy(legacy),
+    ...(gender === "femenino"
+      ? { ligaLabel: "2ª RFEF Femenina", matchCompetition: "liga-femenina" as CompetitionId }
+      : {}),
   };
 }
 

@@ -43,7 +43,7 @@ export function buildFixturesPayloadForConfig(
   config: SeasonCompetitionConfigBundle,
   bundles: SeasonBundlesMap,
 ): SeasonFixturesBundle | SeasonFemeninoFixturesBundle {
-  const competition = resolveMatchCompetition(config);
+  const competition = resolveMatchCompetition(config, gender);
   const emptySource = { matchdays: [], matchdaysGrupo2: [], matchdaysFemenino: [] };
 
   if (gender === "femenino") {

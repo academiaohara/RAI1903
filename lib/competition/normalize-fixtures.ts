@@ -80,7 +80,7 @@ export function normalizeLeagueMatchdays(
   competitionOverride?: CompetitionId,
   gender: PrimerEquipoGender = "masculino",
 ): Matchday[] {
-  const competition = competitionOverride ?? resolveMatchCompetition(config);
+  const competition = competitionOverride ?? resolveMatchCompetition(config, gender);
   const totalRounds = leagueRoundCount(config.teamsPerGroup);
   const perRound = matchesPerLeagueRound(config.teamsPerGroup);
   const result: Matchday[] = [];

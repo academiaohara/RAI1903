@@ -6,7 +6,8 @@ import { CalendarMatchEditor, useEditedCalendarMatch } from "@/components/calend
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamLink } from "@/components/TeamLink";
-import { matchCompetitionShortLabel } from "@/lib/competition-labels";
+import { useLigaCompetitionLabel } from "@/hooks/useLigaCompetitionLabel";
+import { calendarCompetitionDisplayLabel } from "@/lib/calendar-competition-label";
 import { getCompetitionAccentClass } from "@/lib/competition-styles";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { cn } from "@/lib/utils";
@@ -56,7 +57,9 @@ export function CalendarMatchCell({
 }: CalendarMatchCellProps) {
   const router = useRouter();
   const { editMode } = useInlineEditing();
+  const ligaLabel = useLigaCompetitionLabel(gender);
   const displayMatch = useEditedCalendarMatch(match, gender);
+  const competitionLabel = calendarCompetitionDisplayLabel(displayMatch, { gender, ligaLabel });
   const href = editMode ? null : displayMatch.chronicleUrl ?? displayMatch.previaUrl;
   const opponentTeamId = displayMatch.isHome ? displayMatch.awayTeamId : displayMatch.homeTeamId;
   const ariaLabel = displayMatch.played
@@ -116,7 +119,7 @@ export function CalendarMatchCell({
                 "group-hover/card:text-white",
               )}
             >
-              {matchCompetitionShortLabel(displayMatch)}
+              {competitionLabel}
             </p>
             <TeamLink
               gender={gender}
@@ -149,7 +152,7 @@ export function CalendarMatchCell({
       )}
 
       <p className="sr-only">
-        {displayMatch.opponent}, {matchCompetitionShortLabel(displayMatch)}, {displayMatch.isHome ? "local" : "visitante"}
+        {displayMatch.opponent}, {competitionLabel}, {displayMatch.isHome ? "local" : "visitante"}
       </p>
     </article>
   );

@@ -2,13 +2,13 @@
 
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
+import { SplitDateInput } from "@/components/calendar/SplitDateInput";
 import {
   applyCalendarMatchOverride,
   applyMatchResultOverride,
   calendarMatchToMatch,
   mergeUtcDateAndTime,
   teamDisplayName,
-  utcDateInputValue,
   utcTimeInputValue,
   type MatchResultOverride,
 } from "@/lib/calendar-match-overrides";
@@ -68,7 +68,6 @@ export function CalendarMatchEditor({
   const { getOverride, mergeSaveValue } = useInlineEditing();
   const resolveTeamName = useResolveTeamName(gender);
   const override = readMatchResultOverride<MatchResultOverride>(getOverride, gender, match.id) ?? {};
-  const baseMatch = calendarMatchToMatch(match);
   const editedMatch = applyMatchResultOverride(calendarMatchToMatch(match), override, gender, resolveTeamName);
   const status = editedMatch.status;
 
@@ -96,15 +95,24 @@ export function CalendarMatchEditor({
     });
   };
 
-  const onDateChange = (dateValue: string) => {
-    if (!dateValue) return;
-    const timeValue = utcTimeInputValue(editedMatch.date) || "12:00";
-    savePatch({ date: mergeUtcDateAndTime(baseMatch.date, dateValue, timeValue) });
+  const onDateChange = (iso: string) => {
+    savePatch({ date: iso });
   };
 
   const onTimeChange = (timeValue: string) => {
+    const dateValue = editedMatch.date.slice(0, 10);
+    const ymd =
+      dateValue.length >= 10
+        ? dateValue
+        : (() => {
+            const d = new Date(editedMatch.date);
+            const y = d.getUTCFullYear();
+            const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+            const day = String(d.getUTCDate()).padStart(2, "0");
+            return `${y}-${m}-${day}`;
+          })();
     savePatch({
-      date: mergeUtcDateAndTime(editedMatch.date, utcDateInputValue(editedMatch.date), timeValue || "12:00"),
+      date: mergeUtcDateAndTime(editedMatch.date, ymd, timeValue || "12:00"),
     });
   };
 
@@ -187,17 +195,14 @@ export function CalendarMatchEditor({
         </label>
       </div>
 
-      <div className="grid grid-cols-2 gap-1.5">
-        <label className="grid gap-0.5">
-          <span className="font-extrabold uppercase tracking-wide text-slate-500">Día</span>
-          <input
-            type="date"
-            value={utcDateInputValue(editedMatch.date)}
-            onChange={(event) => onDateChange(event.target.value)}
-            className={fieldClass}
-            aria-label="Fecha del partido"
-          />
-        </label>
+      <div className="space-y-1.5">
+        <SplitDateInput
+          key={editedMatch.date.slice(0, 10)}
+          iso={editedMatch.date}
+          onChange={onDateChange}
+          fieldClassName={fieldClass}
+          disabled={status === "finished"}
+        />
         <label className="grid gap-0.5">
           <span className="font-extrabold uppercase tracking-wide text-slate-500">Hora</span>
           <input

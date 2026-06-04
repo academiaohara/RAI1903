@@ -8,13 +8,20 @@ import {
   emptyAmistosoMatch,
   emptyCalendarExtraMatch,
   emptyCopaMatch,
-  EXTRA_FIXTURE_COMPETITION_OPTIONS,
+  extraFixtureCompetitionOptions,
   mergeExtraFixturesIntoBundle,
+  mergeFemeninoExtraFixturesIntoBundle,
 } from "@/lib/cms/extra-fixtures";
-import { getFixturesBundle, upsertSeasonBundle, type SeasonFixturesBundle } from "@/lib/cms/season-bundles";
+import {
+  getFixturesBundle,
+  upsertSeasonBundle,
+  type SeasonFemeninoFixturesBundle,
+  type SeasonFixturesBundle,
+} from "@/lib/cms/season-bundles";
 import { slugFromTeamName } from "@/lib/cms/group-teams";
-import { RAI_TEAM_ID } from "@/data/mock";
+import { getRaiTeamId } from "@/lib/fixtures";
 import { fixtureSourceFromBundles } from "@/lib/season/fixture-source";
+import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { CompetitionId, Match } from "@/types";
 
 function matchDateInput(iso: string): string {
@@ -43,13 +50,16 @@ function ExtraMatchEditor({
   onChange,
   onDelete,
   defaultCompetitionName,
+  gender,
 }: {
   match: Match;
   onChange: (next: Match) => void;
   onDelete: () => void;
   defaultCompetitionName: string;
+  gender: PrimerEquipoGender;
 }) {
-  const isRaiHome = match.homeTeamId === RAI_TEAM_ID;
+  const raiTeamId = getRaiTeamId(gender);
+  const isRaiHome = match.homeTeamId === raiTeamId;
   const rivalName = isRaiHome ? match.awayTeam : match.homeTeam;
   const rivalId = isRaiHome ? match.awayTeamId : match.homeTeamId;
 
@@ -62,20 +72,22 @@ function ExtraMatchEditor({
     }
   };
 
+  const avilesName = gender === "femenino" ? "Real Avilés Industrial Femenino" : "Real Avilés Industrial";
+
   const setAvilesHome = (avilesHome: boolean) => {
     if (avilesHome) {
       onChange({
         ...match,
-        homeTeamId: RAI_TEAM_ID,
-        homeTeam: "Real Avilés Industrial",
+        homeTeamId: raiTeamId,
+        homeTeam: avilesName,
         awayTeamId: rivalId,
         awayTeam: rivalName,
       });
     } else {
       onChange({
         ...match,
-        awayTeamId: RAI_TEAM_ID,
-        awayTeam: "Real Avilés Industrial",
+        awayTeamId: raiTeamId,
+        awayTeam: avilesName,
         homeTeamId: rivalId,
         homeTeam: rivalName,
       });
@@ -106,7 +118,7 @@ function ExtraMatchEditor({
             onChange={(e) => onChange({ ...match, competition: e.target.value as CompetitionId })}
             className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
           >
-            {EXTRA_FIXTURE_COMPETITION_OPTIONS.map((option) => (
+            {extraFixtureCompetitionOptions(gender).map((option) => (
               <option key={option.id} value={option.id}>
                 {option.label}
               </option>
@@ -242,7 +254,8 @@ function ExtraMatchSection({
   matches,
   onChange,
   onAdd,
-}: ExtraSectionProps) {
+  gender,
+}: ExtraSectionProps & { gender: PrimerEquipoGender }) {
   return (
     <section className="space-y-2">
       <div className="flex items-center justify-between gap-2">
@@ -263,6 +276,7 @@ function ExtraMatchSection({
           <ExtraMatchEditor
             key={match.id}
             match={match}
+            gender={gender}
             defaultCompetitionName={defaultCompetitionName}
             onChange={(next) => onChange(matches.map((row, i) => (i === index ? next : row)))}
             onDelete={() => onChange(matches.filter((_, i) => i !== index))}
@@ -273,41 +287,75 @@ function ExtraMatchSection({
   );
 }
 
-export function ExtraFixturesOnPageEditor() {
+type ExtraFixturesOnPageEditorProps = {
+  gender?: PrimerEquipoGender;
+};
+
+export function ExtraFixturesOnPageEditor({ gender = "masculino" }: ExtraFixturesOnPageEditorProps) {
   const { viewedSeasonId, viewedSeason, bundles, refreshBundles } = useSeason();
   const [amistosos, setAmistosos] = useState<Match[]>([]);
   const [copa, setCopa] = useState<Match[]>([]);
   const [extras, setExtras] = useState<Match[]>([]);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const isFemenino = gender === "femenino";
 
   const loadFromBundles = useCallback(() => {
-    const source = fixtureSourceFromBundles(bundles, "masculino");
+    const source = fixtureSourceFromBundles(bundles, gender);
     setAmistosos(structuredClone(source.amistosoMatches));
     setCopa(structuredClone(source.copaDelReyMatches));
     setExtras(structuredClone(source.calendarExtraMatches));
-  }, [bundles]);
+  }, [bundles, gender]);
 
   useEffect(() => {
     queueMicrotask(() => loadFromBundles());
   }, [loadFromBundles]);
 
-  const existingBundle = useMemo(
+  const existingMasculinoBundle = useMemo(
     () => getFixturesBundle(bundles, "masculino") as SeasonFixturesBundle | null,
+    [bundles],
+  );
+  const existingFemeninoBundle = useMemo(
+    () => getFixturesBundle(bundles, "femenino") as SeasonFemeninoFixturesBundle | null,
     [bundles],
   );
 
   const saveExtraFixtures = async () => {
-    if (!existingBundle?.matchdays?.length) {
+    if (isFemenino) {
+      if (!existingFemeninoBundle?.matchdaysFemenino?.length) {
+        setMessage("Primero genera el calendario de liga en Editar → Competición (femenino).");
+        return;
+      }
+      setBusy(true);
+      setMessage(null);
+      const payload = mergeFemeninoExtraFixturesIntoBundle(
+        existingFemeninoBundle,
+        existingFemeninoBundle.matchdaysFemenino,
+        amistosos,
+        extras,
+      );
+      const result = await upsertSeasonBundle(viewedSeasonId, "femenino", "fixtures", payload);
+      setBusy(false);
+      if (!result.ok) {
+        setMessage(result.error ?? "Error al guardar");
+        return;
+      }
+      const total = amistosos.length + extras.length;
+      setMessage(`Partidos extra guardados (${total} en ${viewedSeason.label})`);
+      await refreshBundles();
+      return;
+    }
+
+    if (!existingMasculinoBundle?.matchdays?.length) {
       setMessage("Primero genera el calendario de liga en Editar → Competición.");
       return;
     }
     setBusy(true);
     setMessage(null);
     const payload = mergeExtraFixturesIntoBundle(
-      existingBundle,
-      existingBundle.matchdays,
-      existingBundle.matchdaysGrupo2,
+      existingMasculinoBundle,
+      existingMasculinoBundle.matchdays,
+      existingMasculinoBundle.matchdaysGrupo2,
       amistosos,
       copa,
       extras,
@@ -326,7 +374,11 @@ export function ExtraFixturesOnPageEditor() {
   return (
     <OnPageEditorSection
       title="Partidos extra del calendario"
-      description="Añade amistosos, copa, playoff, playout u otros partidos del Avilés. El nombre de competición es el que verán los aficionados en el calendario."
+      description={
+        isFemenino
+          ? "Añade amistosos, torneos u otros partidos del equipo femenino. El nombre de competición es el que verán en el calendario."
+          : "Añade amistosos, copa, playoff, playout u otros partidos del Avilés. El nombre de competición es el que verán los aficionados en el calendario."
+      }
     >
       <div className="space-y-4">
         <ExtraMatchSection
@@ -336,27 +388,32 @@ export function ExtraFixturesOnPageEditor() {
           defaultCompetitionName="Pretemporada"
           matches={amistosos}
           onChange={setAmistosos}
-          onAdd={() => setAmistosos((rows) => [...rows, emptyAmistosoMatch()])}
+          onAdd={() => setAmistosos((rows) => [...rows, emptyAmistosoMatch("Rival", gender)])}
+          gender={gender}
         />
 
-        <ExtraMatchSection
-          title="Copa del Rey"
-          emptyLabel="Sin partidos de copa en esta temporada."
-          addLabel="Añadir partido de copa"
-          defaultCompetitionName="Copa del Rey"
-          matches={copa}
-          onChange={setCopa}
-          onAdd={() => setCopa((rows) => [...rows, emptyCopaMatch()])}
-        />
+        {!isFemenino ? (
+          <ExtraMatchSection
+            title="Copa del Rey"
+            emptyLabel="Sin partidos de copa en esta temporada."
+            addLabel="Añadir partido de copa"
+            defaultCompetitionName="Copa del Rey"
+            matches={copa}
+            onChange={setCopa}
+            onAdd={() => setCopa((rows) => [...rows, emptyCopaMatch("Rival", "Eliminatoria", gender)])}
+            gender={gender}
+          />
+        ) : null}
 
         <ExtraMatchSection
-          title="Otros partidos del Avilés"
+          title={isFemenino ? "Otros partidos del equipo" : "Otros partidos del Avilés"}
           emptyLabel="Sin otros partidos extra (playoff, torneos, etc.)."
           addLabel="Añadir partido"
           defaultCompetitionName="Torneo / fase extra"
           matches={extras}
           onChange={setExtras}
-          onAdd={() => setExtras((rows) => [...rows, emptyCalendarExtraMatch()])}
+          onAdd={() => setExtras((rows) => [...rows, emptyCalendarExtraMatch("Rival", "Torneo / fase extra", gender)])}
+          gender={gender}
         />
 
         {message ? (
