@@ -27,7 +27,6 @@ export default function QuinielaRankingPage() {
         ) : (
           <QuinielaRankingList
             entries={entries}
-            showHits
             emptyMessage={
               isSupabaseConfigured()
                 ? "Aún no hay quinielas guardadas en esta temporada."

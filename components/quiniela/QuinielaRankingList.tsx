@@ -3,10 +3,9 @@ import type { QuinielaRankingEntry } from "@/lib/quiniela-ranking";
 type QuinielaRankingListProps = {
   entries: QuinielaRankingEntry[];
   emptyMessage: string;
-  showHits?: boolean;
 };
 
-export function QuinielaRankingList({ entries, emptyMessage, showHits = false }: QuinielaRankingListProps) {
+export function QuinielaRankingList({ entries, emptyMessage }: QuinielaRankingListProps) {
   if (entries.length === 0) {
     return <p className="text-sm text-slate-500">{emptyMessage}</p>;
   }
@@ -24,9 +23,6 @@ export function QuinielaRankingList({ entries, emptyMessage, showHits = false }:
             </span>
             <div className="min-w-0">
               <p className="truncate font-extrabold uppercase text-[#214C9B]">{row.user}</p>
-              {showHits && row.hits > 0 && (
-                <p className="text-[10px] font-semibold text-slate-500 sm:text-xs">{row.hits} aciertos 1-X-2</p>
-              )}
             </div>
           </div>
           <span className="shrink-0 font-extrabold text-slate-900">{row.points} pts</span>
