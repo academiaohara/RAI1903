@@ -8,7 +8,10 @@ import { PredictionForm } from "@/components/PredictionForm";
 import { bebasNeue } from "@/lib/fonts";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { QuinielaHowItWorks } from "@/components/QuinielaHowItWorks";
+import { useSeason } from "@/components/season/SeasonProvider";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
+import { buildQuinielaScoringContext, scoringOptionsForMatch } from "@/lib/quiniela/scoring-context";
+import { quinielaRequiresAuth } from "@/lib/quiniela-storage";
 import type { CompetitionSeasonId } from "@/data/mock";
 import {
   countFinishedMatches,
@@ -35,7 +38,12 @@ type PronosticosBodyProps = {
 };
 
 function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundlesLoading }: PronosticosBodyProps) {
+  const { bundles } = useSeason();
   const { canEdit: isCmsEditor } = useInlineEditing();
+  const scoringContext = useMemo(
+    () => buildQuinielaScoringContext(bundles, matchdays),
+    [bundles, matchdays],
+  );
   const [round, setRound] = useState(currentRound);
   const [predictions, setPredictions] = useState<Record<string, Prediction>>({});
   const [savedRounds, setSavedRounds] = useState<Record<number, string>>({});
@@ -93,9 +101,13 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
   const jornadaFinalizada = isMatchdayFullyFinished(selectedMatchday);
   const hits = countOutcomeHits(selectedMatchday, predictions);
   const matchdayPoints = useMemo(
-    () => scoreMatchdayPoints(selectedMatchday, predictions),
-    [selectedMatchday, predictions],
+    () =>
+      scoreMatchdayPoints(selectedMatchday, predictions, (match) =>
+        scoringOptionsForMatch(scoringContext, match),
+      ),
+    [selectedMatchday, predictions, scoringContext],
   );
+  const needsLogin = quinielaRequiresAuth() && hydrated && !userId;
   const showCompare = readOnly && (isLocked || finishedMatches > 0);
   const showScore = hydrated && finishedMatches > 0;
 
@@ -149,6 +161,12 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
         currentRound={currentRound}
         onChange={handleRoundChange}
       />
+
+      {needsLogin && (
+        <p className="rounded-xl border border-[#214C9B]/25 bg-blue-50 px-3 py-2 text-xs font-bold text-[#214C9B] sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
+          Inicia sesión para guardar tu quiniela en Supabase y aparecer en el ranking de jornada y el ranking general.
+        </p>
+      )}
 
       {hydrated && statusBanner === "unsaved" && (
         <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">

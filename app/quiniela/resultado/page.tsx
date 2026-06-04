@@ -10,11 +10,7 @@ import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
 import { useQuinielaRoundRanking } from "@/hooks/useQuinielaRoundRanking";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
 import type { CompetitionSeasonId } from "@/data/mock";
-import {
-  getMatchdayByRound,
-  hasFirstMatchStarted,
-  sortQuinielaMatches,
-} from "@/lib/quiniela";
+import { getMatchdayByRound, sortQuinielaMatches } from "@/lib/quiniela";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { Matchday } from "@/types";
 
@@ -37,11 +33,9 @@ function ResultadoBody({ seasonId, matchdays, currentRound, totalRounds }: Resul
     [selectedMatchday.matches],
   );
   const hasMatchesForRound = selectedMatchday.matches.length > 0;
-  const started = hasFirstMatchStarted(selectedMatchday);
-  const { entries: rankingEntries, loading: rankingLoading } = useQuinielaRoundRanking(
-    seasonId,
-    selectedMatchday,
-  );
+  const { entries: rankingEntries, loading: rankingLoading, countPoints, error: rankingError } =
+    useQuinielaRoundRanking(seasonId, selectedMatchday);
+  const started = countPoints;
 
   return (
     <>
@@ -86,6 +80,8 @@ function ResultadoBody({ seasonId, matchdays, currentRound, totalRounds }: Resul
           </div>
         ) : rankingLoading ? (
           <p className="text-sm text-slate-500">Cargando participantes…</p>
+        ) : rankingError ? (
+          <p className="text-sm font-semibold text-[#981915]">{rankingError}</p>
         ) : (
           <>
             <QuinielaRankingList

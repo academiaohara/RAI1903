@@ -8,8 +8,8 @@ import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export default function QuinielaRankingPage() {
-  const { matchdays, seasonId } = useQuinielaSeason();
-  const { entries, loading } = useQuinielaSeasonRanking(seasonId, matchdays);
+  const { seasonId } = useQuinielaSeason();
+  const { entries, loading, error } = useQuinielaSeasonRanking(seasonId);
 
   return (
     <div className="space-y-6">
@@ -22,6 +22,8 @@ export default function QuinielaRankingPage() {
       <Card eyebrow="Ranking" title="Clasificación general">
         {loading ? (
           <p className="text-sm text-slate-500">Cargando clasificación…</p>
+        ) : error ? (
+          <p className="text-sm font-semibold text-[#981915]">{error}</p>
         ) : (
           <QuinielaRankingList
             entries={entries}

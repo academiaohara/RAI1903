@@ -2,13 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { CompetitionSeasonId } from "@/data/mock";
-import {
-  fetchQuinielaRoundRanking,
-  fetchQuinielaSeasonRanking,
-  type QuinielaRankingEntry,
-  type QuinielaSeasonRankingEntry,
-} from "@/lib/quiniela-ranking";
-import { hasFirstMatchStarted } from "@/lib/quiniela";
+import type { QuinielaRankingEntry, QuinielaSeasonRankingEntry } from "@/lib/quiniela-ranking";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { Matchday } from "@/types";
 
@@ -17,24 +11,59 @@ export function useQuinielaRoundRanking(
   matchday: Matchday | undefined,
 ) {
   const [entries, setEntries] = useState<QuinielaRankingEntry[]>([]);
+  const [countPoints, setCountPoints] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const round = matchday?.round;
 
   useEffect(() => {
     let cancelled = false;
 
     const load = async () => {
-      if (!matchday) {
+      if (!matchday || !isSupabaseConfigured()) {
         setEntries([]);
+        setCountPoints(false);
         setLoading(false);
+        setError(isSupabaseConfigured() ? null : "Supabase no configurado");
         return;
       }
 
-      const countPoints = hasFirstMatchStarted(matchday);
-      const rows = await fetchQuinielaRoundRanking(seasonId, matchday, countPoints);
-      if (cancelled) return;
-      setEntries(rows);
-      setLoading(false);
+      setLoading(true);
+      setError(null);
+
+      try {
+        const params = new URLSearchParams({
+          seasonId,
+          scope: "round",
+          round: String(round),
+        });
+        const response = await fetch(`/api/quiniela/ranking?${params.toString()}`);
+        const payload = (await response.json()) as {
+          entries?: QuinielaRankingEntry[];
+          countPoints?: boolean;
+          error?: string;
+        };
+
+        if (cancelled) return;
+
+        if (!response.ok) {
+          setEntries([]);
+          setCountPoints(false);
+          setError(payload.error ?? "No se pudo cargar el ranking");
+          setLoading(false);
+          return;
+        }
+
+        setEntries(payload.entries ?? []);
+        setCountPoints(Boolean(payload.countPoints));
+        setLoading(false);
+      } catch {
+        if (cancelled) return;
+        setEntries([]);
+        setCountPoints(false);
+        setError("No se pudo cargar el ranking");
+        setLoading(false);
+      }
     };
 
     void load();
@@ -44,29 +73,53 @@ export function useQuinielaRoundRanking(
     };
   }, [seasonId, round, matchday]);
 
-  return { entries, loading, needsAuth: isSupabaseConfigured() };
+  return { entries, loading, countPoints, error, needsAuth: isSupabaseConfigured() };
 }
 
-export function useQuinielaSeasonRanking(
-  seasonId: CompetitionSeasonId,
-  matchdays: Matchday[],
-) {
+export function useQuinielaSeasonRanking(seasonId: CompetitionSeasonId) {
   const [entries, setEntries] = useState<QuinielaSeasonRankingEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     const load = async () => {
-      const countPointsForRound = (round: number) => {
-        const matchday = matchdays.find((md) => md.round === round);
-        return matchday ? hasFirstMatchStarted(matchday) : false;
-      };
+      if (!isSupabaseConfigured()) {
+        setEntries([]);
+        setLoading(false);
+        setError("Supabase no configurado");
+        return;
+      }
 
-      const rows = await fetchQuinielaSeasonRanking(seasonId, matchdays, countPointsForRound);
-      if (cancelled) return;
-      setEntries(rows);
-      setLoading(false);
+      setLoading(true);
+      setError(null);
+
+      try {
+        const params = new URLSearchParams({ seasonId, scope: "season" });
+        const response = await fetch(`/api/quiniela/ranking?${params.toString()}`);
+        const payload = (await response.json()) as {
+          entries?: QuinielaSeasonRankingEntry[];
+          error?: string;
+        };
+
+        if (cancelled) return;
+
+        if (!response.ok) {
+          setEntries([]);
+          setError(payload.error ?? "No se pudo cargar el ranking");
+          setLoading(false);
+          return;
+        }
+
+        setEntries(payload.entries ?? []);
+        setLoading(false);
+      } catch {
+        if (cancelled) return;
+        setEntries([]);
+        setError("No se pudo cargar el ranking");
+        setLoading(false);
+      }
     };
 
     void load();
@@ -74,7 +127,7 @@ export function useQuinielaSeasonRanking(
     return () => {
       cancelled = true;
     };
-  }, [seasonId, matchdays]);
+  }, [seasonId]);
 
-  return { entries, loading, needsAuth: isSupabaseConfigured() };
+  return { entries, loading, error, needsAuth: isSupabaseConfigured() };
 }
