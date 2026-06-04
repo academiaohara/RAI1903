@@ -1,6 +1,6 @@
 import { RAI_TEAM_ID, teams as mockTeams } from "@/data/mock";
 import { isPlaceholderMatch, isSchedulableMatchday } from "@/lib/competition/normalize-fixtures";
-import { getAvilesScorerFromEvents } from "@/lib/aviles-match-events";
+import { getAllAvilesScorerLabelsFromEvents } from "@/lib/aviles-match-events";
 import type { MatchEvent } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
 import {
@@ -102,20 +102,28 @@ export function getAvilesScore(match: Match): number | null {
   return match.homeTeamId === RAI_TEAM_ID ? match.homeScore : match.awayScore;
 }
 
+export function actualAvilesScorers(
+  match: Match,
+  options?: { events?: MatchEvent[]; squad?: SquadPlayer[] },
+): string[] {
+  const goals = getAvilesScore(match);
+  if (goals === null) return [];
+  if (goals === 0) return ["nadie"];
+
+  if (options?.events && options.squad) {
+    const fromChronicle = getAllAvilesScorerLabelsFromEvents(match, options.events, options.squad);
+    if (fromChronicle.length > 0) return fromChronicle;
+  }
+
+  return [];
+}
+
 export function actualAvilesScorer(
   match: Match,
   options?: { events?: MatchEvent[]; squad?: SquadPlayer[] },
 ): string | null {
-  const goals = getAvilesScore(match);
-  if (goals === null) return null;
-  if (goals === 0) return "nadie";
-
-  if (options?.events && options.squad) {
-    const fromChronicle = getAvilesScorerFromEvents(match, options.events, options.squad);
-    if (fromChronicle !== null) return fromChronicle;
-  }
-
-  return null;
+  const all = actualAvilesScorers(match, options);
+  return all.length > 0 ? all[0]! : null;
 }
 
 export function isScorerPredictionCorrect(
