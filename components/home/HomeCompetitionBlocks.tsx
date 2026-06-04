@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { CalendarNavButton } from "@/components/CalendarNavButton";
 import { Card } from "@/components/Card";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
@@ -20,7 +20,12 @@ import { seasonHasCompetitionBundles } from "@/lib/season/cms-data-policy";
 import { defaultCronicaId } from "@/lib/match-article-factory";
 import { primerEquipoBase } from "@/lib/primer-equipo";
 import { getTeamCrestById } from "@/lib/team-crests";
-import { matchFixtureDesktopGridClassName } from "@/lib/match-card-styles";
+import {
+  matchFixtureBannerDesktopGridClassName,
+  matchFixtureCardClassName,
+  matchFixtureCardMobileWidthClassName,
+  matchFixtureDesktopCardMinHeightClassName,
+} from "@/lib/match-card-styles";
 import { cn, formatMatchDate, formatMatchDay, formatMatchTime } from "@/lib/utils";
 import type { Route } from "next";
 import type { Match } from "@/types";
@@ -66,7 +71,6 @@ export function HomeMatchBannersBlock() {
           href={
             `${primerEquipoBase("masculino")}/cronicas/${latestArticle?.id ?? defaultCronicaId(latestMatch.id, "masculino")}` as Route
           }
-          action="Entrar en la ficha del partido"
         />
       )}
       {nextMatch && (
@@ -76,7 +80,6 @@ export function HomeMatchBannersBlock() {
           href={
             `${primerEquipoBase("masculino")}/cronicas/${nextArticle?.id ?? defaultCronicaId(nextMatch.id, "masculino")}` as Route
           }
-          action="Entrar en la ficha del partido"
           accent="granate"
         />
       )}
@@ -224,13 +227,11 @@ function MatchBanner({
   match,
   label,
   href,
-  action,
   accent = "blue",
 }: {
   match: Match;
   label: string;
   href: Route;
-  action: string;
   accent?: MatchBannerAccent;
 }) {
   const roundBadgeLabel = matchRoundBadgeLabel(match);
@@ -245,9 +246,18 @@ function MatchBanner({
       <p className="text-xs font-bold uppercase tracking-[0.08em] text-[#981915] md:hidden">{label}</p>
       <Link
         href={href}
-        className="group block overflow-hidden rounded-xl border border-[#214C9B]/25 bg-white shadow-[0_10px_28px_rgba(17,24,39,0.06)] transition hover:-translate-y-1 hover:border-[#214C9B] md:rounded-[1.5rem] md:shadow-[0_18px_45px_rgba(17,24,39,0.08)] lg:rounded-[2rem]"
+        className={cn(
+          matchFixtureCardClassName,
+          "group block w-full transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(17,24,39,0.08)]",
+          matchFixtureDesktopCardMinHeightClassName,
+        )}
       >
-        <div className="mx-auto grid w-[288px] max-w-full grid-cols-3 items-stretch md:hidden">
+        <div
+          className={cn(
+            "mx-auto grid grid-cols-3 items-stretch md:hidden",
+            matchFixtureCardMobileWidthClassName,
+          )}
+        >
           <div className="flex items-center justify-center bg-white p-3">
             <OpponentCrest logo={teamCrestLogo(match.homeTeamId)} opponent={match.homeTeam} size="md" className="mx-auto" />
           </div>
@@ -264,14 +274,14 @@ function MatchBanner({
           </div>
         </div>
 
-        <div className={cn("hidden min-h-[7.5rem] md:grid", matchFixtureDesktopGridClassName)}>
+        <div className={cn("hidden min-h-[7.5rem] md:grid", matchFixtureBannerDesktopGridClassName)}>
           <div className="flex min-w-0 items-center gap-2 p-4 lg:gap-4 lg:p-5">
             {roundBadgeLabel && (
               <span className="flex h-12 min-w-12 shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 bg-blue-50 px-2 text-center text-xs font-extrabold leading-tight text-[#214C9B] transition group-hover:border-[#214C9B] group-hover:bg-[#214C9B] group-hover:text-white lg:h-14 lg:min-w-14 lg:text-sm">
                 {roundBadgeLabel}
               </span>
             )}
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-xs font-bold uppercase tracking-normal text-[#981915]">{label}</p>
               <p className="mt-1 break-words text-lg font-extrabold leading-tight text-slate-900 lg:text-xl">{match.homeTeam}</p>
             </div>
@@ -283,22 +293,19 @@ function MatchBanner({
             awayTeam={match.awayTeam}
             centerLabel={scoreLabel}
             sublabel={dateLabel}
+            className={centerAccent}
           />
-          <div className="flex min-w-0 items-center justify-between gap-3 p-4 text-right lg:gap-4 lg:p-5">
-            <div className="min-w-0 flex-1">
+          <div className="flex min-w-0 items-center p-4 text-right lg:p-5">
+            <div className="min-w-0 w-full">
               <p className="flex items-center justify-end gap-1.5 text-xs font-bold uppercase tracking-normal text-[#981915]">
                 <CompetitionLogo competition={match.competition} alt={competitionLabel} size="xs" />
                 {matchFixtureMeta(match)}
               </p>
               <p className="mt-1 break-words text-lg font-extrabold leading-tight text-slate-900 lg:text-xl">{match.awayTeam}</p>
             </div>
-            <span className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#214C9B]/20 px-4 py-2 text-sm font-bold text-[#214C9B] transition group-hover:bg-[#214C9B] group-hover:text-white lg:w-auto lg:shrink-0">
-              {action} <ArrowUpRight size={16} />
-            </span>
           </div>
         </div>
       </Link>
     </div>
   );
 }
-

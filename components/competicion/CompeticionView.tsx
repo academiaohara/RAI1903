@@ -265,10 +265,14 @@ function CopaDelReyPanel({
             <CupStat label="Victorias" value={wins.toString()} />
             <CupStat label="Estado" value={status} />
           </div>
-          <div className="grid gap-2 sm:gap-3 lg:grid-cols-2">
-            {matches.map((match) => (
-              <MatchCard key={match.id} match={match} highlightTeamId={highlightTeamId} gender={gender} />
-            ))}
+          <div className="flex flex-col gap-2 sm:gap-3">
+            {matches.map((match) =>
+              isMatchPlayed(match) ? (
+                <RecentMatchCard key={match.id} match={match} gender={gender} />
+              ) : (
+                <UpcomingMatchCard key={match.id} match={match} gender={gender} />
+              ),
+            )}
           </div>
         </div>
       ) : (

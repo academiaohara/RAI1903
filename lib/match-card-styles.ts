@@ -9,6 +9,10 @@ export const matchFixtureCardMobileWidthClassName = "mx-auto w-[288px] max-w-ful
 export const matchFixtureDesktopGridClassName =
   "grid grid-cols-[minmax(0,1fr)_12rem_minmax(0,1fr)] items-stretch";
 
+/** Banners de inicio (último / próximo): más espacio lateral para nombres largos. */
+export const matchFixtureBannerDesktopGridClassName =
+  "grid grid-cols-[minmax(0,1.2fr)_12rem_minmax(0,1fr)] items-stretch";
+
 /** Altura mínima uniforme de tarjetas de partido en escritorio. */
 export const matchFixtureDesktopCardMinHeightClassName = "md:min-h-[7.5rem]";
 
