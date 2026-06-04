@@ -1,5 +1,35 @@
 import type { User } from "@supabase/supabase-js";
 
+export type ProfileDisplayFields = {
+  display_name: string | null;
+  email: string | null;
+  avatar_url?: string | null;
+};
+
+function handleFromLabel(label: string): string {
+  const trimmed = label.trim();
+  if (!trimmed) return "@usuario";
+  return trimmed.startsWith("@") ? trimmed : `@${trimmed}`;
+}
+
+export function getProfileHandle(profile: ProfileDisplayFields): string {
+  const name = profile.display_name?.trim();
+  if (name) return handleFromLabel(name);
+
+  const email = profile.email?.trim();
+  if (email) {
+    const local = email.split("@")[0]?.trim();
+    if (local) return `@${local}`;
+  }
+
+  return "@usuario";
+}
+
+export function getProfileAvatarUrl(profile: ProfileDisplayFields): string | null {
+  const url = profile.avatar_url?.trim();
+  return url || null;
+}
+
 export function getUserDisplayName(user: User): string {
   const meta = user.user_metadata as Record<string, unknown> | undefined;
   const preferred =

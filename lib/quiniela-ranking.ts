@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { getProfileAvatarUrl, getProfileHandle } from "@/lib/auth/user-display";
 import { countOutcomeHits, migratePrediction, scorePredictionPoints } from "@/lib/quiniela";
 import {
   scoringOptionsForMatch,
@@ -9,7 +10,8 @@ import type { Matchday, Prediction } from "@/types";
 
 export type QuinielaRankingEntry = {
   userId: string;
-  user: string;
+  handle: string;
+  avatarUrl: string | null;
   submittedAt: string;
   points: number;
   hits: number;
@@ -18,16 +20,6 @@ export type QuinielaRankingEntry = {
 export type QuinielaSeasonRankingEntry = QuinielaRankingEntry & {
   roundsPlayed: number;
 };
-
-function displayNameFromProfile(row: {
-  display_name: string | null;
-  email: string | null;
-}): string {
-  if (row.display_name?.trim()) return row.display_name.trim();
-  const email = row.email?.trim();
-  if (email) return email.split("@")[0] ?? email;
-  return "Usuario";
-}
 
 function rowToPrediction(row: {
   match_id: string;
@@ -93,7 +85,12 @@ type PredictionRow = {
   scorer: string | null;
   updated_at: string;
 };
-type ProfileRow = { id: string; display_name: string | null; email: string | null };
+type ProfileRow = {
+  id: string;
+  display_name: string | null;
+  email: string | null;
+  avatar_url: string | null;
+};
 
 async function fetchSavedRounds(
   supabase: SupabaseClient,
@@ -148,7 +145,7 @@ async function fetchProfiles(supabase: SupabaseClient, userIds: string[]): Promi
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, display_name, email")
+    .select("id, display_name, email, avatar_url")
     .in("id", userIds);
 
   if (error) {
@@ -198,7 +195,8 @@ export async function fetchQuinielaRoundRanking(
     const profile = profileMap.get(userId);
     return {
       userId,
-      user: profile ? displayNameFromProfile(profile) : "Usuario",
+      handle: profile ? getProfileHandle(profile) : "@usuario",
+      avatarUrl: profile ? getProfileAvatarUrl(profile) : null,
       submittedAt: savedAtByUser.get(userId) ?? "",
       points,
       hits,
@@ -254,7 +252,8 @@ export async function fetchQuinielaSeasonRanking(
     const profile = profileMap.get(userId);
     return {
       userId,
-      user: profile ? displayNameFromProfile(profile) : "Usuario",
+      handle: profile ? getProfileHandle(profile) : "@usuario",
+      avatarUrl: profile ? getProfileAvatarUrl(profile) : null,
       submittedAt: earliestSavedAt(userSaved),
       points,
       hits,
