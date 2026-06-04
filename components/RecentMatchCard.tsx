@@ -6,12 +6,10 @@ import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { MatchFixtureDesktopPanels } from "@/components/MatchFixtureDesktopPanels";
 import { MatchFixtureJerseyMobile } from "@/components/MatchFixtureJerseyMobile";
 import { matchCompetitionShortLabel, matchFixtureMeta, matchRoundBadgeLabel } from "@/lib/competition-labels";
-import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
-import { defaultCronicaId } from "@/lib/match-article-factory";
 import { getAvilesMatchResult } from "@/lib/fixtures";
 import { matchFixtureCardClassName, matchFixtureDesktopCardMinHeightClassName } from "@/lib/match-card-styles";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
-import { primerEquipoBase, primerEquipoHasCronicas } from "@/lib/primer-equipo";
+import { primerEquipoBase } from "@/lib/primer-equipo";
 import { cn, formatMatchDate } from "@/lib/utils";
 import type { Match } from "@/types";
 import type { Route } from "next";
@@ -48,11 +46,6 @@ const cronicaCardHoverClass = cn(
   "has-[a.cronica-overlay:hover]:[&_.recent-card-competicion_img]:invert",
 );
 
-const cronicaFooterHoverClass = cn(
-  "text-xs font-bold text-slate-600 transition-colors duration-200",
-  "group-has-[a.cronica-overlay:hover]/card:!text-white",
-);
-
 function recentResultBadgeLabel(hasScore: boolean, result: ReturnType<typeof getAvilesMatchResult>): string {
   if (!hasScore) return "Sin resultado";
   if (result === "W") return "Victoria";
@@ -62,15 +55,8 @@ function recentResultBadgeLabel(hasScore: boolean, result: ReturnType<typeof get
 }
 
 export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCardProps) {
-  const { getCronica } = useSeasonMatchArticles();
   const result = getAvilesMatchResult(match, gender);
-  const cronica = getCronica(match.id, gender);
-  const hasCronicas = primerEquipoHasCronicas(gender);
-  const cronicaHref = (
-    hasCronicas
-      ? `${primerEquipoBase(gender)}/cronicas/${cronica?.id ?? defaultCronicaId(match.id, gender)}`
-      : `${primerEquipoBase(gender)}/calendario`
-  ) as Route;
+  const cronicaHref = `${primerEquipoBase(gender)}/calendario` as Route;
   const competicionHref = `${primerEquipoBase(gender)}/competicion` as Route;
   const hasScore = match.homeScore !== undefined && match.awayScore !== undefined;
   const scoreLabel = hasScore ? `${match.homeScore} - ${match.awayScore}` : "Sin resultado";
@@ -119,11 +105,7 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
       <Link
         href={cronicaHref}
         className="cronica-overlay absolute inset-0 z-0 rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#214C9B] md:rounded-2xl"
-        aria-label={
-          hasCronicas
-            ? `Crónica: ${match.homeTeam} ${scoreLabel} ${match.awayTeam}`
-            : `Calendario: ${match.homeTeam} ${scoreLabel} ${match.awayTeam}`
-        }
+        aria-label={`Calendario: ${match.homeTeam} ${scoreLabel} ${match.awayTeam}`}
       />
       <div className="relative z-[1] pointer-events-none">
         <div className="md:hidden">
@@ -150,11 +132,7 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
             dateLabel={dateLabel}
             badge={badge}
             competitionSlot={competitionLink}
-            footerLeft={
-              hasCronicas ? (
-                <p className={cronicaFooterHoverClass}>Leer la cronica</p>
-              ) : null
-            }
+            footerLeft={null}
             homeTeamClassName={cn(teamLinkHoverClass, "hover:translate-x-0.5")}
             awayTeamClassName={cn(teamLinkHoverClass, "hover:-translate-x-0.5")}
             scoreStripeClassName={cn(

@@ -6,12 +6,10 @@ import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { MatchFixtureDesktopPanels } from "@/components/MatchFixtureDesktopPanels";
 import { MatchFixtureJerseyMobile } from "@/components/MatchFixtureJerseyMobile";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
-import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { matchCompetitionShortLabel, matchFixtureMeta, matchRoundBadgeLabel } from "@/lib/competition-labels";
-import { defaultCronicaId } from "@/lib/match-article-factory";
 import { matchFixtureCardClassName, matchFixtureDesktopCardMinHeightClassName } from "@/lib/match-card-styles";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
-import { primerEquipoBase, primerEquipoHasCronicas } from "@/lib/primer-equipo";
+import { primerEquipoBase } from "@/lib/primer-equipo";
 import { cn, formatMatchDate, formatMatchTime } from "@/lib/utils";
 import type { Match } from "@/types";
 import type { Route } from "next";
@@ -52,14 +50,7 @@ const upcomingFooterHoverClass = cn(
 );
 
 export function UpcomingMatchCard({ match, gender = "masculino" }: UpcomingMatchCardProps) {
-  const { getPrevia } = useSeasonMatchArticles();
-  const previa = getPrevia(match.id, gender);
-  const hasCronicas = primerEquipoHasCronicas(gender);
-  const matchHref = (
-    hasCronicas
-      ? `${primerEquipoBase(gender)}/cronicas/${previa?.id ?? defaultCronicaId(match.id, gender)}`
-      : `${primerEquipoBase(gender)}/calendario`
-  ) as Route;
+  const matchHref = `${primerEquipoBase(gender)}/calendario` as Route;
   const competicionHref = `${primerEquipoBase(gender)}/competicion` as Route;
   const timeLabel = formatMatchTime(match.date);
   const dateLabel = formatMatchDate(match.date);

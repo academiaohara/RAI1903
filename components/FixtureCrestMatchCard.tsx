@@ -3,13 +3,11 @@
 import Link from "next/link";
 import { MatchFixtureJerseyMobile } from "@/components/MatchFixtureJerseyMobile";
 import { MatchFixtureWideScoreRow } from "@/components/MatchFixtureWideScoreRow";
-import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
-import { defaultCronicaId } from "@/lib/match-article-factory";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import { matchRoundBadgeLabel } from "@/lib/competition-labels";
 import { fixtureCrestMatchCardClassName, matchFixtureCardMobileWidthClassName } from "@/lib/match-card-styles";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
-import { primerEquipoBase, primerEquipoHasCronicas } from "@/lib/primer-equipo";
+import { primerEquipoBase } from "@/lib/primer-equipo";
 import { cn, formatMatchDate, formatMatchDay, formatMatchTime } from "@/lib/utils";
 import type { Match } from "@/types";
 import type { Route } from "next";
@@ -32,14 +30,7 @@ export function FixtureCrestMatchCard({
   href,
   linkable = true,
 }: FixtureCrestMatchCardProps) {
-  const { getForMatch } = useSeasonMatchArticles();
-  const article = getForMatch(match.id, gender);
-  const hasCronicas = primerEquipoHasCronicas(gender);
-  const defaultHref = (
-    hasCronicas
-      ? `${primerEquipoBase(gender)}/cronicas/${article?.id ?? defaultCronicaId(match.id, gender)}`
-      : `${primerEquipoBase(gender)}/calendario`
-  ) as Route;
+  const defaultHref = `${primerEquipoBase(gender)}/calendario` as Route;
   const linkHref = href ?? defaultHref;
   const scoreLabel = match.status === "finished" ? `${match.homeScore}-${match.awayScore}` : formatMatchTime(match.date);
   const highlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;

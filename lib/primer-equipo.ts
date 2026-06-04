@@ -21,13 +21,13 @@ export const PRIMER_EQUIPO_SECTIONS = [
   "competicion",
   "jornadas",
   "calendario",
-  "cronicas",
 ] as const;
 
 export type PrimerEquipoSection = (typeof PRIMER_EQUIPO_SECTIONS)[number];
 
 export function primerEquipoHasCronicas(gender: PrimerEquipoGender) {
-  return gender === "masculino";
+  void gender;
+  return false;
 }
 
 export function getPrimerEquipoTabs(gender: PrimerEquipoGender) {
@@ -38,9 +38,8 @@ export function getPrimerEquipoTabs(gender: PrimerEquipoGender) {
     { href: `${base}/competicion`, label: "Competición" },
     { href: `${base}/jornadas`, label: "Jornadas" },
     { href: `${base}/calendario`, label: "Calendario" },
-    { href: `${base}/cronicas`, label: "Crónicas" },
   ];
-  return primerEquipoHasCronicas(gender) ? tabs : tabs.filter((tab) => !tab.href.endsWith("/cronicas"));
+  return tabs;
 }
 
 /** Keeps the current subsection when switching between masculino and femenino. */
@@ -52,8 +51,7 @@ export function primerEquipoPathForGender(pathname: string, gender: PrimerEquipo
 
   if (
     section &&
-    PRIMER_EQUIPO_SECTIONS.includes(section as PrimerEquipoSection) &&
-    (section !== "cronicas" || primerEquipoHasCronicas(gender))
+    PRIMER_EQUIPO_SECTIONS.includes(section as PrimerEquipoSection)
   ) {
     return `${primerEquipoBase(gender)}/${section}`;
   }
