@@ -8,6 +8,7 @@ import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { HomeStatHighlights } from "@/components/home/HomeStatHighlights";
 import { MatchScoreCenter } from "@/components/MatchScoreCenter";
 import { OpponentCrest } from "@/components/OpponentCrest";
+import { FixtureCrestMatchCard } from "@/components/FixtureCrestMatchCard";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
 import { MatchCard } from "@/components/MatchCard";
 import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
@@ -143,7 +144,7 @@ export function HomeRecentUpcomingBlock() {
           <div className="space-y-2">
             {latestMatches.length > 0 ? (
               latestMatches.map((match) => (
-                <HomeMobileCrestMatchRow key={match.id} match={match} accent="blue" />
+                <FixtureCrestMatchCard key={match.id} match={match} accent="blue" />
               ))
             ) : (
               <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 p-4 text-sm font-bold text-slate-500">
@@ -159,7 +160,7 @@ export function HomeRecentUpcomingBlock() {
         >
           <div className="space-y-2">
             {upcomingMatches.length > 0 ? (
-              upcomingMatches.map((match) => <HomeMobileCrestMatchRow key={match.id} match={match} accent="granate" />)
+              upcomingMatches.map((match) => <FixtureCrestMatchCard key={match.id} match={match} accent="granate" />)
             ) : (
               <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 p-4 text-sm font-bold text-slate-500">
                 No hay proximos partidos actualmente.
@@ -300,36 +301,3 @@ function MatchBanner({
   );
 }
 
-function HomeMobileCrestMatchRow({ match, accent }: { match: Match; accent: MatchBannerAccent }) {
-  const { getForMatch } = useSeasonMatchArticles();
-  const article = getForMatch(match.id, "masculino");
-  const href =
-    `${primerEquipoBase("masculino")}/cronicas/${article?.id ?? defaultCronicaId(match.id, "masculino")}` as Route;
-  const scoreLabel = match.status === "finished" ? `${match.homeScore}-${match.awayScore}` : "vs";
-  const centerAccent = matchCenterAccentClass(accent);
-  const timeOrDate =
-    match.status === "scheduled"
-      ? new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "short" }).format(new Date(match.date))
-      : formatMatchDate(match.date);
-
-  return (
-    <Link
-      href={href}
-      className="block overflow-hidden rounded-xl border border-[#214C9B]/20 bg-white transition hover:border-[#214C9B]"
-      aria-label={`${match.homeTeam} ${scoreLabel} ${match.awayTeam}`}
-    >
-      <div className="grid grid-cols-[1fr_auto_1fr] items-stretch">
-        <div className="flex items-center justify-center p-2.5">
-          <OpponentCrest logo={teamCrestLogo(match.homeTeamId)} opponent={match.homeTeam} size="md" className="mx-auto" />
-        </div>
-        <div className={cn("flex w-24 shrink-0 flex-col items-center justify-center px-1.5 py-2.5 text-center text-white", centerAccent)}>
-          <p className="text-xl font-extrabold leading-none">{scoreLabel}</p>
-          <p className="mt-1 w-full break-words text-[9px] font-bold uppercase leading-snug text-white/85">{timeOrDate}</p>
-        </div>
-        <div className="flex items-center justify-center p-2.5">
-          <OpponentCrest logo={teamCrestLogo(match.awayTeamId)} opponent={match.awayTeam} size="md" className="mx-auto" />
-        </div>
-      </div>
-    </Link>
-  );
-}
