@@ -59,9 +59,6 @@ function isRaiMatch(detail: MatchDetail): boolean {
   return detail.match.homeTeamId === raiId || detail.match.awayTeamId === raiId;
 }
 
-const panelClassName =
-  "min-w-0 rounded-[2rem] border border-[#214C9B]/20 bg-white p-5 shadow-[0_12px_30px_rgba(17,24,39,0.06)] sm:p-8";
-
 export function MatchCenter({ detail, article, backHref, backLabel }: MatchCenterProps) {
   const { items: newsItems } = usePublishedNews();
   const { editMode } = useInlineEditing();
@@ -149,9 +146,7 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
       <MatchCenterHeader detail={resolvedDetail} backHref={backHref} backLabel={backLabel} />
 
       {showArticleBodyAboveTabs && article && (
-        <div className={panelClassName}>
-          <MatchArticleInlineBlock article={article} sectionLabel="Previa" />
-        </div>
+        <MatchArticleInlineBlock article={article} sectionLabel="Previa" />
       )}
 
       {showClubNews &&
@@ -173,7 +168,7 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
         />
       )}
 
-      {panelContent && <div className={panelClassName}>{panelContent}</div>}
+      {panelContent}
     </div>
   );
 }
