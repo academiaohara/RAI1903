@@ -53,6 +53,14 @@ const cronicaFooterHoverClass = cn(
   "group-has-[a.cronica-overlay:hover]/card:!text-white",
 );
 
+function recentResultBadgeLabel(hasScore: boolean, result: ReturnType<typeof getAvilesMatchResult>): string {
+  if (!hasScore) return "Sin resultado";
+  if (result === "W") return "Victoria";
+  if (result === "D") return "Empate";
+  if (result === "L") return "Derrota";
+  return "Finalizado";
+}
+
 export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCardProps) {
   const { getCronica } = useSeasonMatchArticles();
   const result = getAvilesMatchResult(match, gender);
@@ -70,15 +78,7 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
   const highlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
   const dateLabel = formatMatchDate(match.date);
   const roundLabel = matchRoundBadgeLabel(match) ?? matchCompetitionShortLabel(match);
-  const badgeLabel = hasScore
-    ? result === "W"
-      ? "Victoria"
-      : result === "D"
-        ? "Empate"
-        : result === "L"
-          ? "Derrota"
-          : "Finalizado"
-    : "Sin resultado";
+  const badgeLabel = recentResultBadgeLabel(hasScore, result);
 
   const badge = (
     <Badge
