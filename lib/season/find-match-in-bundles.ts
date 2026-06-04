@@ -25,6 +25,23 @@ function listFixtureMatches(source: JornadasFixtureSource, gender: PrimerEquipoG
   ];
 }
 
+export function findMatchInFixtureSource(
+  source: JornadasFixtureSource,
+  matchId: string,
+  gender: PrimerEquipoGender,
+  mapMatch: (match: Match) => Match = (match) => match,
+): Match | undefined {
+  const raiId = getRaiTeamId(gender);
+
+  for (const raw of listFixtureMatches(source, gender)) {
+    const match = mapMatch(raw);
+    if (match.id !== matchId) continue;
+    if (match.homeTeamId === raiId || match.awayTeamId === raiId) return match;
+  }
+
+  return undefined;
+}
+
 export function findMatchInBundles(
   bundles: SeasonBundlesMap,
   matchId: string,
@@ -35,13 +52,8 @@ export function findMatchInBundles(
 
   for (const gender of genders) {
     const source = fixtureSourceFromBundles(bundles, gender);
-    const raiId = getRaiTeamId(gender);
-
-    for (const raw of listFixtureMatches(source, gender)) {
-      const match = mapMatch(raw);
-      if (match.id !== matchId) continue;
-      if (match.homeTeamId === raiId || match.awayTeamId === raiId) return match;
-    }
+    const found = findMatchInFixtureSource(source, matchId, gender, mapMatch);
+    if (found) return found;
   }
 
   return undefined;

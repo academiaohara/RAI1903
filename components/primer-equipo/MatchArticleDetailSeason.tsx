@@ -16,7 +16,7 @@ import {
 } from "@/lib/match-article-factory";
 import { buildMatchDetail, getMatchForArticle } from "@/lib/match-detail";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
-import { findMatchInBundles } from "@/lib/season/find-match-in-bundles";
+import { findMatchInFixtureSource } from "@/lib/season/find-match-in-bundles";
 import { getLeagueMatchdaysForGender } from "@/lib/season/aviles-matches";
 
 type MatchArticleDetailSeasonProps = {
@@ -25,7 +25,7 @@ type MatchArticleDetailSeasonProps = {
 };
 
 export function MatchArticleDetailSeason({ gender, articleId }: MatchArticleDetailSeasonProps) {
-  const { bundles, bundlesLoading, getFixtureSource } = useSeason();
+  const { bundles, bundlesLoading, getEnrichedFixtureSource } = useSeason();
   const { getOverride } = useInlineEditing();
   const { getById } = useSeasonMatchArticles();
   const cmsTeams = useMemo(() => getTeamsBundle(bundles, gender)?.teams ?? [], [bundles, gender]);
@@ -39,9 +39,11 @@ export function MatchArticleDetailSeason({ gender, articleId }: MatchArticleDeta
       applyMatchInlineOverride(match, getOverride, gender, resolveTeamName),
     [gender, getOverride, resolveTeamName],
   );
+  const fixtureSource = useMemo(() => getEnrichedFixtureSource(gender), [gender, getEnrichedFixtureSource]);
+
   const findMatch = useCallback(
-    (matchId: string) => findMatchInBundles(bundles, matchId, { gender, mapMatch }),
-    [bundles, gender, mapMatch],
+    (matchId: string) => findMatchInFixtureSource(fixtureSource, matchId, gender, mapMatch),
+    [fixtureSource, gender, mapMatch],
   );
 
   const article = useMemo(() => {
@@ -60,8 +62,8 @@ export function MatchArticleDetailSeason({ gender, articleId }: MatchArticleDeta
   }, [articleId, findMatch, gender, getById]);
 
   const leagueMatchdays = useMemo(
-    () => getLeagueMatchdaysForGender(getFixtureSource(gender), gender),
-    [gender, getFixtureSource],
+    () => getLeagueMatchdaysForGender(getEnrichedFixtureSource(gender), gender),
+    [gender, getEnrichedFixtureSource],
   );
 
   const detail = useMemo(() => {

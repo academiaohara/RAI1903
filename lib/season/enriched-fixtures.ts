@@ -10,6 +10,10 @@ import {
   normalizeGrupo2Matchdays,
   normalizeLeagueMatchdays,
 } from "@/lib/competition/normalize-fixtures";
+import {
+  enrichFixtureMatchesVenues,
+  enrichMatchdaysVenues,
+} from "@/lib/match-venue";
 import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import type { JornadasFixtureSource } from "@/lib/season/fixture-source";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -52,14 +56,19 @@ export function enrichFixtureSource(
   const copaDelReyMatches = applyFixtureTeamNamesToMatches(source.copaDelReyMatches, resolveName);
   const calendarExtraMatches = applyFixtureTeamNamesToMatches(source.calendarExtraMatches, resolveName);
 
+  const venueOptions = { bundles, seasonLabel: undefined };
+  const withVenues = {
+    matchdays: enrichMatchdaysVenues(matchdays, gender, venueOptions),
+    matchdaysGrupo2: enrichMatchdaysVenues(matchdaysGrupo2, gender, venueOptions),
+    matchdaysFemenino: enrichMatchdaysVenues(matchdaysFemenino, gender, venueOptions),
+    amistosoMatches: enrichFixtureMatchesVenues(amistosoMatches, gender, venueOptions),
+    copaDelReyMatches: enrichFixtureMatchesVenues(copaDelReyMatches, gender, venueOptions),
+    calendarExtraMatches: enrichFixtureMatchesVenues(calendarExtraMatches, gender, venueOptions),
+  };
+
   return {
     ...source,
-    matchdays,
-    matchdaysGrupo2,
-    matchdaysFemenino,
-    amistosoMatches,
-    copaDelReyMatches,
-    calendarExtraMatches,
+    ...withVenues,
     competitionConfig: config,
   };
 }
