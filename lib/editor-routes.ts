@@ -12,6 +12,10 @@ export function isFemeninoPath(pathname: string) {
   return /^\/primer-equipo\/femenino/.test(pathname);
 }
 
+export function isJornadasPath(pathname: string) {
+  return /^\/primer-equipo\/(masculino|femenino)\/jornadas/.test(pathname);
+}
+
 export function isFilialPath(pathname: string) {
   return pathname === "/cantera/filial" || pathname.startsWith("/cantera/filial/");
 }
