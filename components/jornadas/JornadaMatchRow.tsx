@@ -3,6 +3,7 @@
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamCrest } from "@/components/TeamCrest";
 import { TeamLink } from "@/components/TeamLink";
+import { SplitDateInput } from "@/components/calendar/SplitDateInput";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
 import {
@@ -93,10 +94,8 @@ export function JornadaMatchRow({
     }
   };
 
-  const onDateChange = (dateValue: string) => {
-    if (!dateValue) return;
-    const timeValue = editedFixture.kickoffTime ?? (utcTimeInputValue(editedFixture.date) || "12:00");
-    savePatch({ date: mergeUtcDateAndTime(fixture.date, dateValue, timeValue) });
+  const onDateChange = (iso: string) => {
+    savePatch({ date: iso });
   };
 
   const onTimeChange = (timeValue: string) => {
@@ -109,6 +108,9 @@ export function JornadaMatchRow({
       kickoffTime: timeValue || undefined,
     });
   };
+
+  const kickoffTimeForDate =
+    (editedFixture.kickoffTime ?? utcTimeInputValue(editedFixture.date)) || "12:00";
 
   const nameClass = (isHighlight: boolean) =>
     cn(
@@ -188,7 +190,7 @@ export function JornadaMatchRow({
       </div>
 
       {editMode ? (
-        <div className="relative z-[1] min-w-[8rem] rounded-xl border border-[#214C9B]/20 bg-white p-2 text-center shadow-sm">
+        <div className="relative z-[1] min-w-[11rem] rounded-xl border border-[#214C9B]/20 bg-white p-2 text-center shadow-sm sm:min-w-[12rem]">
           <select
             value={editedFixture.status}
             onChange={(event) => {
@@ -209,16 +211,16 @@ export function JornadaMatchRow({
             <option value="scheduled">Programado</option>
             <option value="finished">Finalizado</option>
           </select>
-          <label className="mb-1 grid gap-0.5 text-left">
-            <span className="text-[9px] font-extrabold uppercase tracking-wide text-slate-500">Día</span>
-            <input
-              type="date"
-              value={utcDateInputValue(editedFixture.date)}
-              onChange={(event) => onDateChange(event.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-1 py-0.5 text-[10px] font-bold text-slate-700"
-              aria-label="Fecha del partido"
-            />
-          </label>
+          <SplitDateInput
+            key={editedFixture.date.slice(0, 10)}
+            iso={editedFixture.date}
+            timeValue={kickoffTimeForDate}
+            onChange={onDateChange}
+            className="mb-1"
+            labelClassName="text-[9px]"
+            fieldClassName="rounded-lg border border-slate-200 px-1 py-0.5 text-[10px] font-bold text-slate-700"
+            disabled={editedFixture.status === "finished"}
+          />
           {editedFixture.status === "finished" ? (
             <div className="flex items-center gap-1">
               <input

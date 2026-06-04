@@ -2,13 +2,16 @@
 
 import { mergeUtcDateAndTime, utcTimeInputValue } from "@/lib/calendar-match-overrides";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, type KeyboardEvent } from "react";
 
 type SplitDateInputProps = {
   iso: string;
   onChange: (iso: string) => void;
+  /** Hora HH:mm si se guarda aparte del ISO (p. ej. kickoffTime en jornadas). */
+  timeValue?: string;
   className?: string;
   fieldClassName?: string;
+  labelClassName?: string;
   disabled?: boolean;
 };
 
@@ -51,14 +54,18 @@ function isValidDateParts(day: string, month: string, year: string): boolean {
 export function SplitDateInput({
   iso,
   onChange,
+  timeValue: timeValueProp,
   className,
   fieldClassName,
+  labelClassName,
   disabled = false,
 }: SplitDateInputProps) {
   const synced = utcDateParts(iso);
   const [day, setDay] = useState(synced.day);
   const [month, setMonth] = useState(synced.month);
   const [year, setYear] = useState(synced.year);
+
+  const resolvedTime = () => (timeValueProp ?? utcTimeInputValue(iso)) || "12:00";
 
   const commit = (nextDay: string, nextMonth: string, nextYear: string) => {
     const normalizedDay = pad2(nextDay);
@@ -69,8 +76,14 @@ export function SplitDateInput({
     setYear(normalizedYear);
     if (!isValidDateParts(normalizedDay, normalizedMonth, normalizedYear)) return;
     const dateValue = `${normalizedYear}-${normalizedMonth}-${normalizedDay}`;
-    const timeValue = utcTimeInputValue(iso) || "12:00";
-    onChange(mergeUtcDateAndTime(iso, dateValue, timeValue));
+    onChange(mergeUtcDateAndTime(iso, dateValue, resolvedTime()));
+  };
+
+  const onFieldKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      (event.target as HTMLInputElement).blur();
+    }
   };
 
   const inputClass = cn(
@@ -81,7 +94,7 @@ export function SplitDateInput({
   return (
     <div className={cn("grid grid-cols-3 gap-1.5", className)}>
       <label className="grid gap-0.5">
-        <span className="font-extrabold uppercase tracking-wide text-slate-500">Día</span>
+        <span className={cn("font-extrabold uppercase tracking-wide text-slate-500", labelClassName)}>Día</span>
         <input
           type="text"
           inputMode="numeric"
@@ -90,13 +103,14 @@ export function SplitDateInput({
           disabled={disabled}
           onChange={(event) => setDay(digitsOnly(event.target.value, 2))}
           onBlur={() => commit(day, month, year)}
+          onKeyDown={onFieldKeyDown}
           className={inputClass}
           aria-label="Día del partido"
           placeholder="DD"
         />
       </label>
       <label className="grid gap-0.5">
-        <span className="font-extrabold uppercase tracking-wide text-slate-500">Mes</span>
+        <span className={cn("font-extrabold uppercase tracking-wide text-slate-500", labelClassName)}>Mes</span>
         <input
           type="text"
           inputMode="numeric"
@@ -105,13 +119,14 @@ export function SplitDateInput({
           disabled={disabled}
           onChange={(event) => setMonth(digitsOnly(event.target.value, 2))}
           onBlur={() => commit(day, month, year)}
+          onKeyDown={onFieldKeyDown}
           className={inputClass}
           aria-label="Mes del partido"
           placeholder="MM"
         />
       </label>
       <label className="grid gap-0.5">
-        <span className="font-extrabold uppercase tracking-wide text-slate-500">Año</span>
+        <span className={cn("font-extrabold uppercase tracking-wide text-slate-500", labelClassName)}>Año</span>
         <input
           type="text"
           inputMode="numeric"
@@ -120,6 +135,7 @@ export function SplitDateInput({
           disabled={disabled}
           onChange={(event) => setYear(digitsOnly(event.target.value, 4))}
           onBlur={() => commit(day, month, year)}
+          onKeyDown={onFieldKeyDown}
           className={inputClass}
           aria-label="Año del partido"
           placeholder="AAAA"
