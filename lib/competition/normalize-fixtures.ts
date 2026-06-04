@@ -1,6 +1,7 @@
 import { matchesPerLeagueRound, leagueRoundCount } from "@/lib/cms/competition-config-bundle";
 import type { SeasonCompetitionConfigBundle } from "@/lib/cms/competition-config-bundle";
 import { resolveMatchCompetition } from "@/lib/cms/competition-config-bundle";
+import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Match, Matchday, CompetitionId } from "@/types";
 
 /** Fecha lejana para partidos sin asignar; evita bloquear la quiniela antes de fijar horarios. */
@@ -27,18 +28,24 @@ function placeholderTeamName(slot: number): string {
   return `Equipo ${slot}`;
 }
 
+function placeholderGenderTag(gender: PrimerEquipoGender): "m" | "f" {
+  return gender === "femenino" ? "f" : "m";
+}
+
 function createPlaceholderMatch(
   round: number,
   matchIndex: number,
   grupo: "1" | "2",
   competition: CompetitionId,
+  gender: PrimerEquipoGender,
 ): Match {
   const base = matchIndex * 2;
   const homeSlot = base + 1;
   const awaySlot = base + 2;
   const suffix = grupo === "2" ? "-g2" : "";
+  const genderTag = placeholderGenderTag(gender);
   return {
-    id: `cms-ph-j${round}${suffix}-m${matchIndex}`,
+    id: `cms-ph-${genderTag}-j${round}${suffix}-m${matchIndex}`,
     competition,
     matchday: round,
     date: PLACEHOLDER_MATCH_DATE,
@@ -57,10 +64,11 @@ function ensureMatchdayMatches(
   expectedCount: number,
   grupo: "1" | "2",
   competition: CompetitionId,
+  gender: PrimerEquipoGender,
 ): Matchday {
   const matches = [...(existing?.matches ?? [])];
   while (matches.length < expectedCount) {
-    matches.push(createPlaceholderMatch(round, matches.length, grupo, competition));
+    matches.push(createPlaceholderMatch(round, matches.length, grupo, competition, gender));
   }
   return { round, matches };
 }
@@ -70,6 +78,7 @@ export function normalizeLeagueMatchdays(
   matchdays: Matchday[],
   config: SeasonCompetitionConfigBundle,
   competitionOverride?: CompetitionId,
+  gender: PrimerEquipoGender = "masculino",
 ): Matchday[] {
   const competition = competitionOverride ?? resolveMatchCompetition(config);
   const totalRounds = leagueRoundCount(config.teamsPerGroup);
@@ -78,7 +87,7 @@ export function normalizeLeagueMatchdays(
 
   for (let round = 1; round <= totalRounds; round++) {
     const existing = matchdays.find((md) => md.round === round);
-    result.push(ensureMatchdayMatches(existing, round, perRound, "1", competition));
+    result.push(ensureMatchdayMatches(existing, round, perRound, "1", competition, gender));
   }
 
   return result;
@@ -88,9 +97,10 @@ export function normalizeGrupo2Matchdays(
   matchdaysGrupo2: Matchday[],
   config: SeasonCompetitionConfigBundle,
   competitionOverride?: CompetitionId,
+  gender: PrimerEquipoGender = "masculino",
 ): Matchday[] {
   if (config.groupCount < 2) return matchdaysGrupo2;
-  return normalizeLeagueMatchdays(matchdaysGrupo2, config, competitionOverride).map((md) => ({
+  return normalizeLeagueMatchdays(matchdaysGrupo2, config, competitionOverride, gender).map((md) => ({
     ...md,
     matches: md.matches.map((m) => ({
       ...m,

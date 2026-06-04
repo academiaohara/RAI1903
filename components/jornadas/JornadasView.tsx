@@ -55,6 +55,7 @@ export function JornadasView({ gender }: JornadasViewProps) {
         selectedId={selectedRoundId}
         onSelect={handleSelectRound}
         showCrests={showCrests}
+        gender={gender}
       />
 
       <Card

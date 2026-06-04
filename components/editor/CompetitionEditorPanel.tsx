@@ -155,6 +155,11 @@ export function CompetitionEditorPanel({ onClose }: CompetitionEditorPanelProps)
         </div>
       }
     >
+      <p className="mb-3 text-[10px] leading-relaxed text-slate-500">
+        Masculino y femenino tienen calendarios separados. Para el femenino usa el panel{" "}
+        <strong className="text-[#981915]">Femenino</strong> (competición y calendario como en cantera).
+      </p>
+
       <div className="mb-4 space-y-2 rounded-xl border border-slate-100 bg-slate-50/80 p-3">
         <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Plantilla de liga</p>
         <select

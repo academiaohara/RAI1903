@@ -8,6 +8,10 @@ export function isFichajesPath(pathname: string) {
   return pathname === "/fichajes" || pathname.startsWith("/fichajes/");
 }
 
+export function isFemeninoPath(pathname: string) {
+  return /^\/primer-equipo\/femenino/.test(pathname);
+}
+
 export function isFilialPath(pathname: string) {
   return pathname === "/cantera/filial" || pathname.startsWith("/cantera/filial/");
 }
@@ -22,6 +26,7 @@ export function isCanteraCmsPath(pathname: string) {
 
 export const EDITOR_PAGE_LINKS = {
   plantilla: "/primer-equipo/masculino/plantilla" as Route,
+  femenino: "/primer-equipo/femenino/competicion" as Route,
   fichajes: "/fichajes" as Route,
   filial: "/cantera/filial" as Route,
   juvenil: "/cantera/juvenil-a" as Route,

@@ -7,6 +7,7 @@ import { MatchFixtureTeamLinks } from "@/components/MatchFixtureTeamLinks";
 import { RAI_TEAM_ID } from "@/data/mock";
 import { matchCompetitionShortLabel, matchFixtureMeta } from "@/lib/competition-labels";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import { matchResultOverrideKey, readMatchResultOverride } from "@/lib/fixture-inline-keys";
 import { matchFixtureCardClassName } from "@/lib/match-card-styles";
 import { formatMatchDate } from "@/lib/utils";
 import type { Match } from "@/types";
@@ -23,11 +24,11 @@ export function MatchCard({
   gender?: PrimerEquipoGender;
 }) {
   const { editMode, getOverride, mergeSaveValue } = useInlineEditing();
-  const override = getOverride<Partial<Match>>(`match-result:${match.id}`) ?? {};
+  const override = readMatchResultOverride<Partial<Match>>(getOverride, gender, match.id) ?? {};
   const editedMatch = { ...match, ...override };
   const scoreLabel = editedMatch.status === "finished" ? `${editedMatch.homeScore} - ${editedMatch.awayScore}` : "vs";
   const savePatch = (patch: Partial<Match>) => {
-    mergeSaveValue(`match-result:${match.id}`, patch);
+    mergeSaveValue(matchResultOverrideKey(gender, match.id), patch);
   };
 
   return (

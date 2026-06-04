@@ -1,4 +1,9 @@
-import { getFixturesBundle, type SeasonBundlesMap, type SeasonFixturesBundle } from "@/lib/cms/season-bundles";
+import {
+  getFixturesBundle,
+  type SeasonBundlesMap,
+  type SeasonFemeninoFixturesBundle,
+  type SeasonFixturesBundle,
+} from "@/lib/cms/season-bundles";
 import type { GroupTeamSlot } from "@/lib/cms/group-teams";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Match, Matchday } from "@/types";
@@ -42,6 +47,17 @@ function remapMatchday(matchday: Matchday, changes: FixtureTeamIdChange[]): Matc
   return { ...matchday, matches };
 }
 
+function remapFemeninoFixturesBundleTeamIds(
+  bundle: SeasonFemeninoFixturesBundle,
+  changes: FixtureTeamIdChange[],
+): SeasonFemeninoFixturesBundle {
+  if (changes.length === 0) return bundle;
+  return {
+    ...bundle,
+    matchdaysFemenino: bundle.matchdaysFemenino.map((md) => remapMatchday(md, changes)),
+  };
+}
+
 /** Actualiza IDs de equipo en el bundle fixtures cuando cambian al guardar la guía de liga. */
 export function remapFixturesBundleTeamIds(
   bundle: SeasonFixturesBundle,
@@ -69,8 +85,11 @@ export function remapSeasonFixturesForTeamIdChanges(
   bundles: SeasonBundlesMap,
   gender: PrimerEquipoGender,
   changes: FixtureTeamIdChange[],
-): SeasonFixturesBundle | null {
+): SeasonFixturesBundle | SeasonFemeninoFixturesBundle | null {
   const raw = getFixturesBundle(bundles, gender);
   if (!raw || changes.length === 0) return null;
+  if (gender === "femenino") {
+    return remapFemeninoFixturesBundleTeamIds(raw as SeasonFemeninoFixturesBundle, changes);
+  }
   return remapFixturesBundleTeamIds(raw as SeasonFixturesBundle, changes);
 }

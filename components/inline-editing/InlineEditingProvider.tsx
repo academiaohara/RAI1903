@@ -32,9 +32,11 @@ import { TeamCrestEditorPanel } from "@/components/editor/TeamCrestEditorPanel";
 import { HomeLayoutEditorPanel } from "@/components/editor/HomeLayoutEditorPanel";
 import { MediaRaiSectionsEditorPanel } from "@/components/editor/MediaRaiSectionsEditorPanel";
 import { CompetitionEditorPanel } from "@/components/editor/CompetitionEditorPanel";
+import { FemeninoEditorPanel } from "@/components/editor/FemeninoEditorPanel";
 import { TeamsEditorPanel } from "@/components/editor/TeamsEditorPanel";
 import {
   EDITOR_PAGE_LINKS,
+  isFemeninoPath,
   isFichajesPath,
   isFilialPath,
   isJuvenilPath,
@@ -502,6 +504,7 @@ export function InlineEditingToolbar() {
   const [homePanelOpen, setHomePanelOpen] = useState(false);
   const [mediaRaiPanelOpen, setMediaRaiPanelOpen] = useState(false);
   const [competitionPanelOpen, setCompetitionPanelOpen] = useState(false);
+  const [femeninoPanelOpen, setFemeninoPanelOpen] = useState(false);
   const [teamsPanelOpen, setTeamsPanelOpen] = useState(false);
   const pathname = usePathname();
   const toolbarScrollRef = useRef<HTMLDivElement>(null);
@@ -523,6 +526,7 @@ export function InlineEditingToolbar() {
     setHomePanelOpen(false);
     setMediaRaiPanelOpen(false);
     setCompetitionPanelOpen(false);
+    setFemeninoPanelOpen(false);
     setTeamsPanelOpen(false);
   }, []);
 
@@ -579,6 +583,9 @@ export function InlineEditingToolbar() {
       )}
       {editMode && competitionPanelOpen && (
         <CompetitionEditorPanel onClose={() => setCompetitionPanelOpen(false)} />
+      )}
+      {editMode && femeninoPanelOpen && (
+        <FemeninoEditorPanel onClose={() => setFemeninoPanelOpen(false)} />
       )}
       {editMode && teamsPanelOpen && <TeamsEditorPanel onClose={() => setTeamsPanelOpen(false)} />}
       <div className="relative min-w-0 sm:max-w-[calc(100vw-2rem)]">
@@ -651,6 +658,27 @@ export function InlineEditingToolbar() {
                 >
                   Competición
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeEditorPanels();
+                    setFemeninoPanelOpen((open) => !open);
+                  }}
+                  className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[#981915]/25 px-2.5 py-1.5 text-[11px] font-extrabold uppercase leading-none text-[#981915] hover:bg-red-50 sm:px-3 sm:py-1.5 sm:text-xs"
+                >
+                  Femenino
+                </button>
+                {!isFemeninoPath(pathname) && (
+                  <Link
+                    href={EDITOR_PAGE_LINKS.femenino}
+                    onClick={closeEditorPanels}
+                    className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[#981915]/20 px-2.5 py-1.5 text-[11px] font-extrabold uppercase leading-none text-[#981915] hover:bg-red-50 sm:px-3 sm:py-1.5 sm:text-xs"
+                  >
+                    <ExternalLink size={13} aria-hidden />
+                    Ir fem.
+                  </Link>
+                )}
                 <button
                   type="button"
                   onClick={() => {

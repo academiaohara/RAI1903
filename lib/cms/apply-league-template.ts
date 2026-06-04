@@ -47,17 +47,22 @@ export function buildFixturesPayloadForConfig(
   const emptySource = { matchdays: [], matchdaysGrupo2: [], matchdaysFemenino: [] };
 
   if (gender === "femenino") {
-    const matchdaysFemenino = normalizeLeagueMatchdays(emptySource.matchdaysFemenino, config, competition);
+    const matchdaysFemenino = normalizeLeagueMatchdays(
+      emptySource.matchdaysFemenino,
+      config,
+      competition,
+      "femenino",
+    );
     return {
       matchdaysFemenino,
       meta: { lastRound: 0 },
     };
   }
 
-  const matchdays = normalizeLeagueMatchdays(emptySource.matchdays, config, competition);
+  const matchdays = normalizeLeagueMatchdays(emptySource.matchdays, config, competition, "masculino");
   const matchdaysGrupo2 =
     config.groupCount >= 2
-      ? normalizeGrupo2Matchdays(emptySource.matchdaysGrupo2, config, competition)
+      ? normalizeGrupo2Matchdays(emptySource.matchdaysGrupo2, config, competition, "masculino")
       : undefined;
   const existing = getFixturesBundle(bundles, gender) as SeasonFixturesBundle | null;
   return {

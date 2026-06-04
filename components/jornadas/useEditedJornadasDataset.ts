@@ -2,6 +2,7 @@
 
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { applyJornadaFixtureOverride } from "@/lib/jornada-fixture-overrides";
+import { readMatchResultOverride } from "@/lib/fixture-inline-keys";
 import { formatShortDate, representativeDateFromFixtures } from "@/lib/jornadas-data";
 import { getRaiTeamId } from "@/lib/fixtures";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -21,8 +22,8 @@ function opponentFromFixtures(
   if (!raiFixture) return undefined;
   const isHome = raiFixture.homeTeamId === raiId;
   return {
-    teamId: isHome ? raiFixture.awayTeamId : raiFixture.homeTeamId,
-    name: isHome ? raiFixture.awayTeamName : raiFixture.homeTeamName,
+    teamId: isHome ? raiFixture.awayTeamId : raiFixture.awayTeamId,
+    name: isHome ? raiFixture.awayTeamName : raiFixture.awayTeamName,
   };
 }
 
@@ -48,12 +49,19 @@ function enrichRoundSummary(
 function applyOverridesToRound(
   roundData: JornadaRoundData,
   getOverride: <T>(key: string) => T | undefined,
+  gender: PrimerEquipoGender,
 ): { grupo1: JornadaFixture[]; grupo2: JornadaFixture[] } {
   const grupo1 = roundData.matchesByGrupo["1"].map((fixture) =>
-    applyJornadaFixtureOverride(fixture, getOverride<Partial<JornadaFixture>>(`match-result:${fixture.id}`)),
+    applyJornadaFixtureOverride(
+      fixture,
+      readMatchResultOverride<Partial<JornadaFixture>>(getOverride, gender, fixture.id),
+    ),
   );
   const grupo2 = roundData.matchesByGrupo["2"].map((fixture) =>
-    applyJornadaFixtureOverride(fixture, getOverride<Partial<JornadaFixture>>(`match-result:${fixture.id}`)),
+    applyJornadaFixtureOverride(
+      fixture,
+      readMatchResultOverride<Partial<JornadaFixture>>(getOverride, gender, fixture.id),
+    ),
   );
   return { grupo1, grupo2 };
 }
@@ -68,13 +76,13 @@ export function useEditedJornadasDataset(
 
   return useMemo(() => {
     const editedRounds = dataset.rounds.map((summary) => {
-      const { grupo1, grupo2 } = applyOverridesToRound(dataset.getRound(summary.id), getOverride);
+      const { grupo1, grupo2 } = applyOverridesToRound(dataset.getRound(summary.id), getOverride, gender);
       return enrichRoundSummary(summary, grupo1, grupo2, raiId);
     });
 
     const getRound = (roundId: Parameters<JornadasDataset["getRound"]>[0]) => {
       const base = dataset.getRound(roundId);
-      const { grupo1, grupo2 } = applyOverridesToRound(base, getOverride);
+      const { grupo1, grupo2 } = applyOverridesToRound(base, getOverride, gender);
       const summary =
         editedRounds.find((round) => round.id === roundId) ??
         enrichRoundSummary(base.summary, grupo1, grupo2, raiId);
@@ -90,5 +98,5 @@ export function useEditedJornadasDataset(
       rounds: editedRounds,
       getRound,
     };
-  }, [dataset, getOverride, raiId]);
+  }, [dataset, gender, getOverride, raiId]);
 }

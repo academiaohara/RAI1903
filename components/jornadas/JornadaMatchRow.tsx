@@ -17,6 +17,7 @@ import { getTeamCrestById } from "@/lib/team-crests";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import { formatMatchScore, isMatchPlayed } from "@/lib/match-result";
+import { matchResultOverrideKey, readMatchResultOverride } from "@/lib/fixture-inline-keys";
 import { formatMatchDate } from "@/lib/utils";
 import type { JornadaFixture } from "@/types/jornadas";
 import { cn } from "@/lib/utils";
@@ -49,7 +50,7 @@ export function JornadaMatchRow({
 }: JornadaMatchRowProps) {
   const { editMode, getOverride, mergeSaveValue } = useInlineEditing();
   const { bundles } = useSeason();
-  const override = getOverride<Partial<JornadaFixture>>(`match-result:${fixture.id}`) ?? {};
+  const override = readMatchResultOverride<Partial<JornadaFixture>>(getOverride, gender, fixture.id) ?? {};
   const editedFixture = applyJornadaFixtureOverride(fixture, override);
   const showCrests = showCrestsProp ?? gender !== "femenino";
   const home = getJornadaTeam(editedFixture.homeTeamId);
@@ -79,7 +80,7 @@ export function JornadaMatchRow({
       next.homeScore = undefined;
       next.awayScore = undefined;
     }
-    mergeSaveValue(`match-result:${fixture.id}`, next);
+    mergeSaveValue(matchResultOverrideKey(gender, fixture.id), next);
   };
 
   const onTeamChange = (side: "home" | "away", teamId: string) => {

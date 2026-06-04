@@ -3,6 +3,7 @@ import {
   type MatchResultOverride,
   type ResolveFixtureTeamName,
 } from "@/lib/calendar-match-overrides";
+import { readMatchResultOverride } from "@/lib/fixture-inline-keys";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Match, Matchday } from "@/types";
 
@@ -12,7 +13,7 @@ export function applyMatchInlineOverride(
   gender: PrimerEquipoGender = "masculino",
   resolveName?: ResolveFixtureTeamName,
 ): Match {
-  const override = getOverride(`match-result:${match.id}`) as MatchResultOverride | undefined;
+  const override = readMatchResultOverride<MatchResultOverride>(getOverride, gender, match.id);
   if (!override || Object.keys(override).length === 0) return match;
   return applyMatchResultOverride(match, override, gender, resolveName);
 }

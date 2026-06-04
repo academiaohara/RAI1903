@@ -57,7 +57,7 @@ export function fixtureSourceFromBundles(
     const bundle = raw as SeasonFemeninoFixturesBundle | null;
     if (!bundle?.matchdaysFemenino?.length) return defaults;
     return {
-      ...defaults,
+      ...EMPTY_FIXTURE_SOURCE,
       matchdaysFemenino: bundle.matchdaysFemenino,
       lastRoundFemenino: bundle.meta?.lastRound ?? defaults.lastRoundFemenino,
     };
@@ -67,12 +67,12 @@ export function fixtureSourceFromBundles(
   if (!bundle?.matchdays?.length) return defaults;
 
   return {
-    ...defaults,
+    ...EMPTY_FIXTURE_SOURCE,
     matchdays: bundle.matchdays,
-    matchdaysGrupo2: bundle.matchdaysGrupo2 ?? defaults.matchdaysGrupo2,
-    amistosoMatches: bundle.amistosoMatches ?? defaults.amistosoMatches,
-    copaDelReyMatches: bundle.copaDelReyMatches ?? defaults.copaDelReyMatches,
-    calendarExtraMatches: bundle.calendarExtraMatches ?? defaults.calendarExtraMatches,
+    matchdaysGrupo2: bundle.matchdaysGrupo2 ?? [],
+    amistosoMatches: bundle.amistosoMatches ?? [],
+    copaDelReyMatches: bundle.copaDelReyMatches ?? [],
+    calendarExtraMatches: bundle.calendarExtraMatches ?? [],
     lastRoundMasculino: bundle.meta?.lastRound ?? defaults.lastRoundMasculino,
     definitiveQualifyingLeagueRound:
       bundle.meta?.definitiveQualifyingLeagueRound ?? defaults.definitiveQualifyingLeagueRound,
