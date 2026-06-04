@@ -4,7 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { EditorPanelFrame } from "@/components/editor/EditorPanelFrame";
 import { useSeason } from "@/components/season/SeasonProvider";
+import {
+  cmsTeamRecordsToGroupSlots,
+  femeninoLeagueTeamRecords,
+} from "@/lib/cms/femenino-league-team-records";
+import { isPlaceholderGroupSlotId } from "@/lib/cms/group-teams";
+import { saveFemeninoGroupTeamsAndCrests } from "@/lib/cms/save-femenino-group-teams";
 import { upsertSeasonBundle } from "@/lib/cms/season-bundles";
+import { getTeamCrestsBundle } from "@/lib/cms/team-crests-bundle";
 import { getTeamsBundle, type CmsTeamRecord, type SeasonTeamsBundle } from "@/lib/cms/teams-bundle";
 import { collectTeamsFromBundles } from "@/lib/season/teams-from-fixtures";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -22,6 +29,10 @@ function slugId(name: string): string {
     .replace(/^-|-$/g, "");
 }
 
+function isFixturePlaceholderTeam(id: string, name: string): boolean {
+  return isPlaceholderGroupSlotId(id) || /^Equipo \d+$/i.test(name.trim());
+}
+
 export function TeamsEditorPanel({ onClose }: TeamsEditorPanelProps) {
   const { viewedSeasonId, viewedSeason, bundles, refreshBundles } = useSeason();
   const [gender, setGender] = useState<PrimerEquipoGender>("masculino");
@@ -30,10 +41,21 @@ export function TeamsEditorPanel({ onClose }: TeamsEditorPanelProps) {
   const [message, setMessage] = useState<string | null>(null);
   const [filter, setFilter] = useState("");
 
-  const fixtureTeams = useMemo(() => collectTeamsFromBundles(bundles), [bundles]);
+  const fixtureTeams = useMemo(
+    () =>
+      collectTeamsFromBundles(bundles).filter(
+        (team) => !isFixturePlaceholderTeam(team.id, team.name),
+      ),
+    [bundles],
+  );
   const bundleTeams = useMemo(() => getTeamsBundle(bundles, gender)?.teams ?? [], [bundles, gender]);
+  const femeninoLeague = useMemo(() => femeninoLeagueTeamRecords(bundles), [bundles]);
 
   const merged = useMemo(() => {
+    if (gender === "femenino") {
+      return femeninoLeague;
+    }
+
     const map = new Map<string, CmsTeamRecord>();
     for (const ref of fixtureTeams) {
       map.set(ref.id, { id: ref.id, name: ref.name });
@@ -42,7 +64,7 @@ export function TeamsEditorPanel({ onClose }: TeamsEditorPanelProps) {
       map.set(t.id, { ...map.get(t.id), ...t });
     }
     return [...map.values()].sort((a, b) => a.name.localeCompare(b.name, "es"));
-  }, [bundleTeams, fixtureTeams]);
+  }, [bundleTeams, fixtureTeams, femeninoLeague, gender]);
 
   useEffect(() => {
     queueMicrotask(() => setTeams(merged.map((t) => ({ ...t }))));
@@ -52,6 +74,8 @@ export function TeamsEditorPanel({ onClose }: TeamsEditorPanelProps) {
   const filtered = filter.trim()
     ? list.filter((t) => t.name.toLowerCase().includes(filter.toLowerCase()) || t.id.includes(filter))
     : list;
+
+  const isFemeninoLeague = gender === "femenino";
 
   const updateTeam = (id: string, patch: Partial<CmsTeamRecord>) => {
     setTeams((current) => (current ?? []).map((t) => (t.id === id ? { ...t, ...patch } : t)));
@@ -72,6 +96,25 @@ export function TeamsEditorPanel({ onClose }: TeamsEditorPanelProps) {
   const save = async () => {
     setBusy(true);
     setMessage(null);
+
+    if (isFemeninoLeague) {
+      const crests = getTeamCrestsBundle(bundles).crests;
+      const result = await saveFemeninoGroupTeamsAndCrests(
+        viewedSeasonId,
+        bundles,
+        cmsTeamRecordsToGroupSlots(list),
+        crests,
+      );
+      setBusy(false);
+      if (!result.ok) {
+        setMessage(result.error ?? "Error al guardar liga femenina");
+        return;
+      }
+      setMessage(`Liga femenina guardada (${viewedSeason.label})`);
+      await refreshBundles();
+      return;
+    }
+
     const payload: SeasonTeamsBundle = { teams: list };
     const result = await upsertSeasonBundle(viewedSeasonId, gender, "teams", payload);
     setBusy(false);
@@ -97,7 +140,7 @@ export function TeamsEditorPanel({ onClose }: TeamsEditorPanelProps) {
           onClick={() => void save()}
           className="w-full rounded-xl bg-[#214C9B] px-4 py-2.5 text-xs font-extrabold uppercase text-white hover:bg-[#173a78] disabled:opacity-60"
         >
-          Guardar equipos
+          {isFemeninoLeague ? "Guardar liga femenina" : "Guardar equipos"}
         </button>
       }
     >
@@ -116,6 +159,13 @@ export function TeamsEditorPanel({ onClose }: TeamsEditorPanelProps) {
         ))}
       </div>
 
+      {isFemeninoLeague ? (
+        <p className="mb-3 rounded-xl border border-[#981915]/20 bg-rose-50/50 px-3 py-2 text-[11px] font-semibold leading-relaxed text-slate-600">
+          Lista de los <strong>{list.length} clubes del grupo</strong> (clasificación y calendario). Los escudos se
+          asignan en <strong>Editar → Escudos</strong>. No uses «Añadir equipo» aquí: son plazas fijas de liga.
+        </p>
+      ) : null}
+
       <input
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
@@ -123,21 +173,28 @@ export function TeamsEditorPanel({ onClose }: TeamsEditorPanelProps) {
         className="mb-3 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold"
       />
 
-      <button
-        type="button"
-        onClick={addTeam}
-        className="mb-3 inline-flex w-full items-center justify-center gap-1 rounded-xl border border-dashed border-[#214C9B]/40 py-2 text-xs font-extrabold uppercase text-[#214C9B]"
-      >
-        <Plus size={14} /> Añadir equipo
-      </button>
+      {!isFemeninoLeague ? (
+        <button
+          type="button"
+          onClick={addTeam}
+          className="mb-3 inline-flex w-full items-center justify-center gap-1 rounded-xl border border-dashed border-[#214C9B]/40 py-2 text-xs font-extrabold uppercase text-[#214C9B]"
+        >
+          <Plus size={14} /> Añadir equipo
+        </button>
+      ) : null}
 
       <ul className="space-y-3">
         {filtered.map((team, index) => (
           <li
             key={team.id}
-            className={`rounded-xl border p-2 ${team.removed ? "border-slate-200 bg-slate-100 opacity-70" : "border-slate-200 bg-white"}`}
+            className={`rounded-xl border p-2 ${
+              team.removed ? "border-slate-200 bg-slate-100 opacity-70" : "border-slate-200 bg-white"
+            } ${isFemeninoLeague ? "border-[#981915]/10" : ""}`}
           >
-            <p className="mb-1 text-[10px] font-bold uppercase text-slate-400">{team.id}</p>
+            <p className="mb-1 text-[10px] font-bold uppercase text-slate-400">
+              {isFemeninoLeague ? `#${index + 1} · ` : ""}
+              {team.id}
+            </p>
             {team.removed ? (
               <p className="text-sm font-bold text-slate-500">
                 Eliminado → se mostrará como Equipo {index + 1}
@@ -151,7 +208,7 @@ export function TeamsEditorPanel({ onClose }: TeamsEditorPanelProps) {
                     updateTeam(team.id, { name, shortName: name.slice(0, 12) });
                   }}
                   className="mb-2 w-full rounded-lg border border-slate-200 px-2 py-1 text-sm font-bold"
-                  placeholder="Nombre"
+                  placeholder="Nombre del club"
                 />
                 <div className="grid gap-1">
                   <input
@@ -175,40 +232,44 @@ export function TeamsEditorPanel({ onClose }: TeamsEditorPanelProps) {
                 </div>
               </>
             )}
-            <div className="mt-2 flex gap-2">
-              {!team.removed ? (
+            {!isFemeninoLeague ? (
+              <div className="mt-2 flex gap-2">
+                {!team.removed ? (
+                  <button
+                    type="button"
+                    onClick={() => removeFromList(team.id)}
+                    className="text-[10px] font-bold uppercase text-[#981915]"
+                  >
+                    Marcar eliminado
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => updateTeam(team.id, { removed: false })}
+                    className="text-[10px] font-bold uppercase text-[#214C9B]"
+                  >
+                    Restaurar
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={() => removeFromList(team.id)}
-                  className="text-[10px] font-bold uppercase text-[#981915]"
+                  onClick={() =>
+                    setTeams((current) => (current ?? []).filter((t) => t.id !== team.id))
+                  }
+                  className="ml-auto inline-flex items-center gap-1 text-[10px] font-bold text-slate-400"
                 >
-                  Marcar eliminado
+                  <Trash2 size={12} /> Quitar fila
                 </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => updateTeam(team.id, { removed: false })}
-                  className="text-[10px] font-bold uppercase text-[#214C9B]"
-                >
-                  Restaurar
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() =>
-                  setTeams((current) => (current ?? []).filter((t) => t.id !== team.id))
-                }
-                className="ml-auto inline-flex items-center gap-1 text-[10px] font-bold text-slate-400"
-              >
-                <Trash2 size={12} /> Quitar fila
-              </button>
-            </div>
+              </div>
+            ) : null}
           </li>
         ))}
       </ul>
-      <p className="mt-3 text-[10px] font-semibold text-slate-400">
-        Tip: al guardar un equipo nuevo usa un id único ({slugId("ejemplo")}).
-      </p>
+      {!isFemeninoLeague ? (
+        <p className="mt-3 text-[10px] font-semibold text-slate-400">
+          Tip: al guardar un equipo nuevo usa un id único ({slugId("ejemplo")}).
+        </p>
+      ) : null}
     </EditorPanelFrame>
   );
 }

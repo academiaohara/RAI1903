@@ -81,6 +81,19 @@ export function defaultGroupTeamSlots(
   return normalizeGroupTeamSlots(slots, count, grupo);
 }
 
+/** IDs de casillas vacías del calendario auto-generado, sin club real asignado. */
+export function isPlaceholderGroupSlotId(id: string): boolean {
+  const trimmed = id.trim();
+  return trimmed.startsWith("cms-slot-") || /^grupo-[12]-slot-\d+$/.test(trimmed);
+}
+
+function mergeSlotWithDefault(slot: GroupTeamSlot, fallback: GroupTeamSlot | undefined): GroupTeamSlot {
+  if (!fallback) return slot;
+  const name = slot.name.trim() || fallback.name;
+  const id = isPlaceholderGroupSlotId(slot.id) ? fallback.id : slot.id;
+  return { id, name };
+}
+
 export function getGroupTeamSlots(
   bundles: SeasonBundlesMap,
   gender: PrimerEquipoGender,
@@ -88,11 +101,13 @@ export function getGroupTeamSlots(
 ): GroupTeamSlot[] {
   const config = resolveCompetitionConfig(bundles, gender);
   const count = config.teamsPerGroup;
+  const defaults = defaultGroupTeamSlots(grupo, gender, count, config);
   const stored = config.groupTeams?.[grupo];
   if (stored?.length) {
-    return normalizeGroupTeamSlots(stored, count, grupo);
+    const normalized = normalizeGroupTeamSlots(stored, count, grupo);
+    return normalized.map((slot, index) => mergeSlotWithDefault(slot, defaults[index]));
   }
-  return defaultGroupTeamSlots(grupo, gender, count, config);
+  return defaults;
 }
 
 export function groupSlotToTeam(slot: GroupTeamSlot, index: number): Team {
