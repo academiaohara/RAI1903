@@ -16,8 +16,18 @@ export const QUINIELA_TABS = [
   { href: "/quiniela/ranking", label: "Ranking" },
 ] as const;
 
+export function normalizeGoalsPick(value: unknown): GoalsPick | undefined {
+  if (value === null || value === undefined || value === "") return undefined;
+  if (value === "M" || value === "m") return "M";
+  const n = Number(value);
+  if (Number.isNaN(n)) return undefined;
+  if (n >= 3) return "M";
+  if (n === 0 || n === 1 || n === 2) return n;
+  return undefined;
+}
+
 export function goalsPickToNumber(pick: GoalsPick): number {
-  return pick === "M" ? 3 : pick;
+  return pick === "M" ? 3 : Number(pick);
 }
 
 export function formatGoalsPick(pick: GoalsPick): string {
@@ -257,11 +267,11 @@ export function countOutcomeHits(matchday: Matchday, predictions: Record<string,
 
 export function migratePrediction(raw: Prediction & { exactScore?: { home: number; away: number }; scorers?: string[] }): Prediction {
   const goalsHome =
-    raw.goalsHome ??
-    (raw.exactScore ? (raw.exactScore.home >= 3 ? "M" : (raw.exactScore.home as GoalsPick)) : undefined);
+    normalizeGoalsPick(raw.goalsHome) ??
+    (raw.exactScore ? normalizeGoalsPick(raw.exactScore.home >= 3 ? "M" : raw.exactScore.home) : undefined);
   const goalsAway =
-    raw.goalsAway ??
-    (raw.exactScore ? (raw.exactScore.away >= 3 ? "M" : (raw.exactScore.away as GoalsPick)) : undefined);
+    normalizeGoalsPick(raw.goalsAway) ??
+    (raw.exactScore ? normalizeGoalsPick(raw.exactScore.away >= 3 ? "M" : raw.exactScore.away) : undefined);
   const scorer = raw.scorer ?? (raw.scorers && raw.scorers.length > 0 ? raw.scorers[0] : undefined);
 
   return {
