@@ -10,7 +10,7 @@ type SeasonSelectorProps = {
 };
 
 export function SeasonSelector({ className }: SeasonSelectorProps) {
-  const { seasons, viewedSeasonId, setViewedSeasonId, isViewingArchive, activeSeasonId } = useSeason();
+  const { seasons, viewedSeasonId, setViewedSeasonId } = useSeason();
 
   const published = seasons.filter((row) => row.published);
   const list = published.length ? published : seasons;
@@ -83,11 +83,6 @@ export function SeasonSelector({ className }: SeasonSelectorProps) {
           <ChevronRight size={16} />
         </button>
       </div>
-      {isViewingArchive && (
-        <span className="text-[10px] font-bold uppercase tracking-wide text-amber-700">
-          Archivo · activa {list.find((row) => row.id === activeSeasonId)?.label ?? activeSeasonId}
-        </span>
-      )}
     </div>
   );
 }
