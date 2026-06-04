@@ -11,6 +11,7 @@ import { OpponentCrest } from "@/components/OpponentCrest";
 import { FixtureCrestMatchCard } from "@/components/FixtureCrestMatchCard";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
 import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
+import { UpcomingMatchCard } from "@/components/UpcomingMatchCard";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
 import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
@@ -159,7 +160,7 @@ export function HomeRecentUpcomingBlock() {
         >
           <div className="space-y-2">
             {upcomingMatches.length > 0 ? (
-              upcomingMatches.map((match) => <FixtureCrestMatchCard key={match.id} match={match} accent="granate" />)
+              upcomingMatches.map((match) => <UpcomingMatchCard key={match.id} match={match} />)
             ) : (
               <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 p-4 text-sm font-bold text-slate-500">
                 No hay proximos partidos actualmente.
@@ -195,7 +196,7 @@ export function HomeRecentUpcomingBlock() {
           </div>
           <div className="flex flex-col gap-3">
             {upcomingMatches.length > 0 ? (
-              upcomingMatches.map((match) => <FixtureCrestMatchCard key={match.id} match={match} accent="granate" />)
+              upcomingMatches.map((match) => <UpcomingMatchCard key={match.id} match={match} />)
             ) : (
               <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 p-4 text-sm font-bold text-slate-500">
                 No hay proximos partidos actualmente.

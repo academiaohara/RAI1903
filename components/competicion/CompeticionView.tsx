@@ -11,6 +11,7 @@ import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard"
 import { ExtraFixturesOnPageEditor } from "@/components/editor/ExtraFixturesOnPageEditor";
 import { FixtureCrestMatchCard } from "@/components/FixtureCrestMatchCard";
 import { MatchCard } from "@/components/MatchCard";
+import { UpcomingMatchCard } from "@/components/UpcomingMatchCard";
 import { hasMultipleGrupos, zonesToLegacyConfig } from "@/lib/cms/competition-config-bundle";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { useSeason } from "@/components/season/SeasonProvider";
@@ -206,7 +207,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
                     <div className="space-y-2">
                       {upcoming.length > 0 ? (
                         upcoming.map((match) => (
-                          <FixtureCrestMatchCard key={match.id} match={match} accent="granate" gender={gender} />
+                          <UpcomingMatchCard key={match.id} match={match} gender={gender} />
                         ))
                       ) : (
                         <p className="text-sm font-bold text-slate-500">Sin partidos programados.</p>
