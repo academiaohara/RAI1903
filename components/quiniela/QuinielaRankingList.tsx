@@ -1,9 +1,33 @@
+import Image from "next/image";
 import type { QuinielaRankingEntry } from "@/lib/quiniela-ranking";
 
 type QuinielaRankingListProps = {
   entries: QuinielaRankingEntry[];
   emptyMessage: string;
 };
+
+function RankingAvatar({ handle, avatarUrl }: { handle: string; avatarUrl: string | null }) {
+  const initial = handle.replace(/^@/, "").charAt(0).toUpperCase() || "?";
+
+  if (avatarUrl) {
+    return (
+      <Image
+        src={avatarUrl}
+        alt=""
+        width={32}
+        height={32}
+        className="h-8 w-8 shrink-0 rounded-full object-cover sm:h-9 sm:w-9"
+        unoptimized
+      />
+    );
+  }
+
+  return (
+    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#214C9B]/10 text-xs font-extrabold uppercase text-[#214C9B] sm:h-9 sm:w-9 sm:text-sm">
+      {initial}
+    </span>
+  );
+}
 
 export function QuinielaRankingList({ entries, emptyMessage }: QuinielaRankingListProps) {
   if (entries.length === 0) {
@@ -21,8 +45,9 @@ export function QuinielaRankingList({ entries, emptyMessage }: QuinielaRankingLi
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#214C9B]/10 text-[11px] font-extrabold text-[#214C9B] sm:h-8 sm:w-8 sm:text-xs">
               {index + 1}
             </span>
+            <RankingAvatar handle={row.handle} avatarUrl={row.avatarUrl} />
             <div className="min-w-0">
-              <p className="truncate font-extrabold uppercase text-[#214C9B]">{row.user}</p>
+              <p className="truncate font-extrabold text-[#214C9B]">{row.handle}</p>
             </div>
           </div>
           <span className="shrink-0 font-extrabold text-slate-900">{row.points} pts</span>
