@@ -20,7 +20,7 @@ import { seasonHasCompetitionBundles } from "@/lib/season/cms-data-policy";
 import { defaultCronicaId } from "@/lib/match-article-factory";
 import { primerEquipoBase } from "@/lib/primer-equipo";
 import { getTeamCrestById } from "@/lib/team-crests";
-import { cn, formatMatchDate } from "@/lib/utils";
+import { cn, formatMatchDate, formatMatchDay, formatMatchTime } from "@/lib/utils";
 import type { Route } from "next";
 import type { Match } from "@/types";
 
@@ -235,7 +235,8 @@ function MatchBanner({
   const jornadaLabel = matchJornadaLabel(match);
   const competitionLabel = matchCompetitionShortLabel(match);
   const centerRoundLabel = jornadaLabel ?? (match.competition === "copa-rey" ? competitionLabel : null);
-  const scoreLabel = match.status === "finished" ? `${match.homeScore}-${match.awayScore}` : "vs";
+  const scoreLabel = match.status === "finished" ? `${match.homeScore}-${match.awayScore}` : formatMatchTime(match.date);
+  const dateLabel = match.status === "finished" ? formatMatchDate(match.date) : formatMatchDay(match.date);
   const centerAccent = matchCenterAccentClass(accent);
 
   return (
@@ -254,7 +255,7 @@ function MatchBanner({
               <p className="w-full break-words text-xs font-extrabold uppercase tracking-normal text-white/90">{centerRoundLabel}</p>
             )}
             <p className={`font-extrabold leading-none text-white ${centerRoundLabel ? "mt-1 text-2xl" : "text-3xl"}`}>{scoreLabel}</p>
-            <p className="mt-1 w-full break-words text-[10px] font-bold uppercase tracking-normal text-white/80">{formatMatchDate(match.date)}</p>
+            <p className="mt-1 w-full break-words text-[10px] font-bold uppercase tracking-normal text-white/80">{dateLabel}</p>
             <p className="mt-1 w-full break-words text-[11px] font-bold leading-snug text-white/90">{match.venue}</p>
           </div>
           <div className="flex items-center justify-center p-3">
@@ -280,7 +281,7 @@ function MatchBanner({
             awayLogo={teamCrestLogo(match.awayTeamId)}
             awayTeam={match.awayTeam}
             centerLabel={scoreLabel}
-            sublabel={formatMatchDate(match.date)}
+            sublabel={dateLabel}
           />
           <div className="flex min-w-0 items-center justify-between gap-3 p-4 text-right lg:gap-4 lg:p-5">
             <div className="min-w-0 flex-1">
