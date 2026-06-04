@@ -16,8 +16,18 @@ export const QUINIELA_TABS = [
   { href: "/quiniela/ranking", label: "Ranking" },
 ] as const;
 
+export function normalizeGoalsPick(value: unknown): GoalsPick | undefined {
+  if (value === null || value === undefined || value === "") return undefined;
+  if (value === "M" || value === "m") return "M";
+  const n = Number(value);
+  if (Number.isNaN(n)) return undefined;
+  if (n >= 3) return "M";
+  if (n === 0 || n === 1 || n === 2) return n;
+  return undefined;
+}
+
 export function goalsPickToNumber(pick: GoalsPick): number {
-  return pick === "M" ? 3 : pick;
+  return pick === "M" ? 3 : Number(pick);
 }
 
 export function formatGoalsPick(pick: GoalsPick): string {
@@ -194,7 +204,16 @@ export function areGoalsPredictionCorrect(match: Match, prediction: Prediction):
   return predictedHome === actualHome && predictedAway === actualAway;
 }
 
-export function scorePredictionPoints(match: Match, prediction?: Prediction): number {
+export type ScorePredictionOptions = {
+  events?: MatchEvent[];
+  squad?: SquadPlayer[];
+};
+
+export function scorePredictionPoints(
+  match: Match,
+  prediction?: Prediction,
+  options?: ScorePredictionOptions,
+): number {
   const outcome = actualOutcome(match);
   if (!outcome || !prediction) return 0;
 
@@ -205,17 +224,22 @@ export function scorePredictionPoints(match: Match, prediction?: Prediction): nu
     let points = 0;
     if (predictedOutcome === outcome) points += 1;
     if (areGoalsPredictionCorrect(match, prediction)) points += 1;
-    if (isScorerPredictionCorrect(match, prediction)) points += 1;
+    if (isScorerPredictionCorrect(match, prediction, options)) points += 1;
     return points;
   }
 
   return predictedOutcome === outcome ? 1 : 0;
 }
 
-export function scoreMatchdayPoints(matchday: Matchday, predictions: Record<string, Prediction>): number {
+export function scoreMatchdayPoints(
+  matchday: Matchday,
+  predictions: Record<string, Prediction>,
+  options?: ScorePredictionOptions | ((match: Match) => ScorePredictionOptions | undefined),
+): number {
+  const resolveOptions = typeof options === "function" ? options : () => options;
   return matchday.matches.reduce((total, match) => {
     const prediction = predictions[match.id];
-    return total + scorePredictionPoints(match, prediction);
+    return total + scorePredictionPoints(match, prediction, resolveOptions(match));
   }, 0);
 }
 
@@ -255,13 +279,20 @@ export function countOutcomeHits(matchday: Matchday, predictions: Record<string,
   }, 0);
 }
 
-export function migratePrediction(raw: Prediction & { exactScore?: { home: number; away: number }; scorers?: string[] }): Prediction {
+export function migratePrediction(
+  raw: Omit<Prediction, "goalsHome" | "goalsAway"> & {
+    goalsHome?: unknown;
+    goalsAway?: unknown;
+    exactScore?: { home: number; away: number };
+    scorers?: string[];
+  },
+): Prediction {
   const goalsHome =
-    raw.goalsHome ??
-    (raw.exactScore ? (raw.exactScore.home >= 3 ? "M" : (raw.exactScore.home as GoalsPick)) : undefined);
+    normalizeGoalsPick(raw.goalsHome) ??
+    (raw.exactScore ? normalizeGoalsPick(raw.exactScore.home >= 3 ? "M" : raw.exactScore.home) : undefined);
   const goalsAway =
-    raw.goalsAway ??
-    (raw.exactScore ? (raw.exactScore.away >= 3 ? "M" : (raw.exactScore.away as GoalsPick)) : undefined);
+    normalizeGoalsPick(raw.goalsAway) ??
+    (raw.exactScore ? normalizeGoalsPick(raw.exactScore.away >= 3 ? "M" : raw.exactScore.away) : undefined);
   const scorer = raw.scorer ?? (raw.scorers && raw.scorers.length > 0 ? raw.scorers[0] : undefined);
 
   return {

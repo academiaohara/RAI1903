@@ -1,6 +1,9 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { countOutcomeHits, migratePrediction, scorePredictionPoints } from "@/lib/quiniela";
-import { createClient } from "@/lib/supabase/client";
-import { isSupabaseConfigured } from "@/lib/supabase/env";
+import {
+  scoringOptionsForMatch,
+  type QuinielaScoringContext,
+} from "@/lib/quiniela/scoring-context";
 import type { CompetitionSeasonId } from "@/data/mock";
 import type { Matchday, Prediction } from "@/types";
 
@@ -39,8 +42,8 @@ function rowToPrediction(row: {
     matchId: row.match_id,
     matchday: row.matchday,
     outcome: (row.outcome as Prediction["outcome"]) ?? undefined,
-    goalsHome: (row.goals_home as Prediction["goalsHome"]) ?? undefined,
-    goalsAway: (row.goals_away as Prediction["goalsAway"]) ?? undefined,
+    goalsHome: row.goals_home,
+    goalsAway: row.goals_away,
     scorer: row.scorer ?? undefined,
     updatedAt: row.updated_at,
   });
@@ -50,6 +53,7 @@ export function scoreUserMatchday(
   matchday: Matchday,
   predictions: Record<string, Prediction>,
   countPoints: boolean,
+  scoringContext?: QuinielaScoringContext,
 ): { points: number; hits: number } {
   if (!countPoints) {
     return { points: 0, hits: 0 };
@@ -58,7 +62,8 @@ export function scoreUserMatchday(
   for (const match of matchday.matches) {
     const prediction = predictions[match.id];
     if (prediction) {
-      points += scorePredictionPoints(match, prediction);
+      const options = scoringContext ? scoringOptionsForMatch(scoringContext, match) : undefined;
+      points += scorePredictionPoints(match, prediction, options);
     }
   }
   return { points, hits: countOutcomeHits(matchday, predictions) };
@@ -91,12 +96,10 @@ type PredictionRow = {
 type ProfileRow = { id: string; display_name: string | null; email: string | null };
 
 async function fetchSavedRounds(
+  supabase: SupabaseClient,
   seasonId: CompetitionSeasonId,
   round?: number,
 ): Promise<SavedRoundRow[]> {
-  if (!isSupabaseConfigured()) return [];
-
-  const supabase = createClient();
   let query = supabase
     .from("quiniela_saved_rounds")
     .select("user_id, round, saved_at")
@@ -115,13 +118,13 @@ async function fetchSavedRounds(
 }
 
 async function fetchPredictions(
+  supabase: SupabaseClient,
   seasonId: CompetitionSeasonId,
   userIds: string[],
   matchday?: number,
 ): Promise<PredictionRow[]> {
-  if (!isSupabaseConfigured() || userIds.length === 0) return [];
+  if (userIds.length === 0) return [];
 
-  const supabase = createClient();
   let query = supabase
     .from("quiniela_predictions")
     .select("user_id, match_id, matchday, outcome, goals_home, goals_away, scorer, updated_at")
@@ -140,10 +143,9 @@ async function fetchPredictions(
   return (data ?? []) as PredictionRow[];
 }
 
-async function fetchProfiles(userIds: string[]): Promise<Map<string, ProfileRow>> {
-  if (!isSupabaseConfigured() || userIds.length === 0) return new Map();
+async function fetchProfiles(supabase: SupabaseClient, userIds: string[]): Promise<Map<string, ProfileRow>> {
+  if (userIds.length === 0) return new Map();
 
-  const supabase = createClient();
   const { data, error } = await supabase
     .from("profiles")
     .select("id, display_name, email")
@@ -172,17 +174,19 @@ function earliestSavedAt(rows: SavedRoundRow[]): string {
 }
 
 export async function fetchQuinielaRoundRanking(
+  supabase: SupabaseClient,
   seasonId: CompetitionSeasonId,
   matchday: Matchday,
   countPoints: boolean,
+  scoringContext?: QuinielaScoringContext,
 ): Promise<QuinielaRankingEntry[]> {
-  const savedRows = await fetchSavedRounds(seasonId, matchday.round);
+  const savedRows = await fetchSavedRounds(supabase, seasonId, matchday.round);
   if (savedRows.length === 0) return [];
 
   const userIds = [...new Set(savedRows.map((row) => row.user_id))];
   const [predictionRows, profileMap] = await Promise.all([
-    fetchPredictions(seasonId, userIds, matchday.round),
-    fetchProfiles(userIds),
+    fetchPredictions(supabase, seasonId, userIds, matchday.round),
+    fetchProfiles(supabase, userIds),
   ]);
 
   const byUser = predictionsByUser(predictionRows);
@@ -190,7 +194,7 @@ export async function fetchQuinielaRoundRanking(
 
   const entries = userIds.map((userId) => {
     const predictions = byUser.get(userId) ?? {};
-    const { points, hits } = scoreUserMatchday(matchday, predictions, countPoints);
+    const { points, hits } = scoreUserMatchday(matchday, predictions, countPoints, scoringContext);
     const profile = profileMap.get(userId);
     return {
       userId,
@@ -205,17 +209,19 @@ export async function fetchQuinielaRoundRanking(
 }
 
 export async function fetchQuinielaSeasonRanking(
+  supabase: SupabaseClient,
   seasonId: CompetitionSeasonId,
   matchdays: Matchday[],
   countPointsForRound: (round: number) => boolean,
+  scoringContext?: QuinielaScoringContext,
 ): Promise<QuinielaSeasonRankingEntry[]> {
-  const savedRows = await fetchSavedRounds(seasonId);
+  const savedRows = await fetchSavedRounds(supabase, seasonId);
   if (savedRows.length === 0) return [];
 
   const userIds = [...new Set(savedRows.map((row) => row.user_id))];
   const [predictionRows, profileMap] = await Promise.all([
-    fetchPredictions(seasonId, userIds),
-    fetchProfiles(userIds),
+    fetchPredictions(supabase, seasonId, userIds),
+    fetchProfiles(supabase, userIds),
   ]);
 
   const byUser = predictionsByUser(predictionRows);
@@ -240,7 +246,7 @@ export async function fetchQuinielaSeasonRanking(
       if (!matchday) continue;
       roundsPlayed += 1;
       const countPoints = countPointsForRound(saved.round);
-      const scored = scoreUserMatchday(matchday, predictions, countPoints);
+      const scored = scoreUserMatchday(matchday, predictions, countPoints, scoringContext);
       points += scored.points;
       hits += scored.hits;
     }

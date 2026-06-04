@@ -35,8 +35,8 @@ function rowToPrediction(row: {
     matchId: row.match_id,
     matchday: row.matchday,
     outcome: (row.outcome as Prediction["outcome"]) ?? undefined,
-    goalsHome: (row.goals_home as Prediction["goalsHome"]) ?? undefined,
-    goalsAway: (row.goals_away as Prediction["goalsAway"]) ?? undefined,
+    goalsHome: row.goals_home,
+    goalsAway: row.goals_away,
     scorer: row.scorer ?? undefined,
     updatedAt: row.updated_at,
   });
@@ -46,51 +46,52 @@ export async function loadQuinielaState(
   userId: string | null,
   seasonId: CompetitionSeasonId = DEFAULT_COMPETITION_SEASON_ID,
 ): Promise<QuinielaState> {
-  const local: QuinielaState = {
-    predictions: loadLocalPredictions(),
-    savedRounds: loadLocalSavedRounds(),
-  };
+  if (isSupabaseConfigured()) {
+    if (!userId) {
+      return { predictions: {}, savedRounds: {} };
+    }
 
-  if (!userId || !isSupabaseConfigured()) {
-    return local;
-  }
+    const supabase = createClient();
+    const [{ data: predictionRows, error: predError }, { data: roundRows, error: roundError }] =
+      await Promise.all([
+        supabase
+          .from("quiniela_predictions")
+          .select("match_id, matchday, outcome, goals_home, goals_away, scorer, updated_at")
+          .eq("user_id", userId)
+          .eq("season_id", seasonId),
+        supabase
+          .from("quiniela_saved_rounds")
+          .select("round, saved_at")
+          .eq("user_id", userId)
+          .eq("season_id", seasonId),
+      ]);
 
-  const supabase = createClient();
+    if (predError || roundError) {
+      console.error("quiniela load", predError?.message ?? roundError?.message);
+      return { predictions: {}, savedRounds: {} };
+    }
 
-  const [{ data: predictionRows, error: predError }, { data: roundRows, error: roundError }] =
-    await Promise.all([
-      supabase
-        .from("quiniela_predictions")
-        .select("match_id, matchday, outcome, goals_home, goals_away, scorer, updated_at")
-        .eq("user_id", userId)
-        .eq("season_id", seasonId),
-      supabase
-        .from("quiniela_saved_rounds")
-        .select("round, saved_at")
-        .eq("user_id", userId)
-        .eq("season_id", seasonId),
-    ]);
+    const cloudPredictions = Object.fromEntries(
+      (predictionRows ?? []).map((row) => [row.match_id, rowToPrediction(row)]),
+    );
+    const cloudSavedRounds = Object.fromEntries(
+      (roundRows ?? []).map((row) => [row.round, row.saved_at as string]),
+    );
 
-  if (predError || roundError) {
-    return local;
-  }
+    const hasCloudData =
+      Object.keys(cloudPredictions).length > 0 || Object.keys(cloudSavedRounds).length > 0;
+    const local: QuinielaState = {
+      predictions: loadLocalPredictions(),
+      savedRounds: loadLocalSavedRounds(),
+    };
+    const hasLocalData =
+      Object.keys(local.predictions).length > 0 || Object.keys(local.savedRounds).length > 0;
 
-  const cloudPredictions = Object.fromEntries(
-    (predictionRows ?? []).map((row) => [row.match_id, rowToPrediction(row)]),
-  );
-  const cloudSavedRounds = Object.fromEntries(
-    (roundRows ?? []).map((row) => [row.round, row.saved_at as string]),
-  );
+    if (!hasCloudData && hasLocalData) {
+      await migrateLocalQuinielaToCloud(userId, seasonId, local);
+      return local;
+    }
 
-  const hasCloudData = Object.keys(cloudPredictions).length > 0 || Object.keys(cloudSavedRounds).length > 0;
-  const hasLocalData = Object.keys(local.predictions).length > 0 || Object.keys(local.savedRounds).length > 0;
-
-  if (!hasCloudData && hasLocalData) {
-    await migrateLocalQuinielaToCloud(userId, seasonId, local);
-    return local;
-  }
-
-  if (hasCloudData) {
     saveLocalPredictions(cloudPredictions);
     if (typeof window !== "undefined") {
       window.localStorage.setItem(QUINIELA_SAVED_ROUNDS_KEY, JSON.stringify(cloudSavedRounds));
@@ -98,7 +99,10 @@ export async function loadQuinielaState(
     return { predictions: cloudPredictions, savedRounds: cloudSavedRounds };
   }
 
-  return { predictions: {}, savedRounds: {} };
+  return {
+    predictions: loadLocalPredictions(),
+    savedRounds: loadLocalSavedRounds(),
+  };
 }
 
 async function migrateLocalQuinielaToCloud(
@@ -119,7 +123,8 @@ export async function saveQuinielaPredictions(
   seasonId: CompetitionSeasonId = DEFAULT_COMPETITION_SEASON_ID,
 ): Promise<void> {
   saveLocalPredictions(predictions);
-  if (!userId || !isSupabaseConfigured()) return;
+
+  if (!isSupabaseConfigured() || !userId) return;
 
   const supabase = createClient();
   const rows = Object.values(predictions).map((p) => ({
@@ -128,8 +133,8 @@ export async function saveQuinielaPredictions(
     season_id: seasonId,
     matchday: p.matchday,
     outcome: p.outcome ?? null,
-    goals_home: p.goalsHome ?? null,
-    goals_away: p.goalsAway ?? null,
+    goals_home: p.goalsHome != null ? String(p.goalsHome) : null,
+    goals_away: p.goalsAway != null ? String(p.goalsAway) : null,
     scorer: p.scorer ?? null,
     updated_at: p.updatedAt,
   }));
@@ -151,7 +156,8 @@ export async function saveQuinielaRound(
   seasonId: CompetitionSeasonId = DEFAULT_COMPETITION_SEASON_ID,
 ): Promise<void> {
   saveLocalRoundAsSaved(round);
-  if (!userId || !isSupabaseConfigured()) return;
+
+  if (!isSupabaseConfigured() || !userId) return;
 
   const supabase = createClient();
   const { error } = await supabase.from("quiniela_saved_rounds").upsert(
@@ -181,4 +187,8 @@ async function saveQuinielaState(
       await saveQuinielaRound(userId, round, seasonId);
     }
   }
+}
+
+export function quinielaRequiresAuth(): boolean {
+  return isSupabaseConfigured();
 }
