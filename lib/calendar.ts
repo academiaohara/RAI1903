@@ -28,7 +28,7 @@ function avilesResult(match: Match, raiId: string): string | null {
   return `${avilesGoals}-${rivalGoals}`;
 }
 
-type MatchArticleLookup = {
+type CalendarMatchOptions = {
   /** When CMS crests load, pass the map so calendar rows re-resolve opponent logos. */
   crestMap?: Record<string, string>;
   /** Resuelve nombres desde guía de liga / bundle teams (p. ej. sustituye «Equipo 42»). */
@@ -38,7 +38,7 @@ type MatchArticleLookup = {
 export function matchToCalendarMatch(
   match: Match,
   gender: PrimerEquipoGender,
-  articles?: MatchArticleLookup,
+  options?: CalendarMatchOptions,
 ): CalendarMatch {
   const raiId = getRaiTeamId(gender);
   const avilesHome = match.homeTeamId === raiId;
@@ -52,7 +52,7 @@ export function matchToCalendarMatch(
 
   const opponentFallback = avilesHome ? match.awayTeam : match.homeTeam;
   const opponent =
-    articles?.resolveTeamName?.(rivalId, opponentFallback) ?? opponentFallback;
+    options?.resolveTeamName?.(rivalId, opponentFallback) ?? opponentFallback;
 
   return {
     id: match.id,
@@ -87,11 +87,11 @@ export function getCalendarMatchesByGender(gender: PrimerEquipoGender): Calendar
 export function getCalendarMatchesFromSource(
   matches: Match[],
   gender: PrimerEquipoGender,
-  articles?: MatchArticleLookup,
+  options?: CalendarMatchOptions,
 ): CalendarMatch[] {
-  void articles?.crestMap;
+  void options?.crestMap;
   return matches
-    .map((match) => matchToCalendarMatch(match, gender, articles))
+    .map((match) => matchToCalendarMatch(match, gender, options))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }
 
