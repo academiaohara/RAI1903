@@ -53,17 +53,11 @@ export function MatchFixtureWideScoreRow({
   return (
     <div
       className={cn(
-        "grid grid-cols-[minmax(0,1fr)_minmax(7rem,8.5rem)_minmax(0,1fr)] items-stretch gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(8.5rem,10rem)_minmax(0,1fr)] sm:gap-3",
+        "grid grid-cols-[minmax(0,1fr)_minmax(8.75rem,10.5rem)_minmax(0,1fr)] items-stretch gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(10.5rem,12rem)_minmax(0,1fr)] sm:gap-3",
         className,
       )}
     >
       <div className="flex min-w-0 items-center gap-2 py-2 pl-2 pr-1 sm:pl-3">
-        <OpponentCrest
-          logo={teamCrestLogo(match.homeTeamId, gender)}
-          opponent={match.homeTeam}
-          size="sm"
-          className="shrink-0"
-        />
         <div className="pointer-events-auto min-w-0 flex-1">
           {linkTeams ? (
             <MatchTeamLink
@@ -81,25 +75,33 @@ export function MatchFixtureWideScoreRow({
 
       <div
         className={cn(
-          "flex min-h-14 w-full flex-col items-center justify-center self-stretch rounded-xl bg-[#214C9B] px-3 py-2 text-center text-white shadow-md shadow-blue-950/10 sm:min-h-16 sm:rounded-2xl sm:px-4",
+          "flex min-h-14 w-full items-center justify-between gap-2 self-stretch rounded-xl bg-[#214C9B] px-2.5 py-2 text-center text-white shadow-md shadow-blue-950/10 sm:min-h-16 sm:rounded-2xl sm:px-3",
           scoreStripeClassName,
         )}
       >
-        <span className="text-xl font-extrabold leading-none tabular-nums sm:text-2xl">{scoreLabel}</span>
-        {sublabel ? (
-          <span className="mt-1 w-full break-words text-[9px] font-bold uppercase leading-snug text-white/85 sm:text-[10px]">
-            {sublabel}
-          </span>
-        ) : null}
-      </div>
-
-      <div className="flex min-w-0 items-center justify-end gap-2 py-2 pl-1 pr-2 text-right sm:pr-3">
+        <OpponentCrest
+          logo={teamCrestLogo(match.homeTeamId, gender)}
+          opponent={match.homeTeam}
+          size="sm"
+          className="shrink-0"
+        />
+        <span className="min-w-0 flex-1">
+          <span className="block text-xl font-extrabold leading-none tabular-nums sm:text-2xl">{scoreLabel}</span>
+          {sublabel ? (
+            <span className="mt-1 block w-full break-words text-[9px] font-bold uppercase leading-snug text-white/85 sm:text-[10px]">
+              {sublabel}
+            </span>
+          ) : null}
+        </span>
         <OpponentCrest
           logo={teamCrestLogo(match.awayTeamId, gender)}
           opponent={match.awayTeam}
           size="sm"
           className="shrink-0"
         />
+      </div>
+
+      <div className="flex min-w-0 items-center justify-end gap-2 py-2 pl-1 pr-2 text-right sm:pr-3">
         <div className="pointer-events-auto min-w-0 flex-1">
           {linkTeams ? (
             <MatchTeamLink
