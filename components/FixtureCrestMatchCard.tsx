@@ -1,28 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { OpponentCrest } from "@/components/OpponentCrest";
+import { MatchFixtureWideScoreRow } from "@/components/MatchFixtureWideScoreRow";
 import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { defaultCronicaId } from "@/lib/match-article-factory";
-import { getTeamByGender } from "@/lib/fixtures";
+import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import { fixtureCrestMatchCardClassName } from "@/lib/match-card-styles";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { primerEquipoBase, primerEquipoHasCronicas } from "@/lib/primer-equipo";
-import { getTeamCrestById } from "@/lib/team-crests";
 import { cn, formatMatchDate } from "@/lib/utils";
 import type { Match } from "@/types";
 import type { Route } from "next";
 
 export type FixtureCrestMatchAccent = "blue" | "granate";
-
-function matchCenterAccentClass(accent: FixtureCrestMatchAccent): string {
-  return accent === "granate" ? "bg-[#981915]" : "bg-[#214C9B]";
-}
-
-function teamCrestLogo(teamId: string, gender: PrimerEquipoGender): string {
-  const team = getTeamByGender(teamId, gender);
-  return getTeamCrestById(teamId, team?.crestInitials);
-}
 
 type FixtureCrestMatchCardProps = {
   match: Match;
@@ -50,35 +40,39 @@ export function FixtureCrestMatchCard({
   ) as Route;
   const linkHref = href ?? defaultHref;
   const scoreLabel = match.status === "finished" ? `${match.homeScore}-${match.awayScore}` : "vs";
-  const centerAccent = matchCenterAccentClass(accent);
+  const highlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
   const timeOrDate =
     match.status === "scheduled"
       ? new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "short" }).format(new Date(match.date))
       : formatMatchDate(match.date);
+  const cardClassName = cn(
+    fixtureCrestMatchCardClassName,
+    accent === "granate" && "hover:border-[#981915]/70",
+  );
 
   const inner = (
-    <div className="grid grid-cols-[1fr_auto_1fr] items-stretch">
-      <div className="flex items-center justify-center p-2.5">
-        <OpponentCrest logo={teamCrestLogo(match.homeTeamId, gender)} opponent={match.homeTeam} size="md" className="mx-auto" />
-      </div>
-      <div className={cn("flex w-24 shrink-0 flex-col items-center justify-center px-1.5 py-2.5 text-center text-white", centerAccent)}>
-        <p className="text-xl font-extrabold leading-none">{scoreLabel}</p>
-        <p className="mt-1 w-full break-words text-[9px] font-bold uppercase leading-snug text-white/85">{timeOrDate}</p>
-      </div>
-      <div className="flex items-center justify-center p-2.5">
-        <OpponentCrest logo={teamCrestLogo(match.awayTeamId, gender)} opponent={match.awayTeam} size="md" className="mx-auto" />
-      </div>
-    </div>
+    <MatchFixtureWideScoreRow
+      match={match}
+      gender={gender}
+      highlightTeamId={highlightTeamId}
+      scoreLabel={scoreLabel}
+      sublabel={timeOrDate}
+      linkTeams={false}
+      className="gap-0 sm:gap-0"
+      scoreStripeClassName="rounded-none shadow-none"
+      homeTeamClassName="text-[10px] sm:text-xs"
+      awayTeamClassName="text-[10px] sm:text-xs"
+    />
   );
 
   if (!linkable) {
-    return <div className={fixtureCrestMatchCardClassName}>{inner}</div>;
+    return <div className={cardClassName}>{inner}</div>;
   }
 
   return (
     <Link
       href={linkHref}
-      className={fixtureCrestMatchCardClassName}
+      className={cardClassName}
       aria-label={`${match.homeTeam} ${scoreLabel} ${match.awayTeam}`}
     >
       {inner}

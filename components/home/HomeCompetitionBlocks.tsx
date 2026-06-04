@@ -10,7 +10,6 @@ import { MatchScoreCenter } from "@/components/MatchScoreCenter";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { FixtureCrestMatchCard } from "@/components/FixtureCrestMatchCard";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
-import { MatchCard } from "@/components/MatchCard";
 import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
@@ -196,7 +195,7 @@ export function HomeRecentUpcomingBlock() {
           </div>
           <div className="flex flex-col gap-3">
             {upcomingMatches.length > 0 ? (
-              upcomingMatches.map((match) => <MatchCard key={match.id} match={match} compact />)
+              upcomingMatches.map((match) => <FixtureCrestMatchCard key={match.id} match={match} accent="granate" />)
             ) : (
               <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 p-4 text-sm font-bold text-slate-500">
                 No hay proximos partidos actualmente.
