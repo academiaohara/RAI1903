@@ -282,9 +282,9 @@ function MatchBanner({
             centerLabel={scoreLabel}
             sublabel={formatMatchDate(match.date)}
           />
-          <div className="flex min-w-0 items-center justify-between gap-3 p-4 lg:gap-4 lg:p-5">
-            <div className="min-w-0">
-              <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-normal text-[#981915]">
+          <div className="flex min-w-0 items-center justify-between gap-3 p-4 text-right lg:gap-4 lg:p-5">
+            <div className="min-w-0 flex-1">
+              <p className="flex items-center justify-end gap-1.5 text-xs font-bold uppercase tracking-normal text-[#981915]">
                 <CompetitionLogo competition={match.competition} alt={competitionLabel} size="xs" />
                 {competitionLabel}
               </p>
