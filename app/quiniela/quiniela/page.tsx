@@ -5,6 +5,7 @@ import { Card } from "@/components/Card";
 import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
 import { PredictionForm } from "@/components/PredictionForm";
+import { bebasNeue } from "@/lib/fonts";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { QuinielaHowItWorks } from "@/components/QuinielaHowItWorks";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
@@ -13,6 +14,7 @@ import {
   countFinishedMatches,
   countOutcomeHits,
   getMatchdayByRound,
+  scoreMatchdayPoints,
   hasFirstMatchStarted,
   isMatchdayComplete,
   isMatchdayFullyFinished,
@@ -90,7 +92,12 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
   const finishedMatches = countFinishedMatches(selectedMatchday);
   const jornadaFinalizada = isMatchdayFullyFinished(selectedMatchday);
   const hits = countOutcomeHits(selectedMatchday, predictions);
+  const matchdayPoints = useMemo(
+    () => scoreMatchdayPoints(selectedMatchday, predictions),
+    [selectedMatchday, predictions],
+  );
   const showCompare = readOnly && (isLocked || finishedMatches > 0);
+  const showScore = hydrated && finishedMatches > 0;
 
   const statusBanner = useMemo(() => {
     if (jornadaFinalizada) return "finished" as const;
@@ -167,7 +174,25 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
         </p>
       )}
 
-      <Card eyebrow={`Jornada ${selectedMatchday.round}`} title="Tu quiniela">
+      <Card
+        eyebrow={`Jornada ${selectedMatchday.round}`}
+        title="Tu quiniela"
+        action={
+          showScore ? (
+            <div
+              className="flex min-w-[4.5rem] flex-col items-center rounded-2xl border border-[#214C9B]/15 bg-slate-50/80 px-3 py-2 text-center sm:min-w-[5.5rem] sm:px-4 sm:py-2.5"
+              aria-label={`Puntuación de la jornada: ${matchdayPoints} puntos`}
+            >
+              <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[#981915] sm:text-xs">Puntos</p>
+              <p
+                className={`${bebasNeue.className} text-[1.35rem] font-normal leading-[0.9] tracking-[0.25px] text-[#214C9B] tabular-nums sm:text-[64px] sm:tracking-[1px] lg:text-[72px]`}
+              >
+                {matchdayPoints}
+              </p>
+            </div>
+          ) : undefined
+        }
+      >
         {!bundlesLoading && !hasMatchesForRound && (
           <p className="mb-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 sm:mb-4 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
             {isCmsEditor ? (
