@@ -9,11 +9,7 @@ export default async function PrimerEquipoCalendarioPage({ params }: { params: P
     <>
       <PrimerEquipoPageHero
         title="Calendario"
-        description={
-          gender === "femenino"
-            ? `Calendario completo de ${genderLabels[gender].club}: partidos jugados y pendientes.`
-            : `Calendario completo de ${genderLabels[gender].club}: partidos jugados y pendientes con acceso directo a las cronicas.`
-        }
+        description={`Calendario completo de ${genderLabels[gender].club}: partidos jugados y pendientes.`}
       />
 
       <CalendarioSeasonView gender={gender} />

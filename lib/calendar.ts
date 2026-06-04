@@ -1,11 +1,8 @@
 import { getAvilesMatchesByGender, getRaiTeamId, getTeamsByGender } from "@/lib/fixtures";
 import { isMatchPlayed } from "@/lib/match-result";
 import { getTeamCrest, getTeamCrestById } from "@/lib/team-crests";
-import { defaultCronicaId } from "@/lib/match-article-factory";
-import { getMatchArticleForMatch } from "@/lib/match-articles";
-import { primerEquipoBase, primerEquipoHasCronicas, type PrimerEquipoGender } from "@/lib/primer-equipo";
+import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { CalendarMatch, Match } from "@/types";
-import type { Route } from "next";
 
 const NO_TIME_COMPETITIONS = new Set(["amistoso"]);
 
@@ -32,11 +29,6 @@ function avilesResult(match: Match, raiId: string): string | null {
 }
 
 type MatchArticleLookup = {
-  getForMatch?: (matchId: string, gender: PrimerEquipoGender) => { id: string } | undefined;
-  /** @deprecated Usar getForMatch */
-  getCronica?: (matchId: string, gender: PrimerEquipoGender) => { id: string } | undefined;
-  /** @deprecated Usar getForMatch */
-  getPrevia?: (matchId: string, gender: PrimerEquipoGender) => { id: string } | undefined;
   /** When CMS crests load, pass the map so calendar rows re-resolve opponent logos. */
   crestMap?: Record<string, string>;
   /** Resuelve nombres desde guía de liga / bundle teams (p. ej. sustituye «Equipo 42»). */
@@ -52,11 +44,6 @@ export function matchToCalendarMatch(
   const avilesHome = match.homeTeamId === raiId;
   const rivalId = avilesHome ? match.awayTeamId : match.homeTeamId;
   const rival = getTeamsByGender(gender).find((team) => team.id === rivalId);
-  const matchArticle =
-    articles?.getForMatch?.(match.id, gender) ??
-    articles?.getCronica?.(match.id, gender) ??
-    articles?.getPrevia?.(match.id, gender) ??
-    getMatchArticleForMatch(match.id, gender);
   const played = isMatchPlayed(match);
   const hasTime = !NO_TIME_COMPETITIONS.has(match.competition);
   const opponentLogo = rival
@@ -66,10 +53,6 @@ export function matchToCalendarMatch(
   const opponentFallback = avilesHome ? match.awayTeam : match.homeTeam;
   const opponent =
     articles?.resolveTeamName?.(rivalId, opponentFallback) ?? opponentFallback;
-
-  const matchPageUrl = primerEquipoHasCronicas(gender)
-    ? (`${primerEquipoBase(gender)}/cronicas/${matchArticle?.id ?? defaultCronicaId(match.id, gender)}` as Route)
-    : null;
 
   return {
     id: match.id,
@@ -90,8 +73,8 @@ export function matchToCalendarMatch(
     result: avilesResult(match, raiId),
     homeScore: match.homeScore,
     awayScore: match.awayScore,
-    chronicleUrl: matchPageUrl,
-    previaUrl: matchPageUrl,
+    chronicleUrl: null,
+    previaUrl: null,
   };
 }
 

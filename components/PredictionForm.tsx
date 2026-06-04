@@ -10,7 +10,6 @@ import { RAI_TEAM_ID } from "@/data/mock";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { buildMatchDetail } from "@/lib/match-detail";
-import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { getTeamsBundle, resolveFixtureTeamDisplayName } from "@/lib/cms/teams-bundle";
@@ -120,13 +119,9 @@ export function PredictionForm({
       resolveFixtureTeamDisplayName(match.awayTeamId, match.awayTeam, cmsTeams, bundles, "masculino"),
     [bundles, cmsTeams, match.awayTeam, match.awayTeamId, teams],
   );
-  const { getForMatch } = useSeasonMatchArticles();
   const avilesMatch = isAvilesMatch(match);
   const avilesIsHome = match.homeTeamId === RAI_TEAM_ID;
-  const matchArticle = getForMatch(match.id, "masculino");
-  const matchPageHref = matchArticle
-    ? (`${primerEquipoBase("masculino")}/cronicas/${matchArticle.id}` as Route)
-    : undefined;
+  const matchPageHref = `${primerEquipoBase("masculino")}/calendario` as Route;
   const avilesGoalsPick = prediction ? getAvilesGoalsPick(match, prediction) : undefined;
   const scorerLockedToNadie = avilesGoalsPick === 0;
   const derivedOutcome =
@@ -259,12 +254,12 @@ export function PredictionForm({
                   />
                 )}
               </div>
-              {avilesMatch && matchPageHref ? (
+              {avilesMatch ? (
                 <Link
                   href={matchPageHref}
                   className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#214C9B]/25 px-2.5 py-1.5 text-[11px] font-bold text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50 sm:px-3 sm:text-xs"
                 >
-                  <Eye size={14} /> Previa
+                  <Eye size={14} /> Calendario
                 </Link>
               ) : (
                 <button
