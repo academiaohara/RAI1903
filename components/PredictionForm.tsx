@@ -14,9 +14,11 @@ import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { getTeamsBundle, resolveFixtureTeamDisplayName } from "@/lib/cms/teams-bundle";
-import { scorerLabelForPlayer } from "@/lib/squad-player-resolve";
+import { resolveSquadPlayerByName, scorerLabelForPlayer } from "@/lib/squad-player-resolve";
+import { getNationalityFlag, getPlayerDisplayName } from "@/lib/squad-utils";
 import {
   actualAvilesScorer,
+  actualAvilesScorers,
   actualOutcome,
   formatGoalsPick,
   getActualGoalsPicks,
@@ -31,7 +33,9 @@ import { getTeamCrestById } from "@/lib/team-crests";
 import { primerEquipoBase } from "@/lib/primer-equipo";
 import { cn } from "@/lib/utils";
 import type { GoalsPick, Match, Prediction, PredictionOutcome } from "@/types";
+import type { SquadPlayer } from "@/types/squad";
 import type { Route } from "next";
+import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 
 const outcomes: PredictionOutcome[] = ["1", "X", "2"];
 const goalOptions: GoalsPick[] = [0, 1, 2, "M"];
@@ -159,6 +163,9 @@ export function PredictionForm({
   const actualScorer = avilesMatch
     ? actualAvilesScorer(match, { events: chronicleEvents, squad })
     : null;
+  const actualScorers = avilesMatch
+    ? actualAvilesScorers(match, { events: chronicleEvents, squad })
+    : [];
   const scorerCorrect =
     avilesMatch && prediction
       ? isScorerPredictionCorrect(match, prediction, { events: chronicleEvents, squad })
@@ -268,17 +275,6 @@ export function PredictionForm({
                   <Eye size={14} /> Previa
                 </button>
               )}
-              {avilesMatch && (
-                <ScorerCombobox
-                  value={scorerLockedToNadie ? "nadie" : prediction?.scorer}
-                  readOnly={formReadOnly || scorerLockedToNadie}
-                  options={scorerOptions}
-                  mode={displayMode}
-                  actualScorer={actualScorer}
-                  isCorrect={scorerCorrect}
-                  onChange={(scorer) => update({ scorer })}
-                />
-              )}
             </div>
           </div>
 
@@ -307,6 +303,20 @@ export function PredictionForm({
             </div>
           </div>
         </div>
+
+        {avilesMatch && (
+          <ScorerCombobox
+            value={scorerLockedToNadie ? "nadie" : prediction?.scorer}
+            readOnly={formReadOnly || scorerLockedToNadie}
+            options={scorerOptions}
+            squad={squad}
+            mode={displayMode}
+            actualScorer={actualScorer}
+            actualScorers={actualScorers}
+            isCorrect={scorerCorrect}
+            onChange={(scorer) => update({ scorer })}
+          />
+        )}
       </div>
 
       <MatchPreviewModal match={match} open={previewOpen} onClose={() => setPreviewOpen(false)} />
@@ -314,20 +324,31 @@ export function PredictionForm({
   );
 }
 
+function resolveScorerPlayer(squad: SquadPlayer[], label: string | undefined): SquadPlayer | undefined {
+  if (!label || label === "nadie") return undefined;
+  const byName = resolveSquadPlayerByName(squad, label);
+  if (byName) return byName;
+  return squad.find((player) => scorerLabelForPlayer(player) === label);
+}
+
 function ScorerCombobox({
   value,
   readOnly,
   options,
+  squad,
   mode,
   actualScorer,
+  actualScorers,
   isCorrect,
   onChange,
 }: {
   value?: string;
   readOnly?: boolean;
   options: ScorerOption[];
+  squad: SquadPlayer[];
   mode: PredictionFormMode;
   actualScorer: string | null;
+  actualScorers: string[];
   isCorrect: boolean;
   onChange: (scorer: string) => void;
 }) {
@@ -377,44 +398,78 @@ function ScorerCombobox({
     setOpen(false);
   };
 
+  const predictedPlayer = resolveScorerPlayer(squad, value);
+  const showPredictedFicha = mode === "edit" && predictedPlayer;
+  const showUserFichaCompare = mode === "compare" && Boolean(value);
+  const actualFichasForDisplay =
+    mode === "compare" ? actualScorers.filter((label) => label !== value) : actualScorers;
+
   return (
-    <div ref={rootRef} className="relative flex w-full min-w-0 flex-col gap-1 sm:max-w-xs sm:flex-row sm:items-center sm:gap-2">
-      <label htmlFor={inputId} className="shrink-0 text-xs font-bold text-slate-700 sm:text-sm">
-        Goleador:
-      </label>
-      <input
-        id={inputId}
-        type="text"
-        role="combobox"
-        aria-controls={listboxId}
-        aria-expanded={open}
-        aria-autocomplete="list"
-        disabled={readOnly}
-        value={displayValue}
-        placeholder="Buscar jugador..."
-        onFocus={() => {
-          if (readOnly) return;
-          setOpen(true);
-          setQuery(selectedLabel);
-        }}
-        onChange={(event) => {
-          if (readOnly) return;
-          setQuery(event.target.value);
-          setOpen(true);
-        }}
-        onKeyDown={(event) => {
-          if (event.key === "Escape") {
-            setOpen(false);
-            setQuery("");
-          }
-        }}
-        className={inputClassName}
-      />
-      {mode !== "edit" && actualScorer && (
-        <p className="text-xs font-bold text-slate-500 sm:col-span-2">
-          Goleador: <span className="text-[#981915]">{actualScorer === "nadie" ? "Nadie" : actualScorer}</span>
-        </p>
+    <div
+      ref={rootRef}
+      className="relative mt-2.5 w-full min-w-0 border-t border-[#214C9B]/10 pt-2.5 sm:mt-3 sm:pt-3"
+    >
+      <div className="flex w-full min-w-0 flex-row items-center gap-2 sm:max-w-md">
+        <label htmlFor={inputId} className="shrink-0 text-xs font-bold text-slate-700 sm:text-sm">
+          Goleador:
+        </label>
+        <input
+          id={inputId}
+          type="text"
+          role="combobox"
+          aria-controls={listboxId}
+          aria-expanded={open}
+          aria-autocomplete="list"
+          disabled={readOnly}
+          value={displayValue}
+          placeholder="Buscar jugador..."
+          onFocus={() => {
+            if (readOnly) return;
+            setOpen(true);
+            setQuery(selectedLabel);
+          }}
+          onChange={(event) => {
+            if (readOnly) return;
+            setQuery(event.target.value);
+            setOpen(true);
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              setOpen(false);
+              setQuery("");
+            }
+          }}
+          className={cn(inputClassName, "min-w-0 flex-1")}
+        />
+      </div>
+
+      {showPredictedFicha && (
+        <div className="mt-2">
+          <QuinielaScorerFicha player={predictedPlayer} tone="user" />
+        </div>
       )}
+
+      {(showUserFichaCompare || actualFichasForDisplay.length > 0) && (
+        <div className="mt-2 flex flex-wrap gap-2">
+          {showUserFichaCompare && (
+            <QuinielaScorerFicha
+              player={predictedPlayer}
+              label={value === "nadie" ? "Nadie" : value}
+              tone="user"
+              highlight={isCorrect}
+            />
+          )}
+          {actualFichasForDisplay.map((label) => (
+            <QuinielaScorerFicha
+              key={label}
+              player={resolveScorerPlayer(squad, label)}
+              label={label === "nadie" ? "Nadie" : label}
+              tone="actual"
+            />
+          ))}
+        </div>
+      )}
+
       <ul
         id={listboxId}
         role="listbox"
@@ -439,6 +494,77 @@ function ScorerCombobox({
         ))}
       </ul>
     </div>
+  );
+}
+
+function QuinielaScorerFicha({
+  player,
+  label,
+  tone = "neutral",
+  highlight = false,
+}: {
+  player?: SquadPlayer;
+  label?: string;
+  tone?: "user" | "actual" | "neutral";
+  highlight?: boolean;
+}) {
+  const displayName = player ? getPlayerDisplayName(player) : label ?? "—";
+  const flag = player ? getNationalityFlag(player.nacionalidad) : null;
+
+  const borderClass =
+    tone === "user"
+      ? "border-[#214C9B]"
+      : tone === "actual"
+        ? "border-[#981915]"
+        : "border-[#214C9B]/40";
+
+  return (
+    <article
+      className={cn(
+        "flex w-[5.5rem] shrink-0 flex-col overflow-hidden rounded-tl-xl rounded-br-xl rounded-tr-sm rounded-bl-sm border-2 bg-gradient-to-b from-sky-100 via-blue-50/90 to-white shadow-[0_4px_12px_rgba(33,76,155,0.12)] sm:w-[6.25rem]",
+        borderClass,
+        highlight && "ring-2 ring-[#981915] ring-offset-1",
+      )}
+      aria-label={displayName}
+    >
+      <div className="relative aspect-[3/4] overflow-hidden bg-[#dff4ff]">
+        {player ? (
+          <>
+            {flag ? (
+              <span
+                className="absolute left-1 top-1 z-10 rounded bg-white px-1 py-0.5 text-[10px] shadow-sm"
+                aria-hidden
+              >
+                {flag}
+              </span>
+            ) : null}
+            <div className="flex h-full items-end justify-center px-0.5 pb-0 pt-1">
+              <PlayerAvatar
+                player={player}
+                bare
+                placeholderTone="light"
+                imageClassName="object-cover object-top"
+                className="aspect-[3/4] h-[98%] w-[94%] max-w-full drop-shadow-[0_2px_8px_rgba(33,76,155,0.2)]"
+              />
+            </div>
+          </>
+        ) : (
+          <div className="flex h-full items-center justify-center px-2 text-center text-[10px] font-extrabold uppercase leading-tight text-[#214C9B]">
+            {displayName}
+          </div>
+        )}
+      </div>
+      <div
+        className={cn(
+          "h-6 shrink-0 px-1 py-1 sm:h-7",
+          tone === "actual" ? "bg-[#981915]" : "bg-[#214C9B]",
+        )}
+      >
+        <p className="truncate text-center text-[9px] font-bold leading-tight text-white sm:text-[10px]">
+          {displayName}
+        </p>
+      </div>
+    </article>
   );
 }
 

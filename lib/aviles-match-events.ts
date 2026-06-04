@@ -30,3 +30,41 @@ export function getAvilesScorerFromEvents(
 
   return firstGoal.player.trim();
 }
+
+function goalScorerLabel(goal: MatchEvent, squad: SquadPlayer[]): string {
+  const player = resolveSquadPlayerByName(squad, goal.player);
+  if (player) return scorerLabelForPlayer(player);
+  return goal.player.trim();
+}
+
+/** Todos los goleadores del Avilés en el partido (orden cronológico, sin duplicar etiqueta). */
+export function getAllAvilesScorerLabelsFromEvents(
+  match: Match,
+  events: MatchEvent[],
+  squad: SquadPlayer[],
+): string[] {
+  const isHome = match.homeTeamId === RAI_TEAM_ID;
+  const isAway = match.awayTeamId === RAI_TEAM_ID;
+  if (!isHome && !isAway) return [];
+
+  const avilesSide: "home" | "away" = isHome ? "home" : "away";
+  const goals = events
+    .filter((event) => event.type === "goal" && event.team === avilesSide && event.player.trim())
+    .sort((a, b) => a.minute - b.minute);
+
+  if (goals.length === 0) {
+    const homeScore = match.homeScore ?? 0;
+    const awayScore = match.awayScore ?? 0;
+    const avilesGoals = isHome ? homeScore : awayScore;
+    if (avilesGoals === 0) return ["nadie"];
+    return [];
+  }
+
+  const labels: string[] = [];
+  for (const goal of goals) {
+    const label = goalScorerLabel(goal, squad);
+    if (label && !labels.includes(label)) labels.push(label);
+  }
+  return labels;
+}
+
