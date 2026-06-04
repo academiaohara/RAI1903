@@ -13,11 +13,9 @@ import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard"
 import { UpcomingMatchCard } from "@/components/UpcomingMatchCard";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
-import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { matchCompetitionShortLabel, matchFixtureMeta, matchRoundBadgeLabel } from "@/lib/competition-labels";
 import { getTeamByGender } from "@/lib/fixtures";
 import { seasonHasCompetitionBundles } from "@/lib/season/cms-data-policy";
-import { defaultCronicaId } from "@/lib/match-article-factory";
 import { primerEquipoBase } from "@/lib/primer-equipo";
 import { getTeamCrestById } from "@/lib/team-crests";
 import {
@@ -54,11 +52,9 @@ export function HomeCompetitionEmptyHint() {
 
 export function HomeMatchBannersBlock() {
   const { latestMatches, nextMatch } = useMasculinoLeagueSeason();
-  const { getForMatch } = useSeasonMatchArticles();
 
   const latestMatch = latestMatches[0];
-  const latestArticle = latestMatch ? getForMatch(latestMatch.id, "masculino") : undefined;
-  const nextArticle = nextMatch ? getForMatch(nextMatch.id, "masculino") : undefined;
+  const calendarioHref = `${primerEquipoBase("masculino")}/calendario` as Route;
 
   if (!latestMatch && !nextMatch) return null;
 
@@ -68,18 +64,14 @@ export function HomeMatchBannersBlock() {
         <MatchBanner
           match={latestMatch}
           label="Ultimo partido"
-          href={
-            `${primerEquipoBase("masculino")}/cronicas/${latestArticle?.id ?? defaultCronicaId(latestMatch.id, "masculino")}` as Route
-          }
+          href={calendarioHref}
         />
       )}
       {nextMatch && (
         <MatchBanner
           match={nextMatch}
           label="Proximo partido"
-          href={
-            `${primerEquipoBase("masculino")}/cronicas/${nextArticle?.id ?? defaultCronicaId(nextMatch.id, "masculino")}` as Route
-          }
+          href={calendarioHref}
           accent="granate"
         />
       )}
