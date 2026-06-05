@@ -1,3 +1,4 @@
+import { getTeam } from "@/lib/fixtures";
 import { formatMatchScore, isMatchPlayed } from "@/lib/match-result";
 import { formatMatchDate } from "@/lib/utils";
 import type { JornadaFixture } from "@/types/jornadas";
@@ -24,10 +25,14 @@ export function CanteraJornadaMatchRow({
 }: CanteraJornadaMatchRowProps) {
   const highlightHome = Boolean(highlightTeamId && fixture.homeTeamId === highlightTeamId);
   const highlightAway = Boolean(highlightTeamId && fixture.awayTeamId === highlightTeamId);
+  const homeTeam = getTeam(fixture.homeTeamId);
+  const awayTeam = getTeam(fixture.awayTeamId);
+  const homeShortName = homeTeam?.shortName ?? fixture.homeTeamName;
+  const awayShortName = awayTeam?.shortName ?? fixture.awayTeamName;
 
   const nameClass = (isHighlight: boolean) =>
     cn(
-      "min-w-0 truncate text-[11px] font-extrabold leading-tight sm:text-sm",
+      "min-w-0 truncate text-[9px] font-extrabold leading-tight sm:text-sm",
       isHighlight ? (highlighted ? "text-[#981915]" : "text-[#214C9B]") : "text-slate-800",
     );
 
@@ -40,18 +45,24 @@ export function CanteraJornadaMatchRow({
           : "border-[#214C9B]/12 bg-slate-50/80",
       )}
     >
-      <p className={cn(nameClass(highlightHome), "text-left")}>{fixture.homeTeamName}</p>
+      <p className={cn(nameClass(highlightHome), "text-left")}>
+        <span className="sm:hidden">{homeShortName}</span>
+        <span className="hidden sm:inline">{fixture.homeTeamName}</span>
+      </p>
 
       <div
         className={cn(
-          "min-w-[3.25rem] rounded-lg px-2 py-1.5 text-center text-[11px] font-extrabold tabular-nums sm:min-w-[4.5rem] sm:rounded-xl sm:px-3 sm:py-2 sm:text-sm",
+          "min-w-[2.35rem] rounded-md px-1 py-0.5 text-center text-[9px] font-extrabold tabular-nums sm:min-w-[4.5rem] sm:rounded-xl sm:px-3 sm:py-2 sm:text-sm",
           highlighted ? "bg-[#981915] text-white shadow-sm" : "bg-[#214C9B] text-white",
         )}
       >
         {scoreOrTime(fixture)}
       </div>
 
-      <p className={cn(nameClass(highlightAway), "text-right")}>{fixture.awayTeamName}</p>
+      <p className={cn(nameClass(highlightAway), "text-right")}>
+        <span className="sm:hidden">{awayShortName}</span>
+        <span className="hidden sm:inline">{fixture.awayTeamName}</span>
+      </p>
     </article>
   );
 }
