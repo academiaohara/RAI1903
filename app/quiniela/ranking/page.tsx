@@ -8,7 +8,7 @@ import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export default function QuinielaRankingPage() {
-  const { seasonId } = useQuinielaSeason();
+  const { seasonId, matchdays } = useQuinielaSeason();
   const { entries, loading, error } = useQuinielaSeasonRanking(seasonId);
 
   return (
@@ -27,6 +27,8 @@ export default function QuinielaRankingPage() {
         ) : (
           <QuinielaRankingList
             entries={entries}
+            seasonId={seasonId}
+            matchdays={matchdays}
             emptyMessage={
               isSupabaseConfigured()
                 ? "Aún no hay quinielas guardadas en esta temporada."
