@@ -22,7 +22,7 @@ type EquipoLigaTeamInfoProps = {
 /** Datos básicos del club (escudo, entrenador, estadio, estadísticas de temporada). Sin plantilla. */
 export function EquipoLigaTeamInfo({ gender, team }: EquipoLigaTeamInfoProps) {
   const { bundles, viewedSeason, viewedSeasonId } = useSeason();
-  const { editMode } = useInlineEditing();
+  const { editMode, getValue } = useInlineEditing();
   const { club: baseClub, isOwnClub } = useMemo(
     () => getCompeticionSquadData(gender, team, bundles, viewedSeason.label),
     [bundles, gender, team, viewedSeason.label],
@@ -32,6 +32,9 @@ export function EquipoLigaTeamInfo({ gender, team }: EquipoLigaTeamInfoProps) {
     () => ({
       ...baseClub,
       temporada: viewedSeason.label,
+      ...(isOwnClub
+        ? { entrenador: getValue(`squad-club:${gender}:entrenador`, baseClub.entrenador) }
+        : {}),
       ...(stadiumOverride
         ? {
             estadio: stadiumOverride.nombre,
@@ -39,7 +42,7 @@ export function EquipoLigaTeamInfo({ gender, team }: EquipoLigaTeamInfoProps) {
           }
         : {}),
     }),
-    [baseClub, stadiumOverride, viewedSeason.label],
+    [baseClub, getValue, gender, isOwnClub, stadiumOverride, viewedSeason.label],
   );
   const [stadiumOpen, setStadiumOpen] = useState(false);
   const stadiumModalOpen = stadiumOpen && !editMode;

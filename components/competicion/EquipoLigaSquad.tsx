@@ -43,7 +43,7 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
     setPlayerEstado: setRivalPlayerEstado,
     setEntrenador: setRivalEntrenador,
   } = useRivalSquadAvailability(gender, team);
-  const { editMode } = useInlineEditing();
+  const { editMode, getValue } = useInlineEditing();
   const squad = isOwnClub ? ownSquad : rivalSquad.length > 0 ? rivalSquad : baseSquad;
   const [stadiumOverride, setStadiumOverride] = useState<StadiumInfo | null>(null);
   const club = useMemo(() => {
@@ -55,14 +55,19 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
         }
       : baseClub;
 
-    if (isOwnClub) return withStadium;
+    if (isOwnClub) {
+      return {
+        ...withStadium,
+        entrenador: getValue(`squad-club:${gender}:entrenador`, withStadium.entrenador),
+      };
+    }
 
     return {
       ...withStadium,
       temporada: viewedSeason.label,
       entrenador: rivalEntrenador,
     };
-  }, [baseClub, isOwnClub, rivalEntrenador, stadiumOverride, viewedSeason.label]);
+  }, [baseClub, gender, getValue, isOwnClub, rivalEntrenador, stadiumOverride, viewedSeason.label]);
   const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
 
   const handleMarkUnavailable = useCallback(
