@@ -30,7 +30,7 @@ import {
   matchFixtureCardMobileWidthClassName,
   matchFixtureDesktopCardMinHeightClassName,
 } from "@/lib/match-card-styles";
-import { cn, formatMatchDate, formatMatchDay, formatMatchTime } from "@/lib/utils";
+import { cn, formatMatchTime, formatMatchWeekdayLetterDate } from "@/lib/utils";
 import type { Route } from "next";
 import type { Match } from "@/types";
 
@@ -336,7 +336,7 @@ function MatchBanner({
   const competitionLabel = matchCompetitionShortLabel(match);
   const centerRoundLabel = roundBadgeLabel;
   const scoreLabel = match.status === "finished" ? `${match.homeScore}-${match.awayScore}` : formatMatchTime(match.date);
-  const dateLabel = match.status === "finished" ? formatMatchDate(match.date) : formatMatchDay(match.date);
+  const dateLabel = formatMatchWeekdayLetterDate(match.date);
   const centerAccent = matchCenterAccentClass(accent);
 
   return (

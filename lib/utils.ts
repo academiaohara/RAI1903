@@ -42,6 +42,16 @@ const MATCH_WEEKDAY_LETTER_ES = ["D", "L", "M", "X", "J", "V", "S"] as const;
 export const formatMatchWeekdayLetter = (date: string) =>
   MATCH_WEEKDAY_LETTER_ES[new Date(date).getDay()] ?? "";
 
+/** Día de la semana en una letra + fecha numérica: «D, 15/03/2026». */
+export const formatMatchWeekdayLetterDate = (date: string) => {
+  const numericDate = new Intl.DateTimeFormat("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date(date));
+  return `${formatMatchWeekdayLetter(date)}, ${numericDate}`;
+};
+
 export const formatMatchTime = (date: string) =>
   new Intl.DateTimeFormat("es-ES", {
     hour: "2-digit",

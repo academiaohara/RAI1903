@@ -11,7 +11,7 @@ import { defaultCronicaId } from "@/lib/match-article-factory";
 import { getMatchArticlePageHref } from "@/lib/match-article-url";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { primerEquipoBase } from "@/lib/primer-equipo";
-import { cn, formatMatchDate, formatMatchDay, formatMatchTime } from "@/lib/utils";
+import { cn, formatMatchTime, formatMatchWeekdayLetterDate } from "@/lib/utils";
 import type { Match } from "@/types";
 import type { Route } from "next";
 
@@ -41,7 +41,7 @@ export function FixtureCrestMatchCard({
   const linkHref = href ?? defaultHref;
   const scoreLabel = match.status === "finished" ? `${match.homeScore}-${match.awayScore}` : formatMatchTime(match.date);
   const highlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
-  const dateLabel = match.status === "scheduled" ? formatMatchDay(match.date) : formatMatchDate(match.date);
+  const dateLabel = formatMatchWeekdayLetterDate(match.date);
   const roundLabel = matchRoundBadgeLabel(match);
   const centerAccent = accent === "granate" ? "bg-[#981915]" : "bg-[#214C9B]";
   const cardClassName = cn(
