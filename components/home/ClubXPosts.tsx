@@ -11,6 +11,7 @@ import {
   isClubXPostsList,
   moveClubXPost,
   normalizeClubXPostEmbed,
+  sortClubXPostsByDate,
   type ClubXPostEmbed,
 } from "@/lib/club-x-posts";
 import { loadXWidgets } from "@/lib/x-widgets";
@@ -25,7 +26,9 @@ export function ClubXPosts() {
   const [parseError, setParseError] = useState<string | null>(null);
 
   const hasCustomList = overrides[CLUB_X_POSTS_STORAGE_KEY] !== undefined;
-  const currentPosts = getValue<ClubXPostEmbed[]>(CLUB_X_POSTS_STORAGE_KEY, CLUB_X_POST_EMBEDS);
+  const currentPosts = sortClubXPostsByDate(
+    getValue<ClubXPostEmbed[]>(CLUB_X_POSTS_STORAGE_KEY, CLUB_X_POST_EMBEDS),
+  );
 
   const reloadWidgets = useCallback(() => {
     loadXWidgets(() => {
@@ -167,11 +170,11 @@ export function ClubXPosts() {
         <p className="text-sm font-semibold text-slate-500">No hay tweets publicados todavía.</p>
       ) : (
         <div className="max-h-[min(70vh,640px)] w-full max-w-full overflow-y-auto overscroll-y-contain pr-1">
-          <div ref={containerRef} className="space-y-4">
+          <div ref={containerRef} className="flex flex-col items-center gap-4">
             {currentPosts.map((post) => (
               <blockquote
                 key={post.id}
-                className="twitter-tweet"
+                className="twitter-tweet mx-auto w-full max-w-[550px]"
                 data-dnt="true"
                 dangerouslySetInnerHTML={{ __html: post.html }}
               />
