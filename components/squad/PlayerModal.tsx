@@ -131,11 +131,7 @@ function PlayerModalContent({
               <InfoChip
                 icon={Star}
                 label="Valoración media"
-                value={
-                  fanRating
-                    ? `${formatFanRating(fanRating.average)} (${fanRating.count} partido${fanRating.count === 1 ? "" : "s"})`
-                    : "Sin valoraciones"
-                }
+                value={fanRating ? formatFanRating(fanRating.average) : "Sin valoraciones"}
               />
               <InfoChip icon={Calendar} label="Nacimiento" value={formatBirthDate(player.fechaNacimiento)} />
               <InfoChip icon={MapPin} label="Lugar" value={player.lugarNacimiento} />
