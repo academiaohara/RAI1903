@@ -21,6 +21,7 @@ import { isEditorSession } from "@/lib/auth/editor";
 import {
   clearInlineOverrides,
   deleteInlineOverride,
+  fetchHomeGlobalInlineOverrides,
   fetchInlineOverrides,
   fetchMediaRaiInlineOverrides,
   resolveInlineOverrideSeasonId,
@@ -246,8 +247,8 @@ export function InlineEditingProvider({
       return;
     }
 
-    void Promise.all([fetchInlineOverrides(seasonId), fetchMediaRaiInlineOverrides()]).then(
-      ([seasonResult, mediaRaiResult]) => {
+    void Promise.all([fetchInlineOverrides(seasonId), fetchMediaRaiInlineOverrides(), fetchHomeGlobalInlineOverrides()]).then(
+      ([seasonResult, mediaRaiResult, homeGlobalResult]) => {
         const legacy = readLegacyOverrides();
         setOverrides(
           mergeOverrideMaps(
@@ -255,9 +256,10 @@ export function InlineEditingProvider({
             seasonId === DEFAULT_COMPETITION_SEASON_ID ? initialOverrides : {},
             seasonResult.overrides,
             mediaRaiResult.overrides,
+            homeGlobalResult.overrides,
           ),
         );
-        const error = seasonResult.error ?? mediaRaiResult.error;
+        const error = seasonResult.error ?? mediaRaiResult.error ?? homeGlobalResult.error;
         if (error) {
           setSyncError(`No se pudieron cargar cambios de Supabase: ${error}`);
         }

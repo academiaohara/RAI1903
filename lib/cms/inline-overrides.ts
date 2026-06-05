@@ -3,7 +3,12 @@ import { isMissingSeasonIdColumnError } from "@/lib/cms/inline-overrides-compat"
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
 import { shouldCopyInlineOverrideKey } from "@/lib/fixture-inline-keys";
+import { CLUB_X_POSTS_STORAGE_KEY } from "@/lib/club-x-posts";
 import { isMediaRaiGlobalInlineKey, MEDIA_RAI_INLINE_SEASON_ID } from "@/lib/fan-videos";
+
+export function isHomeGlobalInlineKey(key: string): boolean {
+  return key === CLUB_X_POSTS_STORAGE_KEY;
+}
 
 export type InlineOverridesMap = Record<string, unknown>;
 
@@ -105,7 +110,76 @@ export function resolveInlineOverrideSeasonId(
   key: string,
   viewedSeasonId = DEFAULT_COMPETITION_SEASON_ID,
 ): string {
-  return isMediaRaiGlobalInlineKey(key) ? MEDIA_RAI_INLINE_SEASON_ID : viewedSeasonId;
+  if (isMediaRaiGlobalInlineKey(key) || isHomeGlobalInlineKey(key)) {
+    return MEDIA_RAI_INLINE_SEASON_ID;
+  }
+  return viewedSeasonId;
+}
+
+/** Overrides globales de inicio (p. ej. tweets del club). */
+export async function fetchHomeGlobalInlineOverrides(): Promise<{
+  overrides: InlineOverridesMap;
+  error?: string;
+}> {
+  if (!isSupabaseConfigured()) return { overrides: {} };
+
+  const supabase = createBrowserClient();
+  let { data, error } = await supabase
+    .from("cms_inline_overrides")
+    .select("season_id, key, value, updated_at")
+    .eq("key", CLUB_X_POSTS_STORAGE_KEY);
+
+  if (error && isMissingSeasonIdColumnError(error.message)) {
+    const legacy = await supabase.from("cms_inline_overrides").select("key, value").eq("key", CLUB_X_POSTS_STORAGE_KEY);
+    data = legacy.data?.map((row) => ({ ...row, season_id: MEDIA_RAI_INLINE_SEASON_ID, updated_at: undefined })) ?? null;
+    error = legacy.error;
+  }
+
+  if (error) {
+    return {
+      overrides: {},
+      error: `${error.message} — Ejecuta supabase/APPLY_CMS_MIGRATIONS.sql en el SQL Editor de Supabase.`,
+    };
+  }
+  if (!data?.length) return { overrides: {} };
+
+  const latest = (data as InlineOverrideSeasonRow[]).reduce<InlineOverrideSeasonRow | null>((best, row) => {
+    if (!best) return row;
+    const bestTime = best.updated_at ? Date.parse(best.updated_at) : 0;
+    const rowTime = row.updated_at ? Date.parse(row.updated_at) : 0;
+    return rowTime >= bestTime ? row : best;
+  }, null);
+
+  return { overrides: latest ? rowsToMap([latest]) : {} };
+}
+
+export async function deleteClubXPostOverrides(): Promise<{ ok: boolean; error?: string }> {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: "Supabase no configurado" };
+  }
+
+  const supabase = createBrowserClient();
+  const { data, error } = await supabase
+    .from("cms_inline_overrides")
+    .select("season_id, key")
+    .eq("key", CLUB_X_POSTS_STORAGE_KEY);
+
+  if (error) return { ok: false, error: error.message };
+  if (!data?.length) return { ok: true };
+
+  const results = await Promise.all(
+    data.map((row) =>
+      supabase
+        .from("cms_inline_overrides")
+        .delete()
+        .eq("season_id", row.season_id ?? MEDIA_RAI_INLINE_SEASON_ID)
+        .eq("key", row.key),
+    ),
+  );
+
+  const failed = results.find(({ error: deleteError }) => deleteError);
+  if (failed?.error) return { ok: false, error: failed.error.message };
+  return { ok: true };
 }
 
 export async function deleteMediaRaiSpaceOverrides(section: string): Promise<{ ok: boolean; error?: string }> {
