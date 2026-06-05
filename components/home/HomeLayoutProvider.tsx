@@ -9,9 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { useSeason } from "@/components/season/SeasonProvider";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
-import { upsertInlineOverride } from "@/lib/cms/inline-overrides";
 import {
   DEFAULT_HOME_SECTION_ORDER,
   HOME_SECTION_ORDER_KEY,
@@ -45,22 +43,21 @@ function writeLocalOrder(order: HomeSectionId[]) {
 }
 
 export function HomeLayoutProvider({ children }: { children: ReactNode }) {
-  const { getValue, ready } = useInlineEditing();
-  const { activeSeasonId } = useSeason();
+  const { getValue, ready, saveValue, saveNow } = useInlineEditing();
+  const inlineOrder = getValue<HomeSectionId[] | undefined>(HOME_SECTION_ORDER_KEY, undefined);
   const [sectionOrder, setSectionOrderState] = useState<HomeSectionId[]>(DEFAULT_HOME_SECTION_ORDER);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     if (!ready) return;
 
-    const fromInline = getValue<HomeSectionId[] | undefined>(HOME_SECTION_ORDER_KEY, undefined);
     const fromLocal = readLocalOrder();
-    const next = normalizeHomeSectionOrder(fromInline ?? fromLocal ?? DEFAULT_HOME_SECTION_ORDER);
+    const next = normalizeHomeSectionOrder(inlineOrder ?? fromLocal ?? DEFAULT_HOME_SECTION_ORDER);
     queueMicrotask(() => {
       setSectionOrderState(next);
       setHydrated(true);
     });
-  }, [getValue, ready]);
+  }, [inlineOrder, ready]);
 
   const setSectionOrder = useCallback((order: HomeSectionId[]) => {
     setSectionOrderState(normalizeHomeSectionOrder(order));
@@ -71,14 +68,16 @@ export function HomeLayoutProvider({ children }: { children: ReactNode }) {
       const normalized = normalizeHomeSectionOrder(order);
       setSectionOrderState(normalized);
       writeLocalOrder(normalized);
+      saveValue(HOME_SECTION_ORDER_KEY, normalized);
 
       if (!isSupabaseConfigured()) {
         return { ok: true };
       }
 
-      return upsertInlineOverride(HOME_SECTION_ORDER_KEY, normalized, null, activeSeasonId);
+      const ok = await saveNow();
+      return ok ? { ok: true } : { ok: false, error: "No se pudo guardar en Supabase" };
     },
-    [activeSeasonId],
+    [saveNow, saveValue],
   );
 
   const value = useMemo<HomeLayoutContextValue>(

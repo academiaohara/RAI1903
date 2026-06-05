@@ -5,9 +5,12 @@ import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
 import { shouldCopyInlineOverrideKey } from "@/lib/fixture-inline-keys";
 import { CLUB_X_POSTS_STORAGE_KEY } from "@/lib/club-x-posts";
 import { isMediaRaiGlobalInlineKey, MEDIA_RAI_INLINE_SEASON_ID } from "@/lib/fan-videos";
+import { HOME_SECTION_ORDER_KEY } from "@/lib/home-layout";
+
+const HOME_GLOBAL_INLINE_KEYS = [CLUB_X_POSTS_STORAGE_KEY, HOME_SECTION_ORDER_KEY] as const;
 
 export function isHomeGlobalInlineKey(key: string): boolean {
-  return key === CLUB_X_POSTS_STORAGE_KEY;
+  return (HOME_GLOBAL_INLINE_KEYS as readonly string[]).includes(key);
 }
 
 export type InlineOverridesMap = Record<string, unknown>;
@@ -127,11 +130,15 @@ export async function fetchHomeGlobalInlineOverrides(): Promise<{
   let { data, error } = await supabase
     .from("cms_inline_overrides")
     .select("season_id, key, value, updated_at")
-    .eq("key", CLUB_X_POSTS_STORAGE_KEY);
+    .in("key", [...HOME_GLOBAL_INLINE_KEYS]);
 
   if (error && isMissingSeasonIdColumnError(error.message)) {
-    const legacy = await supabase.from("cms_inline_overrides").select("key, value").eq("key", CLUB_X_POSTS_STORAGE_KEY);
-    data = legacy.data?.map((row) => ({ ...row, season_id: MEDIA_RAI_INLINE_SEASON_ID, updated_at: undefined })) ?? null;
+    const legacy = await supabase
+      .from("cms_inline_overrides")
+      .select("key, value")
+      .in("key", [...HOME_GLOBAL_INLINE_KEYS]);
+    data =
+      legacy.data?.map((row) => ({ ...row, season_id: MEDIA_RAI_INLINE_SEASON_ID, updated_at: undefined })) ?? null;
     error = legacy.error;
   }
 
@@ -143,14 +150,24 @@ export async function fetchHomeGlobalInlineOverrides(): Promise<{
   }
   if (!data?.length) return { overrides: {} };
 
-  const latest = (data as InlineOverrideSeasonRow[]).reduce<InlineOverrideSeasonRow | null>((best, row) => {
-    if (!best) return row;
-    const bestTime = best.updated_at ? Date.parse(best.updated_at) : 0;
-    const rowTime = row.updated_at ? Date.parse(row.updated_at) : 0;
-    return rowTime >= bestTime ? row : best;
-  }, null);
+  const latestByKey = new Map<string, InlineOverrideSeasonRow>();
+  for (const row of data as InlineOverrideSeasonRow[]) {
+    if (!isHomeGlobalInlineKey(row.key)) continue;
 
-  return { overrides: latest ? rowsToMap([latest]) : {} };
+    const existing = latestByKey.get(row.key);
+    if (!existing) {
+      latestByKey.set(row.key, row);
+      continue;
+    }
+
+    const existingTime = existing.updated_at ? Date.parse(existing.updated_at) : 0;
+    const rowTime = row.updated_at ? Date.parse(row.updated_at) : 0;
+    if (rowTime >= existingTime) {
+      latestByKey.set(row.key, row);
+    }
+  }
+
+  return { overrides: rowsToMap([...latestByKey.values()]) };
 }
 
 export async function deleteClubXPostOverrides(): Promise<{ ok: boolean; error?: string }> {
