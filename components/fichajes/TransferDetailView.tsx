@@ -16,7 +16,6 @@ import {
   getTransferKind,
   getTransferKindLabel,
   getTransferOriginClub,
-  getTransferPlayerNews,
 } from "@/lib/fichajes";
 import { usePublishedNews } from "@/hooks/usePublishedNews";
 import { useSeasonPlayerRatings } from "@/hooks/useSeasonPlayerRatings";
@@ -69,7 +68,6 @@ export function TransferDetailView({ transfer, player: initialPlayer }: Transfer
   const visibleTabs = allTabs.filter((tab) => !tab.requiresPlayer || player);
   const [activeTab, setActiveTab] = useState<TransferDetailTab>("actualidad");
   const clubAnnouncementNews = getTransferClubAnnouncementNews(transfer, allNews);
-  const playerNews = getTransferPlayerNews(transfer, allNews);
   const displayName = getTransferDisplayName(transfer);
   const originClub = getTransferOriginClub(transfer);
   const flag = player ? getNationalityFlag(player.nacionalidad) : "🇪🇸";
@@ -167,9 +165,7 @@ export function TransferDetailView({ transfer, player: initialPlayer }: Transfer
             {activeTab === "actualidad" && (
               <PlayerActualidadSection
                 clubAnnouncement={clubAnnouncementFromTransfer(transfer, clubAnnouncementNews)}
-                playerNews={playerNews}
                 accentClass={tone.accent}
-                announcementTone={tone.announcement}
                 transfer={transfer}
               />
             )}

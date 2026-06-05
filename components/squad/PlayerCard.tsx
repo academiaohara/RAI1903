@@ -10,12 +10,15 @@ import {
 } from "@/lib/squad-utils";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 import { SquadPlayerQuickEdit } from "@/components/squad/SquadPlayerQuickEdit";
+import { formatFanRating } from "@/lib/format-fan-rating";
+import type { PlayerRatingAverage } from "@/lib/match-ratings-storage";
 
 type SquadPlayerCardProps = {
   player: SquadPlayer;
   onSelect: (player: SquadPlayer) => void;
   index?: number;
   variant?: "default" | "fichas";
+  fanRating?: PlayerRatingAverage;
   editMode?: boolean;
   onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
 };
@@ -25,6 +28,7 @@ export function PlayerCard({
   onSelect,
   index = 0,
   variant = "default",
+  fanRating,
   editMode = false,
   onQuickUpdate,
 }: SquadPlayerCardProps) {
@@ -34,6 +38,7 @@ export function PlayerCard({
         player={player}
         onSelect={onSelect}
         index={index}
+        fanRating={fanRating}
         editMode={editMode}
         onQuickUpdate={onQuickUpdate}
       />
@@ -118,12 +123,15 @@ export function PlayerCard({
             </p>
           </div>
 
-          <div className="grid grid-cols-4 gap-2">
+          <div className={`grid gap-2 ${fanRating ? "grid-cols-5" : "grid-cols-4"}`}>
             {[
               { label: "G", value: player.goles },
               { label: "A", value: player.asistencias },
               { label: "TA", value: player.amarillas },
               { label: "TR", value: player.rojas },
+              ...(fanRating
+                ? [{ label: "Nota", value: formatFanRating(fanRating.average) }]
+                : []),
             ].map((stat) => (
               <div key={stat.label} className="rounded-xl border border-slate-200/80 bg-white/80 px-2 py-2 text-center">
                 <p className="text-[10px] font-bold uppercase text-slate-400">{stat.label}</p>
@@ -141,12 +149,14 @@ function PlayerFichaCard({
   player,
   onSelect,
   index,
+  fanRating,
   editMode = false,
   onQuickUpdate,
 }: {
   player: SquadPlayer;
   onSelect: (player: SquadPlayer) => void;
   index: number;
+  fanRating?: PlayerRatingAverage;
   editMode?: boolean;
   onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
 }) {
@@ -198,10 +208,15 @@ function PlayerFichaCard({
         <article className={articleClass}>
           <button type="button" onClick={() => onSelect(player)} className="flex min-h-0 flex-1 flex-col text-left">
             {photoBlock}
-            <div className="mt-auto h-7 shrink-0 bg-[#214C9B] px-1 py-1 sm:h-8 sm:px-2 sm:py-1.5">
+            <div className="mt-auto shrink-0 bg-[#214C9B] px-1 py-1 sm:px-2 sm:py-1.5">
               <p className="truncate text-center text-[9px] font-bold leading-tight text-white sm:text-xs">
                 {displayName}
               </p>
+              {fanRating ? (
+                <p className="mt-0.5 text-center text-[8px] font-bold tabular-nums text-white/85 sm:text-[9px]">
+                  {formatFanRating(fanRating.average)}
+                </p>
+              ) : null}
             </div>
           </button>
           <SquadPlayerQuickEdit
@@ -234,8 +249,13 @@ function PlayerFichaCard({
     >
       <article className={articleClass}>
         {photoBlock}
-        <div className="mt-auto h-7 shrink-0 rounded-br-[0.65rem] bg-[#214C9B] px-1 py-1 sm:h-8 sm:px-2 sm:py-1.5">
+        <div className="mt-auto shrink-0 rounded-br-[0.65rem] bg-[#214C9B] px-1 py-1 sm:px-2 sm:py-1.5">
           <p className="truncate text-center text-[9px] font-bold leading-tight text-white sm:text-xs">{displayName}</p>
+          {fanRating ? (
+            <p className="mt-0.5 text-center text-[8px] font-bold tabular-nums text-white/85 sm:text-[9px]">
+              {formatFanRating(fanRating.average)}
+            </p>
+          ) : null}
         </div>
       </article>
     </motion.button>

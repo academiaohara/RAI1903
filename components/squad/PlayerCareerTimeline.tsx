@@ -1,10 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { sortCareerByTemporada } from "@/lib/career-utils";
 import type { SquadPlayer } from "@/types/squad";
 
 export function PlayerCareerTimeline({ player }: { player: SquadPlayer }) {
-  const career = [...player.trayectoria].reverse();
+  const career = sortCareerByTemporada(player.trayectoria).reverse();
 
   return (
     <div className="relative space-y-0">

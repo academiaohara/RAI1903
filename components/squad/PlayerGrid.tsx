@@ -5,11 +5,13 @@ import { SQUAD_POSITIONS } from "@/types/squad";
 import { groupPlayersByPosition } from "@/lib/squad-utils";
 import { PositionSection } from "@/components/squad/PositionSection";
 import { PlayerCard } from "@/components/squad/PlayerCard";
+import type { PlayerRatingAverage } from "@/lib/match-ratings-storage";
 
 type PlayerGridProps = {
   players: SquadPlayer[];
   onSelect: (player: SquadPlayer) => void;
   variant?: "default" | "fichas";
+  fanRatings?: Record<string, PlayerRatingAverage>;
   showEmptyPositions?: boolean;
   editMode?: boolean;
   onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
@@ -19,6 +21,7 @@ export function PlayerGrid({
   players,
   onSelect,
   variant = "default",
+  fanRatings,
   showEmptyPositions = false,
   editMode = false,
   onQuickUpdate,
@@ -51,6 +54,7 @@ export function PlayerGrid({
                     onSelect={onSelect}
                     index={index}
                     variant={variant}
+                    fanRating={fanRatings?.[player.id]}
                     editMode={editMode}
                     onQuickUpdate={onQuickUpdate}
                   />

@@ -13,14 +13,18 @@ import {
 import { PositionSection } from "@/components/squad/PositionSection";
 import { SquadListColGroup } from "@/components/squad/SquadListColGroup";
 import { SquadPlayerQuickEdit } from "@/components/squad/SquadPlayerQuickEdit";
+import { formatFanRating } from "@/lib/format-fan-rating";
+import type { PlayerRatingAverage } from "@/lib/match-ratings-storage";
 
 type PlayerTableProps = {
   players: SquadPlayer[];
   onSelect?: (player: SquadPlayer) => void;
   showMarketValue?: boolean;
   showAge?: boolean;
+  showFanRating?: boolean;
   showEmptyPositions?: boolean;
   editMode?: boolean;
+  fanRatings?: Record<string, PlayerRatingAverage>;
   onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
 };
 
@@ -33,7 +37,7 @@ const cellPad = "px-4 py-3";
 type MobileDataView = "stats" | "info";
 
 const mobileGridClass = {
-  stats: "grid-cols-[minmax(7.25rem,1fr)_repeat(5,minmax(1.75rem,2rem))]",
+  stats: "grid-cols-[minmax(7.25rem,1fr)_repeat(6,minmax(1.75rem,2rem))]",
   info: "grid-cols-[minmax(7.25rem,1fr)_repeat(3,minmax(2.75rem,3.25rem))]",
 };
 
@@ -42,8 +46,10 @@ export function PlayerTable({
   onSelect,
   showMarketValue = false,
   showAge = true,
+  showFanRating = false,
   showEmptyPositions = false,
   editMode = false,
+  fanRatings,
   onQuickUpdate,
 }: PlayerTableProps) {
   const [mobileDataView, setMobileDataView] = useState<MobileDataView>("stats");
@@ -58,6 +64,7 @@ export function PlayerTable({
     { key: "a", label: "A", align: "center" as const },
     { key: "ta", label: "TA", align: "center" as const },
     { key: "tr", label: "TR", align: "center" as const },
+    ...(showFanRating ? [{ key: "nota", label: "Nota", align: "center" as const }] : []),
     ...(showMarketValue
       ? [
           { key: "valor", label: "Valor", align: "center" as const },
@@ -82,6 +89,7 @@ export function PlayerTable({
                     variant="primer-equipo"
                     showAge={showAge}
                     showMarketValue={showMarketValue}
+                    showFanRating={showFanRating}
                   />
                   <thead>
                     <tr className="border-b border-slate-100 bg-slate-50/90 text-[11px] font-bold uppercase tracking-wider text-slate-500">
@@ -109,6 +117,8 @@ export function PlayerTable({
                           index={rowIndex}
                           showMarketValue={showMarketValue}
                           showAge={showAge}
+                          showFanRating={showFanRating}
+                          fanRating={fanRatings?.[player.id]}
                           editMode={editMode}
                           onQuickUpdate={onQuickUpdate}
                         />
@@ -122,6 +132,7 @@ export function PlayerTable({
                 <MobileSectionHeader
                   position={position}
                   view={mobileDataView}
+                  showFanRating={showFanRating}
                 />
                 {list.length === 0 ? (
                   <p className="p-4 text-center text-sm font-semibold text-slate-400">Sin jugadores en esta posición</p>
@@ -133,6 +144,8 @@ export function PlayerTable({
                       onSelect={onSelect}
                       index={rowIndex}
                       view={mobileDataView}
+                      showFanRating={showFanRating}
+                      fanRating={fanRatings?.[player.id]}
                       editMode={editMode}
                       onQuickUpdate={onQuickUpdate}
                     />
@@ -147,8 +160,8 @@ export function PlayerTable({
   );
 }
 
-function squadTableColumnCount(showAge: boolean, showMarketValue: boolean) {
-  return 2 + 1 + (showAge ? 1 : 0) + 5 + (showMarketValue ? 1 : 0) + 1;
+function squadTableColumnCount(showAge: boolean, showMarketValue: boolean, showFanRating: boolean) {
+  return 2 + 1 + (showAge ? 1 : 0) + 5 + (showFanRating ? 1 : 0) + (showMarketValue ? 1 : 0) + 1;
 }
 
 function PlayerRow({
@@ -157,6 +170,8 @@ function PlayerRow({
   index,
   showMarketValue,
   showAge,
+  showFanRating,
+  fanRating,
   editMode,
   onQuickUpdate,
 }: {
@@ -165,12 +180,14 @@ function PlayerRow({
   index: number;
   showMarketValue: boolean;
   showAge: boolean;
+  showFanRating: boolean;
+  fanRating?: PlayerRatingAverage;
   editMode?: boolean;
   onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
 }) {
   const interactive = Boolean(onSelect);
   const canQuickEdit = editMode && onQuickUpdate;
-  const columnCount = squadTableColumnCount(showAge, showMarketValue);
+  const columnCount = squadTableColumnCount(showAge, showMarketValue, showFanRating);
 
   if (canQuickEdit) {
     return (
@@ -231,6 +248,11 @@ function PlayerRow({
       <StatCell value={player.asistencias} highlight={player.asistencias > 0} />
       <StatCell value={player.amarillas} warn={player.amarillas > 0} />
       <StatCell value={player.rojas} warn={player.rojas > 0} />
+      {showFanRating && (
+        <td className={`${cellPad} text-center text-xs font-extrabold tabular-nums text-[#214C9B] ${alignClass.center}`}>
+          {fanRating ? formatFanRating(fanRating.average) : "—"}
+        </td>
+      )}
       {showMarketValue && (
         <td className={`${cellPad} text-[10px] font-bold leading-tight tabular-nums text-slate-600 ${alignClass.center}`}>
           {player.valorMercado ?? "—"}
@@ -248,6 +270,8 @@ function PlayerMobileRow({
   onSelect,
   index,
   view,
+  showFanRating,
+  fanRating,
   editMode,
   onQuickUpdate,
 }: {
@@ -255,6 +279,8 @@ function PlayerMobileRow({
   onSelect?: (player: SquadPlayer) => void;
   index: number;
   view: MobileDataView;
+  showFanRating: boolean;
+  fanRating?: PlayerRatingAverage;
   editMode?: boolean;
   onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
 }) {
@@ -299,6 +325,11 @@ function PlayerMobileRow({
           <MobileValue>{player.asistencias}</MobileValue>
           <MobileValue warn={player.amarillas > 0}>{player.amarillas}</MobileValue>
           <MobileValue warn={player.rojas > 0}>{player.rojas}</MobileValue>
+          {showFanRating ? (
+            <MobileValue highlight={Boolean(fanRating)}>
+              {fanRating ? formatFanRating(fanRating.average) : "—"}
+            </MobileValue>
+          ) : null}
         </>
       ) : (
         <>
@@ -390,9 +421,11 @@ function MobileDataToggle({
 function MobileSectionHeader({
   position,
   view,
+  showFanRating,
 }: {
   position: (typeof SQUAD_POSITIONS)[number];
   view: MobileDataView;
+  showFanRating: boolean;
 }) {
   return (
     <div
@@ -406,6 +439,7 @@ function MobileSectionHeader({
           <span className="text-center" aria-label="Asistencias">A</span>
           <span className="text-center" aria-label="Tarjetas amarillas">🟨</span>
           <span className="text-center" aria-label="Tarjetas rojas">🟥</span>
+          {showFanRating ? <span className="text-center">Nota</span> : null}
         </>
       ) : (
         <>
@@ -421,17 +455,19 @@ function MobileSectionHeader({
 function MobileValue({
   children,
   warn = false,
+  highlight = false,
   compact = false,
 }: {
   children: ReactNode;
   warn?: boolean;
+  highlight?: boolean;
   compact?: boolean;
 }) {
   return (
     <span
       className={`min-w-0 truncate text-center font-bold tabular-nums ${
         compact ? "text-[9.5px]" : "text-[10.5px]"
-      } ${warn ? "text-red-600" : "text-slate-700"}`}
+      } ${warn ? "text-red-600" : highlight ? "text-[#214C9B]" : "text-slate-700"}`}
     >
       {children}
     </span>
