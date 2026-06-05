@@ -13,6 +13,10 @@ import { buildMatchDetail } from "@/lib/match-detail";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { getTeamsBundle, resolveFixtureTeamDisplayName } from "@/lib/cms/teams-bundle";
+import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
+import { defaultCronicaId } from "@/lib/match-article-factory";
+import { getMatchArticlePageHref } from "@/lib/match-article-url";
+import { isMatchPlayed } from "@/lib/match-result";
 import { resolveSquadPlayerByName, scorerLabelForPlayer } from "@/lib/squad-player-resolve";
 import { getNationalityFlag, getPlayerDisplayName } from "@/lib/squad-utils";
 import {
@@ -29,11 +33,9 @@ import {
   outcomeFromGoalsPicks,
 } from "@/lib/quiniela";
 import { getTeamCrestById } from "@/lib/team-crests";
-import { primerEquipoBase } from "@/lib/primer-equipo";
 import { cn } from "@/lib/utils";
 import type { GoalsPick, Match, Prediction, PredictionOutcome } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
-import type { Route } from "next";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 
 const outcomes: PredictionOutcome[] = ["1", "X", "2"];
@@ -105,6 +107,7 @@ export function PredictionForm({
 }) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const { bundles } = useSeason();
+  const { getForMatch } = useSeasonMatchArticles();
   const teams = useMemo(() => resolveGroupTeams(bundles, "masculino", "1"), [bundles]);
   const cmsTeams = useMemo(() => getTeamsBundle(bundles, "masculino")?.teams ?? [], [bundles]);
   const homeTeamName = useMemo(
@@ -121,7 +124,12 @@ export function PredictionForm({
   );
   const avilesMatch = isAvilesMatch(match);
   const avilesIsHome = match.homeTeamId === RAI_TEAM_ID;
-  const matchPageHref = `${primerEquipoBase("masculino")}/calendario` as Route;
+  const avilesArticleHref = useMemo(() => {
+    if (!avilesMatch) return null;
+    const article = getForMatch(match.id, "masculino");
+    return getMatchArticlePageHref(match.id, "masculino", article?.id ?? defaultCronicaId(match.id, "masculino"));
+  }, [avilesMatch, getForMatch, match.id]);
+  const avilesArticleLabel = isMatchPlayed(match) ? "Crónica" : "Previa";
   const avilesGoalsPick = prediction ? getAvilesGoalsPick(match, prediction) : undefined;
   const scorerLockedToNadie = avilesGoalsPick === 0;
   const derivedOutcome =
@@ -254,14 +262,14 @@ export function PredictionForm({
                   />
                 )}
               </div>
-              {avilesMatch ? (
+              {avilesMatch && avilesArticleHref ? (
                 <Link
-                  href={matchPageHref}
+                  href={avilesArticleHref}
                   className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#214C9B]/25 px-2.5 py-1.5 text-[11px] font-bold text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50 sm:px-3 sm:text-xs"
                 >
-                  <Eye size={14} /> Calendario
+                  <Eye size={14} /> {avilesArticleLabel}
                 </Link>
-              ) : (
+              ) : !avilesMatch ? (
                 <button
                   type="button"
                   onClick={() => setPreviewOpen(true)}
@@ -269,7 +277,7 @@ export function PredictionForm({
                 >
                   <Eye size={14} /> Previa
                 </button>
-              )}
+              ) : null}
             </div>
           </div>
 
