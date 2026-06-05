@@ -79,3 +79,26 @@ export function moveClubXPost(
   [next[index], next[target]] = [next[target], next[index]];
   return next;
 }
+
+const TWITTER_EPOCH_MS = BigInt(1288834974657);
+const SNOWFLAKE_TIMESTAMP_SHIFT = BigInt(22);
+
+/** Extrae la fecha de publicación desde el ID numérico de un tweet (snowflake de X). */
+export function tweetPublishedAtMs(id: string): number | null {
+  if (!/^\d+$/.test(id)) return null;
+  try {
+    const snowflake = BigInt(id);
+    return Number((snowflake >> SNOWFLAKE_TIMESTAMP_SHIFT) + TWITTER_EPOCH_MS);
+  } catch {
+    return null;
+  }
+}
+
+/** Ordena tweets por fecha de publicación (más recientes primero). */
+export function sortClubXPostsByDate(posts: ClubXPostEmbed[]): ClubXPostEmbed[] {
+  return [...posts].sort((a, b) => {
+    const aMs = tweetPublishedAtMs(a.id) ?? 0;
+    const bMs = tweetPublishedAtMs(b.id) ?? 0;
+    return bMs - aMs;
+  });
+}
