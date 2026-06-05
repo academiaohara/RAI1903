@@ -48,9 +48,9 @@ export function CardHeader({
 
 export function Card({ eyebrow, title, action, children, className, dense = false, borderlessHeader = false }: CardProps) {
   return (
-    <section className={cn(className)}>
+    <section className={cn("min-w-0", className)}>
       <CardHeader eyebrow={eyebrow} title={title} action={action} dense={dense} borderlessHeader={borderlessHeader} />
-      <div className={dense ? "p-3 sm:p-4" : "p-3 sm:p-5"}>{children}</div>
+      <div className={cn("min-w-0", dense ? "p-3 sm:p-4" : "p-3 sm:p-5")}>{children}</div>
     </section>
   );
 }

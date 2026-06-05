@@ -46,33 +46,36 @@ export function LeagueTable({
   const showCrests = showCrestsProp ?? gender !== "femenino";
   const visibleRows = [...teams].sort((a, b) => a.position - b.position);
 
+  const statColClass = "px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5";
+  const optionalStatColClass = cn(statColClass, compact && "hidden sm:table-cell");
+
   return (
-    <div className="space-y-3">
-      <div className="overflow-x-auto rounded-2xl border border-[#214C9B]/20 bg-white">
-        <table className="w-full text-left text-[10px] md:text-sm">
+    <div className="min-w-0 space-y-3">
+      <div className="overflow-x-auto rounded-2xl border border-[#214C9B]/20 bg-white [-webkit-overflow-scrolling:touch]">
+        <table className="w-full table-fixed text-left text-[10px] sm:table-auto md:text-sm">
           <thead className="bg-[#214C9B] text-[8px] uppercase tracking-[0.06em] text-white md:text-[10px] md:tracking-[0.1em]">
             <tr>
-              <th className="w-5 p-0 text-center font-bold md:w-7">#</th>
+              <th className="w-[1.75rem] p-0 text-center font-bold sm:w-5 md:w-7">#</th>
               <th className="px-1 py-1.5 font-bold md:px-2 md:py-2.5">Equipo</th>
               {!compact ? (
                 <>
-                  <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">PJ</th>
-                  <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">G</th>
-                  <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">E</th>
-                  <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">P</th>
-                  <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">GF:GC</th>
+                  <th className={statColClass}>PJ</th>
+                  <th className={statColClass}>G</th>
+                  <th className={statColClass}>E</th>
+                  <th className={statColClass}>P</th>
+                  <th className={cn(statColClass, "hidden sm:table-cell")}>GF:GC</th>
                 </>
               ) : (
                 <>
-                  <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">PJ</th>
-                  <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">G</th>
-                  <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">E</th>
-                  <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">P</th>
+                  <th className={statColClass}>PJ</th>
+                  <th className={optionalStatColClass}>G</th>
+                  <th className={optionalStatColClass}>E</th>
+                  <th className={optionalStatColClass}>P</th>
                 </>
               )}
-              <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">DG</th>
-              <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">Pts</th>
-              {!compact && <th className="px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5">Forma</th>}
+              <th className={cn(statColClass, "w-[2rem] sm:w-auto")}>DG</th>
+              <th className={cn(statColClass, "w-[2.25rem] sm:w-auto")}>Pts</th>
+              {!compact && <th className={cn(statColClass, "hidden md:table-cell")}>Forma</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -96,8 +99,10 @@ export function LeagueTable({
               const teamLinkable = canLinkEquipoLiga(gender, team.id, season?.bundles);
               const teamCellContent = (
                 <>
-                  {showCrests ? <TeamCrest team={team} size="sm" className="shrink-0" /> : null}
-                  <span className="max-w-[4.5rem] truncate font-bold group-hover/team:underline group-hover/team:decoration-[#214C9B]/40 group-hover/team:underline-offset-2 sm:max-w-none md:max-w-none">
+                  {showCrests ? (
+                    <TeamCrest team={team} size="sm" className="h-5 w-5 shrink-0 sm:h-7 sm:w-7" />
+                  ) : null}
+                  <span className="min-w-0 truncate font-bold group-hover/team:underline group-hover/team:decoration-[#214C9B]/40 group-hover/team:underline-offset-2">
                     <span className="md:hidden">{team.shortName}</span>
                     <span className="hidden md:inline">{teamLabel}</span>
                   </span>
@@ -139,7 +144,7 @@ export function LeagueTable({
                       <td
                         className={cn(
                           dataCellClassName,
-                          "text-center tabular-nums",
+                          "hidden text-center tabular-nums sm:table-cell",
                           highlighted ? "text-white/90" : "text-slate-600",
                         )}
                       >
@@ -149,9 +154,15 @@ export function LeagueTable({
                   ) : (
                     <>
                       <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.played}</td>
-                      <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.won}</td>
-                      <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.drawn}</td>
-                      <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.lost}</td>
+                      <td className={cn(dataCellClassName, "hidden text-center tabular-nums sm:table-cell")}>
+                        {team.stats.won}
+                      </td>
+                      <td className={cn(dataCellClassName, "hidden text-center tabular-nums sm:table-cell")}>
+                        {team.stats.drawn}
+                      </td>
+                      <td className={cn(dataCellClassName, "hidden text-center tabular-nums sm:table-cell")}>
+                        {team.stats.lost}
+                      </td>
                     </>
                   )}
                   <td className={cn(dataCellClassName, "text-center font-semibold tabular-nums")}>
@@ -167,7 +178,7 @@ export function LeagueTable({
                     {team.stats.points}
                   </td>
                   {!compact && (
-                    <td className={dataCellClassName}>
+                    <td className={cn(dataCellClassName, "hidden md:table-cell")}>
                       <div className="flex justify-center gap-px md:gap-0.5">
                         {team.form.map((result, index) => (
                           <span
@@ -193,7 +204,7 @@ export function LeagueTable({
 
       {showLegend && (
         <div
-          className="flex flex-nowrap justify-center gap-x-2 overflow-x-auto px-1 text-[8px] font-bold uppercase tracking-[0.04em] text-slate-500 md:flex-wrap md:justify-start md:gap-x-4 md:gap-y-2 md:overflow-visible md:text-[10px] md:tracking-[0.08em]"
+          className="flex flex-wrap justify-center gap-x-2 gap-y-1.5 px-1 text-[8px] font-bold uppercase tracking-[0.04em] text-slate-500 md:justify-start md:gap-x-4 md:gap-y-2 md:text-[10px] md:tracking-[0.08em]"
           role="list"
           aria-label="Leyenda de zonas en la clasificacion"
         >

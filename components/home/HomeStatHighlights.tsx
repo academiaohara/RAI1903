@@ -96,15 +96,21 @@ export function HomeStatHighlights() {
   }
 
   return (
-    <ul className="space-y-3">
+    <ul className="space-y-2 sm:space-y-3">
       {rows.map((item) => (
-        <li key={item.label} className="flex items-center justify-between gap-4 border-b border-[#214C9B]/10 pb-3 last:border-b-0 last:pb-0">
-          <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-normal text-slate-500">{item.label}</p>
-            <p className="mt-1 truncate text-base font-extrabold uppercase text-[#214C9B]">{item.name}</p>
+        <li
+          key={item.label}
+          className="flex items-start justify-between gap-2 border-b border-[#214C9B]/10 pb-2 last:border-b-0 last:pb-0 sm:items-center sm:gap-4 sm:pb-3"
+        >
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-bold uppercase tracking-normal text-slate-500 sm:text-xs">{item.label}</p>
+            <p className="mt-0.5 truncate text-sm font-extrabold uppercase text-[#214C9B] sm:mt-1 sm:text-base">
+              {item.name}
+            </p>
           </div>
-          <p className="shrink-0 text-right text-2xl font-extrabold text-slate-950">
-            {item.value} <span className="text-xs font-bold text-slate-500">{item.suffix}</span>
+          <p className="shrink-0 text-right text-lg font-extrabold text-slate-950 sm:text-2xl">
+            {item.value}{" "}
+            <span className="block text-[10px] font-bold text-slate-500 sm:inline sm:text-xs">{item.suffix}</span>
           </p>
         </li>
       ))}

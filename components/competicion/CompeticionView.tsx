@@ -162,7 +162,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
         <>
           {isMasculino && <GuiaLiga gender={gender} teams={teams} grupo={grupo} />}
 
-          <section className="grid gap-6 xl:grid-cols-2">
+          <section className="grid min-w-0 gap-6 xl:grid-cols-2">
             <StandingsLeagueTableCard
               key={`${gender}-${grupo}`}
               eyebrow="Liga"
@@ -177,7 +177,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
               zoneRules={competitionConfig.zones}
               {...(isMasculino ? {} : { tiebreak: undefined })}
             />
-            <div className="grid gap-6">
+            <div className="grid min-w-0 gap-6">
               {showAvilesSidebar && (
                 <>
                   <Card eyebrow="Forma reciente" title="Ultimos resultados" borderlessHeader>
