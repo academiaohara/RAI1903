@@ -39,13 +39,6 @@ export async function GET(request: Request) {
       round,
     );
 
-    if (!result) {
-      return NextResponse.json(
-        { error: "Este usuario no tiene quinielas guardadas en la temporada." },
-        { status: 404 },
-      );
-    }
-
     return NextResponse.json(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error al cargar la quiniela";

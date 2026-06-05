@@ -78,7 +78,7 @@ export async function computeQuinielaUserRoundFromSupabase(
   seasonId: CompetitionSeasonId,
   userId: string,
   round?: number,
-): Promise<QuinielaUserRoundResult | null> {
+): Promise<QuinielaUserRoundResult> {
   const { matchdays, scoringContext } = await loadQuinielaRankingMatchdays(supabase, seasonId);
   return fetchQuinielaUserRound(supabase, seasonId, userId, matchdays, round, scoringContext);
 }

@@ -14,6 +14,8 @@ type QuinielaRankingListProps = {
   emptyMessage: string;
   seasonId: CompetitionSeasonId;
   matchdays: Matchday[];
+  totalRounds: number;
+  currentRound: number;
   initialModalRound?: number;
 };
 
@@ -22,6 +24,8 @@ export function QuinielaRankingList({
   emptyMessage,
   seasonId,
   matchdays,
+  totalRounds,
+  currentRound,
   initialModalRound,
 }: QuinielaRankingListProps) {
   const pagination = usePagination(entries);
@@ -86,6 +90,8 @@ export function QuinielaRankingList({
           handle={selectedUser.handle}
           avatarUrl={selectedUser.avatarUrl}
           matchdays={matchdays}
+          totalRounds={totalRounds}
+          currentRound={currentRound}
           initialRound={initialModalRound}
         />
       ) : null}

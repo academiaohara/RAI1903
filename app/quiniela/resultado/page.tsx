@@ -88,6 +88,8 @@ function ResultadoBody({ seasonId, matchdays, currentRound, totalRounds }: Resul
               entries={rankingEntries}
               seasonId={seasonId}
               matchdays={matchdays}
+              totalRounds={totalRounds}
+              currentRound={currentRound}
               initialModalRound={round}
               emptyMessage={
                 isSupabaseConfigured()

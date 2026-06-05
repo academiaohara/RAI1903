@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { getProfileAvatarUrl, getProfileHandle } from "@/lib/auth/user-display";
 import {
   countOutcomeHits,
+  getMatchdayByRound,
   migratePrediction,
   scorePredictionPoints,
   shouldCountQuinielaPoints,
@@ -32,6 +33,7 @@ export type QuinielaUserRoundResult = {
   avatarUrl: string | null;
   round: number;
   savedRounds: number[];
+  hasSavedRound: boolean;
   predictions: Record<string, Prediction>;
   points: number;
   hits: number;
@@ -288,19 +290,14 @@ export async function fetchQuinielaUserRound(
   matchdays: Matchday[],
   requestedRound?: number,
   scoringContext?: QuinielaScoringContext,
-): Promise<QuinielaUserRoundResult | null> {
+): Promise<QuinielaUserRoundResult> {
   const savedRows = await fetchSavedRounds(supabase, seasonId);
   const userSaved = savedRows.filter((row) => row.user_id === userId);
-  if (userSaved.length === 0) return null;
-
   const savedRounds = [...new Set(userSaved.map((row) => row.round))].sort((a, b) => b - a);
-  const round =
-    requestedRound !== undefined && savedRounds.includes(requestedRound)
-      ? requestedRound
-      : savedRounds[0];
+  const round = requestedRound ?? savedRounds[0] ?? 1;
 
-  const matchday = matchdays.find((md) => md.round === round);
-  if (!matchday) return null;
+  const matchday = getMatchdayByRound(matchdays, round);
+  const hasSavedRound = savedRounds.includes(round);
 
   const [predictionRows, profileMap] = await Promise.all([
     fetchPredictions(supabase, seasonId, [userId], round),
@@ -309,7 +306,12 @@ export async function fetchQuinielaUserRound(
 
   const predictions = predictionsByUser(predictionRows).get(userId) ?? {};
   const countPoints = shouldCountQuinielaPoints(matchday);
-  const { points, hits } = scoreUserMatchday(matchday, predictions, countPoints, scoringContext);
+  const { points, hits } = scoreUserMatchday(
+    matchday,
+    predictions,
+    countPoints && hasSavedRound,
+    scoringContext,
+  );
   const profile = profileMap.get(userId);
 
   return {
@@ -318,6 +320,7 @@ export async function fetchQuinielaUserRound(
     avatarUrl: profile ? getProfileAvatarUrl(profile) : null,
     round,
     savedRounds,
+    hasSavedRound,
     predictions,
     points,
     hits,
