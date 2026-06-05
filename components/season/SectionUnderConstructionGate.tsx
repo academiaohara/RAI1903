@@ -21,6 +21,11 @@ type SectionUnderConstructionGateProps = {
   editorHintOverride?: string;
   /** Texto extra para visitantes (p. ej. indicar que pueden cambiar de temporada). */
   publicHintOverride?: string;
+  /**
+   * Cabecera que permanece visible para visitantes cuando la sección está en construcción.
+   * En ese caso el cartel se muestra debajo de la cabecera (no encima del contenido).
+   */
+  header?: ReactNode;
   children: ReactNode;
 };
 
@@ -83,6 +88,7 @@ export function SectionUnderConstructionGate({
   labelOverride,
   editorHintOverride,
   publicHintOverride,
+  header,
   children,
 }: SectionUnderConstructionGateProps) {
   const { bundles, bundlesLoading } = useSeason();
@@ -94,6 +100,40 @@ export function SectionUnderConstructionGate({
 
   const underConstruction = isSectionUnderConstruction(bundles, scope, section);
   const showContent = !underConstruction || (canEdit && editMode);
+
+  if (header) {
+    if (showContent) {
+      return (
+        <div className="space-y-4">
+          {underConstruction && canEdit && editMode && (
+            <SectionUnderConstructionBanner
+              scope={scope}
+              section={section}
+              labelOverride={labelOverride}
+              editorHintOverride={editorHintOverride}
+              publicHintOverride={publicHintOverride}
+            />
+          )}
+          {children}
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        {header}
+        {underConstruction && (
+          <SectionUnderConstructionBanner
+            scope={scope}
+            section={section}
+            labelOverride={labelOverride}
+            editorHintOverride={editorHintOverride}
+            publicHintOverride={publicHintOverride}
+          />
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
