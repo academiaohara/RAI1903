@@ -9,6 +9,7 @@ import { EditableText } from "@/components/inline-editing/EditableText";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
 import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
 import { ExtraFixturesOnPageEditor } from "@/components/editor/ExtraFixturesOnPageEditor";
+import { SectionUnderConstructionGate } from "@/components/season/SectionUnderConstructionGate";
 import { MatchCard } from "@/components/MatchCard";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
 import { UpcomingMatchCard } from "@/components/UpcomingMatchCard";
@@ -109,6 +110,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
   }, [showAvilesSidebar, editedStandingsMatchdays]);
 
   return (
+    <SectionUnderConstructionGate scope={gender} section="competicion">
     <div className="space-y-6">
       {isMasculino && (
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
@@ -221,6 +223,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
         </>
       )}
     </div>
+    </SectionUnderConstructionGate>
   );
 }
 

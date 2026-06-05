@@ -70,7 +70,8 @@ alter table public.cms_season_bundles
       'transfers',
       'competition_config',
       'teams',
-      'rival_squads'
+      'rival_squads',
+      'section_status'
     )
   );
 

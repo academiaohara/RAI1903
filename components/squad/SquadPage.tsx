@@ -20,6 +20,7 @@ import { PlayerModal } from "@/components/squad/PlayerModal";
 import { StadiumModal } from "@/components/squad/StadiumModal";
 import { StadiumEditorModal } from "@/components/squad/StadiumEditorModal";
 import { SquadEditToolbar } from "@/components/squad/SquadEditToolbar";
+import { SectionUnderConstructionGate } from "@/components/season/SectionUnderConstructionGate";
 import { StandingsEvolutionChart } from "@/components/squad/StandingsEvolutionChart";
 import type { StadiumInfo } from "@/types/squad";
 
@@ -104,6 +105,7 @@ export function SquadPage({ gender }: SquadPageProps) {
   const stadiumEditorOpen = stadiumOpen && editMode;
 
   return (
+    <SectionUnderConstructionGate scope={gender} section="plantilla">
     <div className="space-y-6">
       <SquadHeader
         club={club}
@@ -176,5 +178,6 @@ export function SquadPage({ gender }: SquadPageProps) {
         onSaved={setStadiumOverride}
       />
     </div>
+    </SectionUnderConstructionGate>
   );
 }

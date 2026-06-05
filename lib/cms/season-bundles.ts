@@ -20,7 +20,8 @@ export type SeasonBundleKey =
   | "transfers"
   | "competition_config"
   | "teams"
-  | "rival_squads";
+  | "rival_squads"
+  | "section_status";
 
 /** Movimiento oficial del mercado (carrusel de inicio). */
 export type CmsTransferEntry = {

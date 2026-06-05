@@ -6,6 +6,7 @@ import { JornadaRoundCarousel } from "@/components/jornadas/JornadaRoundCarousel
 import { JornadasGrupoSwitcher } from "@/components/jornadas/JornadasGrupoSwitcher";
 import { useEditedJornadasDataset } from "@/components/jornadas/useEditedJornadasDataset";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { SectionUnderConstructionGate } from "@/components/season/SectionUnderConstructionGate";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { hasMultipleGrupos } from "@/lib/cms/competition-config-bundle";
 import { buildJornadasDataset, groupFixturesByCalendarDay, jornadaSectionTitle } from "@/lib/jornadas-data";
@@ -49,6 +50,7 @@ export function JornadasView({ gender }: JornadasViewProps) {
   const showCrests = gender !== "femenino";
 
   return (
+    <SectionUnderConstructionGate scope={gender} section="jornadas">
     <div className="space-y-6">
       <JornadaRoundCarousel
         rounds={dataset.rounds}
@@ -83,5 +85,6 @@ export function JornadasView({ gender }: JornadasViewProps) {
         )}
       </Card>
     </div>
+    </SectionUnderConstructionGate>
   );
 }
