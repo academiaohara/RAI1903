@@ -84,6 +84,7 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
   const [activeTab, setActiveTab] = useState<ActiveTabId>(isFinished ? "eventos" : "previa");
   const showTabBar = tabs.length > 0;
   const safeActiveTab = !isFinished && !UNLOCKED_UPCOMING_TAB_IDS.has(activeTab) ? "previa" : activeTab;
+  const activeTabMeta = tabs.find((tab) => tab.id === safeActiveTab);
 
   const showArticleBodyAboveTabs = !isFinished && article !== undefined;
   const showClubNews = article !== undefined;
@@ -157,15 +158,22 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
         ))}
 
       {showTabBar && tabs.length > 0 && (
-        <MatchCenterTabs
-          tabs={tabs}
-          active={safeActiveTab}
-          onChange={(id) => {
-            const tab = tabs.find((item) => item.id === id);
-            if (tab?.disabled) return;
-            setActiveTab(id as ActiveTabId);
-          }}
-        />
+        <div className="min-w-0 space-y-3">
+          <MatchCenterTabs
+            tabs={tabs}
+            active={safeActiveTab}
+            onChange={(id) => {
+              const tab = tabs.find((item) => item.id === id);
+              if (tab?.disabled) return;
+              setActiveTab(id as ActiveTabId);
+            }}
+          />
+          {activeTabMeta ? (
+            <h2 className="text-lg font-extrabold uppercase tracking-normal text-[#214C9B] sm:hidden">
+              {activeTabMeta.label}
+            </h2>
+          ) : null}
+        </div>
       )}
 
       {panelContent}
