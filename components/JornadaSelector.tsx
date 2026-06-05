@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type WheelEvent } from "react";
-import { scrollElementHorizontally } from "@/lib/scroll-horizontal";
+import { scrollAlignForIndex, scrollElementHorizontally } from "@/lib/scroll-horizontal";
 import { cn } from "@/lib/utils";
 
 export function JornadaSelector({
@@ -24,11 +24,18 @@ export function JornadaSelector({
     const list = listRef.current;
     if (!list) return;
 
-    const selected = list.querySelector<HTMLButtonElement>(`[data-round="${value}"]`);
-    if (selected) {
-      scrollElementHorizontally(list, selected, { behavior: "smooth", align: "center" });
-    }
-  }, [value]);
+    const frame = requestAnimationFrame(() => {
+      const selected = list.querySelector<HTMLButtonElement>(`[data-round="${value}"]`);
+      if (!selected) return;
+
+      scrollElementHorizontally(list, selected, {
+        behavior: "smooth",
+        align: scrollAlignForIndex(value, total),
+      });
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [value, total]);
 
   const handleWheel = (event: WheelEvent<HTMLDivElement>) => {
     if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
@@ -78,7 +85,7 @@ export function JornadaSelector({
         ref={listRef}
         onWheel={handleWheel}
         className={cn(
-          "no-scrollbar flex w-full min-w-0 touch-pan-x flex-nowrap overflow-x-auto overscroll-x-contain pb-1",
+          "relative no-scrollbar flex w-full min-w-0 touch-pan-x scroll-px-1 flex-nowrap overflow-x-auto overscroll-x-contain pb-1",
           compact ? "mt-2 gap-1.5" : "mt-2 gap-1.5 sm:mt-3 sm:gap-2",
         )}
       >

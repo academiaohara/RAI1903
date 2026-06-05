@@ -6,8 +6,10 @@ export function scrollElementHorizontally(
 ): void {
   const behavior = options?.behavior ?? "auto";
   const align = options?.align ?? "center";
-  const elementLeft = element.offsetLeft;
-  const elementWidth = element.offsetWidth;
+  const containerRect = container.getBoundingClientRect();
+  const elementRect = element.getBoundingClientRect();
+  const elementLeft = elementRect.left - containerRect.left + container.scrollLeft;
+  const elementWidth = elementRect.width;
   const containerWidth = container.clientWidth;
   const maxScroll = Math.max(0, container.scrollWidth - containerWidth);
 
@@ -28,4 +30,11 @@ export function scrollElementHorizontally(
     left: Math.max(0, Math.min(targetLeft, maxScroll)),
     behavior,
   });
+}
+
+/** Alineacion que mantiene visibles las primeras y ultimas jornadas en listas largas. */
+export function scrollAlignForIndex(index: number, total: number): "start" | "center" | "end" {
+  if (index <= 3) return "start";
+  if (index >= total - 2) return "end";
+  return "center";
 }
