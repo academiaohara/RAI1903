@@ -4,7 +4,10 @@ import { GearAdorno } from "@/components/GearAdorno";
 import { cn } from "@/lib/utils";
 import { useId, type ElementType } from "react";
 
-const pageTitleClass = "text-[clamp(2rem,9vw,3.75rem)]";
+const pageTitleSizes = {
+  default: "text-[clamp(2rem,9vw,3.75rem)]",
+  compact: "text-[clamp(1.55rem,6.5vw,3.75rem)]",
+} as const;
 const gearSizeClass = "h-[1.38em] w-[1.38em]";
 const gearTextOverlapClass = "-ml-[0.74em]";
 
@@ -14,6 +17,7 @@ type TitleWithOrnamentProps = {
   mobileTitle?: string;
   as?: ElementType;
   animated?: boolean;
+  size?: keyof typeof pageTitleSizes;
   className?: string;
   wrapperClassName?: string;
 };
@@ -23,6 +27,7 @@ export function TitleWithOrnament({
   mobileTitle,
   as: Tag = "h1",
   animated = false,
+  size = "default",
   className,
   wrapperClassName,
 }: TitleWithOrnamentProps) {
@@ -34,7 +39,7 @@ export function TitleWithOrnament({
     <div
       className={cn(
         "title-gear inline-flex max-w-full items-center overflow-visible bg-transparent",
-        pageTitleClass,
+        pageTitleSizes[size],
         wrapperClassName,
       )}
     >

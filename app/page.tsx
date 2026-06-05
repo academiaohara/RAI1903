@@ -9,9 +9,8 @@ export default function HomePage() {
         title="RAI1903"
         description="Inicio blanquiazul para seguir ultimo partido, proxima previa, clasificacion, forma, calendario, stats y noticiero."
         titleWrapperClassName="title-gear-rai-home"
-      >
-        <SeasonSelector className="border-[#214C9B]/20 sm:w-auto sm:shrink-0" />
-      </PageHero>
+        titleActions={<SeasonSelector className="border-[#214C9B]/20 sm:w-auto sm:shrink-0" />}
+      />
 
       <HomePageSections />
     </div>

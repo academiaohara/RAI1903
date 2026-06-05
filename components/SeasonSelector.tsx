@@ -7,9 +7,11 @@ import { cn } from "@/lib/utils";
 
 type SeasonSelectorProps = {
   className?: string;
+  /** Selector móvil más pequeño (p. ej. cabecera de Competición). */
+  compact?: boolean;
 };
 
-export function SeasonSelector({ className }: SeasonSelectorProps) {
+export function SeasonSelector({ className, compact = false }: SeasonSelectorProps) {
   const { seasons, viewedSeasonId, setViewedSeasonId } = useSeason();
 
   const published = seasons.filter((row) => row.published);
@@ -35,7 +37,7 @@ export function SeasonSelector({ className }: SeasonSelectorProps) {
   };
 
   return (
-    <div className="flex min-w-0 flex-col items-end gap-1">
+    <div className="shrink-0">
       <label className="sr-only" htmlFor="season-select-mobile">
         Temporada
       </label>
@@ -44,7 +46,8 @@ export function SeasonSelector({ className }: SeasonSelectorProps) {
         value={viewedSeasonId}
         onChange={(event) => setViewedSeasonId(event.target.value as CompetitionSeasonId)}
         className={cn(
-          "w-auto max-w-full rounded-lg border bg-white px-2 py-1.5 text-[11px] font-extrabold uppercase tracking-normal text-[#214C9B] outline-none focus:border-[#214C9B] focus:ring-1 focus:ring-[#214C9B]/30 sm:hidden",
+          "w-auto max-w-full rounded-lg border bg-white font-extrabold uppercase tracking-normal text-[#214C9B] outline-none focus:border-[#214C9B] focus:ring-1 focus:ring-[#214C9B]/30 sm:hidden",
+          compact ? "px-1.5 py-1 text-[10px]" : "px-2 py-1.5 text-[11px]",
           className,
         )}
         aria-label="Seleccionar temporada"

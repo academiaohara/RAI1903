@@ -142,8 +142,12 @@ export const mobileNavSections: MobileNavSection[] = [
     items: navChildrenByHref("/noticias"),
   },
   {
-    title: "APPS",
-    items: [...navChildrenByHref("/quiniela"), ...navChildrenByHref("/media-rai")],
+    title: "QUINIELA",
+    items: navChildrenByHref("/quiniela"),
+  },
+  {
+    title: "MEDIA RAI",
+    items: navChildrenByHref("/media-rai"),
   },
 ];
 
