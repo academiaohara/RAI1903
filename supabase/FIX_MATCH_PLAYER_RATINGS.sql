@@ -1,4 +1,12 @@
--- Valoraciones de jugadores por partido (usuarios autenticados)
+-- =============================================================================
+-- Valoraciones de jugadores en crónicas — ejecutar en Supabase → SQL Editor
+-- Si al enviar valoraciones ves:
+--   Could not find the table 'public.match_player_ratings' in the schema cache
+-- es que la tabla no se creó (no está en migraciones CMS antiguas).
+-- Idempotente: puedes ejecutarlo varias veces.
+-- Alternativa: volver a ejecutar supabase/APPLY_CMS_MIGRATIONS.sql (incluye esta tabla).
+-- =============================================================================
+
 create table if not exists public.match_player_ratings (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users (id) on delete cascade,
