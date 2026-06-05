@@ -6,7 +6,6 @@ import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvi
 import { deleteClubXPostOverrides } from "@/lib/cms/inline-overrides";
 import { CLUB_X_HANDLE } from "@/lib/club-x";
 import {
-  CLUB_X_EMBED_WIDTH_PX,
   CLUB_X_POST_EMBEDS,
   CLUB_X_POSTS_STORAGE_KEY,
   isClubXPostsList,
@@ -75,7 +74,7 @@ export function ClubXPosts() {
   };
 
   return (
-    <div className="w-full" style={{ maxWidth: CLUB_X_EMBED_WIDTH_PX }}>
+    <div className="w-full min-w-0 max-w-full lg:max-w-[550px]">
       {editMode && (
         <div className="mb-4 space-y-3 rounded-2xl border border-dashed border-[#214C9B]/35 bg-blue-50/40 p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -167,10 +166,7 @@ export function ClubXPosts() {
       {currentPosts.length === 0 && !editMode ? (
         <p className="text-sm font-semibold text-slate-500">No hay tweets publicados todavía.</p>
       ) : (
-        <div
-          className="max-h-[min(70vh,640px)] overflow-y-auto overscroll-y-contain pr-1"
-          style={{ width: CLUB_X_EMBED_WIDTH_PX, maxWidth: "100%" }}
-        >
+        <div className="max-h-[min(70vh,640px)] w-full max-w-full overflow-y-auto overscroll-y-contain pr-1">
           <div ref={containerRef} className="space-y-4">
             {currentPosts.map((post) => (
               <blockquote
