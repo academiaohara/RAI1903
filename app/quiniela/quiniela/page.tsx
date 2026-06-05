@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useAppDialog } from "@/components/AppDialogProvider";
 import { Card } from "@/components/Card";
 import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
@@ -38,6 +39,7 @@ type PronosticosBodyProps = {
 };
 
 function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundlesLoading }: PronosticosBodyProps) {
+  const { alert } = useAppDialog();
   const { bundles } = useSeason();
   const { canEdit: isCmsEditor } = useInlineEditing();
   const scoringContext = useMemo(
@@ -132,9 +134,9 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
     [isSaved, isEditing, userId, seasonId],
   );
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!isMatchdayComplete(selectedMatchday, predictions)) {
-      window.alert("Completa los 10 partidos (signo 1-X-2 y porra del Avilés si aplica) antes de guardar.");
+      await alert("Completa los 10 partidos (signo 1-X-2 y porra del Avilés si aplica) antes de guardar.");
       return;
     }
     void saveQuinielaPredictions(userId, predictions, seasonId);
@@ -264,7 +266,7 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
           {canSave && (
             <button
               type="button"
-              onClick={handleSave}
+              onClick={() => void handleSave()}
               className="rounded-xl bg-[#214C9B] px-4 py-2.5 text-xs font-extrabold uppercase text-white transition hover:bg-[#173a78] sm:rounded-2xl sm:px-6 sm:py-3 sm:text-sm"
             >
               Guardar
