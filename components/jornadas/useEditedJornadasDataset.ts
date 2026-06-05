@@ -22,8 +22,8 @@ function opponentFromFixtures(
   if (!raiFixture) return undefined;
   const isHome = raiFixture.homeTeamId === raiId;
   return {
-    teamId: isHome ? raiFixture.awayTeamId : raiFixture.awayTeamId,
-    name: isHome ? raiFixture.awayTeamName : raiFixture.awayTeamName,
+    teamId: isHome ? raiFixture.awayTeamId : raiFixture.homeTeamId,
+    name: isHome ? raiFixture.awayTeamName : raiFixture.homeTeamName,
   };
 }
 
