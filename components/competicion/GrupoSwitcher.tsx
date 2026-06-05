@@ -13,7 +13,7 @@ export function GrupoSwitcher({ value, onChange, className }: GrupoSwitcherProps
   return (
     <div
       className={cn(
-        "inline-flex rounded-2xl border border-[#214C9B]/20 bg-white p-1 shadow-sm",
+        "inline-flex rounded-xl border border-[#214C9B]/20 bg-white p-0.5 shadow-sm sm:rounded-2xl sm:p-1",
         className,
       )}
       role="tablist"
@@ -29,7 +29,7 @@ export function GrupoSwitcher({ value, onChange, className }: GrupoSwitcherProps
             aria-selected={active}
             onClick={() => onChange(grupo.id)}
             className={cn(
-              "rounded-xl px-4 py-2 text-sm font-extrabold uppercase tracking-wide transition",
+              "rounded-lg px-2 py-1 text-[11px] font-extrabold uppercase tracking-wide transition sm:rounded-xl sm:px-4 sm:py-2 sm:text-sm",
               active
                 ? "bg-[#214C9B] text-white shadow-sm"
                 : "text-slate-600 hover:bg-blue-50 hover:text-[#214C9B]",
