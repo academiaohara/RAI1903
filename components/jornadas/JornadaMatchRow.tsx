@@ -114,18 +114,37 @@ export function JornadaMatchRow({
 
   const nameClass = (isHighlight: boolean) =>
     cn(
-      "min-w-0 truncate text-[10px] font-extrabold sm:text-sm",
+      "min-w-0 truncate text-[9px] font-extrabold leading-tight sm:text-sm",
       isHighlight ? (highlighted ? "text-[#981915]" : "text-[#214C9B]") : "text-slate-800",
     );
 
+  const teamShortName = (teamId: string, fallbackName: string, team?: ReturnType<typeof getJornadaTeam>) =>
+    groupTeams.find((entry) => entry.id === teamId)?.shortName ?? team?.shortName ?? fallbackName;
+
+  const teamNameContent = (
+    teamId: string,
+    teamName: string,
+    team: ReturnType<typeof getJornadaTeam> | undefined,
+    align: "left" | "right",
+  ) => {
+    const shortName = teamShortName(teamId, teamName, team);
+    return (
+      <>
+        <span className={cn("sm:hidden", align === "right" && "block text-right")}>{shortName}</span>
+        <span className={cn("hidden sm:inline", align === "right" && "text-right")}>{teamName}</span>
+      </>
+    );
+  };
+
   const crestForTeam = (teamId: string, teamName: string, team?: ReturnType<typeof getJornadaTeam>) => {
-    if (team) return <TeamCrest team={team} size="sm" className="shrink-0" />;
+    const crestClassName = "h-3.5 w-3.5 shrink-0 sm:h-7 sm:w-7";
+    if (team) return <TeamCrest team={team} size="sm" className={crestClassName} />;
     return (
       <OpponentCrest
         logo={getTeamCrestById(teamId, teamName.slice(0, 3).toUpperCase())}
         opponent={teamName}
         size="sm"
-        className="shrink-0"
+        className={crestClassName}
       />
     );
   };
@@ -166,13 +185,13 @@ export function JornadaMatchRow({
   return (
     <article
       className={cn(
-        "grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1 rounded-xl border px-1.5 py-2 sm:gap-3 sm:rounded-2xl sm:p-4",
+        "grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1.5 rounded-2xl border p-2.5 sm:gap-3 sm:p-4",
         highlighted
           ? "border-[#981915]/40 bg-gradient-to-br from-[#981915]/6 via-white to-[#214C9B]/5 shadow-[0_10px_28px_rgba(152,25,21,0.12)]"
           : "border-[#214C9B]/12 bg-slate-50/80",
       )}
     >
-      <div className="flex min-w-0 items-center gap-1 sm:gap-2">
+      <div className="flex min-w-0 items-center gap-0.5 sm:gap-2">
         {showCrests ? (
           <TeamLink gender={gender} teamId={editedFixture.homeTeamId} teamName={editedFixture.homeTeamName} className="shrink-0">
             {crestForTeam(editedFixture.homeTeamId, editedFixture.homeTeamName, home)}
@@ -184,7 +203,7 @@ export function JornadaMatchRow({
           </div>
         ) : (
           <TeamLink gender={gender} teamId={editedFixture.homeTeamId} teamName={editedFixture.homeTeamName} className={nameClass(highlightHome)}>
-            {editedFixture.homeTeamName}
+            {teamNameContent(editedFixture.homeTeamId, editedFixture.homeTeamName, home, "left")}
           </TeamLink>
         )}
       </div>
@@ -252,7 +271,7 @@ export function JornadaMatchRow({
       ) : (
         <div
           className={cn(
-            "min-w-[2.85rem] rounded-lg px-1.5 py-1 text-center text-[11px] font-extrabold tabular-nums sm:min-w-[4.5rem] sm:rounded-xl sm:px-3 sm:py-2 sm:text-sm",
+            "min-w-[2.35rem] rounded-md px-1 py-0.5 text-center text-[9px] font-extrabold tabular-nums sm:min-w-[4.5rem] sm:rounded-xl sm:px-3 sm:py-2 sm:text-sm",
             highlighted ? "bg-[#981915] text-white shadow-sm" : "bg-[#214C9B] text-white",
           )}
         >
@@ -260,7 +279,7 @@ export function JornadaMatchRow({
         </div>
       )}
 
-      <div className="flex min-w-0 items-center justify-end gap-1 sm:gap-2">
+      <div className="flex min-w-0 items-center justify-end gap-0.5 sm:gap-2">
         {editMode && groupTeams.length > 0 ? (
           <div className="min-w-0 flex-1">
             {teamSelect("away", editedFixture.awayTeamId, editedFixture.awayTeamName, "Equipo visitante")}
@@ -272,7 +291,7 @@ export function JornadaMatchRow({
             teamName={editedFixture.awayTeamName}
             className={cn(nameClass(highlightAway), "text-right")}
           >
-            {editedFixture.awayTeamName}
+            {teamNameContent(editedFixture.awayTeamId, editedFixture.awayTeamName, away, "right")}
           </TeamLink>
         )}
         {showCrests ? (
