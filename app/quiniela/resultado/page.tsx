@@ -86,6 +86,9 @@ function ResultadoBody({ seasonId, matchdays, currentRound, totalRounds }: Resul
           <>
             <QuinielaRankingList
               entries={rankingEntries}
+              seasonId={seasonId}
+              matchdays={matchdays}
+              initialModalRound={round}
               emptyMessage={
                 isSupabaseConfigured()
                   ? "Nadie ha guardado la quiniela de esta jornada todavía."

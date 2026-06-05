@@ -7,8 +7,10 @@ import { buildQuinielaScoringContext } from "@/lib/quiniela/scoring-context";
 import {
   fetchQuinielaRoundRanking,
   fetchQuinielaSeasonRanking,
+  fetchQuinielaUserRound,
   type QuinielaRankingEntry,
   type QuinielaSeasonRankingEntry,
+  type QuinielaUserRoundResult,
 } from "@/lib/quiniela-ranking";
 import { getMatchdayByRound, shouldCountQuinielaPoints } from "@/lib/quiniela";
 import type { Matchday } from "@/types";
@@ -69,4 +71,14 @@ export async function computeQuinielaRankingFromSupabase(
     scoringContext,
   );
   return { scope: "season", entries, matchdays };
+}
+
+export async function computeQuinielaUserRoundFromSupabase(
+  supabase: SupabaseClient,
+  seasonId: CompetitionSeasonId,
+  userId: string,
+  round?: number,
+): Promise<QuinielaUserRoundResult | null> {
+  const { matchdays, scoringContext } = await loadQuinielaRankingMatchdays(supabase, seasonId);
+  return fetchQuinielaUserRound(supabase, seasonId, userId, matchdays, round, scoringContext);
 }
