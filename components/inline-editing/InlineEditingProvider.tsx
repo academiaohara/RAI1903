@@ -1,7 +1,17 @@
 "use client";
 
 import type { User } from "@supabase/supabase-js";
-import { Check, ChevronRight, Clipboard, CloudUpload, ExternalLink, Pencil, X } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+  Clipboard,
+  CloudUpload,
+  ExternalLink,
+  Pencil,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -51,6 +61,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 const LEGACY_STORAGE_KEY = "rai1903:inline-edits:v1";
 const MODE_KEY = "rai1903:inline-edit-mode";
+const TOOLBAR_COLLAPSED_KEY = "rai1903:editor-toolbar-collapsed";
 const SAVE_DEBOUNCE_MS = 450;
 
 type InlineOverrides = Record<string, unknown>;
@@ -507,9 +518,20 @@ export function InlineEditingToolbar() {
   const [competitionPanelOpen, setCompetitionPanelOpen] = useState(false);
   const [femeninoPanelOpen, setFemeninoPanelOpen] = useState(false);
   const [teamsPanelOpen, setTeamsPanelOpen] = useState(false);
+  const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
   const pathname = usePathname();
   const toolbarScrollRef = useRef<HTMLDivElement>(null);
-  const scrollHint = useHorizontalScrollHint(toolbarScrollRef, editMode, pathname);
+  const scrollHint = useHorizontalScrollHint(
+    toolbarScrollRef,
+    editMode && !toolbarCollapsed,
+    pathname,
+  );
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      setToolbarCollapsed(window.localStorage.getItem(TOOLBAR_COLLAPSED_KEY) === "1");
+    });
+  }, []);
 
   const handleToolbarWheel = (event: WheelEvent<HTMLDivElement>) => {
     if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
@@ -530,6 +552,15 @@ export function InlineEditingToolbar() {
     setFemeninoPanelOpen(false);
     setTeamsPanelOpen(false);
   }, []);
+
+  const setToolbarCollapsedPersisted = useCallback(
+    (collapsed: boolean) => {
+      setToolbarCollapsed(collapsed);
+      if (collapsed) closeEditorPanels();
+      window.localStorage.setItem(TOOLBAR_COLLAPSED_KEY, collapsed ? "1" : "0");
+    },
+    [closeEditorPanels],
+  );
 
   if (!ready || !canEdit) return null;
 
@@ -561,7 +592,7 @@ export function InlineEditingToolbar() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[80] flex flex-col items-stretch gap-2 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 sm:bottom-4 sm:left-auto sm:right-4 sm:w-auto sm:max-w-[calc(100vw-2rem)] sm:items-end sm:px-0 sm:pb-0 sm:pt-0">
-      {editMode && (
+      {editMode && !toolbarCollapsed && (
         <div
           className={`rounded-2xl border bg-white/95 p-2 text-xs font-bold shadow-xl backdrop-blur sm:max-w-xs ${
             syncError ? "border-[#981915]/30 text-[#981915]" : "border-[#214C9B]/20 text-slate-600"
@@ -570,27 +601,29 @@ export function InlineEditingToolbar() {
           {statusLabel}
         </div>
       )}
-      {editMode && seasonPanelOpen && (
+      {editMode && !toolbarCollapsed && seasonPanelOpen && (
         <SeasonManagerPanel onClose={() => setSeasonPanelOpen(false)} />
       )}
-      {editMode && crestPanelOpen && (
+      {editMode && !toolbarCollapsed && crestPanelOpen && (
         <TeamCrestEditorPanel onClose={() => setCrestPanelOpen(false)} />
       )}
-      {editMode && homePanelOpen && (
+      {editMode && !toolbarCollapsed && homePanelOpen && (
         <HomeLayoutEditorPanel onClose={() => setHomePanelOpen(false)} />
       )}
-      {editMode && mediaRaiPanelOpen && (
+      {editMode && !toolbarCollapsed && mediaRaiPanelOpen && (
         <MediaRaiSectionsEditorPanel onClose={() => setMediaRaiPanelOpen(false)} />
       )}
-      {editMode && competitionPanelOpen && (
+      {editMode && !toolbarCollapsed && competitionPanelOpen && (
         <CompetitionEditorPanel onClose={() => setCompetitionPanelOpen(false)} />
       )}
-      {editMode && femeninoPanelOpen && (
+      {editMode && !toolbarCollapsed && femeninoPanelOpen && (
         <FemeninoEditorPanel onClose={() => setFemeninoPanelOpen(false)} />
       )}
-      {editMode && teamsPanelOpen && <TeamsEditorPanel onClose={() => setTeamsPanelOpen(false)} />}
+      {editMode && !toolbarCollapsed && teamsPanelOpen && (
+        <TeamsEditorPanel onClose={() => setTeamsPanelOpen(false)} />
+      )}
       <div className="relative min-w-0 sm:max-w-[calc(100vw-2rem)]">
-        {editMode && scrollHint.right && (
+        {editMode && !toolbarCollapsed && scrollHint.right && (
           <p
             className="pointer-events-none absolute -top-5 right-14 z-10 flex items-center gap-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[#214C9B]/80"
             aria-hidden
@@ -599,19 +632,51 @@ export function InlineEditingToolbar() {
             <ChevronRight size={12} className="animate-pulse" aria-hidden />
           </p>
         )}
-        {scrollHint.left && (
+        {editMode && !toolbarCollapsed && scrollHint.left && (
           <div
             className="pointer-events-none absolute inset-y-0 left-0 z-10 w-6 rounded-l-full bg-gradient-to-r from-white/95 to-transparent"
             aria-hidden
           />
         )}
-        {scrollHint.right && (
+        {editMode && !toolbarCollapsed && scrollHint.right && (
           <div
-            className="pointer-events-none absolute inset-y-0 right-12 z-10 w-8 rounded-r-full bg-gradient-to-l from-white/95 to-transparent"
+            className="pointer-events-none absolute inset-y-0 right-24 z-10 w-8 rounded-r-full bg-gradient-to-l from-white/95 to-transparent"
             aria-hidden
           />
         )}
         {editMode ? (
+          toolbarCollapsed ? (
+            <div className="flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 bg-white/95 p-1.5 shadow-2xl backdrop-blur">
+              <span className="inline-flex shrink-0 items-center gap-1 px-2 text-[11px] font-extrabold uppercase leading-none text-[#214C9B] sm:text-xs">
+                <Pencil size={13} aria-hidden />
+                Editando
+              </span>
+              {!localOnly && (
+                <button
+                  type="button"
+                  onClick={() => void handleSaveNow()}
+                  disabled={cloudSaving}
+                  className={editorToolbarSaveButtonClass}
+                >
+                  <CloudUpload size={13} />
+                  {cloudSaving ? "…" : saveAck ? "OK" : "Guardar"}
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setToolbarCollapsedPersisted(false)}
+                className={editorToolbarButtonClass}
+                aria-expanded={false}
+              >
+                <ChevronUp size={13} aria-hidden />
+                Mostrar
+              </button>
+              <button type="button" onClick={() => setEditMode(false)} className={editorToolbarToggleClass}>
+                <X size={13} />
+                Salir
+              </button>
+            </div>
+          ) : (
           <div className="flex min-w-0 items-center gap-1.5 rounded-full border border-[#214C9B]/20 bg-white/95 p-1.5 shadow-2xl backdrop-blur">
             <div
               ref={toolbarScrollRef}
@@ -744,18 +809,28 @@ export function InlineEditingToolbar() {
                   {copied ? "Copiado" : "Exportar"}
                 </button>
             </div>
+            <button
+              type="button"
+              onClick={() => setToolbarCollapsedPersisted(true)}
+              className={editorToolbarButtonClass}
+              aria-expanded
+            >
+              <ChevronDown size={13} aria-hidden />
+              Ocultar
+            </button>
             <button type="button" onClick={() => setEditMode(false)} className={editorToolbarToggleClass}>
               <X size={13} />
               Salir
             </button>
           </div>
+          )
         ) : (
           <button type="button" onClick={() => setEditMode(true)} className={editorToolbarToggleClass}>
             <Pencil size={13} />
             Editar
           </button>
         )}
-        {editMode && scrollHint.right && (
+        {editMode && !toolbarCollapsed && scrollHint.right && (
           <span className="sr-only">Desliza horizontalmente para ver más opciones del editor</span>
         )}
       </div>
