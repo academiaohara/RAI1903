@@ -15,19 +15,27 @@ import { isSupabaseConfigured } from "@/lib/supabase/env";
 type SectionUnderConstructionGateProps = {
   scope: SeasonBundleScope;
   section: SectionStatusKey;
+  /** Etiqueta visible en el cartel (p. ej. «Quiniela» cuando depende de jornadas). */
+  labelOverride?: string;
+  /** Texto extra para editores (p. ej. explicar qué toggle controla la sección). */
+  editorHintOverride?: string;
   children: ReactNode;
 };
 
 export function SectionUnderConstructionBanner({
   scope,
   section,
+  labelOverride,
+  editorHintOverride,
 }: {
   scope: SeasonBundleScope;
   section: SectionStatusKey;
+  labelOverride?: string;
+  editorHintOverride?: string;
 }) {
   const { viewedSeason } = useSeason();
   const { canEdit, editMode } = useInlineEditing();
-  const label = sectionStatusLabel(scope, section);
+  const label = labelOverride ?? sectionStatusLabel(scope, section);
 
   return (
     <div
@@ -50,8 +58,8 @@ export function SectionUnderConstructionBanner({
           </p>
           {canEdit && editMode ? (
             <p className="text-xs leading-relaxed">
-              Los visitantes no ven el contenido de esta sección. Puedes seguir editándola y, cuando esté lista, desmarca
-              «En construcción» en <strong>Editar → Secciones</strong>.
+              {editorHintOverride ??
+                "Los visitantes no ven el contenido de esta sección. Puedes seguir editándola y, cuando esté lista, desmarca «En construcción» en Editar → Secciones."}
             </p>
           ) : (
             <p className="text-xs leading-relaxed">
@@ -64,7 +72,13 @@ export function SectionUnderConstructionBanner({
   );
 }
 
-export function SectionUnderConstructionGate({ scope, section, children }: SectionUnderConstructionGateProps) {
+export function SectionUnderConstructionGate({
+  scope,
+  section,
+  labelOverride,
+  editorHintOverride,
+  children,
+}: SectionUnderConstructionGateProps) {
   const { bundles, bundlesLoading } = useSeason();
   const { canEdit, editMode } = useInlineEditing();
 
@@ -77,7 +91,14 @@ export function SectionUnderConstructionGate({ scope, section, children }: Secti
 
   return (
     <div className="space-y-4">
-      {underConstruction && <SectionUnderConstructionBanner scope={scope} section={section} />}
+      {underConstruction && (
+        <SectionUnderConstructionBanner
+          scope={scope}
+          section={section}
+          labelOverride={labelOverride}
+          editorHintOverride={editorHintOverride}
+        />
+      )}
       {showContent ? children : null}
     </div>
   );
