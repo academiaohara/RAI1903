@@ -11,8 +11,11 @@ import { OpponentCrest } from "@/components/OpponentCrest";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
 import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
 import { UpcomingMatchCard } from "@/components/UpcomingMatchCard";
+import { SectionUnderConstructionGate } from "@/components/season/SectionUnderConstructionGate";
 import { useSeason } from "@/components/season/SeasonProvider";
+import { isSectionUnderConstruction } from "@/lib/cms/section-status-bundle";
 import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { defaultCronicaId } from "@/lib/match-article-factory";
 import { getMatchArticlePageHref } from "@/lib/match-article-url";
@@ -31,14 +34,30 @@ import { cn, formatMatchDate, formatMatchDay, formatMatchTime } from "@/lib/util
 import type { Route } from "next";
 import type { Match } from "@/types";
 
+const HOME_MASCULINO_SCOPE = "masculino" as const;
+
+const HOME_JORNADAS_PUBLIC_HINT =
+  "Estamos preparando los partidos para esta temporada. Elige otra temporada en el selector de arriba para ver resultados y calendario de temporadas anteriores.";
+
+const HOME_COMPETICION_PUBLIC_HINT =
+  "Estamos preparando la clasificación para esta temporada. Elige otra temporada en el selector de arriba para ver la tabla de temporadas anteriores.";
+
 export function useHomeCompetitionEmptyHint(): boolean {
   const { leagueMatchdays, bundlesLoading } = useMasculinoLeagueSeason();
-  const { viewedSeasonId, getBundles, isBundlesLoading } = useSeason();
-  const bundles = getBundles(viewedSeasonId);
+  const { viewedSeasonId, getBundles, isBundlesLoading, bundles } = useSeason();
+  const viewedBundles = getBundles(viewedSeasonId);
+  const sectionStatusReady =
+    !isSupabaseConfigured() || (!bundlesLoading && !isBundlesLoading(viewedSeasonId));
+  const jornadasUnderConstruction =
+    sectionStatusReady && isSectionUnderConstruction(bundles, HOME_MASCULINO_SCOPE, "jornadas");
+  const competicionUnderConstruction =
+    sectionStatusReady && isSectionUnderConstruction(bundles, HOME_MASCULINO_SCOPE, "competicion");
+
   return (
-    !bundlesLoading &&
-    !isBundlesLoading(viewedSeasonId) &&
-    !seasonHasCompetitionBundles(bundles) &&
+    sectionStatusReady &&
+    !jornadasUnderConstruction &&
+    !competicionUnderConstruction &&
+    !seasonHasCompetitionBundles(viewedBundles) &&
     leagueMatchdays.length === 0
   );
 }
@@ -61,9 +80,13 @@ export function HomeMatchBannersBlock() {
   const latestArticle = latestMatch ? getForMatch(latestMatch.id, "masculino") : undefined;
   const nextArticle = nextMatch ? getForMatch(nextMatch.id, "masculino") : undefined;
 
-  if (!latestMatch && !nextMatch) return null;
-
   return (
+    <SectionUnderConstructionGate
+      scope={HOME_MASCULINO_SCOPE}
+      section="jornadas"
+      publicHintOverride={HOME_JORNADAS_PUBLIC_HINT}
+    >
+    {(latestMatch || nextMatch) ? (
     <section className="grid gap-4">
       {latestMatch && (
         <MatchBanner
@@ -93,6 +116,8 @@ export function HomeMatchBannersBlock() {
         />
       )}
     </section>
+    ) : null}
+    </SectionUnderConstructionGate>
   );
 }
 
@@ -110,15 +135,21 @@ export function HomeStandingsStatsBlock() {
 
   return (
     <section className="grid gap-6 xl:grid-cols-[1fr_0.42fr]">
-      <StandingsLeagueTableCard
-        eyebrow="Estado competitivo"
-        sourceTeams={teams}
-        matchdays={leagueMatchdays}
-        highlightTeamId={highlightTeamId}
-        compact
-        zones={standingsZones}
-        zoneRules={competitionConfig.zones}
-      />
+      <SectionUnderConstructionGate
+        scope={HOME_MASCULINO_SCOPE}
+        section="competicion"
+        publicHintOverride={HOME_COMPETICION_PUBLIC_HINT}
+      >
+        <StandingsLeagueTableCard
+          eyebrow="Estado competitivo"
+          sourceTeams={teams}
+          matchdays={leagueMatchdays}
+          highlightTeamId={highlightTeamId}
+          compact
+          zones={standingsZones}
+          zoneRules={competitionConfig.zones}
+        />
+      </SectionUnderConstructionGate>
       <Card
         eyebrow="Jugadores destacados"
         title="Estadisticas"
@@ -150,6 +181,11 @@ export function HomeRecentUpcomingBlock() {
   }
 
   return (
+    <SectionUnderConstructionGate
+      scope={HOME_MASCULINO_SCOPE}
+      section="jornadas"
+      publicHintOverride={HOME_JORNADAS_PUBLIC_HINT}
+    >
     <>
       <section className="grid gap-6 xl:hidden">
         <Card eyebrow="Resultados" title="Ultimos 5 partidos">
@@ -218,6 +254,7 @@ export function HomeRecentUpcomingBlock() {
         </div>
       </section>
     </>
+    </SectionUnderConstructionGate>
   );
 }
 
