@@ -2,6 +2,7 @@
 
 import { Loader2, Trash2 } from "lucide-react";
 import { useCallback, useState } from "react";
+import { useAppDialog } from "@/components/AppDialogProvider";
 import { sourceFromUrl } from "@/lib/news-source";
 import type { NewsChannel, NewsItem, NewsTag, PrimerEquipoGender } from "@/types";
 
@@ -47,6 +48,7 @@ export function NewsEditorForm({
   onDelete,
   onCancel,
 }: NewsEditorFormProps) {
+  const { confirm } = useAppDialog();
   const [url, setUrl] = useState(initialItem?.url ?? "");
   const [title, setTitle] = useState(initialItem?.title ?? "");
   const [excerpt, setExcerpt] = useState(initialItem?.excerpt ?? "");
@@ -105,7 +107,9 @@ export function NewsEditorForm({
   const handleDelete = useCallback(async () => {
     if (!onDelete) return;
 
-    const confirmed = window.confirm("¿Eliminar esta noticia? No se puede deshacer.");
+    const confirmed = await confirm("¿Eliminar esta noticia? No se puede deshacer.", {
+      confirmLabel: "Eliminar",
+    });
     if (!confirmed) return;
 
     setDeleting(true);
@@ -116,7 +120,7 @@ export function NewsEditorForm({
     if (!result.ok) {
       setError(result.error ?? "No se pudo eliminar");
     }
-  }, [onDelete]);
+  }, [confirm, onDelete]);
 
   const handleSave = useCallback(async () => {
     const trimmedUrl = url.trim();

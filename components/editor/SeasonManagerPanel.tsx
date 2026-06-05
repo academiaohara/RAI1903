@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Loader2, Trash2, X } from "lucide-react";
+import { useAppDialog } from "@/components/AppDialogProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
 import type { CompetitionSeasonId } from "@/data/mock";
 import {
@@ -24,6 +25,7 @@ type SeasonManagerPanelProps = {
 };
 
 export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
+  const { confirm } = useAppDialog();
   const { viewedSeasonId, refreshSeasons, refreshBundles, setViewedSeasonId, activeSeasonId } =
     useSeason();
   const [rows, setRows] = useState<CmsSeason[]>([]);
@@ -71,9 +73,10 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
     await load();
   };
 
-  const handleDelete = (row: CmsSeason) => {
-    const confirmed = window.confirm(
+  const handleDelete = async (row: CmsSeason) => {
+    const confirmed = await confirm(
       `¿Borrar la temporada «${row.label}» (${row.id})?\n\nSe eliminarán plantillas, calendarios, escudos y ediciones asociadas. No se puede deshacer.`,
+      { confirmLabel: "Borrar" },
     );
     if (!confirmed) return;
     void runAction(() => deleteSeason(row.id), `Temporada ${row.label} eliminada`);
@@ -179,7 +182,7 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
                   <button
                     type="button"
                     disabled={busy}
-                    onClick={() => handleDelete(row)}
+                    onClick={() => void handleDelete(row)}
                     className="inline-flex items-center gap-0.5 rounded-lg border border-[#981915]/25 px-2 py-1 font-bold text-[#981915] hover:bg-red-50 disabled:opacity-50"
                     title="Eliminar temporada"
                   >

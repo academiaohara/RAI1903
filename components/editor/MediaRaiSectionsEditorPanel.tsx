@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { ChevronDown, ChevronUp, Loader2, Plus, RotateCcw, Trash2, X } from "lucide-react";
+import { useAppDialog } from "@/components/AppDialogProvider";
 import { useMediaRaiSections } from "@/components/media-rai/MediaRaiSectionsProvider";
 import {
   DEFAULT_MEDIA_RAI_SECTIONS,
@@ -16,6 +17,7 @@ type MediaRaiSectionsEditorPanelProps = {
 };
 
 export function MediaRaiSectionsEditorPanel({ onClose }: MediaRaiSectionsEditorPanelProps) {
+  const { prompt } = useAppDialog();
   const { sections, persistSections } = useMediaRaiSections();
   const [draft, setDraft] = useState<MediaRaiSectionEntry[] | null>(null);
   const [busy, setBusy] = useState(false);
@@ -44,8 +46,8 @@ export function MediaRaiSectionsEditorPanel({ onClose }: MediaRaiSectionsEditorP
     });
   };
 
-  const addSection = () => {
-    const name = window.prompt("Nombre de la nueva subsección");
+  const addSection = async () => {
+    const name = await prompt("Nombre de la nueva subsección");
     if (!name?.trim()) return;
 
     setDraft((current) => {
@@ -152,7 +154,7 @@ export function MediaRaiSectionsEditorPanel({ onClose }: MediaRaiSectionsEditorP
 
       <button
         type="button"
-        onClick={addSection}
+        onClick={() => void addSection()}
         className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#214C9B]/30 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
       >
         <Plus size={14} />

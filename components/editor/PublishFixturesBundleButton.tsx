@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { useSeason } from "@/components/season/SeasonProvider";
+import { useAppDialog } from "@/components/AppDialogProvider";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 
 export function PublishFixturesBundleButton() {
   const pathname = usePathname();
   const { viewedSeasonId, viewedSeason, refreshBundles } = useSeason();
+  const { confirm } = useAppDialog();
   const { editMode, canEdit, localOnly } = useInlineEditing();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -22,9 +24,10 @@ export function PublishFixturesBundleButton() {
   if (!canEdit || !editMode || !gender || localOnly) return null;
 
   const handlePublish = async () => {
-    const confirmed = window.confirm(
+    const confirmed = await confirm(
       `¿Publicar los resultados de Jornadas en el calendario CMS de «${viewedSeason.label}»?\n\n` +
         "Se escribirá el bundle fixtures en Supabase (los overrides seguirán existiendo).",
+      { confirmLabel: "Publicar" },
     );
     if (!confirmed) return;
 
