@@ -6,7 +6,9 @@ import { useSeason } from "@/components/season/SeasonProvider";
 import {
   applyChronicleStatsToSquad,
   aggregateAvilesStatsFromChronicles,
+  buildChronicleAggregationMatches,
 } from "@/lib/aviles-chronicle-stats";
+import { getAvilesMatchesFromSource } from "@/lib/season/aviles-matches";
 import { deleteSquadPlayer, upsertSquadPlayer, upsertSquadPlayersBatch } from "@/lib/cms/players";
 import { getSquadBundle, upsertSeasonBundle } from "@/lib/cms/season-bundles";
 import { mergeSquadPlayerOverrides, squadPlayerOverrideKey } from "@/lib/squad-overrides";
@@ -20,8 +22,8 @@ import type { SquadPlayer, SquadPosition } from "@/types/squad";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export function useSquadPlayers(gender: PrimerEquipoGender) {
-  const { getOverride, saveValue, clearValue } = useInlineEditing();
-  const { viewedSeasonId, bundles, bundlesLoading, refreshBundles } = useSeason();
+  const { getOverride, saveValue, clearValue, overrides } = useInlineEditing();
+  const { viewedSeasonId, bundles, bundlesLoading, refreshBundles, getFixtureSource } = useSeason();
   const [baseSquad, setBaseSquad] = useState<SquadPlayer[]>([]);
 
   useEffect(() => {
@@ -50,9 +52,22 @@ export function useSquadPlayers(gender: PrimerEquipoGender) {
       };
     });
 
-    const chronicleStats = aggregateAvilesStatsFromChronicles(gender, withAge, getOverride);
+    const seasonMatches = getAvilesMatchesFromSource(getFixtureSource(gender), gender);
+    const aggregationMatches = buildChronicleAggregationMatches({
+      gender,
+      seasonMatches,
+      overrides,
+      bundles,
+      getOverride,
+    });
+    const chronicleStats = aggregateAvilesStatsFromChronicles(
+      gender,
+      withAge,
+      getOverride,
+      aggregationMatches,
+    );
     return applyChronicleStatsToSquad(withAge, chronicleStats);
-  }, [baseSquad, bundlesLoading, gender, getOverride]);
+  }, [baseSquad, bundles, bundlesLoading, gender, getFixtureSource, getOverride, overrides]);
 
   const persistSquadToCms = useCallback(
     async (players: SquadPlayer[]) => {

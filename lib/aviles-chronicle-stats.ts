@@ -1,9 +1,14 @@
-import { getAvilesMatchesByGender, getRaiTeamId } from "@/lib/fixtures";
+import { getAvilesMatchesByGender, getMatchById, getRaiTeamId } from "@/lib/fixtures";
+import { applyMatchInlineOverride } from "@/lib/fixture-overrides";
 import { buildMatchDetail } from "@/lib/match-detail";
 import { matchCompetitionShortLabel } from "@/lib/competition-labels";
+import { isMatchPlayed } from "@/lib/match-result";
+import { findMatchInBundles } from "@/lib/season/find-match-in-bundles";
+import { findSquadPlayerByDorsal, findSquadPlayerByName } from "@/lib/squad-lineup";
 import { resolveSquadPlayerByName } from "@/lib/squad-player-resolve";
+import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
-import type { Match, MatchEvent, MatchLineup } from "@/types";
+import type { LineupPlayer, Match, MatchEvent, MatchLineup } from "@/types";
 import type { PlayerMatchRecord, SquadPlayer } from "@/types/squad";
 
 export type ChronicleAggregatedStats = {
@@ -97,17 +102,82 @@ function resolvePlayerId(squad: SquadPlayer[], name: string): string | undefined
   return resolveSquadPlayerByName(squad, name)?.id;
 }
 
+function resolveLineupPlayerId(squad: SquadPlayer[], entry: LineupPlayer): string | undefined {
+  if (entry.number > 0) {
+    const byDorsal = findSquadPlayerByDorsal(squad, entry.number);
+    if (byDorsal) return byDorsal.id;
+  }
+  return findSquadPlayerByName(squad, entry.name)?.id;
+}
+
+function isLineupStarter(lineup: MatchLineup, entry: LineupPlayer): boolean {
+  return lineup.starters.some(
+    (starter) =>
+      (entry.number > 0 && starter.number === entry.number) ||
+      starter.name.trim().toLowerCase() === entry.name.trim().toLowerCase(),
+  );
+}
+
+const CHRONICLE_OVERRIDE_KEY = /^match:([^:]+):(events|homeLineup|awayLineup)$/;
+
+/** Partidos con alineación o eventos guardados en overrides (aunque no estén en el calendario cargado). */
+export function matchIdsWithChronicleOverrides(overrides: Record<string, unknown>): string[] {
+  const ids = new Set<string>();
+  for (const key of Object.keys(overrides)) {
+    const match = CHRONICLE_OVERRIDE_KEY.exec(key);
+    if (match) ids.add(match[1]);
+  }
+  return [...ids];
+}
+
+export type BuildChronicleAggregationMatchesOptions = {
+  gender: PrimerEquipoGender;
+  seasonMatches: Match[];
+  overrides: Record<string, unknown>;
+  bundles: SeasonBundlesMap;
+  getOverride: (key: string) => unknown;
+};
+
+/** Calendario de la temporada + partidos referenciados solo en overrides de crónica. */
+export function buildChronicleAggregationMatches({
+  gender,
+  seasonMatches,
+  overrides,
+  bundles,
+  getOverride,
+}: BuildChronicleAggregationMatchesOptions): Match[] {
+  const raiTeamId = getRaiTeamId(gender);
+  const byId = new Map<string, Match>();
+
+  const addMatch = (raw: Match | undefined) => {
+    if (!raw) return;
+    const match = applyMatchInlineOverride(raw, getOverride, gender);
+    if (match.homeTeamId !== raiTeamId && match.awayTeamId !== raiTeamId) return;
+    byId.set(match.id, match);
+  };
+
+  for (const raw of seasonMatches) addMatch(raw);
+
+  for (const matchId of matchIdsWithChronicleOverrides(overrides)) {
+    if (byId.has(matchId)) continue;
+    const fromBundles = findMatchInBundles(bundles, matchId, { gender, mapMatch: (m) => m });
+    addMatch(fromBundles ?? getMatchById(matchId));
+  }
+
+  return [...byId.values()];
+}
+
 export function aggregateAvilesStatsFromChronicles(
   gender: PrimerEquipoGender,
   squad: SquadPlayer[],
   getOverride: <T>(key: string) => T | undefined,
+  matches: Match[] = getAvilesMatchesByGender(gender),
 ): Map<string, ChronicleAggregatedStats> | null {
   const raiTeamId = getRaiTeamId(gender);
-  const finished = getAvilesMatchesByGender(gender).filter((match) => match.status === "finished");
   const map = new Map<string, MutableStats>();
   let hasChronicleData = false;
 
-  for (const match of finished) {
+  for (const match of matches) {
     const events = getOverride<MatchEvent[]>(matchEventsKey(match.id)) ?? [];
     const avilesSide: "home" | "away" = match.homeTeamId === raiTeamId ? "home" : "away";
     const detail = buildMatchDetail(match, gender);
@@ -116,16 +186,17 @@ export function aggregateAvilesStatsFromChronicles(
       getOverride<MatchLineup>(matchLineupKey(match.id, avilesSide)) ?? defaultLineup;
 
     const hasLineup = avilesLineup.starters.length > 0 || avilesLineup.bench.length > 0;
-    if (events.length === 0 && !hasLineup) continue;
+    const hasChronicle = events.length > 0 || hasLineup;
+    if (!hasChronicle && !isMatchPlayed(match)) continue;
 
     hasChronicleData = true;
 
     if (hasLineup && avilesLineup) {
       for (const entry of [...avilesLineup.starters, ...avilesLineup.bench]) {
-        const playerId = resolvePlayerId(squad, entry.name);
+        const playerId = resolveLineupPlayerId(squad, entry);
         if (!playerId) continue;
         const stats = ensurePlayerStats(map, squad, playerId);
-        const minutes = avilesLineup.starters.some((starter) => starter.name === entry.name) ? 90 : 0;
+        const minutes = isLineupStarter(avilesLineup, entry) ? 90 : 0;
         registerAppearance(stats, match, raiTeamId, minutes > 0 ? minutes : 1);
       }
     }
@@ -208,24 +279,15 @@ export function aggregateAvilesStatsFromChronicles(
   return result;
 }
 
-const EMPTY_CHRONICLE_STATS: ChronicleAggregatedStats = {
-  partidos: 0,
-  minutos: 0,
-  goles: 0,
-  asistencias: 0,
-  amarillas: 0,
-  rojas: 0,
-  historialPartidos: [],
-};
-
 export function applyChronicleStatsToSquad(
   squad: SquadPlayer[],
   chronicleStats: Map<string, ChronicleAggregatedStats> | null,
 ): SquadPlayer[] {
-  if (!chronicleStats) return squad;
+  if (!chronicleStats || chronicleStats.size === 0) return squad;
 
   return squad.map((player) => {
-    const stats = chronicleStats.get(player.id) ?? EMPTY_CHRONICLE_STATS;
+    const stats = chronicleStats.get(player.id);
+    if (!stats) return player;
 
     return {
       ...player,
