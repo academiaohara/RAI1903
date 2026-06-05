@@ -2,6 +2,7 @@
 
 import { Loader2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSeason } from "@/components/season/SeasonProvider";
 import { signInWithX } from "@/lib/auth/sign-in-with-x";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { getAvilesPlayersWhoPlayed } from "@/lib/match-rating-eligibility";
@@ -28,6 +29,7 @@ const SLIDER_STEP = 0.5;
 const SLIDER_DEFAULT = 5;
 
 export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
+  const { viewedSeasonId } = useSeason();
   const { squad } = useSquadPlayers(detail.gender);
   const configured = isSupabaseConfigured();
 
@@ -40,7 +42,7 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
   const [authReady, setAuthReady] = useState(!configured);
   const [draftRatings, setDraftRatings] = useState<Record<string, number>>({});
   const [averages, setAverages] = useState<Record<string, { average: number; count: number }>>({});
-  const sessionKey = `${detail.match.id}:${user?.id ?? "guest"}`;
+  const sessionKey = `${viewedSeasonId}:${detail.match.id}:${user?.id ?? "guest"}`;
   const [loadedKey, setLoadedKey] = useState<string | null>(null);
   const loading = configured && authReady && loadedKey !== sessionKey;
   const [submitting, setSubmitting] = useState(false);
@@ -70,12 +72,12 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
     if (user) await migrateLegacyPlayerRatingsToSupabase(user.id, detail.gender);
 
     const [communityAverages, userRatings] = await Promise.all([
-      fetchMatchRatingAverages(detail.match.id),
-      user ? fetchUserMatchRatings(user.id, detail.match.id) : Promise.resolve({}),
+      fetchMatchRatingAverages(detail.match.id, viewedSeasonId),
+      user ? fetchUserMatchRatings(user.id, detail.match.id, viewedSeasonId) : Promise.resolve({}),
     ]);
     setAverages(communityAverages);
     setDraftRatings(userRatings);
-  }, [configured, detail.gender, detail.match.id, user]);
+  }, [configured, detail.gender, detail.match.id, user, viewedSeasonId]);
 
   useEffect(() => {
     if (!configured || !authReady) return;
@@ -86,8 +88,8 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
       if (user) await migrateLegacyPlayerRatingsToSupabase(user.id, detail.gender);
 
       const [communityAverages, userRatings] = await Promise.all([
-        fetchMatchRatingAverages(detail.match.id),
-        user ? fetchUserMatchRatings(user.id, detail.match.id) : Promise.resolve({}),
+        fetchMatchRatingAverages(detail.match.id, viewedSeasonId),
+        user ? fetchUserMatchRatings(user.id, detail.match.id, viewedSeasonId) : Promise.resolve({}),
       ]);
       if (cancelled) return;
       setAverages(communityAverages);
@@ -98,7 +100,7 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
     return () => {
       cancelled = true;
     };
-  }, [authReady, configured, detail.gender, detail.match.id, sessionKey, user]);
+  }, [authReady, configured, detail.gender, detail.match.id, sessionKey, user, viewedSeasonId]);
 
   const handleSubmit = async () => {
     if (!user) return;
@@ -110,6 +112,7 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
       matchId: detail.match.id,
       gender: detail.gender,
       ratings: draftRatings,
+      seasonId: viewedSeasonId,
     });
 
     setSubmitting(false);
