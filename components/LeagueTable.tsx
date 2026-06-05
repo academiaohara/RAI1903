@@ -46,35 +46,26 @@ export function LeagueTable({
   const showCrests = showCrestsProp ?? gender !== "femenino";
   const visibleRows = [...teams].sort((a, b) => a.position - b.position);
 
-  const statColClass = "px-0.5 py-1.5 text-center font-bold md:px-2 md:py-2.5";
-  const optionalStatColClass = cn(statColClass, compact && "hidden sm:table-cell");
+  const statColClass =
+    "min-w-[1.65rem] px-1 py-1.5 text-center font-bold tabular-nums sm:min-w-0 sm:px-1.5 md:px-2 md:py-2.5";
+  const resultStatColClass = cn(statColClass, compact && "hidden sm:table-cell");
 
   return (
     <div className="min-w-0 space-y-3">
       <div className="overflow-x-auto rounded-2xl border border-[#214C9B]/20 bg-white [-webkit-overflow-scrolling:touch]">
-        <table className="w-full table-fixed text-left text-[10px] sm:table-auto md:text-sm">
-          <thead className="bg-[#214C9B] text-[8px] uppercase tracking-[0.06em] text-white md:text-[10px] md:tracking-[0.1em]">
+        <table className="w-full min-w-[20rem] table-fixed text-left text-[11px] sm:min-w-0 sm:table-auto md:text-sm">
+          <thead className="bg-[#214C9B] text-[9px] uppercase tracking-[0.06em] text-white sm:text-[8px] md:text-[10px] md:tracking-[0.1em]">
             <tr>
               <th className="w-[1.75rem] p-0 text-center font-bold sm:w-5 md:w-7">#</th>
-              <th className="px-1 py-1.5 font-bold md:px-2 md:py-2.5">Equipo</th>
-              {!compact ? (
-                <>
-                  <th className={statColClass}>PJ</th>
-                  <th className={statColClass}>G</th>
-                  <th className={statColClass}>E</th>
-                  <th className={statColClass}>P</th>
-                  <th className={cn(statColClass, "hidden sm:table-cell")}>GF:GC</th>
-                </>
-              ) : (
-                <>
-                  <th className={statColClass}>PJ</th>
-                  <th className={optionalStatColClass}>G</th>
-                  <th className={optionalStatColClass}>E</th>
-                  <th className={optionalStatColClass}>P</th>
-                </>
-              )}
-              <th className={cn(statColClass, "w-[2rem] sm:w-auto")}>DG</th>
-              <th className={cn(statColClass, "w-[2.25rem] sm:w-auto")}>Pts</th>
+              <th className="px-1.5 py-1.5 font-bold md:px-2 md:py-2.5">Equipo</th>
+              <th className={statColClass}>PJ</th>
+              <th className={resultStatColClass}>G</th>
+              <th className={resultStatColClass}>E</th>
+              <th className={resultStatColClass}>P</th>
+              <th className={statColClass}>GF</th>
+              <th className={statColClass}>GC</th>
+              <th className={cn(statColClass, "min-w-[2rem]")}>DG</th>
+              <th className={cn(statColClass, "min-w-[2.25rem]")}>Pts</th>
               {!compact && <th className={cn(statColClass, "hidden md:table-cell")}>Forma</th>}
             </tr>
           </thead>
@@ -91,7 +82,7 @@ export function LeagueTable({
               const highlightCellClassName = getStandingsHighlightCellClass(rowHighlight);
               const positionClassName = getStandingsHighlightPositionClass(false, team.zone, team.zoneColorClass);
               const dataCellClassName = cn(
-                "px-0.5 py-1.5 md:px-2 md:py-2.5",
+                "px-1 py-1.5 tabular-nums sm:px-1.5 md:px-2 md:py-2.5",
                 highlightCellClassName,
                 rowClassName,
               );
@@ -135,43 +126,41 @@ export function LeagueTable({
                       <div className="flex min-w-0 items-center gap-1 md:gap-2">{teamCellContent}</div>
                     )}
                   </td>
-                  {!compact ? (
-                    <>
-                      <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.played}</td>
-                      <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.won}</td>
-                      <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.drawn}</td>
-                      <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.lost}</td>
-                      <td
-                        className={cn(
-                          dataCellClassName,
-                          "hidden text-center tabular-nums sm:table-cell",
-                          highlighted ? "text-white/90" : "text-slate-600",
-                        )}
-                      >
-                        {team.stats.goalsFor}:{team.stats.goalsAgainst}
-                      </td>
-                    </>
-                  ) : (
-                    <>
-                      <td className={cn(dataCellClassName, "text-center tabular-nums")}>{team.stats.played}</td>
-                      <td className={cn(dataCellClassName, "hidden text-center tabular-nums sm:table-cell")}>
-                        {team.stats.won}
-                      </td>
-                      <td className={cn(dataCellClassName, "hidden text-center tabular-nums sm:table-cell")}>
-                        {team.stats.drawn}
-                      </td>
-                      <td className={cn(dataCellClassName, "hidden text-center tabular-nums sm:table-cell")}>
-                        {team.stats.lost}
-                      </td>
-                    </>
-                  )}
-                  <td className={cn(dataCellClassName, "text-center font-semibold tabular-nums")}>
+                  <td className={cn(dataCellClassName, "text-center")}>{team.stats.played}</td>
+                  <td className={cn(dataCellClassName, "text-center", compact && "hidden sm:table-cell")}>
+                    {team.stats.won}
+                  </td>
+                  <td className={cn(dataCellClassName, "text-center", compact && "hidden sm:table-cell")}>
+                    {team.stats.drawn}
+                  </td>
+                  <td className={cn(dataCellClassName, "text-center", compact && "hidden sm:table-cell")}>
+                    {team.stats.lost}
+                  </td>
+                  <td
+                    className={cn(
+                      dataCellClassName,
+                      "text-center",
+                      highlighted ? "text-white/90" : "text-slate-600",
+                    )}
+                  >
+                    {team.stats.goalsFor}
+                  </td>
+                  <td
+                    className={cn(
+                      dataCellClassName,
+                      "text-center",
+                      highlighted ? "text-white/90" : "text-slate-600",
+                    )}
+                  >
+                    {team.stats.goalsAgainst}
+                  </td>
+                  <td className={cn(dataCellClassName, "text-center font-semibold")}>
                     {formatGoalDifference(diff)}
                   </td>
                   <td
                     className={cn(
                       dataCellClassName,
-                      "text-center text-xs font-extrabold tabular-nums md:text-base",
+                      "text-center text-xs font-extrabold md:text-base",
                       highlighted ? "text-white" : "text-[#214C9B]",
                     )}
                   >
