@@ -10,11 +10,18 @@ type StadiumModalProps = {
   onClose: () => void;
 };
 
+function resolveStadiumMapsUrl(stadium: StadiumInfo): string {
+  const link = stadium.direccion.trim();
+  if (/^https?:\/\//i.test(link)) return link;
+
+  const ubicacion = [stadium.direccion, stadium.ciudad].filter(Boolean).join(", ");
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ubicacion)}`;
+}
+
 export function StadiumModal({ stadium, open, onClose }: StadiumModalProps) {
   if (!stadium) return null;
 
-  const ubicacion = `${stadium.direccion}, ${stadium.ciudad}`;
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ubicacion)}`;
+  const mapsUrl = resolveStadiumMapsUrl(stadium);
 
   return (
     <Modal

@@ -19,13 +19,15 @@ export type StadiumCatalogEntry = StadiumInfo & {
   seasonLabel?: string;
   /** Equipo asociado en esa temporada. */
   teamLabel?: string;
+  /** Solo entradas del catálogo CMS (`stadium_photos`) se pueden borrar desde el editor. */
+  deletable?: boolean;
 };
 
 export type StadiumCatalogBundle = {
   entries: StadiumCatalogEntry[];
 };
 
-function stadiumEntryKey(info: Pick<StadiumInfo, "nombre" | "imagen">): string {
+export function stadiumEntryKey(info: Pick<StadiumInfo, "nombre" | "imagen">): string {
   return `${info.nombre.trim().toLowerCase()}|${info.imagen.trim()}`;
 }
 
@@ -52,7 +54,26 @@ function mergeEntries(target: Map<string, StadiumCatalogEntry>, entry: StadiumCa
     ...entry,
     seasonLabel: existing.seasonLabel ?? entry.seasonLabel,
     teamLabel: existing.teamLabel ?? entry.teamLabel,
+    deletable: existing.deletable || entry.deletable,
   });
+}
+
+async function writeStadiumCatalogEntries(
+  entries: StadiumCatalogEntry[],
+): Promise<{ ok: boolean; error?: string }> {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: "Supabase no configurado" };
+  }
+
+  const seasons = await fetchEditorSeasons();
+  const anchorSeasonId = seasons.find((row) => row.isDefault)?.id ?? seasons[0]?.id;
+  if (!anchorSeasonId) {
+    return { ok: false, error: "No hay temporadas para guardar el catálogo" };
+  }
+
+  return upsertSeasonBundle(anchorSeasonId, "global", "stadium_photos", {
+    entries,
+  } satisfies StadiumCatalogBundle);
 }
 
 export function getStadiumCatalogFromBundles(map: SeasonBundlesMap): StadiumCatalogEntry[] {
@@ -84,7 +105,7 @@ export async function fetchStadiumCatalogEntries(): Promise<StadiumCatalogEntry[
   for (const season of seasons) {
     const bundles = await fetchSeasonBundles(season.id);
     for (const entry of getStadiumCatalogFromBundles(bundles)) {
-      mergeEntries(merged, entry);
+      mergeEntries(merged, { ...entry, deletable: true });
     }
 
     for (const gender of ["masculino", "femenino"] as const) {
@@ -105,10 +126,6 @@ export async function fetchStadiumCatalogEntries(): Promise<StadiumCatalogEntry[
 }
 
 export async function upsertStadiumCatalogEntry(entry: StadiumCatalogEntry): Promise<{ ok: boolean; error?: string }> {
-  if (!isSupabaseConfigured()) {
-    return { ok: false, error: "Supabase no configurado" };
-  }
-
   const seasons = await fetchEditorSeasons();
   const anchorSeasonId = seasons.find((row) => row.isDefault)?.id ?? seasons[0]?.id;
   if (!anchorSeasonId) {
@@ -117,8 +134,43 @@ export async function upsertStadiumCatalogEntry(entry: StadiumCatalogEntry): Pro
 
   const bundles = await fetchSeasonBundles(anchorSeasonId);
   const current = getStadiumCatalogFromBundles(bundles);
-  const next = [...current.filter((row) => row.id !== entry.id), entry];
-  return upsertSeasonBundle(anchorSeasonId, "global", "stadium_photos", { entries: next } satisfies StadiumCatalogBundle);
+  const next = [...current.filter((row) => row.id !== entry.id), { ...entry, deletable: true }];
+  return writeStadiumCatalogEntries(next);
+}
+
+export async function updateStadiumCatalogEntry(
+  previousId: string,
+  stadium: StadiumInfo,
+  meta?: { seasonLabel?: string; teamLabel?: string },
+): Promise<{ ok: boolean; error?: string }> {
+  const entry: StadiumCatalogEntry = { ...catalogEntryFromStadium(stadium, meta), deletable: true };
+  const seasons = await fetchEditorSeasons();
+  const anchorSeasonId = seasons.find((row) => row.isDefault)?.id ?? seasons[0]?.id;
+  if (!anchorSeasonId) {
+    return { ok: false, error: "No hay temporadas para guardar el catálogo" };
+  }
+
+  const bundles = await fetchSeasonBundles(anchorSeasonId);
+  const current = getStadiumCatalogFromBundles(bundles);
+  const next = [...current.filter((row) => row.id !== previousId && row.id !== entry.id), entry];
+  return writeStadiumCatalogEntries(next);
+}
+
+export async function deleteStadiumCatalogEntry(entryId: string): Promise<{ ok: boolean; error?: string }> {
+  const seasons = await fetchEditorSeasons();
+  const anchorSeasonId = seasons.find((row) => row.isDefault)?.id ?? seasons[0]?.id;
+  if (!anchorSeasonId) {
+    return { ok: false, error: "No hay temporadas para guardar el catálogo" };
+  }
+
+  const bundles = await fetchSeasonBundles(anchorSeasonId);
+  const current = getStadiumCatalogFromBundles(bundles);
+  if (!current.some((row) => row.id === entryId)) {
+    return { ok: false, error: "Solo puedes borrar estadios guardados en el catálogo (no los del repositorio)" };
+  }
+
+  const next = current.filter((row) => row.id !== entryId);
+  return writeStadiumCatalogEntries(next);
 }
 
 export async function saveClubStadiumForSeason(
