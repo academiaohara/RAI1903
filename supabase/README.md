@@ -7,9 +7,16 @@ Ejecuta en **Supabase → SQL Editor** (copiar y pegar el archivo completo).
 | Paso | Archivo | Cuándo |
 |------|---------|--------|
 | 1 | [`DROP_API_FOOTBALL.sql`](./DROP_API_FOOTBALL.sql) | Solo si probaste la integración API-Football (tablas `api_football_*`) |
-| 2 | [`APPLY_CMS_MIGRATIONS.sql`](./APPLY_CMS_MIGRATIONS.sql) | Siempre (temporadas, bundles, `season_id` en overrides) |
+| 2 | [`APPLY_CMS_MIGRATIONS.sql`](./APPLY_CMS_MIGRATIONS.sql) | Siempre (temporadas, bundles, `season_id` en overrides, valoraciones) |
 
 Después en la web: **Editar → Temporadas → Subir mock actual a `2025-26`**.
+
+## Correcciones puntuales
+
+| Error | Script |
+|-------|--------|
+| `cms_season_bundles_bundle_key_check` al guardar fichajes | [`FIX_TRANSFERS_BUNDLE.sql`](./FIX_TRANSFERS_BUNDLE.sql) |
+| `Could not find the table 'public.match_player_ratings'` al valorar jugadores | [`FIX_MATCH_PLAYER_RATINGS.sql`](./FIX_MATCH_PLAYER_RATINGS.sql) |
 
 ## Migraciones automáticas (CLI)
 
