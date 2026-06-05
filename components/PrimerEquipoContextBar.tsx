@@ -14,11 +14,12 @@ export function PrimerEquipoContextBar({ gender }: { gender: PrimerEquipoGender 
     pathname.endsWith("/jornadas") ||
     pathname.endsWith("/calendario") ||
     pathname.endsWith("/noticias");
-  const seasonSelectorWrapperClass = isCronicaPage
-    ? "hidden"
-    : pathname.endsWith("/plantilla") || seasonSelectorInHero
-      ? "hidden sm:block"
-      : "";
+  const seasonSelectorWrapperClass =
+    isCronicaPage || seasonSelectorInHero
+      ? "hidden"
+      : pathname.endsWith("/plantilla")
+        ? "hidden sm:block"
+        : "";
 
   return (
     <section aria-label="Contexto de primer equipo" className="space-y-3">
