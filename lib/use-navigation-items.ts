@@ -40,12 +40,11 @@ export function useMobileNavSections(): MobileNavSection[] {
     );
 
     return mobileNavSections.map((section) => {
-      if (section.title !== "APPS") return section;
+      if (section.title !== "MEDIA RAI") return section;
 
-      const quinielaItems = navChildrenByHref("/quiniela");
       return {
         ...section,
-        items: [...quinielaItems, ...children],
+        items: children,
       };
     });
   }, [mediaRai?.sections]);

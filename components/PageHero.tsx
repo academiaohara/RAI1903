@@ -10,6 +10,8 @@ type PageHeroProps = {
   description: string;
   children?: ReactNode;
   titleActions?: ReactNode;
+  titleSize?: "default" | "compact";
+  titleActionsClassName?: string;
   className?: string;
   titleWrapperClassName?: string;
 };
@@ -21,6 +23,8 @@ export function PageHero({
   description,
   children,
   titleActions,
+  titleSize = "default",
+  titleActionsClassName,
   className,
   titleWrapperClassName,
 }: PageHeroProps) {
@@ -33,9 +37,12 @@ export function PageHero({
             <AnimatedPageTitle
               title={title}
               mobileTitle={titleMobile}
+              size={titleSize}
               wrapperClassName={titleWrapperClassName}
             />
-            {titleActions ? <div className="ml-auto shrink-0">{titleActions}</div> : null}
+            {titleActions ? (
+              <div className={cn("ml-auto shrink-0 sm:ml-auto", titleActionsClassName)}>{titleActions}</div>
+            ) : null}
           </div>
           <p className="mt-3 text-base leading-7 text-slate-600">{description}</p>
         </div>

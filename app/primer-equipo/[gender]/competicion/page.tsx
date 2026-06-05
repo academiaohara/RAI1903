@@ -12,6 +12,8 @@ export default async function PrimerEquipoCompeticionPage({ params }: { params: 
       <PrimerEquipoPageHero
         title="Competición"
         description={`Guia de la liga, clasificacion completa, resultados y fichas de rivales de ${genderLabels[gender].club}.`}
+        compactTitle
+        compactSeasonSelector
       />
 
       <CompeticionView gender={gender} highlightTeamId={highlightTeamId} />

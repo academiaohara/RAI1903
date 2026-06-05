@@ -8,7 +8,13 @@ import { getPrimerEquipoTabs, type PrimerEquipoGender } from "@/lib/primer-equip
 export function PrimerEquipoContextBar({ gender }: { gender: PrimerEquipoGender }) {
   const pathname = usePathname();
   const tabs = getPrimerEquipoTabs(gender);
-  const seasonSelectorWrapperClass = pathname.endsWith("/plantilla") ? "hidden sm:block" : "";
+  const seasonSelectorInHero =
+    pathname.endsWith("/competicion") ||
+    pathname.endsWith("/jornadas") ||
+    pathname.endsWith("/calendario") ||
+    pathname.endsWith("/noticias");
+  const seasonSelectorWrapperClass =
+    pathname.endsWith("/plantilla") || seasonSelectorInHero ? "hidden sm:block" : "";
 
   return (
     <section aria-label="Contexto de primer equipo" className="space-y-3">
