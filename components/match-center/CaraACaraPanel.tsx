@@ -92,7 +92,11 @@ export function CaraACaraPanel({ data, gender }: { data: CaraACaraData; gender: 
       </div>
 
       <div className="mt-4 border-t border-[#214C9B]/10 pt-2">
-        <StatRow label="Clasificación" homeValue={`${home.position}º`} awayValue={`${away.position}º`} />
+        <StatRow
+          label="Clasificación"
+          homeValue={home.played > 0 ? `${home.position}º` : "—"}
+          awayValue={away.played > 0 ? `${away.position}º` : "—"}
+        />
         <StatRow label="Puntos" homeValue={home.points} awayValue={away.points} />
         <StatRow label="Goles a favor" homeValue={home.goalsFor} awayValue={away.goalsFor} />
         <StatRow label="Goles en contra" homeValue={home.goalsAgainst} awayValue={away.goalsAgainst} />
