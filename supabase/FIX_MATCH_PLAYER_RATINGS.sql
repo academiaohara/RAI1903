@@ -25,18 +25,33 @@ create index if not exists match_player_ratings_match_idx
 
 alter table public.match_player_ratings enable row level security;
 
+-- Lectura pública: cualquiera ve las medias (anon + autenticados).
 drop policy if exists "match_player_ratings_select" on public.match_player_ratings;
 create policy "match_player_ratings_select"
   on public.match_player_ratings for select
-  to authenticated
   using (true);
 
+-- Escritura solo del propio usuario (insert/update/delete).
 drop policy if exists "match_player_ratings_own_write" on public.match_player_ratings;
-create policy "match_player_ratings_own_write"
-  on public.match_player_ratings for all
+drop policy if exists "match_player_ratings_own_insert" on public.match_player_ratings;
+drop policy if exists "match_player_ratings_own_update" on public.match_player_ratings;
+drop policy if exists "match_player_ratings_own_delete" on public.match_player_ratings;
+
+create policy "match_player_ratings_own_insert"
+  on public.match_player_ratings for insert
+  to authenticated
+  with check (auth.uid() = user_id);
+
+create policy "match_player_ratings_own_update"
+  on public.match_player_ratings for update
   to authenticated
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
+
+create policy "match_player_ratings_own_delete"
+  on public.match_player_ratings for delete
+  to authenticated
+  using (auth.uid() = user_id);
 
 create or replace function public.set_match_player_ratings_updated_at()
 returns trigger

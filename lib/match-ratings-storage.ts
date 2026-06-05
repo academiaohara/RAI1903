@@ -1,3 +1,4 @@
+import type { CompetitionSeasonId } from "@/data/mock";
 import { loadSeasonId } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -45,7 +46,7 @@ export async function migrateLegacyPlayerRatingsToSupabase(
   for (const matchId of matchIds) {
     const ratings = legacy.matches[matchId];
     if (!ratings || !Object.keys(ratings).length) continue;
-    await submitMatchRatings({ userId, matchId, gender, ratings });
+    await submitMatchRatings({ userId, matchId, gender, ratings, seasonId: loadSeasonId() });
   }
 
   window.localStorage.removeItem(LEGACY_PLAYER_RATINGS_KEY);
@@ -55,11 +56,11 @@ export async function migrateLegacyPlayerRatingsToSupabase(
 export async function fetchUserMatchRatings(
   userId: string,
   matchId: string,
+  seasonId: CompetitionSeasonId = loadSeasonId(),
 ): Promise<Record<string, number>> {
   if (!isSupabaseConfigured()) return {};
 
   const supabase = createClient();
-  const seasonId = loadSeasonId();
 
   const { data, error } = await supabase
     .from("match_player_ratings")
@@ -77,11 +78,13 @@ export async function fetchUserMatchRatings(
   return ratings;
 }
 
-export async function fetchMatchRatingAverages(matchId: string): Promise<Record<string, PlayerRatingAverage>> {
+export async function fetchMatchRatingAverages(
+  matchId: string,
+  seasonId: CompetitionSeasonId = loadSeasonId(),
+): Promise<Record<string, PlayerRatingAverage>> {
   if (!isSupabaseConfigured()) return {};
 
   const supabase = createClient();
-  const seasonId = loadSeasonId();
 
   const { data, error } = await supabase
     .from("match_player_ratings")
@@ -111,6 +114,7 @@ export async function submitMatchRatings(params: {
   matchId: string;
   gender: PrimerEquipoGender;
   ratings: Record<string, number>;
+  seasonId?: CompetitionSeasonId;
 }): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!isSupabaseConfigured()) {
     return { ok: false, error: "Supabase no configurado" };
@@ -122,7 +126,7 @@ export async function submitMatchRatings(params: {
   }
 
   const supabase = createClient();
-  const seasonId = loadSeasonId();
+  const seasonId = params.seasonId ?? loadSeasonId();
   const rows = entries.map(([playerId, rating]) => ({
     user_id: params.userId,
     match_id: params.matchId,
