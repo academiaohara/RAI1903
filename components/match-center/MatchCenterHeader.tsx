@@ -367,7 +367,10 @@ export function MatchCenterTabs({
   onChange: (id: string) => void;
 }) {
   return (
-    <nav className="flex flex-nowrap justify-between gap-2 sm:flex-wrap sm:justify-start" aria-label="Secciones del partido">
+    <nav
+      className="no-scrollbar flex min-w-0 w-full touch-pan-x flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0"
+      aria-label="Secciones del partido"
+    >
       {tabs.map((tab) => {
         const isActive = tab.id === active;
         const disabled = Boolean(tab.disabled);
