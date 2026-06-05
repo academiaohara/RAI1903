@@ -2,7 +2,7 @@
 
 import { ExternalLink } from "lucide-react";
 import { Card } from "@/components/Card";
-import { ClubXTimeline } from "@/components/home/ClubXTimeline";
+import { ClubXPosts } from "@/components/home/ClubXPosts";
 import { CLUB_X_HANDLE, CLUB_X_PROFILE_URL } from "@/lib/club-x";
 
 export function HomeClubXBlock() {
@@ -23,7 +23,7 @@ export function HomeClubXBlock() {
         </a>
       }
     >
-      <ClubXTimeline />
+      <ClubXPosts />
     </Card>
   );
 }
