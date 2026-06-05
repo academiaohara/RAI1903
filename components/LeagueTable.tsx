@@ -14,7 +14,7 @@ import {
   type StandingsLegendItem,
 } from "@/lib/standings-styles";
 import { cn, formatGoalDifference, resultTone } from "@/lib/utils";
-import type { Team } from "@/types";
+import type { FormCode, Team } from "@/types";
 
 type LeagueTableProps = {
   teams: Team[];
@@ -29,6 +29,25 @@ type LeagueTableProps = {
   gender?: PrimerEquipoGender;
   zoneLegend?: StandingsLegendItem[];
 };
+
+function TeamFormBadges({ form, className }: { form: FormCode[]; className?: string }) {
+  return (
+    <div className={cn("flex gap-px", className)}>
+      {form.map((result, index) => (
+        <span
+          key={`${result}-${index}`}
+          className={cn(
+            "flex h-2.5 w-2.5 items-center justify-center rounded-[2px] text-[6px] font-extrabold leading-none sm:h-3.5 sm:w-3.5 sm:rounded sm:text-[7px] md:h-5 md:w-5 md:text-[9px]",
+            resultTone(result),
+          )}
+          title={result === "G" ? "Victoria" : result === "E" ? "Empate" : "Derrota"}
+        >
+          {result}
+        </span>
+      ))}
+    </div>
+  );
+}
 
 export function LeagueTable({
   teams,
@@ -45,29 +64,47 @@ export function LeagueTable({
   const legend = zoneLegend ?? STANDINGS_ZONE_LEGEND;
   const showCrests = showCrestsProp ?? gender !== "femenino";
   const visibleRows = [...teams].sort((a, b) => a.position - b.position);
+  const showFormColumn = !compact;
 
   const statColClass =
-    "min-w-[1.35rem] px-0.5 py-1 text-center font-bold tabular-nums sm:min-w-0 sm:px-1.5 md:px-2 md:py-2.5";
-  const resultStatColClass = cn(statColClass, compact && "hidden sm:table-cell");
-  const goalStatColClass = cn(statColClass, "hidden sm:table-cell");
+    "w-[1.15rem] px-0 py-1 text-center font-bold tabular-nums sm:w-auto sm:px-1 sm:py-1.5 md:px-2 md:py-2.5";
+  const ptsColClass = cn(statColClass, "w-[1.35rem] sm:w-auto");
 
   return (
     <div className="min-w-0 space-y-3">
       <div className="overflow-x-auto rounded-2xl border border-[#214C9B]/20 bg-white [-webkit-overflow-scrolling:touch]">
-        <table className="w-full table-fixed text-left text-[10px] sm:table-auto md:text-sm">
-          <thead className="bg-[#214C9B] text-[8px] uppercase tracking-[0.05em] text-white md:text-[10px] md:tracking-[0.1em]">
+        <table className="w-full min-w-[300px] table-fixed text-[9px] sm:min-w-0 sm:table-auto sm:text-xs md:text-sm">
+          <colgroup>
+            <col className="w-[1.1rem] sm:w-5 md:w-7" />
+            <col />
+            <col className="w-[1.35rem] sm:w-auto" />
+            <col className="w-[1.15rem] sm:w-auto" />
+            <col className="w-[1.15rem] sm:w-auto" />
+            <col className="w-[1.15rem] sm:w-auto" />
+            <col className="w-[1.15rem] sm:w-auto" />
+            <col className="w-[1.15rem] sm:w-auto" />
+            <col className="w-[1.15rem] sm:w-auto" />
+            <col className="w-[1.35rem] sm:w-auto" />
+            {showFormColumn ? <col className="hidden md:table-column" /> : null}
+          </colgroup>
+          <thead className="bg-[#214C9B] text-[7px] uppercase tracking-[0.04em] text-white sm:text-[8px] md:text-[10px] md:tracking-[0.1em]">
             <tr>
-              <th className="w-[1.35rem] p-0 text-center font-bold sm:w-5 md:w-7">#</th>
-              <th className="px-1 py-1 font-bold sm:px-1.5 sm:py-1.5 md:px-2 md:py-2.5">Equipo</th>
+              <th className="p-0 text-center font-bold">#</th>
+              <th className="px-1 py-1 text-left font-bold sm:px-1.5 sm:py-1.5 md:px-2 md:py-2.5">Equipo</th>
+              <th className={ptsColClass}>
+                <span className="md:hidden">Pt</span>
+                <span className="hidden md:inline">Pts</span>
+              </th>
               <th className={statColClass}>PJ</th>
-              <th className={resultStatColClass}>G</th>
-              <th className={resultStatColClass}>E</th>
-              <th className={resultStatColClass}>P</th>
-              <th className={goalStatColClass}>GF</th>
-              <th className={goalStatColClass}>GC</th>
-              <th className={cn(statColClass, "min-w-[1.5rem] sm:min-w-[2rem]")}>DG</th>
-              <th className={cn(statColClass, "min-w-[1.65rem] sm:min-w-[2.25rem]")}>Pts</th>
-              {!compact && <th className={cn(statColClass, "hidden md:table-cell")}>Forma</th>}
+              <th className={statColClass}>G</th>
+              <th className={statColClass}>E</th>
+              <th className={statColClass}>P</th>
+              <th className={statColClass}>GF</th>
+              <th className={statColClass}>GC</th>
+              <th className={statColClass}>DG</th>
+              {showFormColumn ? (
+                <th className={cn(statColClass, "hidden md:table-cell")}>Forma</th>
+              ) : null}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -83,22 +120,27 @@ export function LeagueTable({
               const highlightCellClassName = getStandingsHighlightCellClass(rowHighlight);
               const positionClassName = getStandingsHighlightPositionClass(false, team.zone, team.zoneColorClass);
               const dataCellClassName = cn(
-                "px-0.5 py-1 tabular-nums sm:px-1.5 sm:py-1.5 md:px-2 md:py-2.5",
+                "px-0 py-1 tabular-nums sm:px-1.5 sm:py-1.5 md:px-2 md:py-2.5",
                 highlightCellClassName,
                 rowClassName,
               );
               const teamLabel = compact ? team.shortName : team.name;
               const teamLinkable = canLinkEquipoLiga(gender, team.id, season?.bundles);
               const teamCellContent = (
-                <>
+                <div className="flex min-w-0 items-start gap-0.5 sm:items-center sm:gap-1 md:gap-2">
                   {showCrests ? (
-                    <TeamCrest team={team} size="sm" className="h-4 w-4 shrink-0 sm:h-7 sm:w-7" />
+                    <TeamCrest team={team} size="sm" className="mt-px h-3.5 w-3.5 shrink-0 sm:mt-0 sm:h-7 sm:w-7" />
                   ) : null}
-                  <span className="min-w-0 font-bold leading-tight group-hover/team:underline group-hover/team:decoration-[#214C9B]/40 group-hover/team:underline-offset-2 sm:truncate">
-                    <span className="md:hidden">{team.shortName}</span>
-                    <span className="hidden md:inline">{teamLabel}</span>
-                  </span>
-                </>
+                  <div className="min-w-0">
+                    <span className="block min-w-0 font-bold leading-tight group-hover/team:underline group-hover/team:decoration-[#214C9B]/40 group-hover/team:underline-offset-2">
+                      <span className="md:hidden">{team.shortName}</span>
+                      <span className="hidden truncate md:inline">{teamLabel}</span>
+                    </span>
+                    {team.form.length > 0 ? (
+                      <TeamFormBadges form={team.form} className="mt-0.5 md:hidden" />
+                    ) : null}
+                  </div>
+                </div>
               );
 
               return (
@@ -108,7 +150,7 @@ export function LeagueTable({
                 >
                   <td
                     className={cn(
-                      "w-[1.35rem] p-0 text-center text-[8px] font-extrabold tabular-nums sm:w-5 sm:text-[9px] md:w-7 md:text-[11px]",
+                      "p-0 text-center text-[8px] font-extrabold tabular-nums sm:text-[9px] md:text-[11px]",
                       positionClassName,
                     )}
                   >
@@ -118,29 +160,32 @@ export function LeagueTable({
                     {teamLinkable ? (
                       <Link
                         href={equipoLigaHref(gender, team.id)}
-                        className="group/team flex min-w-0 items-center gap-0.5 rounded-lg outline-none transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[#214C9B] focus-visible:ring-offset-1 sm:gap-1 md:gap-2"
+                        className="group/team block min-w-0 rounded-lg outline-none transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[#214C9B] focus-visible:ring-offset-1"
                         aria-label={`Ver ficha de ${team.name}`}
                       >
                         {teamCellContent}
                       </Link>
                     ) : (
-                      <div className="flex min-w-0 items-center gap-0.5 sm:gap-1 md:gap-2">{teamCellContent}</div>
+                      <div className="min-w-0">{teamCellContent}</div>
                     )}
-                  </td>
-                  <td className={cn(dataCellClassName, "text-center")}>{team.stats.played}</td>
-                  <td className={cn(dataCellClassName, "text-center", compact && "hidden sm:table-cell")}>
-                    {team.stats.won}
-                  </td>
-                  <td className={cn(dataCellClassName, "text-center", compact && "hidden sm:table-cell")}>
-                    {team.stats.drawn}
-                  </td>
-                  <td className={cn(dataCellClassName, "text-center", compact && "hidden sm:table-cell")}>
-                    {team.stats.lost}
                   </td>
                   <td
                     className={cn(
                       dataCellClassName,
-                      "hidden text-center sm:table-cell",
+                      "text-center text-[9px] font-extrabold sm:text-xs md:text-base",
+                      highlighted ? "text-white" : "text-[#214C9B]",
+                    )}
+                  >
+                    {team.stats.points}
+                  </td>
+                  <td className={cn(dataCellClassName, "text-center")}>{team.stats.played}</td>
+                  <td className={cn(dataCellClassName, "text-center")}>{team.stats.won}</td>
+                  <td className={cn(dataCellClassName, "text-center")}>{team.stats.drawn}</td>
+                  <td className={cn(dataCellClassName, "text-center")}>{team.stats.lost}</td>
+                  <td
+                    className={cn(
+                      dataCellClassName,
+                      "text-center",
                       highlighted ? "text-white/90" : "text-slate-600",
                     )}
                   >
@@ -149,7 +194,7 @@ export function LeagueTable({
                   <td
                     className={cn(
                       dataCellClassName,
-                      "hidden text-center sm:table-cell",
+                      "text-center",
                       highlighted ? "text-white/90" : "text-slate-600",
                     )}
                   >
@@ -158,33 +203,11 @@ export function LeagueTable({
                   <td className={cn(dataCellClassName, "text-center font-semibold")}>
                     {formatGoalDifference(diff)}
                   </td>
-                  <td
-                    className={cn(
-                      dataCellClassName,
-                      "text-center text-[10px] font-extrabold sm:text-xs md:text-base",
-                      highlighted ? "text-white" : "text-[#214C9B]",
-                    )}
-                  >
-                    {team.stats.points}
-                  </td>
-                  {!compact && (
+                  {showFormColumn ? (
                     <td className={cn(dataCellClassName, "hidden md:table-cell")}>
-                      <div className="flex justify-center gap-px md:gap-0.5">
-                        {team.form.map((result, index) => (
-                          <span
-                            key={`${team.id}-${result}-${index}`}
-                            className={cn(
-                              "flex h-3.5 w-3.5 items-center justify-center rounded text-[7px] font-extrabold md:h-5 md:w-5 md:text-[9px]",
-                              resultTone(result),
-                            )}
-                            title={result === "G" ? "Victoria" : result === "E" ? "Empate" : "Derrota"}
-                          >
-                            {result}
-                          </span>
-                        ))}
-                      </div>
+                      <TeamFormBadges form={team.form} className="justify-center" />
                     </td>
-                  )}
+                  ) : null}
                 </tr>
               );
             })}
