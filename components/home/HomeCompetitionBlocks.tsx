@@ -147,24 +147,27 @@ export function HomeStandingsStatsBlock() {
   }
 
   return (
-    <section className="grid gap-6 xl:grid-cols-[1fr_0.42fr]">
-      <SectionUnderConstructionGate
-        scope={HOME_MASCULINO_SCOPE}
-        section="competicion"
-        publicHintOverride={HOME_COMPETICION_PUBLIC_HINT}
-        header={<CardHeader eyebrow="Estado competitivo" title="Clasificacion y jornada" />}
-      >
-        <StandingsLeagueTableCard
-          eyebrow="Estado competitivo"
-          sourceTeams={teams}
-          matchdays={leagueMatchdays}
-          highlightTeamId={highlightTeamId}
-          compact
-          zones={standingsZones}
-          zoneRules={competitionConfig.zones}
-        />
-      </SectionUnderConstructionGate>
+    <section className="grid min-w-0 gap-6 xl:grid-cols-[1fr_0.42fr]">
+      <div className="min-w-0">
+        <SectionUnderConstructionGate
+          scope={HOME_MASCULINO_SCOPE}
+          section="competicion"
+          publicHintOverride={HOME_COMPETICION_PUBLIC_HINT}
+          header={<CardHeader eyebrow="Estado competitivo" title="Clasificacion y jornada" />}
+        >
+          <StandingsLeagueTableCard
+            eyebrow="Estado competitivo"
+            sourceTeams={teams}
+            matchdays={leagueMatchdays}
+            highlightTeamId={highlightTeamId}
+            compact
+            zones={standingsZones}
+            zoneRules={competitionConfig.zones}
+          />
+        </SectionUnderConstructionGate>
+      </div>
       <Card
+        className="min-w-0"
         eyebrow="Jugadores destacados"
         title="Estadisticas"
         action={

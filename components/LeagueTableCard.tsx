@@ -87,6 +87,7 @@ export function LeagueTableCard({
         <LeagueTable
           teams={modalTeams}
           highlightTeamId={highlightTeamId}
+          compact={compact}
           gender={gender}
           zoneLegend={zoneLegend}
           showCrests={showCrests}
