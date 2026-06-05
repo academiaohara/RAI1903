@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Users } from "lucide-react";
 import { CalendarNavButton } from "@/components/CalendarNavButton";
-import { Card } from "@/components/Card";
+import { Card, CardHeader } from "@/components/Card";
 import { CompetitionLogo } from "@/components/CompetitionLogo";
 import { HomeStatHighlights } from "@/components/home/HomeStatHighlights";
 import { MatchScoreCenter } from "@/components/MatchScoreCenter";
@@ -80,11 +80,24 @@ export function HomeMatchBannersBlock() {
   const latestArticle = latestMatch ? getForMatch(latestMatch.id, "masculino") : undefined;
   const nextArticle = nextMatch ? getForMatch(nextMatch.id, "masculino") : undefined;
 
+  const matchBannerHeaders =
+    latestMatch || nextMatch ? (
+      <div className="grid gap-4">
+        {latestMatch && (
+          <p className="text-xs font-bold uppercase tracking-[0.08em] text-[#981915]">Ultimo partido</p>
+        )}
+        {nextMatch && (
+          <p className="text-xs font-bold uppercase tracking-[0.08em] text-[#981915]">Proximo partido</p>
+        )}
+      </div>
+    ) : undefined;
+
   return (
     <SectionUnderConstructionGate
       scope={HOME_MASCULINO_SCOPE}
       section="jornadas"
       publicHintOverride={HOME_JORNADAS_PUBLIC_HINT}
+      header={matchBannerHeaders}
     >
     {(latestMatch || nextMatch) ? (
     <section className="grid gap-4">
@@ -139,6 +152,7 @@ export function HomeStandingsStatsBlock() {
         scope={HOME_MASCULINO_SCOPE}
         section="competicion"
         publicHintOverride={HOME_COMPETICION_PUBLIC_HINT}
+        header={<CardHeader eyebrow="Estado competitivo" title="Clasificacion y jornada" />}
       >
         <StandingsLeagueTableCard
           eyebrow="Estado competitivo"
@@ -171,6 +185,7 @@ export function HomeStandingsStatsBlock() {
 
 export function HomeRecentUpcomingBlock() {
   const { latestMatches, upcomingMatches, bundlesLoading } = useMasculinoLeagueSeason();
+  const calendarioHref = `${primerEquipoBase("masculino")}/calendario` as Route;
 
   if (bundlesLoading) {
     return (
@@ -180,11 +195,45 @@ export function HomeRecentUpcomingBlock() {
     );
   }
 
+  const sectionHeaders = (
+    <>
+      <section className="grid gap-6 xl:hidden">
+        <section>
+          <CardHeader eyebrow="Resultados" title="Ultimos 5 partidos" />
+        </section>
+        <section>
+          <CardHeader
+            eyebrow="Calendario"
+            title="Proximos 5 partidos"
+            action={<CalendarNavButton href={calendarioHref} />}
+          />
+        </section>
+      </section>
+
+      <section className="hidden space-y-4 xl:block">
+        <div className="grid grid-cols-2 gap-6">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">Resultados</p>
+            <h2 className="text-3xl font-extrabold uppercase text-[#214C9B]">Ultimos 5 partidos</h2>
+          </div>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">Calendario</p>
+              <h2 className="text-3xl font-extrabold uppercase text-[#214C9B]">Proximos 5 partidos</h2>
+            </div>
+            <CalendarNavButton href={calendarioHref} />
+          </div>
+        </div>
+      </section>
+    </>
+  );
+
   return (
     <SectionUnderConstructionGate
       scope={HOME_MASCULINO_SCOPE}
       section="jornadas"
       publicHintOverride={HOME_JORNADAS_PUBLIC_HINT}
+      header={sectionHeaders}
     >
     <>
       <section className="grid gap-6 xl:hidden">
@@ -204,7 +253,7 @@ export function HomeRecentUpcomingBlock() {
         <Card
           eyebrow="Calendario"
           title="Proximos 5 partidos"
-          action={<CalendarNavButton href={`${primerEquipoBase("masculino")}/calendario` as Route} />}
+          action={<CalendarNavButton href={calendarioHref} />}
         >
           <div className="space-y-2">
             {upcomingMatches.length > 0 ? (
@@ -229,7 +278,7 @@ export function HomeRecentUpcomingBlock() {
               <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">Calendario</p>
               <h2 className="text-3xl font-extrabold uppercase text-[#214C9B]">Proximos 5 partidos</h2>
             </div>
-            <CalendarNavButton href={`${primerEquipoBase("masculino")}/calendario` as Route} />
+            <CalendarNavButton href={calendarioHref} />
           </div>
         </div>
         <div className="grid grid-cols-2 items-start gap-6">
