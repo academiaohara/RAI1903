@@ -74,7 +74,7 @@ export function ClubXPosts() {
   };
 
   return (
-    <div className="w-full min-w-0 max-w-full lg:max-w-[550px]">
+    <div className="w-full min-w-0 max-w-full">
       {editMode && (
         <div className="mb-4 space-y-3 rounded-2xl border border-dashed border-[#214C9B]/35 bg-blue-50/40 p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">

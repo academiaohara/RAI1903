@@ -80,7 +80,7 @@ export function HomeClubResumenesHeader() {
       <div className="min-w-0">
         <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#981915] sm:text-xs">Media RAI</p>
         <h3 className="mt-0.5 text-base font-extrabold uppercase leading-tight text-[#214C9B] sm:mt-1 sm:text-2xl lg:text-4xl">
-          Últimos resúmenes
+          Resúmenes
         </h3>
       </div>
       <Link

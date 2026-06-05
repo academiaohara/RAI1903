@@ -11,7 +11,7 @@ import {
 import { CLUB_X_HANDLE, CLUB_X_PROFILE_URL } from "@/lib/club-x";
 import { cn } from "@/lib/utils";
 
-const TWO_COLUMN_GRID = "grid gap-4 sm:gap-6 lg:grid-cols-[minmax(0,auto)_minmax(0,1fr)] lg:items-start lg:gap-8";
+const TWO_COLUMN_GRID = "grid gap-4 sm:gap-6 lg:grid-cols-2 lg:items-start lg:gap-8";
 
 export function HomeClubXBlock() {
   const resumenes = useHomeClubResumenesVideos();
