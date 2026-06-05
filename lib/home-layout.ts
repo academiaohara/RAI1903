@@ -4,6 +4,7 @@ export type HomeSectionId =
   | "standings_stats"
   | "recent_upcoming"
   | "news"
+  | "club_x"
   | "transfers";
 
 export const HOME_SECTION_ORDER_KEY = "home:section_order";
@@ -13,6 +14,7 @@ export const DEFAULT_HOME_SECTION_ORDER: HomeSectionId[] = [
   "standings_stats",
   "recent_upcoming",
   "news",
+  "club_x",
   "transfers",
 ];
 
@@ -21,6 +23,7 @@ export const HOME_SECTION_LABELS: Record<HomeSectionId, string> = {
   standings_stats: "Clasificación y estadísticas",
   recent_upcoming: "Últimos 5 y próximos 5 partidos",
   news: "Noticiero",
+  club_x: "Club en X",
   transfers: "Fichajes y renovaciones",
 };
 
@@ -30,7 +33,7 @@ export function isHomeSectionId(value: unknown): value is HomeSectionId {
   return typeof value === "string" && ALL_SECTION_IDS.has(value as HomeSectionId);
 }
 
-/** Garantiza las cinco secciones, sin duplicados ni ids desconocidos. */
+/** Garantiza todas las secciones, sin duplicados ni ids desconocidos. */
 export function normalizeHomeSectionOrder(raw: unknown): HomeSectionId[] {
   if (!Array.isArray(raw)) return [...DEFAULT_HOME_SECTION_ORDER];
 
