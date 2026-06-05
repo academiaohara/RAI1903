@@ -65,12 +65,14 @@ export function QuinielaUserModal({
           </div>
         </div>
 
-        <JornadaSelector
-          value={round}
-          total={totalRounds}
-          currentRound={currentRound}
-          onChange={setRound}
-        />
+        <div className="min-w-0 -mx-1 px-1 sm:mx-0 sm:px-0">
+          <JornadaSelector
+            value={round}
+            total={totalRounds}
+            currentRound={currentRound}
+            onChange={setRound}
+          />
+        </div>
 
         {data?.hasSavedRound && data.countPoints ? (
           <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#214C9B]/20 bg-white px-3 py-2.5 sm:px-4 sm:py-3">
