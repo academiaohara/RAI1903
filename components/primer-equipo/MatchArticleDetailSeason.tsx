@@ -25,7 +25,7 @@ type MatchArticleDetailSeasonProps = {
 };
 
 export function MatchArticleDetailSeason({ gender, articleId }: MatchArticleDetailSeasonProps) {
-  const { bundles, bundlesLoading, getEnrichedFixtureSource } = useSeason();
+  const { bundles, bundlesLoading, getEnrichedFixtureSource, viewedSeason } = useSeason();
   const { getOverride } = useInlineEditing();
   const { getById } = useSeasonMatchArticles();
   const cmsTeams = useMemo(() => getTeamsBundle(bundles, gender)?.teams ?? [], [bundles, gender]);
@@ -70,8 +70,11 @@ export function MatchArticleDetailSeason({ gender, articleId }: MatchArticleDeta
     if (!article || article.gender !== gender) return null;
     const match = findMatch(article.matchId) ?? getMatchForArticle(article);
     if (!match) return null;
-    return buildMatchDetail(match, article.gender, { leagueMatchdays });
-  }, [article, findMatch, gender, leagueMatchdays]);
+    return buildMatchDetail(match, article.gender, {
+      leagueMatchdays,
+      seasonLabel: viewedSeason.label,
+    });
+  }, [article, findMatch, gender, leagueMatchdays, viewedSeason.label]);
 
   if (bundlesLoading) {
     return (

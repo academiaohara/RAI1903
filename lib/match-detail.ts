@@ -18,6 +18,8 @@ import type {
 export type BuildMatchDetailOptions = {
   /** Jornadas de liga de la temporada (CMS o mock). Si faltan, se usa el calendario mock del género. */
   leagueMatchdays?: Matchday[];
+  /** Etiqueta de temporada visible (p. ej. `25/26`). */
+  seasonLabel?: string;
 };
 
 const EMPTY_LINEUP: MatchLineup = { formation: "", starters: [], bench: [] };
@@ -127,7 +129,7 @@ export function buildMatchDetail(
     attendance: null,
     kickoffTime: formatKickoffTime(match.date),
     kickoffDateLabel: formatKickoffDateLabel(match.date),
-    seasonLabel: "2025/2026",
+    seasonLabel: options?.seasonLabel ?? "",
     stats: [],
     events: [],
     homeLineup,

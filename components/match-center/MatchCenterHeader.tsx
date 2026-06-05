@@ -133,7 +133,7 @@ function ScoreInput({
 }
 
 export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHeaderProps) {
-  const { match, gender, referee, attendance, kickoffTime, kickoffDateLabel, seasonLabel } = detail;
+  const { match, gender, referee, attendance, kickoffTime, kickoffDateLabel } = detail;
   const { bundles, viewedSeason } = useSeason();
   const { editMode, getValue, saveValue, getOverride, mergeSaveValue } = useInlineEditing();
   const keys = useMatchDetailStorageKeys(match.id);
@@ -180,7 +180,7 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
     .sort((a, b) => a.minute - b.minute);
   const isFinished = match.status === "finished";
   const jornada = matchJornadaLabel(match);
-  const meta = [matchCompetitionShortLabel(match), jornada, seasonLabel].filter(Boolean).join(" · ");
+  const meta = [matchCompetitionShortLabel(match), jornada, viewedSeason.label].filter(Boolean).join(" · ");
   const showReferee = Boolean(currentReferee) || editMode;
   const showAttendance = isFinished && (currentAttendance !== null || editMode);
 
