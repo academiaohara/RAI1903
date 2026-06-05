@@ -39,6 +39,7 @@ import {
   upsertInlineOverridesBatch,
 } from "@/lib/cms/inline-overrides";
 import { SeasonManagerPanel } from "@/components/editor/SeasonManagerPanel";
+import { SectionStatusEditorPanel } from "@/components/editor/SectionStatusEditorPanel";
 import { TeamCrestEditorPanel } from "@/components/editor/TeamCrestEditorPanel";
 import { HomeLayoutEditorPanel } from "@/components/editor/HomeLayoutEditorPanel";
 import { MediaRaiSectionsEditorPanel } from "@/components/editor/MediaRaiSectionsEditorPanel";
@@ -518,6 +519,7 @@ export function InlineEditingToolbar() {
   const [competitionPanelOpen, setCompetitionPanelOpen] = useState(false);
   const [femeninoPanelOpen, setFemeninoPanelOpen] = useState(false);
   const [teamsPanelOpen, setTeamsPanelOpen] = useState(false);
+  const [sectionStatusPanelOpen, setSectionStatusPanelOpen] = useState(false);
   const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
   const pathname = usePathname();
   const toolbarScrollRef = useRef<HTMLDivElement>(null);
@@ -551,6 +553,7 @@ export function InlineEditingToolbar() {
     setCompetitionPanelOpen(false);
     setFemeninoPanelOpen(false);
     setTeamsPanelOpen(false);
+    setSectionStatusPanelOpen(false);
   }, []);
 
   const setToolbarCollapsedPersisted = useCallback(
@@ -621,6 +624,9 @@ export function InlineEditingToolbar() {
       )}
       {editMode && !toolbarCollapsed && teamsPanelOpen && (
         <TeamsEditorPanel onClose={() => setTeamsPanelOpen(false)} />
+      )}
+      {editMode && !toolbarCollapsed && sectionStatusPanelOpen && (
+        <SectionStatusEditorPanel onClose={() => setSectionStatusPanelOpen(false)} />
       )}
       <div className="relative min-w-0 sm:max-w-[calc(100vw-2rem)]">
         {editMode && !toolbarCollapsed && scrollHint.right && (
@@ -704,6 +710,16 @@ export function InlineEditingToolbar() {
                   className={editorToolbarButtonClass}
                 >
                   Temporadas
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeEditorPanels();
+                    setSectionStatusPanelOpen((open) => !open);
+                  }}
+                  className={editorToolbarButtonClass}
+                >
+                  Secciones
                 </button>
                 {!isPlantillaPath(pathname) && (
                   <Link

@@ -5,6 +5,7 @@ import { Card } from "@/components/Card";
 import { TeamCalendar } from "@/components/TeamCalendar";
 import { ExtraFixturesOnPageEditor } from "@/components/editor/ExtraFixturesOnPageEditor";
 import { useEditedCalendarMatches } from "@/components/calendar/CalendarMatchEditor";
+import { SectionUnderConstructionGate } from "@/components/season/SectionUnderConstructionGate";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useAllSeasonsCalendarMatches } from "@/hooks/useAllSeasonsCalendarMatches";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -30,6 +31,7 @@ export function CalendarioSeasonView({ gender }: CalendarioSeasonViewProps) {
   const upcoming = listMatches.length - played;
 
   return (
+    <SectionUnderConstructionGate scope={gender} section="calendario">
     <Card eyebrow="Temporada" title="Partidos del equipo">
       <ExtraFixturesOnPageEditor gender={gender} />
       <div className="mb-6 flex flex-wrap gap-4 text-sm font-bold text-slate-600">
@@ -56,5 +58,6 @@ export function CalendarioSeasonView({ gender }: CalendarioSeasonViewProps) {
         />
       )}
     </Card>
+    </SectionUnderConstructionGate>
   );
 }

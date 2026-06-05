@@ -7,6 +7,7 @@ import { useCanteraSeasonOptional } from "@/components/cantera/CanteraSeasonCont
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { SubsectionFilterNav } from "@/components/SubsectionFilterNav";
 import { CanteraCompeticionSection } from "@/components/cantera/CanteraCompeticionSection";
+import { SectionUnderConstructionGate } from "@/components/season/SectionUnderConstructionGate";
 import { TeamCalendar } from "@/components/TeamCalendar";
 import {
   canteraTeamIdToCmsScope,
@@ -130,7 +131,9 @@ export function CanteraTeamSections({ teamId, cmsScope: cmsScopeProp }: CanteraT
 
       {activeSection === "plantilla" &&
         (isCmsBacked && cmsScope ? (
-          <CanteraSquadTableWithEditing teamId={cmsScopeToCanteraTeamId(cmsScope)} cmsScope={cmsScope} />
+          <SectionUnderConstructionGate scope={cmsScope} section="plantilla">
+            <CanteraSquadTableWithEditing teamId={cmsScopeToCanteraTeamId(cmsScope)} cmsScope={cmsScope} />
+          </SectionUnderConstructionGate>
         ) : (
           <CanteraSquadTable
             teamId={teamId}
@@ -139,23 +142,44 @@ export function CanteraTeamSections({ teamId, cmsScope: cmsScopeProp }: CanteraT
           />
         ))}
 
-      {activeSection === "calendario" && (
-        <TeamCalendar matches={calendarMatches} listOnly showCrests={false} showVenue={false} />
-      )}
+      {activeSection === "calendario" &&
+        (isCmsBacked && cmsScope ? (
+          <SectionUnderConstructionGate scope={cmsScope} section="calendario">
+            <TeamCalendar matches={calendarMatches} listOnly showCrests={false} showVenue={false} />
+          </SectionUnderConstructionGate>
+        ) : (
+          <TeamCalendar matches={calendarMatches} listOnly showCrests={false} showVenue={false} />
+        ))}
 
-      {activeSection === "clasificacion" && (
-        <CanteraCompeticionSection
-          standings={standings}
-          highlightTeamId={avilesTeamId}
-          calendarMatches={clasificacionCalendar}
-          zoneLegend={isCmsBacked && canteraSeason ? canteraSeason.zoneLegend : undefined}
-          isClubHighlight={(row) => isCanteraClubTeam(teamId, row.id, row.name)}
-        />
-      )}
+      {activeSection === "clasificacion" &&
+        (isCmsBacked && cmsScope ? (
+          <SectionUnderConstructionGate scope={cmsScope} section="competicion">
+            <CanteraCompeticionSection
+              standings={standings}
+              highlightTeamId={avilesTeamId}
+              calendarMatches={clasificacionCalendar}
+              zoneLegend={isCmsBacked && canteraSeason ? canteraSeason.zoneLegend : undefined}
+              isClubHighlight={(row) => isCanteraClubTeam(teamId, row.id, row.name)}
+            />
+          </SectionUnderConstructionGate>
+        ) : (
+          <CanteraCompeticionSection
+            standings={standings}
+            highlightTeamId={avilesTeamId}
+            calendarMatches={clasificacionCalendar}
+            zoneLegend={isCmsBacked && canteraSeason ? canteraSeason.zoneLegend : undefined}
+            isClubHighlight={(row) => isCanteraClubTeam(teamId, row.id, row.name)}
+          />
+        ))}
 
-      {activeSection === "jornadas" && (
-        <CanteraJornadasView teamId={teamId} filialMatches={cmsMatches} />
-      )}
+      {activeSection === "jornadas" &&
+        (isCmsBacked && cmsScope ? (
+          <SectionUnderConstructionGate scope={cmsScope} section="jornadas">
+            <CanteraJornadasView teamId={teamId} filialMatches={cmsMatches} />
+          </SectionUnderConstructionGate>
+        ) : (
+          <CanteraJornadasView teamId={teamId} filialMatches={cmsMatches} />
+        ))}
     </div>
   );
 }
