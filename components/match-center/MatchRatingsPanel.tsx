@@ -2,8 +2,8 @@
 
 import { Loader2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useSeason } from "@/components/season/SeasonProvider";
 import { signInWithX } from "@/lib/auth/sign-in-with-x";
+import { useMatchRatingsSeasonId } from "@/hooks/useMatchRatingsSeasonId";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { getAvilesPlayersWhoPlayed } from "@/lib/match-rating-eligibility";
 import { formatFanRating } from "@/lib/format-fan-rating";
@@ -29,7 +29,10 @@ const SLIDER_STEP = 0.5;
 const SLIDER_DEFAULT = 5;
 
 export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
-  const { viewedSeasonId } = useSeason();
+  const { seasonId: ratingsSeasonId, resolving: resolvingSeason } = useMatchRatingsSeasonId(
+    detail.match.id,
+    detail.gender,
+  );
   const { squad } = useSquadPlayers(detail.gender);
   const configured = isSupabaseConfigured();
 
@@ -42,9 +45,9 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
   const [authReady, setAuthReady] = useState(!configured);
   const [draftRatings, setDraftRatings] = useState<Record<string, number>>({});
   const [averages, setAverages] = useState<Record<string, { average: number; count: number }>>({});
-  const sessionKey = `${viewedSeasonId}:${detail.match.id}:${user?.id ?? "guest"}`;
+  const sessionKey = `${ratingsSeasonId}:${detail.match.id}:${user?.id ?? "guest"}`;
   const [loadedKey, setLoadedKey] = useState<string | null>(null);
-  const loading = configured && authReady && loadedKey !== sessionKey;
+  const loading = configured && (resolvingSeason || !authReady || loadedKey !== sessionKey);
   const [submitting, setSubmitting] = useState(false);
   const [signingIn, setSigningIn] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -72,15 +75,15 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
     if (user) await migrateLegacyPlayerRatingsToSupabase(user.id, detail.gender);
 
     const [communityAverages, userRatings] = await Promise.all([
-      fetchMatchRatingAverages(detail.match.id, viewedSeasonId),
-      user ? fetchUserMatchRatings(user.id, detail.match.id, viewedSeasonId) : Promise.resolve({}),
+      fetchMatchRatingAverages(detail.match.id, ratingsSeasonId),
+      user ? fetchUserMatchRatings(user.id, detail.match.id, ratingsSeasonId) : Promise.resolve({}),
     ]);
     setAverages(communityAverages);
     setDraftRatings(userRatings);
-  }, [configured, detail.gender, detail.match.id, user, viewedSeasonId]);
+  }, [configured, detail.gender, detail.match.id, ratingsSeasonId, user]);
 
   useEffect(() => {
-    if (!configured || !authReady) return;
+    if (!configured || !authReady || resolvingSeason) return;
 
     let cancelled = false;
 
@@ -88,8 +91,8 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
       if (user) await migrateLegacyPlayerRatingsToSupabase(user.id, detail.gender);
 
       const [communityAverages, userRatings] = await Promise.all([
-        fetchMatchRatingAverages(detail.match.id, viewedSeasonId),
-        user ? fetchUserMatchRatings(user.id, detail.match.id, viewedSeasonId) : Promise.resolve({}),
+        fetchMatchRatingAverages(detail.match.id, ratingsSeasonId),
+        user ? fetchUserMatchRatings(user.id, detail.match.id, ratingsSeasonId) : Promise.resolve({}),
       ]);
       if (cancelled) return;
       setAverages(communityAverages);
@@ -100,7 +103,7 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
     return () => {
       cancelled = true;
     };
-  }, [authReady, configured, detail.gender, detail.match.id, sessionKey, user, viewedSeasonId]);
+  }, [authReady, configured, detail.gender, detail.match.id, ratingsSeasonId, resolvingSeason, sessionKey, user]);
 
   const handleSubmit = async () => {
     if (!user) return;
@@ -112,7 +115,7 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
       matchId: detail.match.id,
       gender: detail.gender,
       ratings: draftRatings,
-      seasonId: viewedSeasonId,
+      seasonId: ratingsSeasonId,
     });
 
     setSubmitting(false);
