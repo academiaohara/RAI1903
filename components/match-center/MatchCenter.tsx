@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 import { MatchArticleNewsLinker } from "@/components/editor/MatchArticleNewsLinker";
 import { MatchArticleClubNewsBlock } from "@/components/match-articles/MatchArticleClubNewsBlock";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
-import { MatchArticleInlineBlock } from "@/components/match-articles/MatchArticleInlineBlock";
 import { usePublishedNews } from "@/hooks/usePublishedNews";
 import { MatchCenterHeader, MatchCenterTabs } from "@/components/match-center/MatchCenterHeader";
 import { MatchEventsPanel } from "@/components/match-center/MatchEventsPanel";
@@ -86,7 +85,6 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
   const safeActiveTab = !isFinished && !UNLOCKED_UPCOMING_TAB_IDS.has(activeTab) ? "previa" : activeTab;
   const activeTabMeta = tabs.find((tab) => tab.id === safeActiveTab);
 
-  const showArticleBodyAboveTabs = !isFinished && article !== undefined;
   const showClubNews = article !== undefined;
 
   const previaPanel = (
@@ -145,10 +143,6 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
   return (
     <div className="space-y-6">
       <MatchCenterHeader detail={resolvedDetail} backHref={backHref} backLabel={backLabel} />
-
-      {showArticleBodyAboveTabs && article && (
-        <MatchArticleInlineBlock article={article} sectionLabel="Previa" />
-      )}
 
       {showClubNews &&
         (editMode ? (
