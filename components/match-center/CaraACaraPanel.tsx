@@ -1,6 +1,6 @@
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamLink } from "@/components/TeamLink";
-import { getTeamCrest } from "@/lib/team-crests";
+import { getTeamCrestById } from "@/lib/team-crests";
 import { getTeamByGender } from "@/lib/fixtures";
 import { cn, resultTone } from "@/lib/utils";
 import type { CaraACaraData } from "@/lib/cara-a-cara";
@@ -39,15 +39,15 @@ function TeamHeader({
   gender: PrimerEquipoGender;
   align: "left" | "right";
 }) {
-  const team = getTeamByGender(side.teamId, gender);
+  const mockTeam = getTeamByGender(side.teamId, gender);
+  const crest = getTeamCrestById(
+    side.teamId,
+    mockTeam?.crestInitials ?? side.teamName.slice(0, 3).toUpperCase(),
+  );
 
   return (
     <div className={cn("flex min-w-0 items-center gap-2", align === "right" && "flex-row-reverse text-right")}>
-      <OpponentCrest
-        logo={team ? getTeamCrest(team) : side.teamId.slice(0, 3).toUpperCase()}
-        opponent={side.teamName}
-        size="sm"
-      />
+      <OpponentCrest logo={crest} opponent={side.teamName} size="sm" />
       <TeamLink
         gender={gender}
         teamId={side.teamId}
