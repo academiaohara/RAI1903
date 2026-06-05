@@ -36,6 +36,12 @@ export const formatMatchDay = (date: string) =>
     month: "short",
   }).format(new Date(date));
 
+/** Día de la semana en una letra (D L M X J V S), índice getDay() domingo=0. */
+const MATCH_WEEKDAY_LETTER_ES = ["D", "L", "M", "X", "J", "V", "S"] as const;
+
+export const formatMatchWeekdayLetter = (date: string) =>
+  MATCH_WEEKDAY_LETTER_ES[new Date(date).getDay()] ?? "";
+
 export const formatMatchTime = (date: string) =>
   new Intl.DateTimeFormat("es-ES", {
     hour: "2-digit",
