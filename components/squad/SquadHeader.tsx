@@ -30,24 +30,38 @@ export function SquadHeader({ club, stats, gender, onStadiumClick, onEntrenadorC
             <h1 className="text-[clamp(1rem,5.1vw,1.25rem)] font-extrabold uppercase leading-[1.02] tracking-tight text-slate-950 sm:break-words sm:text-4xl">
               {club.nombre}
             </h1>
-            <p className="mt-1 truncate text-[11px] font-semibold text-slate-700 sm:mt-2 sm:text-base">
-              <span className="text-slate-500">Entrenador:</span>{" "}
-              {editMode && onEntrenadorChange ? (
-                <input
-                  value={club.entrenador}
-                  onChange={(event) => onEntrenadorChange(event.target.value)}
-                  aria-label="Editar entrenador"
-                  className="inline-block max-w-[min(100%,14rem)] rounded-xl border border-[#214C9B]/25 bg-white px-2 py-1 text-sm font-semibold text-slate-800 outline-none ring-2 ring-transparent transition focus:border-[#214C9B] focus:ring-[#214C9B]/15 sm:max-w-xs"
-                />
-              ) : (
+            {editMode ? (
+              <div className="mt-1 space-y-1 text-[11px] font-semibold text-slate-700 sm:mt-2 sm:text-base">
+                <span className="block text-slate-500 sm:inline">Entrenador:</span>
+                {onEntrenadorChange ? (
+                  <input
+                    value={club.entrenador}
+                    onChange={(event) => onEntrenadorChange(event.target.value)}
+                    aria-label="Editar entrenador"
+                    placeholder="Nombre del entrenador"
+                    className="block w-full max-w-xs rounded-xl border border-[#214C9B]/25 bg-white px-2 py-1.5 text-sm font-semibold text-slate-800 outline-none ring-2 ring-transparent transition focus:border-[#214C9B] focus:ring-[#214C9B]/15"
+                  />
+                ) : (
+                  <EditableText
+                    storageKey={`squad-club:${gender}:entrenador`}
+                    value={club.entrenador}
+                    aria-label="Editar entrenador"
+                    placeholder="Nombre del entrenador"
+                    inputClassName="text-sm font-semibold text-slate-800"
+                  />
+                )}
+              </div>
+            ) : (
+              <p className="mt-1 truncate text-[11px] font-semibold text-slate-700 sm:mt-2 sm:text-base">
+                <span className="text-slate-500">Entrenador:</span>{" "}
                 <EditableText
                   storageKey={`squad-club:${gender}:entrenador`}
                   value={club.entrenador}
                   aria-label="Editar entrenador"
-                  inputClassName="text-sm font-semibold text-slate-800"
+                  className="text-slate-800"
                 />
-              )}
-            </p>
+              </p>
+            )}
             <p className="mt-0.5 text-[10px] font-semibold text-slate-500 sm:mt-2 sm:text-xs">Temporada {club.temporada}</p>
           </div>
         </div>
