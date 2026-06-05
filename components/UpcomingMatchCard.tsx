@@ -13,7 +13,7 @@ import { defaultCronicaId } from "@/lib/match-article-factory";
 import { getMatchArticlePageHref } from "@/lib/match-article-url";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { primerEquipoBase } from "@/lib/primer-equipo";
-import { cn, formatMatchDate, formatMatchTime } from "@/lib/utils";
+import { cn, formatMatchTime, formatMatchWeekdayLetterDate } from "@/lib/utils";
 import type { Match } from "@/types";
 import type { Route } from "next";
 
@@ -60,7 +60,7 @@ export function UpcomingMatchCard({ match, gender = "masculino" }: UpcomingMatch
     (`${primerEquipoBase(gender)}/calendario` as Route);
   const competicionHref = `${primerEquipoBase(gender)}/competicion` as Route;
   const timeLabel = formatMatchTime(match.date);
-  const dateLabel = formatMatchDate(match.date);
+  const dateLabel = formatMatchWeekdayLetterDate(match.date);
   const competitionLabel = matchCompetitionShortLabel(match);
   const highlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
   const roundLabel = matchRoundBadgeLabel(match) ?? matchCompetitionShortLabel(match);

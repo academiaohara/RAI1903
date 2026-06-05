@@ -13,7 +13,7 @@ import { defaultCronicaId } from "@/lib/match-article-factory";
 import { getMatchArticlePageHref } from "@/lib/match-article-url";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { primerEquipoBase } from "@/lib/primer-equipo";
-import { cn, formatMatchDate, formatMatchWeekdayLetter } from "@/lib/utils";
+import { cn, formatMatchDate, formatMatchWeekdayLetterDate } from "@/lib/utils";
 import type { Match } from "@/types";
 import type { Route } from "next";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
@@ -70,7 +70,7 @@ export function RecentMatchCard({ match, gender = "masculino" }: RecentMatchCard
   const competitionLabel = matchCompetitionShortLabel(match);
   const highlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
   const dateLabel = formatMatchDate(match.date);
-  const mobileDateLabel = formatMatchWeekdayLetter(match.date);
+  const mobileDateLabel = formatMatchWeekdayLetterDate(match.date);
   const roundLabel = matchRoundBadgeLabel(match) ?? matchCompetitionShortLabel(match);
   const badgeLabel = recentResultBadgeLabel(hasScore, result);
 
