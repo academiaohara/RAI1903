@@ -19,6 +19,8 @@ type SectionUnderConstructionGateProps = {
   labelOverride?: string;
   /** Texto extra para editores (p. ej. explicar qué toggle controla la sección). */
   editorHintOverride?: string;
+  /** Texto extra para visitantes (p. ej. indicar que pueden cambiar de temporada). */
+  publicHintOverride?: string;
   children: ReactNode;
 };
 
@@ -27,11 +29,13 @@ export function SectionUnderConstructionBanner({
   section,
   labelOverride,
   editorHintOverride,
+  publicHintOverride,
 }: {
   scope: SeasonBundleScope;
   section: SectionStatusKey;
   labelOverride?: string;
   editorHintOverride?: string;
+  publicHintOverride?: string;
 }) {
   const { viewedSeason } = useSeason();
   const { canEdit, editMode } = useInlineEditing();
@@ -63,7 +67,8 @@ export function SectionUnderConstructionBanner({
             </p>
           ) : (
             <p className="text-xs leading-relaxed">
-              Estamos preparando esta sección para la temporada {viewedSeason.label}. Vuelve pronto.
+              {publicHintOverride ??
+                `Estamos preparando esta sección para la temporada ${viewedSeason.label}. Vuelve pronto.`}
             </p>
           )}
         </div>
@@ -77,6 +82,7 @@ export function SectionUnderConstructionGate({
   section,
   labelOverride,
   editorHintOverride,
+  publicHintOverride,
   children,
 }: SectionUnderConstructionGateProps) {
   const { bundles, bundlesLoading } = useSeason();
@@ -97,6 +103,7 @@ export function SectionUnderConstructionGate({
           section={section}
           labelOverride={labelOverride}
           editorHintOverride={editorHintOverride}
+          publicHintOverride={publicHintOverride}
         />
       )}
       {showContent ? children : null}
