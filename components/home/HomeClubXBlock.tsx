@@ -3,6 +3,7 @@
 import { ExternalLink } from "lucide-react";
 import { Card } from "@/components/Card";
 import { ClubXPosts } from "@/components/home/ClubXPosts";
+import { HomeClubResumenesPanel } from "@/components/home/HomeClubResumenesPanel";
 import { CLUB_X_HANDLE, CLUB_X_PROFILE_URL } from "@/lib/club-x";
 
 export function HomeClubXBlock() {
@@ -23,7 +24,10 @@ export function HomeClubXBlock() {
         </a>
       }
     >
-      <ClubXPosts />
+      <div className="grid gap-6 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-start">
+        <ClubXPosts />
+        <HomeClubResumenesPanel />
+      </div>
     </Card>
   );
 }
