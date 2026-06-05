@@ -50,8 +50,6 @@ export function useSquadPlayers(gender: PrimerEquipoGender) {
       };
     });
 
-    if (gender !== "masculino") return withAge;
-
     const chronicleStats = aggregateAvilesStatsFromChronicles(gender, withAge, getOverride);
     return applyChronicleStatsToSquad(withAge, chronicleStats);
   }, [baseSquad, bundlesLoading, gender, getOverride]);

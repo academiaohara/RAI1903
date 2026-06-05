@@ -208,15 +208,24 @@ export function aggregateAvilesStatsFromChronicles(
   return result;
 }
 
+const EMPTY_CHRONICLE_STATS: ChronicleAggregatedStats = {
+  partidos: 0,
+  minutos: 0,
+  goles: 0,
+  asistencias: 0,
+  amarillas: 0,
+  rojas: 0,
+  historialPartidos: [],
+};
+
 export function applyChronicleStatsToSquad(
   squad: SquadPlayer[],
   chronicleStats: Map<string, ChronicleAggregatedStats> | null,
 ): SquadPlayer[] {
-  if (!chronicleStats || chronicleStats.size === 0) return squad;
+  if (!chronicleStats) return squad;
 
   return squad.map((player) => {
-    const stats = chronicleStats.get(player.id);
-    if (!stats) return player;
+    const stats = chronicleStats.get(player.id) ?? EMPTY_CHRONICLE_STATS;
 
     return {
       ...player,

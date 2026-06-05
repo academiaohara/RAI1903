@@ -3,10 +3,12 @@ export function SquadListColGroup({
   variant,
   showAge = true,
   showMarketValue = false,
+  showFanRating = false,
 }: {
   variant: "primer-equipo" | "cantera";
   showAge?: boolean;
   showMarketValue?: boolean;
+  showFanRating?: boolean;
 }) {
   if (variant === "cantera") {
     return (
@@ -36,6 +38,7 @@ export function SquadListColGroup({
       <col className="w-12" />
       <col className="w-12" />
       <col className="w-12" />
+      {showFanRating && <col className="w-12" />}
       {showMarketValue && <col className="w-[4.25rem]" />}
       <col className="w-16" />
     </colgroup>

@@ -1,14 +1,15 @@
 import type { SquadPlayer } from "@/types/squad";
 import { STADIUM_PATHS } from "@/lib/stadium-manifest";
 
-/** Dorsales con foto oficial temporada 2025/26 (masculino). */
-export const SQUAD_PHOTO_DORSALS_2526 = new Set([
-  1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 26,
-]);
+/** Ruta por defecto en `public/Jugadores/` (p. ej. `/Jugadores/13.webp`). */
+export function defaultSquadPlayerPhotoPath(dorsal: number): string | null {
+  if (!Number.isFinite(dorsal) || dorsal <= 0) return null;
+  return `/Jugadores/${dorsal}.webp`;
+}
 
+/** @deprecated Usa `defaultSquadPlayerPhotoPath`. */
 export function getSquadPlayerPhoto(dorsal: number): string | null {
-  if (!SQUAD_PHOTO_DORSALS_2526.has(dorsal)) return null;
-  return `/plantilla/2526/${dorsal}.webp`;
+  return defaultSquadPlayerPhotoPath(dorsal);
 }
 
 /** Convierte enlaces tipo /blob/ de GitHub a raw.githubusercontent.com (sirven como src de imagen). */
@@ -30,18 +31,19 @@ export function normalizeSquadPlayerPhotoUrl(url: string): string {
   }
 }
 
-/** Foto efectiva: local en repo por dorsal; si no, URL del CMS normalizada. */
+/** Foto efectiva: ruta explícita del jugador; si no, dorsal en `/Jugadores/`. */
 export function resolveSquadPlayerPhoto(player: SquadPlayer): string | null {
-  const local = getSquadPlayerPhoto(player.dorsal);
-  if (local) return local;
-  if (!player.foto) return null;
-  return normalizeSquadPlayerPhotoUrl(player.foto);
+  if (player.foto?.trim()) {
+    const trimmed = player.foto.trim();
+    if (trimmed.startsWith("/") || trimmed.startsWith("http")) {
+      return trimmed.startsWith("http") ? normalizeSquadPlayerPhotoUrl(trimmed) : trimmed;
+    }
+    return `/${trimmed.replace(/^\/+/, "")}`;
+  }
+  return defaultSquadPlayerPhotoPath(player.dorsal);
 }
 
-/**
- * Alinea `foto` con los assets del repo cuando hay dorsal conocido.
- * Las URLs de GitHub del CMS se ignoran en ese caso (Next/Image no las sirve bien como /blob/).
- */
+/** Alinea `foto` con la ruta resuelta (respeta overrides del editor). */
 export function withSquadPlayerPhoto(player: SquadPlayer): SquadPlayer {
   const foto = resolveSquadPlayerPhoto(player);
   return foto ? { ...player, foto } : { ...player, foto: null };

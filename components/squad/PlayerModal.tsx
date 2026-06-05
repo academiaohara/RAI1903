@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Calendar, MapPin, Ruler, Scale, Star, X } from "lucide-react";
+import { Calendar, ChevronDown, ChevronUp, MapPin, Ruler, Scale, Star, X } from "lucide-react";
 import type { PlayerCareerRecord, SquadModalTab, SquadPlayer } from "@/types/squad";
 import { SQUAD_POSITIONS, SQUAD_ROLE_CODES } from "@/types/squad";
 import { ageFromBirthDate } from "@/lib/squad-age";
@@ -14,16 +14,13 @@ import {
   getPlayerFullName,
 } from "@/lib/squad-utils";
 import { getTransferKind, getTransferClubAnnouncementNews } from "@/lib/fichajes";
-import {
-  clubAnnouncementFromTransfer,
-  clubAnnouncementNewsItem,
-  CLUB_ANNOUNCEMENT_INLINE_ID,
-} from "@/lib/club-announcement";
+import { clubAnnouncementFromTransfer } from "@/lib/club-announcement";
 import { useTransfers } from "@/hooks/useTransfers";
 import { formatFanRating } from "@/lib/format-fan-rating";
 import { usePublishedNews } from "@/hooks/usePublishedNews";
 import { useSeasonPlayerRatings } from "@/hooks/useSeasonPlayerRatings";
-import { getPlayerClubAnnouncementNews, getPlayerNews } from "@/lib/player-news";
+import { getPlayerClubAnnouncementNews } from "@/lib/player-news";
+import { defaultSquadPlayerPhotoPath } from "@/lib/squad-photos";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 import { PlayerStats } from "@/components/squad/PlayerStats";
 import { PlayerMatchesTable } from "@/components/squad/PlayerMatchesTable";
@@ -70,28 +67,21 @@ function PlayerModalContent({
   const { getForPlayer } = useTransfers();
   const transfer = getForPlayer(player.id);
 
-  const { clubAnnouncementNews, playerNews, announcementTone } = useMemo(() => {
+  const { clubAnnouncementNews, hasSigningChronicle } = useMemo(() => {
     const announcementNews = transfer
       ? getTransferClubAnnouncementNews(transfer, allNews)
       : getPlayerClubAnnouncementNews(allNews, player.id, { playerName });
 
-    const clubAnnouncement = clubAnnouncementFromTransfer(transfer, announcementNews);
-    const cardNews = clubAnnouncement ? clubAnnouncementNewsItem(clubAnnouncement) : null;
-    const excludeNewsId =
-      cardNews && cardNews.id !== CLUB_ANNOUNCEMENT_INLINE_ID ? cardNews.id : announcementNews?.id;
-
-    const news = getPlayerNews(allNews, player.id, {
-      excludeNewsId,
-      playerName,
-    });
     const kind = transfer ? getTransferKind(transfer) : null;
-    const tone =
-      kind === "renovacion" ? "renovacion" : kind === "cesion" ? "fichaje" : kind === "fichaje" ? "fichaje" : "default";
+    const fromTransfer = kind === "fichaje" || kind === "renovacion" || kind === "cesion";
+    const fromNews = Boolean(
+      announcementNews &&
+        (announcementNews.tags.includes("fichajes") || announcementNews.tags.includes("renovaciones")),
+    );
 
     return {
       clubAnnouncementNews: announcementNews,
-      playerNews: news,
-      announcementTone: tone as "fichaje" | "renovacion" | "default",
+      hasSigningChronicle: fromTransfer || fromNews,
     };
   }, [allNews, player.id, playerName, transfer]);
 
@@ -203,14 +193,15 @@ function PlayerModalContent({
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.22 }}
           >
-            {activeTab === "actualidad" && (
-              <PlayerActualidadSection
-                clubAnnouncement={clubAnnouncementFromTransfer(transfer, clubAnnouncementNews)}
-                playerNews={playerNews}
-                announcementTone={announcementTone}
-                transfer={transfer}
-              />
-            )}
+            {activeTab === "actualidad" &&
+              (hasSigningChronicle ? (
+                <PlayerActualidadSection
+                  clubAnnouncement={clubAnnouncementFromTransfer(transfer, clubAnnouncementNews)}
+                  transfer={transfer}
+                />
+              ) : (
+                <p className="text-sm text-slate-500">Sin crónica de fichaje o renovación para este jugador.</p>
+              ))}
             {activeTab === "resumen" && <PlayerResumenSection player={player} fanRating={fanRating} />}
             {activeTab === "partidos" && <PlayerMatchesTable player={player} />}
             {activeTab === "estadisticas" && (
@@ -351,6 +342,12 @@ function PlayerInlineEditor({
           value={player.contratoHasta}
           onChange={(value) => onUpdate({ contratoHasta: value })}
         />
+        <EditorInput
+          label="Foto (ruta)"
+          value={player.foto ?? ""}
+          placeholder={defaultSquadPlayerPhotoPath(player.dorsal) ?? "/Jugadores/1.webp"}
+          onChange={(value) => onUpdate({ foto: value.trim() || null })}
+        />
       </div>
       <label className="mt-3 block text-xs font-bold uppercase tracking-wide text-slate-500">
         Descripción
@@ -369,11 +366,13 @@ function EditorInput({
   value,
   onChange,
   type = "text",
+  placeholder,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   type?: "text" | "number" | "date";
+  placeholder?: string;
 }) {
   return (
     <label className="block text-xs font-bold uppercase tracking-wide text-slate-500">
@@ -381,6 +380,7 @@ function EditorInput({
       <input
         type={type}
         value={value}
+        placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
         className="mt-1 w-full rounded-xl border border-[#214C9B]/20 bg-white px-3 py-2 text-sm normal-case text-slate-800 outline-none focus:border-[#214C9B]"
       />
@@ -457,35 +457,80 @@ function PlayerCareerEditor({
     onChange(trayectoria.map((row, rowIndex) => (rowIndex === index ? { ...row, ...patch } : row)));
   };
 
-  const addRow = () => {
-    onChange([
-      ...trayectoria,
-      { temporada: "2025/26", club: "", partidos: 0, goles: 0, asistencias: 0 },
-    ]);
+  const addRow = (position: "start" | "end") => {
+    const row: PlayerCareerRecord = {
+      temporada: position === "start" ? "2020/21" : "2025/26",
+      club: "",
+      partidos: 0,
+      goles: 0,
+      asistencias: 0,
+    };
+    onChange(position === "start" ? [row, ...trayectoria] : [...trayectoria, row]);
   };
 
   const removeRow = (index: number) => {
     onChange(trayectoria.filter((_, rowIndex) => rowIndex !== index));
   };
 
+  const moveRow = (index: number, direction: -1 | 1) => {
+    const target = index + direction;
+    if (target < 0 || target >= trayectoria.length) return;
+    const next = [...trayectoria];
+    const [item] = next.splice(index, 1);
+    next.splice(target, 0, item!);
+    onChange(next);
+  };
+
   return (
     <section className="mb-6 rounded-2xl border border-[#214C9B]/20 bg-blue-50/60 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#214C9B]">Editar trayectoria</p>
-        <button
-          type="button"
-          onClick={addRow}
-          className="rounded-full border border-[#214C9B]/25 px-3 py-1 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-white"
-        >
-          Añadir equipo
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => addRow("start")}
+            className="rounded-full border border-[#214C9B]/25 px-3 py-1 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-white"
+          >
+            Temporada anterior
+          </button>
+          <button
+            type="button"
+            onClick={() => addRow("end")}
+            className="rounded-full border border-[#214C9B]/25 px-3 py-1 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-white"
+          >
+            Temporada reciente
+          </button>
+        </div>
       </div>
+      <p className="mt-2 text-[11px] font-semibold text-slate-500">
+        Orden de más antigua a más reciente. Usa las flechas para reordenar.
+      </p>
       <div className="mt-3 space-y-3">
         {trayectoria.map((row, index) => (
           <div
-            key={`${row.temporada}-${row.club}-${index}`}
-            className="grid gap-2 rounded-xl border border-[#214C9B]/15 bg-white p-3 sm:grid-cols-2 lg:grid-cols-6"
+            key={index}
+            className="grid gap-2 rounded-xl border border-[#214C9B]/15 bg-white p-3 sm:grid-cols-2 lg:grid-cols-[auto_repeat(5,minmax(0,1fr))]"
           >
+            <div className="flex items-end gap-1 sm:col-span-2 lg:col-span-1">
+              <button
+                type="button"
+                onClick={() => moveRow(index, -1)}
+                disabled={index === 0}
+                className="rounded-lg border border-[#214C9B]/20 p-2 text-[#214C9B] hover:bg-blue-50 disabled:opacity-30"
+                aria-label="Subir temporada"
+              >
+                <ChevronUp size={16} />
+              </button>
+              <button
+                type="button"
+                onClick={() => moveRow(index, 1)}
+                disabled={index === trayectoria.length - 1}
+                className="rounded-lg border border-[#214C9B]/20 p-2 text-[#214C9B] hover:bg-blue-50 disabled:opacity-30"
+                aria-label="Bajar temporada"
+              >
+                <ChevronDown size={16} />
+              </button>
+            </div>
             <EditorInput label="Temporada" value={row.temporada} onChange={(value) => updateRow(index, { temporada: value })} />
             <EditorInput label="Equipo" value={row.club} onChange={(value) => updateRow(index, { club: value })} />
             <EditorInput
@@ -506,7 +551,7 @@ function PlayerCareerEditor({
               value={String(row.asistencias)}
               onChange={(value) => updateRow(index, { asistencias: Number(value) || 0 })}
             />
-            <div className="flex items-end">
+            <div className="flex items-end sm:col-span-2 lg:col-span-1">
               <button
                 type="button"
                 onClick={() => removeRow(index)}
@@ -518,7 +563,7 @@ function PlayerCareerEditor({
           </div>
         ))}
         {trayectoria.length === 0 && (
-          <p className="text-sm text-slate-600">Sin equipos en la trayectoria. Pulsa «Añadir equipo».</p>
+          <p className="text-sm text-slate-600">Sin equipos en la trayectoria. Añade una temporada.</p>
         )}
       </div>
     </section>

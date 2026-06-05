@@ -1,7 +1,6 @@
 "use client";
 
 import { Megaphone } from "lucide-react";
-import { MatchNewsCarousel } from "@/components/match-center/MatchNewsCarousel";
 import {
   ClubAnnouncementCard,
   ClubAnnouncementCardStatic,
@@ -11,30 +10,26 @@ import {
 import { PlayerClubAnnouncementEditPanel } from "@/components/squad/PlayerClubAnnouncementEditPanel";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import type { ClubAnnouncementDisplay } from "@/lib/club-announcement";
-import type { NewsItem, TransferRumor } from "@/types";
+import type { TransferRumor } from "@/types";
 
 type PlayerActualidadSectionProps = {
   clubAnnouncement?: ClubAnnouncementDisplay;
-  playerNews: NewsItem[];
   accentClass?: string;
-  announcementTone?: "fichaje" | "renovacion" | "default";
   /** Movimiento de mercado del jugador (para editar el comunicado en línea). */
   transfer?: TransferRumor;
 };
 
 export function PlayerActualidadSection({
   clubAnnouncement,
-  playerNews,
   accentClass = "text-[#214C9B]",
   transfer,
 }: PlayerActualidadSectionProps) {
   const { editMode } = useInlineEditing();
   const hasAnnouncement = Boolean(clubAnnouncement && hasClubAnnouncementCard(clubAnnouncement));
-  const hasNews = playerNews.length > 0;
   const showAnnouncementEditor = Boolean(editMode && transfer);
 
-  if (!hasAnnouncement && !hasNews && !showAnnouncementEditor) {
-    return <p className="text-sm text-slate-500">Sin actualidad reciente para este jugador.</p>;
+  if (!hasAnnouncement && !showAnnouncementEditor) {
+    return <p className="text-sm text-slate-500">Sin crónica de fichaje o renovación para este jugador.</p>;
   }
 
   return (
@@ -43,7 +38,9 @@ export function PlayerActualidadSection({
         <section className="space-y-3">
           <div className="flex items-center gap-2">
             <Megaphone className={accentClass} size={18} aria-hidden />
-            <h2 className="text-sm font-extrabold uppercase tracking-wide text-slate-900">Comunicado del club</h2>
+            <h2 className="text-sm font-extrabold uppercase tracking-wide text-slate-900">
+              Crónica del fichaje
+            </h2>
           </div>
           {showAnnouncementEditor && transfer ? <PlayerClubAnnouncementEditPanel transfer={transfer} /> : null}
           {hasAnnouncement && clubAnnouncement ? (
@@ -55,8 +52,6 @@ export function PlayerActualidadSection({
           ) : null}
         </section>
       )}
-
-      {hasNews && <MatchNewsCarousel items={playerNews} title="Noticias del jugador" />}
     </div>
   );
 }

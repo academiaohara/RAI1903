@@ -5,6 +5,7 @@ import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvi
 import { AnimatePresence, motion } from "framer-motion";
 import type { SquadPlayer, SquadViewMode } from "@/types/squad";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
+import { useSeasonPlayerRatings } from "@/hooks/useSeasonPlayerRatings";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { getLeagueMatchdaysForGender } from "@/lib/season/aviles-matches";
 import { resolveSquadClubInfo } from "@/lib/season/squad-source";
@@ -28,6 +29,7 @@ type SquadPageProps = {
 
 export function SquadPage({ gender }: SquadPageProps) {
   const { squad, updatePlayer, addPlayer, removePlayer } = useSquadPlayers(gender);
+  const { averages: fanRatings } = useSeasonPlayerRatings();
   const { bundles, viewedSeason, getFixtureSource } = useSeason();
   const { editMode, getValue } = useInlineEditing();
   const [addBusy, setAddBusy] = useState(false);
@@ -137,6 +139,8 @@ export function SquadPage({ gender }: SquadPageProps) {
               onSelect={handleSelect}
               showMarketValue={!isFemenino}
               showAge={!isFemenino}
+              showFanRating
+              fanRatings={fanRatings}
               showEmptyPositions={editMode}
               editMode={editMode}
               onQuickUpdate={editMode ? handleQuickUpdate : undefined}
@@ -146,6 +150,7 @@ export function SquadPage({ gender }: SquadPageProps) {
               players={squad}
               onSelect={setSelected}
               variant="fichas"
+              fanRatings={fanRatings}
               showEmptyPositions={editMode}
               editMode={editMode}
               onQuickUpdate={editMode ? handleQuickUpdate : undefined}
