@@ -87,6 +87,7 @@ function LineupPlayerRow({
         className="h-8 w-10 shrink-0 rounded-lg border border-[#214C9B]/25 text-center text-xs font-extrabold text-[#214C9B] outline-none focus:border-[#214C9B]"
       />
       <input
+        type="text"
         value={player.name}
         onChange={(event) => onUpdate({ name: event.target.value })}
         aria-label="Nombre del jugador"
@@ -143,7 +144,7 @@ function LineupColumn({
       <ul className="mt-2 space-y-1">
         {lineup[list].map((player, index) => (
           <li
-            key={`${list}-${player.number}-${player.name}-${index}`}
+            key={`${list}-${index}`}
             className="flex min-w-0 items-center gap-2 text-sm text-slate-800"
           >
             <LineupPlayerRow

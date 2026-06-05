@@ -18,7 +18,7 @@ function CategorySection({
   return (
     <div>
       <div className="border-t border-[#eeeeee] bg-[#fafafa] px-4 py-2 first:border-t-0">
-        <p className="text-center text-[11px] font-bold uppercase tracking-wide text-[#333333]">{title}</p>
+        <div className="text-center text-[11px] font-bold uppercase tracking-wide text-[#333333]">{title}</div>
       </div>
       {children}
     </div>
@@ -45,7 +45,7 @@ function renderCategoryRows(
     if (editMode) {
       elements.push(
         <div
-          key={`${row.label}-${rowIndex}`}
+          key={`row-${categoryIndex}-${rowIndex}`}
           className="grid grid-cols-[auto_1fr_auto_1fr] items-center gap-2 border-t border-[#eeeeee] px-4 py-3 text-sm sm:grid-cols-[auto_1fr_auto_1fr]"
         >
           <button
@@ -57,18 +57,21 @@ function renderCategoryRows(
             <Trash2 size={14} />
           </button>
           <input
+            type="text"
             value={String(row.home)}
             onChange={(event) => updateRow(categoryIndex, rowIndex, { home: event.target.value })}
             aria-label={`${row.label || "Estadística"} local`}
             className="rounded-lg border border-[#214C9B]/25 px-2 py-1 text-right text-sm font-semibold tabular-nums outline-none focus:border-[#214C9B]"
           />
           <input
+            type="text"
             value={row.label}
             onChange={(event) => updateRow(categoryIndex, rowIndex, { label: event.target.value })}
             aria-label="Etiqueta de estadistica"
             className="w-full min-w-[6rem] rounded-lg border border-[#214C9B]/25 px-2 py-1 text-center text-xs font-medium outline-none focus:border-[#214C9B]"
           />
           <input
+            type="text"
             value={String(row.away)}
             onChange={(event) => updateRow(categoryIndex, rowIndex, { away: event.target.value })}
             aria-label={`${row.label || "Estadística"} visitante`}
@@ -77,7 +80,7 @@ function renderCategoryRows(
         </div>,
       );
     } else {
-      elements.push(<MatchStatBarRow key={`${row.label}-${rowIndex}`} row={row} />);
+      elements.push(<MatchStatBarRow key={`row-${categoryIndex}-${rowIndex}`} row={row} />);
     }
 
     rowIndex += 1;
@@ -194,7 +197,7 @@ export function MatchStatsPanel({
       ) : (
         <div className="space-y-4">
           {currentCategories.map((category, categoryIndex) => (
-            <div key={`${category.title}-${categoryIndex}`} className="space-y-2">
+            <div key={`category-${categoryIndex}`} className="space-y-2">
               {editMode && currentCategories.length > 1 && (
                 <div className="flex justify-end">
                   <button
@@ -212,6 +215,7 @@ export function MatchStatsPanel({
                   title={
                     editMode ? (
                       <input
+                        type="text"
                         value={category.title}
                         onChange={(event) => updateCategoryTitle(categoryIndex, event.target.value)}
                         aria-label="Editar titulo de categoria de estadisticas"
