@@ -20,6 +20,11 @@ import { fetchPublishedTransfersSnapshot } from "@/lib/season/published-transfer
 import type { TransferMarketWindow } from "@/lib/transfer-market-windows";
 import type { TransferRumor } from "@/types";
 import type { JornadasFixtureSource } from "@/lib/season/fixture-source";
+import { findMatchInBundles } from "@/lib/season/find-match-in-bundles";
+import {
+  findSeasonIdsForMatchInBundles,
+  pickCanonicalSeasonIdForMatch,
+} from "@/lib/season/resolve-match-season";
 import { loadSeasonId, saveSeasonId } from "@/lib/storage";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 
@@ -49,6 +54,8 @@ type SeasonContextValue = {
     gender: PrimerEquipoGender,
     scope?: SeasonDataScope,
   ) => ReturnType<typeof resolveCompetitionConfig>;
+  /** Temporada CMS que contiene el partido (fixtures), no el selector del usuario. */
+  resolveSeasonIdForMatch: (matchId: string, gender: PrimerEquipoGender) => Promise<CompetitionSeasonId>;
 };
 
 const SeasonContext = createContext<SeasonContextValue | null>(null);
@@ -246,6 +253,41 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
     [getBundles, resolveSeasonId],
   );
 
+  const resolveSeasonIdForMatch = useCallback(
+    async (matchId: string, gender: PrimerEquipoGender): Promise<CompetitionSeasonId> => {
+      const publishedIds = seasons.length
+        ? seasons.map((season) => season.id as CompetitionSeasonId)
+        : [activeSeasonId, viewedSeasonId];
+
+      const cachedHits = findSeasonIdsForMatchInBundles(bundleCache, matchId, gender);
+      const candidates = new Set<CompetitionSeasonId>(cachedHits);
+
+      for (const seasonId of publishedIds) {
+        if (candidates.has(seasonId)) continue;
+
+        let bundles = getBundles(seasonId);
+        if (Object.keys(bundles).length === 0) {
+          const fetched = await fetchSeasonBundles(seasonId);
+          setBundleCache((current) => ({ ...current, [seasonId]: fetched }));
+          bundles = fetched;
+        }
+
+        if (findMatchInBundles(bundles, matchId, { gender })) {
+          candidates.add(seasonId);
+        }
+      }
+
+      const picked = pickCanonicalSeasonIdForMatch(
+        [...candidates],
+        seasons,
+        activeSeasonId,
+        viewedSeasonId,
+      );
+      return picked ?? viewedSeasonId;
+    },
+    [activeSeasonId, bundleCache, getBundles, seasons, viewedSeasonId],
+  );
+
   const value = useMemo<SeasonContextValue>(
     () => ({
       seasons,
@@ -267,6 +309,7 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
       getFixtureSource,
       getEnrichedFixtureSource,
       getCompetitionConfig,
+      resolveSeasonIdForMatch,
     }),
     [
       activeSeasonId,
@@ -283,6 +326,7 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
       refreshBundles,
       refreshSeasons,
       resolveSeasonId,
+      resolveSeasonIdForMatch,
       seasons,
       setViewedSeasonId,
       viewedSeason,
