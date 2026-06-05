@@ -168,7 +168,9 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
               setActiveTab(id as ActiveTabId);
             }}
           />
-          {activeTabMeta ? (
+          {activeTabMeta &&
+          safeActiveTab !== "lineups" &&
+          safeActiveTab !== "valoraciones" ? (
             <h2 className="text-lg font-extrabold uppercase tracking-normal text-[#214C9B] sm:hidden">
               {activeTabMeta.label}
             </h2>
