@@ -54,12 +54,16 @@ export function SquadHeader({ club, stats, gender, onStadiumClick, onEntrenadorC
             ) : (
               <p className="mt-1 truncate text-[11px] font-semibold text-slate-700 sm:mt-2 sm:text-base">
                 <span className="text-slate-500">Entrenador:</span>{" "}
-                <EditableText
-                  storageKey={`squad-club:${gender}:entrenador`}
-                  value={club.entrenador}
-                  aria-label="Editar entrenador"
-                  className="text-slate-800"
-                />
+                {onEntrenadorChange ? (
+                  <span className="text-slate-800">{club.entrenador}</span>
+                ) : (
+                  <EditableText
+                    storageKey={`squad-club:${gender}:entrenador`}
+                    value={club.entrenador}
+                    aria-label="Editar entrenador"
+                    className="text-slate-800"
+                  />
+                )}
               </p>
             )}
             <p className="mt-0.5 text-[10px] font-semibold text-slate-500 sm:mt-2 sm:text-xs">Temporada {club.temporada}</p>

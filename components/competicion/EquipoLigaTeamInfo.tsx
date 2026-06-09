@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
+import { useRivalSquadAvailability } from "@/hooks/useRivalSquadAvailability";
 import { getCompeticionSquadData } from "@/lib/competicion-squad";
 import { getRivalSquadsBundle } from "@/lib/cms/rival-squads-bundle";
 import { saveRivalStadiumForSeason } from "@/lib/cms/stadium-catalog";
@@ -27,14 +28,18 @@ export function EquipoLigaTeamInfo({ gender, team }: EquipoLigaTeamInfoProps) {
     () => getCompeticionSquadData(gender, team, bundles, viewedSeason.label),
     [bundles, gender, team, viewedSeason.label],
   );
+  const { entrenador: rivalEntrenador, setEntrenador: setRivalEntrenador } = useRivalSquadAvailability(
+    gender,
+    team,
+  );
   const [stadiumOverride, setStadiumOverride] = useState<StadiumInfo | null>(null);
   const club = useMemo(
     () => ({
       ...baseClub,
       temporada: viewedSeason.label,
-      ...(isOwnClub
-        ? { entrenador: getValue(`squad-club:${gender}:entrenador`, baseClub.entrenador) }
-        : {}),
+      entrenador: isOwnClub
+        ? getValue(`squad-club:${gender}:entrenador`, baseClub.entrenador)
+        : rivalEntrenador,
       ...(stadiumOverride
         ? {
             estadio: stadiumOverride.nombre,
@@ -42,7 +47,7 @@ export function EquipoLigaTeamInfo({ gender, team }: EquipoLigaTeamInfoProps) {
           }
         : {}),
     }),
-    [baseClub, getValue, gender, isOwnClub, stadiumOverride, viewedSeason.label],
+    [baseClub, getValue, gender, isOwnClub, rivalEntrenador, stadiumOverride, viewedSeason.label],
   );
   const [stadiumOpen, setStadiumOpen] = useState(false);
   const stadiumModalOpen = stadiumOpen && !editMode;
@@ -61,7 +66,13 @@ export function EquipoLigaTeamInfo({ gender, team }: EquipoLigaTeamInfoProps) {
 
   return (
     <>
-      <SquadHeader club={club} stats={club.stats} gender={gender} onStadiumClick={() => setStadiumOpen(true)} />
+      <SquadHeader
+        club={club}
+        stats={club.stats}
+        gender={gender}
+        onStadiumClick={() => setStadiumOpen(true)}
+        onEntrenadorChange={!isOwnClub && editMode ? setRivalEntrenador : undefined}
+      />
       <StadiumModal stadium={club.estadioInfo} open={stadiumModalOpen} onClose={() => setStadiumOpen(false)} />
       <StadiumEditorModal
         open={stadiumEditorOpen}
