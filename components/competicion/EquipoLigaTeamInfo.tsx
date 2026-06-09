@@ -71,7 +71,8 @@ export function EquipoLigaTeamInfo({ gender, team }: EquipoLigaTeamInfoProps) {
         stats={club.stats}
         gender={gender}
         onStadiumClick={() => setStadiumOpen(true)}
-        onEntrenadorChange={!isOwnClub && editMode ? setRivalEntrenador : undefined}
+        perTeamEntrenador={!isOwnClub}
+        onEntrenadorChange={!isOwnClub ? setRivalEntrenador : undefined}
       />
       <StadiumModal stadium={club.estadioInfo} open={stadiumModalOpen} onClose={() => setStadiumOpen(false)} />
       <StadiumEditorModal
