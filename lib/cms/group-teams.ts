@@ -5,7 +5,34 @@ import { defaultTeamsForLeagueTemplate } from "@/lib/competition/league-team-sou
 import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getTeam } from "@/lib/fixtures";
+import { getTeamsBundle, type CmsTeamRecord } from "@/lib/cms/teams-bundle";
 import type { Team } from "@/types";
+
+/** Nombre corto al persistir metadatos CMS desde la guía de liga. */
+export function cmsShortNameFromDisplayName(name: string): string {
+  const trimmed = name.trim();
+  return trimmed.length <= 16 ? trimmed : trimmed.slice(0, 12);
+}
+
+/** Prioriza nombre corto del CMS cuando el club fue renombrado en groupTeams. */
+export function shortNameForGroupTeam(
+  slot: GroupTeamSlot,
+  displayName: string,
+  mock: Team | undefined,
+  cmsRecord?: CmsTeamRecord,
+): string {
+  const groupName = slot.name.trim();
+  const mockName = mock?.name.trim();
+  const customized = Boolean(groupName && (!mockName || groupName !== mockName));
+  const cmsShort = cmsRecord?.shortName?.trim();
+
+  if (customized) {
+    return cmsShortNameFromDisplayName(displayName);
+  }
+
+  if (cmsShort) return cmsShort;
+  return mock?.shortName ?? cmsShortNameFromDisplayName(displayName);
+}
 
 export type GroupTeamSlot = {
   id: string;
@@ -95,7 +122,11 @@ export function getGroupTeamSlots(
   return defaultGroupTeamSlots(grupo, gender, count, config);
 }
 
-export function groupSlotToTeam(slot: GroupTeamSlot, index: number): Team {
+export function groupSlotToTeam(
+  slot: GroupTeamSlot,
+  index: number,
+  cmsRecord?: CmsTeamRecord,
+): Team {
   const name = slotDisplayName(slot, index);
   const mock = getTeam(slot.id);
   const initials = name
@@ -108,7 +139,7 @@ export function groupSlotToTeam(slot: GroupTeamSlot, index: number): Team {
   return {
     id: slot.id,
     name,
-    shortName: mock?.shortName ?? name.slice(0, 12),
+    shortName: shortNameForGroupTeam(slot, name, mock, cmsRecord),
     city: mock?.city ?? "",
     stadium: mock?.stadium ?? "",
     coach: mock?.coach ?? "",
@@ -121,9 +152,12 @@ export function groupSlotToTeam(slot: GroupTeamSlot, index: number): Team {
   };
 }
 
-export function teamsFromGroupSlots(slots: GroupTeamSlot[]): Team[] {
+export function teamsFromGroupSlots(
+  slots: GroupTeamSlot[],
+  cmsTeamsById?: ReadonlyMap<string, CmsTeamRecord>,
+): Team[] {
   return slots
-    .map((slot, index) => groupSlotToTeam(slot, index))
+    .map((slot, index) => groupSlotToTeam(slot, index, cmsTeamsById?.get(slot.id)))
     .sort((a, b) => a.name.localeCompare(b.name, "es"));
 }
 
@@ -132,7 +166,9 @@ export function resolveGroupTeams(
   gender: PrimerEquipoGender,
   grupo: RfefGrupoId,
 ): Team[] {
-  return teamsFromGroupSlots(getGroupTeamSlots(bundles, gender, grupo));
+  const cmsTeams = getTeamsBundle(bundles, gender)?.teams ?? [];
+  const cmsTeamsById = new Map(cmsTeams.map((team) => [team.id, team]));
+  return teamsFromGroupSlots(getGroupTeamSlots(bundles, gender, grupo), cmsTeamsById);
 }
 
 export function slotsFromTeamNames(

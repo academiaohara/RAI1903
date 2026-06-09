@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { groupSlotToTeam } from "../lib/cms/group-teams";
 import { remapFixturesBundleTeamIds } from "../lib/cms/remap-fixture-team-ids";
 import { resolveFixtureTeamDisplayName } from "../lib/cms/teams-bundle";
 import type { SeasonBundlesMap, SeasonFixturesBundle } from "../lib/cms/season-bundles";
@@ -57,7 +58,24 @@ function testRemapFixtureTeamIds() {
   assert.equal(remapped.matchdays[0]?.matches[0]?.homeTeamId, "real-irun");
 }
 
+function testCustomGroupNameOverridesMockShortName() {
+  const team = groupSlotToTeam(
+    { id: "athletic-bilbao-b", name: "Bilbao Athletic" },
+    0,
+    { id: "athletic-bilbao-b", name: "Bilbao Athletic", shortName: "Bilbao Athl" },
+  );
+  assert.equal(team.name, "Bilbao Athletic");
+  assert.equal(team.shortName, "Bilbao Athletic", "renombrar en guía de liga debe actualizar shortName en clasificación");
+}
+
+function testDefaultMockShortNameWhenUnchanged() {
+  const team = groupSlotToTeam({ id: "athletic-bilbao-b", name: "Athletic Club B" }, 0);
+  assert.equal(team.shortName, "Athletic B");
+}
+
 testResolveFromGroupTeams();
 testResolveFromCmsWhenNoGroup();
 testRemapFixtureTeamIds();
+testCustomGroupNameOverridesMockShortName();
+testDefaultMockShortNameWhenUnchanged();
 console.log("verify-team-display-names: ok");

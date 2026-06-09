@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { CrestPickerPopover } from "@/components/competicion/CrestPickerPopover";
 import {
+  cmsShortNameFromDisplayName,
   getGroupTeamSlots,
   normalizeGroupTeamSlots,
   slotDisplayName,
@@ -127,7 +128,7 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
       const record: CmsTeamRecord = {
         id: slot.id,
         name: slot.name.trim() ? name : "",
-        shortName: name.slice(0, 12),
+        shortName: cmsShortNameFromDisplayName(name),
         coach: previous?.coach ?? "",
         stadium: previous?.stadium ?? "",
         crestInitials: previous?.crestInitials ?? name.slice(0, 3).toUpperCase(),

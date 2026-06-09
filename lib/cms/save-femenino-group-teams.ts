@@ -1,4 +1,5 @@
 import {
+  cmsShortNameFromDisplayName,
   getGroupTeamSlots,
   normalizeGroupTeamSlots,
   slotDisplayName,
@@ -55,7 +56,7 @@ export async function saveFemeninoGroupTeamsAndCrests(
     const record: CmsTeamRecord = {
       id: slot.id,
       name: slot.name.trim() ? name : "",
-      shortName: name.slice(0, 12),
+      shortName: cmsShortNameFromDisplayName(name),
       coach: previous?.coach ?? "",
       stadium: previous?.stadium ?? "",
       crestInitials: previous?.crestInitials ?? name.slice(0, 3).toUpperCase(),
