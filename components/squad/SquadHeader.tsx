@@ -13,11 +13,22 @@ type SquadHeaderProps = {
   stats: SquadClubStats;
   gender: PrimerEquipoGender;
   onStadiumClick: () => void;
+  /** Rivales: cada club tiene su entrenador (no la clave inline del Real Avilés). */
+  perTeamEntrenador?: boolean;
   onEntrenadorChange?: (value: string) => void;
 };
 
-export function SquadHeader({ club, stats, gender, onStadiumClick, onEntrenadorChange }: SquadHeaderProps) {
+export function SquadHeader({
+  club,
+  stats,
+  gender,
+  onStadiumClick,
+  perTeamEntrenador = false,
+  onEntrenadorChange,
+}: SquadHeaderProps) {
   const { editMode } = useInlineEditing();
+  const ownClubEntrenadorKey = `squad-club:${gender}:entrenador`;
+  const useOwnClubEntrenadorKey = !perTeamEntrenador;
 
   return (
     <div className="flex w-full flex-col items-start gap-4 sm:gap-5">
@@ -33,7 +44,7 @@ export function SquadHeader({ club, stats, gender, onStadiumClick, onEntrenadorC
             {editMode ? (
               <div className="mt-1 space-y-1 text-[11px] font-semibold text-slate-700 sm:mt-2 sm:text-base">
                 <span className="block text-slate-500 sm:inline">Entrenador:</span>
-                {onEntrenadorChange ? (
+                {perTeamEntrenador && onEntrenadorChange ? (
                   <input
                     value={club.entrenador}
                     onChange={(event) => onEntrenadorChange(event.target.value)}
@@ -41,28 +52,30 @@ export function SquadHeader({ club, stats, gender, onStadiumClick, onEntrenadorC
                     placeholder="Nombre del entrenador"
                     className="block w-full max-w-xs rounded-xl border border-[#214C9B]/25 bg-white px-2 py-1.5 text-sm font-semibold text-slate-800 outline-none ring-2 ring-transparent transition focus:border-[#214C9B] focus:ring-[#214C9B]/15"
                   />
-                ) : (
+                ) : useOwnClubEntrenadorKey ? (
                   <EditableText
-                    storageKey={`squad-club:${gender}:entrenador`}
+                    storageKey={ownClubEntrenadorKey}
                     value={club.entrenador}
                     aria-label="Editar entrenador"
                     placeholder="Nombre del entrenador"
                     inputClassName="text-sm font-semibold text-slate-800"
                   />
+                ) : (
+                  <span className="text-sm font-semibold text-slate-800">{club.entrenador}</span>
                 )}
               </div>
             ) : (
               <p className="mt-1 truncate text-[11px] font-semibold text-slate-700 sm:mt-2 sm:text-base">
                 <span className="text-slate-500">Entrenador:</span>{" "}
-                {onEntrenadorChange ? (
-                  <span className="text-slate-800">{club.entrenador}</span>
-                ) : (
+                {useOwnClubEntrenadorKey ? (
                   <EditableText
-                    storageKey={`squad-club:${gender}:entrenador`}
+                    storageKey={ownClubEntrenadorKey}
                     value={club.entrenador}
                     aria-label="Editar entrenador"
                     className="text-slate-800"
                   />
+                ) : (
+                  <span className="text-slate-800">{club.entrenador}</span>
                 )}
               </p>
             )}

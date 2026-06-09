@@ -139,7 +139,8 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
         stats={club.stats}
         gender={gender}
         onStadiumClick={() => setStadiumOpen(true)}
-        onEntrenadorChange={!isOwnClub && editMode ? setRivalEntrenador : undefined}
+        perTeamEntrenador={!isOwnClub}
+        onEntrenadorChange={!isOwnClub ? setRivalEntrenador : undefined}
       />
       <SquadToolbar
         viewMode={viewMode}
