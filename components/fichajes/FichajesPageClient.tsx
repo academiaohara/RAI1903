@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from "react";
 import { TransferMarketOnPageEditor } from "@/components/editor/TransferMarketOnPageEditor";
 import { TransferFichaCard } from "@/components/fichajes/TransferFichaCard";
 import { TransferFichaCardPlaceholder } from "@/components/fichajes/TransferFichaCardPlaceholder";
+import { TransferMarketSection } from "@/components/fichajes/TransferMarketSection";
 import { TransferMarketWindowSelector } from "@/components/fichajes/TransferMarketWindowSelector";
 import { PageHero } from "@/components/PageHero";
 import { useTransferMarketWindows } from "@/hooks/useTransferMarketWindows";
@@ -17,8 +18,14 @@ import type { Route } from "next";
 
 const FICHAJES_GRID_CLASS = "grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-2 sm:gap-2.5";
 
+const MARKET_SECTIONS = [
+  { key: "fichajes" as const, title: "Fichajes" },
+  { key: "cesiones" as const, title: "Cesiones" },
+  { key: "renovaciones" as const, title: "Renovaciones" },
+];
+
 export function FichajesPageClient() {
-  const { getOfficialAltas, loading } = useTransfers();
+  const { getSigningCarousel, getLoans, getRenewalCarousel, loading } = useTransfers();
   const { windows } = useTransferMarketWindows();
   const { defaultWindowId: viewedSeasonDefaultWindowId } = useViewedSeasonTransferMarketWindows();
   const [selectedWindowId, setSelectedWindowId] = useState<TransferMarketWindowId | null>(null);
@@ -46,14 +53,28 @@ export function FichajesPageClient() {
     setSelectedWindowId(nextWindowId);
   }, []);
 
-  const featured = getOfficialAltas(marketWindowId);
+  const sections = useMemo(
+    () =>
+      MARKET_SECTIONS.map((section) => {
+        if (section.key === "fichajes") {
+          return { ...section, transfers: getSigningCarousel(marketWindowId) };
+        }
+        if (section.key === "cesiones") {
+          return { ...section, transfers: getLoans(marketWindowId) };
+        }
+        return { ...section, transfers: getRenewalCarousel(marketWindowId) };
+      }).filter((section) => section.transfers.length > 0),
+    [getLoans, getRenewalCarousel, getSigningCarousel, marketWindowId],
+  );
+
+  const hasAnyTransfers = sections.length > 0;
 
   return (
     <div className="space-y-6">
       <PageHero
         eyebrow="Mercado"
         title="Fichajes"
-        description={`Altas oficiales del Real Avilés Industrial (${selectedWindowLabel}): agentes libres y cesiones del mercado.`}
+        description={`Movimientos oficiales del Real Avilés Industrial (${selectedWindowLabel}): fichajes, cesiones y renovaciones.`}
         titleActions={
           <TransferMarketWindowSelector
             value={marketWindowId}
@@ -67,16 +88,22 @@ export function FichajesPageClient() {
 
       {loading ? (
         <p className="text-sm font-bold text-slate-500">Cargando mercado…</p>
-      ) : featured.length === 0 ? (
+      ) : !hasAnyTransfers ? (
         <div className={FICHAJES_GRID_CLASS}>
           {Array.from({ length: EMPTY_TRANSFER_FICHA_SLOT_COUNT }, (_, index) => (
             <TransferFichaCardPlaceholder key={`empty-fichajes-${index}`} layout="grid" />
           ))}
         </div>
       ) : (
-        <div className={FICHAJES_GRID_CLASS}>
-          {featured.map((transfer, index) => (
-            <TransferFichaCard key={transfer.id} transfer={transfer} index={index} layout="grid" />
+        <div className="space-y-7 sm:space-y-10">
+          {sections.map((section, sectionIndex) => (
+            <TransferMarketSection key={section.key} title={section.title} delay={sectionIndex * 0.05}>
+              <div className={FICHAJES_GRID_CLASS}>
+                {section.transfers.map((transfer, index) => (
+                  <TransferFichaCard key={transfer.id} transfer={transfer} index={index} layout="grid" />
+                ))}
+              </div>
+            </TransferMarketSection>
           ))}
         </div>
       )}
