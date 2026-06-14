@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useSeasonOptional } from "@/components/season/SeasonProvider";
 import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
 import { deleteMediaRaiVideoOverrides } from "@/lib/cms/inline-overrides";
@@ -14,9 +14,9 @@ import {
   sortFanVideosByDate,
 } from "@/lib/fan-videos";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
-import { useHorizontalCarousel } from "@/lib/use-horizontal-carousel";
+import { scrollElementHorizontally } from "@/lib/scroll-horizontal";
 import { useHorizontalWheelScroll } from "@/lib/use-horizontal-wheel-scroll";
-import { youtubeEmbedUrl, youtubeVideoId } from "@/lib/youtube";
+import { youtubeEmbedUrl, youtubeThumbnailUrl, youtubeVideoId } from "@/lib/youtube";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import type { FanYouTubeVideo } from "@/types";
 
@@ -37,6 +37,152 @@ function resolveVideo(video: FanYouTubeVideo) {
 
 const fieldClassName =
   "w-full rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm outline-none focus:border-[#214C9B]";
+
+type ResolvedFanVideo = NonNullable<ReturnType<typeof resolveVideo>>;
+
+function ZonaMixtaVideoPlayer({
+  resolved,
+  featuredLabel,
+  carouselLabel,
+}: {
+  resolved: ResolvedFanVideo[];
+  featuredLabel: string;
+  carouselLabel: string;
+}) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const thumbnailTrackRef = useRef<HTMLDivElement>(null);
+  const { onWheel: handleWheel } = useHorizontalWheelScroll();
+
+  const videoCount = resolved.length;
+  const activeVideo = resolved[activeIndex] ?? resolved[0];
+
+  const scrollThumbnailIntoView = useCallback((index: number, behavior: ScrollBehavior = "smooth") => {
+    const track = thumbnailTrackRef.current;
+    if (!track) return;
+
+    const slide = track.children[index];
+    if (!(slide instanceof HTMLElement)) return;
+
+    scrollElementHorizontally(track, slide, { behavior, align: "start" });
+  }, []);
+
+  const selectVideo = useCallback(
+    (index: number) => {
+      if (videoCount === 0) return;
+      const nextIndex = ((index % videoCount) + videoCount) % videoCount;
+      setActiveIndex(nextIndex);
+      scrollThumbnailIntoView(nextIndex);
+    },
+    [scrollThumbnailIntoView, videoCount],
+  );
+
+  const goPrev = useCallback(() => {
+    if (videoCount <= 1) return;
+    selectVideo(activeIndex - 1);
+  }, [activeIndex, selectVideo, videoCount]);
+
+  const goNext = useCallback(() => {
+    if (videoCount <= 1) return;
+    selectVideo(activeIndex + 1);
+  }, [activeIndex, selectVideo, videoCount]);
+
+  const playerLabel = activeIndex === 0 ? featuredLabel : carouselLabel;
+
+  return (
+    <>
+      <div className="overflow-hidden rounded-3xl border border-[#214C9B]/25 bg-black shadow-[0_16px_40px_rgba(17,24,39,0.12)]">
+        <div className="aspect-video w-full">
+          <iframe
+            key={activeVideo.videoId}
+            src={`${youtubeEmbedUrl(activeVideo.videoId)}?rel=0`}
+            title={activeVideo.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            className="h-full w-full"
+          />
+        </div>
+        <div className="border-t border-white/10 bg-[#0f1f3d] px-5 py-4">
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">{playerLabel}</p>
+          {activeVideo.date && (
+            <time dateTime={activeVideo.date} className="mt-1 block text-xs font-semibold text-white/70">
+              {activeVideo.date}
+            </time>
+          )}
+          <h3 className="mt-1 text-lg font-extrabold uppercase text-white sm:text-xl">{activeVideo.title}</h3>
+        </div>
+      </div>
+
+      {videoCount > 1 && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm font-bold uppercase text-[#214C9B]">{carouselLabel}</p>
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                onClick={goPrev}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#214C9B]/25 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
+                aria-label="Episodio anterior"
+              >
+                <ChevronLeft size={18} aria-hidden />
+              </button>
+              <span className="min-w-[3.5rem] text-center text-xs font-bold tabular-nums text-slate-500">
+                {activeIndex + 1} / {videoCount}
+              </span>
+              <button
+                type="button"
+                onClick={goNext}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#214C9B]/25 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
+                aria-label="Episodio siguiente"
+              >
+                <ChevronRight size={18} aria-hidden />
+              </button>
+            </div>
+          </div>
+
+          <div
+            ref={thumbnailTrackRef}
+            onWheel={handleWheel}
+            className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-1"
+          >
+            {resolved.map((video, index) => {
+              const isActive = index === activeIndex;
+
+              return (
+                <button
+                  key={video.id}
+                  type="button"
+                  onClick={() => selectVideo(index)}
+                  aria-current={isActive ? "true" : undefined}
+                  aria-label={`Reproducir ${video.title}`}
+                  className={`w-[min(100%,220px)] shrink-0 snap-start overflow-hidden rounded-2xl border bg-white text-left shadow-sm transition ${
+                    isActive
+                      ? "border-[#214C9B] ring-2 ring-[#214C9B]/25"
+                      : "border-[#214C9B]/20 hover:border-[#214C9B]/45"
+                  }`}
+                >
+                  <div
+                    className="aspect-video w-full bg-black bg-cover bg-center"
+                    style={{ backgroundImage: `url(${youtubeThumbnailUrl(video.videoId)})` }}
+                    role="img"
+                    aria-hidden
+                  />
+                  <div className="px-3 py-2.5">
+                    {video.date && (
+                      <time dateTime={video.date} className="text-[10px] font-bold uppercase text-[#981915]">
+                        {video.date}
+                      </time>
+                    )}
+                    <p className="line-clamp-2 text-xs font-bold leading-snug text-[#214C9B]">{video.title}</p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
 export function ZonaMixtaVideoShowcase({
   section,
@@ -74,11 +220,6 @@ export function ZonaMixtaVideoShowcase({
   const sorted = sortFanVideosByDate(currentVideos);
   const resolved = sorted.map(resolveVideo).filter((video): video is NonNullable<typeof video> => video !== null);
   const unresolved = sorted.filter((video) => resolveVideo(video) === null);
-  const featured = resolved.length > 0 ? resolved[0] : null;
-  const carouselItems = resolved.length > 1 ? resolved.slice(1) : [];
-  const carouselCount = carouselItems.length;
-  const { trackRef, goPrev, goNext } = useHorizontalCarousel(carouselCount);
-  const { onWheel: handleWheel } = useHorizontalWheelScroll();
 
   const updateVideos = (next: FanYouTubeVideo[]) => {
     saveValue(storageKey, next);
@@ -130,6 +271,8 @@ export function ZonaMixtaVideoShowcase({
   };
 
   if (currentVideos.length === 0 && !editMode) return null;
+
+  const playlistKey = resolved.map((video) => video.id).join("|");
 
   return (
     <div className="space-y-5">
@@ -214,7 +357,7 @@ export function ZonaMixtaVideoShowcase({
         </div>
       )}
 
-      {!featured ? (
+      {resolved.length === 0 ? (
         editMode ? (
           <p className="text-sm text-slate-500">Añade una URL de YouTube válida para previsualizar el vídeo.</p>
         ) : unresolved.length > 0 ? (
@@ -247,87 +390,12 @@ export function ZonaMixtaVideoShowcase({
           </ul>
         ) : null
       ) : (
-        <>
-          <div className="overflow-hidden rounded-3xl border border-[#214C9B]/25 bg-black shadow-[0_16px_40px_rgba(17,24,39,0.12)]">
-            <div className="aspect-video w-full">
-              <iframe
-                src={`${youtubeEmbedUrl(featured.videoId)}?rel=0`}
-                title={featured.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className="h-full w-full"
-              />
-            </div>
-            <div className="border-t border-white/10 bg-[#0f1f3d] px-5 py-4">
-              <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">{featuredLabel}</p>
-              {featured.date && (
-                <time dateTime={featured.date} className="mt-1 block text-xs font-semibold text-white/70">
-                  {featured.date}
-                </time>
-              )}
-              <h3 className="mt-1 text-lg font-extrabold uppercase text-white sm:text-xl">{featured.title}</h3>
-            </div>
-          </div>
-
-          {carouselCount > 0 && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-bold uppercase text-[#214C9B]">{carouselLabel}</p>
-                {carouselCount > 1 && (
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={goPrev}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#214C9B]/25 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
-                      aria-label="Episodio anterior"
-                    >
-                      <ChevronLeft size={18} aria-hidden />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={goNext}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#214C9B]/25 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
-                      aria-label="Episodio siguiente"
-                    >
-                      <ChevronRight size={18} aria-hidden />
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <div
-                ref={trackRef}
-                onWheel={handleWheel}
-                className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-1"
-              >
-                {carouselItems.map((video) => (
-                  <article
-                    key={video.id}
-                    className="w-[min(100%,380px)] shrink-0 snap-start overflow-hidden rounded-2xl border border-[#214C9B]/20 bg-white shadow-sm"
-                  >
-                    <div className="aspect-video w-full bg-black">
-                      <iframe
-                        src={`${youtubeEmbedUrl(video.videoId)}?rel=0`}
-                        title={video.title}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen
-                        className="h-full w-full"
-                      />
-                    </div>
-                    <div className="px-3 py-3">
-                      {video.date && (
-                        <time dateTime={video.date} className="text-xs font-bold uppercase text-[#981915]">
-                          {video.date}
-                        </time>
-                      )}
-                      <p className="text-sm font-bold leading-snug text-[#214C9B]">{video.title}</p>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </div>
-          )}
-        </>
+        <ZonaMixtaVideoPlayer
+          key={playlistKey}
+          resolved={resolved}
+          featuredLabel={featuredLabel}
+          carouselLabel={carouselLabel}
+        />
       )}
     </div>
   );
