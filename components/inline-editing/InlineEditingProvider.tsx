@@ -57,6 +57,7 @@ import {
   isPlantillaPath,
   plantillaEditorLink,
 } from "@/lib/editor-routes";
+import { useTransferMarketEditOptional } from "@/components/editor/TransferMarketEditProvider";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
@@ -506,6 +507,7 @@ const editorToolbarToggleClass =
 
 export function InlineEditingToolbar() {
   const seasonContext = useSeasonOptional();
+  const marketEdit = useTransferMarketEditOptional();
   const { canEdit, editMode, ready, localOnly, syncError, cloudSaving, saveNow, setEditMode, exportJson } =
     useInlineEditing();
   const seasonLabel = seasonContext?.viewedSeason.label;
@@ -573,21 +575,32 @@ export function InlineEditingToolbar() {
     window.setTimeout(() => setCopied(false), 1800);
   };
 
+  const marketDraftPending = Boolean(marketEdit?.hasDraft);
+  const marketBusy = Boolean(marketEdit?.busy);
+  const marketMessage = marketEdit?.message ?? null;
+
   const statusLabel = syncError
     ? syncError
-    : localOnly
-      ? "Solo en este navegador (sin Supabase)"
-      : cloudSaving
-        ? "Guardando en Supabase…"
-        : saveAck
-          ? "Cambios guardados en Supabase"
-          : isArchive
-            ? `Editando archivo ${seasonLabel ?? ""}. Pulsa «Guardar en Supabase» para confirmar.`
-            : `Temporada ${seasonLabel ?? ""}. Pulsa «Guardar en Supabase» para confirmar.`;
+    : marketMessage && (marketMessage.includes("Error") || marketMessage.includes("Selecciona") || marketMessage.includes("ya está"))
+      ? marketMessage
+      : localOnly
+        ? "Solo en este navegador (sin Supabase)"
+        : cloudSaving || marketBusy
+          ? "Guardando en Supabase…"
+          : saveAck
+            ? marketMessage ?? "Cambios guardados en Supabase"
+            : marketDraftPending
+              ? isArchive
+                ? `Editando archivo ${seasonLabel ?? ""}. Hay cambios en el mercado sin guardar.`
+                : `Temporada ${seasonLabel ?? ""}. Hay cambios en el mercado sin guardar.`
+              : isArchive
+                ? `Editando archivo ${seasonLabel ?? ""}. Pulsa «Guardar en Supabase» para confirmar.`
+                : `Temporada ${seasonLabel ?? ""}. Pulsa «Guardar en Supabase» para confirmar.`;
 
   const handleSaveNow = async () => {
-    const ok = await saveNow();
-    if (ok) {
+    const inlineOk = await saveNow();
+    const marketOk = marketEdit?.hasDraft ? await marketEdit.save() : true;
+    if (inlineOk && marketOk) {
       setSaveAck(true);
       window.setTimeout(() => setSaveAck(false), 2500);
     }
@@ -661,11 +674,11 @@ export function InlineEditingToolbar() {
                 <button
                   type="button"
                   onClick={() => void handleSaveNow()}
-                  disabled={cloudSaving}
+                  disabled={cloudSaving || marketBusy}
                   className={editorToolbarSaveButtonClass}
                 >
                   <CloudUpload size={13} />
-                  {cloudSaving ? "…" : saveAck ? "OK" : "Guardar"}
+                  {cloudSaving || marketBusy ? "…" : saveAck ? "OK" : "Guardar"}
                 </button>
               )}
               <button
@@ -693,11 +706,11 @@ export function InlineEditingToolbar() {
                   <button
                     type="button"
                     onClick={() => void handleSaveNow()}
-                    disabled={cloudSaving}
+                    disabled={cloudSaving || marketBusy}
                     className={editorToolbarSaveButtonClass}
                   >
                     <CloudUpload size={13} />
-                    {cloudSaving ? "Guardando…" : saveAck ? "Guardado" : "Guardar"}
+                    {cloudSaving || marketBusy ? "Guardando…" : saveAck ? "Guardado" : "Guardar"}
                   </button>
                 )}
                 {isJornadasPath(pathname) && <PublishFixturesBundleButton />}
