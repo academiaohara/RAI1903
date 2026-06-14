@@ -167,6 +167,8 @@ export type TransferRumor = {
   clubAnnouncementNewsId?: string;
   /** Ventana de mercado (verano / invierno de una temporada). */
   marketWindowId?: TransferMarketWindowId;
+  /** Temporada CMS de la que proviene el movimiento (p. ej. 2025-26). */
+  seasonId?: string;
 };
 
 export type PredictionOutcome = "1" | "X" | "2";

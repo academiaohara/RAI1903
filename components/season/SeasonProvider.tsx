@@ -27,6 +27,8 @@ import {
 } from "@/lib/season/resolve-match-season";
 import { loadSeasonId, saveSeasonId } from "@/lib/storage";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import { resolveTransferSeasonId } from "@/lib/transfer-market-windows";
+import type { SquadPlayer } from "@/types/squad";
 
 export type SeasonDataScope = "viewed" | "active";
 
@@ -42,6 +44,10 @@ type SeasonContextValue = {
   transfersLoading: boolean;
   /** Ventanas de mercado de todas las temporadas publicadas (activas). */
   marketWindows: TransferMarketWindow[];
+  /** Plantilla masculina por temporada (fotos de fichajes). */
+  transferSquadsBySeasonId: Record<string, SquadPlayer[]>;
+  resolveTransferSeasonIdForTransfer: (transfer: TransferRumor) => string;
+  getTransferSquadForSeason: (seasonId: string) => SquadPlayer[];
   setViewedSeasonId: (id: CompetitionSeasonId) => void;
   refreshSeasons: () => Promise<void>;
   refreshBundles: () => Promise<void>;
@@ -80,12 +86,17 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
   const [transfers, setTransfers] = useState<TransferRumor[]>([]);
   const [transfersLoading, setTransfersLoading] = useState(true);
   const [marketWindows, setMarketWindows] = useState<TransferMarketWindow[]>([]);
+  const [transferSquadsBySeasonId, setTransferSquadsBySeasonId] = useState<Record<string, SquadPlayer[]>>({});
 
   const refreshPublishedTransfers = useCallback(async (publishedRows: CmsSeason[]) => {
     setTransfersLoading(true);
     const snapshot = await fetchPublishedTransfersSnapshot(publishedRows);
     setTransfers(snapshot.transfers);
     setMarketWindows(snapshot.marketWindows);
+    setTransferSquadsBySeasonId(snapshot.squadsBySeasonId);
+    if (Object.keys(snapshot.bundlesBySeasonId).length) {
+      setBundleCache((current) => ({ ...current, ...snapshot.bundlesBySeasonId }));
+    }
     setTransfersLoading(false);
   }, []);
 
@@ -253,6 +264,16 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
     [getBundles, resolveSeasonId],
   );
 
+  const resolveTransferSeasonIdForTransfer = useCallback(
+    (transfer: TransferRumor) => resolveTransferSeasonId(transfer, viewedSeasonId),
+    [viewedSeasonId],
+  );
+
+  const getTransferSquadForSeason = useCallback(
+    (seasonId: string) => transferSquadsBySeasonId[seasonId] ?? [],
+    [transferSquadsBySeasonId],
+  );
+
   const resolveSeasonIdForMatch = useCallback(
     async (matchId: string, gender: PrimerEquipoGender): Promise<CompetitionSeasonId> => {
       const publishedIds = seasons.length
@@ -300,6 +321,9 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
       transfers,
       transfersLoading,
       marketWindows,
+      transferSquadsBySeasonId,
+      resolveTransferSeasonIdForTransfer,
+      getTransferSquadForSeason,
       setViewedSeasonId,
       refreshSeasons,
       refreshBundles,
@@ -318,6 +342,9 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
       transfers,
       transfersLoading,
       marketWindows,
+      transferSquadsBySeasonId,
+      resolveTransferSeasonIdForTransfer,
+      getTransferSquadForSeason,
       getFixtureSource,
       getEnrichedFixtureSource,
       getCompetitionConfig,
