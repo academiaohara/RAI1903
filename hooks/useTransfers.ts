@@ -41,7 +41,7 @@ function transfersForViewedSeason(
 }
 
 export function useTransfers() {
-  const { transfers, transfersLoading, bundles, bundlesLoading } = useSeason();
+  const { transfers, transfersLoading, bundles, bundlesLoading, viewedSeasonId } = useSeason();
   const marketEdit = useTransferMarketEditOptional();
 
   const effectiveTransfers = useMemo(() => {
@@ -49,11 +49,11 @@ export function useTransfers() {
     const draftTransfers = transfersFromBundle(
       seasonTransfersBundlePayload(marketEdit.entries),
       marketEdit.squad,
-    );
+    ).map((transfer) => ({ ...transfer, seasonId: transfer.seasonId ?? viewedSeasonId }));
     const viewedEntryIds = new Set(marketEdit.bundleEntries.map((entry) => entry.id));
     const fromOtherSeasons = transfers.filter((transfer) => !viewedEntryIds.has(transfer.id));
     return [...draftTransfers, ...fromOtherSeasons];
-  }, [marketEdit, transfers]);
+  }, [marketEdit, transfers, viewedSeasonId]);
 
   const viewedSeasonTransfers = useMemo(
     () => transfersForViewedSeason(bundles, bundlesLoading, effectiveTransfers),

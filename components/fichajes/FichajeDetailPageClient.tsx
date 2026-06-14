@@ -5,21 +5,19 @@ import Link from "next/link";
 import { TransferDetailView } from "@/components/fichajes/TransferDetailView";
 import { PageHero } from "@/components/PageHero";
 import { useTransfers } from "@/hooks/useTransfers";
-import { getSquadPlayerForTransfer, getTransferKind, getTransferKindLabel } from "@/lib/fichajes";
-import { useSquadPlayers } from "@/hooks/useSquadPlayers";
+import { useTransferSquadPlayer } from "@/hooks/useTransferSquadPlayer";
+import { getTransferKind, getTransferKindLabel } from "@/lib/fichajes";
 import type { Route } from "next";
 
 export function FichajeDetailPageClient({ transferId }: { transferId: string }) {
   const { getById, loading: transfersLoading } = useTransfers();
-  const { squad, loading: squadLoading } = useSquadPlayers("masculino");
   const transfer = getById(transferId);
+  const player = useTransferSquadPlayer(transfer);
 
-  if (!transfersLoading && !squadLoading && !transfer) notFound();
-  if (!transfer || squadLoading) {
+  if (!transfersLoading && !transfer) notFound();
+  if (!transfer) {
     return <p className="text-sm font-bold text-slate-500">Cargando ficha…</p>;
   }
-
-  const player = getSquadPlayerForTransfer(transfer, squad);
   const kind = getTransferKind(transfer);
 
   return (

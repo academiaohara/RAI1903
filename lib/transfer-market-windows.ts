@@ -159,6 +159,25 @@ export function resolveTransferMarketWindowId(transfer: {
   return transfer.marketWindowId ?? inferTransferMarketWindowId(transfer.date);
 }
 
+/** Convierte `verano-25-26` → `2025-26`. Devuelve null si el id no sigue el patrón estándar. */
+export function seasonIdFromTransferMarketWindowId(windowId: string): string | null {
+  const match = windowId.match(/^(?:verano|invierno)-(\d{1,2})-(\d{1,2})$/);
+  if (!match) return null;
+
+  const startYear = 2000 + Number.parseInt(match[1], 10);
+  const endYear = 2000 + Number.parseInt(match[2], 10);
+  return `${startYear}-${String(endYear).slice(-2)}`;
+}
+
+export function resolveTransferSeasonId(
+  transfer: { seasonId?: string; date: string; marketWindowId?: TransferMarketWindowId },
+  fallbackSeasonId: string,
+): string {
+  if (transfer.seasonId) return transfer.seasonId;
+  const fromWindow = seasonIdFromTransferMarketWindowId(resolveTransferMarketWindowId(transfer));
+  return fromWindow ?? fallbackSeasonId;
+}
+
 export function isTransferMarketWindowIdValid(id: string): boolean {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id);
 }
