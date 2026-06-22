@@ -6,6 +6,7 @@ import { Calendar, ChevronDown, ChevronUp, MapPin, Ruler, Scale, Star, X } from 
 import type { PlayerCareerRecord, SquadModalTab, SquadPlayer } from "@/types/squad";
 import { SQUAD_POSITIONS, SQUAD_ROLE_CODES } from "@/types/squad";
 import { ageFromBirthDate } from "@/lib/squad-age";
+import { parseCareerJson } from "@/lib/career-utils";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import {
   formatBirthDate,
@@ -449,6 +450,10 @@ function PlayerCareerEditor({
   trayectoria: PlayerCareerRecord[];
   onChange: (records: PlayerCareerRecord[]) => void;
 }) {
+  const [showJsonPaste, setShowJsonPaste] = useState(false);
+  const [jsonDraft, setJsonDraft] = useState("");
+  const [jsonError, setJsonError] = useState<string | null>(null);
+
   const updateRow = (index: number, patch: Partial<PlayerCareerRecord>) => {
     onChange(trayectoria.map((row, rowIndex) => (rowIndex === index ? { ...row, ...patch } : row)));
   };
@@ -477,11 +482,41 @@ function PlayerCareerEditor({
     onChange(next);
   };
 
+  const openJsonPaste = () => {
+    setJsonDraft(JSON.stringify(trayectoria, null, 2));
+    setJsonError(null);
+    setShowJsonPaste(true);
+  };
+
+  const closeJsonPaste = () => {
+    setShowJsonPaste(false);
+    setJsonError(null);
+  };
+
+  const applyJsonPaste = () => {
+    const result = parseCareerJson(jsonDraft);
+    if (!result.ok) {
+      setJsonError(result.error);
+      return;
+    }
+    setJsonError(null);
+    onChange(result.records);
+    setShowJsonPaste(false);
+    setJsonDraft("");
+  };
+
   return (
     <section className="mb-6 rounded-2xl border border-[#214C9B]/20 bg-blue-50/60 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#214C9B]">Editar trayectoria</p>
         <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={openJsonPaste}
+            className="rounded-full border border-[#214C9B]/25 px-3 py-1 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-white"
+          >
+            Pegar JSON
+          </button>
           <button
             type="button"
             onClick={() => addRow("start")}
@@ -499,8 +534,46 @@ function PlayerCareerEditor({
         </div>
       </div>
       <p className="mt-2 text-[11px] font-semibold text-slate-500">
-        Orden de más antigua a más reciente. Usa las flechas para reordenar.
+        Orden de más antigua a más reciente. Usa las flechas para reordenar o pega un array JSON.
       </p>
+      {showJsonPaste && (
+        <div className="mt-3 rounded-xl border border-[#214C9B]/20 bg-white p-3">
+          <p className="text-[11px] font-semibold text-slate-600">
+            Pega un array con <code className="font-mono text-[10px]">temporada</code>,{" "}
+            <code className="font-mono text-[10px]">club</code>,{" "}
+            <code className="font-mono text-[10px]">partidos</code>,{" "}
+            <code className="font-mono text-[10px]">goles</code> y{" "}
+            <code className="font-mono text-[10px]">asistencias</code>.
+          </p>
+          <textarea
+            value={jsonDraft}
+            onChange={(event) => {
+              setJsonDraft(event.target.value);
+              if (jsonError) setJsonError(null);
+            }}
+            spellCheck={false}
+            className="mt-2 min-h-[10rem] w-full resize-y rounded-xl border border-[#214C9B]/20 bg-slate-50 px-3 py-2 font-mono text-xs leading-5 text-slate-800 outline-none focus:border-[#214C9B]"
+            placeholder={`[\n  {\n    "temporada": "2024/25",\n    "club": "Real Avilés C.F.",\n    "partidos": 30,\n    "goles": 1,\n    "asistencias": 0\n  }\n]`}
+          />
+          {jsonError && <p className="mt-2 text-xs font-semibold text-[#981915]">{jsonError}</p>}
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={applyJsonPaste}
+              className="rounded-full bg-[#214C9B] px-4 py-1.5 text-xs font-extrabold uppercase text-white hover:bg-[#173a78]"
+            >
+              Aplicar JSON
+            </button>
+            <button
+              type="button"
+              onClick={closeJsonPaste}
+              className="rounded-full border border-slate-300 px-4 py-1.5 text-xs font-extrabold uppercase text-slate-600 hover:bg-slate-50"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
       <div className="mt-3 space-y-3">
         {trayectoria.map((row, index) => (
           <div
