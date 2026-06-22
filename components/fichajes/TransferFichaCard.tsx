@@ -14,22 +14,46 @@ import type { TransferRumor } from "@/types";
 
 const toneStyles = {
   fichaje: {
-    border: "border-[#981915]",
-    footer: "bg-[#981915]",
-    badge: "bg-[#981915] text-white",
-    gradient: "from-rose-50 via-orange-50/90 to-white",
-    shadow: "shadow-[0_10px_28px_rgba(152,25,21,0.12)]",
-    hoverShadow: "group-hover:shadow-[0_16px_36px_rgba(152,25,21,0.22)]",
-    dorsal: "text-[#981915]",
-  },
-  renovacion: {
     border: "border-[#214C9B]",
     footer: "bg-[#214C9B]",
-    badge: "bg-[#214C9B] text-white",
+    footerText: "text-white",
+    footerSubtext: "text-white/85",
+    badge: "bg-white text-[#214C9B]",
+    dorsalBox: "bg-white",
     gradient: "from-sky-100 via-blue-50/90 to-white",
     shadow: "shadow-[0_10px_28px_rgba(33,76,155,0.12)]",
     hoverShadow: "group-hover:shadow-[0_16px_36px_rgba(33,76,155,0.2)]",
     dorsal: "text-[#214C9B]",
+    placeholderInitials: "text-[#214C9B]/25",
+    avatarShadow: "drop-shadow-[0_4px_12px_rgba(33,76,155,0.2)]",
+  },
+  renovacion: {
+    border: "border-[#981915]",
+    footer: "bg-[#981915]",
+    footerText: "text-white",
+    footerSubtext: "text-white/85",
+    badge: "bg-white text-[#981915]",
+    dorsalBox: "bg-white",
+    gradient: "from-rose-50 via-orange-50/90 to-white",
+    shadow: "shadow-[0_10px_28px_rgba(152,25,21,0.12)]",
+    hoverShadow: "group-hover:shadow-[0_16px_36px_rgba(152,25,21,0.22)]",
+    dorsal: "text-[#981915]",
+    placeholderInitials: "text-[#981915]/25",
+    avatarShadow: "drop-shadow-[0_4px_12px_rgba(152,25,21,0.2)]",
+  },
+  cesion: {
+    border: "border-[#981915]",
+    footer: "bg-white",
+    footerText: "text-[#981915]",
+    footerSubtext: "text-[#981915]/80",
+    badge: "border border-[#981915] bg-white text-[#981915]",
+    dorsalBox: "border border-[#981915]/25 bg-white",
+    gradient: "from-white via-slate-50/80 to-white",
+    shadow: "shadow-[0_10px_28px_rgba(152,25,21,0.08)]",
+    hoverShadow: "group-hover:shadow-[0_16px_36px_rgba(152,25,21,0.16)]",
+    dorsal: "text-[#981915]",
+    placeholderInitials: "text-[#981915]/20",
+    avatarShadow: "drop-shadow-[0_4px_12px_rgba(152,25,21,0.15)]",
   },
 } as const;
 
@@ -47,7 +71,7 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
 
   const player = useTransferSquadPlayer(transfer);
   const kind = getTransferKind(transfer);
-  const styles = toneStyles[kind === "renovacion" ? "renovacion" : "fichaje"];
+  const styles = toneStyles[kind];
   const displayName = player ? getPlayerDisplayName(player) : transfer.playerName;
   const fullName = player ? `${player.nombre} ${player.apellido}` : transfer.playerName;
   const wrapperClass =
@@ -68,7 +92,7 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
           className={`overflow-hidden rounded-tl-[1.25rem] rounded-br-[1.25rem] rounded-tr-sm rounded-bl-sm border-2 bg-gradient-to-b ${styles.gradient} ${styles.border} ${styles.shadow} transition-shadow ${styles.hoverShadow}`}
         >
           <div className="relative flex h-[108px] items-center justify-center overflow-hidden sm:h-[140px]">
-            <div className="absolute left-1.5 top-1.5 z-10 flex flex-col items-center gap-0.5 rounded-lg bg-white px-1 py-1 shadow-sm sm:left-2 sm:top-2 sm:gap-1 sm:px-1.5 sm:py-1.5">
+            <div className={`absolute left-1.5 top-1.5 z-10 flex flex-col items-center gap-0.5 rounded-lg px-1 py-1 shadow-sm sm:left-2 sm:top-2 sm:gap-1 sm:px-1.5 sm:py-1.5 ${styles.dorsalBox}`}>
               <span className="text-xs leading-none sm:text-sm" role="img" aria-hidden>
                 {flag}
               </span>
@@ -90,18 +114,18 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
                 placeholderTone="light"
                 loading="eager"
                 imageClassName="object-contain object-bottom"
-                className="mx-auto aspect-[3/4] h-[94%] w-auto max-w-[88%] drop-shadow-[0_4px_12px_rgba(33,76,155,0.2)]"
+                className={`mx-auto aspect-[3/4] h-[94%] w-auto max-w-[88%] ${styles.avatarShadow}`}
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-gradient-to-b from-white/40 to-transparent">
-                <span className="text-4xl font-extrabold text-[#214C9B]/25">{initials}</span>
+                <span className={`text-4xl font-extrabold ${styles.placeholderInitials}`}>{initials}</span>
               </div>
             )}
           </div>
 
           <div className={`px-2 py-1.5 sm:px-3 sm:py-2 ${styles.footer}`}>
-            <p className="truncate text-[11px] font-bold text-white sm:text-[15px]">{displayName}</p>
-            <p className="mt-0.5 truncate text-[9px] font-semibold uppercase tracking-wide text-white/85 sm:text-[10px]">{originClub}</p>
+            <p className={`truncate text-[11px] font-bold sm:text-[15px] ${styles.footerText}`}>{displayName}</p>
+            <p className={`mt-0.5 truncate text-[9px] font-semibold uppercase tracking-wide sm:text-[10px] ${styles.footerSubtext}`}>{originClub}</p>
           </div>
         </article>
   );
