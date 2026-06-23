@@ -11,7 +11,7 @@ import { TradingPlayerFicha } from "@/components/squad/TradingPlayerFicha";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useTransferSquadPlayer } from "@/hooks/useTransferSquadPlayer";
 import { seasonIdToDisplayLabel, usesLegacyFichaDesign } from "@/lib/ficha-design";
-import { getTransferKind, getTransferKindLabel, getTransferOriginClub } from "@/lib/fichajes";
+import { getTransferKind, getTransferKindAbbrev, getTransferKindLabel, getTransferOriginClub } from "@/lib/fichajes";
 import { resolveTransferSeasonId } from "@/lib/transfer-market-windows";
 import { getSquadClubInfo } from "@/lib/squad-data";
 import { getNationalityFlag, getPlayerDisplayName } from "@/lib/squad-utils";
@@ -136,11 +136,7 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
   const clubCrest = getSquadClubInfo("masculino").escudo;
   const tradingMeta = transferTradingMeta(transfer, player);
 
-  const kindBadge = (
-    <span className={`rounded-sm px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide sm:text-[9px] ${styles.badge}`}>
-      {getTransferKindLabel(kind)}
-    </span>
-  );
+  const kindAbbrev = getTransferKindAbbrev(kind);
 
   const legacyCardBody = (
     <article
@@ -163,7 +159,7 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
         <span
           className={`absolute bottom-1.5 right-1.5 z-10 rounded-lg px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide sm:bottom-2 sm:right-2 sm:px-2 sm:py-1 sm:text-[10px] ${styles.badge}`}
         >
-          {getTransferKindLabel(kind)}
+          {kindAbbrev}
         </span>
 
         {player ? (
@@ -202,7 +198,8 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
       rol={tradingMeta.rol}
       edad={tradingMeta.edad || 0}
       ageLabel={tradingMeta.edad > 0 ? undefined : "—"}
-      statusBadge={kindBadge}
+      variant={kind}
+      kindStat={kindAbbrev}
       secondaryStat={player ? player.rol : "—"}
       subtitle={<p className="truncate uppercase tracking-wide">{originClub}</p>}
       photo={
