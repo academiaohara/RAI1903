@@ -10,7 +10,9 @@ import {
 } from "@/lib/squad-utils";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 import { SquadPlayerQuickEdit } from "@/components/squad/SquadPlayerQuickEdit";
+import { TradingPlayerFicha } from "@/components/squad/TradingPlayerFicha";
 import { formatFanRating } from "@/lib/format-fan-rating";
+import { usesLegacyFichaDesign } from "@/lib/ficha-design";
 import type { PlayerRatingAverage } from "@/lib/match-ratings-storage";
 
 type SquadPlayerCardProps = {
@@ -21,6 +23,9 @@ type SquadPlayerCardProps = {
   fanRating?: PlayerRatingAverage;
   editMode?: boolean;
   onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
+  seasonLabel?: string;
+  crestUrl?: string;
+  crestAlt?: string;
 };
 
 export function PlayerCard({
@@ -31,6 +36,9 @@ export function PlayerCard({
   fanRating,
   editMode = false,
   onQuickUpdate,
+  seasonLabel = "25/26",
+  crestUrl = "RAI",
+  crestAlt = "Real Avilés Industrial",
 }: SquadPlayerCardProps) {
   if (variant === "fichas") {
     return (
@@ -41,6 +49,9 @@ export function PlayerCard({
         fanRating={fanRating}
         editMode={editMode}
         onQuickUpdate={onQuickUpdate}
+        seasonLabel={seasonLabel}
+        crestUrl={crestUrl}
+        crestAlt={crestAlt}
       />
     );
   }
@@ -152,6 +163,9 @@ function PlayerFichaCard({
   fanRating,
   editMode = false,
   onQuickUpdate,
+  seasonLabel = "25/26",
+  crestUrl = "RAI",
+  crestAlt = "Real Avilés Industrial",
 }: {
   player: SquadPlayer;
   onSelect: (player: SquadPlayer) => void;
@@ -159,10 +173,89 @@ function PlayerFichaCard({
   fanRating?: PlayerRatingAverage;
   editMode?: boolean;
   onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
+  seasonLabel?: string;
+  crestUrl?: string;
+  crestAlt?: string;
 }) {
   const displayName = getPlayerDisplayName(player);
   const flag = getNationalityFlag(player.nacionalidad);
   const canQuickEdit = editMode && onQuickUpdate;
+  const useTradingDesign = !usesLegacyFichaDesign(seasonLabel);
+
+  const fanRatingSubtitle = fanRating ? (
+    <p className="font-bold tabular-nums text-[#214C9B]">{formatFanRating(fanRating.average)}</p>
+  ) : undefined;
+
+  const tradingPhoto = (
+    <PlayerAvatar
+      player={player}
+      bare
+      placeholderTone="light"
+      imageClassName="object-contain object-bottom"
+      className="h-full w-[92%] max-w-full drop-shadow-[0_6px_14px_rgba(0,0,0,0.35)]"
+    />
+  );
+
+  if (useTradingDesign) {
+    const tradingCard = (
+      <TradingPlayerFicha
+        seasonLabel={seasonLabel}
+        crestUrl={crestUrl}
+        crestAlt={crestAlt}
+        nombre={player.nombre}
+        apellido={player.apellido}
+        posicion={player.posicion}
+        rol={player.rol}
+        edad={player.edad}
+        photo={tradingPhoto}
+        subtitle={fanRatingSubtitle}
+      />
+    );
+
+    if (canQuickEdit) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.03, duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+          className="h-full w-full"
+        >
+          <article className="mx-auto flex h-full w-full max-w-[11rem] flex-col overflow-hidden rounded-sm border-2 border-dashed border-[#214C9B]/35 sm:max-w-none">
+            <button type="button" onClick={() => onSelect(player)} className="flex min-h-0 flex-1 flex-col text-left">
+              {tradingCard}
+            </button>
+            <SquadPlayerQuickEdit
+              player={player}
+              onUpdate={(patch) => onQuickUpdate(player.id, patch)}
+              layout="card"
+            />
+            <button
+              type="button"
+              onClick={() => onSelect(player)}
+              className="w-full border-t border-[#214C9B]/15 bg-white/90 py-1.5 text-center text-[10px] font-extrabold uppercase tracking-wide text-[#214C9B] hover:bg-blue-50"
+            >
+              Ficha completa
+            </button>
+          </article>
+        </motion.div>
+      );
+    }
+
+    return (
+      <motion.button
+        type="button"
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.03, duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+        whileHover={{ y: -4 }}
+        whileTap={{ scale: 0.99 }}
+        onClick={() => onSelect(player)}
+        className="group h-full w-full text-left"
+      >
+        {tradingCard}
+      </motion.button>
+    );
+  }
 
   const articleClass = canQuickEdit
     ? "mx-auto flex h-full w-full max-w-[11rem] flex-col overflow-hidden rounded-tl-xl rounded-br-xl rounded-tr-sm rounded-bl-sm border-2 border-dashed border-[#214C9B] bg-gradient-to-b from-sky-100 via-blue-50/90 to-white shadow-[0_6px_18px_rgba(33,76,155,0.1)] sm:max-w-none"
