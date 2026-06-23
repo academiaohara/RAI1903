@@ -651,7 +651,7 @@ a {
   --bgl-success: #58cc02;
   --bgl-success-shadow: #46a302;
 
-  background: var(--bgl-sky);
+  background: #f3faff;
   color: var(--bgl-ink);
   display: flex;
   flex-direction: column;
@@ -671,17 +671,18 @@ a {
 
 .bgl-close {
   align-items: center;
-  background: #fff;
-  border: 2px solid #cfe8fb;
+  background: var(--bgl-sky);
+  border: 2px solid #b8dff8;
   border-radius: 12px;
-  box-shadow: 0 4px 0 var(--bgl-chip-shadow);
+  box-shadow: 0 4px 0 var(--bgl-sky-shadow);
   color: var(--bgl-muted);
   display: inline-flex;
   height: 2.5rem;
   justify-content: center;
   transition:
     transform 0.12s ease,
-    box-shadow 0.12s ease;
+    box-shadow 0.12s ease,
+    background-color 0.12s ease;
   width: 2.5rem;
 }
 
@@ -696,16 +697,17 @@ a {
 
 .bgl-progress {
   background: var(--bgl-track);
+  border: 2px solid #c5e4f8;
   border-radius: 999px;
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.65);
+  box-shadow: 0 3px 0 var(--bgl-chip-shadow);
   height: 1rem;
   overflow: hidden;
 }
 
 .bgl-progress-fill {
-  background: linear-gradient(180deg, #35c0ff 0%, var(--bgl-blue) 55%, var(--bgl-blue-dark) 100%);
+  background: linear-gradient(180deg, #4ec8ff 0%, var(--bgl-blue) 62%, var(--bgl-blue-dark) 100%);
   border-radius: inherit;
-  box-shadow: 0 2px 0 rgba(24, 153, 214, 0.45);
+  box-shadow: inset 0 -2px 0 rgba(24, 153, 214, 0.35);
   height: 100%;
   min-width: 0.35rem;
   transition: width 0.35s ease;
@@ -740,14 +742,16 @@ a {
 
 .bgl-step-content {
   background: var(--bgl-sky);
+  border: 2px solid #b8dff8;
   border-radius: 1.25rem;
+  box-shadow: 0 4px 0 var(--bgl-sky-shadow);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
   margin: 0 auto;
   max-width: 42rem;
-  min-height: 100%;
-  padding: 0.5rem 0 1rem;
+  min-height: min(100%, 32rem);
+  padding: 1.25rem 1.1rem 1.35rem;
 }
 
 .bgl-step-copy {
@@ -781,11 +785,9 @@ a {
 }
 
 .bgl-step-panel {
-  background: #fff;
-  border: 2px solid #cfe8fb;
-  border-radius: 1.25rem;
-  box-shadow: 0 4px 0 var(--bgl-chip-shadow);
-  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .bgl-conjugate-exercise {
@@ -811,7 +813,7 @@ a {
 }
 
 .bgl-word-chip {
-  background: var(--bgl-chip);
+  background: #fff;
   border: 2px solid #d8ebfa;
   border-radius: 0.9rem;
   box-shadow: 0 3px 0 var(--bgl-chip-shadow);
