@@ -83,8 +83,8 @@ export function TradingPlayerFicha({
           </div>
         </div>
 
-        <div className="absolute bottom-[5%] right-[5%] z-20 flex flex-col gap-0.5 sm:gap-1">
-          {kindStat ? <span className="trading-ficha-stat trading-ficha-kind-stat">{kindStat}</span> : null}
+        <div className="absolute bottom-[5%] right-[5%] z-20 flex flex-col items-end gap-0.5 sm:gap-1">
+          {kindStat ? <span className="trading-ficha-position">{kindStat}</span> : null}
           <span className="trading-ficha-stat trading-ficha-stat--light">{ageLabel ?? `${edad}Y`}</span>
           <span className="trading-ficha-stat trading-ficha-stat--dark">{secondaryStat ?? rol}</span>
         </div>
