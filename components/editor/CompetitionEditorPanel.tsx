@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { EditorPanelFrame } from "@/components/editor/EditorPanelFrame";
+import { FixturesJsonPasteSection } from "@/components/editor/FixturesJsonPasteSection";
 import { useSeason } from "@/components/season/SeasonProvider";
 import {
   defaultCompetitionConfig,
@@ -13,7 +14,12 @@ import {
 } from "@/lib/cms/competition-config-bundle";
 import { getCompetitionConfigBundle } from "@/lib/cms/competition-config-bundle";
 import { applyLeagueTemplate, buildFixturesPayloadForConfig } from "@/lib/cms/apply-league-template";
-import { upsertSeasonBundle } from "@/lib/cms/season-bundles";
+import { parsePrimerEquipoFixturesJson } from "@/lib/cms/parse-fixtures-json";
+import {
+  getFixturesBundle,
+  upsertSeasonBundle,
+  type SeasonFixturesBundle,
+} from "@/lib/cms/season-bundles";
 import {
   leagueTemplatesForGender,
   type LeagueTemplateId,
@@ -33,6 +39,8 @@ type CompetitionEditorPanelProps = {
   onClose: () => void;
 };
 
+type EditorTab = "competicion" | "calendario";
+
 function newZone(): CompetitionZoneRule {
   return {
     id: `zone-${Date.now()}`,
@@ -46,7 +54,9 @@ function newZone(): CompetitionZoneRule {
 export function CompetitionEditorPanel({ onClose }: CompetitionEditorPanelProps) {
   const { viewedSeasonId, viewedSeason, bundles, refreshBundles } = useSeason();
   const [gender, setGender] = useState<PrimerEquipoGender>("masculino");
+  const [tab, setTab] = useState<EditorTab>("competicion");
   const [draft, setDraft] = useState<SeasonCompetitionConfigBundle | null>(null);
+  const [fixtures, setFixtures] = useState<SeasonFixturesBundle | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [selectedTemplateId, setSelectedTemplateId] = useState<LeagueTemplateId | "">("");
@@ -56,13 +66,34 @@ export function CompetitionEditorPanel({ onClose }: CompetitionEditorPanelProps)
     [bundles, gender],
   );
 
+  const loadConfigFromBundles = useCallback(() => {
+    setDraft({ ...stored, zones: stored.zones.map((z) => ({ ...z })) });
+  }, [stored]);
+
+  const loadFixturesFromBundles = useCallback(() => {
+    const cmsFixtures = getFixturesBundle(bundles, "masculino") as SeasonFixturesBundle | null;
+    setFixtures(
+      cmsFixtures?.matchdays?.length
+        ? structuredClone(cmsFixtures)
+        : { matchdays: [], meta: { lastRound: 0 } },
+    );
+  }, [bundles]);
+
   useEffect(() => {
-    queueMicrotask(() => setDraft({ ...stored, zones: stored.zones.map((z) => ({ ...z })) }));
-  }, [stored, gender]);
+    queueMicrotask(() => loadConfigFromBundles());
+  }, [loadConfigFromBundles, gender]);
+
+  useEffect(() => {
+    queueMicrotask(() => loadFixturesFromBundles());
+  }, [loadFixturesFromBundles]);
 
   const config = draft ?? stored;
+  const fixturesDraft = fixtures ?? { matchdays: [], meta: { lastRound: 0 } };
   const rounds = leagueRoundCount(config.teamsPerGroup);
   const matchesPerRound = matchesPerLeagueRound(config.teamsPerGroup);
+  const matchdayCount = fixturesDraft.matchdays.length;
+  const matchCount = fixturesDraft.matchdays.reduce((sum, md) => sum + md.matches.length, 0);
+  const matchdayGrupo2Count = fixturesDraft.matchdaysGrupo2?.length ?? 0;
 
   const updateZone = (id: string, patch: Partial<CompetitionZoneRule>) => {
     setDraft((current) => {
@@ -106,6 +137,28 @@ export function CompetitionEditorPanel({ onClose }: CompetitionEditorPanelProps)
     }
     setMessage(`Calendario generado: ${rounds} jornadas × ${matchesPerRound} partidos/grupo`);
     await refreshBundles();
+    loadFixturesFromBundles();
+  };
+
+  const saveFixtures = async () => {
+    if (!fixtures) return;
+    setBusy(true);
+    setMessage(null);
+    const existing = getFixturesBundle(bundles, "masculino") as SeasonFixturesBundle | null;
+    const payload: SeasonFixturesBundle = {
+      ...existing,
+      matchdays: fixtures.matchdays,
+      matchdaysGrupo2: fixtures.matchdaysGrupo2,
+      meta: fixtures.meta,
+    };
+    const result = await upsertSeasonBundle(viewedSeasonId, "masculino", "fixtures", payload);
+    setBusy(false);
+    if (!result.ok) {
+      setMessage(result.error ?? "Error al guardar calendario");
+      return;
+    }
+    setMessage(`Calendario masculino guardado (${viewedSeason.label})`);
+    await refreshBundles();
   };
 
   const applyTemplate = async () => {
@@ -127,15 +180,10 @@ export function CompetitionEditorPanel({ onClose }: CompetitionEditorPanelProps)
 
   const genderTemplates = leagueTemplatesForGender(gender);
 
-  return (
-    <EditorPanelFrame
-      title="Competición"
-      subtitle={`${viewedSeason.label} · ${rounds} jornadas`}
-      onClose={onClose}
-      busy={busy}
-      message={message}
-      footer={
-        <div className="flex flex-col gap-2">
+  const footer = (
+    <div className="flex flex-col gap-2">
+      {tab === "competicion" ? (
+        <>
           <button
             type="button"
             disabled={busy}
@@ -146,20 +194,101 @@ export function CompetitionEditorPanel({ onClose }: CompetitionEditorPanelProps)
           </button>
           <button
             type="button"
-            disabled={busy}
+            disabled={busy || gender !== "masculino"}
             onClick={() => void generateFixtures()}
             className="w-full rounded-xl border border-[#214C9B]/30 px-4 py-2.5 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50 disabled:opacity-60"
           >
             Generar casillas de jornadas
           </button>
-        </div>
-      }
-    >
+        </>
+      ) : (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => void saveFixtures()}
+          className="w-full rounded-xl bg-[#214C9B] px-4 py-2.5 text-xs font-extrabold uppercase text-white hover:bg-[#173a78] disabled:opacity-60"
+        >
+          Guardar calendario
+        </button>
+      )}
+    </div>
+  );
+
+  const editorBody = (
+    <>
       <p className="mb-3 text-[10px] leading-relaxed text-slate-500">
         Masculino y femenino tienen calendarios separados. Para el femenino usa el panel{" "}
         <strong className="text-[#981915]">Femenino</strong> (competición y calendario como en cantera).
       </p>
 
+      <div className="mb-4 flex flex-wrap gap-2">
+        {(
+          [
+            ["competicion", "Competición"],
+            ["calendario", "Calendario"],
+          ] as const
+        ).map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setTab(id)}
+            disabled={gender !== "masculino" && id === "calendario"}
+            className={`rounded-full px-3 py-1.5 text-[10px] font-extrabold uppercase ${
+              tab === id ? "bg-[#214C9B] text-white" : "bg-slate-100 text-slate-600"
+            } disabled:cursor-not-allowed disabled:opacity-40`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div className="mb-3 flex gap-2">
+        {(["masculino", "femenino"] as const).map((g) => (
+          <button
+            key={g}
+            type="button"
+            onClick={() => {
+              setGender(g);
+              if (g === "femenino" && tab === "calendario") setTab("competicion");
+            }}
+            className={`flex-1 rounded-xl border px-2 py-2 text-xs font-extrabold uppercase ${
+              gender === g ? "border-[#214C9B] bg-[#214C9B] text-white" : "border-slate-200 text-slate-600"
+            }`}
+          >
+            {g === "masculino" ? "Masculino" : "Femenino"}
+          </button>
+        ))}
+      </div>
+
+      {tab === "calendario" && gender === "masculino" ? (
+        <div className="space-y-4">
+          <FixturesJsonPasteSection
+            hint='Pega jornadas con local/visitante, o el bundle CMS (matchdays y matchdaysGrupo2). Los nombres se cruzan con equipos de la temporada. Tras aplicar, pulsa «Guardar calendario».'
+            parse={(input) => parsePrimerEquipoFixturesJson(input, { gender: "masculino", bundles })}
+            onImport={(data) => {
+              setFixtures((current) => ({
+                ...(current ?? fixturesDraft),
+                matchdays: data.matchdays,
+                matchdaysGrupo2: data.matchdaysGrupo2,
+                meta: { ...(current?.meta ?? {}), lastRound: data.meta.lastRound },
+              }));
+            }}
+          />
+
+          <p className="text-[11px] font-semibold text-slate-600">
+            Actual: {matchdayCount} jornadas grupo I
+            {matchdayGrupo2Count > 0 ? ` · ${matchdayGrupo2Count} jornadas grupo II` : ""} · {matchCount} partidos
+            en grupo I
+          </p>
+          <p className="text-[10px] leading-relaxed text-slate-500">
+            Amistosos, Copa del Rey y partidos extra no se borran al guardar; solo se actualizan las jornadas de liga
+            importadas.
+          </p>
+        </div>
+      ) : null}
+
+      {tab === "competicion" ? (
+        <>
       <div className="mb-4 space-y-2 rounded-xl border border-slate-100 bg-slate-50/80 p-3">
         <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Plantilla de liga</p>
         <select
@@ -194,21 +323,6 @@ export function CompetitionEditorPanel({ onClose }: CompetitionEditorPanelProps)
           Pretemporada, Copa del Rey y fases extra (playoff, playout…): en modo edición, abre Calendario o Competición → Copa
           y usa el panel «Pretemporada y Copa del Rey». En Jornadas puedes renombrar cada jornada (p. ej. «Playoff semis»).
         </p>
-      </div>
-
-      <div className="mb-3 flex gap-2">
-        {(["masculino", "femenino"] as const).map((g) => (
-          <button
-            key={g}
-            type="button"
-            onClick={() => setGender(g)}
-            className={`flex-1 rounded-xl border px-2 py-2 text-xs font-extrabold uppercase ${
-              gender === g ? "border-[#214C9B] bg-[#214C9B] text-white" : "border-slate-200 text-slate-600"
-            }`}
-          >
-            {g === "masculino" ? "Masculino" : "Femenino"}
-          </button>
-        ))}
       </div>
 
       <div className="mb-4 grid grid-cols-2 gap-2">
@@ -305,6 +419,21 @@ export function CompetitionEditorPanel({ onClose }: CompetitionEditorPanelProps)
           </li>
         ))}
       </ul>
+        </>
+      ) : null}
+    </>
+  );
+
+  return (
+    <EditorPanelFrame
+      title="Competición"
+      subtitle={`${viewedSeason.label} · ${rounds} jornadas`}
+      onClose={onClose}
+      busy={busy}
+      message={message}
+      footer={footer}
+    >
+      {editorBody}
     </EditorPanelFrame>
   );
 }

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { EditorPanelFrame } from "@/components/editor/EditorPanelFrame";
+import { FixturesJsonPasteSection } from "@/components/editor/FixturesJsonPasteSection";
 import { OnPageEditorSection } from "@/components/editor/OnPageEditorSection";
 import { useSeason } from "@/components/season/SeasonProvider";
 import {
@@ -12,6 +13,7 @@ import {
   type FilialFixturesBundle,
   type FilialTeamSeed,
 } from "@/lib/cms/filial-bundles";
+import { parseCanteraFixturesJson } from "@/lib/cms/parse-fixtures-json";
 import { upsertSeasonBundlesBatch } from "@/lib/cms/season-bundles";
 import type { CanteraCmsScope } from "@/lib/cantera/cantera-cms";
 import { buildCanteraMockBundleEntries } from "@/lib/cantera/cantera-season-data";
@@ -418,6 +420,21 @@ export function CanteraEditorPanel({ scope, onClose, variant = "panel" }: Canter
 
       {tab === "calendario" && (
         <div className="space-y-4">
+          <FixturesJsonPasteSection
+            hint='Pega un objeto con competicion y jornadas (fecha, local, visitante, goles_local, goles_visitante). Tras aplicar, pulsa «Guardar».'
+            onImport={(data) => {
+              setFixtures(data);
+              const lastRound = data.jornadas.at(-1)?.jornada ?? 0;
+              if (lastRound > 0) {
+                setConfig((current) => {
+                  const base = current ?? competition;
+                  return { ...base, leagueRounds: Math.max(base.leagueRounds, lastRound) };
+                });
+              }
+            }}
+            parse={parseCanteraFixturesJson}
+          />
+
           <label className="block text-xs font-semibold text-slate-600">
             Nombre competición
             <input
