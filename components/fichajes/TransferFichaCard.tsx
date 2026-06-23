@@ -199,7 +199,6 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
       edad={tradingMeta.edad || 0}
       ageLabel={tradingMeta.edad > 0 ? undefined : "—"}
       variant={kind}
-      kindStat={kindAbbrev}
       secondaryStat={player ? player.rol : "—"}
       subtitle={<p className="truncate uppercase tracking-wide">{originClub}</p>}
       photo={
