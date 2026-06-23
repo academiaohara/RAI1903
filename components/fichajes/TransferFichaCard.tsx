@@ -7,10 +7,16 @@ import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvi
 import { useTransferMarketEditOptional } from "@/components/editor/TransferMarketEditProvider";
 import { TransferFichaCardEditForm } from "@/components/fichajes/TransferFichaCardEditForm";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
+import { TradingPlayerFicha } from "@/components/squad/TradingPlayerFicha";
+import { useSeason } from "@/components/season/SeasonProvider";
 import { useTransferSquadPlayer } from "@/hooks/useTransferSquadPlayer";
+import { seasonIdToDisplayLabel, usesLegacyFichaDesign } from "@/lib/ficha-design";
 import { getTransferKind, getTransferKindLabel, getTransferOriginClub } from "@/lib/fichajes";
+import { resolveTransferSeasonId } from "@/lib/transfer-market-windows";
+import { getSquadClubInfo } from "@/lib/squad-data";
 import { getNationalityFlag, getPlayerDisplayName } from "@/lib/squad-utils";
 import type { TransferRumor } from "@/types";
+import type { SquadPosition, SquadRoleCode } from "@/types/squad";
 
 const toneStyles = {
   fichaje: {
@@ -63,11 +69,48 @@ type TransferFichaCardProps = {
   layout?: "carousel" | "grid";
 };
 
+function splitTransferPlayerName(playerName: string): { nombre: string; apellido: string } {
+  const parts = playerName.trim().split(/\s+/);
+  if (parts.length <= 1) return { nombre: parts[0] ?? "", apellido: "" };
+  return { nombre: parts[0] ?? "", apellido: parts.slice(1).join(" ") };
+}
+
+function transferTradingMeta(
+  transfer: TransferRumor,
+  player: ReturnType<typeof useTransferSquadPlayer>,
+): {
+  nombre: string;
+  apellido: string;
+  posicion: SquadPosition;
+  rol: SquadRoleCode;
+  edad: number;
+} {
+  if (player) {
+    return {
+      nombre: player.nombre,
+      apellido: player.apellido,
+      posicion: player.posicion,
+      rol: player.rol,
+      edad: player.edad,
+    };
+  }
+
+  const { nombre, apellido } = splitTransferPlayerName(transfer.playerName);
+  return {
+    nombre,
+    apellido,
+    posicion: "Centrocampista",
+    rol: "MC",
+    edad: 0,
+  };
+}
+
 export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: TransferFichaCardProps) {
   const { editMode } = useInlineEditing();
   const marketEdit = useTransferMarketEditOptional();
   const cmsEntry = marketEdit?.getEntry(transfer.id);
   const isCardEditing = Boolean(editMode && marketEdit && cmsEntry);
+  const { viewedSeasonId } = useSeason();
 
   const player = useTransferSquadPlayer(transfer);
   const kind = getTransferKind(transfer);
@@ -87,48 +130,101 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
     .slice(0, 2)
     .toUpperCase();
 
-  const cardBody = (
-        <article
-          className={`overflow-hidden rounded-tl-[1.25rem] rounded-br-[1.25rem] rounded-tr-sm rounded-bl-sm border-2 bg-gradient-to-b ${styles.gradient} ${styles.border} ${styles.shadow} transition-shadow ${styles.hoverShadow}`}
-        >
-          <div className="relative flex h-[108px] items-center justify-center overflow-hidden sm:h-[140px]">
-            <div className={`absolute left-1.5 top-1.5 z-10 flex flex-col items-center gap-0.5 rounded-lg px-1 py-1 shadow-sm sm:left-2 sm:top-2 sm:gap-1 sm:px-1.5 sm:py-1.5 ${styles.dorsalBox}`}>
-              <span className="text-xs leading-none sm:text-sm" role="img" aria-hidden>
-                {flag}
-              </span>
-              {player ? (
-                <span className={`text-xs font-black tabular-nums leading-none sm:text-sm ${styles.dorsal}`}>{player.dorsal}</span>
-              ) : (
-                <span className={`text-[10px] font-black uppercase leading-none ${styles.dorsal}`}>{initials}</span>
-              )}
-            </div>
+  const transferSeasonId = resolveTransferSeasonId(transfer, viewedSeasonId);
+  const seasonLabel = seasonIdToDisplayLabel(transferSeasonId);
+  const useTradingDesign = !usesLegacyFichaDesign(seasonLabel);
+  const clubCrest = getSquadClubInfo("masculino").escudo;
+  const tradingMeta = transferTradingMeta(transfer, player);
 
-            <span className={`absolute bottom-1.5 right-1.5 z-10 rounded-lg px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide sm:bottom-2 sm:right-2 sm:px-2 sm:py-1 sm:text-[10px] ${styles.badge}`}>
-              {getTransferKindLabel(kind)}
-            </span>
-
-            {player ? (
-              <PlayerAvatar
-                player={player}
-                bare
-                placeholderTone="light"
-                loading="eager"
-                imageClassName="object-contain object-bottom"
-                className={`mx-auto aspect-[3/4] h-[94%] w-auto max-w-[88%] ${styles.avatarShadow}`}
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-b from-white/40 to-transparent">
-                <span className={`text-4xl font-extrabold ${styles.placeholderInitials}`}>{initials}</span>
-              </div>
-            )}
-          </div>
-
-          <div className={`px-2 py-1.5 sm:px-3 sm:py-2 ${styles.footer}`}>
-            <p className={`truncate text-[11px] font-bold sm:text-[15px] ${styles.footerText}`}>{displayName}</p>
-            <p className={`mt-0.5 truncate text-[9px] font-semibold uppercase tracking-wide sm:text-[10px] ${styles.footerSubtext}`}>{originClub}</p>
-          </div>
-        </article>
+  const kindBadge = (
+    <span className={`rounded-sm px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide sm:text-[9px] ${styles.badge}`}>
+      {getTransferKindLabel(kind)}
+    </span>
   );
+
+  const legacyCardBody = (
+    <article
+      className={`overflow-hidden rounded-tl-[1.25rem] rounded-br-[1.25rem] rounded-tr-sm rounded-bl-sm border-2 bg-gradient-to-b ${styles.gradient} ${styles.border} ${styles.shadow} transition-shadow ${styles.hoverShadow}`}
+    >
+      <div className="relative flex h-[108px] items-center justify-center overflow-hidden sm:h-[140px]">
+        <div
+          className={`absolute left-1.5 top-1.5 z-10 flex flex-col items-center gap-0.5 rounded-lg px-1 py-1 shadow-sm sm:left-2 sm:top-2 sm:gap-1 sm:px-1.5 sm:py-1.5 ${styles.dorsalBox}`}
+        >
+          <span className="text-xs leading-none sm:text-sm" role="img" aria-hidden>
+            {flag}
+          </span>
+          {player ? (
+            <span className={`text-xs font-black tabular-nums leading-none sm:text-sm ${styles.dorsal}`}>{player.dorsal}</span>
+          ) : (
+            <span className={`text-[10px] font-black uppercase leading-none ${styles.dorsal}`}>{initials}</span>
+          )}
+        </div>
+
+        <span
+          className={`absolute bottom-1.5 right-1.5 z-10 rounded-lg px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide sm:bottom-2 sm:right-2 sm:px-2 sm:py-1 sm:text-[10px] ${styles.badge}`}
+        >
+          {getTransferKindLabel(kind)}
+        </span>
+
+        {player ? (
+          <PlayerAvatar
+            player={player}
+            bare
+            placeholderTone="light"
+            loading="eager"
+            imageClassName="object-contain object-bottom"
+            className={`mx-auto aspect-[3/4] h-[94%] w-auto max-w-[88%] ${styles.avatarShadow}`}
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-b from-white/40 to-transparent">
+            <span className={`text-4xl font-extrabold ${styles.placeholderInitials}`}>{initials}</span>
+          </div>
+        )}
+      </div>
+
+      <div className={`px-2 py-1.5 sm:px-3 sm:py-2 ${styles.footer}`}>
+        <p className={`truncate text-[11px] font-bold sm:text-[15px] ${styles.footerText}`}>{displayName}</p>
+        <p className={`mt-0.5 truncate text-[9px] font-semibold uppercase tracking-wide sm:text-[10px] ${styles.footerSubtext}`}>
+          {originClub}
+        </p>
+      </div>
+    </article>
+  );
+
+  const tradingCardBody = (
+    <TradingPlayerFicha
+      seasonLabel={seasonLabel}
+      crestUrl={clubCrest}
+      crestAlt="Real Avilés Industrial"
+      nombre={tradingMeta.nombre}
+      apellido={tradingMeta.apellido}
+      posicion={tradingMeta.posicion}
+      rol={tradingMeta.rol}
+      edad={tradingMeta.edad || 0}
+      ageLabel={tradingMeta.edad > 0 ? undefined : "—"}
+      topRightBadge={kindBadge}
+      secondaryStat={player ? player.rol : "—"}
+      subtitle={<p className="truncate uppercase tracking-wide">{originClub}</p>}
+      photo={
+        player ? (
+          <PlayerAvatar
+            player={player}
+            bare
+            placeholderTone="light"
+            loading="eager"
+            imageClassName="object-contain object-bottom"
+            className={`h-full w-[92%] max-w-full ${styles.avatarShadow}`}
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <span className={`text-4xl font-extrabold ${styles.placeholderInitials}`}>{initials}</span>
+          </div>
+        )
+      }
+    />
+  );
+
+  const cardBody = useTradingDesign ? tradingCardBody : legacyCardBody;
 
   return (
     <motion.div

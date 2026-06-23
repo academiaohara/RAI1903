@@ -322,6 +322,152 @@ a {
   width: 100%;
 }
 
+/* Plantilla — ficha trading card (26/27+) */
+.trading-ficha-shell {
+  width: 100%;
+}
+
+.trading-ficha-frame {
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(15, 35, 71, 0.22);
+  padding: 3px;
+}
+
+.trading-ficha-card {
+  aspect-ratio: 2 / 3;
+  isolation: isolate;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.trading-ficha-stripes {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #173a78 0,
+      #173a78 11%,
+      #2a5eb5 11%,
+      #2a5eb5 22%
+    );
+  inset: 0;
+  position: absolute;
+}
+
+.trading-ficha-stripes::after {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+  content: "";
+  inset: 0;
+  mix-blend-mode: soft-light;
+  opacity: 0.35;
+  pointer-events: none;
+  position: absolute;
+}
+
+.trading-ficha-season {
+  color: #fff;
+  font-family: var(--font-bebas-neue), "Arial Black", sans-serif;
+  font-size: clamp(0.95rem, 5.5vw, 1.35rem);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.trading-ficha-position {
+  background: var(--rai-red);
+  border-radius: 2px;
+  color: #fff;
+  display: inline-block;
+  font-size: clamp(0.45rem, 2.4vw, 0.62rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  padding: 0.18rem 0.3rem;
+}
+
+.trading-ficha-crest {
+  height: clamp(1.35rem, 7vw, 1.85rem);
+  object-fit: contain;
+  width: clamp(1.35rem, 7vw, 1.85rem);
+}
+
+.trading-ficha-crest-fallback {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 999px;
+  color: var(--rai-blue);
+  display: inline-flex;
+  font-size: clamp(0.45rem, 2.2vw, 0.58rem);
+  font-weight: 800;
+  height: clamp(1.35rem, 7vw, 1.85rem);
+  justify-content: center;
+  width: clamp(1.35rem, 7vw, 1.85rem);
+}
+
+.trading-ficha-name-plate {
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  width: 78%;
+  z-index: 20;
+}
+
+.trading-ficha-name-plate-inner {
+  background: linear-gradient(118deg, rgba(8, 20, 48, 0.97) 0%, rgba(8, 20, 48, 0.88) 72%, transparent 100%);
+  clip-path: polygon(0 22%, 0 100%, 100% 100%, 72% 22%);
+  padding: 18% 8% 7% 7%;
+}
+
+.trading-ficha-first-name {
+  color: #fff;
+  font-family: var(--font-bebas-neue), "Arial Black", sans-serif;
+  font-size: clamp(0.55rem, 3vw, 0.72rem);
+  letter-spacing: 0.06em;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.trading-ficha-last-name {
+  color: #fff;
+  font-family: var(--font-bebas-neue), "Arial Black", sans-serif;
+  font-size: clamp(0.82rem, 4.6vw, 1.12rem);
+  letter-spacing: 0.03em;
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+
+.trading-ficha-stat {
+  border-radius: 2px;
+  display: block;
+  font-size: clamp(0.42rem, 2.2vw, 0.58rem);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  min-width: 1.45rem;
+  padding: 0.2rem 0.28rem;
+  text-align: center;
+}
+
+.trading-ficha-stat--light {
+  background: #fff;
+  color: #0f2347;
+}
+
+.trading-ficha-stat--dark {
+  background: #0f2347;
+  color: #fff;
+}
+
+.trading-ficha-subtitle {
+  color: #475569;
+  font-size: clamp(0.55rem, 2.6vw, 0.68rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-top: 0.35rem;
+  text-align: center;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .title-gear-wrap {
     animation: none;
