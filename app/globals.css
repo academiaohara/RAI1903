@@ -385,6 +385,23 @@ a {
   padding: 0.18rem 0.3rem;
 }
 
+.trading-ficha-kind {
+  align-items: center;
+  background: var(--rai-red);
+  border-radius: 2px;
+  color: #fff;
+  display: inline-flex;
+  flex-shrink: 0;
+  height: clamp(0.88rem, 4.6vw, 1.12rem);
+  justify-content: center;
+  width: clamp(0.88rem, 4.6vw, 1.12rem);
+}
+
+.trading-ficha-kind-icon {
+  height: clamp(0.5rem, 2.6vw, 0.65rem);
+  width: clamp(0.5rem, 2.6vw, 0.65rem);
+}
+
 .trading-ficha-photo-slot {
   inset: 0;
   overflow: hidden;
@@ -524,7 +541,7 @@ a {
     );
 }
 
-.trading-ficha-card--renovacion .trading-ficha-position {
+.trading-ficha-card--renovacion .trading-ficha-position--role {
   background: #fff;
   color: var(--rai-red);
 }
@@ -565,7 +582,7 @@ a {
   text-shadow: none;
 }
 
-.trading-ficha-card--cesion .trading-ficha-position {
+.trading-ficha-card--cesion .trading-ficha-position--role {
   background: var(--rai-red);
   color: #fff;
 }

@@ -1,12 +1,21 @@
 "use client";
 
+import type { LucideIcon } from "lucide-react";
+import { ArrowLeftRight, RefreshCw, UserPlus } from "lucide-react";
 import type { ReactNode } from "react";
 import type { TransferKind } from "@/types";
 import type { SquadPosition, SquadRoleCode } from "@/types/squad";
 import { getFichaPositionAbbrev } from "@/lib/ficha-design";
+import { getTransferKindLabel } from "@/lib/fichajes";
 import { cn } from "@/lib/utils";
 
 export type TradingFichaVariant = "default" | TransferKind;
+
+const KIND_ICON_BY_VARIANT: Record<TransferKind, LucideIcon> = {
+  fichaje: UserPlus,
+  renovacion: RefreshCw,
+  cesion: ArrowLeftRight,
+};
 
 export type TradingPlayerFichaProps = {
   seasonLabel: string;
@@ -19,7 +28,6 @@ export type TradingPlayerFichaProps = {
   edad: number;
   photo: ReactNode;
   subtitle?: ReactNode;
-  kindStat?: string;
   variant?: TradingFichaVariant;
   secondaryStat?: string;
   ageLabel?: string;
@@ -37,7 +45,6 @@ export function TradingPlayerFicha({
   edad,
   photo,
   subtitle,
-  kindStat,
   variant = "default",
   secondaryStat,
   ageLabel,
@@ -46,6 +53,8 @@ export function TradingPlayerFicha({
   const positionAbbrev = getFichaPositionAbbrev(posicion);
   const crestIsUrl = crestUrl.startsWith("/") || crestUrl.startsWith("http");
   const shellVariantClass = variant === "default" ? null : `trading-ficha-shell--${variant}`;
+  const transferKind = variant === "default" ? null : variant;
+  const KindIcon = transferKind ? KIND_ICON_BY_VARIANT[transferKind] : null;
 
   return (
     <div className={cn("trading-ficha-shell", shellVariantClass, className)}>
@@ -58,7 +67,7 @@ export function TradingPlayerFicha({
 
         <div className="absolute left-[6%] top-[4%] z-20 flex flex-col items-start gap-0.5 sm:gap-1">
           <p className="trading-ficha-season">{seasonLabel}</p>
-          <span className="trading-ficha-position">{positionAbbrev}</span>
+          <span className="trading-ficha-position trading-ficha-position--role">{positionAbbrev}</span>
         </div>
 
         <div className="absolute right-[5%] top-[3.5%] z-20">
@@ -84,7 +93,11 @@ export function TradingPlayerFicha({
         </div>
 
         <div className="absolute bottom-[5%] right-[5%] z-20 flex flex-col items-end gap-0.5 sm:gap-1">
-          {kindStat ? <span className="trading-ficha-position">{kindStat}</span> : null}
+          {KindIcon && transferKind ? (
+            <span className="trading-ficha-kind" aria-label={getTransferKindLabel(transferKind)}>
+              <KindIcon className="trading-ficha-kind-icon" aria-hidden />
+            </span>
+          ) : null}
           <span className="trading-ficha-stat trading-ficha-stat--light">{ageLabel ?? `${edad}Y`}</span>
           <span className="trading-ficha-stat trading-ficha-stat--dark">{secondaryStat ?? rol}</span>
         </div>
