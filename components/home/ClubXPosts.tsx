@@ -7,7 +7,6 @@ import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvi
 import { deleteClubXPostOverrides } from "@/lib/cms/inline-overrides";
 import { CLUB_X_HANDLE } from "@/lib/club-x";
 import {
-  CLUB_X_POST_EMBEDS,
   CLUB_X_POSTS_STORAGE_KEY,
   isClubXPostsList,
   moveClubXPost,
@@ -39,7 +38,7 @@ export function ClubXPosts() {
   const [parseError, setParseError] = useState<string | null>(null);
   const hasCustomList = overrides[CLUB_X_POSTS_STORAGE_KEY] !== undefined;
   const currentPosts = sortClubXPostsByDate(
-    getValue<ClubXPostEmbed[]>(CLUB_X_POSTS_STORAGE_KEY, CLUB_X_POST_EMBEDS),
+    getValue<ClubXPostEmbed[]>(CLUB_X_POSTS_STORAGE_KEY, []),
   );
   const postsSignature = currentPosts.map((post) => post.id).join("|");
   const [settledSignature, setSettledSignature] = useState<string | null>(null);
