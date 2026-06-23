@@ -82,7 +82,6 @@ export function TransferDetailView({ transfer, player: initialPlayer }: Transfer
                 player={player}
                 size="xl"
                 priority
-                imageClassName="object-contain object-bottom"
                 className="aspect-[4/5] w-full rounded-[1.5rem] shadow-2xl"
               />
             ) : (
