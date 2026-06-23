@@ -209,7 +209,7 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
             placeholderTone="light"
             loading="eager"
             imageClassName="object-cover object-[center_8%]"
-            className={`h-full w-full ${styles.avatarShadow}`}
+            className={`ml-[5px] h-full w-full ${styles.avatarShadow}`}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
