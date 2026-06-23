@@ -192,7 +192,7 @@ function PlayerFichaCard({
       bare
       placeholderTone="light"
       imageClassName="object-cover object-[center_8%]"
-      className="h-full w-full drop-shadow-[0_6px_14px_rgba(0,0,0,0.35)]"
+      className="ml-[5px] h-full w-full drop-shadow-[0_6px_14px_rgba(0,0,0,0.35)]"
     />
   );
 
@@ -279,7 +279,7 @@ function PlayerFichaCard({
           bare
           placeholderTone="light"
           imageClassName="object-cover object-top"
-          className="aspect-[3/4] h-[98%] w-[94%] max-w-full drop-shadow-[0_4px_12px_rgba(33,76,155,0.2)]"
+          className="ml-[5px] aspect-[3/4] h-[98%] w-[94%] max-w-full drop-shadow-[0_4px_12px_rgba(33,76,155,0.2)]"
         />
       </div>
 
