@@ -212,8 +212,8 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
             bare
             placeholderTone="light"
             loading="eager"
-            imageClassName="object-contain object-bottom"
-            className={styles.avatarShadow}
+            imageClassName="object-cover object-[center_8%]"
+            className={`h-full w-full ${styles.avatarShadow}`}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
