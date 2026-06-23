@@ -1,7 +1,8 @@
 "use client";
 
-import { ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Loader2, Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { deleteClubXPostOverrides } from "@/lib/cms/inline-overrides";
 import { CLUB_X_HANDLE } from "@/lib/club-x";
@@ -19,28 +20,92 @@ import { loadXWidgets } from "@/lib/x-widgets";
 const fieldClassName =
   "w-full rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm outline-none focus:border-[#214C9B]";
 
+const WIDGETS_LOADING_MS = 5000;
+
+function areXPostsRendered(container: HTMLElement, expectedCount: number): boolean {
+  const blockquotes = container.querySelectorAll("blockquote.twitter-tweet");
+  if (blockquotes.length < expectedCount) return false;
+
+  return Array.from(blockquotes).every(
+    (blockquote) =>
+      blockquote.classList.contains("twitter-tweet-rendered") || blockquote.querySelector("iframe") !== null,
+  );
+}
+
 export function ClubXPosts() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { editMode, getValue, saveValue, clearValue, overrides } = useInlineEditing();
   const [draftEmbed, setDraftEmbed] = useState("");
   const [parseError, setParseError] = useState<string | null>(null);
-
   const hasCustomList = overrides[CLUB_X_POSTS_STORAGE_KEY] !== undefined;
   const currentPosts = sortClubXPostsByDate(
     getValue<ClubXPostEmbed[]>(CLUB_X_POSTS_STORAGE_KEY, CLUB_X_POST_EMBEDS),
   );
-
-  const reloadWidgets = useCallback(() => {
-    loadXWidgets(() => {
-      if (containerRef.current) {
-        window.twttr?.widgets.load(containerRef.current);
-      }
-    });
-  }, []);
+  const postsSignature = currentPosts.map((post) => post.id).join("|");
+  const [settledSignature, setSettledSignature] = useState<string | null>(null);
+  const widgetsLoading = currentPosts.length > 0 && settledSignature !== postsSignature;
 
   useEffect(() => {
-    reloadWidgets();
-  }, [currentPosts, reloadWidgets]);
+    if (currentPosts.length === 0) return;
+
+    let settled = false;
+    const signature = postsSignature;
+
+    const finishLoading = () => {
+      if (settled) return;
+      settled = true;
+      setSettledSignature(signature);
+    };
+
+    const timeoutId = window.setTimeout(finishLoading, WIDGETS_LOADING_MS);
+    let observer: MutationObserver | undefined;
+
+    const watchContainer = (container: HTMLElement) => {
+      if (areXPostsRendered(container, currentPosts.length)) {
+        finishLoading();
+        return;
+      }
+
+      observer?.disconnect();
+      observer = new MutationObserver(() => {
+        if (areXPostsRendered(container, currentPosts.length)) {
+          finishLoading();
+        }
+      });
+      observer.observe(container, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["class"],
+      });
+    };
+
+    const loadAndWatch = () => {
+      const container = containerRef.current;
+      if (!container) return;
+      window.twttr?.widgets.load(container);
+      watchContainer(container);
+    };
+
+    loadXWidgets(loadAndWatch);
+
+    const rafId = window.requestAnimationFrame(() => {
+      const container = containerRef.current;
+      if (container) {
+        watchContainer(container);
+        if (areXPostsRendered(container, currentPosts.length)) {
+          finishLoading();
+        }
+      }
+    });
+
+    return () => {
+      settled = true;
+      window.clearTimeout(timeoutId);
+      window.cancelAnimationFrame(rafId);
+      observer?.disconnect();
+    };
+  }, [currentPosts, postsSignature]);
 
   const updatePosts = (next: ClubXPostEmbed[]) => {
     saveValue(CLUB_X_POSTS_STORAGE_KEY, next);
@@ -168,20 +233,38 @@ export function ClubXPosts() {
 
       {currentPosts.length === 0 && !editMode ? (
         <p className="text-sm font-semibold text-slate-500">No hay tweets publicados todavía.</p>
-      ) : (
-        <div className="max-h-[min(70vh,640px)] w-full max-w-full overflow-y-auto overscroll-y-contain pr-1">
-          <div ref={containerRef} className="flex flex-col items-center gap-4">
-            {currentPosts.map((post) => (
-              <blockquote
-                key={post.id}
-                className="twitter-tweet mx-auto w-full max-w-[550px]"
-                data-dnt="true"
-                dangerouslySetInnerHTML={{ __html: post.html }}
-              />
-            ))}
+      ) : currentPosts.length > 0 ? (
+        <div className="relative w-full max-w-full">
+          {widgetsLoading ? (
+            <p
+              className="flex min-h-[min(50vh,320px)] items-center justify-center gap-2 rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 p-6 text-sm font-semibold text-slate-500"
+              role="status"
+              aria-live="polite"
+            >
+              <Loader2 size={18} className="animate-spin text-[#214C9B]" aria-hidden />
+              Cargando tweets…
+            </p>
+          ) : null}
+          <div
+            className={cn(
+              "max-h-[min(70vh,640px)] w-full max-w-full overflow-y-auto overscroll-y-contain pr-1",
+              widgetsLoading && "pointer-events-none absolute h-0 overflow-hidden opacity-0",
+            )}
+            aria-hidden={widgetsLoading}
+          >
+            <div ref={containerRef} className="flex flex-col items-center gap-4">
+              {currentPosts.map((post) => (
+                <blockquote
+                  key={post.id}
+                  className="twitter-tweet mx-auto w-full max-w-[550px]"
+                  data-dnt="true"
+                  dangerouslySetInnerHTML={{ __html: post.html }}
+                />
+              ))}
+            </div>
           </div>
         </div>
-      )}
+      ) : null}
 
       <p className="mt-2.5 border-t border-[#214C9B]/10 pt-2.5 text-center text-[10px] font-semibold uppercase tracking-wide text-slate-400">
         Cuenta oficial · @{CLUB_X_HANDLE}
