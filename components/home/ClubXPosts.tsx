@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, ChevronUp, Loader2, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { deleteClubXPostOverrides } from "@/lib/cms/inline-overrides";
@@ -14,79 +14,13 @@ import {
   sortClubXPostsByDate,
   type ClubXPostEmbed,
 } from "@/lib/club-x-posts";
-import { loadXWidgets, waitForXWidgetEmbeds } from "@/lib/x-widgets";
-import { cn } from "@/lib/utils";
+import { loadXWidgets } from "@/lib/x-widgets";
 
 const fieldClassName =
   "w-full rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm outline-none focus:border-[#214C9B]";
 
-function ClubXPostsEmbedList({ posts }: { posts: ClubXPostEmbed[] }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [widgetsReady, setWidgetsReady] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    let stopWaiting: (() => void) | undefined;
-
-    loadXWidgets(() => {
-      if (cancelled || !containerRef.current) return;
-
-      window.twttr?.widgets.load(containerRef.current);
-      stopWaiting = waitForXWidgetEmbeds(containerRef.current, posts.length, () => {
-        if (!cancelled) {
-          setWidgetsReady(true);
-        }
-      });
-    });
-
-    return () => {
-      cancelled = true;
-      stopWaiting?.();
-    };
-  }, [posts]);
-
-  return (
-    <div className="relative max-h-[min(70vh,640px)] min-h-[12rem] w-full max-w-full overflow-y-auto overscroll-y-contain pr-1">
-      {!widgetsReady && (
-        <div
-          className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-white px-4"
-          aria-live="polite"
-          aria-busy="true"
-        >
-          <p className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500">
-            <Loader2 size={16} className="animate-spin" aria-hidden />
-            Cargando tweets…
-          </p>
-          <div
-            className="mx-auto w-full max-w-[550px] animate-pulse space-y-3 rounded-2xl border border-[#214C9B]/10 bg-slate-50 p-4"
-            aria-hidden
-          >
-            <div className="h-4 w-3/4 rounded bg-slate-200" />
-            <div className="h-4 w-full rounded bg-slate-200" />
-            <div className="h-4 w-5/6 rounded bg-slate-200" />
-            <div className="mt-4 h-3 w-1/3 rounded bg-slate-200" />
-          </div>
-        </div>
-      )}
-      <div
-        ref={containerRef}
-        className={cn("flex flex-col items-center gap-4", !widgetsReady && "opacity-0")}
-        aria-hidden={!widgetsReady}
-      >
-        {posts.map((post) => (
-          <blockquote
-            key={post.id}
-            className="twitter-tweet mx-auto w-full max-w-[550px]"
-            data-dnt="true"
-            dangerouslySetInnerHTML={{ __html: post.html }}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function ClubXPosts() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const { editMode, getValue, saveValue, clearValue, overrides } = useInlineEditing();
   const [draftEmbed, setDraftEmbed] = useState("");
   const [parseError, setParseError] = useState<string | null>(null);
@@ -95,7 +29,18 @@ export function ClubXPosts() {
   const currentPosts = sortClubXPostsByDate(
     getValue<ClubXPostEmbed[]>(CLUB_X_POSTS_STORAGE_KEY, CLUB_X_POST_EMBEDS),
   );
-  const postsRenderKey = currentPosts.map((post) => post.id).join(",");
+
+  const reloadWidgets = useCallback(() => {
+    loadXWidgets(() => {
+      if (containerRef.current) {
+        window.twttr?.widgets.load(containerRef.current);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    reloadWidgets();
+  }, [currentPosts, reloadWidgets]);
 
   const updatePosts = (next: ClubXPostEmbed[]) => {
     saveValue(CLUB_X_POSTS_STORAGE_KEY, next);
@@ -223,9 +168,20 @@ export function ClubXPosts() {
 
       {currentPosts.length === 0 && !editMode ? (
         <p className="text-sm font-semibold text-slate-500">No hay tweets publicados todavía.</p>
-      ) : currentPosts.length > 0 ? (
-        <ClubXPostsEmbedList key={postsRenderKey} posts={currentPosts} />
-      ) : null}
+      ) : (
+        <div className="max-h-[min(70vh,640px)] w-full max-w-full overflow-y-auto overscroll-y-contain pr-1">
+          <div ref={containerRef} className="flex flex-col items-center gap-4">
+            {currentPosts.map((post) => (
+              <blockquote
+                key={post.id}
+                className="twitter-tweet mx-auto w-full max-w-[550px]"
+                data-dnt="true"
+                dangerouslySetInnerHTML={{ __html: post.html }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       <p className="mt-2.5 border-t border-[#214C9B]/10 pt-2.5 text-center text-[10px] font-semibold uppercase tracking-wide text-slate-400">
         Cuenta oficial · @{CLUB_X_HANDLE}
