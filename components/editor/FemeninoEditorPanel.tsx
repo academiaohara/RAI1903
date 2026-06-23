@@ -314,7 +314,7 @@ export function FemeninoEditorPanel({ onClose, variant = "panel" }: FemeninoEdit
         <div className="space-y-4">
           <FixturesJsonPasteSection
             accent="femenino"
-            hint='Pega jornadas con local/visitante o el bundle CMS (matchdaysFemenino). Los nombres se cruzan con equipos de la temporada. Tras aplicar, pulsa «Guardar femenino».'
+            hint='Basta con jornadas, partidos (local, visitante) y fecha. Los goles no se importan. Tras aplicar, pulsa «Guardar femenino».'
             parse={(input) =>
               parsePrimerEquipoFixturesJson(input, { gender: "femenino", bundles })
             }

@@ -88,12 +88,6 @@ function parseJsonInput(input: string): ParseFixturesJsonResult<unknown> {
   }
 }
 
-function optionalScore(value: unknown): number | undefined {
-  if (value === null || value === undefined || value === "") return undefined;
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : undefined;
-}
-
 function parseKickoffIso(fecha: string, hora: string | null | undefined): string {
   const trimmed = fecha.trim();
   if (/^\d{4}-\d{2}-\d{2}/.test(trimmed)) {
@@ -124,14 +118,6 @@ function normalizeCanteraPartido(raw: unknown, index: number, jornada: number): 
   if (!local) return `Jornada ${jornada}, partido ${index + 1}: falta local.`;
   if (!visitante) return `Jornada ${jornada}, partido ${index + 1}: falta visitante.`;
 
-  const golesLocal = optionalScore(row.goles_local);
-  const golesVisitante = optionalScore(row.goles_visitante);
-  const estadoRaw = String(row.estado ?? "").trim().toLowerCase();
-  const estado: "finalizado" | "pendiente" =
-    estadoRaw === "finalizado" || (golesLocal !== undefined && golesVisitante !== undefined)
-      ? "finalizado"
-      : "pendiente";
-
   const hora = row.hora === null || row.hora === undefined || row.hora === "" ? null : String(row.hora);
 
   return {
@@ -139,9 +125,9 @@ function normalizeCanteraPartido(raw: unknown, index: number, jornada: number): 
     hora,
     local,
     visitante,
-    goles_local: golesLocal ?? null,
-    goles_visitante: golesVisitante ?? null,
-    estado,
+    goles_local: null,
+    goles_visitante: null,
+    estado: "pendiente",
   };
 }
 
@@ -259,17 +245,6 @@ function buildTeamLookup(bundles: SeasonBundlesMap, gender: PrimerEquipoGender):
   };
 }
 
-function matchStatusFromPartido(
-  partido: RawPartido,
-  homeScore?: number,
-  awayScore?: number,
-): Match["status"] {
-  const estado = String(partido.estado ?? "").trim().toLowerCase();
-  if (estado === "finalizado" || estado === "finished") return "finished";
-  if (homeScore !== undefined && awayScore !== undefined) return "finished";
-  return "scheduled";
-}
-
 function buildMatchFromPartido(
   partido: RawPartido,
   round: number,
@@ -298,9 +273,6 @@ function buildMatchFromPartido(
 
   const home = lookup.resolve(local);
   const away = lookup.resolve(visitante);
-  const homeScore = optionalScore(partido.goles_local);
-  const awayScore = optionalScore(partido.goles_visitante);
-  const status = matchStatusFromPartido(partido, homeScore, awayScore);
 
   return {
     id: `${idPrefix}j${round}-${home.id}-${away.id}`,
@@ -312,9 +284,7 @@ function buildMatchFromPartido(
     date,
     competition,
     venue: home.stadium,
-    status,
-    ...(homeScore !== undefined ? { homeScore } : {}),
-    ...(awayScore !== undefined ? { awayScore } : {}),
+    status: "scheduled",
   };
 }
 
@@ -353,15 +323,12 @@ function normalizeMatchdayList(
       const awayTeam = String(match.awayTeam ?? "").trim();
       const date = String(match.date ?? "").trim();
       const competition = String(match.competition ?? "").trim() as CompetitionId;
-      const status = String(match.status ?? "scheduled") as Match["status"];
       if (!id || !homeTeamId || !awayTeamId || !homeTeam || !awayTeam || !date || !competition) {
         return {
           ok: false,
           error: `${label} jornada ${round}, partido ${mIndex + 1}: faltan campos obligatorios del partido.`,
         };
       }
-      const homeScore = optionalScore(match.homeScore);
-      const awayScore = optionalScore(match.awayScore);
       matches.push({
         id,
         matchday: round,
@@ -372,9 +339,7 @@ function normalizeMatchdayList(
         date,
         competition,
         venue: String(match.venue ?? ""),
-        status,
-        ...(homeScore !== undefined ? { homeScore } : {}),
-        ...(awayScore !== undefined ? { awayScore } : {}),
+        status: "scheduled",
       });
     }
     matchdays.push({ round, matches });

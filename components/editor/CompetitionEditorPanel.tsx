@@ -263,7 +263,7 @@ export function CompetitionEditorPanel({ onClose }: CompetitionEditorPanelProps)
       {tab === "calendario" && gender === "masculino" ? (
         <div className="space-y-4">
           <FixturesJsonPasteSection
-            hint='Pega jornadas con local/visitante, o el bundle CMS (matchdays y matchdaysGrupo2). Los nombres se cruzan con equipos de la temporada. Tras aplicar, pulsa «Guardar calendario».'
+            hint='Basta con jornadas, partidos (local, visitante) y fecha. Los goles no se importan. Tras aplicar, pulsa «Guardar calendario».'
             parse={(input) => parsePrimerEquipoFixturesJson(input, { gender: "masculino", bundles })}
             onImport={(data) => {
               setFixtures((current) => ({

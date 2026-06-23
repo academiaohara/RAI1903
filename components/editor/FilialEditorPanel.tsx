@@ -421,7 +421,7 @@ export function CanteraEditorPanel({ scope, onClose, variant = "panel" }: Canter
       {tab === "calendario" && (
         <div className="space-y-4">
           <FixturesJsonPasteSection
-            hint='Pega un objeto con competicion y jornadas (fecha, local, visitante, goles_local, goles_visitante). Tras aplicar, pulsa «Guardar».'
+            hint='Basta con jornadas, partidos (local, visitante) y fecha de cada partido. Los goles no se importan: quedan pendientes para rellenarlos a mano. Tras aplicar, pulsa «Guardar».'
             onImport={(data) => {
               setFixtures(data);
               const lastRound = data.jornadas.at(-1)?.jornada ?? 0;
