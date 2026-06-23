@@ -16,7 +16,7 @@ export type TradingPlayerFichaProps = {
   edad: number;
   photo: ReactNode;
   subtitle?: ReactNode;
-  topRightBadge?: ReactNode;
+  statusBadge?: ReactNode;
   secondaryStat?: string;
   ageLabel?: string;
   className?: string;
@@ -33,7 +33,7 @@ export function TradingPlayerFicha({
   edad,
   photo,
   subtitle,
-  topRightBadge,
+  statusBadge,
   secondaryStat,
   ageLabel,
   className,
@@ -47,12 +47,13 @@ export function TradingPlayerFicha({
         <article className="trading-ficha-card" aria-hidden={false}>
         <div className="trading-ficha-stripes" aria-hidden />
 
-        <div className="absolute left-[6%] top-[4%] z-20 flex flex-col gap-0.5 sm:gap-1">
+        <div className="absolute left-[6%] top-[4%] z-20 flex flex-col items-start gap-0.5 sm:gap-1">
           <p className="trading-ficha-season">{seasonLabel}</p>
           <span className="trading-ficha-position">{positionAbbrev}</span>
+          {statusBadge}
         </div>
 
-        <div className="absolute right-[5%] top-[3.5%] z-20 flex flex-col items-end gap-0.5">
+        <div className="absolute right-[5%] top-[3.5%] z-20">
           {crestIsUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={crestUrl} alt={crestAlt} className="trading-ficha-crest" />
@@ -61,10 +62,9 @@ export function TradingPlayerFicha({
               {crestUrl}
             </span>
           )}
-          {topRightBadge}
         </div>
 
-        <div className="relative z-10 flex h-full min-h-0 items-end justify-center px-[4%] pb-[24%] pt-[18%]">
+        <div className="trading-ficha-photo-slot">
           {photo}
         </div>
 

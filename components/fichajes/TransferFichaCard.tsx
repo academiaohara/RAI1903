@@ -202,7 +202,7 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
       rol={tradingMeta.rol}
       edad={tradingMeta.edad || 0}
       ageLabel={tradingMeta.edad > 0 ? undefined : "—"}
-      topRightBadge={kindBadge}
+      statusBadge={kindBadge}
       secondaryStat={player ? player.rol : "—"}
       subtitle={<p className="truncate uppercase tracking-wide">{originClub}</p>}
       photo={
@@ -213,7 +213,7 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
             placeholderTone="light"
             loading="eager"
             imageClassName="object-contain object-bottom"
-            className={`h-full w-[92%] max-w-full ${styles.avatarShadow}`}
+            className={styles.avatarShadow}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">

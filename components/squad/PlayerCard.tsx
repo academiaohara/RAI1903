@@ -192,7 +192,7 @@ function PlayerFichaCard({
       bare
       placeholderTone="light"
       imageClassName="object-contain object-bottom"
-      className="h-full w-[92%] max-w-full drop-shadow-[0_6px_14px_rgba(0,0,0,0.35)]"
+      className="drop-shadow-[0_6px_14px_rgba(0,0,0,0.35)]"
     />
   );
 
