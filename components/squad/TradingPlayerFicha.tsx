@@ -1,9 +1,12 @@
 "use client";
 
 import type { ReactNode } from "react";
+import type { TransferKind } from "@/types";
 import type { SquadPosition, SquadRoleCode } from "@/types/squad";
 import { getFichaPositionAbbrev } from "@/lib/ficha-design";
 import { cn } from "@/lib/utils";
+
+export type TradingFichaVariant = "default" | TransferKind;
 
 export type TradingPlayerFichaProps = {
   seasonLabel: string;
@@ -16,7 +19,8 @@ export type TradingPlayerFichaProps = {
   edad: number;
   photo: ReactNode;
   subtitle?: ReactNode;
-  statusBadge?: ReactNode;
+  kindStat?: string;
+  variant?: TradingFichaVariant;
   secondaryStat?: string;
   ageLabel?: string;
   className?: string;
@@ -33,24 +37,28 @@ export function TradingPlayerFicha({
   edad,
   photo,
   subtitle,
-  statusBadge,
+  kindStat,
+  variant = "default",
   secondaryStat,
   ageLabel,
   className,
 }: TradingPlayerFichaProps) {
   const positionAbbrev = getFichaPositionAbbrev(posicion);
   const crestIsUrl = crestUrl.startsWith("/") || crestUrl.startsWith("http");
+  const shellVariantClass = variant === "default" ? null : `trading-ficha-shell--${variant}`;
 
   return (
-    <div className={cn("trading-ficha-shell", className)}>
+    <div className={cn("trading-ficha-shell", shellVariantClass, className)}>
       <div className="trading-ficha-frame">
-        <article className="trading-ficha-card" aria-hidden={false}>
+        <article
+          className={cn("trading-ficha-card", variant !== "default" && `trading-ficha-card--${variant}`)}
+          aria-hidden={false}
+        >
         <div className="trading-ficha-stripes" aria-hidden />
 
         <div className="absolute left-[6%] top-[4%] z-20 flex flex-col items-start gap-0.5 sm:gap-1">
           <p className="trading-ficha-season">{seasonLabel}</p>
           <span className="trading-ficha-position">{positionAbbrev}</span>
-          {statusBadge}
         </div>
 
         <div className="absolute right-[5%] top-[3.5%] z-20">
@@ -76,6 +84,7 @@ export function TradingPlayerFicha({
         </div>
 
         <div className="absolute bottom-[5%] right-[5%] z-20 flex flex-col gap-0.5 sm:gap-1">
+          {kindStat ? <span className="trading-ficha-stat trading-ficha-kind-stat">{kindStat}</span> : null}
           <span className="trading-ficha-stat trading-ficha-stat--light">{ageLabel ?? `${edad}Y`}</span>
           <span className="trading-ficha-stat trading-ficha-stat--dark">{secondaryStat ?? rol}</span>
         </div>

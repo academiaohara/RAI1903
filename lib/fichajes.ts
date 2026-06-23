@@ -152,6 +152,12 @@ export function getTransferKindLabel(kind: TransferKind): string {
   return "Fichaje";
 }
 
+export function getTransferKindAbbrev(kind: TransferKind): string {
+  if (kind === "renovacion") return "REN";
+  if (kind === "cesion") return "CED";
+  return "FIC";
+}
+
 export function getTransferById(transfers: TransferRumor[], id: string): TransferRumor | undefined {
   return transfers.find((transfer) => transfer.id === id);
 }
