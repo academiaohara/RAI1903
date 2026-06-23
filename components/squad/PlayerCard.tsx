@@ -191,8 +191,8 @@ function PlayerFichaCard({
       player={player}
       bare
       placeholderTone="light"
-      imageClassName="object-contain object-bottom"
-      className="drop-shadow-[0_6px_14px_rgba(0,0,0,0.35)]"
+      imageClassName="object-cover object-[center_8%]"
+      className="h-full w-full drop-shadow-[0_6px_14px_rgba(0,0,0,0.35)]"
     />
   );
 
