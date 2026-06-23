@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { EditorPanelFrame } from "@/components/editor/EditorPanelFrame";
+import { FixturesJsonPasteSection } from "@/components/editor/FixturesJsonPasteSection";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { applyLeagueTemplate, buildFixturesPayloadForConfig } from "@/lib/cms/apply-league-template";
 import {
@@ -13,6 +14,7 @@ import {
   type CompetitionZoneRule,
   type SeasonCompetitionConfigBundle,
 } from "@/lib/cms/competition-config-bundle";
+import { parsePrimerEquipoFixturesJson } from "@/lib/cms/parse-fixtures-json";
 import {
   getFixturesBundle,
   upsertSeasonBundle,
@@ -310,6 +312,21 @@ export function FemeninoEditorPanel({ onClose, variant = "panel" }: FemeninoEdit
 
       {tab === "calendario" && (
         <div className="space-y-4">
+          <FixturesJsonPasteSection
+            accent="femenino"
+            hint='Pega jornadas con local/visitante o el bundle CMS (matchdaysFemenino). Los nombres se cruzan con equipos de la temporada. Tras aplicar, pulsa «Guardar femenino».'
+            parse={(input) =>
+              parsePrimerEquipoFixturesJson(input, { gender: "femenino", bundles })
+            }
+            onImport={(data) => {
+              setFixtures((current) => ({
+                ...(current ?? fixturesDraft),
+                matchdaysFemenino: data.matchdays,
+                meta: { lastRound: data.meta.lastRound },
+              }));
+            }}
+          />
+
           <button
             type="button"
             onClick={() => ensureJornadaSlots(rounds)}
