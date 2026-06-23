@@ -477,11 +477,6 @@ a {
   color: #fff;
 }
 
-.trading-ficha-kind-stat {
-  font-family: var(--font-bebas-neue), "Arial Black", sans-serif;
-  letter-spacing: 0.1em;
-}
-
 /* Fichaje — azul blanquiazul (plantilla y altas) */
 .trading-ficha-card--fichaje .trading-ficha-stripes,
 .trading-ficha-card:not([class*="trading-ficha-card--"]) .trading-ficha-stripes {
@@ -510,11 +505,6 @@ a {
 .trading-ficha-card:not([class*="trading-ficha-card--"]) .trading-ficha-stat--dark {
   background: #0f2347;
   color: #fff;
-}
-
-.trading-ficha-card--fichaje .trading-ficha-kind-stat {
-  background: #fff;
-  color: var(--rai-blue);
 }
 
 /* Renovación — granate con detalles blancos */
@@ -551,11 +541,6 @@ a {
 .trading-ficha-card--renovacion .trading-ficha-stat--dark {
   background: var(--rai-red-dark);
   color: #fff;
-}
-
-.trading-ficha-card--renovacion .trading-ficha-kind-stat {
-  background: #fff;
-  color: var(--rai-red);
 }
 
 /* Cesión — blanco con detalles granate */
@@ -603,12 +588,6 @@ a {
 .trading-ficha-card--cesion .trading-ficha-stat--dark {
   background: var(--rai-red);
   color: #fff;
-}
-
-.trading-ficha-card--cesion .trading-ficha-kind-stat {
-  background: #fff;
-  border: 1px solid rgba(152, 25, 21, 0.35);
-  color: var(--rai-red);
 }
 
 .trading-ficha-subtitle {
