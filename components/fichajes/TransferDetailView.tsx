@@ -21,7 +21,7 @@ import { usePublishedNews } from "@/hooks/usePublishedNews";
 import { useSeasonPlayerRatings } from "@/hooks/useSeasonPlayerRatings";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { withSquadPlayerPhoto } from "@/lib/squad-photos";
-import { formatBirthDate, formatContractDate, getNationalityFlag } from "@/lib/squad-utils";
+import { formatBirthDate, formatContractDate } from "@/lib/squad-utils";
 import { formatDate } from "@/lib/utils";
 import type { TransferRumor } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
@@ -70,8 +70,6 @@ export function TransferDetailView({ transfer, player: initialPlayer }: Transfer
   const clubAnnouncementNews = getTransferClubAnnouncementNews(transfer, allNews);
   const displayName = getTransferDisplayName(transfer);
   const originClub = getTransferOriginClub(transfer);
-  const flag = player ? getNationalityFlag(player.nacionalidad) : "🇪🇸";
-
   return (
     <div className="overflow-hidden rounded-[2rem] border border-[#214C9B]/20 bg-white shadow-[0_18px_45px_rgba(17,24,39,0.08)]">
       <div className={`relative overflow-hidden bg-gradient-to-br px-5 pb-6 pt-5 text-white sm:px-8 sm:pb-8 sm:pt-6 ${tone.hero}`}>
@@ -111,7 +109,7 @@ export function TransferDetailView({ transfer, player: initialPlayer }: Transfer
             </div>
             <h1 className="mt-3 text-3xl font-extrabold uppercase tracking-tight sm:text-4xl">{displayName}</h1>
             <p className="mt-2 text-sm font-semibold text-white/85">
-              {transfer.position} · {transfer.age} años · {flag} {player?.nacionalidad ?? "España"}
+              {transfer.position} · {transfer.age} años · {player?.nacionalidad ?? "España"}
             </p>
 
             <div className="mt-4 grid grid-cols-1 gap-2 text-left text-xs font-semibold sm:grid-cols-2">

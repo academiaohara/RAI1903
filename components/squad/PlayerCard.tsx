@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import type { SquadPlayer } from "@/types/squad";
 import {
   formatPlayerAgeWithUnit,
-  getNationalityFlag,
   getPlayerDisplayName,
   getPlayerFullName,
 } from "@/lib/squad-utils";
@@ -178,7 +177,6 @@ function PlayerFichaCard({
   crestAlt?: string;
 }) {
   const displayName = getPlayerDisplayName(player);
-  const flag = getNationalityFlag(player.nacionalidad);
   const canQuickEdit = editMode && onQuickUpdate;
   const useTradingDesign = !usesLegacyFichaDesign(seasonLabel);
 
@@ -265,11 +263,8 @@ function PlayerFichaCard({
     <div className="relative aspect-[3/4] overflow-hidden">
       <div
         className="absolute left-1 top-1 z-10 flex flex-col items-center gap-0.5 rounded-md bg-white px-1 py-1 shadow-sm sm:left-1.5 sm:top-1.5 sm:gap-1 sm:px-1.5 sm:py-1.5"
-        aria-label={`${player.nacionalidad}, dorsal ${player.dorsal}`}
+        aria-label={`Dorsal ${player.dorsal}`}
       >
-        <span className="text-xs leading-none sm:text-sm" role="img" aria-hidden>
-          {flag}
-        </span>
         <span className="text-xs font-black tabular-nums leading-none text-[#214C9B] sm:text-sm">{player.dorsal}</span>
       </div>
 
