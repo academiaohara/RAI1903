@@ -4,7 +4,9 @@ import { Plus, Trash2 } from "lucide-react";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { MatchSquadPlayerSelect } from "@/components/match-center/MatchSquadPlayerSelect";
 import { useMatchTeamSquadOptions } from "@/hooks/useMatchTeamSquadOptions";
+import { MatchJsonPasteSection } from "@/components/match-center/MatchJsonPasteSection";
 import { useMatchDetailStorageKeys } from "@/components/match-center/useMatchDetailOverrides";
+import { parseMatchLineupsJson } from "@/lib/match-center/parse-match-json";
 import type { LineupPlayer, MatchLineup, PrimerEquipoGender } from "@/types";
 import type { MatchSquadOption } from "@/lib/match-availability-squad";
 import type { SquadPlayer } from "@/types/squad";
@@ -266,6 +268,31 @@ export function MatchLineupsPanel({
   return (
     <section>
       <h2 className="text-lg font-extrabold uppercase tracking-normal text-[#214C9B]">Alineaciones</h2>
+      {editMode && (
+        <div className="mt-4">
+          <MatchJsonPasteSection
+            title="Importar alineaciones JSON"
+            hint='Un equipo: { "formation", "starters", "bench" }. Ambos: { "home"/"local": { … }, "away"/"visitante": { … } }. Jugador: number/dorsal, name/nombre.'
+            applyLabel="Aplicar alineaciones"
+            placeholder={`{
+  "home": {
+    "formation": "4-4-2",
+    "starters": [{ "number": 1, "name": "Portero" }],
+    "bench": [{ "number": 13, "name": "Suplente" }]
+  },
+  "away": {
+    "formation": "4-3-3",
+    "starters": [{ "number": 9, "name": "Delantero" }]
+  }
+}`}
+            parse={parseMatchLineupsJson}
+            onImport={(data) => {
+              if (data.home) updateHome(data.home);
+              if (data.away) updateAway(data.away);
+            }}
+          />
+        </div>
+      )}
       {editMode && (homeSquadOptions || awaySquadOptions) && (
         <p className="mt-2 text-xs font-semibold text-slate-600">
           Los jugadores del Avilés se eligen desde la plantilla de la temporada.
