@@ -1,7 +1,8 @@
 "use client";
 
 import { Plus, Trash2 } from "lucide-react";
-import { useCallback } from "react";
+import { motion } from "framer-motion";
+import { useCallback, useState } from "react";
 import { TenteFirmeSpaceCard } from "@/components/TenteFirmeSpaceCard";
 import { ZonaMixtaVideoShowcase } from "@/components/ZonaMixtaVideoShowcase";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
@@ -13,7 +14,10 @@ import {
   newFanSpace,
   sortFanSpacesByDate,
 } from "@/lib/fan-spaces";
+import { collectMediaRaiVideos, mediaRaiVideosStorageKey } from "@/lib/fan-videos";
 import type { FanMediaLink, FanYouTubeVideo } from "@/types";
+
+type TenteFirmeMediaTab = "spaces" | "youtube";
 
 type TenteFirmeShowcaseProps = {
   section: string;
@@ -24,9 +28,50 @@ type TenteFirmeShowcaseProps = {
 const fieldClassName =
   "w-full rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm outline-none focus:border-[#214C9B]";
 
+function TenteFirmeMediaToggle({
+  value,
+  onChange,
+}: {
+  value: TenteFirmeMediaTab;
+  onChange: (tab: TenteFirmeMediaTab) => void;
+}) {
+  const options: Array<{ id: TenteFirmeMediaTab; label: string }> = [
+    { id: "spaces", label: "X Spaces" },
+    { id: "youtube", label: "YouTube" },
+  ];
+
+  return (
+    <div className="relative flex w-full max-w-md rounded-2xl border border-[#214C9B]/15 bg-slate-100/80 p-1 sm:w-auto">
+      {options.map((option) => {
+        const active = value === option.id;
+        return (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => onChange(option.id)}
+            className={`relative z-10 flex flex-1 items-center justify-center rounded-xl px-4 py-2 text-[11px] font-bold uppercase tracking-wide transition sm:px-5 sm:py-2.5 sm:text-xs ${
+              active ? "text-white" : "text-slate-600 hover:text-[#214C9B]"
+            }`}
+          >
+            {active && (
+              <motion.span
+                layoutId="tente-firme-media-toggle"
+                className="absolute inset-0 rounded-xl bg-[#214C9B] shadow-md shadow-blue-950/20"
+                transition={{ type: "spring", stiffness: 420, damping: 32 }}
+              />
+            )}
+            <span className="relative z-10">{option.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export function TenteFirmeShowcase({ section, spaces, videos = [] }: TenteFirmeShowcaseProps) {
   const { editMode, getValue, saveValue, clearValue, overrides } = useInlineEditing();
   const storageKey = mediaRaiSpacesStorageKey(section);
+  const videosStorageKey = mediaRaiVideosStorageKey(section);
 
   const collected = collectMediaRaiSpaces(section, overrides, spaces);
   const hasCustomList = collected.hasCustomList || overrides[storageKey] !== undefined;
@@ -34,8 +79,30 @@ export function TenteFirmeShowcase({ section, spaces, videos = [] }: TenteFirmeS
     (overrides[storageKey] as FanMediaLink[] | undefined) ?? getValue(storageKey, collected.spaces);
   const sortedSpaces = sortFanSpacesByDate(currentSpaces);
 
-  const showSpaces = sortedSpaces.length > 0 || editMode;
-  const showYoutube = videos.length > 0 || editMode;
+  const collectedVideos = collectMediaRaiVideos(section, overrides, videos);
+  const currentVideos =
+    (overrides[videosStorageKey] as FanYouTubeVideo[] | undefined) ?? collectedVideos.videos;
+
+  const hasSpaces = sortedSpaces.length > 0;
+  const hasYoutube = currentVideos.length > 0;
+  const showSpaces = hasSpaces || editMode;
+  const showYoutube = hasYoutube || editMode;
+  const showToggle = editMode || (hasSpaces && hasYoutube);
+
+  const [activeTab, setActiveTab] = useState<TenteFirmeMediaTab>(() =>
+    hasSpaces ? "spaces" : "youtube",
+  );
+
+  const resolveActiveTab = (
+    preferred: TenteFirmeMediaTab,
+    spacesAvailable: boolean,
+    youtubeAvailable: boolean,
+  ): TenteFirmeMediaTab => {
+    if (preferred === "spaces" && spacesAvailable) return "spaces";
+    if (preferred === "youtube" && youtubeAvailable) return "youtube";
+    if (spacesAvailable) return "spaces";
+    return "youtube";
+  };
 
   const restoreDefaultSpaces = useCallback(() => {
     clearValue(storageKey);
@@ -93,12 +160,24 @@ export function TenteFirmeShowcase({ section, spaces, videos = [] }: TenteFirmeS
 
   if (!showSpaces && !showYoutube) return null;
 
-  return (
-    <div className="space-y-10">
-      {showSpaces && (
-        <section className="space-y-5 overflow-visible">
-          <p className="text-sm font-bold uppercase text-[#214C9B]">X Spaces</p>
+  const resolvedTab: TenteFirmeMediaTab = showToggle
+    ? resolveActiveTab(activeTab, showSpaces, showYoutube)
+    : hasSpaces
+      ? "spaces"
+      : "youtube";
 
+  return (
+    <div className="space-y-5">
+      {showToggle ? (
+        <TenteFirmeMediaToggle value={resolvedTab} onChange={setActiveTab} />
+      ) : (
+        <p className="text-sm font-bold uppercase text-[#214C9B]">
+          {resolvedTab === "spaces" ? "X Spaces" : "YouTube"}
+        </p>
+      )}
+
+      {resolvedTab === "spaces" && showSpaces && (
+        <section className="space-y-5 overflow-visible">
           {editMode && (
             <div className="space-y-4 rounded-2xl border border-dashed border-[#214C9B]/35 bg-blue-50/40 p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -204,9 +283,8 @@ export function TenteFirmeShowcase({ section, spaces, videos = [] }: TenteFirmeS
         </section>
       )}
 
-      {showYoutube && (
+      {resolvedTab === "youtube" && showYoutube && (
         <section className="space-y-5">
-          <p className="text-sm font-bold uppercase text-[#214C9B]">YouTube</p>
           <ZonaMixtaVideoShowcase section={section} videos={videos} />
         </section>
       )}
