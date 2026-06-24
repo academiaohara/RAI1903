@@ -18,6 +18,8 @@ import { hasMultipleGrupos, zonesToLegacyConfig } from "@/lib/cms/competition-co
 import { getCompetitionSidebarMatches } from "@/lib/competition-match-sections";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { useSeason } from "@/components/season/SeasonProvider";
+import { isSectionUnderConstruction } from "@/lib/cms/section-status-bundle";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { useEditedMatchdays } from "@/hooks/useEditedMatchdays";
 import {
   getCopaDelReyMatchesFromSource,
@@ -45,7 +47,7 @@ const COMPETICION_OPTIONS = [
 type CompeticionPanel = (typeof COMPETICION_OPTIONS)[number]["id"];
 
 export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }: CompeticionViewProps) {
-  const { getEnrichedFixtureSource, getCompetitionConfig, bundles, viewedSeason } = useSeason();
+  const { getEnrichedFixtureSource, getCompetitionConfig, bundles, bundlesLoading, viewedSeason } = useSeason();
   const fixtureSource = useMemo(() => getEnrichedFixtureSource(gender), [gender, getEnrichedFixtureSource]);
   const competitionConfig = useMemo(() => getCompetitionConfig(gender), [gender, getCompetitionConfig]);
   const standingsZones = useMemo(() => zonesToLegacyConfig(competitionConfig.zones), [competitionConfig.zones]);
@@ -87,6 +89,12 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
     : editedLeagueMatchdays;
   const multiGrupo = hasMultipleGrupos(competitionConfig);
   const showAvilesSidebar = !isMasculino || !multiGrupo || grupo === "1";
+  const matchSectionsActive =
+    !isSupabaseConfigured() ||
+    bundlesLoading ||
+    (!isSectionUnderConstruction(bundles, gender, "jornadas") &&
+      !isSectionUnderConstruction(bundles, gender, "calendario"));
+  const showAvilesMatchCards = showAvilesSidebar && matchSectionsActive;
   const copaDelReyMatches = copaMatches;
   const calendarHref = `${primerEquipoBase(gender)}/calendario` as Route;
   const baseLigaLabel = competitionConfig.ligaLabel ?? "1ª RFEF";
@@ -108,6 +116,9 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
     if (!matchday) return null;
     return { round: lastRound, matches: matchday.matches };
   }, [showAvilesSidebar, editedStandingsMatchdays]);
+
+  const showSidebarColumn =
+    showAvilesMatchCards || (isMasculino && multiGrupo && !showAvilesSidebar && lastGrupoJornada != null);
 
   return (
     <SectionUnderConstructionGate scope={gender} section="competicion">
@@ -162,7 +173,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
         <>
           {isMasculino && <GuiaLiga gender={gender} teams={teams} grupo={grupo} />}
 
-          <section className="grid min-w-0 gap-6 xl:grid-cols-2">
+          <section className={`grid min-w-0 gap-6${showSidebarColumn ? " xl:grid-cols-2" : ""}`}>
             <StandingsLeagueTableCard
               key={`${gender}-${grupo}`}
               eyebrow="Liga"
@@ -177,8 +188,9 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
               zoneRules={competitionConfig.zones}
               {...(isMasculino ? {} : { tiebreak: undefined })}
             />
+            {showSidebarColumn ? (
             <div className="grid min-w-0 gap-6">
-              {showAvilesSidebar && (
+              {showAvilesMatchCards && (
                 <>
                   <Card eyebrow="Forma reciente" title="Ultimos resultados" borderlessHeader>
                     <div className="space-y-2">
@@ -219,6 +231,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
                 </Card>
               )}
             </div>
+            ) : null}
           </section>
         </>
       )}
