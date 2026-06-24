@@ -3,10 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { EditorPanelFrame } from "@/components/editor/EditorPanelFrame";
+import { TeamColorPairInput } from "@/components/editor/TeamColorPairInput";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { upsertSeasonBundle } from "@/lib/cms/season-bundles";
 import { getTeamsBundle, type CmsTeamRecord, type SeasonTeamsBundle } from "@/lib/cms/teams-bundle";
 import { collectTeamsFromBundles } from "@/lib/season/teams-from-fixtures";
+import { resolveTeamColorsFromSources } from "@/lib/team-stripes";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 
 type TeamsEditorPanelProps = {
@@ -61,7 +63,15 @@ export function TeamsEditorPanel({ onClose }: TeamsEditorPanelProps) {
     const id = `equipo-${Date.now()}`;
     setTeams((current) => [
       ...(current ?? []),
-      { id, name: "Nuevo equipo", shortName: "NEQ", coach: "", stadium: "", removed: false },
+      {
+        id,
+        name: "Nuevo equipo",
+        shortName: "NEQ",
+        coach: "",
+        stadium: "",
+        colors: [...resolveTeamColorsFromSources(id)],
+        removed: false,
+      },
     ]);
   };
 
@@ -172,6 +182,14 @@ export function TeamsEditorPanel({ onClose }: TeamsEditorPanelProps) {
                     placeholder="Iniciales escudo"
                     className="rounded-lg border border-slate-200 px-2 py-1 text-xs font-semibold"
                   />
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-bold uppercase text-slate-400">Colores (franjas guía)</p>
+                    <TeamColorPairInput
+                      fieldId={`teams-editor-${team.id}`}
+                      colors={resolveTeamColorsFromSources(team.id, team.colors)}
+                      onChange={(colors) => updateTeam(team.id, { colors: [...colors] })}
+                    />
+                  </div>
                 </div>
               </>
             )}
