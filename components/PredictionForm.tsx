@@ -18,7 +18,7 @@ import { defaultCronicaId } from "@/lib/match-article-factory";
 import { getMatchArticlePageHref } from "@/lib/match-article-url";
 import { isMatchPlayed } from "@/lib/match-result";
 import { resolveSquadPlayerByName, scorerLabelForPlayer } from "@/lib/squad-player-resolve";
-import { getNationalityFlag, getPlayerDisplayName } from "@/lib/squad-utils";
+import { getPlayerDisplayName } from "@/lib/squad-utils";
 import {
   actualAvilesScorer,
   actualAvilesScorers,
@@ -512,7 +512,6 @@ function QuinielaScorerFicha({
   highlight?: boolean;
 }) {
   const displayName = player ? getPlayerDisplayName(player) : label ?? "—";
-  const flag = player ? getNationalityFlag(player.nacionalidad) : null;
 
   const borderClass =
     tone === "user"
@@ -533,14 +532,6 @@ function QuinielaScorerFicha({
       <div className="relative aspect-[3/4] overflow-hidden bg-[#dff4ff]">
         {player ? (
           <>
-            {flag ? (
-              <span
-                className="absolute left-1 top-1 z-10 rounded bg-white px-1 py-0.5 text-[10px] shadow-sm"
-                aria-hidden
-              >
-                {flag}
-              </span>
-            ) : null}
             <div className="flex h-full items-end justify-center px-0.5 pb-0 pt-1">
               <PlayerAvatar
                 player={player}

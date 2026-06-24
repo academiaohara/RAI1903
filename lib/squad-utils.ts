@@ -23,24 +23,6 @@ export function getPlayerInitials(player: SquadPlayer): string {
   return `${player.nombre[0] ?? ""}${player.apellido[0] ?? ""}`.toUpperCase();
 }
 
-const NATIONALITY_FLAGS: Record<string, string> = {
-  España: "🇪🇸",
-  Portugal: "🇵🇹",
-  Francia: "🇫🇷",
-  Argentina: "🇦🇷",
-  Brasil: "🇧🇷",
-  Colombia: "🇨🇴",
-  Mexico: "🇲🇽",
-  México: "🇲🇽",
-  Marruecos: "🇲🇦",
-  Senegal: "🇸🇳",
-  Nigeria: "🇳🇬",
-};
-
-export function getNationalityFlag(nacionalidad: string): string {
-  return NATIONALITY_FLAGS[nacionalidad] ?? "🏳️";
-}
-
 const NATIONALITY_ISO: Record<string, string> = {
   España: "es",
   Portugal: "pt",

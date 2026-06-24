@@ -14,7 +14,7 @@ import { seasonIdToDisplayLabel, usesLegacyFichaDesign } from "@/lib/ficha-desig
 import { getTransferKind, getTransferKindAbbrev, getTransferKindLabel, getTransferOriginClub } from "@/lib/fichajes";
 import { resolveTransferSeasonId } from "@/lib/transfer-market-windows";
 import { getSquadClubInfo } from "@/lib/squad-data";
-import { getNationalityFlag, getPlayerDisplayName } from "@/lib/squad-utils";
+import { getPlayerDisplayName } from "@/lib/squad-utils";
 import type { TransferRumor } from "@/types";
 import type { SquadPosition, SquadRoleCode } from "@/types/squad";
 
@@ -121,7 +121,6 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
     layout === "grid"
       ? `group w-full${isCardEditing ? " max-w-[220px]" : ""}`
       : `group shrink-0 snap-start${isCardEditing ? " w-[min(100%,220px)]" : " w-[min(43vw,128px)] sm:w-[175px]"}`;
-  const flag = player ? getNationalityFlag(player.nacionalidad) : "🇪🇸";
   const originClub = getTransferOriginClub(transfer);
   const initials = transfer.playerName
     .split(" ")
@@ -146,9 +145,6 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
         <div
           className={`absolute left-1.5 top-1.5 z-10 flex flex-col items-center gap-0.5 rounded-lg px-1 py-1 shadow-sm sm:left-2 sm:top-2 sm:gap-1 sm:px-1.5 sm:py-1.5 ${styles.dorsalBox}`}
         >
-          <span className="text-xs leading-none sm:text-sm" role="img" aria-hidden>
-            {flag}
-          </span>
           {player ? (
             <span className={`text-xs font-black tabular-nums leading-none sm:text-sm ${styles.dorsal}`}>{player.dorsal}</span>
           ) : (
