@@ -272,7 +272,7 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
                       alt=""
                       width={64}
                       height={64}
-                      className="relative z-10 h-[80%] w-[80%] object-contain drop-shadow-md"
+                      className="relative z-10 h-[65%] w-[65%] object-contain drop-shadow-[0_3px_10px_rgba(0,0,0,0.45)]"
                       unoptimized
                     />
                   ) : (

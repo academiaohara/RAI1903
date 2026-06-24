@@ -87,7 +87,7 @@ export function GuiaLiga({ gender, teams, grupo }: GuiaLigaProps) {
               <Link
                 key={team.id}
                 href={guiaLigaTeamHref(gender, team.id)}
-                className="group block transition hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#214C9B]"
+                className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#214C9B]"
                 aria-label={
                   team.id === RAI_TEAM_ID ? `Ver plantilla de ${team.name}` : `Ver ficha de ${team.name}`
                 }
