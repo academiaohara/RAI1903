@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Pencil } from "lucide-react";
 import { useMemo, useState } from "react";
-import { TeamCrest } from "@/components/TeamCrest";
+import { GuiaLigaCrestCell } from "@/components/competicion/GuiaLigaCrestCell";
 import { Card } from "@/components/Card";
 import { GuiaLigaGroupEditor } from "@/components/competicion/GuiaLigaGroupEditor";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
@@ -68,13 +68,13 @@ export function GuiaLiga({ gender, teams, grupo }: GuiaLigaProps) {
         <div className="grid grid-cols-5 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10">
           {displayTeams.map((team) => {
             const linkable = canLinkEquipoLiga(gender, team.id, bundles) && !isPlaceholderTeam(team);
-            const crest = <TeamCrest team={team} size="md" className="h-full w-full max-h-14 max-w-14" />;
+            const crest = <GuiaLigaCrestCell team={team} />;
 
             if (!linkable) {
               return (
                 <div
                   key={team.id}
-                  className="flex aspect-square items-center justify-center p-1 opacity-90"
+                  className="opacity-90"
                   aria-label={team.name}
                   title={team.name}
                 >
@@ -87,7 +87,7 @@ export function GuiaLiga({ gender, teams, grupo }: GuiaLigaProps) {
               <Link
                 key={team.id}
                 href={guiaLigaTeamHref(gender, team.id)}
-                className="group flex aspect-square items-center justify-center p-1 transition hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#214C9B]"
+                className="group block transition hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#214C9B]"
                 aria-label={
                   team.id === RAI_TEAM_ID ? `Ver plantilla de ${team.name}` : `Ver ficha de ${team.name}`
                 }
