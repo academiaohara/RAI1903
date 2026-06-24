@@ -5,6 +5,8 @@ import type { ReactNode } from "react";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { MatchStatBarRow } from "@/components/match-center/match-stats-ui";
 import { useMatchDetailStorageKeys } from "@/components/match-center/useMatchDetailOverrides";
+import { MatchJsonPasteSection } from "@/components/match-center/MatchJsonPasteSection";
+import { parseMatchStatsJson } from "@/lib/match-center/parse-match-json";
 import { buildStandardMatchStatCategory } from "@/lib/match-stats-defaults";
 import type { MatchStatCategory, MatchStatRow } from "@/types";
 
@@ -163,6 +165,27 @@ export function MatchStatsPanel({
 
   return (
     <section>
+      {editMode && (
+        <div className="mb-4">
+          <MatchJsonPasteSection
+            title="Importar estadísticas JSON"
+            hint='Categorías con filas, solo filas sueltas, o { "rows": [ … ] }. Campos: label/etiqueta, home/local, away/visitante.'
+            applyLabel="Aplicar estadísticas"
+            placeholder={`[
+  {
+    "title": "Estadísticas",
+    "rows": [
+      { "label": "Posesión", "home": "55%", "away": "45%" },
+      { "label": "Disparos", "home": 12, "away": 8 }
+    ]
+  }
+]`}
+            parse={parseMatchStatsJson}
+            onImport={(data) => updateCategories(data)}
+          />
+        </div>
+      )}
+
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-sm font-bold uppercase tracking-wide text-[#333333]">Estadísticas del partido</h2>
         {editMode && (

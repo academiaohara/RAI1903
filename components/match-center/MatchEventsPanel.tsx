@@ -5,7 +5,9 @@ import { useMemo } from "react";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { MatchSquadPlayerSelect } from "@/components/match-center/MatchSquadPlayerSelect";
 import { useMatchTeamSquadOptions } from "@/hooks/useMatchTeamSquadOptions";
+import { MatchJsonPasteSection } from "@/components/match-center/MatchJsonPasteSection";
 import { createMatchEventId, matchEventTypeLabels } from "@/lib/match-events";
+import { parseMatchEventsJson } from "@/lib/match-center/parse-match-json";
 import { getRaiTeamId } from "@/lib/fixtures";
 import type { MatchEvent, MatchEventType, PrimerEquipoGender } from "@/types";
 import { useMatchDetailStorageKeys } from "@/components/match-center/useMatchDetailOverrides";
@@ -347,6 +349,20 @@ export function MatchEventsPanel({
 
   return (
     <section className="space-y-6">
+      {editMode && (
+        <MatchJsonPasteSection
+          title="Importar eventos JSON"
+          hint='Array de eventos o { "events": [ … ] }. Campos: minute/minuto, type/tipo (goal, yellow, red, substitution), team/equipo (home/local, away/visitante), player/jugador, detail/asistencia/sale.'
+          applyLabel="Aplicar eventos"
+          placeholder={`[
+  { "minute": 12, "type": "goal", "team": "home", "player": "J. Santamaria", "detail": "J. Cueto" },
+  { "minute": 67, "type": "substitution", "team": "away", "player": "Entra", "detail": "Sale" }
+]`}
+          parse={parseMatchEventsJson}
+          onImport={(data) => updateEvents(data)}
+        />
+      )}
+
       {editMode && (
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs font-semibold uppercase text-slate-500">
