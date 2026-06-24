@@ -263,16 +263,16 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
                 }`}
               >
                 <div
-                  className="flex aspect-square items-center justify-center overflow-hidden rounded-lg p-1 ring-1 ring-black/10"
+                  className="flex aspect-square items-center justify-center overflow-hidden rounded-lg p-0.5 ring-1 ring-black/10"
                   style={teamStripeBackgroundStyle(slotColors)}
                 >
                   {showImage ? (
                     <Image
                       src={crestPath}
                       alt=""
-                      width={48}
-                      height={48}
-                      className="relative z-10 h-full w-full max-h-12 max-w-12 object-contain drop-shadow-md"
+                      width={64}
+                      height={64}
+                      className="relative z-10 h-[80%] w-[80%] object-contain drop-shadow-md"
                       unoptimized
                     />
                   ) : (

@@ -3,9 +3,9 @@ import type { CSSProperties } from "react";
 
 export const DEFAULT_TEAM_COLORS: [string, string] = ["#214C9B", "#FFFFFF"];
 
-/** Franjas verticales uniformes (mismo ángulo y ancho en todos los equipos). */
-const STRIPE_CYCLE_PERCENT = 22;
-const STRIPE_PRIMARY_SHARE = 11;
+/** Franjas verticales uniformes: 5 franjas visibles por celda (2 colores alternos). */
+const STRIPE_CYCLE_PERCENT = 40;
+const STRIPE_PRIMARY_SHARE = 20;
 
 export function resolveTeamColors(colors?: string[]): [string, string] {
   const primary = colors?.[0]?.trim();
