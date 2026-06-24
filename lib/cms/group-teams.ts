@@ -4,7 +4,9 @@ import { resolveCompetitionConfig } from "@/lib/cms/competition-config-bundle";
 import { defaultTeamsForLeagueTemplate } from "@/lib/competition/league-team-sources";
 import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import { getTeamsBundle } from "@/lib/cms/teams-bundle";
 import { getTeam } from "@/lib/fixtures";
+import { resolveTeamColorsFromSources } from "@/lib/team-stripes";
 import type { Team } from "@/types";
 
 export type GroupTeamSlot = {
@@ -95,7 +97,7 @@ export function getGroupTeamSlots(
   return defaultGroupTeamSlots(grupo, gender, count, config);
 }
 
-export function groupSlotToTeam(slot: GroupTeamSlot, index: number): Team {
+export function groupSlotToTeam(slot: GroupTeamSlot, index: number, cmsColors?: string[]): Team {
   const name = slotDisplayName(slot, index);
   const mock = getTeam(slot.id);
   const initials = name
@@ -104,6 +106,7 @@ export function groupSlotToTeam(slot: GroupTeamSlot, index: number): Team {
     .map((part) => part[0]?.toUpperCase() ?? "")
     .join("")
     .slice(0, 3);
+  const colors = resolveTeamColorsFromSources(slot.id, cmsColors);
 
   return {
     id: slot.id,
@@ -114,16 +117,19 @@ export function groupSlotToTeam(slot: GroupTeamSlot, index: number): Team {
     coach: mock?.coach ?? "",
     founded: mock?.founded ?? 0,
     crestInitials: (mock?.crestInitials ?? initials) || "EQP",
-    colors: mock?.colors ?? ["#214C9B", "#FFFFFF"],
+    colors: [...colors],
     position: 0,
     form: [],
     stats: { ...EMPTY_STATS },
   };
 }
 
-export function teamsFromGroupSlots(slots: GroupTeamSlot[]): Team[] {
+export function teamsFromGroupSlots(
+  slots: GroupTeamSlot[],
+  cmsColorsByTeamId?: Map<string, string[]>,
+): Team[] {
   return slots
-    .map((slot, index) => groupSlotToTeam(slot, index))
+    .map((slot, index) => groupSlotToTeam(slot, index, cmsColorsByTeamId?.get(slot.id)))
     .sort((a, b) => a.name.localeCompare(b.name, "es"));
 }
 
@@ -132,7 +138,13 @@ export function resolveGroupTeams(
   gender: PrimerEquipoGender,
   grupo: RfefGrupoId,
 ): Team[] {
-  return teamsFromGroupSlots(getGroupTeamSlots(bundles, gender, grupo));
+  const slots = getGroupTeamSlots(bundles, gender, grupo);
+  const cmsColorsByTeamId = new Map(
+    (getTeamsBundle(bundles, gender)?.teams ?? [])
+      .filter((team) => team.colors?.length)
+      .map((team) => [team.id, team.colors!]),
+  );
+  return teamsFromGroupSlots(slots, cmsColorsByTeamId);
 }
 
 export function slotsFromTeamNames(

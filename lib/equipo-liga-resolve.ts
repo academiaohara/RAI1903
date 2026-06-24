@@ -1,4 +1,5 @@
 import { getGroupTeamSlots, groupSlotToTeam } from "@/lib/cms/group-teams";
+import { getTeamsBundle } from "@/lib/cms/teams-bundle";
 import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import { getTeamByGender } from "@/lib/fixtures";
 import { isTeamInRfefGrupo, isTeamInRfefGrupo1, type RfefGrupoId } from "@/lib/rfef-grupos";
@@ -31,7 +32,10 @@ export function resolveEquipoLigaTeam(
     for (const grupo of ["1", "2"] as const) {
       const slots = getGroupTeamSlots(bundles, gender, grupo);
       const index = slots.findIndex((slot) => slot.id === teamId && slot.name.trim());
-      if (index >= 0) return groupSlotToTeam(slots[index]!, index);
+      if (index >= 0) {
+        const cmsColors = getTeamsBundle(bundles, gender)?.teams.find((team) => team.id === teamId)?.colors;
+        return groupSlotToTeam(slots[index]!, index, cmsColors);
+      }
     }
   }
 

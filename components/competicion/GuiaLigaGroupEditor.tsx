@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { CrestPickerPopover } from "@/components/competicion/CrestPickerPopover";
+import { TeamColorPairInput } from "@/components/editor/TeamColorPairInput";
 import {
   getGroupTeamSlots,
   normalizeGroupTeamSlots,
@@ -23,6 +24,7 @@ import { getTeamCrestsBundle } from "@/lib/cms/team-crests-bundle";
 import type { TeamCrestsBundle } from "@/lib/cms/team-crests-bundle";
 import type { CmsTeamRecord, SeasonTeamsBundle } from "@/lib/cms/teams-bundle";
 import { getTeamCrestById, isTeamCrestUrl } from "@/lib/team-crests";
+import { resolveTeamColorsFromSources, teamStripeBackgroundStyle } from "@/lib/team-stripes";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { RfefGrupoId } from "@/lib/rfef-grupos";
 
@@ -49,9 +51,14 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
   const config = useMemo(() => resolveCompetitionConfig(bundles, gender), [bundles, gender]);
   const storedSlots = useMemo(() => getGroupTeamSlots(bundles, gender, grupo), [bundles, gender, grupo]);
   const crestsFromBundle = useMemo(() => getTeamCrestsBundle(bundles).crests, [bundles]);
+  const bundleTeams = useMemo(
+    () => (bundles[bundleMapKey(gender, "teams")] as SeasonTeamsBundle | undefined)?.teams ?? [],
+    [bundles, gender],
+  );
 
   const [slots, setSlots] = useState<GroupTeamSlot[]>(storedSlots);
   const [crests, setCrests] = useState<Record<string, string>>({});
+  const [colorOverrides, setColorOverrides] = useState<Record<string, [string, string]>>({});
   const [pickingForIndex, setPickingForIndex] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -60,8 +67,22 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
     queueMicrotask(() => {
       setSlots(storedSlots);
       setCrests({});
+      setColorOverrides({});
     });
   }, [storedSlots]);
+
+  const effectiveColors = useMemo(() => {
+    const map: Record<string, [string, string]> = {};
+    for (const slot of slots) {
+      if (colorOverrides[slot.id]) {
+        map[slot.id] = colorOverrides[slot.id]!;
+        continue;
+      }
+      const cms = bundleTeams.find((team) => team.id === slot.id);
+      map[slot.id] = resolveTeamColorsFromSources(slot.id, cms?.colors);
+    }
+    return map;
+  }, [slots, colorOverrides, bundleTeams]);
 
   const effectiveCrests = useMemo(
     () => ({ ...crestsFromBundle, ...crests }),
@@ -110,11 +131,17 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
     setPickingForIndex(null);
   };
 
+  const updateColors = (slotId: string, colors: [string, string]) => {
+    setColorOverrides((current) => ({ ...current, [slotId]: colors }));
+  };
+
   const save = async () => {
     setBusy(true);
     setMessage(null);
 
     const normalized = normalizeGroupTeamSlots(syncSlotIds(slots, grupo), config.teamsPerGroup, grupo);
+    const syncedSlots = syncSlotIds(slots, grupo);
+    const colorsByIndex = syncedSlots.map((slot) => effectiveColors[slot.id]!);
     const idChanges = collectFixtureTeamIdChanges(storedSlots, normalized);
     const nextConfig = withGroupTeamsInConfig(config, grupo, normalized);
 
@@ -131,6 +158,7 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
         coach: previous?.coach ?? "",
         stadium: previous?.stadium ?? "",
         crestInitials: previous?.crestInitials ?? name.slice(0, 3).toUpperCase(),
+        colors: [...colorsByIndex[index]!],
         removed: !slot.name.trim(),
       };
       byId.set(slot.id, record);
@@ -225,6 +253,7 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
             const crestPath = effectiveCrests[slot.id] ?? getTeamCrestById(slot.id);
             const showImage = isTeamCrestUrl(crestPath);
             const empty = !slot.name.trim();
+            const slotColors = effectiveColors[slot.id]!;
 
             return (
               <div
@@ -233,18 +262,21 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
                   empty ? "border-dashed border-slate-300 bg-slate-50" : "border-slate-200 bg-white"
                 }`}
               >
-                <div className="flex aspect-square items-center justify-center rounded-lg bg-white p-1">
+                <div
+                  className="flex aspect-square items-center justify-center overflow-hidden rounded-lg p-1 ring-1 ring-black/10"
+                  style={teamStripeBackgroundStyle(slotColors)}
+                >
                   {showImage ? (
                     <Image
                       src={crestPath}
                       alt=""
                       width={48}
                       height={48}
-                      className="h-full w-full max-h-12 max-w-12 object-contain"
+                      className="relative z-10 h-full w-full max-h-12 max-w-12 object-contain drop-shadow-md"
                       unoptimized
                     />
                   ) : (
-                    <span className="text-center text-[10px] font-extrabold uppercase text-slate-400">
+                    <span className="relative z-10 text-center text-[10px] font-extrabold uppercase text-white drop-shadow">
                       {empty ? `#${index + 1}` : label.slice(0, 3)}
                     </span>
                   )}
@@ -255,6 +287,14 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
                   placeholder={`Equipo ${index + 1}`}
                   className="w-full rounded-md border border-slate-200 px-1 py-0.5 text-[10px] font-semibold"
                 />
+                {!empty ? (
+                  <TeamColorPairInput
+                    fieldId={`guia-liga-${slot.id}`}
+                    compact
+                    colors={slotColors}
+                    onChange={(colors) => updateColors(slot.id, colors)}
+                  />
+                ) : null}
                 <p className="truncate text-[9px] text-slate-400" title={slot.id}>
                   {slot.id}
                 </p>
