@@ -1,30 +1,26 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { AddNewsPanel } from "@/components/editor/AddNewsPanel";
 import { NewsCard } from "@/components/NewsCard";
 import { PageHero } from "@/components/PageHero";
 import { Pagination } from "@/components/Pagination";
 import { useNewsDateRangeFilter } from "@/hooks/useNewsDateRangeFilter";
 import { usePagination } from "@/hooks/usePagination";
-import { fetchPublishedNewsItems } from "@/lib/cms/news";
+import { usePublishedNews } from "@/hooks/usePublishedNews";
 import { newsByChannel } from "@/lib/noticias";
-import type { NewsItem, NewsTag } from "@/types";
+import type { NewsTag } from "@/types";
 const tags: Array<NewsTag | "todas"> = ["todas", "partido", "fichajes", "cantera", "previa", "cronica", "club", "lesionados", "rumores", "renovaciones", "entrevistas", "otros"];
 
 export default function NoticiasClubPage() {
   const [query, setQuery] = useState("");
   const [tag, setTag] = useState<NewsTag | "todas">("todas");
-  const [allNews, setAllNews] = useState<NewsItem[]>([]);
+  const { items: allNews, refresh } = usePublishedNews();
   const { dateFrom, dateTo, setDateFrom, setDateTo, clearDateRange, matchesDateRange } = useNewsDateRangeFilter();
 
   const loadNews = useCallback(() => {
-    void fetchPublishedNewsItems().then(setAllNews);
-  }, []);
-
-  useEffect(() => {
-    loadNews();
-  }, [loadNews]);
+    void refresh();
+  }, [refresh]);
 
   const clubNews = useMemo(() => newsByChannel(allNews, "club"), [allNews]);
 

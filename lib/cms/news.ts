@@ -5,6 +5,7 @@ import {
   newsTimeFromPublishedAt,
   normalizeNewsDate,
 } from "@/lib/noticias";
+import type { InlineOverridesMap } from "@/lib/cms/inline-overrides";
 import type { NewsItem, NewsTag } from "@/types";
 
 const LOCAL_NEWS_KEY = "rai1903:cms-news:v1";
@@ -25,6 +26,29 @@ type CmsNewsRow = {
   player_ids: string[];
   published: boolean;
 };
+
+export function newsTitleOverrideKey(id: string) {
+  return `news:${id}:title`;
+}
+
+export function newsExcerptOverrideKey(id: string) {
+  return `news:${id}:excerpt`;
+}
+
+/** Aplica overrides inline legacy (titular/extracto) sobre noticias del CMS. */
+export function applyNewsInlineOverrides(items: NewsItem[], overrides: InlineOverridesMap): NewsItem[] {
+  return items.map((item) => {
+    const titleOverride = overrides[newsTitleOverrideKey(item.id)];
+    const excerptOverride = overrides[newsExcerptOverrideKey(item.id)];
+    if (titleOverride === undefined && excerptOverride === undefined) return item;
+
+    return {
+      ...item,
+      ...(typeof titleOverride === "string" ? { title: titleOverride } : {}),
+      ...(typeof excerptOverride === "string" ? { excerpt: excerptOverride } : {}),
+    };
+  });
+}
 
 function rowToNewsItem(row: CmsNewsRow): NewsItem {
   const time = newsTimeFromPublishedAt(row.published_at);

@@ -5,10 +5,15 @@ import type { LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/Badge";
 import { NewsEditorForm } from "@/components/editor/NewsEditorForm";
-import { EditableText } from "@/components/inline-editing/EditableText";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { NewsInlineField } from "@/components/NewsInlineField";
 import { NewsMedia } from "@/components/NewsMedia";
-import { deleteNewsItem, updateNewsItem } from "@/lib/cms/news";
+import {
+  deleteNewsItem,
+  newsExcerptOverrideKey,
+  newsTitleOverrideKey,
+  updateNewsItem,
+} from "@/lib/cms/news";
 import { newsCategoryBadge } from "@/lib/noticias";
 import { formatNewsPublishedLabel } from "@/lib/utils";
 import type { NewsItem } from "@/types";
@@ -26,7 +31,7 @@ type NewsCardProps = {
 export function NewsCard({ item, onUpdated }: NewsCardProps) {
   const category = newsCategoryBadge(item);
   const CategoryIcon = categoryIcons[category.key] ?? Newspaper;
-  const { editMode, canEdit } = useInlineEditing();
+  const { editMode, canEdit, clearValue } = useInlineEditing();
   const [editing, setEditing] = useState(false);
 
   if (editing && canEdit && editMode) {
@@ -40,6 +45,8 @@ export function NewsCard({ item, onUpdated }: NewsCardProps) {
         onSave={async (updated) => {
           const result = await updateNewsItem(updated);
           if (result.ok) {
+            clearValue(newsTitleOverrideKey(item.id));
+            clearValue(newsExcerptOverrideKey(item.id));
             setEditing(false);
             onUpdated?.();
           }
@@ -63,17 +70,19 @@ export function NewsCard({ item, onUpdated }: NewsCardProps) {
       <div className="flex min-w-0 flex-1 flex-col justify-center p-2.5 sm:justify-between sm:p-5">
         <div>
           <h3 className="news-card-title line-clamp-2 text-[13px] font-extrabold uppercase leading-snug text-[#214C9B] sm:line-clamp-none sm:text-lg sm:leading-tight">
-            <EditableText
-              storageKey={`news:${item.id}:title`}
-              value={item.title}
+            <NewsInlineField
+              item={item}
+              field="title"
+              onUpdated={onUpdated}
               aria-label="Editar titular de noticia"
               inputClassName="font-extrabold uppercase leading-snug"
             />
           </h3>
           <p className="news-card-excerpt mt-2 hidden line-clamp-2 text-sm leading-6 text-slate-800 sm:block sm:line-clamp-3">
-            <EditableText
-              storageKey={`news:${item.id}:excerpt`}
-              value={item.excerpt}
+            <NewsInlineField
+              item={item}
+              field="excerpt"
+              onUpdated={onUpdated}
               multiline
               aria-label="Editar extracto de noticia"
               inputClassName="text-sm text-slate-800"

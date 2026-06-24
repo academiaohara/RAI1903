@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { fetchPublishedNewsItems } from "@/lib/cms/news";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { applyNewsInlineOverrides, fetchPublishedNewsItems } from "@/lib/cms/news";
 import type { NewsItem } from "@/types";
 
 export function usePublishedNews() {
+  const { overrides } = useInlineEditing();
   const [items, setItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -28,5 +30,7 @@ export function usePublishedNews() {
     };
   }, []);
 
-  return { items, loading, refresh };
+  const resolvedItems = useMemo(() => applyNewsInlineOverrides(items, overrides), [items, overrides]);
+
+  return { items: resolvedItems, loading, refresh };
 }
