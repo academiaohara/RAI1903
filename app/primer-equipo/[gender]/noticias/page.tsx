@@ -1,32 +1,28 @@
 "use client";
 
-import { use, useCallback, useEffect, useMemo, useState } from "react";
+import { use, useCallback, useMemo, useState } from "react";
 import { NewsCard } from "@/components/NewsCard";
 import { Pagination } from "@/components/Pagination";
 import { PrimerEquipoPageHero } from "@/components/PrimerEquipoPageHero";
 import { useNewsDateRangeFilter } from "@/hooks/useNewsDateRangeFilter";
 import { usePagination } from "@/hooks/usePagination";
-import { fetchPublishedNewsItems } from "@/lib/cms/news";
+import { usePublishedNews } from "@/hooks/usePublishedNews";
 import { newsForTeam } from "@/lib/noticias";
 import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
-import type { NewsItem, NewsTag } from "@/types";
+import type { NewsTag } from "@/types";
 
 const tags: Array<NewsTag | "todas"> = ["todas", "partido", "fichajes", "cantera", "previa", "cronica", "club", "lesionados", "rumores", "renovaciones", "entrevistas", "otros"];
 
 export default function PrimerEquipoNoticiasPage({ params }: { params: Promise<{ gender: string }> }) {
   const { gender } = use(params) as { gender: PrimerEquipoGender };
   const [tag, setTag] = useState<NewsTag | "todas">("todas");
-  const [allNews, setAllNews] = useState<NewsItem[]>([]);
+  const { items: allNews, refresh } = usePublishedNews();
   const { dateFrom, dateTo, setDateFrom, setDateTo, clearDateRange, hasDateRange, matchesDateRange } =
     useNewsDateRangeFilter();
 
   const loadNews = useCallback(() => {
-    void fetchPublishedNewsItems().then(setAllNews);
-  }, []);
-
-  useEffect(() => {
-    loadNews();
-  }, [loadNews]);
+    void refresh();
+  }, [refresh]);
 
   const teamNews = useMemo(() => newsForTeam(allNews, gender), [allNews, gender]);
 

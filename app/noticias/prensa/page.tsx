@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Card } from "@/components/Card";
 import { AddNewsPanel } from "@/components/editor/AddNewsPanel";
 import { NewsCard } from "@/components/NewsCard";
@@ -8,25 +8,21 @@ import { PageHero } from "@/components/PageHero";
 import { Pagination } from "@/components/Pagination";
 import { useNewsDateRangeFilter } from "@/hooks/useNewsDateRangeFilter";
 import { usePagination } from "@/hooks/usePagination";
-import { fetchPublishedNewsItems } from "@/lib/cms/news";
+import { usePublishedNews } from "@/hooks/usePublishedNews";
 import { newsByChannel } from "@/lib/noticias";
-import type { NewsItem, NewsTag } from "@/types";
+import type { NewsTag } from "@/types";
 const tags: Array<NewsTag | "todas"> = ["todas", "partido", "fichajes", "cantera", "previa", "cronica", "club", "lesionados", "rumores", "renovaciones", "entrevistas", "otros"];
 
 export default function NoticiasPrensaPage() {
   const [source, setSource] = useState("Todos");
   const [query, setQuery] = useState("");
   const [tag, setTag] = useState<NewsTag | "todas">("todas");
-  const [allNews, setAllNews] = useState<NewsItem[]>([]);
+  const { items: allNews, refresh } = usePublishedNews();
   const { dateFrom, dateTo, setDateFrom, setDateTo, clearDateRange, matchesDateRange } = useNewsDateRangeFilter();
 
-  const loadNews = () => {
-    void fetchPublishedNewsItems().then(setAllNews);
-  };
-
-  useEffect(() => {
-    loadNews();
-  }, []);
+  const loadNews = useCallback(() => {
+    void refresh();
+  }, [refresh]);
 
   const pressNews = useMemo(() => newsByChannel(allNews, "prensa"), [allNews]);
   const sources = ["Todos", ...Array.from(new Set(pressNews.map((item) => item.source)))];
