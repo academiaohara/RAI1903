@@ -225,7 +225,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
                 <Card eyebrow="Grupo II" title={`Ultima jornada · J${lastGrupoJornada.round}`} borderlessHeader>
                   <div className="space-y-3">
                     {lastGrupoJornada.matches.map((match) => (
-                      <MatchCard key={match.id} match={match} compact highlightTeamId="" gender={gender} />
+                      <MatchCard key={match.id} match={match} compact highlightTeamId="" gender={gender} layout="stripe" />
                     ))}
                   </div>
                 </Card>
