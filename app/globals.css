@@ -349,87 +349,87 @@ a {
   gap: 0;
 }
 
+/* Export wrapper — header + pitch card for sharing */
+.lineup-export-wrapper {
+  border-radius: 0.75rem;
+  box-shadow: 0 16px 40px rgba(17, 24, 39, 0.18);
+  overflow: hidden;
+  width: 100%;
+}
+
 /* Export card — full-width pizarra background, no padding */
 .lineup-export-card {
   aspect-ratio: 1148 / 1370;
   background: url("/Pizarra.png") center top / 100% 100% no-repeat;
-  border-radius: 0 0 0.5rem 0.5rem;
-  box-shadow: 0 16px 40px rgba(17, 24, 39, 0.18);
   overflow: visible;
   position: relative;
   width: 100%;
 }
 
-/* Standalone header above the pitch card */
+/* Header: XI RAI + formation + rival crest */
 .lineup-card-header-standalone {
   align-items: center;
-  background: #fff;
-  border: 1px solid rgba(33, 76, 155, 0.15);
-  border-bottom: none;
-  border-radius: 0.75rem 0.75rem 0 0;
-  box-shadow: 0 -2px 12px rgba(17, 24, 39, 0.06);
+  background:
+    repeating-linear-gradient(
+      -52deg,
+      rgba(0, 0, 0, 0) 0,
+      rgba(0, 0, 0, 0) 42px,
+      rgba(0, 0, 0, 0.028) 42px,
+      rgba(0, 0, 0, 0.028) 84px
+    ),
+    #fff;
   display: flex;
   justify-content: space-between;
-  padding: 0.75rem 1.1rem;
+  padding: 1rem 1.25rem;
 }
 
 .lineup-card-header-left {
-  align-items: flex-start;
+  align-items: center;
   display: flex;
   flex-direction: column;
-  gap: 0.25em;
+  gap: 0.35rem;
 }
 
 .lineup-card-xi {
-  color: #214c9b;
+  color: #0072bc;
   font-family: var(--font-bebas-neue, "Arial Black", sans-serif);
-  font-size: clamp(1.6rem, 5.5vw, 2.6rem);
+  font-size: clamp(1.75rem, 6vw, 2.75rem);
   font-weight: 900;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   line-height: 1;
   text-transform: uppercase;
 }
 
 .lineup-card-formation-badge {
-  background: #214c9b;
-  border-radius: 0.3em;
+  background: #0072bc;
+  border-radius: 999px;
   color: #fff;
-  font-size: clamp(0.75rem, 2vw, 1rem);
+  font-size: clamp(0.8rem, 2.2vw, 1.05rem);
   font-weight: 800;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
   line-height: 1;
-  padding: 0.2em 0.5em;
-  text-transform: uppercase;
+  padding: 0.3em 0.85em;
 }
 
 .lineup-card-header-right {
   align-items: center;
   display: flex;
-  gap: 0.55em;
+  gap: 0.65rem;
 }
 
 .lineup-card-vs {
-  color: #94a3b8;
-  font-size: clamp(0.75rem, 2vw, 1rem);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  color: #000;
+  font-size: clamp(0.95rem, 2.5vw, 1.25rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1;
 }
 
 .lineup-card-rival-crest {
-  height: clamp(2.4rem, 6vw, 3.6rem) !important;
-  width: clamp(2.4rem, 6vw, 3.6rem) !important;
-}
-
-.lineup-card-rival-name {
-  color: #1e293b;
-  font-size: clamp(0.8rem, 2.2vw, 1.1rem);
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  max-width: 10rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  border-radius: 50%;
+  height: clamp(2.5rem, 6.5vw, 3.75rem) !important;
+  object-fit: contain;
+  width: clamp(2.5rem, 6.5vw, 3.75rem) !important;
 }
 
 /* Pitch shell fills the card */
