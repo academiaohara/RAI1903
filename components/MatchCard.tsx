@@ -46,7 +46,7 @@ export function MatchCard({
   };
 
   return (
-    <article className={cn(matchFixtureCardClassName, layout === "stripe" && "p-0")}>
+    <article className={cn(matchFixtureCardClassName, layout === "stripe" && "pb-2 sm:pb-3")}>
       <div
         className={cn(
           "mb-0.5 flex items-start justify-between gap-1 sm:mb-1 sm:gap-2",
