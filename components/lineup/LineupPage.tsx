@@ -70,6 +70,73 @@ function LineupListPanel({ slots, assignments, playersById }: LineupListPanelPro
   );
 }
 
+type RivalPreview = {
+  teamId: string;
+  name: string;
+  crest: string;
+};
+
+type LineupPizarraCardProps = {
+  formation: FormationId;
+  slots: FormationSlot[];
+  assignments: Array<string | null>;
+  playersById: Map<string, SquadPlayer>;
+  squad: SquadPlayer[];
+  assignedIds: Set<string>;
+  rival: RivalPreview | null;
+  showRival: boolean;
+  exportMode?: boolean;
+  onPlayerAssign?: (playerId: string, slotIndex: number) => void;
+  onRemovePlayer?: (slotIndex: number) => void;
+};
+
+function LineupPizarraCard({
+  formation,
+  slots,
+  assignments,
+  playersById,
+  squad,
+  assignedIds,
+  rival,
+  showRival,
+  exportMode = false,
+  onPlayerAssign,
+  onRemovePlayer,
+}: LineupPizarraCardProps) {
+  return (
+    <div className="lineup-export-card">
+      <div className="lineup-card-header">
+        <div className="lineup-card-header-left">
+          <span className="lineup-card-xi">XI RAI</span>
+          <span className="lineup-card-formation-badge">{formation}</span>
+        </div>
+        {rival && showRival && (
+          <div className="lineup-card-header-right">
+            <span className="lineup-card-vs">VS</span>
+            <OpponentCrest
+              logo={rival.crest}
+              opponent={rival.name}
+              size="lg"
+              className="lineup-card-rival-crest"
+            />
+          </div>
+        )}
+      </div>
+      <LineupPitch
+        formation={formation}
+        slots={slots}
+        assignments={assignments}
+        playersById={playersById}
+        squad={squad}
+        assignedIds={assignedIds}
+        onPlayerAssign={onPlayerAssign ?? (() => {})}
+        onRemovePlayer={onRemovePlayer ?? (() => {})}
+        exportMode={exportMode}
+      />
+    </div>
+  );
+}
+
 type LineupBoardProps = {
   gender: PrimerEquipoGender;
   seasonId: string;
@@ -269,36 +336,32 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
       {/* Main layout: pizarra + list */}
       <div className="lineup-main-grid">
         <section className="lineup-pizarra-section">
-          <div ref={exportRef} className="lineup-export-wrapper">
-            <div className="lineup-export-card">
-              <div className="lineup-card-header">
-                <div className="lineup-card-header-left">
-                  <span className="lineup-card-xi">XI RAI</span>
-                  <span className="lineup-card-formation-badge">{formation}</span>
-                </div>
-                {rival && showRival && (
-                  <div className="lineup-card-header-right">
-                    <span className="lineup-card-vs">VS</span>
-                    <OpponentCrest
-                      logo={rival.crest}
-                      opponent={rival.name}
-                      size="lg"
-                      className="lineup-card-rival-crest"
-                    />
-                  </div>
-                )}
-              </div>
-              <LineupPitch
-                formation={formation}
-                slots={slots}
-                assignments={assignments}
-                playersById={playersById}
-                squad={squad}
-                assignedIds={assignedIds}
-                onPlayerAssign={assignPlayerToSlot}
-                onRemovePlayer={removeFromSlot}
-              />
-            </div>
+          <div ref={exportRef} className="lineup-export-capture" aria-hidden="true">
+            <LineupPizarraCard
+              formation={formation}
+              slots={slots}
+              assignments={assignments}
+              playersById={playersById}
+              squad={squad}
+              assignedIds={assignedIds}
+              rival={rival}
+              showRival={showRival}
+              exportMode
+            />
+          </div>
+          <div className="lineup-export-wrapper">
+            <LineupPizarraCard
+              formation={formation}
+              slots={slots}
+              assignments={assignments}
+              playersById={playersById}
+              squad={squad}
+              assignedIds={assignedIds}
+              rival={rival}
+              showRival={showRival}
+              onPlayerAssign={assignPlayerToSlot}
+              onRemovePlayer={removeFromSlot}
+            />
           </div>
           <p className="mt-2 text-center text-xs font-semibold text-slate-500">
             {assignedIds.size < 11
