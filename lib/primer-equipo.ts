@@ -32,11 +32,15 @@ export function primerEquipoHasCronicas(gender: PrimerEquipoGender) {
   return true;
 }
 
+export function primerEquipoHasLineup(gender: PrimerEquipoGender) {
+  return gender === "masculino";
+}
+
 export function getPrimerEquipoTabs(gender: PrimerEquipoGender) {
   const base = primerEquipoBase(gender);
   const tabs = [
     { href: `${base}/plantilla`, label: "Plantilla" },
-    { href: `${base}/lineup`, label: "Lineup" },
+    ...(primerEquipoHasLineup(gender) ? [{ href: `${base}/lineup`, label: "Lineup" }] : []),
     { href: `${base}/noticias`, label: "Noticias" },
     { href: `${base}/competicion`, label: "Competición" },
     { href: `${base}/jornadas`, label: "Jornadas" },
@@ -54,7 +58,8 @@ export function primerEquipoPathForGender(pathname: string, gender: PrimerEquipo
 
   if (
     section &&
-    PRIMER_EQUIPO_SECTIONS.includes(section as PrimerEquipoSection)
+    PRIMER_EQUIPO_SECTIONS.includes(section as PrimerEquipoSection) &&
+    !(section === "lineup" && !primerEquipoHasLineup(gender))
   ) {
     return `${primerEquipoBase(gender)}/${section}`;
   }

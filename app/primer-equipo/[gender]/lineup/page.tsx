@@ -1,11 +1,19 @@
 "use client";
 
+import { notFound } from "next/navigation";
 import { use } from "react";
 import { LineupPage } from "@/components/lineup/LineupPage";
-import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
+import {
+  genderLabels,
+  isPrimerEquipoGender,
+  primerEquipoHasLineup,
+  type PrimerEquipoGender,
+} from "@/lib/primer-equipo";
 
 export default function PrimerEquipoLineupPage({ params }: { params: Promise<{ gender: string }> }) {
-  const { gender } = use(params) as { gender: PrimerEquipoGender };
+  const { gender: genderParam } = use(params);
+  if (!isPrimerEquipoGender(genderParam) || !primerEquipoHasLineup(genderParam)) notFound();
+  const gender = genderParam as PrimerEquipoGender;
 
   return (
     <div className="space-y-2">
