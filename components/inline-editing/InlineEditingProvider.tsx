@@ -34,10 +34,12 @@ import {
   fetchHomeGlobalInlineOverrides,
   fetchInlineOverrides,
   fetchMediaRaiInlineOverrides,
+  isHomeGlobalInlineKey,
   resolveInlineOverrideSeasonId,
   upsertInlineOverride,
   upsertInlineOverridesBatch,
 } from "@/lib/cms/inline-overrides";
+import { isMediaRaiGlobalInlineKey } from "@/lib/fan-videos";
 import { SeasonManagerPanel } from "@/components/editor/SeasonManagerPanel";
 import { SectionStatusEditorPanel } from "@/components/editor/SectionStatusEditorPanel";
 import { TeamCrestEditorPanel } from "@/components/editor/TeamCrestEditorPanel";
@@ -114,6 +116,16 @@ async function canCurrentUserEdit(user: User | null): Promise<boolean> {
 
 function mergeOverrideMaps(...maps: InlineOverrides[]): InlineOverrides {
   return Object.assign({}, ...maps);
+}
+
+function globalOverridesFromInitial(initial: InlineOverrides): InlineOverrides {
+  const result: InlineOverrides = {};
+  for (const [key, value] of Object.entries(initial)) {
+    if (isMediaRaiGlobalInlineKey(key) || isHomeGlobalInlineKey(key)) {
+      result[key] = value;
+    }
+  }
+  return result;
 }
 
 export function InlineEditingProvider({
@@ -266,7 +278,7 @@ export function InlineEditingProvider({
         setOverrides(
           mergeOverrideMaps(
             legacy,
-            seasonId === DEFAULT_COMPETITION_SEASON_ID ? initialOverrides : {},
+            seasonId === DEFAULT_COMPETITION_SEASON_ID ? initialOverrides : globalOverridesFromInitial(initialOverrides),
             seasonResult.overrides,
             mediaRaiResult.overrides,
             homeGlobalResult.overrides,

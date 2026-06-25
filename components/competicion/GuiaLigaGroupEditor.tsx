@@ -78,7 +78,11 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
         map[slot.id] = colorOverrides[slot.id]!;
         continue;
       }
-      const cms = bundleTeams.find((team) => team.id === slot.id);
+      const cms =
+        bundleTeams.find((team) => team.id === slot.id) ??
+        (slot.name.trim()
+          ? bundleTeams.find((team) => team.id === slugFromTeamName(slot.name))
+          : undefined);
       map[slot.id] = resolveTeamColorsFromSources(slot.id, cms?.colors);
     }
     return map;
@@ -140,8 +144,7 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
     setMessage(null);
 
     const normalized = normalizeGroupTeamSlots(syncSlotIds(slots, grupo), config.teamsPerGroup, grupo);
-    const syncedSlots = syncSlotIds(slots, grupo);
-    const colorsByIndex = syncedSlots.map((slot) => effectiveColors[slot.id]!);
+    const colorsByIndex = slots.map((slot) => effectiveColors[slot.id]!);
     const idChanges = collectFixtureTeamIdChanges(storedSlots, normalized);
     const nextConfig = withGroupTeamsInConfig(config, grupo, normalized);
 
