@@ -360,6 +360,66 @@ a {
   width: 100%;
 }
 
+/* Card header: XI RAI (left) + next rival (right) */
+.lineup-card-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  left: 4%;
+  position: absolute;
+  right: 4%;
+  top: 2.5%;
+  z-index: 3;
+}
+
+.lineup-card-header-left {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+}
+
+.lineup-card-xi {
+  color: #214c9b;
+  font-family: var(--font-bebas-neue, "Arial Black", sans-serif);
+  font-size: clamp(1rem, 4.5%, 2rem);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.lineup-card-formation-badge {
+  background: #214c9b;
+  border-radius: 0.25em;
+  color: #fff;
+  font-size: clamp(0.5rem, 2%, 0.85rem);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  padding: 0.15em 0.45em;
+  text-transform: uppercase;
+}
+
+.lineup-card-header-right {
+  align-items: center;
+  display: flex;
+  gap: 0.4em;
+}
+
+.lineup-card-vs {
+  color: #475569;
+  font-size: clamp(0.5rem, 2%, 0.85rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lineup-card-rival-crest {
+  height: clamp(1.75rem, 6.5%, 3rem) !important;
+  width: clamp(1.75rem, 6.5%, 3rem) !important;
+}
+
 /* Pitch shell fills the card */
 .lineup-pitch-shell {
   bottom: 0;
@@ -385,7 +445,7 @@ a {
   padding: 0;
   position: absolute;
   transform: translate(-50%, -50%);
-  width: clamp(46px, 9.5%, 72px);
+  width: clamp(52px, 11%, 82px);
   z-index: 2;
 }
 
@@ -401,9 +461,10 @@ a {
 
 .pitch-player-photo {
   aspect-ratio: 1;
-  border: 2.5px solid rgba(255, 255, 255, 0.92);
+  background: #fff;
+  border: 3px solid #214c9b;
   border-radius: 50%;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
   overflow: hidden;
   position: relative;
   width: 100%;
@@ -436,9 +497,9 @@ a {
   transform: scale(1.18);
 }
 
-/* Name below the photo circle with a dark pill background for readability */
+/* Name below the photo circle */
 .pitch-player-name {
-  background: rgba(0, 0, 0, 0.72);
+  background: #214c9b;
   border-radius: 0.22rem;
   color: #fff;
   font-size: clamp(0.5rem, 1.6%, 0.68rem);
@@ -453,33 +514,35 @@ a {
   white-space: nowrap;
 }
 
-/* Empty slot: dashed circle with position label */
+/* Empty slot: granate circle with position label */
 .pitch-slot-empty {
   align-items: center;
   aspect-ratio: 1;
-  background: rgba(255, 255, 255, 0.15);
-  border: 2px dashed rgba(255, 255, 255, 0.65);
+  background: rgba(140, 20, 50, 0.82);
+  border: 2.5px solid rgba(255, 255, 255, 0.55);
   border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
   width: 100%;
 }
 
 .pitch-slot-empty:hover,
 .lineup-pitch-slot:focus-visible .pitch-slot-empty {
-  background: rgba(255, 255, 255, 0.28);
-  border-color: rgba(255, 255, 255, 0.9);
+  background: rgba(160, 28, 60, 0.95);
+  border-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
 }
 
 .pitch-slot-label {
-  color: rgba(255, 255, 255, 0.92);
-  font-size: clamp(0.46rem, 1.4%, 0.6rem);
+  color: rgba(255, 255, 255, 0.96);
+  font-size: clamp(0.46rem, 1.4%, 0.62rem);
   font-weight: 800;
   letter-spacing: 0.06em;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
   text-transform: uppercase;
 }
 
