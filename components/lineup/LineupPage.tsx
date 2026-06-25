@@ -4,7 +4,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Share2 } from "lucide-react";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { LineupPitch } from "@/components/lineup/LineupPitch";
+import { OpponentCrest } from "@/components/OpponentCrest";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
+import { usePrimerEquipoLeagueSeason } from "@/hooks/usePrimerEquipoLeagueSeason";
 import {
   DEFAULT_FORMATION,
   FORMATION_OPTIONS,
@@ -20,6 +22,8 @@ import {
   saveLineup,
 } from "@/lib/lineup-storage";
 import { type PrimerEquipoGender } from "@/lib/primer-equipo";
+import { getTeamCrestById } from "@/lib/team-crests";
+import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import type { SquadPlayer } from "@/types/squad";
 
 type LineupPageProps = {
@@ -77,6 +81,19 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
     initialLineupState(seasonId, gender),
   );
   const [sharing, setSharing] = useState(false);
+
+  const { nextMatch, teams } = usePrimerEquipoLeagueSeason(gender);
+  const highlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
+
+  const rival = useMemo(() => {
+    if (!nextMatch) return null;
+    const isHome = nextMatch.homeTeamId === highlightTeamId;
+    const rivalTeamId = isHome ? nextMatch.awayTeamId : nextMatch.homeTeamId;
+    const rivalName = isHome ? nextMatch.awayTeam : nextMatch.homeTeam;
+    const rivalTeam = teams.find((t) => t.id === rivalTeamId);
+    const rivalCrest = getTeamCrestById(rivalTeamId, rivalTeam?.crestInitials);
+    return { teamId: rivalTeamId, name: rivalName, crest: rivalCrest };
+  }, [nextMatch, teams, highlightTeamId]);
 
   const playersById = useMemo(
     () => new Map(squad.map((player) => [player.id, player])),
@@ -176,6 +193,24 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
       <div className="lineup-main-grid">
         <section className="lineup-pizarra-section">
           <div ref={exportRef} className="lineup-export-card">
+            {/* Card header: XI RAI on the left, next rival on the right */}
+            <div className="lineup-card-header">
+              <div className="lineup-card-header-left">
+                <span className="lineup-card-xi">XI RAI</span>
+                <span className="lineup-card-formation-badge">{formation}</span>
+              </div>
+              {rival && (
+                <div className="lineup-card-header-right">
+                  <span className="lineup-card-vs">vs</span>
+                  <OpponentCrest
+                    logo={rival.crest}
+                    opponent={rival.name}
+                    size="md"
+                    className="lineup-card-rival-crest"
+                  />
+                </div>
+              )}
+            </div>
             <LineupPitch
               formation={formation}
               slots={slots}
