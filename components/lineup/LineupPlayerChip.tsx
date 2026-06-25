@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 type LineupPlayerChipProps = {
   player: SquadPlayer;
   index?: number;
+  crestUrl?: string | null;
   selected?: boolean;
   assigned?: boolean;
   onSelect: (player: SquadPlayer) => void;
@@ -17,6 +18,7 @@ type LineupPlayerChipProps = {
 export function LineupPlayerChip({
   player,
   index = 0,
+  crestUrl,
   selected = false,
   assigned = false,
   onSelect,
@@ -38,7 +40,7 @@ export function LineupPlayerChip({
       aria-pressed={selected}
       aria-label={`${displayName}, dorsal ${player.dorsal}`}
     >
-      <LineupMiniFicha player={player} size="sidebar" />
+      <LineupMiniFicha player={player} size="sidebar" crestUrl={crestUrl} />
     </motion.button>
   );
 }

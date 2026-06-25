@@ -2,8 +2,7 @@
 
 import type { ReactNode } from "react";
 import type { SquadPlayer } from "@/types/squad";
-import { getFichaPositionAbbrev } from "@/lib/ficha-design";
-import { getPlayerDisplayName } from "@/lib/squad-utils";
+import { getNationalityFlagUrl, getPlayerDisplayName } from "@/lib/squad-utils";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +11,7 @@ export type LineupMiniFichaSize = "pitch" | "sidebar";
 type LineupMiniFichaProps = {
   player: SquadPlayer;
   size?: LineupMiniFichaSize;
+  crestUrl?: string | null;
   className?: string;
   photo?: ReactNode;
 };
@@ -19,11 +19,12 @@ type LineupMiniFichaProps = {
 export function LineupMiniFicha({
   player,
   size = "sidebar",
+  crestUrl,
   className,
   photo,
 }: LineupMiniFichaProps) {
-  const positionAbbrev = getFichaPositionAbbrev(player.posicion);
-  const displayName = getPlayerDisplayName(player);
+  const displayName = getPlayerDisplayName(player).toUpperCase();
+  const flagUrl = getNationalityFlagUrl(player.nacionalidad);
 
   const photoNode =
     photo ?? (
@@ -32,28 +33,31 @@ export function LineupMiniFicha({
         bare
         placeholderTone="light"
         imageClassName="object-cover object-[center_8%]"
-        className="h-full w-full drop-shadow-[0_4px_10px_rgba(0,0,0,0.35)]"
+        className="h-full w-full"
       />
     );
 
   return (
     <div className={cn("lineup-mini-ficha", `lineup-mini-ficha--${size}`, className)}>
-      <div className="lineup-mini-ficha-frame">
-        <article className="trading-ficha-card trading-ficha-card--fichaje lineup-mini-ficha-card">
-          <div className="trading-ficha-stripes" aria-hidden />
-
-          <span className="lineup-mini-ficha-position">{positionAbbrev}</span>
-
-          <div className="lineup-mini-ficha-photo">{photoNode}</div>
-
-          <div className="trading-ficha-name-plate" aria-hidden>
-            <div className="trading-ficha-name-plate-inner">
-              <p className="trading-ficha-first-name">{player.nombre}</p>
-              <p className="trading-ficha-last-name">{player.apellido || displayName}</p>
-            </div>
-          </div>
-        </article>
-      </div>
+      <article className="lineup-ficha-card">
+        <div className="lineup-ficha-photo">
+          {photoNode}
+          {crestUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="lineup-ficha-crest" src={crestUrl} alt="" width={16} height={16} loading="lazy" />
+          ) : null}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="lineup-ficha-flag"
+            src={flagUrl}
+            alt={player.nacionalidad}
+            width={18}
+            height={12}
+            loading="lazy"
+          />
+        </div>
+        <div className="lineup-ficha-name">{displayName}</div>
+      </article>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { Share2 } from "lucide-react";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { LineupPitch } from "@/components/lineup/LineupPitch";
-import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
+import { LineupPositionCarousel } from "@/components/lineup/LineupPositionCarousel";
 import { usePrimerEquipoLeagueSeason } from "@/hooks/usePrimerEquipoLeagueSeason";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import {
@@ -24,8 +24,10 @@ import {
 import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getTeamCrestById } from "@/lib/team-crests";
 import { formatLineupKickoffLabel, formatMatchWeekdayLetterDate } from "@/lib/utils";
+import { resolveSquadClubInfo } from "@/lib/season/squad-source";
+import { getLeagueMatchdaysForGender } from "@/lib/season/aviles-matches";
 import { groupPlayersByPosition } from "@/lib/squad-utils";
-import { SQUAD_POSITIONS } from "@/types/squad";
+import { SQUAD_POSITIONS, SQUAD_POSITION_LABELS } from "@/types/squad";
 import type { Match } from "@/types";
 
 type LineupPageProps = {
@@ -54,6 +56,7 @@ type LineupBoardProps = {
   seasonId: string;
   seasonLabel: string;
   squad: ReturnType<typeof useSquadPlayers>["squad"];
+  clubCrestUrl: string;
   nextMatch: Match | undefined;
   highlightTeamId: string;
 };
@@ -63,6 +66,7 @@ function LineupBoard({
   seasonId,
   seasonLabel,
   squad,
+  clubCrestUrl,
   nextMatch,
   highlightTeamId,
 }: LineupBoardProps) {
@@ -221,11 +225,14 @@ function LineupBoard({
         </section>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)] lg:items-start">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(300px,0.95fr)] xl:items-start">
         <section className="lineup-board">
           <div ref={exportRef} className="lineup-export-card">
             <header className="lineup-export-header">
-              <h2 className="lineup-export-title">XI RAI</h2>
+              <div className="lineup-export-heading">
+                <h2 className="lineup-export-title">El XI del RAI</h2>
+                <span className="lineup-export-formation">{formation}</span>
+              </div>
               {nextMatch ? (
                 <p className="lineup-export-kickoff">{formatLineupKickoffLabel(nextMatch.date)}</p>
               ) : (
@@ -253,16 +260,22 @@ function LineupBoard({
               slots={slots}
               assignments={assignments}
               playersById={playersById}
+              crestUrl={clubCrestUrl}
               selectedPlayerId={selectedPlayerId}
               selectedSlotIndex={selectedSlotIndex}
               onSlotClick={handleSlotClick}
             />
+
+            <footer className="lineup-export-footer" aria-hidden>
+              <span className="lineup-export-footer-brand">Real Avilés Industrial</span>
+              <span className="lineup-export-footer-url">RAI1903.COM</span>
+            </footer>
           </div>
 
           <p className="mt-3 text-center text-xs font-semibold text-slate-500">
             {selectedPlayerId
               ? "Pulsa una posición vacía para colocar al jugador seleccionado."
-              : "Selecciona un jugador a la derecha y colócalo en la pizarra."}
+              : "Selecciona un jugador a la derecha y colócalo en el campo."}
           </p>
         </section>
 
@@ -294,31 +307,18 @@ function LineupBoard({
               </span>
             </div>
 
-            <div className="lineup-sidebar-scroll space-y-4">
-              {SQUAD_POSITIONS.map((position) => {
-                const list = groupedPlayers[position];
-                if (list.length === 0) return null;
-
-                return (
-                  <div key={position} className="space-y-2">
-                    <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-400">
-                      {position}
-                    </p>
-                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-3 xl:grid-cols-4">
-                      {list.map((player, index) => (
-                        <LineupPlayerChip
-                          key={player.id}
-                          player={player}
-                          index={index}
-                          selected={selectedPlayerId === player.id}
-                          assigned={assignedIds.has(player.id)}
-                          onSelect={(entry) => handlePlayerSelect(entry.id)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="lineup-sidebar-scroll space-y-3">
+              {SQUAD_POSITIONS.map((position) => (
+                <LineupPositionCarousel
+                  key={position}
+                  label={SQUAD_POSITION_LABELS[position]}
+                  players={groupedPlayers[position]}
+                  crestUrl={clubCrestUrl}
+                  selectedPlayerId={selectedPlayerId}
+                  assignedIds={assignedIds}
+                  onSelect={(entry) => handlePlayerSelect(entry.id)}
+                />
+              ))}
             </div>
           </div>
         </aside>
@@ -330,7 +330,16 @@ function LineupBoard({
 export function LineupPage({ gender }: LineupPageProps) {
   const { squad } = useSquadPlayers(gender);
   const { nextMatch, highlightTeamId } = usePrimerEquipoLeagueSeason(gender);
-  const { viewedSeasonId, viewedSeason } = useSeason();
+  const { viewedSeasonId, viewedSeason, bundles, getFixtureSource } = useSeason();
+  const leagueMatchdays = useMemo(
+    () => getLeagueMatchdaysForGender(getFixtureSource(gender), gender),
+    [gender, getFixtureSource],
+  );
+  const clubCrestUrl = useMemo(
+    () =>
+      resolveSquadClubInfo(gender, viewedSeason.label, bundles, squad.length, leagueMatchdays).escudo,
+    [bundles, gender, leagueMatchdays, squad.length, viewedSeason.label],
+  );
 
   return (
     <LineupBoard
@@ -339,6 +348,7 @@ export function LineupPage({ gender }: LineupPageProps) {
       seasonId={viewedSeasonId}
       seasonLabel={viewedSeason.label}
       squad={squad}
+      clubCrestUrl={clubCrestUrl}
       nextMatch={nextMatch}
       highlightTeamId={highlightTeamId}
     />

@@ -12,6 +12,7 @@ type LineupPitchProps = {
   slots: FormationSlot[];
   assignments: Array<string | null>;
   playersById: Map<string, SquadPlayer>;
+  crestUrl?: string | null;
   selectedPlayerId: string | null;
   selectedSlotIndex: number | null;
   onSlotClick: (slotIndex: number) => void;
@@ -23,6 +24,7 @@ export function LineupPitch({
   slots,
   assignments,
   playersById,
+  crestUrl,
   selectedPlayerId,
   selectedSlotIndex,
   onSlotClick,
@@ -31,6 +33,12 @@ export function LineupPitch({
   return (
     <div className="lineup-pitch-shell">
       <div className={cn("lineup-pitch", exportMode && "lineup-pitch--export")}>
+        <div className="lineup-pitch-markings" aria-hidden>
+          <span className="lineup-pitch-center-circle" />
+          <span className="lineup-pitch-penalty lineup-pitch-penalty--top" />
+          <span className="lineup-pitch-penalty lineup-pitch-penalty--bottom" />
+        </div>
+
         {slots.map((slot, index) => {
           const playerId = assignments[index];
           const player = playerId ? playersById.get(playerId) : undefined;
@@ -58,7 +66,7 @@ export function LineupPitch({
             >
               {player ? (
                 <>
-                  <LineupMiniFicha player={player} size="pitch" />
+                  <LineupMiniFicha player={player} size="pitch" crestUrl={crestUrl} />
                   {!exportMode ? (
                     <span className="lineup-pitch-slot-remove" aria-hidden>
                       <X className="h-3 w-3" />
