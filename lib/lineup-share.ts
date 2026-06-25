@@ -10,7 +10,7 @@ async function captureLineupImage(node: HTMLElement): Promise<Blob> {
   const dataUrl = await toPng(node, {
     cacheBust: true,
     pixelRatio: 2,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#e6e6e6",
   });
 
   const response = await fetch(dataUrl);

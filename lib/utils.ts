@@ -58,6 +58,12 @@ export const formatMatchTime = (date: string) =>
     minute: "2-digit",
   }).format(new Date(date));
 
+/** Etiqueta compacta para la pizarra del lineup: «S27-20:00». */
+export const formatLineupKickoffLabel = (date: string) => {
+  const day = new Date(date).getDate();
+  return `${formatMatchWeekdayLetter(date)}${day}-${formatMatchTime(date)}`;
+};
+
 export const resultTone = (result: ResultCode | FormCode) => {
   if (result === "W" || result === "G") return "bg-emerald-500 text-white";
   if (result === "D" || result === "E") return "bg-orange-400 text-orange-950";

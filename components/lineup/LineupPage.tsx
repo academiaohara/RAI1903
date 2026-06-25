@@ -23,7 +23,7 @@ import {
 } from "@/lib/lineup-storage";
 import { genderLabels, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getTeamCrestById } from "@/lib/team-crests";
-import { formatMatchWeekdayLetterDate } from "@/lib/utils";
+import { formatLineupKickoffLabel, formatMatchWeekdayLetterDate } from "@/lib/utils";
 import { groupPlayersByPosition } from "@/lib/squad-utils";
 import { SQUAD_POSITIONS } from "@/types/squad";
 import type { Match } from "@/types";
@@ -224,19 +224,29 @@ function LineupBoard({
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)] lg:items-start">
         <section className="lineup-board">
           <div ref={exportRef} className="lineup-export-card">
-            <div className="lineup-board-header">
-              <div>
-                <h2 className="lineup-board-title">El XI del RAI</h2>
-                <p className="text-xs font-semibold text-slate-500">{clubLabel}</p>
-              </div>
-              <span className="lineup-formation-badge">{formation}</span>
-            </div>
-
-            {opponent ? (
-              <p className="lineup-board-rival">
-                vs <span>{opponent.name}</span>
-              </p>
-            ) : null}
+            <header className="lineup-export-header">
+              <h2 className="lineup-export-title">XI RAI</h2>
+              {nextMatch ? (
+                <p className="lineup-export-kickoff">{formatLineupKickoffLabel(nextMatch.date)}</p>
+              ) : (
+                <p className="lineup-export-kickoff">{seasonLabel}</p>
+              )}
+              {opponent ? (
+                <div className="lineup-export-vs">
+                  <span className="lineup-export-vs-label">VS</span>
+                  {opponentCrest ? (
+                    <OpponentCrest
+                      logo={opponentCrest}
+                      opponent={opponent.name}
+                      size="sm"
+                      className="lineup-export-crest"
+                    />
+                  ) : null}
+                </div>
+              ) : (
+                <span aria-hidden />
+              )}
+            </header>
 
             <LineupPitch
               formation={formation}
