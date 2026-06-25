@@ -555,6 +555,7 @@ a {
   padding: 0.35rem;
   position: fixed;
   width: 228px;
+  z-index: 9999;
 }
 
 .lineup-dropdown-header {
