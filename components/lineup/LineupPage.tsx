@@ -192,25 +192,27 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
       {/* Main layout: pizarra + list */}
       <div className="lineup-main-grid">
         <section className="lineup-pizarra-section">
-          <div ref={exportRef} className="lineup-export-card">
-            {/* Card header: XI RAI on the left, next rival on the right */}
-            <div className="lineup-card-header">
-              <div className="lineup-card-header-left">
-                <span className="lineup-card-xi">XI RAI</span>
-                <span className="lineup-card-formation-badge">{formation}</span>
-              </div>
-              {rival && (
-                <div className="lineup-card-header-right">
-                  <span className="lineup-card-vs">vs</span>
-                  <OpponentCrest
-                    logo={rival.crest}
-                    opponent={rival.name}
-                    size="md"
-                    className="lineup-card-rival-crest"
-                  />
-                </div>
-              )}
+          {/* Standalone header: XI RAI + formation + rival — above the pitch */}
+          <div className="lineup-card-header-standalone">
+            <div className="lineup-card-header-left">
+              <span className="lineup-card-xi">XI RAI</span>
+              <span className="lineup-card-formation-badge">{formation}</span>
             </div>
+            {rival && (
+              <div className="lineup-card-header-right">
+                <span className="lineup-card-vs">vs</span>
+                <OpponentCrest
+                  logo={rival.crest}
+                  opponent={rival.name}
+                  size="lg"
+                  className="lineup-card-rival-crest"
+                />
+                <span className="lineup-card-rival-name">{rival.name}</span>
+              </div>
+            )}
+          </div>
+
+          <div ref={exportRef} className="lineup-export-card">
             <LineupPitch
               formation={formation}
               slots={slots}
