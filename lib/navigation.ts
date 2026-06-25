@@ -59,7 +59,6 @@ export const navItems: NavItem[] = [
     activePrefix: "/primer-equipo/femenino",
     children: [
       { href: "/primer-equipo/femenino/plantilla", label: "Plantilla", icon: Users },
-      { href: "/primer-equipo/femenino/lineup", label: "Lineup", icon: LayoutGrid },
       { href: "/primer-equipo/femenino/competicion", label: "Competición", icon: Trophy },
       { href: "/primer-equipo/femenino/jornadas", label: "Jornadas", icon: Columns3 },
       { href: "/primer-equipo/femenino/calendario", label: "Calendario", icon: CalendarDays },
