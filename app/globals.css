@@ -357,6 +357,22 @@ a {
   width: 100%;
 }
 
+/* Off-screen capture target — fixed desktop width, no remove buttons */
+.lineup-export-capture {
+  left: -10000px;
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  width: 1148px;
+  z-index: -1;
+}
+
+.lineup-export-capture .lineup-export-card {
+  border-radius: 0.75rem;
+  box-shadow: none;
+  overflow: hidden;
+}
+
 /* Export card — full-width pizarra background, no padding */
 .lineup-export-card {
   aspect-ratio: 1148 / 1370;
@@ -557,54 +573,54 @@ a {
 }
 
 @media (max-width: 767px) {
-  .lineup-pitch-slot {
+  .lineup-export-wrapper .lineup-pitch-slot {
     width: clamp(52px, 12.5%, 72px);
   }
 
-  .pitch-player-photo {
+  .lineup-export-wrapper .pitch-player-photo {
     border-width: 2px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
   }
 
-  .pitch-player-name {
+  .lineup-export-wrapper .pitch-player-name {
     font-size: clamp(0.5rem, 1.7vw, 0.62rem);
     max-width: 5.5rem;
     padding: 0.12rem 0.28rem;
   }
 
-  .pitch-player-remove {
+  .lineup-export-wrapper .pitch-player-remove {
     font-size: 0.62rem;
     height: 0.95rem;
     width: 0.95rem;
   }
 
-  .pitch-slot-empty {
+  .lineup-export-wrapper .pitch-slot-empty {
     border-width: 2px;
   }
 
-  .pitch-slot-label {
+  .lineup-export-wrapper .pitch-slot-label {
     font-size: clamp(0.48rem, 1.6vw, 0.62rem);
   }
 
-  .pitch-player-node {
+  .lineup-export-wrapper .pitch-player-node {
     gap: 0.2rem;
   }
 
-  .lineup-card-xi {
+  .lineup-export-wrapper .lineup-card-xi {
     font-size: clamp(1.35rem, 5vw, 1.75rem);
   }
 
-  .lineup-card-formation-badge {
+  .lineup-export-wrapper .lineup-card-formation-badge {
     font-size: clamp(0.68rem, 2vw, 0.8rem);
     padding: 0.22em 0.65em;
   }
 
-  .lineup-card-rival-crest {
+  .lineup-export-wrapper .lineup-card-rival-crest {
     height: clamp(2rem, 5.5vw, 2.5rem) !important;
     width: clamp(2rem, 5.5vw, 2.5rem) !important;
   }
 
-  .lineup-card-vs {
+  .lineup-export-wrapper .lineup-card-vs {
     font-size: clamp(0.8rem, 2.2vw, 0.95rem);
   }
 }
