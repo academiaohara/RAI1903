@@ -129,8 +129,24 @@ export function teamsFromGroupSlots(
   cmsColorsByTeamId?: Map<string, string[]>,
 ): Team[] {
   return slots
-    .map((slot, index) => groupSlotToTeam(slot, index, cmsColorsByTeamId?.get(slot.id)))
+    .map((slot, index) => groupSlotToTeam(slot, index, resolveCmsColorsForSlot(slot, cmsColorsByTeamId)))
     .sort((a, b) => a.name.localeCompare(b.name, "es"));
+}
+
+function resolveCmsColorsForSlot(
+  slot: GroupTeamSlot,
+  cmsColorsByTeamId?: Map<string, string[]>,
+): string[] | undefined {
+  if (!cmsColorsByTeamId?.size) return undefined;
+
+  const direct = cmsColorsByTeamId.get(slot.id);
+  if (direct?.length) return direct;
+
+  const slug = slot.name.trim() ? slugFromTeamName(slot.name) : "";
+  if (!slug) return undefined;
+
+  const bySlug = cmsColorsByTeamId.get(slug);
+  return bySlug?.length ? bySlug : undefined;
 }
 
 export function resolveGroupTeams(

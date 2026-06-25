@@ -10,8 +10,6 @@ import {
   type ReactNode,
 } from "react";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
-import { upsertInlineOverride } from "@/lib/cms/inline-overrides";
-import { MEDIA_RAI_INLINE_SEASON_ID } from "@/lib/fan-videos";
 import {
   DEFAULT_MEDIA_RAI_SECTIONS,
   MEDIA_RAI_SECTIONS_KEY,
@@ -44,46 +42,53 @@ function writeLocalSections(sections: MediaRaiSectionEntry[]) {
   window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sections));
 }
 
+function initialSectionsState(): MediaRaiSectionEntry[] {
+  return normalizeMediaRaiSections(readLocalSections() ?? DEFAULT_MEDIA_RAI_SECTIONS);
+}
+
 export function MediaRaiSectionsProvider({ children }: { children: ReactNode }) {
-  const { getValue, ready } = useInlineEditing();
-  const [sections, setSectionsState] = useState<MediaRaiSectionEntry[]>(DEFAULT_MEDIA_RAI_SECTIONS);
-  const [hydrated, setHydrated] = useState(false);
+  const { getValue, ready, saveValue, saveNow } = useInlineEditing();
+  const inlineSections = getValue<MediaRaiSectionEntry[] | undefined>(MEDIA_RAI_SECTIONS_KEY, undefined);
+  const [sections, setSectionsState] = useState<MediaRaiSectionEntry[]>(initialSectionsState);
 
   useEffect(() => {
     if (!ready) return;
 
-    const fromInline = getValue<MediaRaiSectionEntry[] | undefined>(MEDIA_RAI_SECTIONS_KEY, undefined);
     const fromLocal = readLocalSections();
-    const next = normalizeMediaRaiSections(fromInline ?? fromLocal ?? DEFAULT_MEDIA_RAI_SECTIONS);
+    const next = normalizeMediaRaiSections(inlineSections ?? fromLocal ?? DEFAULT_MEDIA_RAI_SECTIONS);
     queueMicrotask(() => {
       setSectionsState(next);
-      setHydrated(true);
     });
-  }, [getValue, ready]);
+  }, [inlineSections, ready]);
 
   const setSections = useCallback((next: MediaRaiSectionEntry[]) => {
     setSectionsState(normalizeMediaRaiSections(next));
   }, []);
 
-  const persistSections = useCallback(async (next: MediaRaiSectionEntry[]) => {
-    const normalized = normalizeMediaRaiSections(next);
-    setSectionsState(normalized);
-    writeLocalSections(normalized);
+  const persistSections = useCallback(
+    async (next: MediaRaiSectionEntry[]) => {
+      const normalized = normalizeMediaRaiSections(next);
+      setSectionsState(normalized);
+      writeLocalSections(normalized);
+      saveValue(MEDIA_RAI_SECTIONS_KEY, normalized);
 
-    if (!isSupabaseConfigured()) {
-      return { ok: true };
-    }
+      if (!isSupabaseConfigured()) {
+        return { ok: true };
+      }
 
-    return upsertInlineOverride(MEDIA_RAI_SECTIONS_KEY, normalized, null, MEDIA_RAI_INLINE_SEASON_ID);
-  }, []);
+      const ok = await saveNow();
+      return ok ? { ok: true } : { ok: false, error: "No se pudo guardar en Supabase" };
+    },
+    [saveNow, saveValue],
+  );
 
   const value = useMemo<MediaRaiSectionsContextValue>(
     () => ({
-      sections: hydrated ? sections : DEFAULT_MEDIA_RAI_SECTIONS,
+      sections,
       setSections,
       persistSections,
     }),
-    [hydrated, persistSections, sections, setSections],
+    [persistSections, sections, setSections],
   );
 
   return <MediaRaiSectionsContext.Provider value={value}>{children}</MediaRaiSectionsContext.Provider>;
