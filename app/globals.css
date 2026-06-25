@@ -427,7 +427,7 @@ a {
 
 .lineup-pitch-slot {
   align-items: center;
-  aspect-ratio: 0.78 / 1;
+  aspect-ratio: 2 / 3;
   background: transparent;
   border: 0;
   cursor: pointer;
@@ -436,7 +436,7 @@ a {
   padding: 0;
   position: absolute;
   transform: translate(-50%, -50%);
-  width: clamp(54px, 11vw, 84px);
+  width: clamp(42px, 7.8vw, 58px);
   z-index: 1;
 }
 
@@ -446,7 +446,7 @@ a {
 }
 
 .lineup-pitch-slot--selected .lineup-pitch-slot-empty,
-.lineup-pitch-slot--selected .lineup-pitch-player {
+.lineup-pitch-slot--selected .lineup-mini-ficha {
   outline: 2px solid var(--lineup-blue);
   outline-offset: 2px;
 }
@@ -459,70 +459,108 @@ a {
   border-radius: 999px;
   color: #111827;
   display: flex;
-  height: 2.4rem;
+  height: 1.85rem;
   justify-content: center;
-  width: 2.4rem;
+  width: 1.85rem;
 }
 
-.lineup-pitch-player {
-  background: linear-gradient(180deg, #eef4ff 0%, #fff 100%);
-  border: 2px solid var(--lineup-blue);
-  border-radius: 0.55rem;
-  box-shadow: 0 4px 10px rgba(17, 24, 39, 0.18);
+.lineup-mini-ficha {
   height: 100%;
-  overflow: hidden;
-  position: relative;
   width: 100%;
 }
 
-.lineup-pitch-player-photo {
-  align-items: flex-end;
-  background: #dbeafe;
-  display: flex;
-  height: 68%;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.lineup-pitch-player-flag {
-  border: 1px solid #cbd5e1;
-  bottom: 1.35rem;
-  height: 10px;
-  left: 4px;
-  object-fit: cover;
-  position: absolute;
-  width: 14px;
-}
-
-.lineup-pitch-player-name {
-  background: var(--lineup-blue);
-  bottom: 0;
-  color: #fff;
-  font-size: 9px;
-  font-weight: 800;
-  left: 0;
-  line-height: 1.1;
-  overflow: hidden;
-  padding: 2px 3px;
-  position: absolute;
-  right: 0;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.lineup-pitch-player-dorsal {
+.lineup-mini-ficha-frame {
   background: #fff;
-  border: 1px solid rgba(33, 76, 155, 0.25);
-  border-radius: 999px;
-  color: var(--lineup-blue);
-  font-size: 9px;
-  font-weight: 900;
-  left: 4px;
-  padding: 1px 4px;
+  box-shadow: 0 4px 12px rgba(15, 35, 71, 0.2);
+  height: 100%;
+  padding: 2px;
+  width: 100%;
+}
+
+.lineup-mini-ficha-card {
+  height: 100%;
+  width: 100%;
+}
+
+.lineup-mini-ficha-position {
+  background: var(--rai-red);
+  border-radius: 2px;
+  color: #fff;
+  font-size: 0.42rem;
+  font-weight: 800;
+  left: 6%;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  padding: 0.12rem 0.2rem;
   position: absolute;
-  top: 4px;
-  z-index: 2;
+  top: 4%;
+  z-index: 20;
+}
+
+.lineup-mini-ficha-photo {
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  z-index: 5;
+}
+
+.lineup-mini-ficha-photo > * {
+  bottom: -1%;
+  height: 96%;
+  left: 50%;
+  max-width: none;
+  position: absolute;
+  transform: translateX(-50%);
+  width: 114%;
+}
+
+.lineup-mini-ficha--pitch .trading-ficha-name-plate {
+  width: 88%;
+}
+
+.lineup-mini-ficha--pitch .trading-ficha-name-plate-inner {
+  padding: 16% 6% 5% 5%;
+}
+
+.lineup-mini-ficha--pitch .trading-ficha-first-name {
+  font-size: 0.34rem;
+  letter-spacing: 0.04em;
+}
+
+.lineup-mini-ficha--pitch .trading-ficha-last-name {
+  font-size: 0.48rem;
+  letter-spacing: 0.02em;
+}
+
+.lineup-mini-ficha--sidebar {
+  width: 100%;
+}
+
+.lineup-mini-ficha--sidebar .lineup-mini-ficha-frame {
+  box-shadow: 0 6px 16px rgba(15, 35, 71, 0.18);
+  padding: 2px;
+}
+
+.lineup-mini-ficha--sidebar .trading-ficha-name-plate {
+  width: 82%;
+}
+
+.lineup-mini-ficha--sidebar .trading-ficha-name-plate-inner {
+  padding: 17% 7% 6% 6%;
+}
+
+.lineup-mini-ficha--sidebar .trading-ficha-first-name {
+  font-size: 0.48rem;
+}
+
+.lineup-mini-ficha--sidebar .trading-ficha-last-name {
+  font-size: 0.68rem;
+}
+
+.lineup-mini-ficha--sidebar .lineup-mini-ficha-position {
+  font-size: 0.48rem;
+  padding: 0.14rem 0.24rem;
 }
 
 .lineup-pitch-slot-remove {
@@ -554,76 +592,26 @@ a {
 }
 
 .lineup-player-chip {
-  align-items: center;
-  background: linear-gradient(180deg, #f8fbff 0%, #fff 100%);
-  border: 1px solid rgba(33, 76, 155, 0.16);
-  border-radius: 0.85rem;
-  display: flex;
-  gap: 0.45rem;
-  padding: 0.45rem;
+  background: transparent;
+  border: 0;
+  border-radius: 0.35rem;
+  display: block;
+  padding: 0;
   position: relative;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease;
   width: 100%;
 }
 
 .lineup-player-chip:hover {
-  border-color: rgba(33, 76, 155, 0.35);
-  box-shadow: 0 8px 18px rgba(33, 76, 155, 0.12);
+  transform: translateY(-2px);
 }
 
-.lineup-player-chip--selected {
-  border-color: var(--lineup-blue);
-  box-shadow: 0 0 0 2px rgba(33, 76, 155, 0.18);
+.lineup-player-chip--selected .lineup-mini-ficha-frame {
+  box-shadow: 0 0 0 2px var(--lineup-blue), 0 8px 18px rgba(33, 76, 155, 0.22);
 }
 
 .lineup-player-chip--assigned {
-  opacity: 0.62;
-}
-
-.lineup-player-chip-dorsal {
-  align-items: center;
-  align-self: stretch;
-  background: var(--lineup-blue);
-  border-radius: 0.45rem;
-  color: #fff;
-  display: flex;
-  flex-shrink: 0;
-  font-size: 0.72rem;
-  font-weight: 900;
-  justify-content: center;
-  padding-inline: 0.35rem;
-  width: 1.65rem;
-}
-
-.lineup-player-chip-photo {
-  aspect-ratio: 3 / 4;
-  border-radius: 0.45rem;
-  flex-shrink: 0;
-  overflow: hidden;
-  width: 2.4rem;
-}
-
-.lineup-player-chip-meta {
-  flex: 1;
-  min-width: 0;
-}
-
-.lineup-player-chip-role {
-  color: rgba(33, 76, 155, 0.7);
-  font-size: 0.58rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.lineup-player-chip-name {
-  color: #0f172a;
-  font-size: 0.68rem;
-  font-weight: 800;
-  line-height: 1.15;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  opacity: 0.58;
 }
 
 /* Plantilla — ficha trading card (26/27+) */

@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { Plus, X } from "lucide-react";
+import { LineupMiniFicha } from "@/components/lineup/LineupMiniFicha";
 import type { SquadPlayer } from "@/types/squad";
-import { getPlayerDisplayName, getNationalityFlagUrl } from "@/lib/squad-utils";
+import { getPlayerDisplayName } from "@/lib/squad-utils";
 import { cn } from "@/lib/utils";
 import type { FormationId, FormationSlot } from "@/lib/lineup-formations";
 
@@ -17,53 +17,6 @@ type LineupPitchProps = {
   onSlotClick: (slotIndex: number) => void;
   exportMode?: boolean;
 };
-
-function PitchPlayerToken({
-  player,
-  exportMode = false,
-}: {
-  player: SquadPlayer;
-  exportMode?: boolean;
-}) {
-  const displayName = getPlayerDisplayName(player);
-  const initials = displayName
-    .split(/\s+/)
-    .map((part) => part[0] ?? "")
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-
-  return (
-    <div className="lineup-pitch-player">
-      <div className="lineup-pitch-player-photo">
-        {player.foto ? (
-          <Image
-            src={player.foto}
-            alt={displayName}
-            width={80}
-            height={96}
-            className="h-full w-full object-cover object-top"
-            unoptimized={player.foto.startsWith("http")}
-          />
-        ) : (
-          <span className="text-xs font-extrabold text-[#214C9B]/70">{initials}</span>
-        )}
-      </div>
-      {!exportMode ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          className="lineup-pitch-player-flag"
-          src={getNationalityFlagUrl(player.nacionalidad)}
-          alt={player.nacionalidad}
-          width={14}
-          height={10}
-        />
-      ) : null}
-      <p className="lineup-pitch-player-name">{player.apellido || player.nombre}</p>
-      <span className="lineup-pitch-player-dorsal">{player.dorsal}</span>
-    </div>
-  );
-}
 
 export function LineupPitch({
   formation,
@@ -105,7 +58,7 @@ export function LineupPitch({
             >
               {player ? (
                 <>
-                  <PitchPlayerToken player={player} exportMode={exportMode} />
+                  <LineupMiniFicha player={player} size="pitch" />
                   {!exportMode ? (
                     <span className="lineup-pitch-slot-remove" aria-hidden>
                       <X className="h-3 w-3" />
@@ -114,7 +67,7 @@ export function LineupPitch({
                 </>
               ) : (
                 <span className="lineup-pitch-slot-empty" aria-hidden>
-                  <Plus className="h-5 w-5" strokeWidth={2.5} />
+                  <Plus className="h-4 w-4" strokeWidth={2.5} />
                 </span>
               )}
             </button>

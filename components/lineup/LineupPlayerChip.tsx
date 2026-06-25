@@ -1,9 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { LineupMiniFicha } from "@/components/lineup/LineupMiniFicha";
 import type { SquadPlayer } from "@/types/squad";
 import { getPlayerDisplayName } from "@/lib/squad-utils";
-import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 import { cn } from "@/lib/utils";
 
 type LineupPlayerChipProps = {
@@ -31,27 +31,14 @@ export function LineupPlayerChip({
       transition={{ delay: index * 0.015, duration: 0.25 }}
       onClick={() => onSelect(player)}
       className={cn(
-        "lineup-player-chip group text-left",
+        "lineup-player-chip",
         selected && "lineup-player-chip--selected",
         assigned && !selected && "lineup-player-chip--assigned",
       )}
       aria-pressed={selected}
       aria-label={`${displayName}, dorsal ${player.dorsal}`}
     >
-      <span className="lineup-player-chip-dorsal">{player.dorsal}</span>
-      <div className="lineup-player-chip-photo">
-        <PlayerAvatar
-          player={player}
-          bare
-          placeholderTone="light"
-          imageClassName="object-cover object-top"
-          className="h-full w-full"
-        />
-      </div>
-      <div className="lineup-player-chip-meta">
-        <p className="lineup-player-chip-role">{player.rol}</p>
-        <p className="lineup-player-chip-name">{displayName}</p>
-      </div>
+      <LineupMiniFicha player={player} size="sidebar" />
     </motion.button>
   );
 }

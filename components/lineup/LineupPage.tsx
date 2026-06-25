@@ -294,7 +294,7 @@ function LineupBoard({
                     <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-400">
                       {position}
                     </p>
-                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-3 xl:grid-cols-4">
                       {list.map((player, index) => (
                         <LineupPlayerChip
                           key={player.id}
