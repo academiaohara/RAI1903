@@ -20,11 +20,11 @@ import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { CalendarMatch, CalendarViewMode } from "@/types";
 
 type TeamCalendarProps = {
-  /** Partidos mostrados en la vista mes (puede abarcar varias temporadas). */
+  /** Partidos de la temporada seleccionada (vista mes y lista). */
   matches: CalendarMatch[];
   /** Partidos de la vista lista; por defecto los mismos que `matches`. */
   listMatches?: CalendarMatch[];
-  /** IDs de temporada publicados para acotar la navegación hacia atrás. */
+  /** ID(s) de temporada para acotar la navegación del calendario (julio–junio). */
   seasonIds?: string[];
   className?: string;
   gender?: PrimerEquipoGender;

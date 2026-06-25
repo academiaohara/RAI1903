@@ -15,20 +15,15 @@ type CalendarioSeasonViewProps = {
 };
 
 export function CalendarioSeasonView({ gender }: CalendarioSeasonViewProps) {
-  const { seasons } = useSeason();
-  const { allMatches, seasonMatches, loading } = useAllSeasonsCalendarMatches(gender);
+  const { viewedSeasonId } = useSeason();
+  const { seasonMatches } = useAllSeasonsCalendarMatches(gender);
 
-  const monthMatches = useEditedCalendarMatches(allMatches, gender);
-  const listMatches = useEditedCalendarMatches(seasonMatches, gender);
+  const matches = useEditedCalendarMatches(seasonMatches, gender);
 
-  const seasonIds = useMemo(() => {
-    const published = seasons.filter((row) => row.published);
-    const list = published.length ? published : seasons;
-    return list.map((row) => row.id);
-  }, [seasons]);
+  const seasonIds = useMemo(() => [viewedSeasonId], [viewedSeasonId]);
 
-  const played = listMatches.filter((match) => match.played).length;
-  const upcoming = listMatches.length - played;
+  const played = matches.filter((match) => match.played).length;
+  const upcoming = matches.length - played;
 
   return (
     <SectionUnderConstructionGate scope={gender} section="calendario">
@@ -36,7 +31,7 @@ export function CalendarioSeasonView({ gender }: CalendarioSeasonViewProps) {
       <ExtraFixturesOnPageEditor gender={gender} />
       <div className="mb-6 flex flex-wrap gap-4 text-sm font-bold text-slate-600">
         <span>
-          <span className="text-[#214C9B]">{listMatches.length}</span> partidos
+          <span className="text-[#214C9B]">{matches.length}</span> partidos
         </span>
         <span>
           <span className="text-emerald-700">{played}</span> jugados
@@ -45,18 +40,13 @@ export function CalendarioSeasonView({ gender }: CalendarioSeasonViewProps) {
           <span className="text-[#981915]">{upcoming}</span> pendientes
         </span>
       </div>
-      {loading ? (
-        <p className="text-sm font-bold text-slate-500">Cargando calendario…</p>
-      ) : (
-        <TeamCalendar
-          matches={monthMatches}
-          listMatches={listMatches}
-          seasonIds={seasonIds}
-          gender={gender}
-          listOnly={gender === "femenino"}
-          showVenue={gender !== "femenino"}
-        />
-      )}
+      <TeamCalendar
+        matches={matches}
+        seasonIds={seasonIds}
+        gender={gender}
+        listOnly={gender === "femenino"}
+        showVenue={gender !== "femenino"}
+      />
     </Card>
     </SectionUnderConstructionGate>
   );
