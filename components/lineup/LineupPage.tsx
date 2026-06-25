@@ -192,37 +192,37 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
       {/* Main layout: pizarra + list */}
       <div className="lineup-main-grid">
         <section className="lineup-pizarra-section">
-          {/* Standalone header: XI RAI + formation + rival — above the pitch */}
-          <div className="lineup-card-header-standalone">
-            <div className="lineup-card-header-left">
-              <span className="lineup-card-xi">XI RAI</span>
-              <span className="lineup-card-formation-badge">{formation}</span>
-            </div>
-            {rival && (
-              <div className="lineup-card-header-right">
-                <span className="lineup-card-vs">vs</span>
-                <OpponentCrest
-                  logo={rival.crest}
-                  opponent={rival.name}
-                  size="lg"
-                  className="lineup-card-rival-crest"
-                />
-                <span className="lineup-card-rival-name">{rival.name}</span>
+          <div ref={exportRef} className="lineup-export-wrapper">
+            <div className="lineup-card-header-standalone">
+              <div className="lineup-card-header-left">
+                <span className="lineup-card-xi">XI RAI</span>
+                <span className="lineup-card-formation-badge">{formation}</span>
               </div>
-            )}
-          </div>
+              {rival && (
+                <div className="lineup-card-header-right">
+                  <span className="lineup-card-vs">VS</span>
+                  <OpponentCrest
+                    logo={rival.crest}
+                    opponent={rival.name}
+                    size="lg"
+                    className="lineup-card-rival-crest"
+                  />
+                </div>
+              )}
+            </div>
 
-          <div ref={exportRef} className="lineup-export-card">
-            <LineupPitch
-              formation={formation}
-              slots={slots}
-              assignments={assignments}
-              playersById={playersById}
-              squad={squad}
-              assignedIds={assignedIds}
-              onPlayerAssign={assignPlayerToSlot}
-              onRemovePlayer={removeFromSlot}
-            />
+            <div className="lineup-export-card">
+              <LineupPitch
+                formation={formation}
+                slots={slots}
+                assignments={assignments}
+                playersById={playersById}
+                squad={squad}
+                assignedIds={assignedIds}
+                onPlayerAssign={assignPlayerToSlot}
+                onRemovePlayer={removeFromSlot}
+              />
+            </div>
           </div>
           <p className="mt-2 text-center text-xs font-semibold text-slate-500">
             {assignedIds.size < 11
