@@ -4,6 +4,7 @@ import {
   CalendarDays,
   ClipboardList,
   Columns3,
+  LayoutGrid,
   Ship,
   Home,
   Medal,
@@ -44,6 +45,7 @@ export const navItems: NavItem[] = [
     activePrefix: "/primer-equipo/masculino",
     children: [
       { href: "/primer-equipo/masculino/plantilla", label: "Plantilla", icon: Users },
+      { href: "/primer-equipo/masculino/lineup", label: "Lineup", icon: LayoutGrid },
       { href: "/primer-equipo/masculino/competicion", label: "Competición", icon: Trophy },
       { href: "/primer-equipo/masculino/jornadas", label: "Jornadas", icon: Columns3 },
       { href: "/primer-equipo/masculino/calendario", label: "Calendario", icon: CalendarDays },
@@ -57,6 +59,7 @@ export const navItems: NavItem[] = [
     activePrefix: "/primer-equipo/femenino",
     children: [
       { href: "/primer-equipo/femenino/plantilla", label: "Plantilla", icon: Users },
+      { href: "/primer-equipo/femenino/lineup", label: "Lineup", icon: LayoutGrid },
       { href: "/primer-equipo/femenino/competicion", label: "Competición", icon: Trophy },
       { href: "/primer-equipo/femenino/jornadas", label: "Jornadas", icon: Columns3 },
       { href: "/primer-equipo/femenino/calendario", label: "Calendario", icon: CalendarDays },

@@ -17,6 +17,7 @@ export function primerEquipoBase(gender: PrimerEquipoGender) {
 
 export const PRIMER_EQUIPO_SECTIONS = [
   "plantilla",
+  "lineup",
   "noticias",
   "competicion",
   "jornadas",
@@ -35,6 +36,7 @@ export function getPrimerEquipoTabs(gender: PrimerEquipoGender) {
   const base = primerEquipoBase(gender);
   const tabs = [
     { href: `${base}/plantilla`, label: "Plantilla" },
+    { href: `${base}/lineup`, label: "Lineup" },
     { href: `${base}/noticias`, label: "Noticias" },
     { href: `${base}/competicion`, label: "Competición" },
     { href: `${base}/jornadas`, label: "Jornadas" },
