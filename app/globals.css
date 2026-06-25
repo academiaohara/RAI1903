@@ -325,6 +325,7 @@ a {
 /* Lineup — pizarra interactiva */
 .lineup-page {
   --lineup-blue: #214c9b;
+  --lineup-purple: #6b4e9e;
 }
 
 .lineup-opponent-banner {
@@ -338,91 +339,95 @@ a {
   padding: 0.9rem 1rem;
 }
 
-.lineup-board,
-.lineup-export-card {
-  background: #fff;
-  border: 1px solid rgba(33, 76, 155, 0.12);
-  border-radius: 1.25rem;
-  box-shadow: 0 16px 40px rgba(17, 24, 39, 0.06);
-}
-
-.lineup-export-card {
-  padding: 1rem 1rem 0.75rem;
-}
-
-.lineup-board-header {
-  align-items: flex-start;
+.lineup-board {
   display: flex;
+  flex-direction: column;
   gap: 0.75rem;
-  justify-content: space-between;
-  margin-bottom: 0.35rem;
 }
 
-.lineup-board-title {
+.lineup-export-card {
+  aspect-ratio: 1148 / 1370;
+  background: url("/Pizarra.png") center top / 100% 100% no-repeat;
+  border-radius: 0.35rem;
+  box-shadow: 0 12px 32px rgba(17, 24, 39, 0.12);
+  display: flex;
+  flex-direction: column;
+  margin-inline: auto;
+  max-width: min(100%, 440px);
+  overflow: hidden;
+  padding: 4.5% 5.5% 4%;
+  width: 100%;
+}
+
+.lineup-export-header {
+  align-items: center;
+  display: grid;
+  flex-shrink: 0;
+  gap: 0.35rem;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  margin-bottom: 2.5%;
+}
+
+.lineup-export-title {
   color: var(--lineup-blue);
-  font-size: 1.35rem;
+  font-size: clamp(1.35rem, 5.5vw, 1.85rem);
   font-weight: 900;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   line-height: 1;
   text-transform: uppercase;
 }
 
-.lineup-formation-badge {
-  background: var(--lineup-blue);
-  border-radius: 999px;
-  color: #fff;
-  font-size: 0.72rem;
+.lineup-export-kickoff {
+  color: var(--lineup-purple);
+  font-size: clamp(0.72rem, 2.8vw, 0.88rem);
   font-weight: 800;
-  letter-spacing: 0.08em;
-  padding: 0.35rem 0.65rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+  white-space: nowrap;
 }
 
-.lineup-board-rival {
-  color: #64748b;
-  font-size: 0.78rem;
-  font-weight: 700;
-  margin-bottom: 0.65rem;
+.lineup-export-vs {
+  align-items: center;
+  display: flex;
+  gap: 0.35rem;
+  justify-content: flex-end;
 }
 
-.lineup-board-rival span {
-  color: #0f172a;
-  font-weight: 800;
+.lineup-export-vs-label {
+  color: #111827;
+  font-size: clamp(0.82rem, 3vw, 1rem);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.lineup-export-crest {
+  height: clamp(1.75rem, 6vw, 2.35rem) !important;
+  width: clamp(1.75rem, 6vw, 2.35rem) !important;
 }
 
 .lineup-pitch-shell {
+  flex: 1;
   margin-inline: auto;
-  max-width: 640px;
+  max-width: none;
+  min-height: 0;
+  width: 100%;
 }
 
 .lineup-pitch {
-  aspect-ratio: 1 / 1.15;
-  background: #fff;
-  border: 2px solid #111827;
-  border-radius: 0.75rem;
-  box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.08);
-  overflow: hidden;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  height: 100%;
+  overflow: visible;
   position: relative;
   width: 100%;
 }
 
-.lineup-pitch::before {
-  border: 2px solid rgba(17, 24, 39, 0.85);
-  border-radius: 2px;
-  content: "";
-  inset: 7% 10%;
-  pointer-events: none;
-  position: absolute;
-}
-
+.lineup-pitch::before,
 .lineup-pitch::after {
-  background: rgba(17, 24, 39, 0.85);
-  content: "";
-  height: 2px;
-  left: 10%;
-  position: absolute;
-  right: 10%;
-  top: 50%;
-  transform: translateY(-50%);
+  content: none;
+  display: none;
 }
 
 .lineup-pitch-slot {
@@ -454,8 +459,8 @@ a {
 .lineup-pitch-slot-empty {
   align-items: center;
   aspect-ratio: 1;
-  background: #fff;
-  border: 2px solid #111827;
+  background: rgba(255, 255, 255, 0.72);
+  border: 2px solid rgba(17, 24, 39, 0.75);
   border-radius: 999px;
   color: #111827;
   display: flex;

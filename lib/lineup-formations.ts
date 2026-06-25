@@ -30,18 +30,18 @@ function row(count: number, y: number): FormationSlot[] {
 }
 
 function goalkeeper(): FormationSlot[] {
-  return [{ x: 50, y: 92 }];
+  return [{ x: 50, y: 90 }];
 }
 
 /** Eleven slot positions on the pitch (percentages), from goalkeeper to attack. */
 export const FORMATION_SLOTS: Record<FormationId, FormationSlot[]> = {
-  "4-4-2": [...goalkeeper(), ...row(4, 76), ...row(4, 52), ...row(2, 26)],
-  "4-3-3": [...goalkeeper(), ...row(4, 76), ...row(3, 52), ...row(3, 26)],
-  "4-2-3-1": [...goalkeeper(), ...row(4, 76), ...row(2, 62), ...row(3, 40), ...row(1, 24)],
-  "3-5-2": [...goalkeeper(), ...row(3, 76), ...row(5, 52), ...row(2, 26)],
-  "3-4-2-1": [...goalkeeper(), ...row(3, 76), ...row(4, 54), ...row(2, 36), ...row(1, 22)],
-  "5-3-2": [...goalkeeper(), ...row(5, 76), ...row(3, 52), ...row(2, 26)],
-  "4-5-1": [...goalkeeper(), ...row(4, 76), ...row(5, 52), ...row(1, 24)],
+  "4-4-2": [...goalkeeper(), ...row(4, 74), ...row(4, 50), ...row(2, 28)],
+  "4-3-3": [...goalkeeper(), ...row(4, 74), ...row(3, 50), ...row(3, 28)],
+  "4-2-3-1": [...goalkeeper(), ...row(4, 74), ...row(2, 60), ...row(3, 40), ...row(1, 26)],
+  "3-5-2": [...goalkeeper(), ...row(3, 74), ...row(5, 50), ...row(2, 28)],
+  "3-4-2-1": [...goalkeeper(), ...row(3, 74), ...row(4, 52), ...row(2, 36), ...row(1, 24)],
+  "5-3-2": [...goalkeeper(), ...row(5, 74), ...row(3, 50), ...row(2, 28)],
+  "4-5-1": [...goalkeeper(), ...row(4, 74), ...row(5, 50), ...row(1, 26)],
 };
 
 export function isFormationId(value: string): value is FormationId {
