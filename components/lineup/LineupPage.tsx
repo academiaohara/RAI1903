@@ -193,25 +193,24 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
       <div className="lineup-main-grid">
         <section className="lineup-pizarra-section">
           <div ref={exportRef} className="lineup-export-wrapper">
-            <div className="lineup-card-header-standalone">
-              <div className="lineup-card-header-left">
-                <span className="lineup-card-xi">XI RAI</span>
-                <span className="lineup-card-formation-badge">{formation}</span>
-              </div>
-              {rival && (
-                <div className="lineup-card-header-right">
-                  <span className="lineup-card-vs">VS</span>
-                  <OpponentCrest
-                    logo={rival.crest}
-                    opponent={rival.name}
-                    size="lg"
-                    className="lineup-card-rival-crest"
-                  />
-                </div>
-              )}
-            </div>
-
             <div className="lineup-export-card">
+              <div className="lineup-card-header">
+                <div className="lineup-card-header-left">
+                  <span className="lineup-card-xi">XI RAI</span>
+                  <span className="lineup-card-formation-badge">{formation}</span>
+                </div>
+                {rival && (
+                  <div className="lineup-card-header-right">
+                    <span className="lineup-card-vs">VS</span>
+                    <OpponentCrest
+                      logo={rival.crest}
+                      opponent={rival.name}
+                      size="lg"
+                      className="lineup-card-rival-crest"
+                    />
+                  </div>
+                )}
+              </div>
               <LineupPitch
                 formation={formation}
                 slots={slots}
