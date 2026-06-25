@@ -14,7 +14,8 @@ import {
   type FormationId,
   type FormationSlot,
 } from "@/lib/lineup-formations";
-import { shareLineupImage } from "@/lib/lineup-share";
+import { downloadLineupImage, shareLineupImage, shareLineupOnX } from "@/lib/lineup-share";
+import { isSchedulableMatchDate } from "@/lib/match-calendar-dates";
 import {
   createEmptySlots,
   loadSavedLineup,
@@ -36,7 +37,8 @@ function initialLineupState(seasonId: string, gender: PrimerEquipoGender) {
   const assignments = saved
     ? resizeLineupSlots(saved.slots, FORMATION_SLOTS[formation].length)
     : createEmptySlots(FORMATION_SLOTS[formation].length);
-  return { formation, assignments };
+  const showRival = saved?.showRival !== false;
+  return { formation, assignments, showRival };
 }
 
 type LineupListPanelProps = {
@@ -77,23 +79,30 @@ type LineupBoardProps = {
 
 function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps) {
   const exportRef = useRef<HTMLDivElement>(null);
-  const [{ formation, assignments }, setLineupState] = useState(() =>
+  const shareMenuRef = useRef<HTMLDivElement>(null);
+  const [{ formation, assignments, showRival }, setLineupState] = useState(() =>
     initialLineupState(seasonId, gender),
   );
   const [sharing, setSharing] = useState(false);
+  const [shareMenuOpen, setShareMenuOpen] = useState(false);
 
-  const { nextMatch, teams } = usePrimerEquipoLeagueSeason(gender);
+  const { nextMatch, teams, leagueMatchdays, avilesMatches } = usePrimerEquipoLeagueSeason(gender);
   const highlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
 
+  const hasCalendar = useMemo(() => {
+    if (leagueMatchdays.length === 0) return false;
+    return avilesMatches.some((match) => isSchedulableMatchDate(match.date));
+  }, [avilesMatches, leagueMatchdays]);
+
   const rival = useMemo(() => {
-    if (!nextMatch) return null;
+    if (!hasCalendar || !nextMatch || !isSchedulableMatchDate(nextMatch.date)) return null;
     const isHome = nextMatch.homeTeamId === highlightTeamId;
     const rivalTeamId = isHome ? nextMatch.awayTeamId : nextMatch.homeTeamId;
     const rivalName = isHome ? nextMatch.awayTeam : nextMatch.homeTeam;
     const rivalTeam = teams.find((t) => t.id === rivalTeamId);
     const rivalCrest = getTeamCrestById(rivalTeamId, rivalTeam?.crestInitials);
     return { teamId: rivalTeamId, name: rivalName, crest: rivalCrest };
-  }, [nextMatch, teams, highlightTeamId]);
+  }, [hasCalendar, nextMatch, teams, highlightTeamId]);
 
   const playersById = useMemo(
     () => new Map(squad.map((player) => [player.id, player])),
@@ -106,13 +115,25 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
   const slots = FORMATION_SLOTS[formation];
 
   useEffect(() => {
-    saveLineup(seasonId, gender, { formation, slots: assignments });
-  }, [assignments, formation, gender, seasonId]);
+    saveLineup(seasonId, gender, { formation, slots: assignments, showRival });
+  }, [assignments, formation, gender, seasonId, showRival]);
+
+  useEffect(() => {
+    if (!shareMenuOpen) return;
+    const close = (event: MouseEvent) => {
+      if (shareMenuRef.current && !shareMenuRef.current.contains(event.target as Node)) {
+        setShareMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [shareMenuOpen]);
 
   const handleFormationChange = useCallback((nextFormation: FormationId) => {
     setLineupState((current) => ({
       formation: nextFormation,
       assignments: resizeLineupSlots(current.assignments, FORMATION_SLOTS[nextFormation].length),
+      showRival: current.showRival,
     }));
   }, []);
 
@@ -134,19 +155,33 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
     });
   }, []);
 
-  const handleShare = useCallback(async () => {
-    if (!exportRef.current || sharing) return;
-    setSharing(true);
-    try {
-      await shareLineupImage({
-        node: exportRef.current,
-        fileName: `lineup-${gender}-${seasonLabel.replace("/", "-")}.png`,
-        shareText: `Mi XI del Avilés (${formation}) #RealAviles`,
-      });
-    } finally {
-      setSharing(false);
-    }
-  }, [formation, gender, sharing, seasonLabel]);
+  const runShareAction = useCallback(
+    async (action: "native" | "x" | "download") => {
+      if (!exportRef.current || sharing) return;
+      setSharing(true);
+      setShareMenuOpen(false);
+      try {
+        const options = {
+          node: exportRef.current,
+          fileName: `lineup-${gender}-${seasonLabel.replace("/", "-")}.png`,
+          shareText: `Mi XI del Avilés (${formation}) #RealAviles`,
+        };
+        if (action === "native") {
+          await shareLineupImage(options);
+        } else if (action === "x") {
+          await shareLineupOnX(options);
+        } else {
+          await downloadLineupImage(options);
+        }
+      } finally {
+        setSharing(false);
+      }
+    },
+    [formation, gender, sharing, seasonLabel],
+  );
+
+  const canNativeShare =
+    typeof navigator !== "undefined" && typeof navigator.share === "function";
 
   return (
     <div className="lineup-page space-y-4">
@@ -177,15 +212,57 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
               ))}
             </select>
           </label>
-          <button
-            type="button"
-            onClick={() => void handleShare()}
-            disabled={sharing || assignedIds.size === 0}
-            className="inline-flex items-center gap-2 rounded-full border-2 border-[#214C9B] px-4 py-2 text-sm font-extrabold uppercase tracking-wide text-[#214C9B] transition hover:bg-[#214C9B] hover:text-white disabled:cursor-not-allowed disabled:opacity-45"
-          >
-            <Share2 className="h-4 w-4" aria-hidden />
-            {sharing ? "Generando…" : "Compartir"}
-          </button>
+          {rival && (
+            <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-[#214C9B]/15 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-sm">
+              <input
+                type="checkbox"
+                checked={showRival}
+                onChange={(e) =>
+                  setLineupState((current) => ({ ...current, showRival: e.target.checked }))
+                }
+                className="h-4 w-4 rounded border-[#214C9B]/30 text-[#214C9B] focus:ring-[#214C9B]/30"
+              />
+              <span>Mostrar rival</span>
+            </label>
+          )}
+          <div className="relative" ref={shareMenuRef}>
+            <button
+              type="button"
+              onClick={() => setShareMenuOpen((open) => !open)}
+              disabled={sharing || assignedIds.size === 0}
+              className="inline-flex items-center gap-2 rounded-full border-2 border-[#214C9B] px-4 py-2 text-sm font-extrabold uppercase tracking-wide text-[#214C9B] transition hover:bg-[#214C9B] hover:text-white disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              <Share2 className="h-4 w-4" aria-hidden />
+              {sharing ? "Generando…" : "Compartir"}
+            </button>
+            {shareMenuOpen && !sharing && (
+              <div className="lineup-share-menu">
+                {canNativeShare && (
+                  <button
+                    type="button"
+                    className="lineup-share-menu-item"
+                    onClick={() => void runShareAction("native")}
+                  >
+                    Compartir…
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="lineup-share-menu-item"
+                  onClick={() => void runShareAction("x")}
+                >
+                  Compartir en X
+                </button>
+                <button
+                  type="button"
+                  className="lineup-share-menu-item"
+                  onClick={() => void runShareAction("download")}
+                >
+                  Descargar imagen
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -199,7 +276,7 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
                   <span className="lineup-card-xi">XI RAI</span>
                   <span className="lineup-card-formation-badge">{formation}</span>
                 </div>
-                {rival && (
+                {rival && showRival && (
                   <div className="lineup-card-header-right">
                     <span className="lineup-card-vs">VS</span>
                     <OpponentCrest
