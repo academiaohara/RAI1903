@@ -48,7 +48,7 @@ export function LineupPitch({
 }: LineupPitchProps) {
   const [dropdown, setDropdown] = useState<DropdownState | null>(null);
   const isClient = useIsClient();
-  const slotRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const slotRefs = useRef<(HTMLDivElement | null)[]>([]);
   const groupedPlayers = useMemo(() => groupPlayersByPosition(squad), [squad]);
 
   useEffect(() => {
@@ -101,14 +101,25 @@ export function LineupPitch({
           const player = playerId ? playersById.get(playerId) : undefined;
 
           return (
-            <button
+            // Using div with role="button" to avoid invalid nested <button> elements
+            <div
               key={`${formation}-${index}`}
               ref={(el) => {
                 slotRefs.current[index] = el;
               }}
-              type="button"
+              role={exportMode ? undefined : "button"}
+              tabIndex={exportMode ? undefined : 0}
               onClick={exportMode ? undefined : () => handleSlotClick(index)}
-              disabled={exportMode}
+              onKeyDown={
+                exportMode
+                  ? undefined
+                  : (e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleSlotClick(index);
+                      }
+                    }
+              }
               className="lineup-pitch-slot"
               style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
               aria-label={
@@ -127,17 +138,17 @@ export function LineupPitch({
                       imageClassName="object-cover object-[center_top]"
                       className="h-full w-full"
                     />
-                    {!exportMode && (
-                      <button
-                        type="button"
-                        className="pitch-player-remove"
-                        onClick={(e) => handleRemoveClick(e, index)}
-                        aria-label="Quitar jugador"
-                      >
-                        ×
-                      </button>
-                    )}
                   </div>
+                  {!exportMode && (
+                    <button
+                      type="button"
+                      className="pitch-player-remove"
+                      onClick={(e) => handleRemoveClick(e, index)}
+                      aria-label="Quitar jugador"
+                    >
+                      ×
+                    </button>
+                  )}
                   <span className="pitch-player-name">
                     {player.apellido || player.nombre}
                   </span>
@@ -147,7 +158,7 @@ export function LineupPitch({
                   <span className="pitch-slot-label">{slot.label}</span>
                 </div>
               )}
-            </button>
+            </div>
           );
         })}
       </div>
@@ -166,7 +177,7 @@ export function LineupPitch({
               style={{ top: dropdown.top, left: dropdown.left }}
             >
               <div className="lineup-dropdown-header">
-                <span>Elige jugador — pos. {slots[dropdown.slotIndex]?.label}</span>
+                <span>Elige jugador — {slots[dropdown.slotIndex]?.label}</span>
                 <button
                   type="button"
                   onClick={() => setDropdown(null)}
@@ -176,31 +187,35 @@ export function LineupPitch({
                   <X className="h-3.5 w-3.5" />
                 </button>
               </div>
-              {assignments[dropdown.slotIndex] && (() => {
-                const currentId = assignments[dropdown.slotIndex];
-                const currentPlayer = currentId ? playersById.get(currentId) : undefined;
-                return currentPlayer ? (
-                  <div className="lineup-dropdown-current">
-                    <button
-                      type="button"
-                      className="lineup-dropdown-remove-current"
-                      onClick={() => {
-                        onRemovePlayer(dropdown.slotIndex);
-                        setDropdown(null);
-                      }}
-                    >
-                      <X className="h-3 w-3" />
-                      <span>
-                        Quitar a {currentPlayer.apellido || currentPlayer.nombre}
-                      </span>
-                    </button>
-                  </div>
-                ) : null;
-              })()}
+              {assignments[dropdown.slotIndex] &&
+                (() => {
+                  const currentId = assignments[dropdown.slotIndex];
+                  const currentPlayer = currentId
+                    ? playersById.get(currentId)
+                    : undefined;
+                  return currentPlayer ? (
+                    <div className="lineup-dropdown-current">
+                      <button
+                        type="button"
+                        className="lineup-dropdown-remove-current"
+                        onClick={() => {
+                          onRemovePlayer(dropdown.slotIndex);
+                          setDropdown(null);
+                        }}
+                      >
+                        <X className="h-3 w-3" />
+                        <span>
+                          Quitar a {currentPlayer.apellido || currentPlayer.nombre}
+                        </span>
+                      </button>
+                    </div>
+                  ) : null;
+                })()}
               {SQUAD_POSITIONS.map((position) => {
                 const currentSlotPlayerId = assignments[dropdown.slotIndex];
                 const list = groupedPlayers[position].filter(
-                  (p) => !assignedIds.has(p.id) || p.id === currentSlotPlayerId,
+                  (p) =>
+                    !assignedIds.has(p.id) || p.id === currentSlotPlayerId,
                 );
                 if (list.length === 0) return null;
                 return (
@@ -212,7 +227,11 @@ export function LineupPitch({
                       <button
                         key={player.id}
                         type="button"
-                        className={`lineup-dropdown-player${player.id === currentSlotPlayerId ? " lineup-dropdown-player--current" : ""}`}
+                        className={`lineup-dropdown-player${
+                          player.id === currentSlotPlayerId
+                            ? " lineup-dropdown-player--current"
+                            : ""
+                        }`}
                         onClick={() => handlePlayerSelect(player.id)}
                       >
                         <span className="lineup-dropdown-dorsal">
