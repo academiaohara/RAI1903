@@ -63,7 +63,7 @@ export function MatchCard({
       </div>
       {layout === "stripe" ? (
         <>
-          <div className="md:hidden">
+          <div className="sm:hidden">
             <MatchFixtureJerseyMobile
               match={editedMatch}
               gender={gender}
@@ -80,7 +80,7 @@ export function MatchCard({
             scoreLabel={scoreLabel}
             sublabel={stripeDateLabel}
             linkTeams
-            className="hidden md:grid"
+            className="hidden sm:grid"
           />
         </>
       ) : (
