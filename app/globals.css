@@ -556,6 +556,94 @@ a {
   text-transform: uppercase;
 }
 
+@media (max-width: 767px) {
+  .lineup-pitch-slot {
+    width: clamp(52px, 12.5%, 72px);
+  }
+
+  .pitch-player-photo {
+    border-width: 2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  }
+
+  .pitch-player-name {
+    font-size: clamp(0.5rem, 1.7vw, 0.62rem);
+    max-width: 5.5rem;
+    padding: 0.12rem 0.28rem;
+  }
+
+  .pitch-player-remove {
+    font-size: 0.62rem;
+    height: 0.95rem;
+    width: 0.95rem;
+  }
+
+  .pitch-slot-empty {
+    border-width: 2px;
+  }
+
+  .pitch-slot-label {
+    font-size: clamp(0.48rem, 1.6vw, 0.62rem);
+  }
+
+  .pitch-player-node {
+    gap: 0.2rem;
+  }
+
+  .lineup-card-xi {
+    font-size: clamp(1.35rem, 5vw, 1.75rem);
+  }
+
+  .lineup-card-formation-badge {
+    font-size: clamp(0.68rem, 2vw, 0.8rem);
+    padding: 0.22em 0.65em;
+  }
+
+  .lineup-card-rival-crest {
+    height: clamp(2rem, 5.5vw, 2.5rem) !important;
+    width: clamp(2rem, 5.5vw, 2.5rem) !important;
+  }
+
+  .lineup-card-vs {
+    font-size: clamp(0.8rem, 2.2vw, 0.95rem);
+  }
+}
+
+.lineup-share-menu {
+  background: #fff;
+  border: 1px solid rgba(33, 76, 155, 0.18);
+  border-radius: 0.85rem;
+  box-shadow: 0 12px 32px rgba(17, 24, 39, 0.14);
+  display: flex;
+  flex-direction: column;
+  min-width: 11.5rem;
+  overflow: hidden;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.45rem);
+  z-index: 20;
+}
+
+.lineup-share-menu-item {
+  background: transparent;
+  border: none;
+  color: #1e293b;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.7rem 0.95rem;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+
+.lineup-share-menu-item:hover {
+  background: rgba(33, 76, 155, 0.08);
+}
+
+.lineup-share-menu-item + .lineup-share-menu-item {
+  border-top: 1px solid rgba(33, 76, 155, 0.1);
+}
+
 /* List panel — right column */
 .lineup-list-section {
   position: sticky;

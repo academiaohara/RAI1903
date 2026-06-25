@@ -6,7 +6,7 @@ type ShareLineupImageOptions = {
   shareText: string;
 };
 
-async function captureLineupImage(node: HTMLElement): Promise<Blob> {
+export async function captureLineupImage(node: HTMLElement): Promise<Blob> {
   const dataUrl = await toPng(node, {
     cacheBust: true,
     pixelRatio: 2,
@@ -26,7 +26,7 @@ function downloadBlob(blob: Blob, fileName: string) {
   URL.revokeObjectURL(url);
 }
 
-function openTwitterIntent(text: string) {
+export function openXShareIntent(text: string) {
   const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
   window.open(url, "_blank", "noopener,noreferrer");
 }
@@ -48,5 +48,16 @@ export async function shareLineupImage({ node, fileName, shareText }: ShareLineu
   }
 
   downloadBlob(blob, fileName);
-  openTwitterIntent(`${shareText}\n\n(Imagen descargada: adjúntala al tuit)`);
+  openXShareIntent(`${shareText}\n\n(Imagen descargada: adjúntala al tuit)`);
+}
+
+export async function shareLineupOnX({ node, fileName, shareText }: ShareLineupImageOptions) {
+  const blob = await captureLineupImage(node);
+  downloadBlob(blob, fileName);
+  openXShareIntent(`${shareText}\n\n(Imagen descargada: adjúntala al tuit)`);
+}
+
+export async function downloadLineupImage({ node, fileName }: Pick<ShareLineupImageOptions, "node" | "fileName">) {
+  const blob = await captureLineupImage(node);
+  downloadBlob(blob, fileName);
 }

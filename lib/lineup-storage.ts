@@ -4,6 +4,7 @@ import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 export type SavedLineup = {
   formation: FormationId;
   slots: Array<string | null>;
+  showRival?: boolean;
 };
 
 const STORAGE_PREFIX = "rai-lineup";
@@ -23,7 +24,7 @@ export function loadSavedLineup(seasonId: string, gender: PrimerEquipoGender): S
     const slots = Array.isArray(parsed.slots)
       ? parsed.slots.map((entry) => (typeof entry === "string" ? entry : null))
       : [];
-    return { formation, slots };
+    return { formation, slots, showRival: parsed.showRival !== false };
   } catch {
     return null;
   }
