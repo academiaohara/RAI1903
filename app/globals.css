@@ -349,7 +349,7 @@ a {
   gap: 0;
 }
 
-/* Export wrapper — header + pitch card for sharing */
+/* Export wrapper — pitch card for sharing */
 .lineup-export-wrapper {
   border-radius: 0.75rem;
   box-shadow: 0 16px 40px rgba(17, 24, 39, 0.18);
@@ -366,21 +366,18 @@ a {
   width: 100%;
 }
 
-/* Header: XI RAI + formation + rival crest */
-.lineup-card-header-standalone {
+/* Header overlay: XI RAI + formation + rival crest */
+.lineup-card-header {
   align-items: center;
-  background:
-    repeating-linear-gradient(
-      -52deg,
-      rgba(0, 0, 0, 0) 0,
-      rgba(0, 0, 0, 0) 42px,
-      rgba(0, 0, 0, 0.028) 42px,
-      rgba(0, 0, 0, 0.028) 84px
-    ),
-    #fff;
   display: flex;
   justify-content: space-between;
-  padding: 1rem 1.25rem;
+  left: 0;
+  padding: clamp(0.65rem, 2.5vw, 1.25rem) clamp(0.85rem, 3vw, 1.25rem);
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 3;
 }
 
 .lineup-card-header-left {
