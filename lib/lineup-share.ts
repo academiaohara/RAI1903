@@ -1,16 +1,39 @@
 import { toPng } from "html-to-image";
 
+const LINEUP_EXPORT_WIDTH = 1148;
+const LINEUP_EXPORT_HEIGHT = 1370;
+
 type ShareLineupImageOptions = {
   node: HTMLElement;
   fileName: string;
   shareText: string;
 };
 
+async function waitForImages(node: HTMLElement): Promise<void> {
+  const images = Array.from(node.querySelectorAll("img"));
+  await Promise.all(
+    images.map(
+      (img) =>
+        img.complete
+          ? Promise.resolve()
+          : new Promise<void>((resolve) => {
+              img.addEventListener("load", () => resolve(), { once: true });
+              img.addEventListener("error", () => resolve(), { once: true });
+            }),
+    ),
+  );
+}
+
 export async function captureLineupImage(node: HTMLElement): Promise<Blob> {
+  await waitForImages(node);
+
   const dataUrl = await toPng(node, {
-    cacheBust: true,
+    cacheBust: false,
     pixelRatio: 2,
     backgroundColor: "#e6e6e6",
+    width: LINEUP_EXPORT_WIDTH,
+    height: LINEUP_EXPORT_HEIGHT,
+    onImageErrorHandler: () => undefined,
   });
 
   const response = await fetch(dataUrl);

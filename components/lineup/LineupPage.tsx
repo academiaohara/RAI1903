@@ -152,6 +152,7 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
   );
   const [sharing, setSharing] = useState(false);
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
+  const [isCapturing, setIsCapturing] = useState(false);
 
   const { nextMatch, teams, leagueMatchdays, avilesMatches } = usePrimerEquipoLeagueSeason(gender);
   const highlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
@@ -227,6 +228,10 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
       if (!exportRef.current || sharing) return;
       setSharing(true);
       setShareMenuOpen(false);
+      setIsCapturing(true);
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      });
       try {
         const options = {
           node: exportRef.current,
@@ -241,6 +246,7 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
           await downloadLineupImage(options);
         }
       } finally {
+        setIsCapturing(false);
         setSharing(false);
       }
     },
@@ -336,7 +342,7 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
       {/* Main layout: pizarra + list */}
       <div className="lineup-main-grid">
         <section className="lineup-pizarra-section">
-          <div ref={exportRef} className="lineup-export-capture" aria-hidden="true">
+          <div ref={exportRef} className="lineup-export-wrapper">
             <LineupPizarraCard
               formation={formation}
               slots={slots}
@@ -346,19 +352,7 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
               assignedIds={assignedIds}
               rival={rival}
               showRival={showRival}
-              exportMode
-            />
-          </div>
-          <div className="lineup-export-wrapper">
-            <LineupPizarraCard
-              formation={formation}
-              slots={slots}
-              assignments={assignments}
-              playersById={playersById}
-              squad={squad}
-              assignedIds={assignedIds}
-              rival={rival}
-              showRival={showRival}
+              exportMode={isCapturing}
               onPlayerAssign={assignPlayerToSlot}
               onRemovePlayer={removeFromSlot}
             />

@@ -357,22 +357,6 @@ a {
   width: 100%;
 }
 
-/* Off-screen capture target — fixed desktop width, no remove buttons */
-.lineup-export-capture {
-  left: -10000px;
-  pointer-events: none;
-  position: fixed;
-  top: 0;
-  width: 1148px;
-  z-index: -1;
-}
-
-.lineup-export-capture .lineup-export-card {
-  border-radius: 0.75rem;
-  box-shadow: none;
-  overflow: hidden;
-}
-
 /* Export card — full-width pizarra background, no padding */
 .lineup-export-card {
   aspect-ratio: 1148 / 1370;
