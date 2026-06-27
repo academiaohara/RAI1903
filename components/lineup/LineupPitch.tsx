@@ -155,7 +155,9 @@ export function LineupPitch({
                 </div>
               ) : (
                 <div className="pitch-slot-empty">
-                  <span className="pitch-slot-label">{slot.label}</span>
+                  <span className="pitch-slot-add" aria-hidden="true">
+                    +
+                  </span>
                 </div>
               )}
             </div>
