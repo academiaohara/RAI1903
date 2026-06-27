@@ -1,7 +1,6 @@
 import { toPng } from "html-to-image";
 
 const LINEUP_EXPORT_WIDTH = 1148;
-const LINEUP_EXPORT_HEIGHT = 1370;
 
 type ShareLineupImageOptions = {
   node: HTMLElement;
@@ -24,19 +23,46 @@ async function waitForImages(node: HTMLElement): Promise<void> {
   );
 }
 
+function waitForLayout(): Promise<void> {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  });
+}
+
 export async function captureLineupImage(node: HTMLElement): Promise<Blob> {
   await waitForImages(node);
 
-  const dataUrl = await toPng(node, {
-    cacheBust: false,
-    pixelRatio: 2,
-    width: LINEUP_EXPORT_WIDTH,
-    height: LINEUP_EXPORT_HEIGHT,
-    onImageErrorHandler: () => undefined,
-  });
+  const previousStyles = {
+    width: node.style.width,
+    maxWidth: node.style.maxWidth,
+    minWidth: node.style.minWidth,
+  };
 
-  const response = await fetch(dataUrl);
-  return response.blob();
+  node.style.width = `${LINEUP_EXPORT_WIDTH}px`;
+  node.style.maxWidth = `${LINEUP_EXPORT_WIDTH}px`;
+  node.style.minWidth = `${LINEUP_EXPORT_WIDTH}px`;
+
+  await waitForLayout();
+
+  try {
+    const width = node.offsetWidth;
+    const height = node.offsetHeight;
+
+    const dataUrl = await toPng(node, {
+      cacheBust: true,
+      pixelRatio: 1,
+      width,
+      height,
+      onImageErrorHandler: () => undefined,
+    });
+
+    const response = await fetch(dataUrl);
+    return response.blob();
+  } finally {
+    node.style.width = previousStyles.width;
+    node.style.maxWidth = previousStyles.maxWidth;
+    node.style.minWidth = previousStyles.minWidth;
+  }
 }
 
 function downloadBlob(blob: Blob, fileName: string) {
