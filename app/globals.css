@@ -524,36 +524,37 @@ a {
   white-space: nowrap;
 }
 
-/* Empty slot: granate circle with position label */
+/* Empty slot: dashed granate ring + small add button */
 .pitch-slot-empty {
   align-items: center;
   aspect-ratio: 1;
-  background: rgba(140, 20, 50, 0.82);
-  border: 2.5px solid rgba(255, 255, 255, 0.55);
+  background: transparent;
+  border: 2.5px dashed #981915;
   border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
   cursor: pointer;
   display: flex;
-  flex-direction: column;
   justify-content: center;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease;
   width: 100%;
 }
 
 .pitch-slot-empty:hover,
 .lineup-pitch-slot:focus-visible .pitch-slot-empty {
-  background: rgba(160, 28, 60, 0.95);
-  border-color: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
+  border-color: #b5201a;
 }
 
-.pitch-slot-label {
-  color: rgba(255, 255, 255, 0.96);
-  font-size: clamp(0.58rem, 1.9%, 0.78rem);
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-  text-transform: uppercase;
+.pitch-slot-add {
+  align-items: center;
+  background: #981915;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  font-size: clamp(0.85rem, 2.8%, 1.15rem);
+  font-weight: 700;
+  height: clamp(1.35rem, 4.5%, 1.85rem);
+  justify-content: center;
+  line-height: 1;
+  width: clamp(1.35rem, 4.5%, 1.85rem);
 }
 
 @media (max-width: 767px) {
@@ -582,8 +583,10 @@ a {
     border-width: 2px;
   }
 
-  .lineup-export-wrapper .pitch-slot-label {
-    font-size: clamp(0.48rem, 1.6vw, 0.62rem);
+  .lineup-export-wrapper .pitch-slot-add {
+    font-size: clamp(0.65rem, 2.2vw, 0.85rem);
+    height: clamp(1rem, 3.4vw, 1.35rem);
+    width: clamp(1rem, 3.4vw, 1.35rem);
   }
 
   .lineup-export-wrapper .pitch-player-node {
