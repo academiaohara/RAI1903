@@ -41,6 +41,7 @@ export async function captureLineupImage(node: HTMLElement): Promise<Blob> {
   node.style.width = `${LINEUP_EXPORT_WIDTH}px`;
   node.style.maxWidth = `${LINEUP_EXPORT_WIDTH}px`;
   node.style.minWidth = `${LINEUP_EXPORT_WIDTH}px`;
+  node.classList.add("lineup-export-card--capture");
 
   await waitForLayout();
 
@@ -59,6 +60,7 @@ export async function captureLineupImage(node: HTMLElement): Promise<Blob> {
     const response = await fetch(dataUrl);
     return response.blob();
   } finally {
+    node.classList.remove("lineup-export-card--capture");
     node.style.width = previousStyles.width;
     node.style.maxWidth = previousStyles.maxWidth;
     node.style.minWidth = previousStyles.minWidth;

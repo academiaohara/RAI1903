@@ -106,7 +106,10 @@ function LineupPizarraCard({
   onRemovePlayer,
 }: LineupPizarraCardProps) {
   return (
-    <div ref={exportRef} className="lineup-export-card">
+    <div
+      ref={exportRef}
+      className={`lineup-export-card${exportMode ? " lineup-export-card--capture" : ""}`}
+    >
       <div className="lineup-card-header">
         <div className="lineup-card-header-left">
           <span className="lineup-card-xi">XI RAI</span>
