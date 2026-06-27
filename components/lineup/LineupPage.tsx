@@ -133,6 +133,11 @@ function LineupPizarraCard({
         onRemovePlayer={onRemovePlayer ?? (() => {})}
         exportMode={exportMode}
       />
+      {exportMode && (
+        <span className="lineup-export-watermark" aria-hidden="true">
+          @Rai1903fan
+        </span>
+      )}
     </div>
   );
 }
@@ -341,8 +346,8 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
 
       {/* Main layout: pizarra + list */}
       <div className="lineup-main-grid">
-        <section className="lineup-pizarra-section">
-          <div ref={exportRef} className="lineup-export-wrapper">
+        <div>
+          <section ref={exportRef} className="lineup-pizarra-section lineup-export-wrapper">
             <LineupPizarraCard
               formation={formation}
               slots={slots}
@@ -356,13 +361,13 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
               onPlayerAssign={assignPlayerToSlot}
               onRemovePlayer={removeFromSlot}
             />
-          </div>
+          </section>
           <p className="mt-2 text-center text-xs font-semibold text-slate-500">
             {assignedIds.size < 11
               ? `Pulsa una posición para elegir jugador · ${assignedIds.size}/11 colocados`
               : "Once completo · Pulsa ✕ sobre un jugador para quitarlo"}
           </p>
-        </section>
+        </div>
 
         <aside className="lineup-list-section">
           <LineupListPanel
