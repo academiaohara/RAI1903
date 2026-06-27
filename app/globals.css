@@ -366,6 +366,64 @@ a {
   width: 100%;
 }
 
+/* Fixed export sizes — viewport units in clamp()/vw stay tiny on mobile otherwise */
+.lineup-export-card.lineup-export-card--capture .lineup-card-header {
+  padding: 1.75rem 2rem;
+}
+
+.lineup-export-card.lineup-export-card--capture .lineup-card-xi {
+  font-size: 4rem;
+}
+
+.lineup-export-card.lineup-export-card--capture .lineup-card-formation-badge {
+  font-size: 1.35rem;
+  padding: 0.35em 1em;
+}
+
+.lineup-export-card.lineup-export-card--capture .lineup-card-vs {
+  font-size: 1.35rem;
+}
+
+.lineup-export-card.lineup-export-card--capture .lineup-card-rival-crest {
+  height: 4.5rem !important;
+  width: 4.5rem !important;
+}
+
+.lineup-export-card.lineup-export-card--capture .lineup-export-watermark {
+  bottom: 1.25rem;
+  font-size: 1.1rem;
+  right: 1.5rem;
+}
+
+.lineup-export-card.lineup-export-card--capture .lineup-pitch-slot {
+  width: 132px;
+}
+
+.lineup-export-card.lineup-export-card--capture .pitch-player-node {
+  gap: 0.45rem;
+}
+
+.lineup-export-card.lineup-export-card--capture .pitch-player-photo {
+  border-width: 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.lineup-export-card.lineup-export-card--capture .pitch-player-name {
+  font-size: 1rem;
+  max-width: 9.5rem;
+  padding: 0.28rem 0.55rem;
+}
+
+.lineup-export-card.lineup-export-card--capture .pitch-slot-empty {
+  border-width: 3px;
+}
+
+.lineup-export-card.lineup-export-card--capture .pitch-slot-add {
+  font-size: 1.35rem;
+  height: 2.1rem;
+  width: 2.1rem;
+}
+
 .lineup-export-watermark {
   bottom: clamp(0.55rem, 2.2vw, 0.95rem);
   color: #214c9b;
