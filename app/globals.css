@@ -366,6 +366,19 @@ a {
   width: 100%;
 }
 
+.lineup-export-watermark {
+  bottom: clamp(0.55rem, 2.2vw, 0.95rem);
+  color: #214c9b;
+  font-size: clamp(0.72rem, 2.1vw, 0.95rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  pointer-events: none;
+  position: absolute;
+  right: clamp(0.65rem, 2.5vw, 1.1rem);
+  z-index: 4;
+}
+
 /* Header overlay: XI RAI + formation + rival crest */
 .lineup-card-header {
   align-items: center;

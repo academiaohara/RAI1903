@@ -30,7 +30,6 @@ export async function captureLineupImage(node: HTMLElement): Promise<Blob> {
   const dataUrl = await toPng(node, {
     cacheBust: false,
     pixelRatio: 2,
-    backgroundColor: "#e6e6e6",
     width: LINEUP_EXPORT_WIDTH,
     height: LINEUP_EXPORT_HEIGHT,
     onImageErrorHandler: () => undefined,
