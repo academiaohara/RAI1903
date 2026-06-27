@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Share2 } from "lucide-react";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { LineupPitch } from "@/components/lineup/LineupPitch";
@@ -86,6 +86,7 @@ type LineupPizarraCardProps = {
   rival: RivalPreview | null;
   showRival: boolean;
   exportMode?: boolean;
+  exportRef?: RefObject<HTMLDivElement | null>;
   onPlayerAssign?: (playerId: string, slotIndex: number) => void;
   onRemovePlayer?: (slotIndex: number) => void;
 };
@@ -100,11 +101,12 @@ function LineupPizarraCard({
   rival,
   showRival,
   exportMode = false,
+  exportRef,
   onPlayerAssign,
   onRemovePlayer,
 }: LineupPizarraCardProps) {
   return (
-    <div className="lineup-export-card">
+    <div ref={exportRef} className="lineup-export-card">
       <div className="lineup-card-header">
         <div className="lineup-card-header-left">
           <span className="lineup-card-xi">XI RAI</span>
@@ -347,8 +349,9 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
       {/* Main layout: pizarra + list */}
       <div className="lineup-main-grid">
         <div>
-          <section ref={exportRef} className="lineup-pizarra-section lineup-export-wrapper">
+          <section className="lineup-pizarra-section lineup-export-wrapper">
             <LineupPizarraCard
+              exportRef={exportRef}
               formation={formation}
               slots={slots}
               assignments={assignments}
