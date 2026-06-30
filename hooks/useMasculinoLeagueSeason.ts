@@ -7,10 +7,11 @@ import {
   type SeasonCompetitionConfigBundle,
 } from "@/lib/cms/competition-config-bundle";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
-import { collectClubMatches, resolveClubTeamIds } from "@/lib/season/club-team-ids";
+import { resolveClubTeamIds } from "@/lib/season/club-team-ids";
 import { RAI_TEAM_ID } from "@/data/mock";
 import { useEditedMatchdays, useEditedMatches } from "@/hooks/useEditedMatchdays";
-import { getLeagueMatchdaysForGender } from "@/lib/season/aviles-matches";
+import { getAvilesMatchesFromSource } from "@/lib/season/aviles-matches";
+import { enrichMatchVenue } from "@/lib/match-venue";
 import { getLastPlayedLeagueRound } from "@/lib/standings";
 import {
   latestMatchesBeforeToday,
@@ -38,18 +39,37 @@ export function useMasculinoLeagueSeason(seasonScope: SeasonDataScope = "viewed"
   );
   const bundlesLoading = isBundlesLoading(seasonId);
   const baseLeagueMatchdays = useMemo(
-    () => getLeagueMatchdaysForGender(fixtureSource, "masculino"),
-    [fixtureSource],
+    () => fixtureSource.matchdays,
+    [fixtureSource.matchdays],
+  );
+  const baseGrupo2Matchdays = useMemo(
+    () => fixtureSource.matchdaysGrupo2,
+    [fixtureSource.matchdaysGrupo2],
   );
   const editedLeagueMatchdays = useEditedMatchdays(baseLeagueMatchdays, "masculino");
+  const editedGrupo2Matchdays = useEditedMatchdays(baseGrupo2Matchdays, "masculino");
   const teams = useMemo(() => resolveGroupTeams(bundles, "masculino", "1"), [bundles]);
-  const clubTeamIds = useMemo(
-    () => resolveClubTeamIds(bundles, "masculino", "1", editedLeagueMatchdays),
-    [bundles, editedLeagueMatchdays],
+  const clubTeamIds = useMemo(() => {
+    const ids = new Set([
+      ...resolveClubTeamIds(bundles, "masculino", "1", editedLeagueMatchdays),
+      ...resolveClubTeamIds(bundles, "masculino", "2", editedGrupo2Matchdays),
+    ]);
+    return [...ids];
+  }, [bundles, editedLeagueMatchdays, editedGrupo2Matchdays]);
+  const sourceForClub = useMemo(
+    () => ({
+      ...fixtureSource,
+      matchdays: editedLeagueMatchdays,
+      matchdaysGrupo2: editedGrupo2Matchdays,
+    }),
+    [fixtureSource, editedLeagueMatchdays, editedGrupo2Matchdays],
   );
   const baseAvilesMatches = useMemo(
-    () => collectClubMatches(editedLeagueMatchdays, fixtureSource, "masculino", clubTeamIds),
-    [editedLeagueMatchdays, fixtureSource, clubTeamIds],
+    () =>
+      getAvilesMatchesFromSource(sourceForClub, "masculino", { clubTeamIds }).map((match) =>
+        enrichMatchVenue(match, "masculino", { bundles }),
+      ),
+    [sourceForClub, clubTeamIds, bundles],
   );
   const avilesMatches = useEditedMatches(baseAvilesMatches, "masculino");
   const currentRound = useMemo(

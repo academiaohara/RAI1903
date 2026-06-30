@@ -10,6 +10,16 @@ export type TeamCatalogEntry = {
   stadium: string;
 };
 
+/** Slugs habituales en calendarios importados → id del mock/CMS. */
+const TEAM_ID_ALIASES: Record<string, string> = {
+  "bilbao-athletic": "athletic-bilbao-b",
+  "athletic-club-b": "athletic-bilbao-b",
+  "barakaldo-cf": "barakaldo",
+  "cd-lugo": "lugo",
+  "pontevedra-cf": "pontevedra",
+  "unionistas-de-salamanca-cf": "unionistas",
+};
+
 function normalizeRef(value: string): string {
   return value
     .trim()
@@ -59,6 +69,10 @@ export function resolveTeamCatalogEntry(
 
   const cmsTeams = getTeamsBundle(bundles, gender)?.teams ?? [];
   const normalizedRef = normalizeRef(trimmed);
+  const aliasId = TEAM_ID_ALIASES[trimmed] ?? TEAM_ID_ALIASES[normalizedRef];
+  if (aliasId && aliasId !== trimmed) {
+    return resolveTeamCatalogEntry(aliasId, bundles, gender);
+  }
 
   const cmsById = cmsTeams.find(
     (team) => team.id === trimmed || normalizeRef(team.id) === normalizedRef,
