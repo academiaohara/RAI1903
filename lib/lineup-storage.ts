@@ -4,7 +4,9 @@ import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 export type SavedLineup = {
   formation: FormationId;
   slots: Array<string | null>;
+  substitutes?: Array<string | null>;
   showRival?: boolean;
+  showSubstitutes?: boolean;
 };
 
 const STORAGE_PREFIX = "rai-lineup";
@@ -24,7 +26,16 @@ export function loadSavedLineup(seasonId: string, gender: PrimerEquipoGender): S
     const slots = Array.isArray(parsed.slots)
       ? parsed.slots.map((entry) => (typeof entry === "string" ? entry : null))
       : [];
-    return { formation, slots, showRival: parsed.showRival !== false };
+    const substitutes = Array.isArray(parsed.substitutes)
+      ? parsed.substitutes.map((entry) => (typeof entry === "string" ? entry : null))
+      : [];
+    return {
+      formation,
+      slots,
+      substitutes,
+      showRival: parsed.showRival !== false,
+      showSubstitutes: parsed.showSubstitutes === true,
+    };
   } catch {
     return null;
   }
@@ -49,4 +60,11 @@ export function resizeLineupSlots(
     next[index] = current[index] ?? null;
   }
   return next;
+}
+
+export function resizeLineupSubstitutes(
+  current: Array<string | null>,
+  nextCount: number,
+): Array<string | null> {
+  return resizeLineupSlots(current, nextCount);
 }
