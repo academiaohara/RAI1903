@@ -1,4 +1,5 @@
 import { applyCmsTeamToBase, getTeamsBundle } from "@/lib/cms/teams-bundle";
+import { resolveTeamCatalogEntry } from "@/lib/cms/resolve-team-catalog";
 import { getCompeticionSquadData } from "@/lib/competicion-squad";
 import { getTeamByGender } from "@/lib/fixtures";
 import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
@@ -19,6 +20,11 @@ export function resolveHomeTeamStadiumName(
   gender: PrimerEquipoGender,
   options?: ResolveMatchVenueOptions,
 ): string {
+  if (options?.bundles) {
+    const fromCatalog = resolveTeamCatalogEntry(homeTeamId, options.bundles, gender).stadium.trim();
+    if (fromCatalog) return formatStadiumDisplayName(fromCatalog);
+  }
+
   const base = getTeamByGender(homeTeamId, gender);
   const cmsRecord = options?.bundles
     ? getTeamsBundle(options.bundles, gender)?.teams.find((team) => team.id === homeTeamId)
