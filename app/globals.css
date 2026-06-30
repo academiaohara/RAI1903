@@ -384,13 +384,18 @@ a {
   padding: 0.35em 1em;
 }
 
+.lineup-export-card.lineup-export-card--capture .lineup-card-header-right {
+  gap: 0.85rem;
+  padding-right: 1.75rem;
+}
+
 .lineup-export-card.lineup-export-card--capture .lineup-card-vs {
-  font-size: 1.35rem;
+  font-size: 1.5rem;
 }
 
 .lineup-export-card.lineup-export-card--capture .lineup-card-rival-crest {
-  height: 4.5rem !important;
-  width: 4.5rem !important;
+  height: 5rem !important;
+  width: 5rem !important;
 }
 
 .lineup-export-card.lineup-export-card--capture .lineup-export-watermark {
@@ -487,12 +492,13 @@ a {
 .lineup-card-header-right {
   align-items: center;
   display: flex;
-  gap: 0.65rem;
+  gap: clamp(0.75rem, 2.5vw, 1rem);
+  padding-right: clamp(0.75rem, 3vw, 1.5rem);
 }
 
 .lineup-card-vs {
   color: #000;
-  font-size: clamp(0.95rem, 2.5vw, 1.25rem);
+  font-size: clamp(1.15rem, 3vw, 1.5rem);
   font-weight: 800;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -500,9 +506,9 @@ a {
 
 .lineup-card-rival-crest {
   border-radius: 50%;
-  height: clamp(2.5rem, 6.5vw, 3.75rem) !important;
+  height: clamp(3rem, 7.8vw, 4.5rem) !important;
   object-fit: contain;
-  width: clamp(2.5rem, 6.5vw, 3.75rem) !important;
+  width: clamp(3rem, 7.8vw, 4.5rem) !important;
 }
 
 /* Pitch shell fills the card */
