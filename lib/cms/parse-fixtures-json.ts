@@ -1,9 +1,8 @@
 import { resolveMatchCompetition } from "@/lib/cms/competition-config-bundle";
-import { getGroupTeamSlots, slugFromTeamName } from "@/lib/cms/group-teams";
 import type { FilialFixturePartido, FilialFixturesBundle } from "@/lib/cms/filial-bundles";
 import { getCompetitionConfigBundle, defaultCompetitionConfig } from "@/lib/cms/competition-config-bundle";
+import { resolveTeamCatalogEntry } from "@/lib/cms/resolve-team-catalog";
 import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
-import { getTeamsBundle } from "@/lib/cms/teams-bundle";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { CompetitionId, Match, Matchday } from "@/types";
 
@@ -197,50 +196,11 @@ type TeamLookup = {
   resolve: (name: string) => { id: string; name: string; stadium: string };
 };
 
-function normalizeName(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{M}/gu, "");
-}
-
 function buildTeamLookup(bundles: SeasonBundlesMap, gender: PrimerEquipoGender): TeamLookup {
-  const entries: Array<{ name: string; id: string; stadium: string }> = [];
-
-  for (const team of getTeamsBundle(bundles, gender)?.teams ?? []) {
-    if (team.name.trim()) entries.push({ name: team.name, id: team.id, stadium: team.stadium ?? "" });
-    if (team.shortName?.trim()) {
-      entries.push({ name: team.shortName, id: team.id, stadium: team.stadium ?? "" });
-    }
-  }
-
-  if (gender === "masculino") {
-    for (const grupo of ["1", "2"] as const) {
-      const slots = getGroupTeamSlots(bundles, gender, grupo);
-      slots.forEach((slot, index) => {
-        const label = slot.name.trim() || `Equipo ${index + 1}`;
-        entries.push({ name: label, id: slot.id, stadium: "" });
-      });
-    }
-  }
-
-  const byNormalized = new Map<string, { id: string; name: string; stadium: string }>();
-  for (const entry of entries) {
-    byNormalized.set(normalizeName(entry.name), {
-      id: entry.id,
-      name: entry.name,
-      stadium: entry.stadium,
-    });
-  }
-
   return {
     resolve(name: string) {
-      const trimmed = name.trim();
-      const known = byNormalized.get(normalizeName(trimmed));
-      if (known) return known;
-      const id = slugFromTeamName(trimmed) || `equipo-${byNormalized.size + 1}`;
-      return { id, name: trimmed, stadium: "" };
+      const entry = resolveTeamCatalogEntry(name, bundles, gender);
+      return { id: entry.id, name: entry.name, stadium: entry.stadium };
     },
   };
 }
@@ -355,8 +315,11 @@ function parseJornadasToMatchdays(
   competition: CompetitionId,
   idPrefix: string,
 ): ParseFixturesJsonResult<Matchday[]> {
-  if (!Array.isArray(rawJornadas) || rawJornadas.length === 0) {
-    return { ok: false, error: "Se esperaba un array jornadas con al menos una jornada." };
+  if (!Array.isArray(rawJornadas)) {
+    return { ok: false, error: "Se esperaba un array jornadas." };
+  }
+  if (rawJornadas.length === 0) {
+    return { ok: true, data: [], summary: "" };
   }
 
   const byRound = new Map<number, Match[]>();
@@ -416,6 +379,7 @@ export type PrimerEquipoFixturesImport = {
   matchdays: Matchday[];
   matchdaysGrupo2?: Matchday[];
   meta: { lastRound: number };
+  touchedGrupos: { grupo1: boolean; grupo2: boolean };
 };
 
 /** Parsea JSON de calendario de primer equipo (masculino o femenino). */
@@ -446,7 +410,11 @@ export function parsePrimerEquipoFixturesJson(
     const matchCount = matchdaysResult.data.reduce((sum, md) => sum + md.matches.length, 0);
     return {
       ok: true,
-      data: { matchdays: matchdaysResult.data, meta: { lastRound } },
+      data: {
+        matchdays: matchdaysResult.data,
+        meta: { lastRound },
+        touchedGrupos: { grupo1: true, grupo2: false },
+      },
       summary: `${matchdaysResult.data.length} jornadas · ${matchCount} partidos`,
     };
   }
@@ -481,6 +449,7 @@ export function parsePrimerEquipoFixturesJson(
         matchdays: matchdaysResult.data,
         ...(matchdaysGrupo2 ? { matchdaysGrupo2 } : {}),
         meta: { lastRound },
+        touchedGrupos: { grupo1: true, grupo2: Boolean(matchdaysGrupo2?.length) },
       },
       summary: `${matchdaysResult.data.length} jornadas${matchdaysGrupo2 ? ` + ${matchdaysGrupo2.length} grupo II` : ""} · ${matchCount} partidos`,
     };
@@ -495,11 +464,34 @@ export function parsePrimerEquipoFixturesJson(
   }
 
   const split = splitJornadasByGrupo(payload.jornadas);
-  const jornadasGrupo1 = split.grupo1.length > 0 ? split.grupo1 : (payload.jornadas as RawJornada[] | undefined);
-  const jornadasGrupo2Raw =
-    payload.jornadasGrupo2 ?? (split.grupo2.length > 0 ? split.grupo2 : undefined);
+  const hasGrupoMarkers = split.grupo1.length > 0 || split.grupo2.length > 0;
 
-  const matchdaysResult = parseJornadasToMatchdays(jornadasGrupo1, lookup, competition, idPrefix);
+  let jornadasGrupo1: RawJornada[] | undefined;
+  let jornadasGrupo2Raw: unknown;
+  let touchedGrupo1 = false;
+  let touchedGrupo2 = false;
+
+  if (payload.jornadasGrupo2) {
+    jornadasGrupo1 = hasGrupoMarkers ? split.grupo1 : (payload.jornadas as RawJornada[] | undefined);
+    jornadasGrupo2Raw = payload.jornadasGrupo2;
+    touchedGrupo1 = Boolean(jornadasGrupo1?.length);
+    touchedGrupo2 = true;
+  } else if (hasGrupoMarkers) {
+    jornadasGrupo1 = split.grupo1;
+    jornadasGrupo2Raw = split.grupo2.length > 0 ? split.grupo2 : undefined;
+    touchedGrupo1 = split.grupo1.length > 0;
+    touchedGrupo2 = split.grupo2.length > 0;
+  } else {
+    jornadasGrupo1 = payload.jornadas as RawJornada[] | undefined;
+    jornadasGrupo2Raw = undefined;
+    touchedGrupo1 = Boolean(jornadasGrupo1?.length);
+    touchedGrupo2 = false;
+  }
+
+  const matchdaysResult =
+    jornadasGrupo1 !== undefined
+      ? parseJornadasToMatchdays(jornadasGrupo1, lookup, competition, idPrefix)
+      : { ok: true as const, data: [], summary: "" };
   if (!matchdaysResult.ok) return matchdaysResult;
 
   let matchdaysGrupo2: Matchday[] | undefined;
@@ -524,6 +516,7 @@ export function parsePrimerEquipoFixturesJson(
       matchdays: matchdaysResult.data,
       ...(matchdaysGrupo2 ? { matchdaysGrupo2 } : {}),
       meta: { lastRound },
+      touchedGrupos: { grupo1: touchedGrupo1, grupo2: touchedGrupo2 },
     },
     summary: `${matchdaysResult.data.length} jornadas${matchdaysGrupo2 ? ` + ${matchdaysGrupo2.length} grupo II` : ""} · ${matchCount} partidos`,
   };

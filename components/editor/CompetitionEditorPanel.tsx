@@ -15,6 +15,7 @@ import {
 import { getCompetitionConfigBundle } from "@/lib/cms/competition-config-bundle";
 import { applyLeagueTemplate, buildFixturesPayloadForConfig } from "@/lib/cms/apply-league-template";
 import { parsePrimerEquipoFixturesJson } from "@/lib/cms/parse-fixtures-json";
+import { enrichMatchdaysVenues } from "@/lib/match-venue";
 import {
   getFixturesBundle,
   upsertSeasonBundle,
@@ -263,13 +264,21 @@ export function CompetitionEditorPanel({ onClose }: CompetitionEditorPanelProps)
       {tab === "calendario" && gender === "masculino" ? (
         <div className="space-y-4">
           <FixturesJsonPasteSection
-            hint='Basta con jornadas, partidos (local, visitante) y fecha. Los goles no se importan. Tras aplicar, pulsa «Guardar calendario».'
+            hint='Basta con jornadas, partidos (local, visitante) y fecha. Para grupo II añade "grupo": "2" en cada jornada (o usa jornadasGrupo2). Los goles no se importan. Tras aplicar, pulsa «Guardar calendario».'
             parse={(input) => parsePrimerEquipoFixturesJson(input, { gender: "masculino", bundles })}
             onImport={(data) => {
+              const venueOptions = { bundles };
+              const matchdays = data.touchedGrupos.grupo1
+                ? enrichMatchdaysVenues(data.matchdays, "masculino", venueOptions)
+                : undefined;
+              const matchdaysGrupo2 = data.touchedGrupos.grupo2 && data.matchdaysGrupo2
+                ? enrichMatchdaysVenues(data.matchdaysGrupo2, "masculino", venueOptions)
+                : undefined;
+
               setFixtures((current) => ({
                 ...(current ?? fixturesDraft),
-                matchdays: data.matchdays,
-                matchdaysGrupo2: data.matchdaysGrupo2,
+                matchdays: matchdays ?? current?.matchdays ?? data.matchdays,
+                matchdaysGrupo2: matchdaysGrupo2 ?? current?.matchdaysGrupo2 ?? data.matchdaysGrupo2,
                 meta: { ...(current?.meta ?? {}), lastRound: data.meta.lastRound },
               }));
             }}
