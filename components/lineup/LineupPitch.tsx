@@ -17,21 +17,28 @@ function useIsClient(): boolean {
   );
 }
 
+type PickerMode = "starter" | "substitute";
+
 type DropdownState = {
   slotIndex: number;
   top: number;
   left: number;
+  mode: PickerMode;
 };
 
 type LineupPitchProps = {
   formation: FormationId;
   slots: FormationSlot[];
   assignments: Array<string | null>;
+  substitutes: Array<string | null>;
+  showSubstitutes: boolean;
   playersById: Map<string, SquadPlayer>;
   squad: SquadPlayer[];
   assignedIds: Set<string>;
   onPlayerAssign: (playerId: string, slotIndex: number) => void;
   onRemovePlayer: (slotIndex: number) => void;
+  onSubstituteAssign: (playerId: string, slotIndex: number) => void;
+  onRemoveSubstitute: (slotIndex: number) => void;
   exportMode?: boolean;
 };
 
@@ -39,11 +46,15 @@ export function LineupPitch({
   formation,
   slots,
   assignments,
+  substitutes,
+  showSubstitutes,
   playersById,
   squad,
   assignedIds,
   onPlayerAssign,
   onRemovePlayer,
+  onSubstituteAssign,
+  onRemoveSubstitute,
   exportMode = false,
 }: LineupPitchProps) {
   const [dropdown, setDropdown] = useState<DropdownState | null>(null);
@@ -62,7 +73,7 @@ export function LineupPitch({
     };
   }, [dropdown]);
 
-  const openDropdown = (slotIndex: number) => {
+  const openDropdown = (slotIndex: number, mode: PickerMode) => {
     const el = slotRefs.current[slotIndex];
     if (!el) return;
     const rect = el.getBoundingClientRect();
@@ -73,12 +84,18 @@ export function LineupPitch({
     if (top + 340 > window.innerHeight) {
       top = Math.max(8, rect.top - 340 - 6);
     }
-    setDropdown({ slotIndex, top, left });
+    setDropdown({ slotIndex, top, left, mode });
   };
 
   const handleSlotClick = (slotIndex: number) => {
     if (exportMode) return;
-    openDropdown(slotIndex);
+    openDropdown(slotIndex, "starter");
+  };
+
+  const handleSubClick = (e: React.MouseEvent, slotIndex: number) => {
+    if (exportMode) return;
+    e.stopPropagation();
+    openDropdown(slotIndex, "substitute");
   };
 
   const handleRemoveClick = (e: React.MouseEvent, slotIndex: number) => {
@@ -89,9 +106,18 @@ export function LineupPitch({
 
   const handlePlayerSelect = (playerId: string) => {
     if (!dropdown) return;
-    onPlayerAssign(playerId, dropdown.slotIndex);
+    if (dropdown.mode === "substitute") {
+      onSubstituteAssign(playerId, dropdown.slotIndex);
+    } else {
+      onPlayerAssign(playerId, dropdown.slotIndex);
+    }
     setDropdown(null);
   };
+
+  const dropdownMode = dropdown?.mode ?? "starter";
+  const dropdownSlotIndex = dropdown?.slotIndex ?? 0;
+  const currentStarterId = assignments[dropdownSlotIndex];
+  const currentSubId = substitutes[dropdownSlotIndex];
 
   return (
     <div className="lineup-pitch-shell">
@@ -99,9 +125,10 @@ export function LineupPitch({
         {slots.map((slot, index) => {
           const playerId = assignments[index];
           const player = playerId ? playersById.get(playerId) : undefined;
+          const subId = substitutes[index];
+          const sub = subId ? playersById.get(subId) : undefined;
 
           return (
-            // Using div with role="button" to avoid invalid nested <button> elements
             <div
               key={`${formation}-${index}`}
               ref={(el) => {
@@ -152,6 +179,28 @@ export function LineupPitch({
                   <span className="pitch-player-name">
                     {player.apellido || player.nombre}
                   </span>
+                  {showSubstitutes &&
+                    (sub ? (
+                      <button
+                        type="button"
+                        className="pitch-player-sub-name"
+                        onClick={(e) => handleSubClick(e, index)}
+                        aria-label={`Suplente: ${sub.apellido || sub.nombre}, cambiar`}
+                      >
+                        {sub.apellido || sub.nombre}
+                      </button>
+                    ) : (
+                      !exportMode && (
+                        <button
+                          type="button"
+                          className="pitch-player-sub-add"
+                          onClick={(e) => handleSubClick(e, index)}
+                          aria-label="Añadir suplente"
+                        >
+                          +
+                        </button>
+                      )
+                    ))}
                 </div>
               ) : (
                 <div className="pitch-slot-empty">
@@ -179,7 +228,11 @@ export function LineupPitch({
               style={{ top: dropdown.top, left: dropdown.left }}
             >
               <div className="lineup-dropdown-header">
-                <span>Elige jugador — {slots[dropdown.slotIndex]?.label}</span>
+                <span>
+                  {dropdownMode === "substitute"
+                    ? `Elige suplente — ${slots[dropdownSlotIndex]?.label}`
+                    : `Elige jugador — ${slots[dropdownSlotIndex]?.label}`}
+                </span>
                 <button
                   type="button"
                   onClick={() => setDropdown(null)}
@@ -189,19 +242,17 @@ export function LineupPitch({
                   <X className="h-3.5 w-3.5" />
                 </button>
               </div>
-              {assignments[dropdown.slotIndex] &&
+              {dropdownMode === "starter" &&
+                currentStarterId &&
                 (() => {
-                  const currentId = assignments[dropdown.slotIndex];
-                  const currentPlayer = currentId
-                    ? playersById.get(currentId)
-                    : undefined;
+                  const currentPlayer = playersById.get(currentStarterId);
                   return currentPlayer ? (
                     <div className="lineup-dropdown-current">
                       <button
                         type="button"
                         className="lineup-dropdown-remove-current"
                         onClick={() => {
-                          onRemovePlayer(dropdown.slotIndex);
+                          onRemovePlayer(dropdownSlotIndex);
                           setDropdown(null);
                         }}
                       >
@@ -213,12 +264,37 @@ export function LineupPitch({
                     </div>
                   ) : null;
                 })()}
+              {dropdownMode === "substitute" &&
+                currentSubId &&
+                (() => {
+                  const currentSub = playersById.get(currentSubId);
+                  return currentSub ? (
+                    <div className="lineup-dropdown-current">
+                      <button
+                        type="button"
+                        className="lineup-dropdown-remove-current"
+                        onClick={() => {
+                          onRemoveSubstitute(dropdownSlotIndex);
+                          setDropdown(null);
+                        }}
+                      >
+                        <X className="h-3 w-3" />
+                        <span>
+                          Quitar suplente {currentSub.apellido || currentSub.nombre}
+                        </span>
+                      </button>
+                    </div>
+                  ) : null;
+                })()}
               {SQUAD_POSITIONS.map((position) => {
-                const currentSlotPlayerId = assignments[dropdown.slotIndex];
-                const list = groupedPlayers[position].filter(
-                  (p) =>
-                    !assignedIds.has(p.id) || p.id === currentSlotPlayerId,
-                );
+                const currentSlotPlayerId =
+                  dropdownMode === "substitute" ? currentSubId : currentStarterId;
+                const starterInSlot = assignments[dropdownSlotIndex];
+                const list = groupedPlayers[position].filter((p) => {
+                  if (p.id === currentSlotPlayerId) return true;
+                  if (dropdownMode === "substitute" && p.id === starterInSlot) return false;
+                  return !assignedIds.has(p.id);
+                });
                 if (list.length === 0) return null;
                 return (
                   <div key={position}>

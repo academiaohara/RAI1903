@@ -384,13 +384,18 @@ a {
   padding: 0.35em 1em;
 }
 
+.lineup-export-card.lineup-export-card--capture .lineup-card-header-right {
+  gap: 0.85rem;
+  padding-right: 1.75rem;
+}
+
 .lineup-export-card.lineup-export-card--capture .lineup-card-vs {
-  font-size: 1.35rem;
+  font-size: 1.5rem;
 }
 
 .lineup-export-card.lineup-export-card--capture .lineup-card-rival-crest {
-  height: 4.5rem !important;
-  width: 4.5rem !important;
+  height: 5rem !important;
+  width: 5rem !important;
 }
 
 .lineup-export-card.lineup-export-card--capture .lineup-export-watermark {
@@ -416,6 +421,12 @@ a {
   font-size: 1rem;
   max-width: 9.5rem;
   padding: 0.28rem 0.55rem;
+}
+
+.lineup-export-card.lineup-export-card--capture .pitch-player-sub-name {
+  font-size: 0.85rem;
+  max-width: 9.5rem;
+  padding: 0.22rem 0.5rem;
 }
 
 .lineup-export-card.lineup-export-card--capture .pitch-slot-empty {
@@ -487,12 +498,13 @@ a {
 .lineup-card-header-right {
   align-items: center;
   display: flex;
-  gap: 0.65rem;
+  gap: clamp(0.75rem, 2.5vw, 1rem);
+  padding-right: clamp(0.75rem, 3vw, 1.5rem);
 }
 
 .lineup-card-vs {
   color: #000;
-  font-size: clamp(0.95rem, 2.5vw, 1.25rem);
+  font-size: clamp(1.15rem, 3vw, 1.5rem);
   font-weight: 800;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -500,9 +512,9 @@ a {
 
 .lineup-card-rival-crest {
   border-radius: 50%;
-  height: clamp(2.5rem, 6.5vw, 3.75rem) !important;
+  height: clamp(3rem, 7.8vw, 4.5rem) !important;
   object-fit: contain;
-  width: clamp(2.5rem, 6.5vw, 3.75rem) !important;
+  width: clamp(3rem, 7.8vw, 4.5rem) !important;
 }
 
 /* Pitch shell fills the card */
@@ -600,6 +612,51 @@ a {
   white-space: nowrap;
 }
 
+/* Substitute name badge — granate, below starter */
+.pitch-player-sub-name {
+  background: #981915;
+  border: none;
+  border-radius: 0.24rem;
+  color: #fff;
+  cursor: pointer;
+  font-size: clamp(0.55rem, 1.85%, 0.72rem);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  line-height: 1.1;
+  max-width: 7.5rem;
+  overflow: hidden;
+  padding: 0.14rem 0.32rem;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pitch-player-sub-name:hover {
+  background: #b5201a;
+}
+
+.pitch-player-sub-add {
+  align-items: center;
+  background: #981915;
+  border: none;
+  border-radius: 0.24rem;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  font-size: clamp(0.55rem, 1.85%, 0.68rem);
+  font-weight: 800;
+  height: clamp(0.95rem, 3%, 1.15rem);
+  justify-content: center;
+  line-height: 1;
+  min-width: clamp(1.35rem, 4%, 1.65rem);
+  padding: 0 0.28rem;
+}
+
+.pitch-player-sub-add:hover {
+  background: #b5201a;
+}
+
 /* Empty slot: dashed granate ring + small add button */
 .pitch-slot-empty {
   align-items: center;
@@ -647,6 +704,18 @@ a {
     font-size: clamp(0.5rem, 1.7vw, 0.62rem);
     max-width: 5.5rem;
     padding: 0.12rem 0.28rem;
+  }
+
+  .lineup-export-wrapper .pitch-player-sub-name {
+    font-size: clamp(0.45rem, 1.5vw, 0.55rem);
+    max-width: 5.5rem;
+    padding: 0.1rem 0.24rem;
+  }
+
+  .lineup-export-wrapper .pitch-player-sub-add {
+    font-size: clamp(0.45rem, 1.5vw, 0.55rem);
+    height: clamp(0.8rem, 2.8vw, 0.95rem);
+    min-width: clamp(1.1rem, 3.6vw, 1.35rem);
   }
 
   .lineup-export-wrapper .pitch-player-remove {
@@ -759,6 +828,19 @@ a {
   align-items: baseline;
   display: flex;
   gap: 0.4rem;
+}
+
+.lineup-list-players {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.lineup-list-sub {
+  color: #981915;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .lineup-list-label {

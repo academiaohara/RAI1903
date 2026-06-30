@@ -20,6 +20,7 @@ import {
   createEmptySlots,
   loadSavedLineup,
   resizeLineupSlots,
+  resizeLineupSubstitutes,
   saveLineup,
 } from "@/lib/lineup-storage";
 import { type PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -34,20 +35,33 @@ type LineupPageProps = {
 function initialLineupState(seasonId: string, gender: PrimerEquipoGender) {
   const saved = loadSavedLineup(seasonId, gender);
   const formation = saved?.formation ?? DEFAULT_FORMATION;
+  const slotCount = FORMATION_SLOTS[formation].length;
   const assignments = saved
-    ? resizeLineupSlots(saved.slots, FORMATION_SLOTS[formation].length)
-    : createEmptySlots(FORMATION_SLOTS[formation].length);
+    ? resizeLineupSlots(saved.slots, slotCount)
+    : createEmptySlots(slotCount);
+  const substitutes = saved
+    ? resizeLineupSubstitutes(saved.substitutes ?? [], slotCount)
+    : createEmptySlots(slotCount);
   const showRival = saved?.showRival !== false;
-  return { formation, assignments, showRival };
+  const showSubstitutes = saved?.showSubstitutes === true;
+  return { formation, assignments, substitutes, showRival, showSubstitutes };
 }
 
 type LineupListPanelProps = {
   slots: FormationSlot[];
   assignments: Array<string | null>;
+  substitutes: Array<string | null>;
+  showSubstitutes: boolean;
   playersById: Map<string, SquadPlayer>;
 };
 
-function LineupListPanel({ slots, assignments, playersById }: LineupListPanelProps) {
+function LineupListPanel({
+  slots,
+  assignments,
+  substitutes,
+  showSubstitutes,
+  playersById,
+}: LineupListPanelProps) {
   return (
     <div className="lineup-list-panel">
       <h3 className="lineup-list-title">Once titular</h3>
@@ -56,11 +70,19 @@ function LineupListPanel({ slots, assignments, playersById }: LineupListPanelPro
           const playerId = assignments[index];
           const player = playerId ? playersById.get(playerId) : null;
           const name = player ? (player.apellido || player.nombre) : "—";
+          const subId = substitutes[index];
+          const sub = subId ? playersById.get(subId) : null;
+          const subName = sub ? (sub.apellido || sub.nombre) : null;
           return (
             <li key={index} className="lineup-list-row">
               <span className="lineup-list-label">{slot.label}</span>
-              <span className={`lineup-list-player${!player ? " lineup-list-player--empty" : ""}`}>
-                {name}
+              <span className="lineup-list-players">
+                <span className={`lineup-list-player${!player ? " lineup-list-player--empty" : ""}`}>
+                  {name}
+                </span>
+                {showSubstitutes && subName && (
+                  <span className="lineup-list-sub">{subName}</span>
+                )}
               </span>
             </li>
           );
@@ -80,6 +102,8 @@ type LineupPizarraCardProps = {
   formation: FormationId;
   slots: FormationSlot[];
   assignments: Array<string | null>;
+  substitutes: Array<string | null>;
+  showSubstitutes: boolean;
   playersById: Map<string, SquadPlayer>;
   squad: SquadPlayer[];
   assignedIds: Set<string>;
@@ -89,12 +113,16 @@ type LineupPizarraCardProps = {
   exportRef?: RefObject<HTMLDivElement | null>;
   onPlayerAssign?: (playerId: string, slotIndex: number) => void;
   onRemovePlayer?: (slotIndex: number) => void;
+  onSubstituteAssign?: (playerId: string, slotIndex: number) => void;
+  onRemoveSubstitute?: (slotIndex: number) => void;
 };
 
 function LineupPizarraCard({
   formation,
   slots,
   assignments,
+  substitutes,
+  showSubstitutes,
   playersById,
   squad,
   assignedIds,
@@ -104,6 +132,8 @@ function LineupPizarraCard({
   exportRef,
   onPlayerAssign,
   onRemovePlayer,
+  onSubstituteAssign,
+  onRemoveSubstitute,
 }: LineupPizarraCardProps) {
   return (
     <div
@@ -131,11 +161,15 @@ function LineupPizarraCard({
         formation={formation}
         slots={slots}
         assignments={assignments}
+        substitutes={substitutes}
+        showSubstitutes={showSubstitutes}
         playersById={playersById}
         squad={squad}
         assignedIds={assignedIds}
         onPlayerAssign={onPlayerAssign ?? (() => {})}
         onRemovePlayer={onRemovePlayer ?? (() => {})}
+        onSubstituteAssign={onSubstituteAssign ?? (() => {})}
+        onRemoveSubstitute={onRemoveSubstitute ?? (() => {})}
         exportMode={exportMode}
       />
       {exportMode && (
@@ -157,9 +191,8 @@ type LineupBoardProps = {
 function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps) {
   const exportRef = useRef<HTMLDivElement>(null);
   const shareMenuRef = useRef<HTMLDivElement>(null);
-  const [{ formation, assignments, showRival }, setLineupState] = useState(() =>
-    initialLineupState(seasonId, gender),
-  );
+  const [{ formation, assignments, substitutes, showRival, showSubstitutes }, setLineupState] =
+    useState(() => initialLineupState(seasonId, gender));
   const [sharing, setSharing] = useState(false);
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
@@ -186,15 +219,31 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
     () => new Map(squad.map((player) => [player.id, player])),
     [squad],
   );
-  const assignedIds = useMemo(
-    () => new Set(assignments.filter((entry): entry is string => Boolean(entry))),
+  const starterCount = useMemo(
+    () => assignments.filter((entry): entry is string => Boolean(entry)).length,
     [assignments],
   );
+  const assignedIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const entry of assignments) {
+      if (entry) ids.add(entry);
+    }
+    for (const entry of substitutes) {
+      if (entry) ids.add(entry);
+    }
+    return ids;
+  }, [assignments, substitutes]);
   const slots = FORMATION_SLOTS[formation];
 
   useEffect(() => {
-    saveLineup(seasonId, gender, { formation, slots: assignments, showRival });
-  }, [assignments, formation, gender, seasonId, showRival]);
+    saveLineup(seasonId, gender, {
+      formation,
+      slots: assignments,
+      substitutes,
+      showRival,
+      showSubstitutes,
+    });
+  }, [assignments, substitutes, formation, gender, seasonId, showRival, showSubstitutes]);
 
   useEffect(() => {
     if (!shareMenuOpen) return;
@@ -208,28 +257,59 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
   }, [shareMenuOpen]);
 
   const handleFormationChange = useCallback((nextFormation: FormationId) => {
-    setLineupState((current) => ({
-      formation: nextFormation,
-      assignments: resizeLineupSlots(current.assignments, FORMATION_SLOTS[nextFormation].length),
-      showRival: current.showRival,
-    }));
+    setLineupState((current) => {
+      const nextCount = FORMATION_SLOTS[nextFormation].length;
+      return {
+        formation: nextFormation,
+        assignments: resizeLineupSlots(current.assignments, nextCount),
+        substitutes: resizeLineupSubstitutes(current.substitutes, nextCount),
+        showRival: current.showRival,
+        showSubstitutes: current.showSubstitutes,
+      };
+    });
   }, []);
 
   const assignPlayerToSlot = useCallback((playerId: string, slotIndex: number) => {
     setLineupState((current) => {
-      const next = [...current.assignments];
-      const existingIndex = next.findIndex((entry) => entry === playerId);
-      if (existingIndex >= 0) next[existingIndex] = null;
-      next[slotIndex] = playerId;
-      return { ...current, assignments: next };
+      const nextAssignments = [...current.assignments];
+      const nextSubstitutes = [...current.substitutes];
+      const existingStarterIndex = nextAssignments.findIndex((entry) => entry === playerId);
+      if (existingStarterIndex >= 0) nextAssignments[existingStarterIndex] = null;
+      const existingSubIndex = nextSubstitutes.findIndex((entry) => entry === playerId);
+      if (existingSubIndex >= 0) nextSubstitutes[existingSubIndex] = null;
+      nextAssignments[slotIndex] = playerId;
+      return { ...current, assignments: nextAssignments, substitutes: nextSubstitutes };
     });
   }, []);
 
   const removeFromSlot = useCallback((slotIndex: number) => {
     setLineupState((current) => {
-      const next = [...current.assignments];
-      next[slotIndex] = null;
-      return { ...current, assignments: next };
+      const nextAssignments = [...current.assignments];
+      const nextSubstitutes = [...current.substitutes];
+      nextAssignments[slotIndex] = null;
+      nextSubstitutes[slotIndex] = null;
+      return { ...current, assignments: nextAssignments, substitutes: nextSubstitutes };
+    });
+  }, []);
+
+  const assignSubstituteToSlot = useCallback((playerId: string, slotIndex: number) => {
+    setLineupState((current) => {
+      const nextSubstitutes = [...current.substitutes];
+      const nextAssignments = [...current.assignments];
+      const existingStarterIndex = nextAssignments.findIndex((entry) => entry === playerId);
+      if (existingStarterIndex >= 0) nextAssignments[existingStarterIndex] = null;
+      const existingSubIndex = nextSubstitutes.findIndex((entry) => entry === playerId);
+      if (existingSubIndex >= 0) nextSubstitutes[existingSubIndex] = null;
+      nextSubstitutes[slotIndex] = playerId;
+      return { ...current, assignments: nextAssignments, substitutes: nextSubstitutes };
+    });
+  }, []);
+
+  const removeSubstituteFromSlot = useCallback((slotIndex: number) => {
+    setLineupState((current) => {
+      const nextSubstitutes = [...current.substitutes];
+      nextSubstitutes[slotIndex] = null;
+      return { ...current, substitutes: nextSubstitutes };
     });
   }, []);
 
@@ -295,6 +375,17 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
               ))}
             </select>
           </label>
+          <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-[#214C9B]/15 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-sm">
+            <input
+              type="checkbox"
+              checked={showSubstitutes}
+              onChange={(e) =>
+                setLineupState((current) => ({ ...current, showSubstitutes: e.target.checked }))
+              }
+              className="h-4 w-4 rounded border-[#214C9B]/30 text-[#214C9B] focus:ring-[#214C9B]/30"
+            />
+            <span>Suplentes</span>
+          </label>
           {rival && (
             <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-[#214C9B]/15 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-sm">
               <input
@@ -312,7 +403,7 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
             <button
               type="button"
               onClick={() => setShareMenuOpen((open) => !open)}
-              disabled={sharing || assignedIds.size === 0}
+              disabled={sharing || starterCount === 0}
               className="inline-flex items-center gap-2 rounded-full border-2 border-[#214C9B] px-4 py-2 text-sm font-extrabold uppercase tracking-wide text-[#214C9B] transition hover:bg-[#214C9B] hover:text-white disabled:cursor-not-allowed disabled:opacity-45"
             >
               <Share2 className="h-4 w-4" aria-hidden />
@@ -358,6 +449,8 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
               formation={formation}
               slots={slots}
               assignments={assignments}
+              substitutes={substitutes}
+              showSubstitutes={showSubstitutes}
               playersById={playersById}
               squad={squad}
               assignedIds={assignedIds}
@@ -366,12 +459,16 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
               exportMode={isCapturing}
               onPlayerAssign={assignPlayerToSlot}
               onRemovePlayer={removeFromSlot}
+              onSubstituteAssign={assignSubstituteToSlot}
+              onRemoveSubstitute={removeSubstituteFromSlot}
             />
           </section>
           <p className="mt-2 text-center text-xs font-semibold text-slate-500">
-            {assignedIds.size < 11
-              ? `Pulsa una posición para elegir jugador · ${assignedIds.size}/11 colocados`
-              : "Once completo · Pulsa ✕ sobre un jugador para quitarlo"}
+            {starterCount < 11
+              ? `Pulsa una posición para elegir jugador · ${starterCount}/11 colocados`
+              : showSubstitutes
+                ? "Once completo · Pulsa el cartel granate para añadir suplente"
+                : "Once completo · Pulsa ✕ sobre un jugador para quitarlo"}
           </p>
         </div>
 
@@ -379,6 +476,8 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
           <LineupListPanel
             slots={slots}
             assignments={assignments}
+            substitutes={substitutes}
+            showSubstitutes={showSubstitutes}
             playersById={playersById}
           />
         </aside>
