@@ -54,6 +54,10 @@ function testStadiumFromSlugAlias() {
   const entry = resolveTeamCatalogEntry("ad-alcorcon", bundles, "masculino");
   assert.equal(entry.id, "alcorcon");
   assert.ok(entry.stadium.length > 0, "debe resolver estadio del local por slug");
+
+  const bilbao = resolveTeamCatalogEntry("bilbao-athletic", bundles, "masculino");
+  assert.equal(bilbao.id, "athletic-bilbao-b");
+  assert.ok(bilbao.stadium.includes("Lezama"), "bilbao-athletic debe enlazar con Athletic B");
 }
 
 function testUploadedCalendarSample() {
