@@ -3,6 +3,7 @@ import { defaultCronicaId } from "@/lib/match-article-factory";
 import { getMatchArticlePageHref } from "@/lib/match-article-url";
 import { getMatchArticleForMatch } from "@/lib/match-articles";
 import { isMatchPlayed } from "@/lib/match-result";
+import { resolveMatchVenue, type ResolveMatchVenueOptions } from "@/lib/match-venue";
 import { getTeamCrest, getTeamCrestById } from "@/lib/team-crests";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { CalendarMatch, Match } from "@/types";
@@ -41,6 +42,7 @@ type MatchArticleLookup = {
   crestMap?: Record<string, string>;
   /** Resuelve nombres desde guía de liga / bundle teams (p. ej. sustituye «Equipo 42»). */
   resolveTeamName?: (teamId: string, fallback: string) => string;
+  venueOptions?: ResolveMatchVenueOptions;
 };
 
 export function matchToCalendarMatch(
@@ -82,7 +84,7 @@ export function matchToCalendarMatch(
     awayTeam: match.awayTeam,
     homeTeamId: match.homeTeamId,
     awayTeamId: match.awayTeamId,
-    venue: match.venue,
+    venue: resolveMatchVenue(match, gender, articles?.venueOptions),
     competition: match.competition,
     competitionStage: match.competitionStage,
     matchday: match.matchday,

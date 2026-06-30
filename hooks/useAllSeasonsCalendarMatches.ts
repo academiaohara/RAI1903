@@ -8,6 +8,7 @@ import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { getCalendarMatchesFromSource } from "@/lib/calendar";
 import { getTeamsBundle, resolveFixtureTeamDisplayName } from "@/lib/cms/teams-bundle";
 import { applyMatchInlineOverride } from "@/lib/fixture-overrides";
+import { enrichMatchVenue } from "@/lib/match-venue";
 import { resolveClubTeamIds } from "@/lib/season/club-team-ids";
 import { getAvilesMatchesFromSource } from "@/lib/season/aviles-matches";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -25,12 +26,20 @@ export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
   const { getForMatch } = useSeasonMatchArticles();
 
   const mapMatch = useMemo(
-    () => (match: ReturnType<typeof getAvilesMatchesFromSource>[number]) =>
-      applyMatchInlineOverride(match, getOverride, gender, resolveTeamName),
-    [getOverride, gender, resolveTeamName],
+    () => (match: ReturnType<typeof getAvilesMatchesFromSource>[number]) => {
+      const withVenue = enrichMatchVenue(match, gender, { bundles });
+      return applyMatchInlineOverride(withVenue, getOverride, gender, resolveTeamName);
+    },
+    [bundles, getOverride, gender, resolveTeamName],
   );
 
-  const clubTeamIds = useMemo(() => resolveClubTeamIds(bundles, gender), [bundles, gender]);
+  const clubTeamIds = useMemo(() => {
+    const ids = new Set([
+      ...resolveClubTeamIds(bundles, gender, "1"),
+      ...resolveClubTeamIds(bundles, gender, "2"),
+    ]);
+    return [...ids];
+  }, [bundles, gender]);
 
   const seasonMatches = useMemo(() => {
     const source = getEnrichedFixtureSource(gender);
@@ -39,8 +48,9 @@ export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
       getForMatch,
       crestMap,
       resolveTeamName,
+      venueOptions: { bundles },
     });
-  }, [gender, getForMatch, getEnrichedFixtureSource, crestMap, mapMatch, resolveTeamName, clubTeamIds]);
+  }, [bundles, gender, getForMatch, getEnrichedFixtureSource, crestMap, mapMatch, resolveTeamName, clubTeamIds]);
 
   return { allMatches: seasonMatches, seasonMatches, loading: false };
 }

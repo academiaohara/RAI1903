@@ -20,6 +20,7 @@ export function getAvilesMatchesFromSource(
         ]
       : [
           ...source.matchdays.flatMap((matchday) => matchday.matches),
+          ...source.matchdaysGrupo2.flatMap((matchday) => matchday.matches),
           ...source.amistosoMatches,
           ...source.copaDelReyMatches,
           ...source.calendarExtraMatches,
