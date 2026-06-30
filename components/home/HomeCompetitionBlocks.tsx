@@ -317,8 +317,36 @@ function teamCrestLogo(teamId: string): string {
 
 type MatchBannerAccent = "blue" | "granate";
 
-function matchCenterAccentClass(accent: MatchBannerAccent): string {
-  return accent === "granate" ? "bg-[#981915]" : "bg-[#214C9B]";
+function matchBannerCenterSwapClass(accent: MatchBannerAccent): string {
+  return accent === "granate"
+    ? "bg-[#981915] text-white group-hover:bg-white group-hover:text-[#981915]"
+    : "bg-[#214C9B] text-white group-hover:bg-white group-hover:text-[#214C9B]";
+}
+
+function matchBannerCenterMutedTextClass(accent: MatchBannerAccent, opacity: "80" | "90"): string {
+  return accent === "granate"
+    ? `text-white/${opacity} group-hover:text-[#981915]/${opacity}`
+    : `text-white/${opacity} group-hover:text-[#214C9B]/${opacity}`;
+}
+
+function matchBannerRoundBadgeClass(accent: MatchBannerAccent): string {
+  return accent === "granate"
+    ? "flex h-12 min-w-12 shrink-0 items-center justify-center rounded-2xl border border-[#981915]/20 bg-white px-2 text-center text-xs font-extrabold leading-tight text-[#981915] transition-colors duration-200 group-hover:border-[#981915] group-hover:bg-[#981915] group-hover:text-white lg:h-14 lg:min-w-14 lg:text-sm"
+    : "flex h-12 min-w-12 shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 bg-white px-2 text-center text-xs font-extrabold leading-tight text-[#214C9B] transition-colors duration-200 group-hover:border-[#214C9B] group-hover:bg-[#214C9B] group-hover:text-white lg:h-14 lg:min-w-14 lg:text-sm";
+}
+
+function matchBannerSidePanelClass(accent: MatchBannerAccent): string {
+  return accent === "granate"
+    ? "transition-colors duration-200 group-hover:bg-[#981915]"
+    : "transition-colors duration-200 group-hover:bg-[#214C9B]";
+}
+
+function matchBannerSideEyebrowClass(): string {
+  return "text-[#981915] transition-colors duration-200 group-hover:text-white";
+}
+
+function matchBannerSideTitleClass(): string {
+  return "text-slate-900 transition-colors duration-200 group-hover:text-white";
 }
 
 function MatchBanner({
@@ -337,7 +365,8 @@ function MatchBanner({
   const centerRoundLabel = roundBadgeLabel;
   const scoreLabel = match.status === "finished" ? `${match.homeScore}-${match.awayScore}` : formatMatchTime(match.date);
   const dateLabel = formatMatchWeekdayLetterDate(match.date);
-  const centerAccent = matchCenterAccentClass(accent);
+  const centerSwap = matchBannerCenterSwapClass(accent);
+  const sidePanel = matchBannerSidePanelClass(accent);
 
   return (
     <div className="space-y-2 md:space-y-0">
@@ -356,32 +385,65 @@ function MatchBanner({
             matchFixtureCardMobileWidthClassName,
           )}
         >
-          <div className="flex items-center justify-center bg-white p-3">
+          <div className={cn("flex items-center justify-center bg-white p-3", sidePanel)}>
             <OpponentCrest logo={teamCrestLogo(match.homeTeamId)} opponent={match.homeTeam} size="md" className="mx-auto" />
           </div>
-          <div className={cn("flex min-w-0 flex-col items-center justify-center px-2 py-3 text-center text-white", centerAccent)}>
-            {centerRoundLabel && (
-              <p className="w-full break-words text-xs font-extrabold uppercase tracking-normal text-white/90">{centerRoundLabel}</p>
+          <div
+            className={cn(
+              "flex min-w-0 flex-col items-center justify-center px-2 py-3 text-center transition-colors duration-200",
+              centerSwap,
             )}
-            <p className={`font-extrabold leading-none text-white ${centerRoundLabel ? "mt-1 text-2xl" : "text-3xl"}`}>{scoreLabel}</p>
-            <p className="mt-1 w-full break-words text-[10px] font-bold uppercase tracking-normal text-white/80">{dateLabel}</p>
-            <p className="mt-1 w-full break-words text-[11px] font-bold leading-snug text-white/90">{match.venue}</p>
+          >
+            {centerRoundLabel && (
+              <p
+                className={cn(
+                  "w-full break-words text-xs font-extrabold uppercase tracking-normal transition-colors duration-200",
+                  matchBannerCenterMutedTextClass(accent, "90"),
+                )}
+              >
+                {centerRoundLabel}
+              </p>
+            )}
+            <p
+              className={cn(
+                "font-extrabold leading-none transition-colors duration-200",
+                centerRoundLabel ? "mt-1 text-2xl" : "text-3xl",
+              )}
+            >
+              {scoreLabel}
+            </p>
+            <p
+              className={cn(
+                "mt-1 w-full break-words text-[10px] font-bold uppercase tracking-normal transition-colors duration-200",
+                matchBannerCenterMutedTextClass(accent, "80"),
+              )}
+            >
+              {dateLabel}
+            </p>
+            <p
+              className={cn(
+                "mt-1 w-full break-words text-[11px] font-bold leading-snug transition-colors duration-200",
+                matchBannerCenterMutedTextClass(accent, "90"),
+              )}
+            >
+              {match.venue}
+            </p>
           </div>
-          <div className="flex items-center justify-center p-3">
+          <div className={cn("flex items-center justify-center p-3", sidePanel)}>
             <OpponentCrest logo={teamCrestLogo(match.awayTeamId)} opponent={match.awayTeam} size="md" className="mx-auto" />
           </div>
         </div>
 
         <div className={cn("hidden min-h-[7.5rem] md:grid", matchFixtureBannerDesktopGridClassName)}>
-          <div className="flex min-w-0 items-center gap-2 p-4 lg:gap-4 lg:p-5">
+          <div className={cn("flex min-w-0 items-center gap-2 p-4 lg:gap-4 lg:p-5", sidePanel)}>
             {roundBadgeLabel && (
-              <span className="flex h-12 min-w-12 shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 bg-blue-50 px-2 text-center text-xs font-extrabold leading-tight text-[#214C9B] transition group-hover:border-[#214C9B] group-hover:bg-[#214C9B] group-hover:text-white lg:h-14 lg:min-w-14 lg:text-sm">
-                {roundBadgeLabel}
-              </span>
+              <span className={matchBannerRoundBadgeClass(accent)}>{roundBadgeLabel}</span>
             )}
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold uppercase tracking-normal text-[#981915]">{label}</p>
-              <p className="mt-1 break-words text-lg font-extrabold leading-tight text-slate-900 lg:text-xl">{match.homeTeam}</p>
+              <p className={matchBannerSideEyebrowClass()}>{label}</p>
+              <p className={cn("mt-1 break-words text-lg font-extrabold leading-tight lg:text-xl", matchBannerSideTitleClass())}>
+                {match.homeTeam}
+              </p>
             </div>
           </div>
           <MatchScoreCenter
@@ -391,15 +453,18 @@ function MatchBanner({
             awayTeam={match.awayTeam}
             centerLabel={scoreLabel}
             sublabel={dateLabel}
-            className={centerAccent}
+            className={centerSwap}
+            accent={accent}
           />
-          <div className="flex min-w-0 items-center p-4 text-right lg:p-5">
+          <div className={cn("flex min-w-0 items-center p-4 text-right lg:p-5", sidePanel)}>
             <div className="min-w-0 w-full">
-              <p className="flex items-center justify-end gap-1.5 text-xs font-bold uppercase tracking-normal text-[#981915]">
+              <p className={cn("flex items-center justify-end gap-1.5 text-xs font-bold uppercase tracking-normal", matchBannerSideEyebrowClass())}>
                 <CompetitionLogo competition={match.competition} alt={competitionLabel} size="xs" />
                 {matchFixtureMeta(match)}
               </p>
-              <p className="mt-1 break-words text-lg font-extrabold leading-tight text-slate-900 lg:text-xl">{match.awayTeam}</p>
+              <p className={cn("mt-1 break-words text-lg font-extrabold leading-tight lg:text-xl", matchBannerSideTitleClass())}>
+                {match.awayTeam}
+              </p>
             </div>
           </div>
         </div>
