@@ -1,4 +1,5 @@
 import { getGroupTeamSlots, slotDisplayName, slugFromTeamName } from "@/lib/cms/group-teams";
+import { getRivalStadiumName } from "@/lib/cms/rival-squads-bundle";
 import { getTeamsBundle, type CmsTeamRecord } from "@/lib/cms/teams-bundle";
 import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import { getAllTeamsForGender, getTeamByGender } from "@/lib/fixtures";
@@ -32,27 +33,39 @@ function stadiumFromSources(
   teamId: string,
   mockStadium: string | undefined,
   cmsTeams: CmsTeamRecord[],
+  bundles: SeasonBundlesMap,
+  gender: PrimerEquipoGender,
 ): string {
   const cms = cmsTeams.find((team) => team.id === teamId);
-  return cms?.stadium?.trim() || mockStadium?.trim() || "";
+  const fromCms = cms?.stadium?.trim();
+  if (fromCms) return fromCms;
+  const fromMock = mockStadium?.trim();
+  if (fromMock) return fromMock;
+  return getRivalStadiumName(bundles, gender, teamId);
 }
 
 function entryFromMock(
   mock: NonNullable<ReturnType<typeof getTeamByGender>>,
   cmsTeams: CmsTeamRecord[],
+  bundles: SeasonBundlesMap,
+  gender: PrimerEquipoGender,
 ): TeamCatalogEntry {
   return {
     id: mock.id,
     name: mock.name,
-    stadium: stadiumFromSources(mock.id, mock.stadium, cmsTeams),
+    stadium: stadiumFromSources(mock.id, mock.stadium, cmsTeams, bundles, gender),
   };
 }
 
-function entryFromCms(cms: CmsTeamRecord): TeamCatalogEntry {
+function entryFromCms(
+  cms: CmsTeamRecord,
+  bundles: SeasonBundlesMap,
+  gender: PrimerEquipoGender,
+): TeamCatalogEntry {
   return {
     id: cms.id,
     name: cms.name.trim() || cms.id,
-    stadium: cms.stadium?.trim() ?? "",
+    stadium: stadiumFromSources(cms.id, undefined, [cms], bundles, gender),
   };
 }
 
@@ -77,10 +90,10 @@ export function resolveTeamCatalogEntry(
   const cmsById = cmsTeams.find(
     (team) => team.id === trimmed || normalizeRef(team.id) === normalizedRef,
   );
-  if (cmsById) return entryFromCms(cmsById);
+  if (cmsById) return entryFromCms(cmsById, bundles, gender);
 
   const mockById = getTeamByGender(trimmed, gender);
-  if (mockById) return entryFromMock(mockById, cmsTeams);
+  if (mockById) return entryFromMock(mockById, cmsTeams, bundles, gender);
 
   if (gender === "masculino") {
     for (const grupo of ["1", "2"] as const) {
@@ -91,11 +104,10 @@ export function resolveTeamCatalogEntry(
       if (index >= 0) {
         const slot = slots[index]!;
         const mock = getTeamByGender(slot.id, gender);
-        const cms = cmsTeams.find((team) => team.id === slot.id);
         return {
           id: slot.id,
           name: slotDisplayName(slot, index),
-          stadium: cms?.stadium?.trim() || mock?.stadium?.trim() || "",
+          stadium: stadiumFromSources(slot.id, mock?.stadium, cmsTeams, bundles, gender),
         };
       }
     }
@@ -103,13 +115,13 @@ export function resolveTeamCatalogEntry(
 
   for (const mock of getAllTeamsForGender(gender)) {
     if (mock.id === trimmed || normalizeRef(mock.id) === normalizedRef) {
-      return entryFromMock(mock, cmsTeams);
+      return entryFromMock(mock, cmsTeams, bundles, gender);
     }
     if (slugFromTeamName(mock.name) === trimmed || normalizeRef(slugFromTeamName(mock.name)) === normalizedRef) {
-      return entryFromMock(mock, cmsTeams);
+      return entryFromMock(mock, cmsTeams, bundles, gender);
     }
     if (normalizeRef(mock.name) === normalizedRef) {
-      return entryFromMock(mock, cmsTeams);
+      return entryFromMock(mock, cmsTeams, bundles, gender);
     }
   }
 
@@ -119,7 +131,7 @@ export function resolveTeamCatalogEntry(
       slugFromTeamName(cms.name) === trimmed ||
       normalizeRef(slugFromTeamName(cms.name)) === normalizedRef
     ) {
-      return entryFromCms(cms);
+      return entryFromCms(cms, bundles, gender);
     }
   }
 
@@ -130,16 +142,16 @@ export function resolveTeamCatalogEntry(
       if (index >= 0) {
         const slot = slots[index]!;
         const mock = getTeamByGender(slot.id, gender);
-        const cms = cmsTeams.find((team) => team.id === slot.id);
         return {
           id: slot.id,
           name: slotDisplayName(slot, index),
-          stadium: cms?.stadium?.trim() || mock?.stadium?.trim() || "",
+          stadium: stadiumFromSources(slot.id, mock?.stadium, cmsTeams, bundles, gender),
         };
       }
     }
   }
 
   const id = slugFromTeamName(trimmed) || trimmed;
-  return { id, name: trimmed, stadium: "" };
+  const stadium = getRivalStadiumName(bundles, gender, id);
+  return { id, name: trimmed, stadium };
 }

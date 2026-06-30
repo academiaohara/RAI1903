@@ -19,6 +19,7 @@ import {
 import { matchCompetitionShortLabel, matchJornadaLabel } from "@/lib/competition-labels";
 import { getCompeticionSquadData } from "@/lib/competicion-squad";
 import { matchResultOverrideKey, readMatchResultOverride } from "@/lib/fixture-inline-keys";
+import { resolveEquipoLigaTeam } from "@/lib/equipo-liga-resolve";
 import { getRaiTeamId, getTeamByGender } from "@/lib/fixtures";
 import { resolveMatchVenue } from "@/lib/match-venue";
 import { resolveSquadPlayerByName } from "@/lib/squad-player-resolve";
@@ -158,8 +159,8 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
   const currentAttendance = getValue(keys.attendance, attendance);
   const currentReferee = getValue(keys.referee, referee);
 
-  const homeTeam = getTeamByGender(match.homeTeamId, gender);
-  const awayTeam = getTeamByGender(match.awayTeamId, gender);
+  const homeTeam = resolveEquipoLigaTeam(match.homeTeamId, gender, bundles) ?? getTeamByGender(match.homeTeamId, gender);
+  const awayTeam = resolveEquipoLigaTeam(match.awayTeamId, gender, bundles) ?? getTeamByGender(match.awayTeamId, gender);
   const raiId = getRaiTeamId(gender);
   const isHomeAviles = match.homeTeamId === raiId;
   const isAwayAviles = match.awayTeamId === raiId;

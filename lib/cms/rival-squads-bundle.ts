@@ -25,6 +25,17 @@ export function getCmsRivalSquad(
   return squad;
 }
 
+export function getRivalStadiumName(
+  bundles: SeasonBundlesMap | undefined,
+  gender: PrimerEquipoGender,
+  teamId: string,
+): string {
+  if (!bundles) return "";
+  const squad = getRivalSquadsBundle(bundles, gender).squads[teamId];
+  if (!squad) return "";
+  return squad.estadioInfo?.nombre?.trim() || squad.estadio?.trim() || "";
+}
+
 export function withRivalSquadInBundle(
   bundle: SeasonRivalSquadsBundle,
   teamId: string,
