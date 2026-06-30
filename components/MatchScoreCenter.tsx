@@ -40,9 +40,9 @@ export function MatchScoreCenter({
       )}
     >
       <div className="flex flex-nowrap items-center justify-center gap-3 lg:gap-4">
-        <OpponentCrest logo={homeLogo} opponent={homeTeam} size="sm" className="shrink-0" />
+        <OpponentCrest logo={homeLogo} opponent={homeTeam} size="md" className="shrink-0 lg:h-14 lg:w-14" />
         <p className="text-3xl font-extrabold leading-none transition-colors duration-200 lg:text-4xl">{centerLabel}</p>
-        <OpponentCrest logo={awayLogo} opponent={awayTeam} size="sm" className="shrink-0" />
+        <OpponentCrest logo={awayLogo} opponent={awayTeam} size="md" className="shrink-0 lg:h-14 lg:w-14" />
       </div>
       {sublabel ? (
         <p

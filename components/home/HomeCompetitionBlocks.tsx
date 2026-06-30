@@ -331,8 +331,8 @@ function matchBannerCenterMutedTextClass(accent: MatchBannerAccent, opacity: "80
 
 function matchBannerRoundBadgeClass(accent: MatchBannerAccent): string {
   return accent === "granate"
-    ? "flex h-12 min-w-12 shrink-0 items-center justify-center rounded-2xl border border-[#981915]/20 bg-white px-2 text-center text-xs font-extrabold leading-tight text-[#981915] transition-colors duration-200 group-hover:border-[#981915] group-hover:bg-[#981915] group-hover:text-white lg:h-14 lg:min-w-14 lg:text-sm"
-    : "flex h-12 min-w-12 shrink-0 items-center justify-center rounded-2xl border border-[#214C9B]/20 bg-white px-2 text-center text-xs font-extrabold leading-tight text-[#214C9B] transition-colors duration-200 group-hover:border-[#214C9B] group-hover:bg-[#214C9B] group-hover:text-white lg:h-14 lg:min-w-14 lg:text-sm";
+    ? "flex h-12 min-w-12 shrink-0 items-center justify-center rounded-2xl border border-[#981915] bg-[#981915] px-2 text-center text-xs font-extrabold leading-tight text-white transition-colors duration-200 group-hover:border-[#981915]/20 group-hover:bg-white group-hover:text-[#981915] lg:h-14 lg:min-w-14 lg:text-sm"
+    : "flex h-12 min-w-12 shrink-0 items-center justify-center rounded-2xl border border-[#214C9B] bg-[#214C9B] px-2 text-center text-xs font-extrabold leading-tight text-white transition-colors duration-200 group-hover:border-[#214C9B]/20 group-hover:bg-white group-hover:text-[#214C9B] lg:h-14 lg:min-w-14 lg:text-sm";
 }
 
 function matchBannerSidePanelClass(accent: MatchBannerAccent): string {
