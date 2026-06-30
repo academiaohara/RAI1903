@@ -1,7 +1,8 @@
-import { applyCmsTeamToBase, getTeamsBundle } from "@/lib/cms/teams-bundle";
+import { getRivalStadiumName } from "@/lib/cms/rival-squads-bundle";
 import { resolveTeamCatalogEntry } from "@/lib/cms/resolve-team-catalog";
+import { applyCmsTeamToBase, getTeamsBundle } from "@/lib/cms/teams-bundle";
 import { getCompeticionSquadData } from "@/lib/competicion-squad";
-import { getTeamByGender } from "@/lib/fixtures";
+import { resolveEquipoLigaTeam } from "@/lib/equipo-liga-resolve";
 import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Match, Matchday } from "@/types";
@@ -25,11 +26,11 @@ export function resolveHomeTeamStadiumName(
     if (fromCatalog) return formatStadiumDisplayName(fromCatalog);
   }
 
-  const base = getTeamByGender(homeTeamId, gender);
   const cmsRecord = options?.bundles
     ? getTeamsBundle(options.bundles, gender)?.teams.find((team) => team.id === homeTeamId)
     : undefined;
-  const team = base ? applyCmsTeamToBase(base, cmsRecord) : undefined;
+  const baseTeam = resolveEquipoLigaTeam(homeTeamId, gender, options?.bundles);
+  const team = baseTeam ? applyCmsTeamToBase(baseTeam, cmsRecord) : undefined;
 
   const fromTeam = team?.stadium?.trim();
   if (fromTeam) return formatStadiumDisplayName(fromTeam);
@@ -39,6 +40,9 @@ export function resolveHomeTeamStadiumName(
     const fromClub = squad.club.estadio?.trim() || squad.club.estadioInfo?.nombre?.trim();
     if (fromClub) return formatStadiumDisplayName(fromClub);
   }
+
+  const fromRivalBundle = getRivalStadiumName(options?.bundles, gender, homeTeamId);
+  if (fromRivalBundle) return formatStadiumDisplayName(fromRivalBundle);
 
   return "";
 }
