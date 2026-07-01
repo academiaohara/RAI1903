@@ -9,23 +9,36 @@ import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 
 function FormRacha({ form }: { form: FormCode[] }) {
   const label: Record<FormCode, string> = { G: "V", E: "E", P: "D" };
-  const padded: FormCode[] =
-    form.length >= 3 ? form.slice(-3) : ([...Array<FormCode>(3 - form.length).fill("E"), ...form] as FormCode[]);
+  const recent = form.slice(-3);
+  const slots: Array<FormCode | null> = [
+    ...Array<null>(3 - recent.length).fill(null),
+    ...recent,
+  ];
 
   return (
     <div className="flex justify-center gap-1">
-      {padded.map((code, index) => (
-        <span
-          key={`${code}-${index}`}
-          className={cn(
-            "flex h-7 w-7 items-center justify-center rounded text-[10px] font-extrabold text-white",
-            resultTone(code),
-          )}
-          title={code === "G" ? "Victoria" : code === "E" ? "Empate" : "Derrota"}
-        >
-          {label[code]}
-        </span>
-      ))}
+      {slots.map((code, index) =>
+        code === null ? (
+          <span
+            key={`empty-${index}`}
+            className="flex h-7 w-7 items-center justify-center rounded bg-slate-200 text-[10px] font-extrabold text-slate-400"
+            title="Sin partido"
+          >
+            —
+          </span>
+        ) : (
+          <span
+            key={`${code}-${index}`}
+            className={cn(
+              "flex h-7 w-7 items-center justify-center rounded text-[10px] font-extrabold text-white",
+              resultTone(code),
+            )}
+            title={code === "G" ? "Victoria" : code === "E" ? "Empate" : "Derrota"}
+          >
+            {label[code]}
+          </span>
+        ),
+      )}
     </div>
   );
 }

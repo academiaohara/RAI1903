@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Modal } from "@/components/Modal";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { canLinkEquipoLiga, equipoLigaHref } from "@/lib/equipo-liga";
-import { players } from "@/data/mock";
 import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
 import { groupSlotToTeam, resolveGroupTeams } from "@/lib/cms/group-teams";
 import { getTeamsBundle, resolveFixtureTeamDisplayName } from "@/lib/cms/teams-bundle";
@@ -48,10 +47,6 @@ function TeamPreviewBlock({
 }) {
   const sideLabel = side === "home" ? "Como local" : "Como visitante";
 
-  const avilesUnavailable = teamId === "real-aviles-industrial"
-    ? players.filter((player) => player.status === "lesionado" || player.status === "sancionado")
-    : [];
-
   const teamNameClass =
     "text-lg font-extrabold text-slate-900" +
     (canLinkEquipoLiga("masculino", teamId)
@@ -87,18 +82,6 @@ function TeamPreviewBlock({
             : "Sin partidos previos en esta condicion"}
         </p>
       </div>
-      {avilesUnavailable.length > 0 && (
-        <div className="mt-3 text-sm">
-          <p className="font-bold text-slate-500">Lesionados / sancionados</p>
-          <ul className="mt-1 space-y-1 text-slate-700">
-            {avilesUnavailable.map((player) => (
-              <li key={player.id}>
-                {player.displayName} <span className="text-xs font-bold uppercase text-[#981915]">({player.status})</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
       {teamId !== "real-aviles-industrial" && (
         <p className="mt-3 text-xs text-slate-500">Bajas del rival: consulta convocatoria oficial.</p>
       )}
