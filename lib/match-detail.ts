@@ -1,6 +1,6 @@
-import { matchdays, matchdaysFemenino, players, playersFemenino } from "@/data/mock";
+import { matchdays, matchdaysFemenino } from "@/data/mock";
 import { isLeagueCompetition, matchCompetitionShortLabel } from "@/lib/competition-labels";
-import { getMatchById, getRaiTeamId, getTeamMatches } from "@/lib/fixtures";
+import { getMatchById, getTeamMatches } from "@/lib/fixtures";
 import { isMatchPlayed } from "@/lib/match-result";
 import { getMatchesBeforeRound, leagueRoundForMatch } from "@/lib/standings";
 import type {
@@ -57,19 +57,8 @@ function toRecentFormMatch(teamId: string, match: Match): RecentFormMatch {
   };
 }
 
-function buildAvailability(teamId: string, gender: PrimerEquipoGender): MatchAvailabilityPlayer[] {
-  const raiId = getRaiTeamId(gender);
-  if (teamId !== raiId) return [];
-
-  const squad = gender === "femenino" ? playersFemenino : players;
-  return squad
-    .filter((player) => player.status === "lesionado" || player.status === "sancionado")
-    .map((player) => ({
-      playerId: player.id,
-      name: player.displayName,
-      reason: player.status === "lesionado" ? "lesionado" : "sancionado",
-      detail: "",
-    }));
+function buildAvailability(): MatchAvailabilityPlayer[] {
+  return [];
 }
 
 function resolveLeagueMatchdays(gender: PrimerEquipoGender, options?: BuildMatchDetailOptions): Matchday[] {
@@ -139,8 +128,8 @@ export function buildMatchDetail(
     headToHead: [],
     h2hSummary: { wins: 0, draws: 0, losses: 0 },
     availability: {
-      home: buildAvailability(match.homeTeamId, gender),
-      away: buildAvailability(match.awayTeamId, gender),
+      home: buildAvailability(),
+      away: buildAvailability(),
     },
     rdpPrevia: null,
     rdpPostpartido: null,
