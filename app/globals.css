@@ -830,17 +830,40 @@ a {
   gap: 0.4rem;
 }
 
-.lineup-list-players {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
+.lineup-list-dorsal {
+  color: #214c9b;
+  font-size: 0.72rem;
+  font-weight: 800;
+  min-width: 1.4rem;
+  text-align: center;
 }
 
-.lineup-list-sub {
+.lineup-list-dorsal--empty {
+  color: #94a3b8;
+}
+
+.lineup-list-dorsal--sub {
   color: #981915;
-  font-size: 0.68rem;
-  font-weight: 700;
-  line-height: 1.2;
+}
+
+.lineup-list-title--subs {
+  margin-top: 0.85rem;
+}
+
+.lineup-list--subs .lineup-list-row {
+  padding-left: 2.8rem;
+}
+
+.lineup-list-player--sub {
+  color: #981915;
+}
+
+.lineup-list-empty-subs {
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-style: italic;
+  margin: 0;
+  padding-left: 2.8rem;
 }
 
 .lineup-list-label {

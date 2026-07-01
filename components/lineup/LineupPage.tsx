@@ -55,6 +55,10 @@ type LineupListPanelProps = {
   playersById: Map<string, SquadPlayer>;
 };
 
+function playerListName(player: SquadPlayer): string {
+  return player.apellido || player.nombre;
+}
+
 function LineupListPanel({
   slots,
   assignments,
@@ -62,6 +66,12 @@ function LineupListPanel({
   showSubstitutes,
   playersById,
 }: LineupListPanelProps) {
+  const substitutePlayers = showSubstitutes
+    ? substitutes
+        .map((subId) => (subId ? playersById.get(subId) : null))
+        .filter((player): player is SquadPlayer => Boolean(player))
+    : [];
+
   return (
     <div className="lineup-list-panel">
       <h3 className="lineup-list-title">Once titular</h3>
@@ -69,25 +79,41 @@ function LineupListPanel({
         {slots.map((slot, index) => {
           const playerId = assignments[index];
           const player = playerId ? playersById.get(playerId) : null;
-          const name = player ? (player.apellido || player.nombre) : "—";
-          const subId = substitutes[index];
-          const sub = subId ? playersById.get(subId) : null;
-          const subName = sub ? (sub.apellido || sub.nombre) : null;
+          const name = player ? playerListName(player) : "—";
           return (
             <li key={index} className="lineup-list-row">
               <span className="lineup-list-label">{slot.label}</span>
-              <span className="lineup-list-players">
-                <span className={`lineup-list-player${!player ? " lineup-list-player--empty" : ""}`}>
-                  {name}
-                </span>
-                {showSubstitutes && subName && (
-                  <span className="lineup-list-sub">{subName}</span>
-                )}
+              <span
+                className={`lineup-list-dorsal${!player ? " lineup-list-dorsal--empty" : ""}`}
+              >
+                {player ? player.dorsal : "—"}
+              </span>
+              <span className={`lineup-list-player${!player ? " lineup-list-player--empty" : ""}`}>
+                {name}
               </span>
             </li>
           );
         })}
       </ol>
+      {showSubstitutes && (
+        <>
+          <h3 className="lineup-list-title lineup-list-title--subs">Suplentes</h3>
+          {substitutePlayers.length > 0 ? (
+            <ol className="lineup-list lineup-list--subs">
+              {substitutePlayers.map((player) => (
+                <li key={player.id} className="lineup-list-row">
+                  <span className="lineup-list-dorsal lineup-list-dorsal--sub">{player.dorsal}</span>
+                  <span className="lineup-list-player lineup-list-player--sub">
+                    {playerListName(player)}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="lineup-list-empty-subs">Sin suplentes asignados</p>
+          )}
+        </>
+      )}
     </div>
   );
 }
