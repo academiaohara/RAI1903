@@ -1,3 +1,4 @@
+import { formatMatchKickoffTime } from "@/lib/match-kickoff-time";
 import { getAvilesMatchesByGender, getRaiTeamId, getTeamsByGender } from "@/lib/fixtures";
 import { defaultCronicaId } from "@/lib/match-article-factory";
 import { getMatchArticlePageHref } from "@/lib/match-article-url";
@@ -11,14 +12,7 @@ import type { CalendarMatch, Match } from "@/types";
 const NO_TIME_COMPETITIONS = new Set(["amistoso"]);
 
 function formatKickoffTime(date: string): string | null {
-  const parsed = new Date(date);
-  if (Number.isNaN(parsed.getTime())) return null;
-  if (parsed.getUTCHours() === 0 && parsed.getUTCMinutes() === 0) return null;
-  return new Intl.DateTimeFormat("es-ES", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(parsed);
+  return formatMatchKickoffTime(date);
 }
 
 function avilesResult(match: Match, raiId: string): string | null {

@@ -1,6 +1,7 @@
 "use client";
 
 import { mergeUtcDateAndTime, utcTimeInputValue } from "@/lib/calendar-match-overrides";
+import { DEFAULT_KICKOFF_UTC } from "@/lib/match-kickoff-time";
 import { cn } from "@/lib/utils";
 import { useState, type KeyboardEvent } from "react";
 
@@ -65,7 +66,7 @@ export function SplitDateInput({
   const [month, setMonth] = useState(synced.month);
   const [year, setYear] = useState(synced.year);
 
-  const resolvedTime = () => (timeValueProp ?? utcTimeInputValue(iso)) || "12:00";
+  const resolvedTime = () => (timeValueProp ?? utcTimeInputValue(iso)) || DEFAULT_KICKOFF_UTC;
 
   const commit = (nextDay: string, nextMonth: string, nextYear: string) => {
     const normalizedDay = pad2(nextDay);

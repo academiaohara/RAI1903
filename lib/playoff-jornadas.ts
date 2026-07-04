@@ -1,3 +1,4 @@
+import { extractKickoffTimeUtc } from "@/lib/match-kickoff-time";
 import { matchdays, matchdaysGrupo2, teams, teamsGrupo2 } from "@/data/mock";
 import { getTeam } from "@/lib/fixtures";
 import { PRIMERA_RFEF_RULES, buildPlayoffBracketFromConfig } from "@/lib/rfef-rules";
@@ -201,11 +202,7 @@ function buildLegMatch(
 }
 
 function extractKickoffTime(iso: string): string | undefined {
-  const date = new Date(iso);
-  const hours = date.getUTCHours();
-  const minutes = date.getUTCMinutes();
-  if (hours === 12 && minutes === 0) return undefined;
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  return extractKickoffTimeUtc(iso);
 }
 
 export function buildPlayoffFixturesForRound(

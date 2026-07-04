@@ -1,4 +1,5 @@
 import { matchToCalendarMatch } from "@/lib/calendar";
+import { isUnsetKickoffUtc } from "@/lib/match-kickoff-time";
 import { getTeamByGender } from "@/lib/fixtures";
 import { isMatchPlayed } from "@/lib/match-result";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -67,7 +68,7 @@ export function utcTimeInputValue(iso: string): string {
   if (Number.isNaN(date.getTime())) return "";
   const hours = date.getUTCHours();
   const minutes = date.getUTCMinutes();
-  if (hours === 0 && minutes === 0) return "";
+  if (isUnsetKickoffUtc(iso)) return "";
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 }
 
