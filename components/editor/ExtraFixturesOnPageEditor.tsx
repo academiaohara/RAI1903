@@ -22,6 +22,7 @@ import { slugFromTeamName } from "@/lib/cms/group-teams";
 import { getRaiTeamId } from "@/lib/fixtures";
 import { fixtureSourceFromBundles } from "@/lib/season/fixture-source";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import { DEFAULT_KICKOFF_UTC, isUnsetKickoffUtc } from "@/lib/match-kickoff-time";
 import type { CompetitionId, Match } from "@/types";
 
 function matchDateInput(iso: string): string {
@@ -35,13 +36,14 @@ function matchDateInput(iso: string): string {
 
 function matchTimeInput(iso: string): string {
   const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "12:00";
+  if (Number.isNaN(date.getTime()) || isUnsetKickoffUtc(iso)) return "";
   return `${String(date.getUTCHours()).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")}`;
 }
 
 function mergeMatchDateTime(iso: string, dateValue: string, timeValue: string): string {
   const [year, month, day] = dateValue.split("-").map(Number);
-  const [hours, minutes] = timeValue.split(":").map(Number);
+  const resolvedTime = timeValue || DEFAULT_KICKOFF_UTC;
+  const [hours, minutes] = resolvedTime.split(":").map(Number);
   return new Date(Date.UTC(year, month - 1, day, hours, minutes)).toISOString();
 }
 

@@ -1,3 +1,4 @@
+import { formatMatchKickoffDisplay, formatMatchKickoffTime } from "@/lib/match-kickoff-time";
 import type { FormCode, ResultCode } from "@/types";
 
 export const cn = (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(" ");
@@ -52,16 +53,13 @@ export const formatMatchWeekdayLetterDate = (date: string) => {
   return `${formatMatchWeekdayLetter(date)}, ${numericDate}`;
 };
 
-export const formatMatchTime = (date: string) =>
-  new Intl.DateTimeFormat("es-ES", {
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(date));
+export const formatMatchTime = (date: string) => formatMatchKickoffDisplay(date);
 
 /** Etiqueta compacta para la pizarra del lineup: «S27-20:00». */
 export const formatLineupKickoffLabel = (date: string) => {
   const day = new Date(date).getDate();
-  return `${formatMatchWeekdayLetter(date)}${day}-${formatMatchTime(date)}`;
+  const time = formatMatchKickoffTime(date);
+  return time ? `${formatMatchWeekdayLetter(date)}${day}-${time}` : `${formatMatchWeekdayLetter(date)}${day}`;
 };
 
 export const resultTone = (result: ResultCode | FormCode) => {

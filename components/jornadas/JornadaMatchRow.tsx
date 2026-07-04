@@ -6,6 +6,7 @@ import { TeamLink } from "@/components/TeamLink";
 import { SplitDateInput } from "@/components/calendar/SplitDateInput";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
+import { DEFAULT_KICKOFF_UTC } from "@/lib/match-kickoff-time";
 import {
   mergeUtcDateAndTime,
   utcDateInputValue,
@@ -103,14 +104,14 @@ export function JornadaMatchRow({
       date: mergeUtcDateAndTime(
         editedFixture.date,
         utcDateInputValue(editedFixture.date),
-        timeValue || "12:00",
+        timeValue || DEFAULT_KICKOFF_UTC,
       ),
       kickoffTime: timeValue || undefined,
     });
   };
 
   const kickoffTimeForDate =
-    (editedFixture.kickoffTime ?? utcTimeInputValue(editedFixture.date)) || "12:00";
+    (editedFixture.kickoffTime ?? utcTimeInputValue(editedFixture.date)) || DEFAULT_KICKOFF_UTC;
 
   const nameClass = (isHighlight: boolean) =>
     cn(

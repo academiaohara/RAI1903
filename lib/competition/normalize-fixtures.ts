@@ -5,7 +5,7 @@ import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Match, Matchday, CompetitionId } from "@/types";
 
 /** Fecha lejana para partidos sin asignar; evita bloquear la quiniela antes de fijar horarios. */
-export const PLACEHOLDER_MATCH_DATE = "2099-07-01T12:00:00.000Z";
+export const PLACEHOLDER_MATCH_DATE = "2099-07-01T00:00:00.000Z";
 
 export function isPlaceholderTeamId(teamId: string): boolean {
   return teamId.startsWith("cms-slot-");

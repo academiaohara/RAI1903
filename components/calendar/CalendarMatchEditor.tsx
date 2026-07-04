@@ -16,6 +16,7 @@ import { getTeamsBundle, resolveFixtureTeamDisplayName } from "@/lib/cms/teams-b
 import { matchResultOverrideKey, readMatchResultOverride } from "@/lib/fixture-inline-keys";
 import { fixtureEditorTeamOptions } from "@/lib/fixtures/editor-team-options";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import { DEFAULT_KICKOFF_UTC } from "@/lib/match-kickoff-time";
 import { cn } from "@/lib/utils";
 import type { CalendarMatch, Match } from "@/types";
 import { useMemo } from "react";
@@ -112,7 +113,7 @@ export function CalendarMatchEditor({
             return `${y}-${m}-${day}`;
           })();
     savePatch({
-      date: mergeUtcDateAndTime(editedMatch.date, ymd, timeValue || "12:00"),
+      date: mergeUtcDateAndTime(editedMatch.date, ymd, timeValue || DEFAULT_KICKOFF_UTC),
     });
   };
 

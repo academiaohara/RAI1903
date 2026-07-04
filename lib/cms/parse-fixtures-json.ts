@@ -91,7 +91,7 @@ function parseKickoffIso(fecha: string, hora: string | null | undefined): string
   const trimmed = fecha.trim();
   if (/^\d{4}-\d{2}-\d{2}/.test(trimmed)) {
     const [year, month, day] = trimmed.slice(0, 10).split("-").map(Number);
-    const [hours, minutes] = hora ? String(hora).split(":").map(Number) : [12, 0];
+    const [hours, minutes] = hora ? String(hora).split(":").map(Number) : [0, 0];
     return new Date(Date.UTC(year, month - 1, day, hours, minutes)).toISOString();
   }
 
@@ -102,7 +102,7 @@ function parseKickoffIso(fecha: string, hora: string | null | undefined): string
   if (!day || month === undefined || !year) {
     throw new Error(`Fecha no reconocida: "${fecha}"`);
   }
-  return new Date(Date.UTC(year, month, day, 12, 0)).toISOString();
+  return new Date(Date.UTC(year, month, day, 0, 0)).toISOString();
 }
 
 function normalizeCanteraPartido(raw: unknown, index: number, jornada: number): FilialFixturePartido | string {

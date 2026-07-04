@@ -3,6 +3,7 @@ import { isLeagueCompetition, matchCompetitionShortLabel } from "@/lib/competiti
 import { getMatchById, getTeamMatches } from "@/lib/fixtures";
 import { isMatchPlayed } from "@/lib/match-result";
 import { getMatchesBeforeRound, leagueRoundForMatch } from "@/lib/standings";
+import { formatMatchKickoffDisplay } from "@/lib/match-kickoff-time";
 import type {
   FormCode,
   Match,
@@ -23,10 +24,6 @@ export type BuildMatchDetailOptions = {
 };
 
 const EMPTY_LINEUP: MatchLineup = { formation: "", starters: [], bench: [] };
-
-function formatKickoffTime(date: string): string {
-  return new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(date));
-}
 
 function formatKickoffDateLabel(date: string): string {
   return new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "long" }).format(new Date(date));
@@ -116,7 +113,7 @@ export function buildMatchDetail(
     gender,
     referee: "",
     attendance: null,
-    kickoffTime: formatKickoffTime(match.date),
+    kickoffTime: formatMatchKickoffDisplay(match.date),
     kickoffDateLabel: formatKickoffDateLabel(match.date),
     seasonLabel: options?.seasonLabel ?? "",
     stats: [],
