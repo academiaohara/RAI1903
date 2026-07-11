@@ -17,6 +17,9 @@ export function isTeamCrestUrl(value: string): boolean {
   return value.startsWith("/") || value.startsWith("http");
 }
 
+/** Sombra suave para que escudos claros (p. ej. Avilés) no se pierdan sobre fondos blancos o azules. */
+export const teamCrestDropShadowClassName = "drop-shadow-[0_3px_10px_rgba(0,0,0,0.45)]";
+
 function resolveCrestPath(teamId: string, crestInitials?: string): string {
   const fromCms = cmsCrestByTeamId[teamId];
   if (fromCms && isTeamCrestUrl(fromCms)) return fromCms;
