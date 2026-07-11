@@ -9,7 +9,7 @@ export function PlayerCareerTimeline({ player }: { player: SquadPlayer }) {
 
   return (
     <div className="relative space-y-0">
-      <div className="absolute bottom-2 left-[calc(3rem-2.125rem+0.4375rem)] top-2 w-px -translate-x-1/2 bg-gradient-to-b from-[#214C9B] via-[#214C9B]/30 to-transparent" />
+      <div className="absolute bottom-2 left-[calc(2.5rem-2.125rem+0.4375rem)] top-2 w-px -translate-x-1/2 bg-gradient-to-b from-[#214C9B] via-[#214C9B]/30 to-transparent sm:left-[calc(3rem-2.125rem+0.4375rem)]" />
 
       {career.map((entry, index) => (
         <motion.div
@@ -17,25 +17,25 @@ export function PlayerCareerTimeline({ player }: { player: SquadPlayer }) {
           initial={{ opacity: 0, x: -12 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: index * 0.05 }}
-          className="grid gap-4 pb-6 pl-12 sm:grid-cols-[1fr_auto]"
+          className="grid gap-3 pb-5 pl-10 sm:grid-cols-[1fr_auto] sm:gap-4 sm:pb-6 sm:pl-12"
         >
           <div className="relative">
             <span
               aria-hidden
-              className="absolute -left-[2.125rem] top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full border-2 border-white bg-[#214C9B] shadow-md shadow-blue-950/20"
+              className="absolute -left-[1.875rem] top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white bg-[#214C9B] shadow-md shadow-blue-950/20 sm:-left-[2.125rem] sm:h-3.5 sm:w-3.5"
             />
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-[#214C9B] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
+                <span className="rounded-full bg-[#214C9B] px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white sm:px-3 sm:py-1 sm:text-[10px]">
                   {entry.temporada}
                 </span>
-                <h4 className="text-base font-extrabold uppercase text-slate-900">{entry.club}</h4>
+                <h4 className="text-sm font-extrabold uppercase text-slate-900 sm:text-base">{entry.club}</h4>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 self-center sm:min-w-[14rem]">
+          <div className="grid grid-cols-3 gap-1.5 self-center sm:min-w-[14rem] sm:gap-2">
             {[
               { label: "PJ", value: entry.partidos },
               { label: "G", value: entry.goles },

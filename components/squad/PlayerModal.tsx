@@ -33,12 +33,12 @@ import {
   SQUAD_ROSTER_ESTADOS,
 } from "@/components/squad/PlayerAvailabilityPanel";
 
-const tabs: Array<{ id: SquadModalTab; label: string }> = [
-  { id: "actualidad", label: "Actualidad" },
-  { id: "resumen", label: "Resumen" },
-  { id: "partidos", label: "Partidos" },
-  { id: "estadisticas", label: "Estadisticas" },
-  { id: "trayectoria", label: "Trayectoria" },
+const tabs: Array<{ id: SquadModalTab; label: string; shortLabel: string }> = [
+  { id: "actualidad", label: "Actualidad", shortLabel: "Actual." },
+  { id: "resumen", label: "Resumen", shortLabel: "Resumen" },
+  { id: "partidos", label: "Partidos", shortLabel: "Partidos" },
+  { id: "estadisticas", label: "Estadisticas", shortLabel: "Stats" },
+  { id: "trayectoria", label: "Trayectoria", shortLabel: "Trayec." },
 ];
 
 type PlayerModalProps = {
@@ -93,66 +93,93 @@ function PlayerModalContent({
       exit={{ opacity: 0, y: 24, scale: 0.98 }}
       transition={{ type: "spring", stiffness: 320, damping: 30 }}
       onClick={(event) => event.stopPropagation()}
-      className="flex max-h-[94vh] w-full max-w-5xl flex-col overflow-hidden rounded-t-[2rem] border border-[#214C9B]/20 bg-white shadow-2xl sm:rounded-[2rem]"
+      className="flex h-[100dvh] w-full max-w-5xl flex-col overflow-hidden rounded-none border-0 border-[#214C9B]/20 bg-white shadow-2xl sm:h-auto sm:max-h-[94vh] sm:rounded-[2rem] sm:border"
     >
-      <div className="relative z-20 shrink-0 overflow-hidden bg-gradient-to-br from-[#0f2347] via-[#173a78] to-[#214C9B] px-5 pb-6 pt-5 text-white sm:px-8 sm:pb-8 sm:pt-6">
+      <div className="relative z-20 shrink-0 overflow-hidden bg-gradient-to-br from-[#0f2347] via-[#173a78] to-[#214C9B] px-4 pb-4 pt-[max(1rem,env(safe-area-inset-top))] text-white sm:px-8 sm:pb-8 sm:pt-6">
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 z-10 rounded-full border border-white/25 bg-white/10 p-2 text-white transition hover:bg-white/20"
+          className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-10 rounded-full border border-white/25 bg-white/10 p-2 text-white transition hover:bg-white/20 sm:right-4 sm:top-4"
           aria-label="Cerrar"
         >
           <X size={18} />
         </button>
 
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-end">
-          <div className="relative mx-auto w-[58%] max-w-[220px] sm:mx-0 sm:w-[200px]">
+        <div className="flex items-start gap-4 pr-10 sm:items-end sm:gap-6 sm:pr-0">
+          <div className="relative w-[6.75rem] shrink-0 sm:w-[200px]">
             <PlayerAvatar
               player={player}
               size="xl"
               priority
-              className="aspect-[4/5] w-full rounded-[1.5rem] shadow-2xl"
+              className="aspect-[4/5] w-full rounded-xl shadow-2xl sm:rounded-[1.5rem]"
             />
-            <div className="absolute -bottom-3 -right-2 rounded-2xl bg-white px-4 py-2 text-4xl font-extrabold text-[#214C9B] shadow-xl">
+            <div className="absolute -bottom-2 -right-1 rounded-xl bg-white px-2.5 py-1 text-2xl font-extrabold text-[#214C9B] shadow-xl sm:-bottom-3 sm:-right-2 sm:rounded-2xl sm:px-4 sm:py-2 sm:text-4xl">
               {player.dorsal}
             </div>
           </div>
 
-          <div className="min-w-0 flex-1 text-center sm:text-left">
-            <span className="inline-flex rounded-full border border-white/25 bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em]">
+          <div className="min-w-0 flex-1 text-left">
+            <span className="inline-flex rounded-full border border-white/25 bg-white/10 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] sm:px-3 sm:py-1 sm:text-[10px] sm:tracking-[0.16em]">
               {player.rol}
             </span>
-            <h2 className="mt-3 text-3xl font-extrabold uppercase tracking-tight sm:text-4xl">{playerName}</h2>
-            <p className="mt-2 text-sm font-semibold text-white/80">
+            <h2 className="mt-2 text-xl font-extrabold uppercase leading-tight tracking-tight sm:mt-3 sm:text-4xl">{playerName}</h2>
+            <p className="mt-1 text-xs font-semibold text-white/80 sm:mt-2 sm:text-sm">
               {player.nacionalidad} · {formatPlayerAgeWithUnit(player.edad)}
             </p>
-
-            <div className="mt-4 grid grid-cols-2 gap-2 text-left text-xs font-semibold sm:grid-cols-3">
-              {player.valorMercado && <InfoChip label="Valor mercado" value={player.valorMercado} />}
-              <InfoChip
-                icon={Star}
-                label="Valoración media"
-                value={fanRating ? formatFanRating(fanRating.average) : "Sin valoraciones"}
-              />
-              <InfoChip icon={Calendar} label="Nacimiento" value={formatBirthDate(player.fechaNacimiento)} />
-              <InfoChip icon={MapPin} label="Lugar" value={player.lugarNacimiento} />
-              <InfoChip icon={Ruler} label="Altura" value={player.altura} />
-              <InfoChip icon={Scale} label="Peso" value={player.peso} />
-              <InfoChip label="Pierna" value={player.piernaBuena} />
-              <InfoChip label="Contrato" value={formatContractDate(player.contratoHasta)} />
-            </div>
           </div>
+        </div>
+
+        <div className="mt-3 -mx-1 flex touch-pan-x flex-nowrap gap-2 overflow-x-auto overscroll-x-contain scroll-px-1 px-1 pb-0.5 no-scrollbar sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-2 sm:overflow-visible sm:px-0 sm:pb-0">
+          {player.valorMercado && (
+            <InfoChip label="Valor mercado" value={player.valorMercado} className="min-w-[8.75rem] shrink-0 sm:min-w-0" />
+          )}
+          <InfoChip
+            icon={Star}
+            label="Valoración media"
+            value={fanRating ? formatFanRating(fanRating.average) : "Sin valoraciones"}
+            className="min-w-[8.75rem] shrink-0 sm:min-w-0"
+          />
+          <InfoChip
+            icon={Calendar}
+            label="Nacimiento"
+            value={formatBirthDate(player.fechaNacimiento)}
+            className="min-w-[8.75rem] shrink-0 sm:min-w-0"
+          />
+          <InfoChip
+            icon={MapPin}
+            label="Lugar"
+            value={player.lugarNacimiento}
+            className="min-w-[8.75rem] shrink-0 sm:min-w-0"
+          />
+          <InfoChip
+            icon={Ruler}
+            label="Altura"
+            value={player.altura}
+            className="min-w-[8.75rem] shrink-0 sm:min-w-0"
+          />
+          <InfoChip
+            icon={Scale}
+            label="Peso"
+            value={player.peso}
+            className="min-w-[8.75rem] shrink-0 sm:min-w-0"
+          />
+          <InfoChip label="Pierna" value={player.piernaBuena} className="min-w-[8.75rem] shrink-0 sm:min-w-0" />
+          <InfoChip
+            label="Contrato"
+            value={formatContractDate(player.contratoHasta)}
+            className="min-w-[8.75rem] shrink-0 sm:min-w-0"
+          />
         </div>
       </div>
 
-      <div className="relative z-10 shrink-0 border-b border-slate-200 bg-white px-4 sm:px-6">
-        <div className="flex gap-1 overflow-x-auto no-scrollbar py-3">
+      <div className="relative z-10 shrink-0 border-b border-slate-200 bg-white px-3 sm:px-6">
+        <div className="-mx-3 flex touch-pan-x flex-nowrap gap-0.5 overflow-x-auto overscroll-x-contain scroll-px-3 px-3 py-2 no-scrollbar sm:mx-0 sm:gap-1 sm:px-0 sm:py-3">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`relative shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-wide transition ${
+              className={`relative shrink-0 rounded-xl px-3 py-2 text-[10px] font-bold uppercase tracking-wide transition sm:px-4 sm:py-2.5 sm:text-xs ${
                 activeTab === tab.id ? "text-[#214C9B]" : "text-slate-500 hover:text-slate-800"
               }`}
             >
@@ -163,13 +190,14 @@ function PlayerModalContent({
                   transition={{ type: "spring", stiffness: 420, damping: 34 }}
                 />
               )}
-              <span className="relative z-10">{tab.label}</span>
+              <span className="relative z-10 sm:hidden">{tab.shortLabel}</span>
+              <span className="relative z-10 hidden sm:inline">{tab.label}</span>
             </button>
           ))}
         </div>
       </div>
 
-      <div className="relative z-0 min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+      <div className="relative z-0 flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-6">
         <PlayerAvailabilityPanel
           player={player}
           editMode={editMode}
@@ -247,7 +275,7 @@ export function PlayerModal({ player, onClose, onUpdate, onRemove }: PlayerModal
     <AnimatePresence>
       {player && (
         <motion.div
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-slate-950/70 p-0 backdrop-blur-md sm:items-center sm:p-4"
+          className="fixed inset-0 z-[60] flex items-stretch justify-center bg-slate-950/70 p-0 backdrop-blur-md sm:items-center sm:p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -418,27 +446,29 @@ function InfoChip({
   icon: Icon,
   label,
   value,
+  className,
 }: {
   icon?: typeof Calendar;
   label: string;
   value: string;
+  className?: string;
 }) {
   return (
-    <div className="rounded-xl border border-white/15 bg-white/10 px-3 py-2">
-      <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-white/60">
-        {Icon && <Icon size={12} />}
-        {label}
+    <div className={`rounded-xl border border-white/15 bg-white/10 px-2.5 py-1.5 sm:px-3 sm:py-2 ${className ?? ""}`}>
+      <p className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide text-white/60 sm:text-[10px]">
+        {Icon && <Icon size={11} className="shrink-0 sm:h-3 sm:w-3" />}
+        <span className="truncate">{label}</span>
       </p>
-      <p className="mt-1 text-xs font-semibold text-white">{value}</p>
+      <p className="mt-0.5 truncate text-[11px] font-semibold text-white sm:mt-1 sm:text-xs">{value}</p>
     </div>
   );
 }
 
 function DetailStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4">
-      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{label}</p>
-      <p className="mt-1 text-2xl font-extrabold text-[#214C9B]">{value}</p>
+    <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4">
+      <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500 sm:text-[10px]">{label}</p>
+      <p className="mt-0.5 text-xl font-extrabold text-[#214C9B] sm:mt-1 sm:text-2xl">{value}</p>
     </div>
   );
 }
