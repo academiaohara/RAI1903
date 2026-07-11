@@ -93,7 +93,7 @@ function PlayerModalContent({
       exit={{ opacity: 0, y: 24, scale: 0.98 }}
       transition={{ type: "spring", stiffness: 320, damping: 30 }}
       onClick={(event) => event.stopPropagation()}
-      className="flex max-h-[min(94dvh,100dvh)] w-full max-w-5xl flex-col overflow-hidden rounded-t-[2rem] border border-[#214C9B]/20 bg-white shadow-2xl sm:max-h-[94vh] sm:rounded-[2rem]"
+      className="flex h-[100dvh] w-full max-w-5xl flex-col overflow-hidden rounded-none border-0 border-[#214C9B]/20 bg-white shadow-2xl sm:h-auto sm:max-h-[94vh] sm:rounded-[2rem] sm:border"
     >
       <div className="relative z-20 shrink-0 overflow-hidden bg-gradient-to-br from-[#0f2347] via-[#173a78] to-[#214C9B] px-4 pb-4 pt-[max(1rem,env(safe-area-inset-top))] text-white sm:px-8 sm:pb-8 sm:pt-6">
         <button
@@ -197,7 +197,7 @@ function PlayerModalContent({
         </div>
       </div>
 
-      <div className="relative z-0 min-h-0 flex-1 overflow-y-auto overscroll-y-contain p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-6">
+      <div className="relative z-0 flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-6">
         <PlayerAvailabilityPanel
           player={player}
           editMode={editMode}
@@ -275,7 +275,7 @@ export function PlayerModal({ player, onClose, onUpdate, onRemove }: PlayerModal
     <AnimatePresence>
       {player && (
         <motion.div
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-slate-950/70 p-0 backdrop-blur-md sm:items-center sm:p-4"
+          className="fixed inset-0 z-[60] flex items-stretch justify-center bg-slate-950/70 p-0 backdrop-blur-md sm:items-center sm:p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
