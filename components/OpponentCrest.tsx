@@ -1,3 +1,4 @@
+import { teamCrestDropShadowClassName } from "@/lib/team-crests";
 import { cn } from "@/lib/utils";
 
 type OpponentCrestProps = {
@@ -23,7 +24,7 @@ export function OpponentCrest({ logo, opponent, className, size = "lg" }: Oppone
       <img
         src={logo}
         alt={`Escudo de ${opponent}`}
-        className={cn("object-contain", sizeClass, className)}
+        className={cn("object-contain", teamCrestDropShadowClassName, sizeClass, className)}
       />
     );
   }
