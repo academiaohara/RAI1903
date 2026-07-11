@@ -386,7 +386,14 @@ function MatchBanner({
           )}
         >
           <div className={cn("flex items-center justify-center bg-white p-3", sidePanel)}>
-            <OpponentCrest logo={teamCrestLogo(match.homeTeamId)} opponent={match.homeTeam} size="md" className="mx-auto" />
+            <OpponentCrest
+              logo={teamCrestLogo(match.homeTeamId)}
+              opponent={match.homeTeam}
+              teamId={match.homeTeamId}
+              onGranateBackgroundHover={accent === "granate"}
+              size="md"
+              className="mx-auto"
+            />
           </div>
           <div
             className={cn(
@@ -430,7 +437,14 @@ function MatchBanner({
             </p>
           </div>
           <div className={cn("flex items-center justify-center p-3", sidePanel)}>
-            <OpponentCrest logo={teamCrestLogo(match.awayTeamId)} opponent={match.awayTeam} size="md" className="mx-auto" />
+            <OpponentCrest
+              logo={teamCrestLogo(match.awayTeamId)}
+              opponent={match.awayTeam}
+              teamId={match.awayTeamId}
+              onGranateBackgroundHover={accent === "granate"}
+              size="md"
+              className="mx-auto"
+            />
           </div>
         </div>
 
@@ -449,8 +463,10 @@ function MatchBanner({
           <MatchScoreCenter
             homeLogo={teamCrestLogo(match.homeTeamId)}
             homeTeam={match.homeTeam}
+            homeTeamId={match.homeTeamId}
             awayLogo={teamCrestLogo(match.awayTeamId)}
             awayTeam={match.awayTeam}
+            awayTeamId={match.awayTeamId}
             centerLabel={scoreLabel}
             sublabel={dateLabel}
             className={centerSwap}

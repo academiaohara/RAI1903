@@ -1,4 +1,4 @@
-import { teamCrestDropShadowClassName } from "@/lib/team-crests";
+import { avilesCrestShadowClassName } from "@/lib/team-crests";
 import { cn } from "@/lib/utils";
 
 type OpponentCrestProps = {
@@ -6,6 +6,11 @@ type OpponentCrestProps = {
   opponent: string;
   className?: string;
   size?: "sm" | "md" | "lg";
+  teamId?: string;
+  /** Franja o panel con fondo granate (#981915). */
+  onGranateBackground?: boolean;
+  /** Igual que onGranateBackground, pero solo al hacer hover en un ancestro con clase `group`. */
+  onGranateBackgroundHover?: boolean;
 };
 
 const crestSizeClass = {
@@ -14,9 +19,21 @@ const crestSizeClass = {
   lg: "h-16 w-16 text-sm sm:h-20 sm:w-20 sm:text-base",
 } as const;
 
-export function OpponentCrest({ logo, opponent, className, size = "lg" }: OpponentCrestProps) {
+export function OpponentCrest({
+  logo,
+  opponent,
+  className,
+  size = "lg",
+  teamId,
+  onGranateBackground = false,
+  onGranateBackgroundHover = false,
+}: OpponentCrestProps) {
   const isUrl = logo.startsWith("/") || logo.startsWith("http");
   const sizeClass = crestSizeClass[size];
+  const avilesShadowClass = avilesCrestShadowClassName(teamId, {
+    onGranate: onGranateBackground,
+    onGranateHover: onGranateBackgroundHover,
+  });
 
   if (isUrl) {
     return (
@@ -24,7 +41,7 @@ export function OpponentCrest({ logo, opponent, className, size = "lg" }: Oppone
       <img
         src={logo}
         alt={`Escudo de ${opponent}`}
-        className={cn("object-contain", teamCrestDropShadowClassName, sizeClass, className)}
+        className={cn("object-contain", avilesShadowClass, sizeClass, className)}
       />
     );
   }
@@ -33,6 +50,7 @@ export function OpponentCrest({ logo, opponent, className, size = "lg" }: Oppone
     <span
       className={cn(
         "flex items-center justify-center font-extrabold text-[#214C9B]",
+        avilesShadowClass,
         sizeClass,
         className,
       )}

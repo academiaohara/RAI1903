@@ -69,6 +69,7 @@ export function FixtureCrestMatchCard({
         scoreLabel={scoreLabel}
         sublabel={dateLabel}
         linkTeams={false}
+        crestOnGranateBackground={accent === "granate"}
         className="hidden gap-0 md:grid md:gap-0"
         scoreStripeClassName={cn("rounded-none shadow-none", centerAccent)}
         homeTeamClassName="text-[10px] md:text-xs"
