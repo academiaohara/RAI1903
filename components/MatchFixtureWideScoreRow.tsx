@@ -16,6 +16,7 @@ type MatchFixtureWideScoreRowProps = {
   homeTeamClassName?: string;
   awayTeamClassName?: string;
   scoreStripeClassName?: string;
+  crestOnGranateBackground?: boolean;
   className?: string;
 };
 
@@ -43,6 +44,7 @@ export function MatchFixtureWideScoreRow({
   homeTeamClassName,
   awayTeamClassName,
   scoreStripeClassName,
+  crestOnGranateBackground = false,
   className,
 }: MatchFixtureWideScoreRowProps) {
   const homeHighlighted = match.homeTeamId === highlightTeamId;
@@ -82,6 +84,8 @@ export function MatchFixtureWideScoreRow({
         <OpponentCrest
           logo={teamCrestLogo(match.homeTeamId, gender)}
           opponent={match.homeTeam}
+          teamId={match.homeTeamId}
+          onGranateBackground={crestOnGranateBackground}
           size="sm"
           className="shrink-0"
         />
@@ -96,6 +100,8 @@ export function MatchFixtureWideScoreRow({
         <OpponentCrest
           logo={teamCrestLogo(match.awayTeamId, gender)}
           opponent={match.awayTeam}
+          teamId={match.awayTeamId}
+          onGranateBackground={crestOnGranateBackground}
           size="sm"
           className="shrink-0"
         />

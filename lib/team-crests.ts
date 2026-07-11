@@ -1,3 +1,4 @@
+import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import { ESCUDO_PATHS } from "@/lib/escudo-manifest";
 import type { Team } from "@/types";
 
@@ -17,8 +18,26 @@ export function isTeamCrestUrl(value: string): boolean {
   return value.startsWith("/") || value.startsWith("http");
 }
 
-/** Sombra suave para que escudos claros (p. ej. Avilés) no se pierdan sobre fondos blancos o azules. */
-export const teamCrestDropShadowClassName = "drop-shadow-[0_3px_10px_rgba(0,0,0,0.45)]";
+export function isAvilesTeamId(teamId: string | undefined): boolean {
+  return teamId === RAI_TEAM_ID || teamId === RAI_FEM_TEAM_ID;
+}
+
+/** Sombra blanca para el escudo del Avilés sobre franjas granate (#981915). */
+export const avilesCrestOnGranateDropShadowClassName =
+  "drop-shadow-[0_2px_8px_rgba(255,255,255,0.9)]";
+
+export const avilesCrestOnGranateHoverDropShadowClassName =
+  "group-hover:drop-shadow-[0_2px_8px_rgba(255,255,255,0.9)]";
+
+export function avilesCrestShadowClassName(
+  teamId: string | undefined,
+  options?: { onGranate?: boolean; onGranateHover?: boolean },
+): string {
+  if (!isAvilesTeamId(teamId)) return "";
+  if (options?.onGranate) return avilesCrestOnGranateDropShadowClassName;
+  if (options?.onGranateHover) return avilesCrestOnGranateHoverDropShadowClassName;
+  return "";
+}
 
 function resolveCrestPath(teamId: string, crestInitials?: string): string {
   const fromCms = cmsCrestByTeamId[teamId];

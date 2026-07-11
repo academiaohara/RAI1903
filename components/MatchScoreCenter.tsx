@@ -7,8 +7,10 @@ type MatchScoreCenterAccent = "blue" | "granate";
 type MatchScoreCenterProps = {
   homeLogo: string;
   homeTeam: string;
+  homeTeamId?: string;
   awayLogo: string;
   awayTeam: string;
+  awayTeamId?: string;
   centerLabel: string;
   sublabel?: string;
   className?: string;
@@ -24,13 +26,17 @@ function matchScoreCenterSublabelClass(accent: MatchScoreCenterAccent): string {
 export function MatchScoreCenter({
   homeLogo,
   homeTeam,
+  homeTeamId,
   awayLogo,
   awayTeam,
+  awayTeamId,
   centerLabel,
   sublabel,
   className,
   accent = "blue",
 }: MatchScoreCenterProps) {
+  const crestOnGranate = accent === "granate";
+
   return (
     <div
       className={cn(
@@ -40,9 +46,23 @@ export function MatchScoreCenter({
       )}
     >
       <div className="flex flex-nowrap items-center justify-center gap-3 lg:gap-4">
-        <OpponentCrest logo={homeLogo} opponent={homeTeam} size="md" className="shrink-0 lg:h-14 lg:w-14" />
+        <OpponentCrest
+          logo={homeLogo}
+          opponent={homeTeam}
+          teamId={homeTeamId}
+          onGranateBackground={crestOnGranate}
+          size="md"
+          className="shrink-0 lg:h-14 lg:w-14"
+        />
         <p className="text-3xl font-extrabold leading-none transition-colors duration-200 lg:text-4xl">{centerLabel}</p>
-        <OpponentCrest logo={awayLogo} opponent={awayTeam} size="md" className="shrink-0 lg:h-14 lg:w-14" />
+        <OpponentCrest
+          logo={awayLogo}
+          opponent={awayTeam}
+          teamId={awayTeamId}
+          onGranateBackground={crestOnGranate}
+          size="md"
+          className="shrink-0 lg:h-14 lg:w-14"
+        />
       </div>
       {sublabel ? (
         <p
