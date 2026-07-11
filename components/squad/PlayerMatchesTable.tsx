@@ -40,12 +40,12 @@ export function PlayerMatchesTable({ player }: { player: SquadPlayer }) {
                   {new Date(match.fecha).toLocaleDateString("es-ES", { day: "2-digit", month: "short" })}
                 </p>
               </div>
-              <div className="mt-3 grid grid-cols-5 gap-2 text-center text-xs font-bold text-slate-600">
-                <span className="rounded-xl bg-slate-100 px-2 py-1 tabular-nums">Min {match.minutos}</span>
-                <span className="rounded-xl bg-blue-50 px-2 py-1 tabular-nums text-[#214C9B]">G {match.goles}</span>
-                <span className="rounded-xl bg-slate-100 px-2 py-1 tabular-nums">A {match.asistencias}</span>
-                <span className="rounded-xl bg-amber-50 px-2 py-1 tabular-nums text-amber-700">TA {match.amarillas}</span>
-                <span className="rounded-xl bg-red-50 px-2 py-1 tabular-nums text-red-700">TR {match.rojas}</span>
+              <div className="mt-3 grid grid-cols-5 gap-1 text-center text-[10px] font-bold text-slate-600 sm:mt-3 sm:gap-2 sm:text-xs">
+                <span className="rounded-lg bg-slate-100 px-1.5 py-1 tabular-nums sm:rounded-xl sm:px-2">Min {match.minutos}</span>
+                <span className="rounded-lg bg-blue-50 px-1.5 py-1 tabular-nums text-[#214C9B] sm:rounded-xl sm:px-2">G {match.goles}</span>
+                <span className="rounded-lg bg-slate-100 px-1.5 py-1 tabular-nums sm:rounded-xl sm:px-2">A {match.asistencias}</span>
+                <span className="rounded-lg bg-amber-50 px-1.5 py-1 tabular-nums text-amber-700 sm:rounded-xl sm:px-2">TA {match.amarillas}</span>
+                <span className="rounded-lg bg-red-50 px-1.5 py-1 tabular-nums text-red-700 sm:rounded-xl sm:px-2">TR {match.rojas}</span>
               </div>
             </motion.article>
           ))}
