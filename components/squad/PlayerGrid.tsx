@@ -16,8 +16,6 @@ type PlayerGridProps = {
   editMode?: boolean;
   onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
   seasonLabel?: string;
-  crestUrl?: string;
-  crestAlt?: string;
 };
 
 export function PlayerGrid({
@@ -29,8 +27,6 @@ export function PlayerGrid({
   editMode = false,
   onQuickUpdate,
   seasonLabel,
-  crestUrl,
-  crestAlt,
 }: PlayerGridProps) {
   const grouped = groupPlayersByPosition(players);
   const isFichas = variant === "fichas";
@@ -64,8 +60,6 @@ export function PlayerGrid({
                     editMode={editMode}
                     onQuickUpdate={onQuickUpdate}
                     seasonLabel={seasonLabel}
-                    crestUrl={crestUrl}
-                    crestAlt={crestAlt}
                   />
                 ))
               )}

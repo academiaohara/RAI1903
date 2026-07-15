@@ -13,8 +13,7 @@ import { useTransferSquadPlayer } from "@/hooks/useTransferSquadPlayer";
 import { seasonIdToDisplayLabel, usesLegacyFichaDesign } from "@/lib/ficha-design";
 import { getTransferKind, getTransferKindAbbrev, getTransferKindLabel, getTransferOriginClub } from "@/lib/fichajes";
 import { resolveTransferSeasonId } from "@/lib/transfer-market-windows";
-import { getSquadClubInfo } from "@/lib/squad-data";
-import { getPlayerDisplayName } from "@/lib/squad-utils";
+import { getPlayerDisplayName, hasDisplayDorsal } from "@/lib/squad-utils";
 import type { TransferRumor } from "@/types";
 import type { SquadPosition, SquadRoleCode } from "@/types/squad";
 
@@ -132,7 +131,6 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
   const transferSeasonId = resolveTransferSeasonId(transfer, viewedSeasonId);
   const seasonLabel = seasonIdToDisplayLabel(transferSeasonId);
   const useTradingDesign = !usesLegacyFichaDesign(seasonLabel);
-  const clubCrest = getSquadClubInfo("masculino").escudo;
   const tradingMeta = transferTradingMeta(transfer, player);
 
   const kindAbbrev = getTransferKindAbbrev(kind);
@@ -145,7 +143,7 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
         <div
           className={`absolute left-1.5 top-1.5 z-10 flex flex-col items-center gap-0.5 rounded-lg px-1 py-1 shadow-sm sm:left-2 sm:top-2 sm:gap-1 sm:px-1.5 sm:py-1.5 ${styles.dorsalBox}`}
         >
-          {player ? (
+          {player && hasDisplayDorsal(player.dorsal) ? (
             <span className={`text-xs font-black tabular-nums leading-none sm:text-sm ${styles.dorsal}`}>{player.dorsal}</span>
           ) : (
             <span className={`text-[10px] font-black uppercase leading-none ${styles.dorsal}`}>{initials}</span>
@@ -186,8 +184,7 @@ export function TransferFichaCard({ transfer, index = 0, layout = "carousel" }: 
   const tradingCardBody = (
     <TradingPlayerFicha
       seasonLabel={seasonLabel}
-      crestUrl={clubCrest}
-      crestAlt="Real Avilés Industrial"
+      dorsal={player?.dorsal}
       nombre={tradingMeta.nombre}
       apellido={tradingMeta.apellido}
       posicion={tradingMeta.posicion}

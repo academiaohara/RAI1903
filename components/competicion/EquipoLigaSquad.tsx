@@ -185,8 +185,6 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
               variant="fichas"
               showEmptyPositions={editMode && isOwnClub}
               seasonLabel={viewedSeason.label}
-              crestUrl={club.escudo}
-              crestAlt={club.nombre}
             />
           )}
         </motion.div>
