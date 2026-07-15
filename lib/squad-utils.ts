@@ -23,6 +23,11 @@ export function getPlayerInitials(player: SquadPlayer): string {
   return `${player.nombre[0] ?? ""}${player.apellido[0] ?? ""}`.toUpperCase();
 }
 
+/** Dorsal visible en cromos (oculta 0 y valores vacíos). */
+export function hasDisplayDorsal(dorsal: number | null | undefined): dorsal is number {
+  return typeof dorsal === "number" && dorsal > 0;
+}
+
 const NATIONALITY_ISO: Record<string, string> = {
   España: "es",
   Portugal: "pt",

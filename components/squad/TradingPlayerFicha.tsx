@@ -7,6 +7,7 @@ import type { TransferKind } from "@/types";
 import type { SquadPosition, SquadRoleCode } from "@/types/squad";
 import { getFichaPositionAbbrev } from "@/lib/ficha-design";
 import { getTransferKindLabel } from "@/lib/fichajes";
+import { hasDisplayDorsal } from "@/lib/squad-utils";
 import { cn } from "@/lib/utils";
 
 export type TradingFichaVariant = "default" | TransferKind;
@@ -19,8 +20,7 @@ const KIND_ICON_BY_VARIANT: Record<TransferKind, LucideIcon> = {
 
 export type TradingPlayerFichaProps = {
   seasonLabel: string;
-  crestUrl: string;
-  crestAlt: string;
+  dorsal?: number | null;
   nombre: string;
   apellido: string;
   posicion: SquadPosition;
@@ -36,8 +36,7 @@ export type TradingPlayerFichaProps = {
 
 export function TradingPlayerFicha({
   seasonLabel,
-  crestUrl,
-  crestAlt,
+  dorsal,
   nombre,
   apellido,
   posicion,
@@ -51,7 +50,7 @@ export function TradingPlayerFicha({
   className,
 }: TradingPlayerFichaProps) {
   const positionAbbrev = getFichaPositionAbbrev(posicion);
-  const crestIsUrl = crestUrl.startsWith("/") || crestUrl.startsWith("http");
+  const showDorsal = hasDisplayDorsal(dorsal);
   const shellVariantClass = variant === "default" ? null : `trading-ficha-shell--${variant}`;
   const transferKind = variant === "default" ? null : variant;
   const KindIcon = transferKind ? KIND_ICON_BY_VARIANT[transferKind] : null;
@@ -70,16 +69,13 @@ export function TradingPlayerFicha({
           <span className="trading-ficha-position trading-ficha-position--role">{positionAbbrev}</span>
         </div>
 
-        <div className="absolute right-[5%] top-[3.5%] z-20">
-          {crestIsUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={crestUrl} alt={crestAlt} className="trading-ficha-crest" />
-          ) : (
-            <span className="trading-ficha-crest-fallback" aria-label={crestAlt}>
-              {crestUrl}
+        {showDorsal ? (
+          <div className="absolute right-[4%] top-[2.5%] z-20">
+            <span className="trading-ficha-dorsal" aria-label={`Dorsal ${dorsal}`}>
+              {dorsal}
             </span>
-          )}
-        </div>
+          </div>
+        ) : null}
 
         <div className="trading-ficha-photo-slot">
           {photo}

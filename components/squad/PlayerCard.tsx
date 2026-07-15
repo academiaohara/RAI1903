@@ -6,6 +6,7 @@ import {
   formatPlayerAgeWithUnit,
   getPlayerDisplayName,
   getPlayerFullName,
+  hasDisplayDorsal,
 } from "@/lib/squad-utils";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 import { SquadPlayerQuickEdit } from "@/components/squad/SquadPlayerQuickEdit";
@@ -23,8 +24,6 @@ type SquadPlayerCardProps = {
   editMode?: boolean;
   onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
   seasonLabel?: string;
-  crestUrl?: string;
-  crestAlt?: string;
 };
 
 export function PlayerCard({
@@ -36,8 +35,6 @@ export function PlayerCard({
   editMode = false,
   onQuickUpdate,
   seasonLabel = "25/26",
-  crestUrl = "RAI",
-  crestAlt = "Real Avilés Industrial",
 }: SquadPlayerCardProps) {
   if (variant === "fichas") {
     return (
@@ -49,8 +46,6 @@ export function PlayerCard({
         editMode={editMode}
         onQuickUpdate={onQuickUpdate}
         seasonLabel={seasonLabel}
-        crestUrl={crestUrl}
-        crestAlt={crestAlt}
       />
     );
   }
@@ -71,9 +66,11 @@ export function PlayerCard({
             onClick={() => onSelect(player)}
             className="w-full p-4 text-left transition hover:bg-blue-50/40"
           >
-            <div className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#214C9B] text-xl font-extrabold text-white shadow-lg">
-              {player.dorsal}
-            </div>
+            {hasDisplayDorsal(player.dorsal) ? (
+              <div className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#214C9B] text-xl font-extrabold text-white shadow-lg">
+                {player.dorsal}
+              </div>
+            ) : null}
             <div className="relative mx-auto mt-2 w-[78%]">
               <PlayerAvatar player={player} size="lg" className="mx-auto aspect-[4/5] h-auto w-full rounded-[1.25rem]" />
             </div>
@@ -115,9 +112,11 @@ export function PlayerCard({
       className="group w-full text-left"
     >
       <article className="card-shine relative overflow-hidden rounded-[1.75rem] border border-[#214C9B]/15 bg-gradient-to-b from-white via-slate-50 to-blue-50/40 p-4 shadow-[0_18px_45px_rgba(17,24,39,0.08)] transition-shadow duration-300 group-hover:border-[#214C9B]/35 group-hover:shadow-[0_28px_60px_rgba(33,76,155,0.18)]">
-        <div className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#214C9B] text-xl font-extrabold text-white shadow-lg">
-          {player.dorsal}
-        </div>
+        {hasDisplayDorsal(player.dorsal) ? (
+          <div className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#214C9B] text-xl font-extrabold text-white shadow-lg">
+            {player.dorsal}
+          </div>
+        ) : null}
 
         <div className="relative mx-auto mt-2 w-[78%]">
           <PlayerAvatar player={player} size="lg" className="mx-auto aspect-[4/5] h-auto w-full rounded-[1.25rem]" />
@@ -163,8 +162,6 @@ function PlayerFichaCard({
   editMode = false,
   onQuickUpdate,
   seasonLabel = "25/26",
-  crestUrl = "RAI",
-  crestAlt = "Real Avilés Industrial",
 }: {
   player: SquadPlayer;
   onSelect: (player: SquadPlayer) => void;
@@ -173,8 +170,6 @@ function PlayerFichaCard({
   editMode?: boolean;
   onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
   seasonLabel?: string;
-  crestUrl?: string;
-  crestAlt?: string;
 }) {
   const displayName = getPlayerDisplayName(player);
   const canQuickEdit = editMode && onQuickUpdate;
@@ -198,8 +193,7 @@ function PlayerFichaCard({
     const tradingCard = (
       <TradingPlayerFicha
         seasonLabel={seasonLabel}
-        crestUrl={crestUrl}
-        crestAlt={crestAlt}
+        dorsal={player.dorsal}
         nombre={player.nombre}
         apellido={player.apellido}
         posicion={player.posicion}
@@ -261,12 +255,14 @@ function PlayerFichaCard({
 
   const photoBlock = (
     <div className="relative aspect-[3/4] overflow-hidden">
-      <div
-        className="absolute left-1 top-1 z-10 flex flex-col items-center gap-0.5 rounded-md bg-white px-1 py-1 shadow-sm sm:left-1.5 sm:top-1.5 sm:gap-1 sm:px-1.5 sm:py-1.5"
-        aria-label={`Dorsal ${player.dorsal}`}
-      >
-        <span className="text-xs font-black tabular-nums leading-none text-[#214C9B] sm:text-sm">{player.dorsal}</span>
-      </div>
+      {hasDisplayDorsal(player.dorsal) ? (
+        <div
+          className="absolute left-1 top-1 z-10 flex flex-col items-center gap-0.5 rounded-md bg-white px-1 py-1 shadow-sm sm:left-1.5 sm:top-1.5 sm:gap-1 sm:px-1.5 sm:py-1.5"
+          aria-label={`Dorsal ${player.dorsal}`}
+        >
+          <span className="text-xs font-black tabular-nums leading-none text-[#214C9B] sm:text-sm">{player.dorsal}</span>
+        </div>
+      ) : null}
 
       <div className="relative flex h-full items-end justify-center px-1 pb-0 pt-1">
         <PlayerAvatar

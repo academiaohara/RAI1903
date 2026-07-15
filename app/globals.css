@@ -1117,23 +1117,17 @@ a {
   width: 114%;
 }
 
-.trading-ficha-crest {
-  height: clamp(1.35rem, 7vw, 1.85rem);
-  object-fit: contain;
-  width: clamp(1.35rem, 7vw, 1.85rem);
-}
-
-.trading-ficha-crest-fallback {
-  align-items: center;
-  background: rgba(255, 255, 255, 0.92);
-  border-radius: 999px;
-  color: var(--rai-blue);
-  display: inline-flex;
-  font-size: clamp(0.45rem, 2.2vw, 0.58rem);
-  font-weight: 800;
-  height: clamp(1.35rem, 7vw, 1.85rem);
-  justify-content: center;
-  width: clamp(1.35rem, 7vw, 1.85rem);
+.trading-ficha-dorsal {
+  color: #fff;
+  display: block;
+  font-family: var(--font-bebas-neue), "Arial Black", sans-serif;
+  font-size: clamp(1.5rem, 8.5vw, 2.15rem);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  line-height: 0.85;
+  text-shadow:
+    0 2px 0 rgba(8, 20, 48, 0.45),
+    0 4px 10px rgba(0, 0, 0, 0.35);
 }
 
 .trading-ficha-name-plate {
@@ -1277,6 +1271,13 @@ a {
 .trading-ficha-card--cesion .trading-ficha-season {
   color: var(--rai-red);
   text-shadow: none;
+}
+
+.trading-ficha-card--cesion .trading-ficha-dorsal {
+  color: var(--rai-red);
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95),
+    0 2px 8px rgba(152, 25, 21, 0.22);
 }
 
 .trading-ficha-card--cesion .trading-ficha-position--role {

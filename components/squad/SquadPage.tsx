@@ -157,8 +157,6 @@ export function SquadPage({ gender }: SquadPageProps) {
               editMode={editMode}
               onQuickUpdate={editMode ? handleQuickUpdate : undefined}
               seasonLabel={viewedSeason.label}
-              crestUrl={club.escudo}
-              crestAlt={club.nombre}
             />
           )}
         </motion.div>
