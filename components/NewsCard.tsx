@@ -14,6 +14,7 @@ import {
   newsTitleOverrideKey,
   updateNewsItem,
 } from "@/lib/cms/news";
+import { dispatchNewsChanged } from "@/lib/cms/news-events";
 import { newsCategoryBadge } from "@/lib/noticias";
 import { formatNewsPublishedLabel } from "@/lib/utils";
 import type { NewsItem } from "@/types";
@@ -48,6 +49,7 @@ export function NewsCard({ item, onUpdated }: NewsCardProps) {
             clearValue(newsTitleOverrideKey(item.id));
             clearValue(newsExcerptOverrideKey(item.id));
             setEditing(false);
+            dispatchNewsChanged();
             onUpdated?.();
           }
           return result;
@@ -56,6 +58,7 @@ export function NewsCard({ item, onUpdated }: NewsCardProps) {
           const result = await deleteNewsItem(item.id);
           if (result.ok) {
             setEditing(false);
+            dispatchNewsChanged();
             onUpdated?.();
           }
           return result;

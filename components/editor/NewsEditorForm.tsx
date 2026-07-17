@@ -37,6 +37,7 @@ export type NewsEditorFormProps = {
   onSave: (item: NewsItem) => Promise<{ ok: boolean; error?: string }>;
   onDelete?: () => Promise<{ ok: boolean; error?: string }>;
   onCancel: () => void;
+  embedded?: boolean;
 };
 
 export function NewsEditorForm({
@@ -47,6 +48,7 @@ export function NewsEditorForm({
   onSave,
   onDelete,
   onCancel,
+  embedded = false,
 }: NewsEditorFormProps) {
   const { confirm } = useAppDialog();
   const [url, setUrl] = useState(initialItem?.url ?? "");
@@ -177,24 +179,26 @@ export function NewsEditorForm({
     url,
   ]);
 
-  return (
-    <section className="rounded-2xl border border-[#214C9B] bg-white p-4 shadow-sm sm:p-5">
-      <h2 className="text-sm font-extrabold uppercase text-[#214C9B]">{heading}</h2>
+  const chipClass = (active: boolean) =>
+    `min-h-10 rounded-full border px-3 py-2 text-xs font-bold uppercase transition active:scale-[0.98] ${
+      active ? "border-[#214C9B] bg-[#214C9B] text-white" : "border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50 active:bg-blue-100"
+    }`;
 
-      <div className="mt-4 space-y-4">
+  const fields = (
+    <div className={embedded ? "space-y-4" : "mt-4 space-y-4"}>
         <div className="flex flex-col gap-2 sm:flex-row">
           <input
             type="url"
             value={url}
             onChange={(event) => setUrl(event.target.value)}
             placeholder="https://..."
-            className="min-w-0 flex-1 rounded-xl border border-[#214C9B]/25 px-3 py-2.5 text-sm outline-none focus:border-[#214C9B]"
+            className="min-w-0 flex-1 rounded-xl border border-[#214C9B]/25 px-3 py-3 text-base outline-none focus:border-[#214C9B] sm:py-2.5 sm:text-sm"
           />
           <button
             type="button"
             onClick={() => void fetchMetadata()}
             disabled={fetching || !url.trim()}
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#214C9B] px-4 py-2.5 text-xs font-extrabold uppercase text-white disabled:opacity-50"
+            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#214C9B] px-4 py-2.5 text-xs font-extrabold uppercase text-white active:bg-[#0f2d5c] disabled:opacity-50"
           >
             {fetching ? <Loader2 className="size-4 animate-spin" aria-hidden /> : null}
             Obtener datos
@@ -206,14 +210,14 @@ export function NewsEditorForm({
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           placeholder="Título"
-          className="w-full rounded-xl border border-[#214C9B]/25 px-3 py-2.5 text-sm outline-none focus:border-[#214C9B]"
+          className="w-full rounded-xl border border-[#214C9B]/25 px-3 py-3 text-base outline-none focus:border-[#214C9B] sm:py-2.5 sm:text-sm"
         />
         <textarea
           value={excerpt}
           onChange={(event) => setExcerpt(event.target.value)}
           placeholder="Descripción / extracto"
           rows={3}
-          className="w-full rounded-xl border border-[#214C9B]/25 px-3 py-2.5 text-sm outline-none focus:border-[#214C9B]"
+          className="w-full rounded-xl border border-[#214C9B]/25 px-3 py-3 text-base outline-none focus:border-[#214C9B] sm:py-2.5 sm:text-sm"
         />
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
           <label className="flex min-w-0 flex-1 flex-col gap-1.5">
@@ -222,7 +226,7 @@ export function NewsEditorForm({
               type="date"
               value={date}
               onChange={(event) => setDate(event.target.value)}
-              className="w-full rounded-xl border border-[#214C9B]/25 px-3 py-2.5 text-sm outline-none focus:border-[#214C9B]"
+              className="w-full rounded-xl border border-[#214C9B]/25 px-3 py-3 text-base outline-none focus:border-[#214C9B] sm:py-2.5 sm:text-sm"
             />
           </label>
           <label className="flex w-full flex-col gap-1.5 sm:w-auto sm:min-w-[9rem]">
@@ -231,7 +235,7 @@ export function NewsEditorForm({
               type="time"
               value={time}
               onChange={(event) => setTime(event.target.value)}
-              className="w-full rounded-xl border border-[#214C9B]/25 px-3 py-2.5 text-sm outline-none focus:border-[#214C9B]"
+              className="w-full rounded-xl border border-[#214C9B]/25 px-3 py-3 text-base outline-none focus:border-[#214C9B] sm:py-2.5 sm:text-sm"
             />
           </label>
         </div>
@@ -239,7 +243,7 @@ export function NewsEditorForm({
           value={imageUrl}
           onChange={(event) => setImageUrl(event.target.value)}
           placeholder="URL de imagen (opcional)"
-          className="w-full rounded-xl border border-[#214C9B]/25 px-3 py-2.5 text-sm outline-none focus:border-[#214C9B]"
+          className="w-full rounded-xl border border-[#214C9B]/25 px-3 py-3 text-base outline-none focus:border-[#214C9B] sm:py-2.5 sm:text-sm"
         />
 
         <div>
@@ -250,7 +254,7 @@ export function NewsEditorForm({
                 key={value}
                 type="button"
                 onClick={() => setChannel(value)}
-                className={`rounded-full border px-3 py-2 text-xs font-bold uppercase transition ${channel === value ? "border-[#214C9B] bg-[#214C9B] text-white" : "border-[#214C9B]/20 bg-white text-slate-700"}`}
+                className={chipClass(channel === value)}
               >
                 {value === "club" ? "Club" : "Prensa"}
               </button>
@@ -272,7 +276,7 @@ export function NewsEditorForm({
                 key={option.id}
                 type="button"
                 onClick={() => setTeamScope(option.id)}
-                className={`rounded-full border px-3 py-2 text-xs font-bold uppercase transition ${teamScope === option.id ? "border-[#214C9B] bg-[#214C9B] text-white" : "border-[#214C9B]/20 bg-white text-slate-700"}`}
+                className={chipClass(teamScope === option.id)}
               >
                 {option.label}
               </button>
@@ -288,7 +292,7 @@ export function NewsEditorForm({
                 key={tag}
                 type="button"
                 onClick={() => toggleTag(tag)}
-                className={`rounded-full border px-3 py-2 text-xs font-bold uppercase transition ${tags.includes(tag) ? "border-[#214C9B] bg-[#214C9B] text-white" : "border-[#214C9B]/20 bg-white text-slate-700 hover:bg-blue-50"}`}
+                className={chipClass(tags.includes(tag))}
               >
                 {tag}
               </button>
@@ -298,12 +302,12 @@ export function NewsEditorForm({
 
         {error ? <p className="text-sm font-medium text-red-600">{error}</p> : null}
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           <button
             type="button"
             onClick={() => void handleSave()}
             disabled={saving}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#981915] px-4 py-2.5 text-xs font-extrabold uppercase text-white disabled:opacity-50"
+            className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-[#981915] px-4 py-2.5 text-xs font-extrabold uppercase text-white active:bg-[#7a1410] disabled:opacity-50 sm:flex-none"
           >
             {saving ? <Loader2 className="size-4 animate-spin" aria-hidden /> : null}
             Guardar noticia
@@ -311,7 +315,7 @@ export function NewsEditorForm({
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-xl border border-[#214C9B]/25 px-4 py-2.5 text-xs font-extrabold uppercase text-slate-600 hover:bg-slate-50"
+            className="min-h-11 rounded-xl border border-[#214C9B]/25 px-4 py-2.5 text-xs font-extrabold uppercase text-slate-600 hover:bg-slate-50 active:bg-slate-100"
           >
             Cancelar
           </button>
@@ -320,7 +324,7 @@ export function NewsEditorForm({
               type="button"
               onClick={() => void handleDelete()}
               disabled={deleting || saving}
-              className="ml-auto inline-flex items-center gap-2 rounded-xl border border-red-200 px-4 py-2.5 text-xs font-extrabold uppercase text-red-700 hover:bg-red-50 disabled:opacity-50"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-red-200 px-4 py-2.5 text-xs font-extrabold uppercase text-red-700 hover:bg-red-50 active:bg-red-100 disabled:opacity-50 sm:ml-auto"
             >
               {deleting ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Trash2 className="size-4" aria-hidden />}
               Eliminar noticia
@@ -328,6 +332,14 @@ export function NewsEditorForm({
           ) : null}
         </div>
       </div>
+  );
+
+  if (embedded) return fields;
+
+  return (
+    <section className="rounded-2xl border border-[#214C9B] bg-white p-4 shadow-sm sm:p-5">
+      <h2 className="text-sm font-extrabold uppercase text-[#214C9B]">{heading}</h2>
+      {fields}
     </section>
   );
 }

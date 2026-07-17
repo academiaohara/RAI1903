@@ -11,6 +11,7 @@ type EditorPanelFrameProps = {
   footer?: ReactNode;
   busy?: boolean;
   message?: string | null;
+  size?: "default" | "large";
 };
 
 export function EditorPanelFrame({
@@ -21,7 +22,13 @@ export function EditorPanelFrame({
   footer,
   busy,
   message,
+  size = "default",
 }: EditorPanelFrameProps) {
+  const panelSizeClass =
+    size === "large"
+      ? "max-h-[min(90dvh,720px)] sm:max-h-[min(88vh,760px)]"
+      : "max-h-[min(72vh,640px)] sm:max-h-[min(82vh,720px)]";
+
   return (
     <>
       <button
@@ -34,7 +41,7 @@ export function EditorPanelFrame({
         role="dialog"
         aria-modal="true"
         aria-labelledby="editor-panel-title"
-        className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-3 right-3 z-[85] flex max-h-[min(72vh,640px)] w-auto flex-col overflow-hidden rounded-2xl border border-[#214C9B]/25 bg-white shadow-2xl sm:bottom-20 sm:left-auto sm:right-4 sm:max-h-[min(82vh,720px)] sm:w-[min(100vw-2rem,28rem)]"
+        className={`fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-3 right-3 z-[85] flex w-auto flex-col overflow-hidden rounded-2xl border border-[#214C9B]/25 bg-white shadow-2xl sm:bottom-20 sm:left-auto sm:right-4 sm:w-[min(100vw-2rem,28rem)] ${panelSizeClass}`}
       >
         <div className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-100 px-4 py-3">
           <div className="min-w-0">
