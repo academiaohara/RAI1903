@@ -5,6 +5,7 @@ import { TeamCrestResolverProvider } from "@/components/assets/TeamCrestResolver
 import { SeasonProvider } from "@/components/season/SeasonProvider";
 import { HomeLayoutProvider } from "@/components/home/HomeLayoutProvider";
 import { MediaRaiSectionsProvider } from "@/components/media-rai/MediaRaiSectionsProvider";
+import { EditorBottomSpacer } from "@/components/inline-editing/EditorBottomSpacer";
 import {
   InlineEditingProvider,
   InlineEditingToolbar,
@@ -46,7 +47,10 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                     <TeamCrestResolverProvider>
                       <div className="min-h-screen athletic-shell">
                         <Header />
-                        <main className="mx-auto max-w-[1480px] px-4 pb-12 pt-6 sm:px-6 sm:pt-8 lg:px-8">{children}</main>
+                        <main className="mx-auto max-w-[1480px] px-4 pb-12 pt-6 sm:px-6 sm:pt-8 lg:px-8">
+                          {children}
+                          <EditorBottomSpacer />
+                        </main>
                       </div>
                     </TeamCrestResolverProvider>
                     <InlineEditingToolbar />

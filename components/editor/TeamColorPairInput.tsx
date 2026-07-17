@@ -30,7 +30,7 @@ export function TeamColorPairInput({
       <div
         className={cn(
           "shrink-0 overflow-hidden rounded-md ring-1 ring-black/10",
-          compact ? "h-5 w-5" : "h-7 w-7",
+          compact ? "h-7 w-7 sm:h-5 sm:w-5" : "h-7 w-7",
         )}
         style={teamStripeBackgroundStyle(colors)}
         aria-hidden
@@ -45,7 +45,7 @@ export function TeamColorPairInput({
         onChange={(event) => onChange([event.target.value, secondary])}
         className={cn(
           "cursor-pointer rounded border border-slate-200 bg-white p-0",
-          compact ? "h-5 w-5" : "h-7 w-7",
+          compact ? "h-7 w-7 sm:h-5 sm:w-5" : "h-7 w-7",
         )}
         title="Color principal"
       />
@@ -59,7 +59,7 @@ export function TeamColorPairInput({
         onChange={(event) => onChange([primary, event.target.value])}
         className={cn(
           "cursor-pointer rounded border border-slate-200 bg-white p-0",
-          compact ? "h-5 w-5" : "h-7 w-7",
+          compact ? "h-7 w-7 sm:h-5 sm:w-5" : "h-7 w-7",
         )}
         title="Color secundario"
       />

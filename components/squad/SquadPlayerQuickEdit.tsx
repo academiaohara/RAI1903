@@ -11,39 +11,39 @@ type SquadPlayerQuickEditProps = {
 };
 
 const fieldClass =
-  "rounded-lg border border-[#214C9B]/25 bg-white px-2 py-1 text-xs font-semibold text-slate-800 outline-none focus:border-[#214C9B] focus:ring-2 focus:ring-[#214C9B]/15";
+  "min-h-10 rounded-lg border border-[#214C9B]/25 bg-white px-2 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#214C9B] focus:ring-2 focus:ring-[#214C9B]/15 sm:min-h-0 sm:py-1";
 
 export function SquadPlayerQuickEdit({ player, onUpdate, layout = "card" }: SquadPlayerQuickEditProps) {
   const stop = (event: React.SyntheticEvent) => event.stopPropagation();
 
   if (layout === "row") {
     return (
-      <div className="flex flex-wrap items-center gap-2" onClick={stop} onKeyDown={stop}>
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center" onClick={stop} onKeyDown={stop}>
         <input
           type="number"
           value={player.dorsal}
           onChange={(event) => onUpdate({ dorsal: Number(event.target.value) || 0 })}
-          className={`${fieldClass} w-12 text-center font-extrabold tabular-nums text-[#214C9B]`}
+          className={`${fieldClass} w-full text-center font-extrabold tabular-nums text-[#214C9B] sm:w-12`}
           aria-label="Dorsal"
         />
         <input
           value={player.nombre}
           onChange={(event) => onUpdate({ nombre: event.target.value })}
           placeholder="Nombre"
-          className={`${fieldClass} min-w-[5rem] flex-1`}
+          className={`${fieldClass} w-full sm:min-w-[5rem] sm:flex-1`}
           aria-label="Nombre"
         />
         <input
           value={player.apellido}
           onChange={(event) => onUpdate({ apellido: event.target.value })}
           placeholder="Apellido"
-          className={`${fieldClass} min-w-[5rem] flex-[1.2]`}
+          className={`${fieldClass} w-full sm:min-w-[5rem] sm:flex-[1.2]`}
           aria-label="Apellido"
         />
         <select
           value={SQUAD_ROSTER_ESTADOS.includes(player.estado) ? player.estado : "titular"}
           onChange={(event) => onUpdate({ estado: event.target.value as PlayerStatus })}
-          className={`${fieldClass} max-w-[9rem] text-[10px] font-bold uppercase`}
+          className={`${fieldClass} w-full sm:max-w-[9rem] sm:text-[10px] font-bold uppercase`}
           aria-label="Estado"
         >
           {SQUAD_ROSTER_ESTADOS.map((estado) => (

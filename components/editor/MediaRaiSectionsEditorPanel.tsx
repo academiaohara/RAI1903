@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { ChevronDown, ChevronUp, Loader2, Plus, RotateCcw, Trash2, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Loader2, Plus, RotateCcw, Trash2 } from "lucide-react";
 import { useAppDialog } from "@/components/AppDialogProvider";
+import { EditorPanelFrame } from "@/components/editor/EditorPanelFrame";
 import { useMediaRaiSections } from "@/components/media-rai/MediaRaiSectionsProvider";
 import {
   DEFAULT_MEDIA_RAI_SECTIONS,
@@ -11,6 +12,12 @@ import {
   uniqueMediaRaiSlug,
   type MediaRaiSectionEntry,
 } from "@/lib/media-rai-sections";
+
+const reorderButtonClass =
+  "flex h-9 w-9 items-center justify-center rounded-lg border border-[#214C9B]/20 text-[#214C9B] enabled:hover:bg-blue-50 enabled:active:bg-blue-100 disabled:opacity-30";
+
+const deleteButtonClass =
+  "flex h-9 w-9 items-center justify-center rounded-lg border border-[#981915]/25 text-[#981915] enabled:hover:bg-red-50 enabled:active:bg-red-100 disabled:opacity-30";
 
 type MediaRaiSectionsEditorPanelProps = {
   onClose: () => void;
@@ -78,34 +85,47 @@ export function MediaRaiSectionsEditorPanel({ onClose }: MediaRaiSectionsEditorP
   };
 
   return (
-    <div className="w-[min(100vw-2rem,26rem)] rounded-2xl border border-[#214C9B]/20 bg-white p-4 shadow-2xl">
-      <div className="mb-3 flex items-start justify-between gap-2">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">Media RAI</p>
-          <h3 className="text-lg font-extrabold uppercase text-[#214C9B]">Subsecciones</h3>
-          <p className="mt-1 text-xs font-semibold text-slate-500">
-            Añade, quita, renombra y reordena las pestañas de Media RAI. El slug de URL no cambia al
-            renombrar.
-          </p>
+    <EditorPanelFrame
+      title="Subsecciones"
+      subtitle="Media RAI"
+      onClose={onClose}
+      busy={busy}
+      message={message}
+      footer={
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => void save()}
+            disabled={busy}
+            className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-[#214C9B] px-4 py-2 text-xs font-extrabold uppercase text-white hover:bg-[#173a78] active:bg-[#0f2d5c] disabled:opacity-60"
+          >
+            {busy ? <Loader2 size={14} className="animate-spin" /> : null}
+            Guardar
+          </button>
+          <button
+            type="button"
+            onClick={reset}
+            disabled={busy}
+            className="inline-flex min-h-11 items-center gap-1 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50 active:bg-blue-100 disabled:opacity-60"
+          >
+            <RotateCcw size={14} />
+            Por defecto
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="rounded-full border border-[#214C9B]/20 p-1.5 text-[#214C9B] hover:bg-blue-50"
-          aria-label="Cerrar panel de Media RAI"
-        >
-          <X size={16} />
-        </button>
-      </div>
+      }
+    >
+      <p className="mb-3 text-xs font-semibold text-slate-500">
+        Añade, quita, renombra y reordena las pestañas de Media RAI. El slug de URL no cambia al renombrar.
+      </p>
 
-      <ol className="max-h-[min(50vh,20rem)] space-y-2 overflow-y-auto pr-1">
+      <ol className="space-y-2">
         {order.map((entry, index) => (
           <li
             key={entry.slug}
             className="rounded-xl border border-[#214C9B]/15 bg-slate-50/80 px-3 py-2"
           >
             <div className="flex items-start gap-2">
-              <span className="mt-2 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#214C9B]/10 text-xs font-extrabold text-[#214C9B]">
+              <span className="mt-1.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#214C9B]/10 text-xs font-extrabold text-[#214C9B]">
                 {index + 1}
               </span>
               <div className="min-w-0 flex-1 space-y-1">
@@ -113,38 +133,38 @@ export function MediaRaiSectionsEditorPanel({ onClose }: MediaRaiSectionsEditorP
                   type="text"
                   value={entry.label ?? getMediaRaiSectionLabel(entry)}
                   onChange={(event) => updateLabel(entry.slug, event.target.value)}
-                  className="w-full rounded-lg border border-[#214C9B]/25 bg-white px-2 py-1.5 text-sm font-bold text-slate-800 outline-none focus:border-[#214C9B]"
+                  className="w-full rounded-lg border border-[#214C9B]/25 bg-white px-2 py-2 text-sm font-bold text-slate-800 outline-none focus:border-[#214C9B]"
                   aria-label={`Nombre de ${entry.slug}`}
                 />
                 <p className="truncate text-[10px] font-semibold text-slate-400">/media-rai/{entry.slug}</p>
               </div>
-              <div className="flex shrink-0 flex-col gap-0.5">
+              <div className="flex shrink-0 gap-1">
                 <button
                   type="button"
                   disabled={index === 0}
                   onClick={() => move(entry.slug, "up")}
-                  className="rounded-lg border border-[#214C9B]/20 p-1 text-[#214C9B] enabled:hover:bg-blue-50 disabled:opacity-30"
+                  className={reorderButtonClass}
                   aria-label="Subir subsección"
                 >
-                  <ChevronUp size={14} />
+                  <ChevronUp size={16} />
                 </button>
                 <button
                   type="button"
                   disabled={index === order.length - 1}
                   onClick={() => move(entry.slug, "down")}
-                  className="rounded-lg border border-[#214C9B]/20 p-1 text-[#214C9B] enabled:hover:bg-blue-50 disabled:opacity-30"
+                  className={reorderButtonClass}
                   aria-label="Bajar subsección"
                 >
-                  <ChevronDown size={14} />
+                  <ChevronDown size={16} />
                 </button>
                 <button
                   type="button"
                   disabled={order.length <= 1}
                   onClick={() => removeSection(entry.slug)}
-                  className="rounded-lg border border-[#981915]/25 p-1 text-[#981915] enabled:hover:bg-red-50 disabled:opacity-30"
+                  className={deleteButtonClass}
                   aria-label="Quitar subsección"
                 >
-                  <Trash2 size={14} />
+                  <Trash2 size={16} />
                 </button>
               </div>
             </div>
@@ -155,40 +175,11 @@ export function MediaRaiSectionsEditorPanel({ onClose }: MediaRaiSectionsEditorP
       <button
         type="button"
         onClick={() => void addSection()}
-        className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#214C9B]/30 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+        className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#214C9B]/30 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50 active:bg-blue-100"
       >
         <Plus size={14} />
         Añadir subsección
       </button>
-
-      {message && (
-        <p
-          className={`mt-3 text-xs font-bold ${message.includes("guardad") ? "text-[#2E7D32]" : "text-[#981915]"}`}
-        >
-          {message}
-        </p>
-      )}
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() => void save()}
-          disabled={busy}
-          className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#214C9B] px-4 py-2 text-xs font-extrabold uppercase text-white hover:bg-[#173a78] disabled:opacity-60"
-        >
-          {busy ? <Loader2 size={14} className="animate-spin" /> : null}
-          Guardar
-        </button>
-        <button
-          type="button"
-          onClick={reset}
-          disabled={busy}
-          className="inline-flex items-center gap-1 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50 disabled:opacity-60"
-        >
-          <RotateCcw size={14} />
-          Por defecto
-        </button>
-      </div>
-    </div>
+    </EditorPanelFrame>
   );
 }

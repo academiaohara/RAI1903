@@ -236,21 +236,21 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
             <button
               type="button"
               onClick={importFromOtherGroup}
-              className="rounded-full border border-[#214C9B]/30 px-3 py-1 text-[10px] font-extrabold uppercase text-[#214C9B] hover:bg-white"
+              className="min-h-9 rounded-full border border-[#214C9B]/30 px-3 py-1.5 text-[10px] font-extrabold uppercase text-[#214C9B] hover:bg-white active:bg-blue-50"
             >
               Rellenar desde Grupo {grupo === "1" ? "2" : "1"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="rounded-full border border-slate-200 px-3 py-1 text-[10px] font-extrabold uppercase text-slate-600 hover:bg-white"
+              className="min-h-9 rounded-full border border-slate-200 px-3 py-1.5 text-[10px] font-extrabold uppercase text-slate-600 hover:bg-white active:bg-slate-50"
             >
               Cancelar
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-5 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10">
           {slots.map((slot, index) => {
             const label = slotDisplayName(slot, index);
             const crestPath = effectiveCrests[slot.id] ?? getTeamCrestById(slot.id);
@@ -261,7 +261,7 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
             return (
               <div
                 key={`slot-${index}`}
-                className={`flex flex-col gap-1 rounded-xl border p-1.5 ${
+                className={`flex flex-col gap-1.5 rounded-xl border p-2 sm:p-1.5 ${
                   empty ? "border-dashed border-slate-300 bg-slate-50" : "border-slate-200 bg-white"
                 }`}
               >
@@ -288,7 +288,7 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
                   value={slot.name}
                   onChange={(event) => updateSlotName(index, event.target.value)}
                   placeholder={`Equipo ${index + 1}`}
-                  className="w-full rounded-md border border-slate-200 px-1 py-0.5 text-[10px] font-semibold"
+                  className="w-full rounded-md border border-slate-200 px-2 py-1.5 text-xs font-semibold sm:px-1 sm:py-0.5 sm:text-[10px]"
                 />
                 {!empty ? (
                   <TeamColorPairInput
@@ -301,11 +301,11 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
                 <p className="truncate text-[9px] text-slate-400" title={slot.id}>
                   {slot.id}
                 </p>
-                <div className="flex gap-1">
+                <div className="flex gap-1.5">
                   <button
                     type="button"
                     onClick={() => setPickingForIndex(index)}
-                    className="flex-1 rounded-md border border-[#214C9B]/20 px-1 py-0.5 text-[9px] font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+                    className="min-h-9 flex-1 rounded-md border border-[#214C9B]/20 px-2 py-1.5 text-[10px] font-extrabold uppercase text-[#214C9B] hover:bg-blue-50 active:bg-blue-100 sm:min-h-0 sm:px-1 sm:py-0.5 sm:text-[9px]"
                   >
                     Escudo
                   </button>
@@ -313,7 +313,8 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
                     <button
                       type="button"
                       onClick={() => clearSlot(index)}
-                      className="rounded-md border border-slate-200 px-1 py-0.5 text-[9px] font-bold text-slate-500 hover:bg-slate-50"
+                      className="flex min-h-9 min-w-9 items-center justify-center rounded-md border border-slate-200 px-2 py-1.5 text-sm font-bold text-slate-500 hover:bg-slate-50 active:bg-slate-100 sm:min-h-0 sm:min-w-0 sm:px-1 sm:py-0.5 sm:text-[9px]"
+                      aria-label={`Vaciar ${label}`}
                     >
                       ×
                     </button>
@@ -329,7 +330,7 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
             type="button"
             disabled={busy}
             onClick={() => void save()}
-            className="rounded-xl bg-[#214C9B] px-4 py-2 text-xs font-extrabold uppercase text-white hover:bg-[#173a78] disabled:opacity-60"
+            className="min-h-11 rounded-xl bg-[#214C9B] px-4 py-2.5 text-xs font-extrabold uppercase text-white hover:bg-[#173a78] active:bg-[#0f2d5c] disabled:opacity-60"
           >
             {busy ? "Guardando…" : "Guardar equipos del grupo"}
           </button>
