@@ -11,6 +11,12 @@ import type { LineupPlayer, MatchLineup, PrimerEquipoGender } from "@/types";
 import type { MatchSquadOption } from "@/lib/match-availability-squad";
 import type { SquadPlayer } from "@/types/squad";
 
+function isCustomLineupPlayer(player: LineupPlayer, squadOptions: MatchSquadOption[] | null): boolean {
+  if (player.custom) return true;
+  if (!squadOptions?.length || !player.name.trim()) return false;
+  return !squadOptions.some((option) => option.name === player.name.trim());
+}
+
 function LineupPlayerRow({
   player,
   editMode,
@@ -28,6 +34,8 @@ function LineupPlayerRow({
   onUpdate: (patch: Partial<LineupPlayer>) => void;
   onRemove: () => void;
 }) {
+  const useFreeText = !squadOptions?.length || isCustomLineupPlayer(player, squadOptions);
+
   if (!editMode) {
     return (
       <>
@@ -47,24 +55,33 @@ function LineupPlayerRow({
     );
   }
 
-  if (squadOptions && squadOptions.length > 0) {
+  if (squadOptions && squadOptions.length > 0 && !useFreeText) {
     return (
       <>
         <span className="flex h-8 w-10 shrink-0 items-center justify-center rounded-lg border border-[#214C9B]/25 text-xs font-extrabold tabular-nums text-[#214C9B]">
           {player.number || "—"}
         </span>
-        <MatchSquadPlayerSelect
-          options={squadOptions}
-          value={player.name}
-          onChange={(name) => {
-            const option = squadOptions.find((item) => item.name === name);
-            onUpdate({ name, ...(option ? { number: option.dorsal } : {}) });
-          }}
-          squadForResolve={ownSquad}
-          placeholder="Jugador de la plantilla…"
-          aria-label="Nombre del jugador"
-          className="min-w-0 flex-1 rounded-lg border border-[#214C9B]/25 px-2 py-1 text-sm font-semibold outline-none focus:border-[#214C9B]"
-        />
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <MatchSquadPlayerSelect
+            options={squadOptions}
+            value={player.name}
+            onChange={(name) => {
+              const option = squadOptions.find((item) => item.name === name);
+              onUpdate({ name, custom: false, ...(option ? { number: option.dorsal } : {}) });
+            }}
+            squadForResolve={ownSquad}
+            placeholder="Jugador de la plantilla…"
+            aria-label="Nombre del jugador"
+            className="w-full rounded-lg border border-[#214C9B]/25 px-2 py-1 text-sm font-semibold outline-none focus:border-[#214C9B]"
+          />
+          <button
+            type="button"
+            onClick={() => onUpdate({ custom: true, name: "", number: 0 })}
+            className="self-start text-[10px] font-bold uppercase text-[#214C9B] hover:underline"
+          >
+            Fuera de plantilla
+          </button>
+        </div>
         <button
           type="button"
           onClick={onRemove}
@@ -85,16 +102,28 @@ function LineupPlayerRow({
         max={99}
         value={player.number}
         onChange={(event) => onUpdate({ number: Number(event.target.value) || 0 })}
-        aria-label={`Dorsal de ${player.name}`}
+        aria-label={`Dorsal de ${player.name || "jugador"}`}
         className="h-8 w-10 shrink-0 rounded-lg border border-[#214C9B]/25 text-center text-xs font-extrabold text-[#214C9B] outline-none focus:border-[#214C9B]"
       />
-      <input
-        type="text"
-        value={player.name}
-        onChange={(event) => onUpdate({ name: event.target.value })}
-        aria-label="Nombre del jugador"
-        className="min-w-0 flex-1 rounded-lg border border-[#214C9B]/25 px-2 py-1 text-sm font-semibold outline-none focus:border-[#214C9B]"
-      />
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <input
+          type="text"
+          value={player.name}
+          onChange={(event) => onUpdate({ name: event.target.value, custom: true })}
+          aria-label="Nombre del jugador"
+          placeholder="Nombre del jugador"
+          className="w-full rounded-lg border border-[#214C9B]/25 px-2 py-1 text-sm font-semibold outline-none focus:border-[#214C9B]"
+        />
+        {squadOptions && squadOptions.length > 0 ? (
+          <button
+            type="button"
+            onClick={() => onUpdate({ custom: false, name: "", number: 0 })}
+            className="self-start text-[10px] font-bold uppercase text-[#214C9B] hover:underline"
+          >
+            Elegir de plantilla
+          </button>
+        ) : null}
+      </div>
       <button
         type="button"
         onClick={onRemove}
@@ -117,6 +146,7 @@ function LineupColumn({
   onUpdatePlayer,
   onRemovePlayer,
   onAddPlayer,
+  onAddCustomPlayer,
 }: {
   title: string;
   lineup: MatchLineup;
@@ -127,20 +157,33 @@ function LineupColumn({
   onUpdatePlayer: (list: "starters" | "bench", index: number, patch: Partial<LineupPlayer>) => void;
   onRemovePlayer: (list: "starters" | "bench", index: number) => void;
   onAddPlayer: (list: "starters" | "bench") => void;
+  onAddCustomPlayer: (list: "starters" | "bench") => void;
 }) {
   const renderList = (list: "starters" | "bench", label: string, highlighted: boolean) => (
     <>
       <div className="mt-4 flex items-center justify-between gap-2">
         <p className="text-xs font-bold uppercase text-slate-500">{label}</p>
         {editMode && (
-          <button
-            type="button"
-            onClick={() => onAddPlayer(list)}
-            className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase text-[#214C9B] hover:underline"
-          >
-            <Plus size={12} aria-hidden />
-            Añadir
-          </button>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => onAddPlayer(list)}
+              className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase text-[#214C9B] hover:underline"
+            >
+              <Plus size={12} aria-hidden />
+              Añadir
+            </button>
+            {squadOptions && squadOptions.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => onAddCustomPlayer(list)}
+                className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase text-slate-600 hover:underline"
+              >
+                <Plus size={12} aria-hidden />
+                Fuera plantilla
+              </button>
+            ) : null}
+          </div>
         )}
       </div>
       <ul className="mt-2 space-y-1">
@@ -226,16 +269,18 @@ export function MatchLineupsPanel({
     else updateAway(updater(currentAway));
   };
 
-  const addPlayer = (side: "home" | "away", list: "starters" | "bench") => {
+  const addPlayer = (side: "home" | "away", list: "starters" | "bench", custom = false) => {
     const options = side === "home" ? homeSquadOptions : awaySquadOptions;
     const first = options?.[0];
     patchLineup(side, (current) => ({
       ...current,
       [list]: [
         ...current[list],
-        first
-          ? { number: first.dorsal, name: first.name }
-          : { number: current[list].length + 1, name: "Nuevo jugador" },
+        custom
+          ? { number: 0, name: "", custom: true }
+          : first
+            ? { number: first.dorsal, name: first.name, custom: false }
+            : { number: current[list].length + 1, name: "Nuevo jugador" },
       ],
     }));
   };
@@ -262,7 +307,8 @@ export function MatchLineupsPanel({
         ...current,
         [list]: current[list].filter((_, playerIndex) => playerIndex !== index),
       })),
-    onAddPlayer: (list: "starters" | "bench") => addPlayer(side, list),
+    onAddPlayer: (list: "starters" | "bench") => addPlayer(side, list, false),
+    onAddCustomPlayer: (list: "starters" | "bench") => addPlayer(side, list, true),
   });
 
   return (
@@ -295,7 +341,7 @@ export function MatchLineupsPanel({
       )}
       {editMode && (homeSquadOptions || awaySquadOptions) && (
         <p className="mt-2 text-xs font-semibold text-slate-600">
-          Los jugadores del Avilés se eligen desde la plantilla de la temporada.
+          Los jugadores del Avilés se eligen desde la plantilla o con «Fuera de plantilla» (canteranos, pruebas, etc.).
         </p>
       )}
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
