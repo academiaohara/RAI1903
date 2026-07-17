@@ -8,6 +8,7 @@ import {
   isFichajesPath,
   isFilialPath,
   isJuvenilPath,
+  isNoticiasPath,
   isPlantillaPath,
   plantillaEditorLink,
 } from "@/lib/editor-routes";
@@ -93,6 +94,18 @@ export function EditorMobileMoreMenu({
           <button type="button" onClick={() => openPanel("mediaRai")} className={linkClass}>
             Media RAI
           </button>
+          {!isNoticiasPath(pathname) && (
+            <Link href={EDITOR_PAGE_LINKS.noticiasClub} onClick={() => { closeEditorPanels(); onClose(); }} className={linkClass}>
+              <ExternalLink size={14} aria-hidden />
+              Noticias club
+            </Link>
+          )}
+          {!isNoticiasPath(pathname) && (
+            <Link href={EDITOR_PAGE_LINKS.noticiasPrensa} onClick={() => { closeEditorPanels(); onClose(); }} className={linkClass}>
+              <ExternalLink size={14} aria-hidden />
+              Noticias prensa
+            </Link>
+          )}
           {!isFichajesPath(pathname) && (
             <Link href={EDITOR_PAGE_LINKS.fichajes} onClick={() => { closeEditorPanels(); onClose(); }} className={linkClass}>
               <ExternalLink size={14} aria-hidden />

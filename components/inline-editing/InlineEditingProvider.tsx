@@ -10,6 +10,7 @@ import {
   CloudUpload,
   ExternalLink,
   Pencil,
+  Plus,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -49,6 +50,7 @@ import { CompetitionEditorPanel } from "@/components/editor/CompetitionEditorPan
 import { FemeninoEditorPanel } from "@/components/editor/FemeninoEditorPanel";
 import { PublishFixturesBundleButton } from "@/components/editor/PublishFixturesBundleButton";
 import { EditorMobileMoreMenu } from "@/components/editor/EditorMobileMoreMenu";
+import { NewsAddEditorPanel } from "@/components/editor/NewsAddEditorPanel";
 import { TeamsEditorPanel } from "@/components/editor/TeamsEditorPanel";
 import {
   EDITOR_PAGE_LINKS,
@@ -57,9 +59,12 @@ import {
   isFilialPath,
   isJornadasPath,
   isJuvenilPath,
+  isNoticiasPath,
   isPlantillaPath,
   plantillaEditorLink,
 } from "@/lib/editor-routes";
+import { defaultNewsChannelFromPath, OPEN_NEWS_ADD_EVENT } from "@/lib/cms/news-events";
+import type { NewsChannel } from "@/types";
 import { useTransferMarketEditOptional } from "@/components/editor/TransferMarketEditProvider";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -521,6 +526,9 @@ const editorToolbarToggleClass =
 const editorToolbarFemButtonClass =
   "inline-flex shrink-0 items-center gap-1 rounded-full border border-[#981915]/25 px-3 py-2 min-h-[44px] text-[11px] font-extrabold uppercase leading-none text-[#981915] hover:bg-red-50 active:bg-red-100 sm:min-h-0 sm:px-3 sm:py-1.5 sm:text-xs";
 
+const editorToolbarNewsButtonClass =
+  "inline-flex shrink-0 items-center gap-1 rounded-full border border-[#981915]/30 bg-[#981915]/10 px-3 py-2 min-h-[44px] text-[11px] font-extrabold uppercase leading-none text-[#981915] hover:bg-[#981915]/15 active:bg-[#981915]/25 sm:min-h-0 sm:px-3 sm:py-1.5 sm:text-xs";
+
 export function InlineEditingToolbar() {
   const seasonContext = useSeasonOptional();
   const marketEdit = useTransferMarketEditOptional();
@@ -540,6 +548,9 @@ export function InlineEditingToolbar() {
   const [sectionStatusPanelOpen, setSectionStatusPanelOpen] = useState(false);
   const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
+  const [newsAddPanelOpen, setNewsAddPanelOpen] = useState(false);
+  const [newsAddChannel, setNewsAddChannel] = useState<NewsChannel>("club");
+  const [newsAddSession, setNewsAddSession] = useState(0);
   const pathname = usePathname();
   const toolbarScrollRef = useRef<HTMLDivElement>(null);
   const scrollHint = useHorizontalScrollHint(
@@ -574,7 +585,27 @@ export function InlineEditingToolbar() {
     setTeamsPanelOpen(false);
     setSectionStatusPanelOpen(false);
     setMobileMoreOpen(false);
+    setNewsAddPanelOpen(false);
   }, []);
+
+  const openNewsAddPanel = useCallback(
+    (channel?: NewsChannel) => {
+      closeEditorPanels();
+      setNewsAddChannel(channel ?? defaultNewsChannelFromPath(pathname));
+      setNewsAddSession((current) => current + 1);
+      setNewsAddPanelOpen(true);
+    },
+    [closeEditorPanels, pathname],
+  );
+
+  useEffect(() => {
+    const handleOpenNewsAdd = (event: Event) => {
+      const detail = (event as CustomEvent<{ channel?: NewsChannel }>).detail;
+      openNewsAddPanel(detail?.channel);
+    };
+    window.addEventListener(OPEN_NEWS_ADD_EVENT, handleOpenNewsAdd);
+    return () => window.removeEventListener(OPEN_NEWS_ADD_EVENT, handleOpenNewsAdd);
+  }, [openNewsAddPanel]);
 
   const setToolbarCollapsedPersisted = useCallback(
     (collapsed: boolean) => {
@@ -650,6 +681,13 @@ export function InlineEditingToolbar() {
       {editMode && !toolbarCollapsed && sectionStatusPanelOpen && (
         <SectionStatusEditorPanel onClose={() => setSectionStatusPanelOpen(false)} />
       )}
+      {editMode && !toolbarCollapsed && newsAddPanelOpen && (
+        <NewsAddEditorPanel
+          key={newsAddSession}
+          defaultChannel={newsAddChannel}
+          onClose={() => setNewsAddPanelOpen(false)}
+        />
+      )}
       {editMode && !toolbarCollapsed && mobileMoreOpen && (
         <EditorMobileMoreMenu
           pathname={pathname}
@@ -718,6 +756,14 @@ export function InlineEditingToolbar() {
               )}
               <button
                 type="button"
+                onClick={() => openNewsAddPanel()}
+                className={editorToolbarNewsButtonClass}
+              >
+                <Plus size={13} aria-hidden />
+                Noticia
+              </button>
+              <button
+                type="button"
                 onClick={() => setToolbarCollapsedPersisted(false)}
                 className={editorToolbarButtonClass}
                 aria-expanded={false}
@@ -745,6 +791,14 @@ export function InlineEditingToolbar() {
                 </button>
               )}
               {isJornadasPath(pathname) && <PublishFixturesBundleButton />}
+              <button
+                type="button"
+                onClick={() => openNewsAddPanel()}
+                className={editorToolbarNewsButtonClass}
+              >
+                <Plus size={13} aria-hidden />
+                Noticia
+              </button>
               <button
                 type="button"
                 onClick={() => {
@@ -804,6 +858,14 @@ export function InlineEditingToolbar() {
                   </button>
                 )}
                 {isJornadasPath(pathname) && <PublishFixturesBundleButton />}
+                <button
+                  type="button"
+                  onClick={() => openNewsAddPanel()}
+                  className={editorToolbarNewsButtonClass}
+                >
+                  <Plus size={13} aria-hidden />
+                  Noticia
+                </button>
                 <button
                   type="button"
                   onClick={() => {
@@ -905,6 +967,12 @@ export function InlineEditingToolbar() {
                 >
                   Media RAI
                 </button>
+                {!isNoticiasPath(pathname) && (
+                  <Link href={EDITOR_PAGE_LINKS.noticiasClub} onClick={closeEditorPanels} className={editorToolbarButtonClass}>
+                    <ExternalLink size={13} aria-hidden />
+                    Noticias
+                  </Link>
+                )}
                 {!isFichajesPath(pathname) && (
                   <Link href={EDITOR_PAGE_LINKS.fichajes} onClick={closeEditorPanels} className={editorToolbarButtonClass}>
                     <ExternalLink size={13} aria-hidden />
