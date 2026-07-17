@@ -316,6 +316,8 @@ export type LineupPlayer = {
   number: number;
   name: string;
   role?: string;
+  /** Jugador fuera de plantilla (cantera, prueba, etc.). */
+  custom?: boolean;
 };
 
 export type MatchLineup = {
@@ -339,6 +341,8 @@ export type RecentFormMatch = {
   date: string;
   homeTeam: string;
   awayTeam: string;
+  homeTeamId?: string;
+  awayTeamId?: string;
   score: string;
   competition: string;
   resultCode: FormCode;
