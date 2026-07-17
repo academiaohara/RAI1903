@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { ChevronDown, ChevronUp, Loader2, RotateCcw, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Loader2, RotateCcw } from "lucide-react";
+import { EditorPanelFrame } from "@/components/editor/EditorPanelFrame";
 import { useHomeLayout } from "@/components/home/HomeLayoutProvider";
 import {
   DEFAULT_HOME_SECTION_ORDER,
@@ -9,6 +10,9 @@ import {
   moveHomeSection,
   type HomeSectionId,
 } from "@/lib/home-layout";
+
+const reorderButtonClass =
+  "flex h-9 w-9 items-center justify-center rounded-lg border border-[#214C9B]/20 text-[#214C9B] enabled:hover:bg-blue-50 enabled:active:bg-blue-100 disabled:opacity-30";
 
 type HomeLayoutEditorPanelProps = {
   onClose: () => void;
@@ -46,24 +50,38 @@ export function HomeLayoutEditorPanel({ onClose }: HomeLayoutEditorPanelProps) {
   };
 
   return (
-    <div className="w-[min(100vw-2rem,24rem)] rounded-2xl border border-[#214C9B]/20 bg-white p-4 shadow-2xl">
-      <div className="mb-3 flex items-start justify-between gap-2">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#981915]">Inicio</p>
-          <h3 className="text-lg font-extrabold uppercase text-[#214C9B]">Orden de secciones</h3>
-          <p className="mt-1 text-xs font-semibold text-slate-500">
-            El hero permanece arriba. El resto se reordena en la página de inicio.
-          </p>
+    <EditorPanelFrame
+      title="Orden de secciones"
+      subtitle="Inicio"
+      onClose={onClose}
+      busy={busy}
+      message={message}
+      footer={
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => void save()}
+            disabled={busy}
+            className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-[#214C9B] px-4 py-2 text-xs font-extrabold uppercase text-white hover:bg-[#173a78] active:bg-[#0f2d5c] disabled:opacity-60"
+          >
+            {busy ? <Loader2 size={14} className="animate-spin" /> : null}
+            Guardar
+          </button>
+          <button
+            type="button"
+            onClick={reset}
+            disabled={busy}
+            className="inline-flex min-h-11 items-center gap-1 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50 active:bg-blue-100 disabled:opacity-60"
+          >
+            <RotateCcw size={14} />
+            Por defecto
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="rounded-full border border-[#214C9B]/20 p-1.5 text-[#214C9B] hover:bg-blue-50"
-          aria-label="Cerrar panel de inicio"
-        >
-          <X size={16} />
-        </button>
-      </div>
+      }
+    >
+      <p className="mb-3 text-xs font-semibold text-slate-500">
+        El hero permanece arriba. El resto se reordena en la página de inicio.
+      </p>
 
       <ol className="space-y-2">
         {order.map((id, index) => (
@@ -71,62 +89,33 @@ export function HomeLayoutEditorPanel({ onClose }: HomeLayoutEditorPanelProps) {
             key={id}
             className="flex items-center gap-2 rounded-xl border border-[#214C9B]/15 bg-slate-50/80 px-3 py-2"
           >
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#214C9B]/10 text-xs font-extrabold text-[#214C9B]">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#214C9B]/10 text-xs font-extrabold text-[#214C9B]">
               {index + 1}
             </span>
             <span className="min-w-0 flex-1 text-sm font-bold text-slate-800">{HOME_SECTION_LABELS[id]}</span>
-            <div className="flex shrink-0 flex-col gap-0.5">
+            <div className="flex shrink-0 gap-1">
               <button
                 type="button"
                 disabled={index === 0}
                 onClick={() => move(id, "up")}
-                className="rounded-lg border border-[#214C9B]/20 p-1 text-[#214C9B] enabled:hover:bg-blue-50 disabled:opacity-30"
+                className={reorderButtonClass}
                 aria-label={`Subir ${HOME_SECTION_LABELS[id]}`}
               >
-                <ChevronUp size={14} />
+                <ChevronUp size={16} />
               </button>
               <button
                 type="button"
                 disabled={index === order.length - 1}
                 onClick={() => move(id, "down")}
-                className="rounded-lg border border-[#214C9B]/20 p-1 text-[#214C9B] enabled:hover:bg-blue-50 disabled:opacity-30"
+                className={reorderButtonClass}
                 aria-label={`Bajar ${HOME_SECTION_LABELS[id]}`}
               >
-                <ChevronDown size={14} />
+                <ChevronDown size={16} />
               </button>
             </div>
           </li>
         ))}
       </ol>
-
-      {message && (
-        <p
-          className={`mt-3 text-xs font-bold ${message.includes("guardado") ? "text-[#2E7D32]" : "text-[#981915]"}`}
-        >
-          {message}
-        </p>
-      )}
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() => void save()}
-          disabled={busy}
-          className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#214C9B] px-4 py-2 text-xs font-extrabold uppercase text-white hover:bg-[#173a78] disabled:opacity-60"
-        >
-          {busy ? <Loader2 size={14} className="animate-spin" /> : null}
-          Guardar
-        </button>
-        <button
-          type="button"
-          onClick={reset}
-          disabled={busy}
-          className="inline-flex items-center gap-1 rounded-full border border-[#214C9B]/20 px-3 py-2 text-xs font-extrabold uppercase text-[#214C9B] hover:bg-blue-50 disabled:opacity-60"
-        >
-          <RotateCcw size={14} />
-          Por defecto
-        </button>
-      </div>
-    </div>
+    </EditorPanelFrame>
   );
 }

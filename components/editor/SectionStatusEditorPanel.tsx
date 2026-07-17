@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Construction, Loader2, X } from "lucide-react";
+import { Construction } from "lucide-react";
+import { EditorPanelFrame } from "@/components/editor/EditorPanelFrame";
 import { useSeason } from "@/components/season/SeasonProvider";
 import {
   getSectionStatusBundle,
@@ -59,25 +60,19 @@ export function SectionStatusEditorPanel({ onClose }: SectionStatusEditorPanelPr
   };
 
   return (
-    <div className="w-[min(100vw-2rem,24rem)] rounded-2xl border border-[#214C9B]/20 bg-white p-4 shadow-2xl">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <h3 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Secciones</h3>
-        <button
-          type="button"
-          onClick={onClose}
-          className="rounded-full p-1 text-slate-500 hover:bg-slate-100"
-          aria-label="Cerrar"
-        >
-          <X size={16} />
-        </button>
-      </div>
-
+    <EditorPanelFrame
+      title="Secciones"
+      subtitle={viewedSeason.label}
+      onClose={onClose}
+      busy={busy}
+      message={message}
+    >
       <p className="mb-3 text-xs leading-relaxed text-slate-600">
-        Marca cada sección de <strong>{viewedSeason.label}</strong> como en construcción. Los visitantes verán un
-        cartel y no el contenido; en modo edición sigues viendo y modificando la sección.
+        Marca cada sección como en construcción. Los visitantes verán un cartel y no el contenido; en modo
+        edición sigues viendo y modificando la sección.
       </p>
 
-      <div className="mb-3 flex flex-wrap gap-1">
+      <div className="mb-3 flex flex-wrap gap-1.5">
         {EDITABLE_SCOPES.map((item) => (
           <button
             key={item}
@@ -88,8 +83,8 @@ export function SectionStatusEditorPanel({ onClose }: SectionStatusEditorPanelPr
               setStatusOverride(null);
               setMessage(null);
             }}
-            className={`rounded-lg px-2.5 py-1 text-[11px] font-extrabold uppercase ${
-              scope === item ? "bg-[#214C9B] text-white" : "border border-slate-200 text-slate-600 hover:bg-slate-50"
+            className={`min-h-9 rounded-lg px-3 py-1.5 text-[11px] font-extrabold uppercase ${
+              scope === item ? "bg-[#214C9B] text-white" : "border border-slate-200 text-slate-600 hover:bg-slate-50 active:bg-slate-100"
             }`}
           >
             {SECTION_STATUS_SCOPE_LABELS[item]}
@@ -107,10 +102,10 @@ export function SectionStatusEditorPanel({ onClose }: SectionStatusEditorPanelPr
                 type="button"
                 disabled={busy}
                 onClick={() => toggleSection(section)}
-                className={`flex w-full items-center justify-between gap-2 rounded-xl border px-3 py-2.5 text-left text-xs transition ${
+                className={`flex min-h-11 w-full items-center justify-between gap-2 rounded-xl border px-3 py-2.5 text-left text-xs transition ${
                   underConstruction
-                    ? "border-amber-300 bg-amber-50 text-amber-950 hover:bg-amber-100"
-                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                    ? "border-amber-300 bg-amber-50 text-amber-950 hover:bg-amber-100 active:bg-amber-200"
+                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 active:bg-slate-100"
                 } disabled:opacity-50`}
               >
                 <span className="font-bold">{label}</span>
@@ -133,15 +128,6 @@ export function SectionStatusEditorPanel({ onClose }: SectionStatusEditorPanelPr
           );
         })}
       </ul>
-
-      {message && (
-        <p className="mt-3 rounded-lg bg-slate-50 px-2 py-2 text-xs font-semibold text-slate-600">{message}</p>
-      )}
-      {busy && (
-        <p className="mt-2 flex items-center gap-2 text-xs text-slate-500">
-          <Loader2 size={14} className="animate-spin" /> Guardando…
-        </p>
-      )}
-    </div>
+    </EditorPanelFrame>
   );
 }

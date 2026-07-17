@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Loader2, Trash2, X } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { useAppDialog } from "@/components/AppDialogProvider";
+import { EditorPanelFrame } from "@/components/editor/EditorPanelFrame";
 import { useSeason } from "@/components/season/SeasonProvider";
 import type { CompetitionSeasonId } from "@/data/mock";
 import {
@@ -83,19 +84,7 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
   };
 
   return (
-    <div className="w-[min(100vw-2rem,26rem)] rounded-2xl border border-[#214C9B]/20 bg-white p-4 shadow-2xl">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <h3 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Temporadas</h3>
-        <button
-          type="button"
-          onClick={onClose}
-          className="rounded-full p-1 text-slate-500 hover:bg-slate-100"
-          aria-label="Cerrar"
-        >
-          <X size={16} />
-        </button>
-      </div>
-
+    <EditorPanelFrame title="Temporadas" onClose={onClose} busy={busy} message={message}>
       <p className="mb-3 text-xs leading-relaxed text-slate-600">
         Puedes tener varias temporadas (25/26, 26/27…). Solo una puede ser <strong>principal</strong> (por
         defecto en la web). El resto puede estar <strong>activa</strong> (visible y con mercado en la home) o{" "}
@@ -107,7 +96,7 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
           <Loader2 size={14} className="animate-spin" /> Cargando…
         </p>
       ) : (
-        <ul className="mb-4 max-h-48 space-y-2 overflow-y-auto text-xs">
+        <ul className="mb-4 space-y-2 text-xs">
           {rows.map((row) => (
             <li
               key={row.id}
@@ -143,7 +132,7 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
                     setViewedSeasonId(row.id as CompetitionSeasonId);
                     setMessage(`Editando ${row.label}`);
                   }}
-                  className="rounded-lg border border-[#214C9B]/20 px-2 py-1 font-bold text-[#214C9B] hover:bg-blue-50 disabled:opacity-50"
+                  className="min-h-9 rounded-lg border border-[#214C9B]/20 px-2.5 py-1.5 font-bold text-[#214C9B] hover:bg-blue-50 active:bg-blue-100 disabled:opacity-50"
                 >
                   Ver
                 </button>
@@ -160,7 +149,7 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
                         return result;
                       }, `${row.label} es ahora la temporada principal`)
                     }
-                    className="rounded-lg bg-[#214C9B] px-2 py-1 font-bold text-white hover:bg-[#173a78] disabled:opacity-50"
+                    className="min-h-9 rounded-lg bg-[#214C9B] px-2.5 py-1.5 font-bold text-white hover:bg-[#173a78] active:bg-[#0f2d5c] disabled:opacity-50"
                   >
                     Principal
                   </button>
@@ -174,7 +163,7 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
                       row.published ? "Temporada desactivada" : "Temporada activada",
                     )
                   }
-                  className="rounded-lg border border-slate-200 px-2 py-1 font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                  className="min-h-9 rounded-lg border border-slate-200 px-2.5 py-1.5 font-bold text-slate-600 hover:bg-slate-50 active:bg-slate-100 disabled:opacity-50"
                 >
                   {row.published ? "Desactivar" : "Activar"}
                 </button>
@@ -183,7 +172,7 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
                     type="button"
                     disabled={busy}
                     onClick={() => void handleDelete(row)}
-                    className="inline-flex items-center gap-0.5 rounded-lg border border-[#981915]/25 px-2 py-1 font-bold text-[#981915] hover:bg-red-50 disabled:opacity-50"
+                    className="inline-flex min-h-9 items-center gap-0.5 rounded-lg border border-[#981915]/25 px-2.5 py-1.5 font-bold text-[#981915] hover:bg-red-50 active:bg-red-100 disabled:opacity-50"
                     title="Eliminar temporada"
                   >
                     <Trash2 size={12} />
@@ -356,19 +345,11 @@ export function SeasonManagerPanel({ onClose }: SeasonManagerPanelProps) {
         </button>
       </div>
 
-      {message && (
-        <p className="mt-3 rounded-lg bg-slate-50 px-2 py-2 text-xs font-semibold text-slate-600">{message}</p>
-      )}
-      {busy && (
-        <p className="mt-2 flex items-center gap-2 text-xs text-slate-500">
-          <Loader2 size={14} className="animate-spin" /> Guardando…
-        </p>
-      )}
       {!loading && activeSeasonId && (
         <p className="mt-2 text-[10px] text-slate-400">
           Principal actual en la web: <strong>{activeSeasonId}</strong>
         </p>
       )}
-    </div>
+    </EditorPanelFrame>
   );
 }

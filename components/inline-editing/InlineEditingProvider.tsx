@@ -48,6 +48,7 @@ import { MediaRaiSectionsEditorPanel } from "@/components/editor/MediaRaiSection
 import { CompetitionEditorPanel } from "@/components/editor/CompetitionEditorPanel";
 import { FemeninoEditorPanel } from "@/components/editor/FemeninoEditorPanel";
 import { PublishFixturesBundleButton } from "@/components/editor/PublishFixturesBundleButton";
+import { EditorMobileMoreMenu } from "@/components/editor/EditorMobileMoreMenu";
 import { TeamsEditorPanel } from "@/components/editor/TeamsEditorPanel";
 import {
   EDITOR_PAGE_LINKS,
@@ -509,13 +510,16 @@ function useHorizontalScrollHint(
 }
 
 const editorToolbarButtonClass =
-  "inline-flex shrink-0 items-center gap-1 rounded-full border border-[#214C9B]/20 px-2.5 py-1.5 text-[11px] font-extrabold uppercase leading-none text-[#214C9B] hover:bg-blue-50 sm:px-3 sm:py-1.5 sm:text-xs";
+  "inline-flex shrink-0 items-center gap-1 rounded-full border border-[#214C9B]/20 px-3 py-2 min-h-[44px] text-[11px] font-extrabold uppercase leading-none text-[#214C9B] hover:bg-blue-50 active:bg-blue-100 sm:min-h-0 sm:px-3 sm:py-1.5 sm:text-xs";
 
 const editorToolbarSaveButtonClass =
-  "inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-600/30 bg-emerald-50 px-2.5 py-1.5 text-[11px] font-extrabold uppercase leading-none text-emerald-800 hover:bg-emerald-100 disabled:opacity-60 sm:px-3 sm:py-1.5 sm:text-xs";
+  "inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-600/30 bg-emerald-50 px-3 py-2 min-h-[44px] text-[11px] font-extrabold uppercase leading-none text-emerald-800 hover:bg-emerald-100 active:bg-emerald-200 disabled:opacity-60 sm:min-h-0 sm:px-3 sm:py-1.5 sm:text-xs";
 
 const editorToolbarToggleClass =
-  "inline-flex shrink-0 items-center gap-1 rounded-full bg-[#214C9B] px-3 py-1.5 text-[11px] font-extrabold uppercase leading-none text-white shadow-lg shadow-blue-950/20 hover:bg-[#173a78] sm:px-4 sm:text-xs";
+  "inline-flex shrink-0 items-center gap-1 rounded-full bg-[#214C9B] px-3 py-2 min-h-[44px] text-[11px] font-extrabold uppercase leading-none text-white shadow-lg shadow-blue-950/20 hover:bg-[#173a78] active:bg-[#0f2d5c] sm:min-h-0 sm:px-4 sm:text-xs";
+
+const editorToolbarFemButtonClass =
+  "inline-flex shrink-0 items-center gap-1 rounded-full border border-[#981915]/25 px-3 py-2 min-h-[44px] text-[11px] font-extrabold uppercase leading-none text-[#981915] hover:bg-red-50 active:bg-red-100 sm:min-h-0 sm:px-3 sm:py-1.5 sm:text-xs";
 
 export function InlineEditingToolbar() {
   const seasonContext = useSeasonOptional();
@@ -535,6 +539,7 @@ export function InlineEditingToolbar() {
   const [teamsPanelOpen, setTeamsPanelOpen] = useState(false);
   const [sectionStatusPanelOpen, setSectionStatusPanelOpen] = useState(false);
   const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const pathname = usePathname();
   const toolbarScrollRef = useRef<HTMLDivElement>(null);
   const scrollHint = useHorizontalScrollHint(
@@ -568,6 +573,7 @@ export function InlineEditingToolbar() {
     setFemeninoPanelOpen(false);
     setTeamsPanelOpen(false);
     setSectionStatusPanelOpen(false);
+    setMobileMoreOpen(false);
   }, []);
 
   const setToolbarCollapsedPersisted = useCallback(
@@ -619,16 +625,7 @@ export function InlineEditingToolbar() {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[80] flex flex-col items-stretch gap-2 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 sm:bottom-4 sm:left-auto sm:right-4 sm:w-auto sm:max-w-[calc(100vw-2rem)] sm:items-end sm:px-0 sm:pb-0 sm:pt-0">
-      {editMode && !toolbarCollapsed && (
-        <div
-          className={`rounded-2xl border bg-white/95 p-2 text-xs font-bold shadow-xl backdrop-blur sm:max-w-xs ${
-            syncError ? "border-[#981915]/30 text-[#981915]" : "border-[#214C9B]/20 text-slate-600"
-          }`}
-        >
-          {statusLabel}
-        </div>
-      )}
+    <>
       {editMode && !toolbarCollapsed && seasonPanelOpen && (
         <SeasonManagerPanel onClose={() => setSeasonPanelOpen(false)} />
       )}
@@ -653,6 +650,32 @@ export function InlineEditingToolbar() {
       {editMode && !toolbarCollapsed && sectionStatusPanelOpen && (
         <SectionStatusEditorPanel onClose={() => setSectionStatusPanelOpen(false)} />
       )}
+      {editMode && !toolbarCollapsed && mobileMoreOpen && (
+        <EditorMobileMoreMenu
+          pathname={pathname}
+          copied={copied}
+          onExport={handleExport}
+          onClose={() => setMobileMoreOpen(false)}
+          closeEditorPanels={closeEditorPanels}
+          onOpenPanel={(panel) => {
+            if (panel === "sectionStatus") setSectionStatusPanelOpen(true);
+            if (panel === "femenino") setFemeninoPanelOpen(true);
+            if (panel === "teams") setTeamsPanelOpen(true);
+            if (panel === "home") setHomePanelOpen(true);
+            if (panel === "mediaRai") setMediaRaiPanelOpen(true);
+          }}
+        />
+      )}
+      <div className="fixed bottom-0 left-0 right-0 z-[80] flex flex-col items-stretch gap-2 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 sm:bottom-4 sm:left-auto sm:right-4 sm:w-auto sm:max-w-[calc(100vw-2rem)] sm:items-end sm:px-0 sm:pb-0 sm:pt-0">
+        {editMode && !toolbarCollapsed && (
+          <div
+            className={`rounded-2xl border bg-white/95 p-2.5 text-xs font-bold shadow-xl backdrop-blur sm:max-w-xs ${
+              syncError ? "border-[#981915]/30 text-[#981915]" : "border-[#214C9B]/20 text-slate-600"
+            }`}
+          >
+            <p className="line-clamp-3 sm:line-clamp-none">{statusLabel}</p>
+          </div>
+        )}
       <div className="relative min-w-0 sm:max-w-[calc(100vw-2rem)]">
         {editMode && !toolbarCollapsed && scrollHint.right && (
           <p
@@ -709,10 +732,65 @@ export function InlineEditingToolbar() {
             </div>
           ) : (
           <div className="flex min-w-0 items-center gap-1.5 rounded-full border border-[#214C9B]/20 bg-white/95 p-1.5 shadow-2xl backdrop-blur">
+            <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:hidden">
+              {!localOnly && (
+                <button
+                  type="button"
+                  onClick={() => void handleSaveNow()}
+                  disabled={cloudSaving || marketBusy}
+                  className={editorToolbarSaveButtonClass}
+                >
+                  <CloudUpload size={13} />
+                  {cloudSaving || marketBusy ? "…" : saveAck ? "OK" : "Guardar"}
+                </button>
+              )}
+              {isJornadasPath(pathname) && <PublishFixturesBundleButton />}
+              <button
+                type="button"
+                onClick={() => {
+                  closeEditorPanels();
+                  setSeasonPanelOpen((open) => !open);
+                }}
+                className={editorToolbarButtonClass}
+              >
+                Temporadas
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  closeEditorPanels();
+                  setCompetitionPanelOpen((open) => !open);
+                }}
+                className={editorToolbarButtonClass}
+              >
+                Competición
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  closeEditorPanels();
+                  setCrestPanelOpen((open) => !open);
+                }}
+                className={editorToolbarButtonClass}
+              >
+                Escudos
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  closeEditorPanels();
+                  setMobileMoreOpen((open) => !open);
+                }}
+                className={editorToolbarButtonClass}
+                aria-expanded={mobileMoreOpen}
+              >
+                Más
+              </button>
+            </div>
             <div
               ref={toolbarScrollRef}
               onWheel={handleToolbarWheel}
-              className="no-scrollbar flex min-w-0 flex-1 touch-pan-x flex-nowrap items-center gap-1.5 overflow-x-auto overscroll-x-contain"
+              className="no-scrollbar hidden min-w-0 flex-1 touch-pan-x flex-nowrap items-center gap-1.5 overflow-x-auto overscroll-x-contain sm:flex"
             >
                 {!localOnly && (
                   <button
@@ -773,7 +851,7 @@ export function InlineEditingToolbar() {
                     closeEditorPanels();
                     setFemeninoPanelOpen((open) => !open);
                   }}
-                  className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[#981915]/25 px-2.5 py-1.5 text-[11px] font-extrabold uppercase leading-none text-[#981915] hover:bg-red-50 sm:px-3 sm:py-1.5 sm:text-xs"
+                  className={editorToolbarFemButtonClass}
                 >
                   Femenino
                 </button>
@@ -781,7 +859,7 @@ export function InlineEditingToolbar() {
                   <Link
                     href={EDITOR_PAGE_LINKS.femenino}
                     onClick={closeEditorPanels}
-                    className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[#981915]/20 px-2.5 py-1.5 text-[11px] font-extrabold uppercase leading-none text-[#981915] hover:bg-red-50 sm:px-3 sm:py-1.5 sm:text-xs"
+                    className={editorToolbarFemButtonClass}
                   >
                     <ExternalLink size={13} aria-hidden />
                     Ir fem.
@@ -876,5 +954,6 @@ export function InlineEditingToolbar() {
         )}
       </div>
     </div>
+    </>
   );
 }
