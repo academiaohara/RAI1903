@@ -17,7 +17,7 @@ function testResolveFromGroupTeams() {
   } as SeasonBundlesMap;
 
   const name = resolveFixtureTeamDisplayName("real-irun", "Equipo 42", cmsTeams, bundles, "masculino");
-  assert.equal(name, "Real Irun", "prefers league guide name over placeholder match name «Equipo N»");
+  assert.equal(name, "Real Irun", "prioriza nombre de guía de liga frente a «Equipo N» del partido");
 }
 
 function testResolveFromCmsWhenNoGroup() {

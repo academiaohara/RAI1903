@@ -128,6 +128,6 @@ const merged = applyChronicleStatsToSquad(
 
 assert.equal(merged[0]?.partidos, 1);
 assert.equal(merged[0]?.goles, 1);
-assert.equal(merged[1]?.partidos, 3, "players without chronicle keep CMS stats");
+assert.equal(merged[1]?.partidos, 3, "jugadores sin crónica conservan stats del CMS");
 
 console.log("verify-chronicle-squad-sync: ok");
