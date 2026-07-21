@@ -20,6 +20,7 @@ import {
   getCanteraStandings,
   isCanteraClubTeam,
   matchesToCanteraCalendarMatches,
+  resolveCanteraClubTeamIdFromConfig,
   type CanteraTeamId,
 } from "@/lib/cantera-data";
 import { getCanteraSquadImport } from "@/lib/cantera-squad";
@@ -72,7 +73,10 @@ export function CanteraTeamSections({ teamId, cmsScope: cmsScopeProp }: CanteraT
   const canteraSeason = useCanteraSeasonOptional();
   const staticTeam = academyTeams.find((item) => item.id === teamId);
 
-  const avilesTeamId = getCanteraPrimaryAvilesTeamId(teamId);
+  const avilesTeamId =
+    isCmsBacked && canteraSeason
+      ? resolveCanteraClubTeamIdFromConfig(teamId, canteraSeason.config)
+      : getCanteraPrimaryAvilesTeamId(teamId);
   const sections = useMemo(() => [...baseSections, jornadasSection] as const, []);
 
   const [activeSection, setActiveSection] = useState<SectionId>("plantilla");
@@ -159,7 +163,7 @@ export function CanteraTeamSections({ teamId, cmsScope: cmsScopeProp }: CanteraT
               highlightTeamId={avilesTeamId}
               calendarMatches={clasificacionCalendar}
               zoneLegend={isCmsBacked && canteraSeason ? canteraSeason.zoneLegend : undefined}
-              isClubHighlight={(row) => isCanteraClubTeam(teamId, row.id, row.name)}
+              isClubHighlight={(row) => row.id === avilesTeamId || isCanteraClubTeam(teamId, row.id, row.name)}
             />
           </SectionUnderConstructionGate>
         ) : (
@@ -168,17 +172,25 @@ export function CanteraTeamSections({ teamId, cmsScope: cmsScopeProp }: CanteraT
             highlightTeamId={avilesTeamId}
             calendarMatches={clasificacionCalendar}
             zoneLegend={isCmsBacked && canteraSeason ? canteraSeason.zoneLegend : undefined}
-            isClubHighlight={(row) => isCanteraClubTeam(teamId, row.id, row.name)}
+            isClubHighlight={(row) => row.id === avilesTeamId || isCanteraClubTeam(teamId, row.id, row.name)}
           />
         ))}
 
       {activeSection === "jornadas" &&
         (isCmsBacked && cmsScope ? (
           <SectionUnderConstructionGate scope={cmsScope} section="jornadas">
-            <CanteraJornadasView teamId={teamId} filialMatches={cmsMatches} />
+            <CanteraJornadasView
+              teamId={teamId}
+              filialMatches={cmsMatches}
+              clubTeamId={avilesTeamId}
+            />
           </SectionUnderConstructionGate>
         ) : (
-          <CanteraJornadasView teamId={teamId} filialMatches={cmsMatches} />
+          <CanteraJornadasView
+            teamId={teamId}
+            filialMatches={cmsMatches}
+            clubTeamId={avilesTeamId}
+          />
         ))}
     </div>
   );

@@ -25,6 +25,9 @@ const ACCENT_STYLES: Record<
 
 type FixturesJsonPasteSectionProps<T> = {
   hint: string;
+  title?: string;
+  applyLabel?: string;
+  placeholder?: string;
   accent?: FixturesJsonPasteAccent;
   parse: (input: string) => ParseFixturesJsonResult<T>;
   onImport: (data: T, summary: string) => void;
@@ -32,6 +35,9 @@ type FixturesJsonPasteSectionProps<T> = {
 
 export function FixturesJsonPasteSection<T>({
   hint,
+  title = "Importar calendario JSON",
+  applyLabel = "Aplicar al calendario",
+  placeholder = '{ "jornadas": [ { "jornada": 1, "partidos": [ { "fecha": "2026-01-10", "local": "Equipo A", "visitante": "Equipo B" } ] } ] }',
   accent = "club",
   parse,
   onImport,
@@ -65,7 +71,7 @@ export function FixturesJsonPasteSection<T>({
     <section className={`rounded-2xl border p-4 ${styles.section}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className={`text-xs font-extrabold uppercase tracking-[0.14em] ${styles.text}`}>
-          Importar calendario JSON
+          {title}
         </p>
         <button
           type="button"
@@ -92,7 +98,7 @@ export function FixturesJsonPasteSection<T>({
             }}
             rows={10}
             spellCheck={false}
-            placeholder='{ "jornadas": [ { "jornada": 1, "partidos": [ { "fecha": "2026-01-10", "local": "Equipo A", "visitante": "Equipo B" } ] } ] }'
+            placeholder={placeholder}
             className="w-full rounded-lg border border-slate-200 px-3 py-2 font-mono text-[11px] leading-relaxed text-slate-700"
           />
           {jsonError ? <p className="mt-2 text-[11px] font-bold text-[#981915]">{jsonError}</p> : null}
@@ -104,7 +110,7 @@ export function FixturesJsonPasteSection<T>({
                 accent === "femenino" ? "bg-[#981915] hover:bg-[#7a1412]" : "bg-[#214C9B] hover:bg-[#173a78]"
               }`}
             >
-              Aplicar al calendario
+              {applyLabel}
             </button>
             <button
               type="button"

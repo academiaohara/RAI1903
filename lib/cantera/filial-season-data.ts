@@ -4,6 +4,7 @@ import {
   type FilialCompetitionConfigBundle,
   type FilialFixturePartido,
   type FilialFixturesBundle,
+  resolveCanteraClubTeamId,
   resolveFilialCompetitionConfig,
 } from "@/lib/cms/filial-bundles";
 import { getFilialFixturesBundle, getFilialSquadBundle } from "@/lib/cms/filial-bundles";
@@ -169,36 +170,38 @@ export function buildFilialStandingsFromMatches(
   return applyCustomZoneColors(teams, config.zones);
 }
 
-export function buildFilialCalendarMatches(matches: Match[]): Match[] {
-  return matches.filter((match) => match.homeTeamId === FILIAL_TEAM_ID || match.awayTeamId === FILIAL_TEAM_ID);
+export function buildFilialCalendarMatches(matches: Match[], clubTeamId: string): Match[] {
+  return matches.filter((match) => match.homeTeamId === clubTeamId || match.awayTeamId === clubTeamId);
 }
 
-function formatFilialResultLine(match: Match): string {
-  if (match.homeTeamId === FILIAL_TEAM_ID) {
-    return `Real Avilés B ${match.homeScore}-${match.awayScore} ${match.awayTeam}`;
+function formatFilialResultLine(match: Match, clubTeamId: string, clubTeamName: string): string {
+  if (match.homeTeamId === clubTeamId) {
+    return `${clubTeamName} ${match.homeScore}-${match.awayScore} ${match.awayTeam}`;
   }
-  return `${match.homeTeam} ${match.homeScore}-${match.awayScore} Real Avilés B`;
+  return `${match.homeTeam} ${match.homeScore}-${match.awayScore} ${clubTeamName}`;
 }
 
 export function buildFilialSummaryFromData(
   standings: Team[],
   calendar: Match[],
   category: string,
+  clubTeamId: string = FILIAL_TEAM_ID,
 ): {
   category: string;
   position: string;
   lastResult: string;
   nextMatch: string;
 } {
-  const filial = standings.find((team) => team.id === FILIAL_TEAM_ID);
+  const clubTeam = standings.find((team) => team.id === clubTeamId);
+  const clubTeamName = clubTeam?.name ?? "Real Avilés";
   const finished = calendar.filter((m) => m.status === "finished");
   const lastMatch = finished.at(-1);
   const nextMatch = calendar.find((m) => m.status === "scheduled");
 
   return {
     category,
-    position: filial ? `${filial.position}º - ${filial.stats.points} pts` : "—",
-    lastResult: lastMatch ? formatFilialResultLine(lastMatch) : "—",
+    position: clubTeam ? `${clubTeam.position}º - ${clubTeam.stats.points} pts` : "—",
+    lastResult: lastMatch ? formatFilialResultLine(lastMatch, clubTeamId, clubTeamName) : "—",
     nextMatch: nextMatch ? `${nextMatch.homeTeam} - ${nextMatch.awayTeam}` : "Sin partidos programados",
   };
 }
@@ -271,10 +274,16 @@ export function resolveFilialSeasonData(bundles: SeasonBundlesMap, seasonLabel: 
 
   const squad = cmsSquad?.plantilla?.length ? cmsSquad : mock.squad;
   const fixtures = cmsFixtures?.jornadas?.length ? cmsFixtures : mock.fixtures;
+  const clubTeamId = resolveCanteraClubTeamId(cmsConfig, FILIAL_TEAM_ID);
   const allMatches = buildFilialMatchesFromFixtures(fixtures, cmsConfig);
   const standings = buildFilialStandingsFromMatches(allMatches, cmsConfig);
-  const calendar = buildFilialCalendarMatches(allMatches);
-  const summary = buildFilialSummaryFromData(standings, calendar, fixtures.competicion);
+  const calendar = buildFilialCalendarMatches(allMatches, clubTeamId);
+  const summary = buildFilialSummaryFromData(
+    standings,
+    calendar,
+    fixtures.competicion,
+    clubTeamId,
+  );
 
   return {
     squad,

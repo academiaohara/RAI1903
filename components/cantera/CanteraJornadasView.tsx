@@ -12,14 +12,17 @@ import type { JornadaRoundId } from "@/types/jornadas";
 type CanteraJornadasViewProps = {
   teamId: CanteraTeamId;
   filialMatches?: Match[];
+  clubTeamId?: string;
 };
 
-export function CanteraJornadasView({ teamId, filialMatches }: CanteraJornadasViewProps) {
+export function CanteraJornadasView({ teamId, filialMatches, clubTeamId }: CanteraJornadasViewProps) {
+  const resolvedClubTeamId = clubTeamId ?? getCanteraPrimaryAvilesTeamId(teamId);
   const dataset = useMemo(() => {
-    if (filialMatches) return buildCanteraJornadasDatasetFromMatches(teamId, filialMatches);
-    return buildCanteraJornadasDataset(teamId);
-  }, [filialMatches, teamId]);
-  const clubTeamId = getCanteraPrimaryAvilesTeamId(teamId);
+    if (filialMatches) {
+      return buildCanteraJornadasDatasetFromMatches(teamId, filialMatches, resolvedClubTeamId);
+    }
+    return buildCanteraJornadasDataset(teamId, resolvedClubTeamId);
+  }, [filialMatches, resolvedClubTeamId, teamId]);
   const [manualRoundId, setManualRoundId] = useState<JornadaRoundId | null>(null);
   const selectedRoundId = manualRoundId ?? dataset.currentRoundId;
 
@@ -43,7 +46,7 @@ export function CanteraJornadasView({ teamId, filialMatches }: CanteraJornadasVi
       />
 
       <Card eyebrow="Resultados" title={title} borderlessHeader>
-        <CanteraJornadaMatchesByDay fixtures={matches} highlightTeamId={clubTeamId} />
+        <CanteraJornadaMatchesByDay fixtures={matches} highlightTeamId={resolvedClubTeamId} />
       </Card>
     </div>
   );

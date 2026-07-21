@@ -102,10 +102,11 @@ function getCanteraMatchdays(teamId: CanteraTeamId): Matchday[] {
 export function buildCanteraJornadasDatasetFromMatches(
   teamId: CanteraTeamId,
   matches: Match[],
+  clubTeamId?: string,
 ): JornadasDataset {
-  const clubTeamId = getCanteraPrimaryAvilesTeamId(teamId);
+  const resolvedClubTeamId = clubTeamId ?? getCanteraPrimaryAvilesTeamId(teamId);
   const matchdays = matchesToMatchdays(matches);
-  return buildCanteraJornadasDatasetCore(matchdays, clubTeamId);
+  return buildCanteraJornadasDatasetCore(matchdays, resolvedClubTeamId);
 }
 
 function buildCanteraJornadasDatasetCore(matchdays: Matchday[], clubTeamId: string): JornadasDataset {
@@ -134,8 +135,8 @@ function buildCanteraJornadasDatasetCore(matchdays: Matchday[], clubTeamId: stri
   };
 }
 
-export function buildCanteraJornadasDataset(teamId: CanteraTeamId): JornadasDataset {
-  const clubTeamId = getCanteraPrimaryAvilesTeamId(teamId);
+export function buildCanteraJornadasDataset(teamId: CanteraTeamId, clubTeamId?: string): JornadasDataset {
+  const resolvedClubTeamId = clubTeamId ?? getCanteraPrimaryAvilesTeamId(teamId);
   const matchdays = getCanteraMatchdays(teamId);
-  return buildCanteraJornadasDatasetCore(matchdays, clubTeamId);
+  return buildCanteraJornadasDatasetCore(matchdays, resolvedClubTeamId);
 }

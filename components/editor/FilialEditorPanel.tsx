@@ -8,12 +8,16 @@ import { OnPageEditorSection } from "@/components/editor/OnPageEditorSection";
 import { useSeason } from "@/components/season/SeasonProvider";
 import {
   defaultFilialCompetitionConfig,
+  leagueRoundCountFromTeamCount,
+  mergeTeamSeedsFromFixtures,
+  resizeFilialTeamSeeds,
   type FilialCompetitionConfigBundle,
   type FilialFixturePartido,
   type FilialFixturesBundle,
   type FilialTeamSeed,
 } from "@/lib/cms/filial-bundles";
 import { parseCanteraFixturesJson } from "@/lib/cms/parse-fixtures-json";
+import { parseCanteraSquadJson } from "@/lib/cms/parse-squad-json";
 import { upsertSeasonBundlesBatch } from "@/lib/cms/season-bundles";
 import type { CanteraCmsScope } from "@/lib/cantera/cantera-cms";
 import { buildCanteraMockBundleEntries } from "@/lib/cantera/cantera-season-data";
@@ -227,6 +231,55 @@ export function CanteraEditorPanel({ scope, onClose, variant = "panel" }: Canter
     });
   };
 
+  const setTeamCount = (targetCount: number) => {
+    const count = Math.max(0, targetCount);
+    setConfig((current) => {
+      const base = current ?? competition;
+      const teams = resizeFilialTeamSeeds(base.teams, count);
+      const clubTeamId =
+        base.clubTeamId && teams.some((team) => team.id === base.clubTeamId)
+          ? base.clubTeamId
+          : undefined;
+      const leagueRounds = leagueRoundCountFromTeamCount(count) || base.leagueRounds;
+      return { ...base, teams, clubTeamId, leagueRounds };
+    });
+    ensureJornadaSlots(leagueRoundCountFromTeamCount(count) || competition.leagueRounds);
+  };
+
+  const syncTeamsFromFixtures = () => {
+    if (!fixturesDraft.jornadas.length) return;
+    setConfig((current) => {
+      const base = current ?? competition;
+      const teams = mergeTeamSeedsFromFixtures(base.teams, fixturesDraft);
+      const clubTeamId =
+        base.clubTeamId && teams.some((team) => team.id === base.clubTeamId)
+          ? base.clubTeamId
+          : base.clubTeamId;
+      return {
+        ...base,
+        teams,
+        clubTeamId,
+        leagueRounds: leagueRoundCountFromTeamCount(teams.length) || base.leagueRounds,
+      };
+    });
+  };
+
+  const addTeamSlot = () => setTeamCount(competition.teams.length + 1);
+
+  const removeTeamSlot = (id: string) => {
+    setConfig((current) => {
+      const base = current ?? competition;
+      const teams = base.teams.filter((team) => team.id !== id);
+      const clubTeamId =
+        base.clubTeamId === id
+          ? undefined
+          : base.clubTeamId && teams.some((team) => team.id === base.clubTeamId)
+            ? base.clubTeamId
+            : base.clubTeamId;
+      return { ...base, teams, clubTeamId };
+    });
+  };
+
   const footer = (
     <div className="flex flex-col gap-2">
       <button
@@ -273,6 +326,15 @@ export function CanteraEditorPanel({ scope, onClose, variant = "panel" }: Canter
 
       {tab === "plantilla" && (
         <div className="space-y-4">
+          <FixturesJsonPasteSection
+            title="Importar plantilla JSON"
+            applyLabel="Aplicar plantilla"
+            placeholder='{ "entrenador": "Nombre", "mediaEdad": 17.5, "plantilla": [ { "jugador": "Nombre", "pos": "Portero", "pc": 0, "pj": 0, "pt": 0, "min": 0, "goles": 0, "ta": 0, "tr": 0 } ] }'
+            hint='Pega un JSON con entrenador, mediaEdad y plantilla (dorsal, jugador, pos, edad, pc, pj, pt, min, goles, ta, tr, golesEncajados). También vale un array de jugadores. Tras aplicar, pulsa «Guardar».'
+            onImport={(data) => setSquad(data)}
+            parse={parseCanteraSquadJson}
+          />
+
           <label className="block text-xs font-semibold text-slate-600">
             Entrenador
             <input
@@ -421,14 +483,24 @@ export function CanteraEditorPanel({ scope, onClose, variant = "panel" }: Canter
       {tab === "calendario" && (
         <div className="space-y-4">
           <FixturesJsonPasteSection
-            hint='Basta con jornadas, partidos (local, visitante) y fecha de cada partido. Los goles no se importan: quedan pendientes para rellenarlos a mano. Tras aplicar, pulsa «Guardar».'
+            hint='Basta con jornadas, partidos (local, visitante) y fecha de cada partido. Los goles no se importan: quedan pendientes para rellenarlos a mano. Tras aplicar, pulsa «Guardar» y revisa los equipos en Competición.'
             onImport={(data) => {
               setFixtures(data);
               const lastRound = data.jornadas.at(-1)?.jornada ?? 0;
               if (lastRound > 0) {
                 setConfig((current) => {
                   const base = current ?? competition;
-                  return { ...base, leagueRounds: Math.max(base.leagueRounds, lastRound) };
+                  const teams = mergeTeamSeedsFromFixtures(base.teams, data);
+                  return {
+                    ...base,
+                    teams,
+                    leagueRounds: Math.max(base.leagueRounds, lastRound),
+                  };
+                });
+              } else {
+                setConfig((current) => {
+                  const base = current ?? competition;
+                  return { ...base, teams: mergeTeamSeedsFromFixtures(base.teams, data) };
                 });
               }
             }}
@@ -648,20 +720,68 @@ export function CanteraEditorPanel({ scope, onClose, variant = "panel" }: Canter
           </label>
 
           <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Equipos del grupo</p>
-          <div className="max-h-40 space-y-2 overflow-y-auto">
+          <div className="flex flex-wrap items-end gap-2">
+            <label className="text-xs font-semibold text-slate-600">
+              Equipos en la liga
+              <input
+                type="number"
+                min={0}
+                value={competition.teams.length}
+                onChange={(e) => setTeamCount(Number(e.target.value) || 0)}
+                className="mt-1 block w-24 rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={addTeamSlot}
+              className="inline-flex items-center gap-1 rounded-lg border border-[#214C9B]/25 px-3 py-2 text-[10px] font-extrabold uppercase text-[#214C9B]"
+            >
+              <Plus size={12} /> Añadir equipo
+            </button>
+            <button
+              type="button"
+              onClick={syncTeamsFromFixtures}
+              className="rounded-lg border border-[#214C9B]/25 px-3 py-2 text-[10px] font-extrabold uppercase text-[#214C9B]"
+            >
+              Extraer del calendario
+            </button>
+          </div>
+          <div className="max-h-52 space-y-2 overflow-y-auto">
             {competition.teams.map((team) => (
-              <div key={team.id} className="grid grid-cols-[1fr_5rem] gap-2">
-                <input
-                  value={team.name}
-                  onChange={(e) => updateTeam(team.id, { name: e.target.value })}
-                  className="rounded-lg border border-slate-200 px-2 py-1 text-xs"
-                />
-                <input
-                  value={team.shortName}
-                  onChange={(e) => updateTeam(team.id, { shortName: e.target.value })}
-                  className="rounded-lg border border-slate-200 px-2 py-1 text-xs"
-                  placeholder="Corto"
-                />
+              <div key={team.id} className="rounded-lg border border-slate-100 bg-slate-50/80 p-2 space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <label className="inline-flex items-center gap-2 text-[10px] font-bold uppercase text-slate-500">
+                    <input
+                      type="radio"
+                      name={`club-team-${scope}`}
+                      checked={competition.clubTeamId === team.id}
+                      onChange={() => setConfig((c) => (c ? { ...c, clubTeamId: team.id } : c))}
+                    />
+                    Nuestro equipo
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => removeTeamSlot(team.id)}
+                    className="text-rose-600"
+                    aria-label="Eliminar equipo"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+                <div className="grid grid-cols-[1fr_5rem] gap-2">
+                  <input
+                    value={team.name}
+                    onChange={(e) => updateTeam(team.id, { name: e.target.value })}
+                    className="rounded-lg border border-slate-200 px-2 py-1 text-xs"
+                    placeholder="Nombre completo"
+                  />
+                  <input
+                    value={team.shortName}
+                    onChange={(e) => updateTeam(team.id, { shortName: e.target.value })}
+                    className="rounded-lg border border-slate-200 px-2 py-1 text-xs"
+                    placeholder="Corto"
+                  />
+                </div>
               </div>
             ))}
           </div>
