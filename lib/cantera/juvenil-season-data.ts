@@ -7,14 +7,15 @@ import {
 import { getJuvenilASquadImport } from "@/lib/cantera-squad";
 import {
   buildJuvenilSummary,
-  getJuvenilAvilesTeamIds,
-  shortNameFromFull,
   slugifyCanteraTeamName,
 } from "@/lib/cantera-data";
 import type {
   FilialCompetitionConfigBundle,
   FilialFixturesBundle,
-  FilialTeamSeed,
+} from "@/lib/cms/filial-bundles";
+import {
+  buildTeamSeedsFromFixtures,
+  resolveCanteraClubTeamId,
 } from "@/lib/cms/filial-bundles";
 import { DEFAULT_ZONE_COLORS } from "@/lib/cms/competition-config-bundle";
 import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
@@ -57,35 +58,16 @@ function getJuvenilCompetitionConfigBundle(map: SeasonBundlesMap): FilialCompeti
   return (payload as FilialCompetitionConfigBundle | undefined) ?? null;
 }
 
-function buildJuvenilTeamSeedsFromFixtures(fixtures: FilialFixturesBundle): FilialTeamSeed[] {
-  const names = new Set<string>();
-  for (const jornada of fixtures.jornadas) {
-    for (const partido of jornada.partidos) {
-      names.add(partido.local);
-      names.add(partido.visitante);
-    }
-  }
-  return [...names].map((name) => ({
-    id: slugifyCanteraTeamName(name),
-    name,
-    shortName: shortNameFromFull(name),
-    city: "Asturias",
-    stadium: "—",
-    crestInitials: name
-      .replace(/\s+U19$/i, "")
-      .split(/\s+/)
-      .slice(0, 3)
-      .map((w) => w[0])
-      .join("")
-      .toUpperCase(),
-    colors: ["#64748B", "#FFFFFF"] as [string, string],
-  }));
+function buildJuvenilCalendarMatches(matches: Match[], clubTeamId: string): Match[] {
+  return matches.filter((m) => m.homeTeamId === clubTeamId || m.awayTeamId === clubTeamId);
 }
+
+const JUVENIL_DEFAULT_CLUB_TEAM_ID = slugifyCanteraTeamName("Real Avilés U19");
 
 export function defaultJuvenilCompetitionConfig(): FilialCompetitionConfigBundle {
   const fixtures = buildMockJuvenilFixturesFromRepo();
   return {
-    teams: buildJuvenilTeamSeedsFromFixtures(fixtures),
+    teams: buildTeamSeedsFromFixtures(fixtures),
     zones: [
       {
         id: "promotion",
@@ -112,6 +94,7 @@ export function defaultJuvenilCompetitionConfig(): FilialCompetitionConfigBundle
     leagueRounds: 30,
     ligaLabel: "Liga Nacional Juvenil",
     matchCompetition: JUVENIL_DEFAULT_COMPETITION_ID,
+    clubTeamId: JUVENIL_DEFAULT_CLUB_TEAM_ID,
   };
 }
 
@@ -139,11 +122,6 @@ function buildMockJuvenilFixturesFromRepo(): FilialFixturesBundle {
   };
 }
 
-function buildJuvenilCalendarMatches(matches: Match[]): Match[] {
-  const avilesIds = new Set(getJuvenilAvilesTeamIds());
-  return matches.filter((m) => avilesIds.has(m.homeTeamId) || avilesIds.has(m.awayTeamId));
-}
-
 export type JuvenilSeasonData = {
   squad: CanteraSquadImport;
   config: FilialCompetitionConfigBundle;
@@ -161,9 +139,10 @@ export type JuvenilSeasonData = {
 export function buildMockJuvenilSeasonData(seasonLabel: string): JuvenilSeasonData {
   const fixtures = buildMockJuvenilFixturesFromRepo();
   const config = defaultJuvenilCompetitionConfig();
+  const clubTeamId = resolveCanteraClubTeamId(config, JUVENIL_DEFAULT_CLUB_TEAM_ID);
   const allMatches = buildFilialMatchesFromFixtures(fixtures, config);
   const standings = buildFilialStandingsFromMatches(allMatches, config);
-  const calendar = buildJuvenilCalendarMatches(allMatches);
+  const calendar = buildJuvenilCalendarMatches(allMatches, clubTeamId);
   const summary = buildJuvenilSummary();
 
   return {
@@ -197,10 +176,16 @@ export function resolveJuvenilSeasonData(bundles: SeasonBundlesMap, seasonLabel:
 
   const squad = cmsSquad?.plantilla?.length ? cmsSquad : mock.squad;
   const fixtures = cmsFixtures?.jornadas?.length ? cmsFixtures : mock.fixtures;
+  const clubTeamId = resolveCanteraClubTeamId(cmsConfig, JUVENIL_DEFAULT_CLUB_TEAM_ID);
   const allMatches = buildFilialMatchesFromFixtures(fixtures, cmsConfig);
   const standings = buildFilialStandingsFromMatches(allMatches, cmsConfig);
-  const calendar = buildJuvenilCalendarMatches(allMatches);
-  const summary = buildFilialSummaryFromData(standings, calendar, fixtures.competicion);
+  const calendar = buildJuvenilCalendarMatches(allMatches, clubTeamId);
+  const summary = buildFilialSummaryFromData(
+    standings,
+    calendar,
+    fixtures.competicion,
+    clubTeamId,
+  );
 
   return {
     squad,

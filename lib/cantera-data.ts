@@ -223,6 +223,19 @@ export function getCanteraPrimaryAvilesTeamId(teamId: CanteraTeamId): string {
   return "filial-real-aviles-b";
 }
 
+export function resolveCanteraClubTeamIdFromConfig(
+  teamId: CanteraTeamId,
+  config?: { clubTeamId?: string; teams: Array<{ id: string; name: string }> },
+): string {
+  const fallback = getCanteraPrimaryAvilesTeamId(teamId);
+  if (!config) return fallback;
+  if (config.clubTeamId && config.teams.some((team) => team.id === config.clubTeamId)) {
+    return config.clubTeamId;
+  }
+  const avilesTeam = config.teams.find((team) => isAvilesCanteraTeamName(team.name));
+  return avilesTeam?.id ?? fallback;
+}
+
 export function isCanteraClubTeam(teamId: CanteraTeamId, rowTeamId: string, teamName?: string): boolean {
   const ids = getCanteraClubHighlightTeamIds(teamId);
   if (ids.includes(rowTeamId)) return true;
