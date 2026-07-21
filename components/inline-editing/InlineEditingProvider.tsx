@@ -2,18 +2,13 @@
 
 import type { User } from "@supabase/supabase-js";
 import {
-  Check,
   ChevronDown,
   ChevronRight,
   ChevronUp,
-  Clipboard,
   CloudUpload,
-  ExternalLink,
   Pencil,
-  Plus,
   X,
 } from "lucide-react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   createContext,
@@ -50,21 +45,8 @@ import { CompetitionEditorPanel } from "@/components/editor/CompetitionEditorPan
 import { FemeninoEditorPanel } from "@/components/editor/FemeninoEditorPanel";
 import { PublishFixturesBundleButton } from "@/components/editor/PublishFixturesBundleButton";
 import { EditorMobileMoreMenu } from "@/components/editor/EditorMobileMoreMenu";
-import { NewsAddEditorPanel } from "@/components/editor/NewsAddEditorPanel";
 import { TeamsEditorPanel } from "@/components/editor/TeamsEditorPanel";
-import {
-  EDITOR_PAGE_LINKS,
-  isFemeninoPath,
-  isFichajesPath,
-  isFilialPath,
-  isJornadasPath,
-  isJuvenilPath,
-  isNoticiasPath,
-  isPlantillaPath,
-  plantillaEditorLink,
-} from "@/lib/editor-routes";
-import { defaultNewsChannelFromPath, OPEN_NEWS_ADD_EVENT } from "@/lib/cms/news-events";
-import type { NewsChannel } from "@/types";
+import { isJornadasPath } from "@/lib/editor-routes";
 import { useTransferMarketEditOptional } from "@/components/editor/TransferMarketEditProvider";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -92,7 +74,6 @@ type InlineEditingContextValue = {
   mergeSaveValue: <T extends Record<string, unknown>>(key: string, patch: Partial<T>) => void;
   clearValue: (key: string) => void;
   clearAll: () => void;
-  exportJson: () => Promise<boolean>;
 };
 
 const InlineEditingContext = createContext<InlineEditingContextValue | null>(null);
@@ -417,16 +398,6 @@ export function InlineEditingProvider({
     }
   }, [configured, seasonId]);
 
-  const exportJson = useCallback(async () => {
-    const payload = JSON.stringify(overridesRef.current, null, 2);
-    try {
-      await navigator.clipboard.writeText(payload);
-      return true;
-    } catch {
-      return false;
-    }
-  }, []);
-
   const value = useMemo<InlineEditingContextValue>(
     () => ({
       canEdit,
@@ -444,7 +415,6 @@ export function InlineEditingProvider({
       mergeSaveValue,
       clearValue,
       clearAll,
-      exportJson,
     }),
     [
       canEdit,
@@ -452,7 +422,6 @@ export function InlineEditingProvider({
       clearValue,
       configured,
       editMode,
-      exportJson,
       mergeSaveValue,
       overrides,
       ready,
@@ -526,17 +495,13 @@ const editorToolbarToggleClass =
 const editorToolbarFemButtonClass =
   "inline-flex shrink-0 items-center gap-1 rounded-full border border-[#981915]/25 px-3 py-2 min-h-[44px] text-[11px] font-extrabold uppercase leading-none text-[#981915] hover:bg-red-50 active:bg-red-100 sm:min-h-0 sm:px-3 sm:py-1.5 sm:text-xs";
 
-const editorToolbarNewsButtonClass =
-  "inline-flex shrink-0 items-center gap-1 rounded-full border border-[#981915]/30 bg-[#981915]/10 px-3 py-2 min-h-[44px] text-[11px] font-extrabold uppercase leading-none text-[#981915] hover:bg-[#981915]/15 active:bg-[#981915]/25 sm:min-h-0 sm:px-3 sm:py-1.5 sm:text-xs";
-
 export function InlineEditingToolbar() {
   const seasonContext = useSeasonOptional();
   const marketEdit = useTransferMarketEditOptional();
-  const { canEdit, editMode, ready, localOnly, syncError, cloudSaving, saveNow, setEditMode, exportJson } =
+  const { canEdit, editMode, ready, localOnly, syncError, cloudSaving, saveNow, setEditMode } =
     useInlineEditing();
   const seasonLabel = seasonContext?.viewedSeason.label;
   const isArchive = seasonContext?.isViewingArchive;
-  const [copied, setCopied] = useState(false);
   const [saveAck, setSaveAck] = useState(false);
   const [seasonPanelOpen, setSeasonPanelOpen] = useState(false);
   const [crestPanelOpen, setCrestPanelOpen] = useState(false);
@@ -548,9 +513,6 @@ export function InlineEditingToolbar() {
   const [sectionStatusPanelOpen, setSectionStatusPanelOpen] = useState(false);
   const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
-  const [newsAddPanelOpen, setNewsAddPanelOpen] = useState(false);
-  const [newsAddChannel, setNewsAddChannel] = useState<NewsChannel>("club");
-  const [newsAddSession, setNewsAddSession] = useState(0);
   const pathname = usePathname();
   const toolbarScrollRef = useRef<HTMLDivElement>(null);
   const scrollHint = useHorizontalScrollHint(
@@ -585,27 +547,7 @@ export function InlineEditingToolbar() {
     setTeamsPanelOpen(false);
     setSectionStatusPanelOpen(false);
     setMobileMoreOpen(false);
-    setNewsAddPanelOpen(false);
   }, []);
-
-  const openNewsAddPanel = useCallback(
-    (channel?: NewsChannel) => {
-      closeEditorPanels();
-      setNewsAddChannel(channel ?? defaultNewsChannelFromPath(pathname));
-      setNewsAddSession((current) => current + 1);
-      setNewsAddPanelOpen(true);
-    },
-    [closeEditorPanels, pathname],
-  );
-
-  useEffect(() => {
-    const handleOpenNewsAdd = (event: Event) => {
-      const detail = (event as CustomEvent<{ channel?: NewsChannel }>).detail;
-      openNewsAddPanel(detail?.channel);
-    };
-    window.addEventListener(OPEN_NEWS_ADD_EVENT, handleOpenNewsAdd);
-    return () => window.removeEventListener(OPEN_NEWS_ADD_EVENT, handleOpenNewsAdd);
-  }, [openNewsAddPanel]);
 
   const setToolbarCollapsedPersisted = useCallback(
     (collapsed: boolean) => {
@@ -617,12 +559,6 @@ export function InlineEditingToolbar() {
   );
 
   if (!ready || !canEdit) return null;
-
-  const handleExport = async () => {
-    const ok = await exportJson();
-    setCopied(ok);
-    window.setTimeout(() => setCopied(false), 1800);
-  };
 
   const marketDraftPending = Boolean(marketEdit?.hasDraft);
   const marketBusy = Boolean(marketEdit?.busy);
@@ -681,18 +617,8 @@ export function InlineEditingToolbar() {
       {editMode && !toolbarCollapsed && sectionStatusPanelOpen && (
         <SectionStatusEditorPanel onClose={() => setSectionStatusPanelOpen(false)} />
       )}
-      {editMode && !toolbarCollapsed && newsAddPanelOpen && (
-        <NewsAddEditorPanel
-          key={newsAddSession}
-          defaultChannel={newsAddChannel}
-          onClose={() => setNewsAddPanelOpen(false)}
-        />
-      )}
       {editMode && !toolbarCollapsed && mobileMoreOpen && (
         <EditorMobileMoreMenu
-          pathname={pathname}
-          copied={copied}
-          onExport={handleExport}
           onClose={() => setMobileMoreOpen(false)}
           closeEditorPanels={closeEditorPanels}
           onOpenPanel={(panel) => {
@@ -756,14 +682,6 @@ export function InlineEditingToolbar() {
               )}
               <button
                 type="button"
-                onClick={() => openNewsAddPanel()}
-                className={editorToolbarNewsButtonClass}
-              >
-                <Plus size={13} aria-hidden />
-                Noticia
-              </button>
-              <button
-                type="button"
                 onClick={() => setToolbarCollapsedPersisted(false)}
                 className={editorToolbarButtonClass}
                 aria-expanded={false}
@@ -791,14 +709,6 @@ export function InlineEditingToolbar() {
                 </button>
               )}
               {isJornadasPath(pathname) && <PublishFixturesBundleButton />}
-              <button
-                type="button"
-                onClick={() => openNewsAddPanel()}
-                className={editorToolbarNewsButtonClass}
-              >
-                <Plus size={13} aria-hidden />
-                Noticia
-              </button>
               <button
                 type="button"
                 onClick={() => {
@@ -860,14 +770,6 @@ export function InlineEditingToolbar() {
                 {isJornadasPath(pathname) && <PublishFixturesBundleButton />}
                 <button
                   type="button"
-                  onClick={() => openNewsAddPanel()}
-                  className={editorToolbarNewsButtonClass}
-                >
-                  <Plus size={13} aria-hidden />
-                  Noticia
-                </button>
-                <button
-                  type="button"
                   onClick={() => {
                     closeEditorPanels();
                     setSeasonPanelOpen((open) => !open);
@@ -886,16 +788,6 @@ export function InlineEditingToolbar() {
                 >
                   Secciones
                 </button>
-                {!isPlantillaPath(pathname) && (
-                  <Link
-                    href={plantillaEditorLink(pathname)}
-                    onClick={closeEditorPanels}
-                    className={editorToolbarButtonClass}
-                  >
-                    <ExternalLink size={13} aria-hidden />
-                    Plantilla
-                  </Link>
-                )}
                 <button
                   type="button"
                   onClick={() => {
@@ -917,16 +809,6 @@ export function InlineEditingToolbar() {
                 >
                   Femenino
                 </button>
-                {!isFemeninoPath(pathname) && (
-                  <Link
-                    href={EDITOR_PAGE_LINKS.femenino}
-                    onClick={closeEditorPanels}
-                    className={editorToolbarFemButtonClass}
-                  >
-                    <ExternalLink size={13} aria-hidden />
-                    Ir fem.
-                  </Link>
-                )}
                 <button
                   type="button"
                   onClick={() => {
@@ -966,34 +848,6 @@ export function InlineEditingToolbar() {
                   className={editorToolbarButtonClass}
                 >
                   Media RAI
-                </button>
-                {!isNoticiasPath(pathname) && (
-                  <Link href={EDITOR_PAGE_LINKS.noticiasClub} onClick={closeEditorPanels} className={editorToolbarButtonClass}>
-                    <ExternalLink size={13} aria-hidden />
-                    Noticias
-                  </Link>
-                )}
-                {!isFichajesPath(pathname) && (
-                  <Link href={EDITOR_PAGE_LINKS.fichajes} onClick={closeEditorPanels} className={editorToolbarButtonClass}>
-                    <ExternalLink size={13} aria-hidden />
-                    Mercado
-                  </Link>
-                )}
-                {!isFilialPath(pathname) && (
-                  <Link href={EDITOR_PAGE_LINKS.filial} onClick={closeEditorPanels} className={editorToolbarButtonClass}>
-                    <ExternalLink size={13} aria-hidden />
-                    Filial
-                  </Link>
-                )}
-                {!isJuvenilPath(pathname) && (
-                  <Link href={EDITOR_PAGE_LINKS.juvenil} onClick={closeEditorPanels} className={editorToolbarButtonClass}>
-                    <ExternalLink size={13} aria-hidden />
-                    Juvenil
-                  </Link>
-                )}
-                <button type="button" onClick={() => void handleExport()} className={editorToolbarButtonClass}>
-                  {copied ? <Check size={13} /> : <Clipboard size={13} />}
-                  {copied ? "Copiado" : "Exportar"}
                 </button>
             </div>
             <button
