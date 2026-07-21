@@ -1,31 +1,12 @@
 "use client";
 
-import { Check, Clipboard, ExternalLink } from "lucide-react";
-import Link from "next/link";
-import {
-  EDITOR_PAGE_LINKS,
-  isFemeninoPath,
-  isFichajesPath,
-  isFilialPath,
-  isJuvenilPath,
-  isNoticiasPath,
-  isPlantillaPath,
-  plantillaEditorLink,
-} from "@/lib/editor-routes";
-
 type EditorMobileMoreMenuProps = {
-  pathname: string;
-  copied: boolean;
-  onExport: () => void;
   onClose: () => void;
   onOpenPanel: (panel: "sectionStatus" | "femenino" | "teams" | "home" | "mediaRai") => void;
   closeEditorPanels: () => void;
 };
 
 export function EditorMobileMoreMenu({
-  pathname,
-  copied,
-  onExport,
   onClose,
   onOpenPanel,
   closeEditorPanels,
@@ -63,28 +44,9 @@ export function EditorMobileMoreMenu({
           <button type="button" onClick={() => openPanel("sectionStatus")} className={linkClass}>
             Secciones
           </button>
-          {!isPlantillaPath(pathname) && (
-            <Link
-              href={plantillaEditorLink(pathname)}
-              onClick={() => {
-                closeEditorPanels();
-                onClose();
-              }}
-              className={linkClass}
-            >
-              <ExternalLink size={14} aria-hidden />
-              Plantilla
-            </Link>
-          )}
           <button type="button" onClick={() => openPanel("femenino")} className={femLinkClass}>
             Femenino
           </button>
-          {!isFemeninoPath(pathname) && (
-            <Link href={EDITOR_PAGE_LINKS.femenino} onClick={() => { closeEditorPanels(); onClose(); }} className={femLinkClass}>
-              <ExternalLink size={14} aria-hidden />
-              Ir a femenino
-            </Link>
-          )}
           <button type="button" onClick={() => openPanel("teams")} className={linkClass}>
             Equipos
           </button>
@@ -93,47 +55,6 @@ export function EditorMobileMoreMenu({
           </button>
           <button type="button" onClick={() => openPanel("mediaRai")} className={linkClass}>
             Media RAI
-          </button>
-          {!isNoticiasPath(pathname) && (
-            <Link href={EDITOR_PAGE_LINKS.noticiasClub} onClick={() => { closeEditorPanels(); onClose(); }} className={linkClass}>
-              <ExternalLink size={14} aria-hidden />
-              Noticias club
-            </Link>
-          )}
-          {!isNoticiasPath(pathname) && (
-            <Link href={EDITOR_PAGE_LINKS.noticiasPrensa} onClick={() => { closeEditorPanels(); onClose(); }} className={linkClass}>
-              <ExternalLink size={14} aria-hidden />
-              Noticias prensa
-            </Link>
-          )}
-          {!isFichajesPath(pathname) && (
-            <Link href={EDITOR_PAGE_LINKS.fichajes} onClick={() => { closeEditorPanels(); onClose(); }} className={linkClass}>
-              <ExternalLink size={14} aria-hidden />
-              Mercado
-            </Link>
-          )}
-          {!isFilialPath(pathname) && (
-            <Link href={EDITOR_PAGE_LINKS.filial} onClick={() => { closeEditorPanels(); onClose(); }} className={linkClass}>
-              <ExternalLink size={14} aria-hidden />
-              Filial
-            </Link>
-          )}
-          {!isJuvenilPath(pathname) && (
-            <Link href={EDITOR_PAGE_LINKS.juvenil} onClick={() => { closeEditorPanels(); onClose(); }} className={linkClass}>
-              <ExternalLink size={14} aria-hidden />
-              Juvenil
-            </Link>
-          )}
-          <button
-            type="button"
-            onClick={() => {
-              void onExport();
-              onClose();
-            }}
-            className={linkClass}
-          >
-            {copied ? <Check size={14} /> : <Clipboard size={14} />}
-            {copied ? "Copiado" : "Exportar"}
           </button>
         </div>
       </div>
