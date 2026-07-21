@@ -31,7 +31,7 @@ const bundles: SeasonBundlesMap = {
 };
 
 const withoutOverride = findMatchInBundles(bundles, "cms-ph-j1-m7", { gender: "masculino" });
-assert.equal(withoutOverride, undefined, "sin override el partido placeholder no cuenta como del Avilés");
+assert.equal(withoutOverride, undefined, "without override placeholder match does not count as Avilés");
 
 const withOverride = findMatchInBundles(bundles, "cms-ph-j1-m7", {
   gender: "masculino",
@@ -43,6 +43,6 @@ const withOverride = findMatchInBundles(bundles, "cms-ph-j1-m7", {
     awayTeam: "Real Irun",
   }),
 });
-assert.equal(withOverride?.awayTeam, "Real Irun", "con override de equipos debe resolver el partido del Avilés");
+assert.equal(withOverride?.awayTeam, "Real Irun", "with team override must resolve Avilés match");
 
 console.log("verify-find-match-in-bundles: ok");
