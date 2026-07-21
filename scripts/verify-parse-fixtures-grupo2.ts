@@ -23,8 +23,8 @@ function testGrupo2OnlyDoesNotFillGrupo1() {
   assert.equal(result.ok, true);
   if (!result.ok) return;
 
-  assert.equal(result.data.matchdays.length, 0, "grupo I debe quedar vacío");
-  assert.equal(result.data.matchdaysGrupo2?.length, 1, "grupo II debe tener jornadas");
+  assert.equal(result.data.matchdays.length, 0, "group I must remain empty");
+  assert.equal(result.data.matchdaysGrupo2?.length, 1, "group II must have matchdays");
   assert.equal(result.data.touchedGrupos.grupo1, false);
   assert.equal(result.data.touchedGrupos.grupo2, true);
   assert.equal(result.data.matchdaysGrupo2?.[0]?.matches[0]?.homeTeamId, "alcorcon");
@@ -53,11 +53,11 @@ function testGrupo1DefaultWithoutMarker() {
 function testStadiumFromSlugAlias() {
   const entry = resolveTeamCatalogEntry("ad-alcorcon", bundles, "masculino");
   assert.equal(entry.id, "alcorcon");
-  assert.ok(entry.stadium.length > 0, "debe resolver estadio del local por slug");
+  assert.ok(entry.stadium.length > 0, "must resolve home stadium from slug");
 
   const bilbao = resolveTeamCatalogEntry("bilbao-athletic", bundles, "masculino");
   assert.equal(bilbao.id, "athletic-bilbao-b");
-  assert.ok(bilbao.stadium.includes("Lezama"), "bilbao-athletic debe enlazar con Athletic B");
+  assert.ok(bilbao.stadium.includes("Lezama"), "bilbao-athletic must link to Athletic B");
 }
 
 function testUploadedCalendarSample() {
@@ -74,7 +74,7 @@ function testUploadedCalendarSample() {
   const matches = result.data.matchdaysGrupo2?.flatMap((md) => md.matches) ?? [];
   assert.equal(matches.length, 380);
   const withVenue = matches.filter((match) => match.venue.trim().length > 0);
-  assert.ok(withVenue.length > 200, "la mayoría de locales conocidos deben tener estadio");
+  assert.ok(withVenue.length > 200, "most known home teams must have a stadium");
 
   const alcorconHome = matches.find((match) => match.homeTeamId === "alcorcon");
   assert.ok(alcorconHome?.venue.includes("Santo Domingo"));

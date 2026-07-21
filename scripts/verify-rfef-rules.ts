@@ -1,6 +1,6 @@
 /**
- * Verificación manual de reglas RFEF (sin framework de tests).
- * Ejecutar: npm run verify:rfef-rules
+ * Manual verification of RFEF rules (no test framework).
+ * Run: npm run verify:rfef-rules
  */
 
 import { matchdays, teams } from "@/data/mock";
@@ -36,13 +36,13 @@ function match(home: string, away: string, hs: number, as: number) {
 
 {
   const matches = [match("a", "b", 2, 0), match("b", "a", 1, 1)];
-  assert(headToHeadGoalDifference("a", "b", matches) === 2, "H2H: A +2 sobre B");
+  assert(headToHeadGoalDifference("a", "b", matches) === 2, "H2H: A +2 over B");
   const accumulators = new Map([
     ["a", acc("a", 10, 30, 20)],
     ["b", acc("b", 10, 25, 25)],
   ]);
   const result = sortTiedTeams(["a", "b"], accumulators, matches, PRIMERA_RFEF_RULES.tiebreak);
-  assert(result.orderedTeamIds[0] === "a", "A delante por H2H pese a peor DG general");
+  assert(result.orderedTeamIds[0] === "a", "A ahead on H2H despite worse overall GD");
 }
 
 {
@@ -60,10 +60,10 @@ function match(home: string, away: string, hs: number, as: number) {
     ["c", acc("c", 20)],
   ]);
   const result = sortTiedTeams(["a", "b", "c"], accumulators, matches, PRIMERA_RFEF_RULES.tiebreak);
-  assert(result.orderedTeamIds[2] === "c", "C último en mini-liga (3 pts)");
+  assert(result.orderedTeamIds[2] === "c", "C last in mini-league (3 pts)");
   assert(
     result.orderedTeamIds[0] === "a" && result.orderedTeamIds[1] === "b",
-    "A y B se desempatan entre sí (A mejor H2H)",
+    "A and B tie-broken between themselves (A better H2H)",
   );
 }
 
@@ -88,11 +88,11 @@ function match(home: string, away: string, hs: number, as: number) {
     { positions: [2, 3, 4, 5] },
     ["castilla"],
   );
-  assert(withSubstitution.length === 4, "Cuatro plazas de playoff");
-  assert(!withSubstitution.some((q) => q.teamId === "castilla"), "Castilla excluida si se sustituye");
+  assert(withSubstitution.length === 4, "Four playoff spots");
+  assert(!withSubstitution.some((q) => q.teamId === "castilla"), "Castilla excluded when substituted");
   assert(
     withSubstitution.some((q) => q.teamId === "t6" && q.replacedIneligible),
-    "t6 ocupa plaza de filial sustituido",
+    "t6 takes substituted reserve team's spot",
   );
 
   const direct = selectPlayoffQualifiers(
@@ -100,7 +100,7 @@ function match(home: string, away: string, hs: number, as: number) {
     { positions: [2, 3, 4, 5] },
     [],
   );
-  assert(direct.some((q) => q.teamId === "castilla"), "Castilla clasifica si juega el cuadro");
+  assert(direct.some((q) => q.teamId === "castilla"), "Castilla qualifies when eligible to play");
 }
 
 {
@@ -115,7 +115,7 @@ function match(home: string, away: string, hs: number, as: number) {
     },
     PRIMERA_RFEF_RULES.playoff.knockout,
   );
-  assert("winnerId" in result && result.winnerId === "home", "Pasa el mejor clasificado (3º)");
+  assert("winnerId" in result && result.winnerId === "home", "Better league finisher advances (3rd)");
 }
 
 {
@@ -130,22 +130,22 @@ function match(home: string, away: string, hs: number, as: number) {
     },
     PRIMERA_RFEF_RULES.playoff.knockout,
   );
-  assert("winnerId" in result && result.winnerId === "away", "Sin away goals: pasa mejor en liga (3º)");
+  assert("winnerId" in result && result.winnerId === "away", "No away goals: better league finisher advances (3rd)");
 }
 
 {
   const teamIds = Array.from({ length: 20 }, (_, i) => `t${i + 1}`);
   const standings = computeStandings(teamIds, [], PRIMERA_RFEF_STANDINGS_ZONES);
-  assert(standings[0]?.zone === "promotion", "1º: ascenso directo");
-  assert(standings[1]?.zone === "playoff" && standings[4]?.zone === "playoff", "2º–5º: playoff");
-  assert(standings[5]?.zone === "mid", "6º: zona media");
-  assert(standings[14]?.zone === "mid", "15º: zona media");
-  assert(standings[15]?.zone === "relegation" && standings[19]?.zone === "relegation", "5 últimos: descenso");
+  assert(standings[0]?.zone === "promotion", "1st: direct promotion");
+  assert(standings[1]?.zone === "playoff" && standings[4]?.zone === "playoff", "2nd–5th: playoff");
+  assert(standings[5]?.zone === "mid", "6th: mid-table zone");
+  assert(standings[14]?.zone === "mid", "15th: mid-table zone");
+  assert(standings[15]?.zone === "relegation" && standings[19]?.zone === "relegation", "bottom 5: relegation");
   assert(
     PRIMERA_RFEF_RULES.zones.promotion === 1 &&
       PRIMERA_RFEF_RULES.zones.playoff === 4 &&
       PRIMERA_RFEF_RULES.zones.relegation === 5,
-    "Reglas exportadas con zonas 1ª RFEF",
+    "Exported rules match 1ª RFEF zones",
   );
 }
 
@@ -153,7 +153,7 @@ function match(home: string, away: string, hs: number, as: number) {
   const badMatchdays = matchdays.flatMap((md) => md.matches.map((match) => ({ round: 1, matches: [match] })));
   const atJ1 = getTeamsAtRound(teams, badMatchdays, qualifyingRoundAfterJornada(1));
   const played = new Set(atJ1.map((team) => team.stats.played));
-  assert(played.size === 1 && played.has(1), "J1 con matchday.round mal: todos con 1 PJ");
+  assert(played.size === 1 && played.has(1), "J1 with wrong matchday.round: everyone with 1 GP");
 }
 
 {
@@ -164,11 +164,11 @@ function match(home: string, away: string, hs: number, as: number) {
     PRIMERA_RFEF_STANDINGS_ZONES,
     PRIMERA_RFEF_RULES.tiebreak,
   );
-  assert(atJ1.length === teams.length, "J1 con desempate RFEF: aparecen todos los equipos");
+  assert(atJ1.length === teams.length, "J1 with RFEF tiebreak: all teams appear");
   assert(
     atJ1.every((team) => team.stats.played === 1),
-    "J1 con desempate RFEF: cada equipo con 1 PJ",
+    "J1 with RFEF tiebreak: each team with 1 GP",
   );
 }
 
-console.log("OK: reglas RFEF verificadas");
+console.log("OK: RFEF rules verified");
