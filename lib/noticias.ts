@@ -155,9 +155,9 @@ const REAL_AVILES_CLUB_SITE = "realavilesindustrial1903.com";
 export const isRealAvilesClubSiteNews = (item: { url: string }) =>
   item.url.includes(REAL_AVILES_CLUB_SITE);
 
-/** Noticias del club (canal o web oficial) que usan el escudo RAI si no hay imagen válida. */
+/** Noticias que usan el escudo RAI si no hay imagen válida (club, prensa o web oficial). */
 export const raiLogoNewsFallbackEligible = (item: Pick<NewsItem, "url" | "channel">) =>
-  isRealAvilesClubSiteNews(item) || item.channel === "club";
+  isRealAvilesClubSiteNews(item) || item.channel === "club" || item.channel === "prensa";
 
 /** Fallback visual cuando no hay og:image ni foto en la nota del club. */
 export const shouldUseRaiLogoNewsFallback = (item: Pick<NewsItem, "url" | "imageUrl" | "channel">) =>
