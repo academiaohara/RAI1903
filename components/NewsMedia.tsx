@@ -5,9 +5,7 @@ import { useState } from "react";
 import {
   RAI_LOGO_PATH,
   newsImageRequiresUnoptimized,
-  raiLogoNewsFallbackEligible,
   raiNewsMediaBgClass,
-  shouldUseRaiLogoNewsFallback,
 } from "@/lib/noticias";
 import type { NewsItem } from "@/types";
 
@@ -17,12 +15,6 @@ const frameByVariant: Record<NewsMediaVariant, string> = {
   card: "h-auto min-h-full w-[6.75rem] shrink-0 self-stretch sm:w-[10rem] md:w-[12rem]",
   featured: "h-24 w-[8.75rem] sm:h-28 sm:w-40",
   ticker: "aspect-[16/9] w-full",
-};
-
-const initialsByVariant: Record<NewsMediaVariant, string> = {
-  card: "text-2xl sm:text-3xl",
-  featured: "text-3xl sm:text-4xl",
-  ticker: "text-2xl",
 };
 
 function RaiLogoNewsMedia({ variant, frame }: { variant: NewsMediaVariant; frame: string }) {
@@ -59,8 +51,6 @@ export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?
   const frame = `relative shrink-0 overflow-hidden ${widthClass} ${raiNewsMediaBgClass(item.teams)} ${rounded} ${frameByVariant[variant]}`;
 
   const showRemoteImage = Boolean(item.imageUrl) && !imageError;
-  const showRaiLogo =
-    raiLogoNewsFallbackEligible(item) && (shouldUseRaiLogoNewsFallback(item) || imageError);
 
   if (showRemoteImage) {
     return (
@@ -86,15 +76,5 @@ export function NewsMedia({ item, variant = "card" }: { item: NewsItem; variant?
     );
   }
 
-  if (showRaiLogo) {
-    return <RaiLogoNewsMedia variant={variant} frame={frame} />;
-  }
-
-  return (
-    <div
-      className={`flex items-center justify-center bg-[linear-gradient(135deg,#214C9B_0%,#214C9B_48%,#ffffff_48%,#ffffff_56%,#981915_56%,#981915_100%)] font-extrabold text-white shadow-inner ${frame} ${initialsByVariant[variant]}`}
-    >
-      {item.source.slice(0, 2).toUpperCase()}
-    </div>
-  );
+  return <RaiLogoNewsMedia variant={variant} frame={frame} />;
 }
