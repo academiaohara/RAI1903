@@ -1,7 +1,8 @@
 "use client";
 
-import { mergeUtcDateAndTime, utcTimeInputValue } from "@/lib/calendar-match-overrides";
-import { DEFAULT_KICKOFF_UTC } from "@/lib/match-kickoff-time";
+import { mergeSpainDateAndTime, spainDateParts } from "@/lib/match-kickoff-time";
+import { utcTimeInputValue } from "@/lib/calendar-match-overrides";
+import { DEFAULT_KICKOFF_LOCAL } from "@/lib/match-kickoff-time";
 import { cn } from "@/lib/utils";
 import { useState, type KeyboardEvent } from "react";
 
@@ -17,13 +18,7 @@ type SplitDateInputProps = {
 };
 
 export function utcDateParts(iso: string): { day: string; month: string; year: string } {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return { day: "", month: "", year: "" };
-  return {
-    day: String(date.getUTCDate()).padStart(2, "0"),
-    month: String(date.getUTCMonth() + 1).padStart(2, "0"),
-    year: String(date.getUTCFullYear()),
-  };
+  return spainDateParts(iso);
 }
 
 function digitsOnly(value: string, maxLen: number): string {
@@ -66,7 +61,7 @@ export function SplitDateInput({
   const [month, setMonth] = useState(synced.month);
   const [year, setYear] = useState(synced.year);
 
-  const resolvedTime = () => (timeValueProp ?? utcTimeInputValue(iso)) || DEFAULT_KICKOFF_UTC;
+  const resolvedTime = () => (timeValueProp ?? utcTimeInputValue(iso)) || DEFAULT_KICKOFF_LOCAL;
 
   const commit = (nextDay: string, nextMonth: string, nextYear: string) => {
     const normalizedDay = pad2(nextDay);
@@ -77,7 +72,7 @@ export function SplitDateInput({
     setYear(normalizedYear);
     if (!isValidDateParts(normalizedDay, normalizedMonth, normalizedYear)) return;
     const dateValue = `${normalizedYear}-${normalizedMonth}-${normalizedDay}`;
-    onChange(mergeUtcDateAndTime(iso, dateValue, resolvedTime()));
+    onChange(mergeSpainDateAndTime(iso, dateValue, resolvedTime()));
   };
 
   const onFieldKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {

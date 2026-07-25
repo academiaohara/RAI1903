@@ -1,5 +1,9 @@
 import { matchToCalendarMatch } from "@/lib/calendar";
-import { isUnsetKickoffUtc } from "@/lib/match-kickoff-time";
+import {
+  mergeSpainDateAndTime,
+  spainDateInputValue,
+  spainTimeInputValue,
+} from "@/lib/match-kickoff-time";
 import { getTeamByGender } from "@/lib/fixtures";
 import { isMatchPlayed } from "@/lib/match-result";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -55,28 +59,15 @@ export function calendarMatchToMatch(calendarMatch: CalendarMatch): Match {
 }
 
 export function utcDateInputValue(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "";
-  const y = date.getUTCFullYear();
-  const m = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const d = String(date.getUTCDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+  return spainDateInputValue(iso);
 }
 
 export function utcTimeInputValue(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "";
-  const hours = date.getUTCHours();
-  const minutes = date.getUTCMinutes();
-  if (isUnsetKickoffUtc(iso)) return "";
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  return spainTimeInputValue(iso);
 }
 
 export function mergeUtcDateAndTime(iso: string, dateValue: string, timeValue: string): string {
-  const fallback = new Date(iso);
-  const [year, month, day] = dateValue.split("-").map(Number);
-  const [hours, minutes] = timeValue ? timeValue.split(":").map(Number) : [fallback.getUTCHours(), fallback.getUTCMinutes()];
-  return new Date(Date.UTC(year, month - 1, day, hours, minutes)).toISOString();
+  return mergeSpainDateAndTime(iso, dateValue, timeValue);
 }
 
 export function applyMatchResultOverride(
@@ -89,11 +80,7 @@ export function applyMatchResultOverride(
   const merged: Match = { ...match, ...patch };
 
   if (patch.kickoffTime !== undefined && patch.date === undefined) {
-    const base = new Date(match.date);
-    const [hours, minutes] = patch.kickoffTime.split(":").map(Number);
-    merged.date = new Date(
-      Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate(), hours, minutes),
-    ).toISOString();
+    merged.date = mergeSpainDateAndTime(match.date, spainDateInputValue(match.date), patch.kickoffTime);
   }
 
   if (patch.homeTeamId && !patch.homeTeam) {

@@ -1,4 +1,7 @@
 import { PLACEHOLDER_MATCH_DATE } from "@/lib/competition/normalize-fixtures";
+import { spainCalendarDayKey, spainTodayKey } from "@/lib/match-kickoff-time";
+import { isMatchPlayed } from "@/lib/match-result";
+import type { MatchStatus } from "@/types";
 
 export function utcDayStartMs(dateIso: string): number {
   const date = new Date(dateIso);
@@ -15,36 +18,60 @@ export function isSchedulableMatchDate(dateIso: string): boolean {
   return !Number.isNaN(new Date(dateIso).getTime());
 }
 
-/** Día del partido anterior al día de hoy (UTC, como el calendario en lista). */
+export function isMatchDateToday(dateIso: string, now: Date = new Date()): boolean {
+  if (!isSchedulableMatchDate(dateIso)) return false;
+  return spainCalendarDayKey(dateIso) === spainTodayKey(now);
+}
+
+/** Día del partido anterior al día de hoy (hora peninsular). */
 export function isMatchDateBeforeToday(dateIso: string, now: Date = new Date()): boolean {
   if (!isSchedulableMatchDate(dateIso)) return false;
-  return utcDayStartMs(dateIso) < utcTodayStartMs(now);
+  return spainCalendarDayKey(dateIso) < spainTodayKey(now);
 }
 
-/** Día del partido posterior al día de hoy (UTC). */
+/** Día del partido posterior al día de hoy (hora peninsular). */
 export function isMatchDateAfterToday(dateIso: string, now: Date = new Date()): boolean {
   if (!isSchedulableMatchDate(dateIso)) return false;
-  return utcDayStartMs(dateIso) > utcTodayStartMs(now);
+  return spainCalendarDayKey(dateIso) > spainTodayKey(now);
 }
 
-export function latestMatchesBeforeToday<T extends { date: string }>(
+type MatchListEntry = {
+  date: string;
+  status?: MatchStatus;
+  homeScore?: number;
+  awayScore?: number;
+  played?: boolean;
+};
+
+function isLatestMatchCandidate(match: MatchListEntry, now: Date): boolean {
+  if (isMatchDateBeforeToday(match.date, now)) return true;
+  return isMatchDateToday(match.date, now) && isMatchPlayed(match);
+}
+
+function isUpcomingMatchCandidate(match: MatchListEntry, now: Date): boolean {
+  if (isMatchPlayed(match)) return false;
+  if (isMatchDateAfterToday(match.date, now)) return true;
+  return isMatchDateToday(match.date, now);
+}
+
+export function latestMatchesBeforeToday<T extends MatchListEntry>(
   matches: readonly T[],
   limit = 5,
   now: Date = new Date(),
 ): T[] {
   return [...matches]
-    .filter((match) => isMatchDateBeforeToday(match.date, now))
+    .filter((match) => isLatestMatchCandidate(match, now))
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, limit);
 }
 
-export function upcomingMatchesAfterToday<T extends { date: string }>(
+export function upcomingMatchesAfterToday<T extends MatchListEntry>(
   matches: readonly T[],
   limit = 5,
   now: Date = new Date(),
 ): T[] {
   return [...matches]
-    .filter((match) => isMatchDateAfterToday(match.date, now))
+    .filter((match) => isUpcomingMatchCandidate(match, now))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .slice(0, limit);
 }
