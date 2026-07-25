@@ -56,7 +56,6 @@ export function CanteraCompeticionSection({
         highlightTeamId={highlightTeamId}
         compact
         borderlessHeader
-        showCrests={false}
         showLegend
         zoneLegend={zoneLegend}
         isClubHighlight={isClubHighlight}

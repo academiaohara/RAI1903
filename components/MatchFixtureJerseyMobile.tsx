@@ -17,9 +17,10 @@ type MatchFixtureJerseyMobileProps = {
   className?: string;
 };
 
-function teamCrestLogo(teamId: string, gender: PrimerEquipoGender): string {
+function teamCrestLogo(teamId: string, gender: PrimerEquipoGender, teamName?: string): string {
   const team = getTeamByGender(teamId, gender);
-  return getTeamCrestById(teamId, team?.crestInitials);
+  const initials = team?.crestInitials ?? (teamName ? teamName.replace(/\s+U19$/i, "").slice(0, 3).toUpperCase() : undefined);
+  return getTeamCrestById(teamId, initials);
 }
 
 export function MatchFixtureJerseyMobile({
@@ -42,7 +43,7 @@ export function MatchFixtureJerseyMobile({
     >
       <div className="flex items-center justify-center bg-white p-2.5">
         <OpponentCrest
-          logo={teamCrestLogo(match.homeTeamId, gender)}
+          logo={teamCrestLogo(match.homeTeamId, gender, match.homeTeam)}
           opponent={match.homeTeam}
           size="md"
           className="mx-auto"
@@ -78,7 +79,7 @@ export function MatchFixtureJerseyMobile({
       </div>
       <div className="flex items-center justify-center bg-white p-2.5">
         <OpponentCrest
-          logo={teamCrestLogo(match.awayTeamId, gender)}
+          logo={teamCrestLogo(match.awayTeamId, gender, match.awayTeam)}
           opponent={match.awayTeam}
           size="md"
           className="mx-auto"

@@ -1,5 +1,7 @@
-import { getTeam } from "@/lib/fixtures";
+import { OpponentCrest } from "@/components/OpponentCrest";
+import { shortNameFromFull } from "@/lib/cantera-data";
 import { formatMatchScore, isMatchPlayed } from "@/lib/match-result";
+import { getTeamCrestById } from "@/lib/team-crests";
 import { formatMatchDate } from "@/lib/utils";
 import type { JornadaFixture } from "@/types/jornadas";
 import { cn } from "@/lib/utils";
@@ -18,6 +20,22 @@ function scoreOrTime(fixture: JornadaFixture): string {
   return formatMatchDate(fixture.date).split(",").pop()?.trim() ?? "—";
 }
 
+function crestInitialsFromName(name: string): string {
+  return name.replace(/\s+U19$/i, "").slice(0, 3).toUpperCase() || "EQP";
+}
+
+function crestForTeam(teamId: string, teamName: string) {
+  const crestClassName = "h-3.5 w-3.5 shrink-0 sm:h-7 sm:w-7";
+  return (
+    <OpponentCrest
+      logo={getTeamCrestById(teamId, crestInitialsFromName(teamName))}
+      opponent={teamName}
+      size="sm"
+      className={crestClassName}
+    />
+  );
+}
+
 export function CanteraJornadaMatchRow({
   fixture,
   highlighted = false,
@@ -25,10 +43,6 @@ export function CanteraJornadaMatchRow({
 }: CanteraJornadaMatchRowProps) {
   const highlightHome = Boolean(highlightTeamId && fixture.homeTeamId === highlightTeamId);
   const highlightAway = Boolean(highlightTeamId && fixture.awayTeamId === highlightTeamId);
-  const homeTeam = getTeam(fixture.homeTeamId);
-  const awayTeam = getTeam(fixture.awayTeamId);
-  const homeShortName = homeTeam?.shortName ?? fixture.homeTeamName;
-  const awayShortName = awayTeam?.shortName ?? fixture.awayTeamName;
 
   const nameClass = (isHighlight: boolean) =>
     cn(
@@ -45,10 +59,13 @@ export function CanteraJornadaMatchRow({
           : "border-[#214C9B]/12 bg-slate-50/80",
       )}
     >
-      <p className={cn(nameClass(highlightHome), "text-left")}>
-        <span className="sm:hidden">{homeShortName}</span>
-        <span className="hidden sm:inline">{fixture.homeTeamName}</span>
-      </p>
+      <div className="flex min-w-0 items-center gap-0.5 sm:gap-2">
+        {crestForTeam(fixture.homeTeamId, fixture.homeTeamName)}
+        <p className={cn(nameClass(highlightHome), "min-w-0 text-left")}>
+          <span className="sm:hidden">{shortNameFromFull(fixture.homeTeamName)}</span>
+          <span className="hidden sm:inline">{fixture.homeTeamName}</span>
+        </p>
+      </div>
 
       <div
         className={cn(
@@ -59,10 +76,13 @@ export function CanteraJornadaMatchRow({
         {scoreOrTime(fixture)}
       </div>
 
-      <p className={cn(nameClass(highlightAway), "text-right")}>
-        <span className="sm:hidden">{awayShortName}</span>
-        <span className="hidden sm:inline">{fixture.awayTeamName}</span>
-      </p>
+      <div className="flex min-w-0 items-center justify-end gap-0.5 sm:gap-2">
+        <p className={cn(nameClass(highlightAway), "min-w-0 text-right")}>
+          <span className="sm:hidden">{shortNameFromFull(fixture.awayTeamName)}</span>
+          <span className="hidden sm:inline">{fixture.awayTeamName}</span>
+        </p>
+        {crestForTeam(fixture.awayTeamId, fixture.awayTeamName)}
+      </div>
     </article>
   );
 }

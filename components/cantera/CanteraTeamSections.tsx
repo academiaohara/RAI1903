@@ -149,10 +149,10 @@ export function CanteraTeamSections({ teamId, cmsScope: cmsScopeProp }: CanteraT
       {activeSection === "calendario" &&
         (isCmsBacked && cmsScope ? (
           <SectionUnderConstructionGate scope={cmsScope} section="calendario">
-            <TeamCalendar matches={calendarMatches} listOnly showCrests={false} showVenue={false} />
+            <TeamCalendar matches={calendarMatches} listOnly showVenue={false} />
           </SectionUnderConstructionGate>
         ) : (
-          <TeamCalendar matches={calendarMatches} listOnly showCrests={false} showVenue={false} />
+          <TeamCalendar matches={calendarMatches} listOnly showVenue={false} />
         ))}
 
       {activeSection === "clasificacion" &&
