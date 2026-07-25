@@ -20,9 +20,10 @@ type MatchFixtureWideScoreRowProps = {
   className?: string;
 };
 
-function teamCrestLogo(teamId: string, gender: PrimerEquipoGender): string {
+function teamCrestLogo(teamId: string, gender: PrimerEquipoGender, teamName?: string): string {
   const team = getTeamByGender(teamId, gender);
-  return getTeamCrestById(teamId, team?.crestInitials);
+  const initials = team?.crestInitials ?? (teamName ? teamName.replace(/\s+U19$/i, "").slice(0, 3).toUpperCase() : undefined);
+  return getTeamCrestById(teamId, initials);
 }
 
 function teamTextClassName(highlighted: boolean, align: "left" | "right", className?: string) {
@@ -82,7 +83,7 @@ export function MatchFixtureWideScoreRow({
         )}
       >
         <OpponentCrest
-          logo={teamCrestLogo(match.homeTeamId, gender)}
+          logo={teamCrestLogo(match.homeTeamId, gender, match.homeTeam)}
           opponent={match.homeTeam}
           teamId={match.homeTeamId}
           onGranateBackground={crestOnGranateBackground}
@@ -98,7 +99,7 @@ export function MatchFixtureWideScoreRow({
           ) : null}
         </span>
         <OpponentCrest
-          logo={teamCrestLogo(match.awayTeamId, gender)}
+          logo={teamCrestLogo(match.awayTeamId, gender, match.awayTeam)}
           opponent={match.awayTeam}
           teamId={match.awayTeamId}
           onGranateBackground={crestOnGranateBackground}

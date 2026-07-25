@@ -4,6 +4,7 @@ import {
   buildSegundaAsturfutbolTable,
 } from "@/lib/segunda-asturfutbol-2526";
 import { computeStandings, extractLeagueMatches } from "@/lib/standings";
+import { getTeamCrestById } from "@/lib/team-crests";
 import type { CalendarMatch, FormCode, Match, Team } from "@/types";
 
 export type CanteraTeamId = "filial" | "juvenil-a";
@@ -179,16 +180,18 @@ function avilesResult(match: Match, avilesTeamId: string): string | null {
   return `${avilesGoals}-${rivalGoals}`;
 }
 
-/** Calendar rows for list view (Avilés-centric, no crests). */
+/** Calendar rows for list view (Avilés-centric). */
 export function matchToCanteraCalendarMatch(match: Match, avilesTeamId: string): CalendarMatch {
   const avilesHome = match.homeTeamId === avilesTeamId;
   const played = match.status === "finished";
+  const opponentId = avilesHome ? match.awayTeamId : match.homeTeamId;
+  const opponentName = avilesHome ? match.awayTeam : match.homeTeam;
 
   return {
     id: match.id,
     date: match.date,
-    opponent: avilesHome ? match.awayTeam : match.homeTeam,
-    opponentLogo: "",
+    opponent: opponentName,
+    opponentLogo: getTeamCrestById(opponentId, initialsFromName(opponentName)),
     homeTeam: match.homeTeam,
     awayTeam: match.awayTeam,
     homeTeamId: match.homeTeamId,

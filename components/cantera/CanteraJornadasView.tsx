@@ -42,7 +42,6 @@ export function CanteraJornadasView({ teamId, filialMatches, clubTeamId }: Cante
         rounds={dataset.rounds}
         selectedId={selectedRoundId}
         onSelect={handleSelectRound}
-        showCrests={false}
       />
 
       <Card eyebrow="Resultados" title={title} borderlessHeader>
