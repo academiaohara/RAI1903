@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { OnPageEditorSection } from "@/components/editor/OnPageEditorSection";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
 import {
   emptyAmistosoMatch,
@@ -20,9 +21,11 @@ import {
 } from "@/lib/cms/season-bundles";
 import { slugFromTeamName } from "@/lib/cms/group-teams";
 import { getRaiTeamId } from "@/lib/fixtures";
+import { applyMatchInlineOverride } from "@/lib/fixture-overrides";
+import { matchResultOverrideKey } from "@/lib/fixture-inline-keys";
 import { fixtureSourceFromBundles } from "@/lib/season/fixture-source";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
-import { DEFAULT_KICKOFF_UTC, isUnsetKickoffUtc } from "@/lib/match-kickoff-time";
+import { DEFAULT_KICKOFF_UTC, extractKickoffTimeUtc, isUnsetKickoffUtc } from "@/lib/match-kickoff-time";
 import type { CompetitionId, Match } from "@/types";
 
 function matchDateInput(iso: string): string {
@@ -42,7 +45,8 @@ function matchTimeInput(iso: string): string {
 
 function mergeMatchDateTime(iso: string, dateValue: string, timeValue: string): string {
   const [year, month, day] = dateValue.split("-").map(Number);
-  const resolvedTime = timeValue || DEFAULT_KICKOFF_UTC;
+  if (!dateValue || Number.isNaN(year)) return iso;
+  const resolvedTime = timeValue || extractKickoffTimeUtc(iso) || DEFAULT_KICKOFF_UTC;
   const [hours, minutes] = resolvedTime.split(":").map(Number);
   return new Date(Date.UTC(year, month - 1, day, hours, minutes)).toISOString();
 }
@@ -295,23 +299,33 @@ type ExtraFixturesOnPageEditorProps = {
 
 export function ExtraFixturesOnPageEditor({ gender = "masculino" }: ExtraFixturesOnPageEditorProps) {
   const { viewedSeasonId, viewedSeason, bundles, refreshBundles } = useSeason();
+  const { getOverride, clearValue } = useInlineEditing();
   const [amistosos, setAmistosos] = useState<Match[]>([]);
   const [copa, setCopa] = useState<Match[]>([]);
   const [extras, setExtras] = useState<Match[]>([]);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [dirty, setDirty] = useState(false);
   const isFemenino = gender === "femenino";
+
+  const applyOverridesToMatches = useCallback(
+    (matches: Match[]) =>
+      matches.map((match) => applyMatchInlineOverride(match, getOverride, gender)),
+    [getOverride, gender],
+  );
 
   const loadFromBundles = useCallback(() => {
     const source = fixtureSourceFromBundles(bundles, gender);
-    setAmistosos(structuredClone(source.amistosoMatches));
-    setCopa(structuredClone(source.copaDelReyMatches));
-    setExtras(structuredClone(source.calendarExtraMatches));
-  }, [bundles, gender]);
+    setAmistosos(structuredClone(applyOverridesToMatches(source.amistosoMatches)));
+    setCopa(structuredClone(applyOverridesToMatches(source.copaDelReyMatches)));
+    setExtras(structuredClone(applyOverridesToMatches(source.calendarExtraMatches)));
+    setDirty(false);
+  }, [applyOverridesToMatches, bundles, gender]);
 
   useEffect(() => {
+    if (dirty) return;
     queueMicrotask(() => loadFromBundles());
-  }, [loadFromBundles]);
+  }, [dirty, loadFromBundles]);
 
   const existingMasculinoBundle = useMemo(
     () => getFixturesBundle(bundles, "masculino") as SeasonFixturesBundle | null,
@@ -322,12 +336,22 @@ export function ExtraFixturesOnPageEditor({ gender = "masculino" }: ExtraFixture
     [bundles],
   );
 
+  const clearSavedMatchOverrides = (matchIds: string[]) => {
+    for (const matchId of new Set(matchIds)) {
+      clearValue(matchResultOverrideKey(gender, matchId));
+    }
+  };
+
   const saveExtraFixtures = async () => {
     if (isFemenino) {
       if (!existingFemeninoBundle?.matchdaysFemenino?.length) {
         setMessage("Primero genera el calendario de liga en Editar → Competición (femenino).");
         return;
       }
+      const previousIds = [
+        ...(existingFemeninoBundle.amistosoMatches ?? []).map((match) => match.id),
+        ...(existingFemeninoBundle.calendarExtraMatches ?? []).map((match) => match.id),
+      ];
       setBusy(true);
       setMessage(null);
       const payload = mergeFemeninoExtraFixturesIntoBundle(
@@ -342,8 +366,14 @@ export function ExtraFixturesOnPageEditor({ gender = "masculino" }: ExtraFixture
         setMessage(result.error ?? "Error al guardar");
         return;
       }
+      clearSavedMatchOverrides([
+        ...previousIds,
+        ...amistosos.map((match) => match.id),
+        ...extras.map((match) => match.id),
+      ]);
       const total = amistosos.length + extras.length;
       setMessage(`Partidos extra guardados (${total} en ${viewedSeason.label})`);
+      setDirty(false);
       await refreshBundles();
       return;
     }
@@ -352,6 +382,11 @@ export function ExtraFixturesOnPageEditor({ gender = "masculino" }: ExtraFixture
       setMessage("Primero genera el calendario de liga en Editar → Competición.");
       return;
     }
+    const previousIds = [
+      ...(existingMasculinoBundle.amistosoMatches ?? []).map((match) => match.id),
+      ...(existingMasculinoBundle.copaDelReyMatches ?? []).map((match) => match.id),
+      ...(existingMasculinoBundle.calendarExtraMatches ?? []).map((match) => match.id),
+    ];
     setBusy(true);
     setMessage(null);
     const payload = mergeExtraFixturesIntoBundle(
@@ -368,8 +403,15 @@ export function ExtraFixturesOnPageEditor({ gender = "masculino" }: ExtraFixture
       setMessage(result.error ?? "Error al guardar");
       return;
     }
+    clearSavedMatchOverrides([
+      ...previousIds,
+      ...amistosos.map((match) => match.id),
+      ...copa.map((match) => match.id),
+      ...extras.map((match) => match.id),
+    ]);
     const total = amistosos.length + copa.length + extras.length;
     setMessage(`Partidos extra guardados (${total} en ${viewedSeason.label})`);
+    setDirty(false);
     await refreshBundles();
   };
 
@@ -389,8 +431,14 @@ export function ExtraFixturesOnPageEditor({ gender = "masculino" }: ExtraFixture
           addLabel="Añadir amistoso"
           defaultCompetitionName="Pretemporada"
           matches={amistosos}
-          onChange={setAmistosos}
-          onAdd={() => setAmistosos((rows) => [...rows, emptyAmistosoMatch("Rival", gender)])}
+          onChange={(rows) => {
+            setDirty(true);
+            setAmistosos(rows);
+          }}
+          onAdd={() => {
+            setDirty(true);
+            setAmistosos((rows) => [...rows, emptyAmistosoMatch("Rival", gender)]);
+          }}
           gender={gender}
         />
 
@@ -401,8 +449,14 @@ export function ExtraFixturesOnPageEditor({ gender = "masculino" }: ExtraFixture
             addLabel="Añadir partido de copa"
             defaultCompetitionName="Copa del Rey"
             matches={copa}
-            onChange={setCopa}
-            onAdd={() => setCopa((rows) => [...rows, emptyCopaMatch("Rival", "Eliminatoria", gender)])}
+            onChange={(rows) => {
+              setDirty(true);
+              setCopa(rows);
+            }}
+            onAdd={() => {
+              setDirty(true);
+              setCopa((rows) => [...rows, emptyCopaMatch("Rival", "Eliminatoria", gender)]);
+            }}
             gender={gender}
           />
         ) : null}
@@ -413,8 +467,14 @@ export function ExtraFixturesOnPageEditor({ gender = "masculino" }: ExtraFixture
           addLabel="Añadir partido"
           defaultCompetitionName="Torneo / fase extra"
           matches={extras}
-          onChange={setExtras}
-          onAdd={() => setExtras((rows) => [...rows, emptyCalendarExtraMatch("Rival", "Torneo / fase extra", gender)])}
+          onChange={(rows) => {
+            setDirty(true);
+            setExtras(rows);
+          }}
+          onAdd={() => {
+            setDirty(true);
+            setExtras((rows) => [...rows, emptyCalendarExtraMatch("Rival", "Torneo / fase extra", gender)]);
+          }}
           gender={gender}
         />
 
