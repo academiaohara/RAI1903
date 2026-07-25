@@ -25,31 +25,12 @@ import { applyMatchInlineOverride } from "@/lib/fixture-overrides";
 import { matchResultOverrideKey } from "@/lib/fixture-inline-keys";
 import { fixtureSourceFromBundles } from "@/lib/season/fixture-source";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
-import { DEFAULT_KICKOFF_UTC, extractKickoffTimeUtc, isUnsetKickoffUtc } from "@/lib/match-kickoff-time";
+import {
+  mergeSpainDateAndTime,
+  spainDateInputValue,
+  spainTimeInputValue,
+} from "@/lib/match-kickoff-time";
 import type { CompetitionId, Match } from "@/types";
-
-function matchDateInput(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "";
-  const y = date.getUTCFullYear();
-  const m = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const d = String(date.getUTCDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
-
-function matchTimeInput(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime()) || isUnsetKickoffUtc(iso)) return "";
-  return `${String(date.getUTCHours()).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")}`;
-}
-
-function mergeMatchDateTime(iso: string, dateValue: string, timeValue: string): string {
-  const [year, month, day] = dateValue.split("-").map(Number);
-  if (!dateValue || Number.isNaN(year)) return iso;
-  const resolvedTime = timeValue || extractKickoffTimeUtc(iso) || DEFAULT_KICKOFF_UTC;
-  const [hours, minutes] = resolvedTime.split(":").map(Number);
-  return new Date(Date.UTC(year, month - 1, day, hours, minutes)).toISOString();
-}
 
 function ExtraMatchEditor({
   match,
@@ -166,25 +147,25 @@ function ExtraMatchEditor({
           Fecha
           <input
             type="date"
-            value={matchDateInput(match.date)}
+            value={spainDateInputValue(match.date)}
             onChange={(e) =>
               onChange({
                 ...match,
-                date: mergeMatchDateTime(match.date, e.target.value, matchTimeInput(match.date)),
+                date: mergeSpainDateAndTime(match.date, e.target.value, spainTimeInputValue(match.date)),
               })
             }
             className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
           />
         </label>
         <label className="text-xs font-semibold text-slate-600">
-          Hora (UTC)
+          Hora (España)
           <input
             type="time"
-            value={matchTimeInput(match.date)}
+            value={spainTimeInputValue(match.date)}
             onChange={(e) =>
               onChange({
                 ...match,
-                date: mergeMatchDateTime(match.date, matchDateInput(match.date), e.target.value),
+                date: mergeSpainDateAndTime(match.date, spainDateInputValue(match.date), e.target.value),
               })
             }
             className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"

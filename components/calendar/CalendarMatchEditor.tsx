@@ -16,7 +16,7 @@ import { getTeamsBundle, resolveFixtureTeamDisplayName } from "@/lib/cms/teams-b
 import { matchResultOverrideKey, readMatchResultOverride } from "@/lib/fixture-inline-keys";
 import { fixtureEditorTeamOptions } from "@/lib/fixtures/editor-team-options";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
-import { DEFAULT_KICKOFF_UTC } from "@/lib/match-kickoff-time";
+import { DEFAULT_KICKOFF_LOCAL, spainDateInputValue } from "@/lib/match-kickoff-time";
 import { cn } from "@/lib/utils";
 import type { CalendarMatch, Match } from "@/types";
 import { useMemo } from "react";
@@ -101,19 +101,12 @@ export function CalendarMatchEditor({
   };
 
   const onTimeChange = (timeValue: string) => {
-    const dateValue = editedMatch.date.slice(0, 10);
-    const ymd =
-      dateValue.length >= 10
-        ? dateValue
-        : (() => {
-            const d = new Date(editedMatch.date);
-            const y = d.getUTCFullYear();
-            const m = String(d.getUTCMonth() + 1).padStart(2, "0");
-            const day = String(d.getUTCDate()).padStart(2, "0");
-            return `${y}-${m}-${day}`;
-          })();
     savePatch({
-      date: mergeUtcDateAndTime(editedMatch.date, ymd, timeValue || DEFAULT_KICKOFF_UTC),
+      date: mergeUtcDateAndTime(
+        editedMatch.date,
+        spainDateInputValue(editedMatch.date),
+        timeValue || DEFAULT_KICKOFF_LOCAL,
+      ),
     });
   };
 
@@ -205,7 +198,7 @@ export function CalendarMatchEditor({
           disabled={status === "finished"}
         />
         <label className="grid gap-0.5">
-          <span className="font-extrabold uppercase tracking-wide text-slate-500">Hora</span>
+          <span className="font-extrabold uppercase tracking-wide text-slate-500">Hora (España)</span>
           <input
             type="time"
             value={utcTimeInputValue(editedMatch.date)}
