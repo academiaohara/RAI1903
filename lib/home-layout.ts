@@ -4,7 +4,7 @@ export type HomeSectionId =
   | "standings_stats"
   | "recent_upcoming"
   | "news"
-  | "club_x"
+  | "other_teams_matches"
   | "transfers";
 
 export const HOME_SECTION_ORDER_KEY = "home:section_order";
@@ -14,7 +14,7 @@ export const DEFAULT_HOME_SECTION_ORDER: HomeSectionId[] = [
   "standings_stats",
   "recent_upcoming",
   "news",
-  "club_x",
+  "other_teams_matches",
   "transfers",
 ];
 
@@ -23,11 +23,21 @@ export const HOME_SECTION_LABELS: Record<HomeSectionId, string> = {
   standings_stats: "Clasificación y estadísticas",
   recent_upcoming: "Últimos 5 y próximos 5 partidos",
   news: "Noticiero",
-  club_x: "Club en X",
+  other_teams_matches: "Femenino, filial y juvenil",
   transfers: "Fichajes y renovaciones",
 };
 
 const ALL_SECTION_IDS = new Set<HomeSectionId>(DEFAULT_HOME_SECTION_ORDER);
+
+const LEGACY_HOME_SECTION_IDS: Record<string, HomeSectionId> = {
+  club_x: "other_teams_matches",
+};
+
+function migrateHomeSectionId(value: unknown): HomeSectionId | null {
+  if (typeof value !== "string") return null;
+  if (isHomeSectionId(value)) return value;
+  return LEGACY_HOME_SECTION_IDS[value] ?? null;
+}
 
 export function isHomeSectionId(value: unknown): value is HomeSectionId {
   return typeof value === "string" && ALL_SECTION_IDS.has(value as HomeSectionId);
@@ -41,9 +51,10 @@ export function normalizeHomeSectionOrder(raw: unknown): HomeSectionId[] {
   const ordered: HomeSectionId[] = [];
 
   for (const item of raw) {
-    if (!isHomeSectionId(item) || seen.has(item)) continue;
-    seen.add(item);
-    ordered.push(item);
+    const migrated = migrateHomeSectionId(item);
+    if (!migrated || seen.has(migrated)) continue;
+    seen.add(migrated);
+    ordered.push(migrated);
   }
 
   for (const id of DEFAULT_HOME_SECTION_ORDER) {

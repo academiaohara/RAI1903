@@ -8,7 +8,7 @@ import {
   HomeRecentUpcomingBlock,
   HomeStandingsStatsBlock,
 } from "@/components/home/HomeCompetitionBlocks";
-import { HomeClubXBlock } from "@/components/home/HomeClubXBlock";
+import { HomeOtherTeamsMatchesBlock } from "@/components/home/HomeOtherTeamsMatchesBlock";
 import { HomeNewsBlock } from "@/components/home/HomeNewsBlock";
 import { useHomeLayout } from "@/components/home/HomeLayoutProvider";
 import type { HomeSectionId } from "@/lib/home-layout";
@@ -18,7 +18,7 @@ const SECTION_RENDERERS: Record<HomeSectionId, () => React.ReactNode> = {
   standings_stats: () => <HomeStandingsStatsBlock />,
   recent_upcoming: () => <HomeRecentUpcomingBlock />,
   news: () => <HomeNewsBlock />,
-  club_x: () => <HomeClubXBlock />,
+  other_teams_matches: () => <HomeOtherTeamsMatchesBlock />,
   transfers: () => <HomeTransfersGate />,
 };
 
