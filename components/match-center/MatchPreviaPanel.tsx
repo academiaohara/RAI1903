@@ -60,20 +60,24 @@ function RecentMatchMobileRow({ row, gender }: { row: RecentFormMatch; gender: P
   );
 }
 
-function RecentMatchDesktopRow({ row }: { row: RecentFormMatch }) {
+function RecentMatchDesktopTable({ matches }: { matches: RecentFormMatch[] }) {
   return (
-    <div className="grid grid-cols-[4.5rem_minmax(0,1fr)_4rem_minmax(0,1fr)_5rem_2rem] items-center gap-x-3 border-b border-slate-100 py-2 text-sm last:border-b-0">
-      <span className="font-semibold tabular-nums text-slate-600">{row.date}</span>
-      <span className="min-w-0 truncate font-semibold text-slate-800" title={row.homeTeam}>
-        {row.homeTeam}
-      </span>
-      <span className="text-center font-extrabold tabular-nums text-[#214C9B]">{row.score}</span>
-      <span className="min-w-0 truncate text-right font-semibold text-slate-800" title={row.awayTeam}>
-        {row.awayTeam}
-      </span>
-      <span className="truncate text-slate-500">{row.competition}</span>
-      <div className="flex justify-end">{resultBadge(row.resultCode)}</div>
-    </div>
+    <table className="w-fit max-w-full border-collapse text-sm">
+      <tbody>
+        {matches.map((row) => (
+          <tr key={`${row.date}-${row.homeTeam}-${row.score}`} className="border-b border-slate-100 last:border-b-0">
+            <td className="whitespace-nowrap py-2 pr-3 font-semibold tabular-nums text-slate-600">{row.date}</td>
+            <td className="py-2 pr-3 font-semibold text-slate-800">{row.homeTeam}</td>
+            <td className="whitespace-nowrap py-2 pr-3 text-center font-extrabold tabular-nums text-[#214C9B]">
+              {row.score}
+            </td>
+            <td className="py-2 pr-3 font-semibold text-slate-800">{row.awayTeam}</td>
+            <td className="whitespace-nowrap py-2 pr-3 text-slate-500">{row.competition}</td>
+            <td className="py-2 pl-1">{resultBadge(row.resultCode)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
 
@@ -102,9 +106,7 @@ function RecentMatchesTable({
         ))}
       </div>
       <div className="hidden md:block">
-        {matches.map((row) => (
-          <RecentMatchDesktopRow key={`${row.date}-${row.homeTeam}-${row.score}`} row={row} />
-        ))}
+        <RecentMatchDesktopTable matches={matches} />
       </div>
     </>
   );
