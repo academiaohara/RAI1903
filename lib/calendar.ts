@@ -9,8 +9,6 @@ import { getTeamCrest, getTeamCrestById } from "@/lib/team-crests";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { CalendarMatch, Match } from "@/types";
 
-const NO_TIME_COMPETITIONS = new Set(["amistoso"]);
-
 function formatKickoffTime(date: string): string | null {
   return formatMatchKickoffTime(date);
 }
@@ -54,7 +52,6 @@ export function matchToCalendarMatch(
     articles?.getPrevia?.(match.id, gender) ??
     getMatchArticleForMatch(match.id, gender);
   const played = isMatchPlayed(match);
-  const hasTime = !NO_TIME_COMPETITIONS.has(match.competition);
   const opponentLogo = rival
     ? getTeamCrest(rival)
     : getTeamCrestById(rivalId, rivalId.slice(0, 3).toUpperCase());
@@ -83,7 +80,7 @@ export function matchToCalendarMatch(
     competitionStage: match.competitionStage,
     matchday: match.matchday,
     isHome: avilesHome,
-    time: played ? null : hasTime ? formatKickoffTime(match.date) : null,
+    time: played ? null : formatKickoffTime(match.date),
     played,
     result: avilesResult(match, raiId),
     homeScore: match.homeScore,
