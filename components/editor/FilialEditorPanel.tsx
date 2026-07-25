@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
+import { CrestPickerPopover } from "@/components/competicion/CrestPickerPopover";
 import { EditorPanelFrame } from "@/components/editor/EditorPanelFrame";
 import { FixturesJsonPasteSection } from "@/components/editor/FixturesJsonPasteSection";
 import { OnPageEditorSection } from "@/components/editor/OnPageEditorSection";
@@ -18,7 +20,9 @@ import {
 } from "@/lib/cms/filial-bundles";
 import { parseCanteraFixturesJson } from "@/lib/cms/parse-fixtures-json";
 import { parseCanteraSquadJson } from "@/lib/cms/parse-squad-json";
+import { getCanteraTeamCrests, saveCanteraBundlesAndCrests } from "@/lib/cms/save-cantera-bundles";
 import { upsertSeasonBundlesBatch } from "@/lib/cms/season-bundles";
+import { getTeamCrestById, isTeamCrestUrl } from "@/lib/team-crests";
 import type { CanteraCmsScope } from "@/lib/cantera/cantera-cms";
 import { buildCanteraMockBundleEntries } from "@/lib/cantera/cantera-season-data";
 import { defaultJuvenilCompetitionConfig } from "@/lib/cantera/juvenil-season-data";
@@ -125,6 +129,11 @@ export function CanteraEditorPanel({ scope, onClose, variant = "panel" }: Canter
   const [config, setConfig] = useState<FilialCompetitionConfigBundle | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [crestDraft, setCrestDraft] = useState<Record<string, string> | null>(null);
+  const [pickingCrestForTeamId, setPickingCrestForTeamId] = useState<string | null>(null);
+
+  const crestsFromBundle = useMemo(() => getCanteraTeamCrests(bundles, scope), [bundles, scope]);
+  const crests = crestDraft ?? crestsFromBundle;
 
   const loadFromBundles = useCallback(() => {
     const mockEntries = buildCanteraMockBundleEntries(scope);
@@ -148,6 +157,13 @@ export function CanteraEditorPanel({ scope, onClose, variant = "panel" }: Canter
     queueMicrotask(() => loadFromBundles());
   }, [loadFromBundles]);
 
+  useEffect(() => {
+    queueMicrotask(() => {
+      setCrestDraft(null);
+      setPickingCrestForTeamId(null);
+    });
+  }, [bundles, viewedSeasonId, scope]);
+
   const defaultConfig =
     scope === "filial" ? defaultFilialCompetitionConfig() : defaultJuvenilCompetitionConfig();
   const competition = config ?? defaultConfig;
@@ -159,21 +175,41 @@ export function CanteraEditorPanel({ scope, onClose, variant = "panel" }: Canter
     [fixturesDraft.jornadas],
   );
 
+  const assignCrest = (teamId: string, path: string) => {
+    const trimmed = path.trim();
+    if (!trimmed) return;
+    setCrestDraft((current) => ({ ...(current ?? crestsFromBundle), [teamId]: trimmed }));
+    setPickingCrestForTeamId(null);
+  };
+
+  const clearCrest = (teamId: string) => {
+    setCrestDraft((current) => {
+      const next = { ...(current ?? crestsFromBundle) };
+      delete next[teamId];
+      return next;
+    });
+  };
+
   const saveAll = async () => {
     if (!squad || !fixtures || !config) return;
     setBusy(true);
     setMessage(null);
-    const result = await upsertSeasonBundlesBatch(viewedSeasonId, [
-      { scope, bundleKey: "squad", payload: squad },
-      { scope, bundleKey: "fixtures", payload: fixtures },
-      { scope, bundleKey: "competition_config", payload: config },
-    ]);
+    const result = await saveCanteraBundlesAndCrests(
+      viewedSeasonId,
+      scope,
+      bundles,
+      squad,
+      fixtures,
+      config,
+      crests,
+    );
     setBusy(false);
     if (!result.ok) {
       setMessage(result.error ?? "Error al guardar");
       return;
     }
     setMessage(`${meta.shortTitle} guardado (${viewedSeason.label})`);
+    setCrestDraft(null);
     await refreshBundles();
   };
 
@@ -720,6 +756,10 @@ export function CanteraEditorPanel({ scope, onClose, variant = "panel" }: Canter
           </label>
 
           <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Equipos del grupo</p>
+          <p className="text-[10px] leading-relaxed text-slate-500">
+            Asigna un escudo a cada rival. Sube PNG a{" "}
+            <code className="rounded bg-slate-100 px-1">public/escudos/</code> y elige la imagen con «Escudo».
+          </p>
           <div className="flex flex-wrap items-end gap-2">
             <label className="text-xs font-semibold text-slate-600">
               Equipos en la liga
@@ -746,45 +786,100 @@ export function CanteraEditorPanel({ scope, onClose, variant = "panel" }: Canter
               Extraer del calendario
             </button>
           </div>
-          <div className="max-h-52 space-y-2 overflow-y-auto">
-            {competition.teams.map((team) => (
-              <div key={team.id} className="rounded-lg border border-slate-100 bg-slate-50/80 p-2 space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <label className="inline-flex items-center gap-2 text-[10px] font-bold uppercase text-slate-500">
+          <div className="max-h-72 space-y-2 overflow-y-auto">
+            {competition.teams.map((team) => {
+              const assigned = crests[team.id];
+              const preview = assigned ?? getTeamCrestById(team.id, team.crestInitials);
+
+              return (
+                <div key={team.id} className="rounded-lg border border-slate-100 bg-slate-50/80 p-2 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <label className="inline-flex items-center gap-2 text-[10px] font-bold uppercase text-slate-500">
+                      <input
+                        type="radio"
+                        name={`club-team-${scope}`}
+                        checked={competition.clubTeamId === team.id}
+                        onChange={() => setConfig((c) => (c ? { ...c, clubTeamId: team.id } : c))}
+                      />
+                      Nuestro equipo
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => removeTeamSlot(team.id)}
+                      className="text-rose-600"
+                      aria-label="Eliminar equipo"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-[1fr_5rem] gap-2">
                     <input
-                      type="radio"
-                      name={`club-team-${scope}`}
-                      checked={competition.clubTeamId === team.id}
-                      onChange={() => setConfig((c) => (c ? { ...c, clubTeamId: team.id } : c))}
+                      value={team.name}
+                      onChange={(e) => updateTeam(team.id, { name: e.target.value })}
+                      className="rounded-lg border border-slate-200 px-2 py-1 text-xs"
+                      placeholder="Nombre completo"
                     />
-                    Nuestro equipo
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => removeTeamSlot(team.id)}
-                    className="text-rose-600"
-                    aria-label="Eliminar equipo"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                    <input
+                      value={team.shortName}
+                      onChange={(e) => updateTeam(team.id, { shortName: e.target.value })}
+                      className="rounded-lg border border-slate-200 px-2 py-1 text-xs"
+                      placeholder="Corto"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white">
+                      {isTeamCrestUrl(preview) ? (
+                        <Image
+                          src={preview}
+                          alt=""
+                          width={28}
+                          height={28}
+                          className="h-7 w-7 object-contain"
+                          unoptimized
+                        />
+                      ) : (
+                        <span className="text-[9px] font-bold text-slate-400">{preview}</span>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[9px] text-slate-400">{team.id}</p>
+                      {assigned ? (
+                        <p className="truncate text-[9px] text-emerald-700">{assigned}</p>
+                      ) : null}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setPickingCrestForTeamId(team.id)}
+                      className="shrink-0 rounded-lg border border-[#214C9B]/20 px-2 py-1 text-[10px] font-extrabold uppercase text-[#214C9B] hover:bg-blue-50"
+                    >
+                      Escudo
+                    </button>
+                    {assigned ? (
+                      <button
+                        type="button"
+                        onClick={() => clearCrest(team.id)}
+                        className="shrink-0 rounded-lg border border-slate-200 px-2 py-1 text-[10px] font-bold text-slate-500 hover:bg-slate-50"
+                      >
+                        Quitar
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
-                <div className="grid grid-cols-[1fr_5rem] gap-2">
-                  <input
-                    value={team.name}
-                    onChange={(e) => updateTeam(team.id, { name: e.target.value })}
-                    className="rounded-lg border border-slate-200 px-2 py-1 text-xs"
-                    placeholder="Nombre completo"
-                  />
-                  <input
-                    value={team.shortName}
-                    onChange={(e) => updateTeam(team.id, { shortName: e.target.value })}
-                    className="rounded-lg border border-slate-200 px-2 py-1 text-xs"
-                    placeholder="Corto"
-                  />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
+
+          {pickingCrestForTeamId ? (
+            <CrestPickerPopover
+              teamLabel={
+                competition.teams.find((team) => team.id === pickingCrestForTeamId)?.name ??
+                pickingCrestForTeamId
+              }
+              currentPath={crests[pickingCrestForTeamId]}
+              onSelect={(path) => assignCrest(pickingCrestForTeamId, path)}
+              onClose={() => setPickingCrestForTeamId(null)}
+            />
+          ) : null}
 
           <div className="flex items-center justify-between">
             <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Tramos clasificación</p>
