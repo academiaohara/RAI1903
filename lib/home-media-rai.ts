@@ -1,35 +1,52 @@
 import { contenidoFanSections } from "@/lib/contenido-fan";
 import { isContenidoFanSlug } from "@/lib/contenido-fan-slugs";
-import { collectMediaRaiVideos, sortFanVideosByDate } from "@/lib/fan-videos";
+import { collectMediaRaiSpaces, sortFanSpacesByDate } from "@/lib/fan-spaces";
+import { collectMediaRaiVideos, parseFanVideoDate } from "@/lib/fan-videos";
 import { getMediaRaiSectionLabel, type MediaRaiSectionEntry } from "@/lib/media-rai-sections";
 import { youtubeVideoId } from "@/lib/youtube";
-import type { FanYouTubeVideo } from "@/types";
+import type { FanMediaLink, FanYouTubeVideo } from "@/types";
 
-export const HOME_MEDIA_RAI_VIDEO_LIMIT = 12;
+export const HOME_MEDIA_RAI_ITEM_LIMIT = 12;
 
-export type HomeMediaRaiVideo = {
+type HomeMediaRaiItemBase = {
   id: string;
   title: string;
   url: string;
   date?: string;
-  videoId: string;
   sectionSlug: string;
   sectionLabel: string;
+  sortDate: number;
 };
+
+export type HomeMediaRaiVideoItem = HomeMediaRaiItemBase & {
+  kind: "video";
+  videoId: string;
+};
+
+export type HomeMediaRaiSpaceItem = HomeMediaRaiItemBase & {
+  kind: "space";
+  description?: string;
+  avatarUrl?: string;
+};
+
+export type HomeMediaRaiItem = HomeMediaRaiVideoItem | HomeMediaRaiSpaceItem;
 
 function fallbackVideosForSection(slug: string): FanYouTubeVideo[] {
   if (!isContenidoFanSlug(slug)) return [];
   return contenidoFanSections[slug].videos ?? [];
 }
 
-function toHomeMediaRaiVideo(
-  video: FanYouTubeVideo,
-  entry: MediaRaiSectionEntry,
-): HomeMediaRaiVideo | null {
+function fallbackSpacesForSection(slug: string): FanMediaLink[] {
+  if (!isContenidoFanSlug(slug)) return [];
+  return contenidoFanSections[slug].links ?? [];
+}
+
+function toVideoItem(video: FanYouTubeVideo, entry: MediaRaiSectionEntry): HomeMediaRaiVideoItem | null {
   const videoId = youtubeVideoId(video.url);
   if (!videoId) return null;
 
   return {
+    kind: "video",
     id: video.id,
     title: video.title,
     url: video.url,
@@ -37,49 +54,81 @@ function toHomeMediaRaiVideo(
     videoId,
     sectionSlug: entry.slug,
     sectionLabel: getMediaRaiSectionLabel(entry),
+    sortDate: parseFanVideoDate(video.date),
   };
 }
 
-/** Vídeos recientes de todas las subsecciones de Media RAI para el carrusel de inicio. */
-export function collectHomeMediaRaiVideos(
+function toSpaceItem(space: FanMediaLink, entry: MediaRaiSectionEntry): HomeMediaRaiSpaceItem | null {
+  if (!space.url?.trim()) return null;
+
+  return {
+    kind: "space",
+    id: space.id,
+    title: space.name,
+    url: space.url,
+    date: space.date,
+    description: space.description || undefined,
+    avatarUrl: space.avatarUrl,
+    sectionSlug: entry.slug,
+    sectionLabel: getMediaRaiSectionLabel(entry),
+    sortDate: parseFanVideoDate(space.date),
+  };
+}
+
+/** Contenido reciente de Media RAI (vídeos y espacios de X) para el carrusel de inicio. */
+export function collectHomeMediaRaiItems(
   sections: MediaRaiSectionEntry[],
   overrides: Record<string, unknown>,
-  limit = HOME_MEDIA_RAI_VIDEO_LIMIT,
-): HomeMediaRaiVideo[] {
-  const merged: FanYouTubeVideo[] = [];
-  const sectionByVideoId = new Map<string, MediaRaiSectionEntry>();
+  limit = HOME_MEDIA_RAI_ITEM_LIMIT,
+): HomeMediaRaiItem[] {
+  const items: HomeMediaRaiItem[] = [];
+  const seenVideoIds = new Set<string>();
+  const seenSpaceIds = new Set<string>();
 
   for (const entry of sections) {
     const { videos } = collectMediaRaiVideos(entry.slug, overrides, fallbackVideosForSection(entry.slug));
-
     for (const video of videos) {
       const videoId = youtubeVideoId(video.url);
-      if (!videoId) continue;
+      if (!videoId || seenVideoIds.has(videoId)) continue;
 
-      const dedupeKey = videoId;
-      if (sectionByVideoId.has(dedupeKey)) continue;
+      const item = toVideoItem(video, entry);
+      if (!item) continue;
 
-      sectionByVideoId.set(dedupeKey, entry);
-      merged.push(video);
+      seenVideoIds.add(videoId);
+      items.push(item);
+    }
+
+    const { spaces } = collectMediaRaiSpaces(entry.slug, overrides, fallbackSpacesForSection(entry.slug));
+    for (const space of sortFanSpacesByDate(spaces)) {
+      if (seenSpaceIds.has(space.id)) continue;
+
+      const item = toSpaceItem(space, entry);
+      if (!item) continue;
+
+      seenSpaceIds.add(space.id);
+      items.push(item);
     }
   }
 
-  const sorted = sortFanVideosByDate(merged);
-  const items: HomeMediaRaiVideo[] = [];
-
-  for (const video of sorted) {
-    const videoId = youtubeVideoId(video.url);
-    if (!videoId) continue;
-
-    const entry = sectionByVideoId.get(videoId);
-    if (!entry) continue;
-
-    const item = toHomeMediaRaiVideo(video, entry);
-    if (!item) continue;
-
-    items.push(item);
-    if (items.length >= limit) break;
-  }
-
-  return items;
+  return items
+    .sort((a, b) => {
+      const dateDiff = b.sortDate - a.sortDate;
+      if (dateDiff !== 0) return dateDiff;
+      return a.id.localeCompare(b.id);
+    })
+    .slice(0, limit);
 }
+
+/** @deprecated Usa collectHomeMediaRaiItems. */
+export function collectHomeMediaRaiVideos(
+  sections: MediaRaiSectionEntry[],
+  overrides: Record<string, unknown>,
+  limit = HOME_MEDIA_RAI_ITEM_LIMIT,
+): HomeMediaRaiVideoItem[] {
+  return collectHomeMediaRaiItems(sections, overrides, limit).filter(
+    (item): item is HomeMediaRaiVideoItem => item.kind === "video",
+  );
+}
+
+/** @deprecated Usa HomeMediaRaiItem. */
+export type HomeMediaRaiVideo = HomeMediaRaiVideoItem;
