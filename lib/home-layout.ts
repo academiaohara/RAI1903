@@ -4,6 +4,7 @@ export type HomeSectionId =
   | "standings_stats"
   | "recent_upcoming"
   | "news"
+  | "media_rai"
   | "other_teams_matches"
   | "transfers";
 
@@ -14,6 +15,7 @@ export const DEFAULT_HOME_SECTION_ORDER: HomeSectionId[] = [
   "standings_stats",
   "recent_upcoming",
   "news",
+  "media_rai",
   "other_teams_matches",
   "transfers",
 ];
@@ -23,6 +25,7 @@ export const HOME_SECTION_LABELS: Record<HomeSectionId, string> = {
   standings_stats: "Clasificación y estadísticas",
   recent_upcoming: "Últimos 5 y próximos 5 partidos",
   news: "Noticiero",
+  media_rai: "Carrusel Media RAI",
   other_teams_matches: "Femenino, filial y juvenil",
   transfers: "Fichajes y renovaciones",
 };
