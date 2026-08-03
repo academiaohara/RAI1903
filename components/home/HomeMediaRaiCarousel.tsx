@@ -1,58 +1,79 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
+import { ExternalLink, Mic2 } from "lucide-react";
 import Link from "next/link";
 import type { Route } from "next";
-import { useHorizontalCarousel } from "@/lib/use-horizontal-carousel";
-import { useHorizontalWheelScroll } from "@/lib/use-horizontal-wheel-scroll";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
+import {
+  useHorizontalWheelScroll,
+  useHorizontalWheelScrollListener,
+} from "@/lib/use-horizontal-wheel-scroll";
 import { mediaRaiSectionHref } from "@/lib/media-rai-sections";
 import { youtubeThumbnailUrl } from "@/lib/youtube";
-import type { HomeMediaRaiVideo } from "@/lib/home-media-rai";
+import type { HomeMediaRaiItem } from "@/lib/home-media-rai";
 
 type HomeMediaRaiCarouselProps = {
-  videos: HomeMediaRaiVideo[];
+  items: HomeMediaRaiItem[];
 };
 
-function HomeMediaRaiCard({ video }: { video: HomeMediaRaiVideo }) {
+function HomeMediaRaiCard({ item }: { item: HomeMediaRaiItem }) {
+  const actionLabel = item.kind === "space" ? "Escuchar espacio" : "Ver vídeo";
+
   return (
-    <article className="group flex w-[min(100%,240px)] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-[#214C9B]/20 bg-white text-left shadow-sm transition hover:border-[#214C9B]/45 hover:shadow-md sm:w-[260px]">
+    <article className="news-ticker-item flex w-[min(72vw,260px)] shrink-0 flex-col overflow-hidden rounded-2xl border border-[#214C9B]/15 bg-white shadow-sm sm:w-[min(82vw,320px)]">
       <a
-        href={video.url}
+        href={item.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="relative block"
-        aria-label={`Ver vídeo: ${video.title}`}
+        className="block"
+        aria-label={`${actionLabel}: ${item.title}`}
       >
-        <div
-          className="aspect-video w-full bg-black bg-cover bg-center"
-          style={{ backgroundImage: `url(${youtubeThumbnailUrl(video.videoId)})` }}
-          role="img"
-          aria-hidden
-        />
-        <span className="pointer-events-none absolute inset-0 bg-[#214C9B]/0 transition group-hover:bg-[#214C9B]/10" />
-      </a>
-      <div className="flex min-h-0 flex-1 flex-col px-3 py-2.5">
-        <div className="flex items-center justify-between gap-2">
-          <Link
-            href={mediaRaiSectionHref(video.sectionSlug) as Route}
-            className="truncate text-[10px] font-bold uppercase text-[#981915] transition hover:text-[#214C9B]"
+        {item.kind === "video" ? (
+          <div
+            className="aspect-video w-full bg-black bg-cover bg-center"
+            style={{ backgroundImage: `url(${youtubeThumbnailUrl(item.videoId)})` }}
+            role="img"
+            aria-hidden
+          />
+        ) : (
+          <div
+            className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-[#0f1f3d] to-[#214C9B] bg-cover bg-center"
+            style={item.avatarUrl ? { backgroundImage: `url(${item.avatarUrl})` } : undefined}
           >
-            {video.sectionLabel}
+            {!item.avatarUrl ? <Mic2 size={36} className="text-white/80" aria-hidden /> : null}
+          </div>
+        )}
+      </a>
+      <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-1.5">
+        <div className="flex items-baseline justify-between gap-2">
+          <Link
+            href={mediaRaiSectionHref(item.sectionSlug) as Route}
+            className="news-ticker-source min-w-0 truncate text-[10px] font-bold uppercase text-[#981915] sm:text-xs"
+          >
+            {item.sectionLabel}
           </Link>
-          {video.date ? (
-            <time dateTime={video.date} className="shrink-0 text-[10px] font-semibold uppercase text-slate-400">
-              {video.date}
+          {item.date ? (
+            <time dateTime={item.date} className="news-ticker-date shrink-0 text-[10px] font-bold uppercase text-[#214C9B]/70 sm:text-xs">
+              {item.date}
             </time>
           ) : null}
         </div>
-        <p className="mt-1 line-clamp-2 text-xs font-bold leading-snug text-[#214C9B] sm:text-sm">{video.title}</p>
+        <h3 className="news-ticker-title mt-1 line-clamp-3 text-sm font-extrabold uppercase leading-snug text-[#214C9B]">
+          {item.title}
+        </h3>
+        {item.kind === "space" && item.description ? (
+          <p className="news-ticker-excerpt mt-1 line-clamp-2 text-[11px] leading-snug text-slate-600 sm:mt-1.5 sm:text-xs sm:leading-5">
+            {item.description}
+          </p>
+        ) : null}
         <a
-          href={video.url}
+          href={item.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-auto inline-flex items-center gap-1 pt-2 text-[10px] font-semibold uppercase text-slate-400 transition hover:text-[#214C9B]"
+          className="news-ticker-excerpt mt-auto inline-flex items-center gap-1 pt-2 text-[10px] font-semibold uppercase text-slate-400"
         >
-          Ver vídeo
+          {actionLabel}
           <ExternalLink size={10} aria-hidden />
         </a>
       </div>
@@ -60,48 +81,135 @@ function HomeMediaRaiCard({ video }: { video: HomeMediaRaiVideo }) {
   );
 }
 
-export function HomeMediaRaiCarousel({ videos }: HomeMediaRaiCarouselProps) {
-  const { trackRef, activeIndex, goPrev, goNext } = useHorizontalCarousel(videos.length);
-  const { onWheel: handleWheel } = useHorizontalWheelScroll();
+export function HomeMediaRaiCarousel({ items }: HomeMediaRaiCarouselProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [manualScroll, setManualScroll] = useState(false);
 
-  if (videos.length === 0) return null;
+  const useTicker = items.length > 1;
+  const loop = useTicker ? [...items, ...items] : items;
+
+  const getLoopWidth = useCallback(() => {
+    const track = trackRef.current;
+    if (!track || !useTicker) return 0;
+    return track.scrollWidth / 2;
+  }, [useTicker]);
+
+  const { onWheel: handleScrollWheel, smoothScroll } = useHorizontalWheelScroll({
+    blockPageScroll: true,
+    smooth: true,
+    getLoopWidth: useTicker ? getLoopWidth : undefined,
+  });
+
+  const pendingManualWheelRef = useRef<{ offset: number; deltaY: number } | null>(null);
+
+  const resetManualScroll = useCallback(() => {
+    pendingManualWheelRef.current = null;
+    const container = containerRef.current;
+    const track = trackRef.current;
+    if (!track) return;
+
+    smoothScroll.cancel();
+    if (container) {
+      container.scrollLeft = 0;
+    }
+
+    track.style.animation = "";
+    track.style.transform = "";
+    track.style.animationPlayState = "";
+    setManualScroll(false);
+  }, [smoothScroll]);
+
+  useLayoutEffect(() => {
+    const pending = pendingManualWheelRef.current;
+    if (!manualScroll || !pending) return;
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    pendingManualWheelRef.current = null;
+    const { offset, deltaY } = pending;
+
+    container.scrollLeft = offset;
+    smoothScroll.syncTarget(container);
+    if (deltaY !== 0) {
+      smoothScroll.addDelta(container, deltaY);
+    }
+  }, [manualScroll, smoothScroll]);
+
+  const handleWheel = useCallback(
+    (event: WheelEvent) => {
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+
+      const track = trackRef.current;
+
+      if (useTicker && !manualScroll && track) {
+        event.preventDefault();
+
+        const transform = window.getComputedStyle(track).transform;
+        let currentX = 0;
+        if (transform && transform !== "none") {
+          currentX = new DOMMatrixReadOnly(transform).m41;
+        }
+        const loopWidth = track.scrollWidth / 2;
+        let offset = Math.max(0, -currentX);
+        if (loopWidth > 0) {
+          offset %= loopWidth;
+        }
+
+        track.style.animation = "none";
+        track.style.transform = "none";
+        track.style.animationPlayState = "";
+
+        pendingManualWheelRef.current = { offset, deltaY: event.deltaY };
+        flushSync(() => setManualScroll(true));
+        return;
+      }
+
+      handleScrollWheel(event);
+    },
+    [handleScrollWheel, manualScroll, useTicker],
+  );
+
+  useHorizontalWheelScrollListener(containerRef, handleWheel);
+
+  useEffect(() => {
+    if (!manualScroll || !useTicker) return;
+
+    const container = containerRef.current;
+    const track = trackRef.current;
+    if (!container || !track) return;
+
+    const onScroll = () => {
+      const loopWidth = track.scrollWidth / 2;
+      if (loopWidth <= 0) return;
+
+      if (container.scrollLeft >= loopWidth) {
+        container.scrollLeft -= loopWidth;
+        smoothScroll.syncTarget(container);
+      }
+    };
+
+    container.addEventListener("scroll", onScroll, { passive: true });
+    return () => container.removeEventListener("scroll", onScroll);
+  }, [manualScroll, smoothScroll, useTicker]);
+
+  if (items.length === 0) return null;
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-xs font-bold uppercase text-[#214C9B] sm:text-sm">Últimos vídeos</p>
-        {videos.length > 1 ? (
-          <div className="flex shrink-0 items-center gap-2">
-            <button
-              type="button"
-              onClick={goPrev}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#214C9B]/25 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
-              aria-label="Vídeo anterior"
-            >
-              <ChevronLeft size={18} aria-hidden />
-            </button>
-            <span className="min-w-[3.5rem] text-center text-xs font-bold tabular-nums text-slate-500">
-              {activeIndex + 1} / {videos.length}
-            </span>
-            <button
-              type="button"
-              onClick={goNext}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#214C9B]/25 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50"
-              aria-label="Vídeo siguiente"
-            >
-              <ChevronRight size={18} aria-hidden />
-            </button>
-          </div>
-        ) : null}
-      </div>
-
+    <div
+      ref={containerRef}
+      onMouseLeave={manualScroll ? resetManualScroll : undefined}
+      className={`py-1 no-scrollbar overflow-x-auto overscroll-x-contain overscroll-y-none${
+        useTicker && !manualScroll ? " news-ticker" : ""
+      }`}
+    >
       <div
         ref={trackRef}
-        onWheel={handleWheel}
-        className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-1"
+        className={`flex w-max gap-4${useTicker && !manualScroll ? " news-ticker-track" : ""}`}
       >
-        {videos.map((video) => (
-          <HomeMediaRaiCard key={video.id} video={video} />
+        {loop.map((item, index) => (
+          <HomeMediaRaiCard key={`${item.id}-${index}`} item={item} />
         ))}
       </div>
     </div>

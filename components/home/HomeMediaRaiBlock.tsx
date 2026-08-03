@@ -8,26 +8,26 @@ import { Card } from "@/components/Card";
 import { HomeMediaRaiCarousel } from "@/components/home/HomeMediaRaiCarousel";
 import { useMediaRaiSections } from "@/components/media-rai/MediaRaiSectionsProvider";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
-import { collectHomeMediaRaiVideos } from "@/lib/home-media-rai";
+import { collectHomeMediaRaiItems } from "@/lib/home-media-rai";
 import { mediaRaiSectionHref } from "@/lib/media-rai-sections";
 
 export function HomeMediaRaiBlock() {
   const { sections } = useMediaRaiSections();
   const { overrides } = useInlineEditing();
 
-  const videos = useMemo(
-    () => collectHomeMediaRaiVideos(sections, overrides),
+  const items = useMemo(
+    () => collectHomeMediaRaiItems(sections, overrides),
     [overrides, sections],
   );
 
-  if (videos.length === 0) return null;
+  if (items.length === 0) return null;
 
   const firstSectionHref = mediaRaiSectionHref(sections[0]?.slug ?? "zona-mixta") as Route;
 
   return (
     <Card
       eyebrow="Media RAI"
-      title="Vídeos del club"
+      title="Lo último"
       action={
         <Link
           href={firstSectionHref}
@@ -38,7 +38,7 @@ export function HomeMediaRaiBlock() {
         </Link>
       }
     >
-      <HomeMediaRaiCarousel videos={videos} />
+      <HomeMediaRaiCarousel items={items} />
     </Card>
   );
 }
