@@ -4,7 +4,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
 import { shouldCopyInlineOverrideKey } from "@/lib/fixture-inline-keys";
 import { CLUB_X_POSTS_STORAGE_KEY } from "@/lib/club-x-posts";
-import { isMediaRaiGlobalInlineKey, MEDIA_RAI_INLINE_SEASON_ID } from "@/lib/fan-videos";
+import { isMediaRaiGlobalInlineKey } from "@/lib/fan-videos";
 import { HOME_SECTION_ORDER_KEY } from "@/lib/home-layout";
 
 const HOME_GLOBAL_INLINE_KEYS = [CLUB_X_POSTS_STORAGE_KEY, HOME_SECTION_ORDER_KEY] as const;
@@ -77,7 +77,12 @@ export async function fetchMediaRaiInlineOverrides(): Promise<{
 
   if (error && isMissingSeasonIdColumnError(error.message)) {
     const legacy = await supabase.from("cms_inline_overrides").select("key, value");
-    data = legacy.data?.map((row) => ({ ...row, season_id: MEDIA_RAI_INLINE_SEASON_ID, updated_at: undefined })) ?? null;
+    data =
+      legacy.data?.map((row) => ({
+        ...row,
+        season_id: DEFAULT_COMPETITION_SEASON_ID,
+        updated_at: undefined,
+      })) ?? null;
     error = legacy.error;
   }
 
@@ -112,9 +117,10 @@ export async function fetchMediaRaiInlineOverrides(): Promise<{
 export function resolveInlineOverrideSeasonId(
   key: string,
   viewedSeasonId = DEFAULT_COMPETITION_SEASON_ID,
+  activeSeasonId = DEFAULT_COMPETITION_SEASON_ID,
 ): string {
   if (isMediaRaiGlobalInlineKey(key) || isHomeGlobalInlineKey(key)) {
-    return MEDIA_RAI_INLINE_SEASON_ID;
+    return activeSeasonId;
   }
   return viewedSeasonId;
 }
@@ -138,7 +144,11 @@ export async function fetchHomeGlobalInlineOverrides(): Promise<{
       .select("key, value")
       .in("key", [...HOME_GLOBAL_INLINE_KEYS]);
     data =
-      legacy.data?.map((row) => ({ ...row, season_id: MEDIA_RAI_INLINE_SEASON_ID, updated_at: undefined })) ?? null;
+      legacy.data?.map((row) => ({
+        ...row,
+        season_id: DEFAULT_COMPETITION_SEASON_ID,
+        updated_at: undefined,
+      })) ?? null;
     error = legacy.error;
   }
 
@@ -189,7 +199,7 @@ export async function deleteClubXPostOverrides(): Promise<{ ok: boolean; error?:
       supabase
         .from("cms_inline_overrides")
         .delete()
-        .eq("season_id", row.season_id ?? MEDIA_RAI_INLINE_SEASON_ID)
+        .eq("season_id", row.season_id ?? DEFAULT_COMPETITION_SEASON_ID)
         .eq("key", row.key),
     ),
   );
@@ -220,7 +230,7 @@ export async function deleteMediaRaiSpaceOverrides(section: string): Promise<{ o
       supabase
         .from("cms_inline_overrides")
         .delete()
-        .eq("season_id", row.season_id ?? MEDIA_RAI_INLINE_SEASON_ID)
+        .eq("season_id", row.season_id ?? DEFAULT_COMPETITION_SEASON_ID)
         .eq("key", row.key),
     ),
   );
@@ -255,7 +265,7 @@ export async function deleteMediaRaiVideoOverrides(section: string): Promise<{ o
       supabase
         .from("cms_inline_overrides")
         .delete()
-        .eq("season_id", row.season_id ?? MEDIA_RAI_INLINE_SEASON_ID)
+        .eq("season_id", row.season_id ?? DEFAULT_COMPETITION_SEASON_ID)
         .eq("key", row.key),
     ),
   );
