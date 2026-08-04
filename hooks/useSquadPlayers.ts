@@ -16,9 +16,11 @@ import { ageFromBirthDate } from "@/lib/squad-age";
 import { createEmptySquadPlayer } from "@/lib/squad-defaults";
 import { getSquadPlayers } from "@/lib/squad-data";
 import { withSquadPlayerPhoto } from "@/lib/squad-photos";
+import { buildSquadFromCanteraImport } from "@/lib/primer-equipo-squad-import";
 import { resolveSquadPlayers, seasonSquadBundlePayload } from "@/lib/season/squad-source";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
-import type { SquadPlayer, SquadPosition } from "@/types/squad";
+import type { CanteraSquadImport } from "@/types/cantera-squad-import";
+import type { SquadClubInfo, SquadPlayer, SquadPosition } from "@/types/squad";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export function useSquadPlayers(gender: PrimerEquipoGender) {
@@ -70,11 +72,12 @@ export function useSquadPlayers(gender: PrimerEquipoGender) {
   }, [baseSquad, bundles, bundlesLoading, gender, getFixtureSource, getOverride, overrides]);
 
   const persistSquadToCms = useCallback(
-    async (players: SquadPlayer[]) => {
+    async (players: SquadPlayer[], clubInfoPatch?: Partial<SquadClubInfo>) => {
       if (!isSupabaseConfigured()) return { ok: true as const };
 
       const bundle = getSquadBundle(bundles, gender);
-      const payload = seasonSquadBundlePayload(players, bundle?.clubInfo);
+      const clubInfo = clubInfoPatch ? { ...bundle?.clubInfo, ...clubInfoPatch } : bundle?.clubInfo;
+      const payload = seasonSquadBundlePayload(players, clubInfo);
       const batchResult = await upsertSquadPlayersBatch(gender, viewedSeasonId, players);
       if (!batchResult.ok) return batchResult;
 
@@ -140,10 +143,24 @@ export function useSquadPlayers(gender: PrimerEquipoGender) {
     [baseSquad, clearValue, gender, persistSquadToCms, viewedSeasonId],
   );
 
+  const importSquad = useCallback(
+    async (data: CanteraSquadImport) => {
+      const { players, clubInfo } = buildSquadFromCanteraImport(data, gender);
+      setBaseSquad(players);
+
+      if (clubInfo?.entrenador) {
+        saveValue(`squad-club:${gender}:entrenador`, clubInfo.entrenador);
+      }
+
+      return persistSquadToCms(players, clubInfo);
+    },
+    [gender, persistSquadToCms, saveValue],
+  );
+
   const getPlayerById = useCallback(
     (playerId: string) => squad.find((player) => player.id === playerId),
     [squad],
   );
 
-  return { squad, updatePlayer, addPlayer, removePlayer, getPlayerById, loading: bundlesLoading };
+  return { squad, updatePlayer, addPlayer, removePlayer, importSquad, getPlayerById, loading: bundlesLoading };
 }
