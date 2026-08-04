@@ -20,6 +20,8 @@ import { PlayerModal } from "@/components/squad/PlayerModal";
 import { StadiumModal } from "@/components/squad/StadiumModal";
 import { StadiumEditorModal } from "@/components/squad/StadiumEditorModal";
 import { SquadEditToolbar } from "@/components/squad/SquadEditToolbar";
+import { FixturesJsonPasteSection } from "@/components/editor/FixturesJsonPasteSection";
+import { parseCanteraSquadJson } from "@/lib/cms/parse-squad-json";
 import { SectionUnderConstructionGate } from "@/components/season/SectionUnderConstructionGate";
 import { StandingsEvolutionChart } from "@/components/squad/StandingsEvolutionChart";
 import type { StadiumInfo } from "@/types/squad";
@@ -29,7 +31,7 @@ type SquadPageProps = {
 };
 
 export function SquadPage({ gender }: SquadPageProps) {
-  const { squad, updatePlayer, addPlayer, removePlayer } = useSquadPlayers(gender);
+  const { squad, updatePlayer, addPlayer, removePlayer, importSquad } = useSquadPlayers(gender);
   const { averages: fanRatings } = useSeasonPlayerRatings();
   const { bundles, viewedSeason, getFixtureSource } = useSeason();
   const { editMode, getValue } = useInlineEditing();
@@ -70,6 +72,7 @@ export function SquadPage({ gender }: SquadPageProps) {
     return merged;
   }, [bundles, gender, getValue, leagueMatchdays, squad.length, stadiumOverride, viewedSeason.label]);
   const isFemenino = gender === "femenino";
+  const showPlayerProfile = !isFemenino;
 
   const [viewMode, setViewMode] = useState<SquadViewMode>(isFemenino ? "lista" : "fichas");
   const [selected, setSelected] = useState<SquadPlayer | null>(null);
@@ -80,7 +83,7 @@ export function SquadPage({ gender }: SquadPageProps) {
     return squad.find((player) => player.id === selected.id) ?? selected;
   }, [selected, squad]);
 
-  const handleSelect = setSelected;
+  const handleSelect = showPlayerProfile ? setSelected : undefined;
 
   const handleStadiumClick = () => setStadiumOpen(true);
 
@@ -96,9 +99,16 @@ export function SquadPage({ gender }: SquadPageProps) {
       setAddBusy(true);
       const result = await addPlayer(position);
       setAddBusy(false);
-      if (result.ok && result.player) setSelected(result.player);
+      if (result.ok && result.player && showPlayerProfile) setSelected(result.player);
     },
-    [addPlayer],
+    [addPlayer, showPlayerProfile],
+  );
+
+  const handleImportSquad = useCallback(
+    (data: Parameters<typeof importSquad>[0]) => {
+      void importSquad(data);
+    },
+    [importSquad],
   );
 
   const stadiumModalOpen = stadiumOpen && !editMode;
@@ -114,6 +124,18 @@ export function SquadPage({ gender }: SquadPageProps) {
         onStadiumClick={handleStadiumClick}
       />
       <SquadToolbar viewMode={viewMode} onViewModeChange={setViewMode} showViewToggle={!isFemenino} />
+
+      {editMode && isFemenino ? (
+        <FixturesJsonPasteSection
+          title="Importar plantilla JSON"
+          applyLabel="Aplicar plantilla"
+          accent="femenino"
+          placeholder='{ "entrenador": "Nombre", "plantilla": [ { "dorsal": 1, "jugador": "Nombre Apellido", "pos": "Portero", "edad": 24, "pj": 0, "goles": 0, "ta": 0, "tr": 0 } ] }'
+          hint='Pega un JSON con entrenador y plantilla (dorsal, jugador, pos, edad, pj, min, goles, ta, tr). También vale un array de jugadores. Sustituye toda la plantilla actual.'
+          parse={parseCanteraSquadJson}
+          onImport={handleImportSquad}
+        />
+      ) : null}
 
       {editMode && <SquadEditToolbar onAddPlayer={(position) => void handleAddPlayer(position)} busy={addBusy} />}
 
@@ -150,7 +172,7 @@ export function SquadPage({ gender }: SquadPageProps) {
           ) : (
             <PlayerGrid
               players={squad}
-              onSelect={setSelected}
+              onSelect={showPlayerProfile ? setSelected : () => {}}
               variant="fichas"
               fanRatings={fanRatings}
               showEmptyPositions={editMode}
@@ -162,12 +184,14 @@ export function SquadPage({ gender }: SquadPageProps) {
         </motion.div>
       </AnimatePresence>
 
-      <PlayerModal
-        player={selectedPlayer}
-        onClose={() => setSelected(null)}
-        onUpdate={updatePlayer}
-        onRemove={editMode ? (playerId) => void removePlayer(playerId).then(() => setSelected(null)) : undefined}
-      />
+      {showPlayerProfile ? (
+        <PlayerModal
+          player={selectedPlayer}
+          onClose={() => setSelected(null)}
+          onUpdate={updatePlayer}
+          onRemove={editMode ? (playerId) => void removePlayer(playerId).then(() => setSelected(null)) : undefined}
+        />
+      ) : null}
       {!isFemenino && <StandingsEvolutionChart />}
       <StadiumModal stadium={club.estadioInfo} open={stadiumModalOpen} onClose={() => setStadiumOpen(false)} />
       <StadiumEditorModal
