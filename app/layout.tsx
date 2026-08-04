@@ -12,7 +12,7 @@ import {
 } from "@/components/inline-editing/InlineEditingProvider";
 import { AppDialogProvider } from "@/components/AppDialogProvider";
 import { InlineEditingMarketEditShell } from "@/components/inline-editing/InlineEditingMarketEditShell";
-import { fetchInlineOverridesServer, fetchMediaRaiInlineOverridesServer } from "@/lib/cms/inline-overrides-server";
+import { fetchHomeGlobalInlineOverridesServer, fetchInlineOverridesServer, fetchMediaRaiInlineOverridesServer } from "@/lib/cms/inline-overrides-server";
 import { fetchDefaultSeasonIdServer } from "@/lib/cms/seasons-server";
 import type { CompetitionSeasonId } from "@/data/mock";
 import { bebasNeue } from "@/lib/fonts";
@@ -29,11 +29,12 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const defaultSeasonId = (await fetchDefaultSeasonIdServer()) as CompetitionSeasonId;
-  const [seasonOverrides, mediaRaiOverrides] = await Promise.all([
+  const [seasonOverrides, mediaRaiOverrides, homeGlobalOverrides] = await Promise.all([
     fetchInlineOverridesServer(defaultSeasonId),
     fetchMediaRaiInlineOverridesServer(),
+    fetchHomeGlobalInlineOverridesServer(),
   ]);
-  const initialOverrides = { ...seasonOverrides, ...mediaRaiOverrides };
+  const initialOverrides = { ...seasonOverrides, ...mediaRaiOverrides, ...homeGlobalOverrides };
 
   return (
     <html lang="es">

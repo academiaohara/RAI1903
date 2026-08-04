@@ -1,9 +1,5 @@
-import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { FanYouTubeVideo } from "@/types";
-
-/** Temporada ancla en Supabase para overrides globales de Media RAI (no dependen de la vista de temporada). */
-export const MEDIA_RAI_INLINE_SEASON_ID = DEFAULT_COMPETITION_SEASON_ID;
 
 /** Clave CMS global para vídeos de Media RAI (sin temporada). */
 export function mediaRaiVideosStorageKey(section: string): string {

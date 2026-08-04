@@ -122,7 +122,9 @@ export function InlineEditingProvider({
   children: React.ReactNode;
   initialOverrides?: InlineOverrides;
 }) {
-  const seasonId = useSeasonOptional()?.viewedSeasonId ?? DEFAULT_COMPETITION_SEASON_ID;
+  const seasonContext = useSeasonOptional();
+  const viewedSeasonId = seasonContext?.viewedSeasonId ?? DEFAULT_COMPETITION_SEASON_ID;
+  const activeSeasonId = seasonContext?.activeSeasonId ?? DEFAULT_COMPETITION_SEASON_ID;
   const configured = isSupabaseConfigured();
   const [ready, setReady] = useState(false);
   const [canEdit, setCanEdit] = useState(!configured);
@@ -147,7 +149,12 @@ export function InlineEditingProvider({
       if (!configured) return true;
 
       pendingValuesRef.current.delete(key);
-      const result = await upsertInlineOverride(key, value, userIdRef.current, resolveInlineOverrideSeasonId(key, seasonId));
+      const result = await upsertInlineOverride(
+        key,
+        value,
+        userIdRef.current,
+        resolveInlineOverrideSeasonId(key, viewedSeasonId, activeSeasonId),
+      );
       if (!result.ok) {
         setSyncError(result.error ?? "No se pudo guardar en Supabase");
         return false;
@@ -155,7 +162,7 @@ export function InlineEditingProvider({
       setSyncError(null);
       return true;
     },
-    [configured, seasonId],
+    [configured, viewedSeasonId, activeSeasonId],
   );
 
   const flushPendingSaves = useCallback(() => {
@@ -224,7 +231,7 @@ export function InlineEditingProvider({
 
     const bySeason = new Map<string, InlineOverrides>();
     for (const [key, value] of Object.entries(toUpload)) {
-      const targetSeasonId = resolveInlineOverrideSeasonId(key, seasonId);
+      const targetSeasonId = resolveInlineOverrideSeasonId(key, viewedSeasonId, activeSeasonId);
       const bucket = bySeason.get(targetSeasonId) ?? {};
       bucket[key] = value;
       bySeason.set(targetSeasonId, bucket);
@@ -242,7 +249,7 @@ export function InlineEditingProvider({
     } else {
       setSyncError(result.error ?? "No se pudo migrar cambios locales");
     }
-  }, [seasonId]);
+  }, [activeSeasonId, viewedSeasonId]);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -259,13 +266,13 @@ export function InlineEditingProvider({
       return;
     }
 
-    void Promise.all([fetchInlineOverrides(seasonId), fetchMediaRaiInlineOverrides(), fetchHomeGlobalInlineOverrides()]).then(
+    void Promise.all([fetchInlineOverrides(viewedSeasonId), fetchMediaRaiInlineOverrides(), fetchHomeGlobalInlineOverrides()]).then(
       ([seasonResult, mediaRaiResult, homeGlobalResult]) => {
         const legacy = readLegacyOverrides();
         setOverrides(
           mergeOverrideMaps(
             legacy,
-            seasonId === DEFAULT_COMPETITION_SEASON_ID ? initialOverrides : globalOverridesFromInitial(initialOverrides),
+            viewedSeasonId === activeSeasonId ? initialOverrides : globalOverridesFromInitial(initialOverrides),
             seasonResult.overrides,
             mediaRaiResult.overrides,
             homeGlobalResult.overrides,
@@ -278,7 +285,7 @@ export function InlineEditingProvider({
         setReady(true);
       },
     );
-  }, [configured, initialOverrides, seasonId]);
+  }, [activeSeasonId, configured, initialOverrides, viewedSeasonId]);
 
   useEffect(() => {
     if (!configured) return;
@@ -371,13 +378,13 @@ export function InlineEditingProvider({
       });
 
       if (configured) {
-        void deleteInlineOverride(key, resolveInlineOverrideSeasonId(key, seasonId)).then((result) => {
+        void deleteInlineOverride(key, resolveInlineOverrideSeasonId(key, viewedSeasonId, activeSeasonId)).then((result) => {
           if (!result.ok) setSyncError(result.error ?? "No se pudo borrar en Supabase");
           else setSyncError(null);
         });
       }
     },
-    [configured, seasonId],
+    [configured, viewedSeasonId, activeSeasonId],
   );
 
   const clearAll = useCallback(() => {
@@ -391,12 +398,12 @@ export function InlineEditingProvider({
     clearLegacyOverrides();
 
     if (configured) {
-      void clearInlineOverrides(seasonId).then((result) => {
+      void clearInlineOverrides(viewedSeasonId).then((result) => {
         if (!result.ok) setSyncError(result.error ?? "No se pudo limpiar Supabase");
         else setSyncError(null);
       });
     }
-  }, [configured, seasonId]);
+  }, [configured, viewedSeasonId]);
 
   const value = useMemo<InlineEditingContextValue>(
     () => ({
