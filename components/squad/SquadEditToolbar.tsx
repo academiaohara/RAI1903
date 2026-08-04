@@ -7,14 +7,19 @@ import { SQUAD_POSITIONS, SQUAD_POSITION_LABELS } from "@/types/squad";
 type SquadEditToolbarProps = {
   onAddPlayer: (position: SquadPosition) => void;
   busy?: boolean;
+  variant?: "default" | "femenino";
 };
 
-export function SquadEditToolbar({ onAddPlayer, busy = false }: SquadEditToolbarProps) {
+export function SquadEditToolbar({ onAddPlayer, busy = false, variant = "default" }: SquadEditToolbarProps) {
+  const isFemenino = variant === "femenino";
+
   return (
     <section className="rounded-2xl border border-dashed border-[#214C9B]/35 bg-blue-50/40 p-4">
       <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#214C9B]">Añadir jugador</p>
       <p className="mt-1 text-sm text-slate-600">
-        Edita nombre, dorsal y rol en cada ficha o fila. Lesionados y sancionados se gestionan en los bloques de bajas de arriba.
+        {isFemenino
+          ? "Edita dorsal, nombre, posición y estadísticas en la tabla. Lesionados y sancionados se gestionan en los bloques de bajas de arriba."
+          : "Edita nombre, dorsal y rol en cada ficha o fila. Lesionados y sancionados se gestionan en los bloques de bajas de arriba."}
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
         {SQUAD_POSITIONS.map((position) => (

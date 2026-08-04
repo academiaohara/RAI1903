@@ -137,7 +137,7 @@ export function SquadPage({ gender }: SquadPageProps) {
         />
       ) : null}
 
-      {editMode && <SquadEditToolbar onAddPlayer={(position) => void handleAddPlayer(position)} busy={addBusy} />}
+      {editMode && <SquadEditToolbar onAddPlayer={(position) => void handleAddPlayer(position)} busy={addBusy} variant={isFemenino ? "femenino" : "default"} />}
 
       <SquadAvailability
         injured={injured}
@@ -167,6 +167,7 @@ export function SquadPage({ gender }: SquadPageProps) {
               fanRatings={fanRatings}
               showEmptyPositions={editMode}
               editMode={editMode}
+              inlineStatsEdit={isFemenino}
               onQuickUpdate={editMode ? handleQuickUpdate : undefined}
             />
           ) : (
