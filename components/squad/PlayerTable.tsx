@@ -2,8 +2,9 @@
 
 import { useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
-import type { SquadPlayer } from "@/types/squad";
-import { SQUAD_POSITION_LABELS, SQUAD_POSITIONS } from "@/types/squad";
+import type { SquadPlayer, SquadPosition } from "@/types/squad";
+import { SQUAD_POSITION_LABELS, SQUAD_POSITIONS, SQUAD_ROLE_CODES } from "@/types/squad";
+import type { SquadRoleCode } from "@/types/squad";
 import {
   formatContractDate,
   formatPlayerAge,
@@ -24,9 +25,24 @@ type PlayerTableProps = {
   showFanRating?: boolean;
   showEmptyPositions?: boolean;
   editMode?: boolean;
+  /** Edición inline de posición y estadísticas (plantilla femenina). */
+  inlineStatsEdit?: boolean;
   fanRatings?: Record<string, PlayerRatingAverage>;
   onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
 };
+
+type SquadStatKey = "partidos" | "goles" | "asistencias" | "amarillas" | "rojas";
+
+const statInputClass =
+  "w-full min-w-[2.25rem] max-w-[3.5rem] rounded-md border border-[#214C9B]/25 bg-white px-1 py-0.5 text-center text-sm font-semibold text-slate-800 focus:border-[#214C9B] focus:outline-none focus:ring-1 focus:ring-[#214C9B]/30";
+
+const inlineFieldClass =
+  "min-w-0 rounded-md border border-[#214C9B]/25 bg-white px-1.5 py-0.5 text-xs font-semibold text-slate-800 focus:border-[#214C9B] focus:outline-none focus:ring-1 focus:ring-[#214C9B]/30";
+
+function parseStatValue(raw: string): number {
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
 
 const alignClass = {
   left: "text-left",
@@ -49,6 +65,7 @@ export function PlayerTable({
   showFanRating = false,
   showEmptyPositions = false,
   editMode = false,
+  inlineStatsEdit = false,
   fanRatings,
   onQuickUpdate,
 }: PlayerTableProps) {
@@ -75,6 +92,11 @@ export function PlayerTable({
 
   return (
     <div className="space-y-5 md:space-y-10">
+      {inlineStatsEdit && editMode ? (
+        <p className="text-sm text-slate-600">
+          <span className="text-[#981915]">Edita dorsal, nombre, posición y estadísticas directamente en la tabla.</span>
+        </p>
+      ) : null}
       <MobileDataToggle value={mobileDataView} onChange={setMobileDataView} />
       {SQUAD_POSITIONS.map((position, sectionIndex) => {
         const list = grouped[position];
@@ -120,6 +142,7 @@ export function PlayerTable({
                           showFanRating={showFanRating}
                           fanRating={fanRatings?.[player.id]}
                           editMode={editMode}
+                          inlineStatsEdit={inlineStatsEdit}
                           onQuickUpdate={onQuickUpdate}
                         />
                       ))
@@ -147,6 +170,7 @@ export function PlayerTable({
                       showFanRating={showFanRating}
                       fanRating={fanRatings?.[player.id]}
                       editMode={editMode}
+                      inlineStatsEdit={inlineStatsEdit}
                       onQuickUpdate={onQuickUpdate}
                     />
                   ))
@@ -173,6 +197,7 @@ function PlayerRow({
   showFanRating,
   fanRating,
   editMode,
+  inlineStatsEdit,
   onQuickUpdate,
 }: {
   player: SquadPlayer;
@@ -183,11 +208,129 @@ function PlayerRow({
   showFanRating: boolean;
   fanRating?: PlayerRatingAverage;
   editMode?: boolean;
+  inlineStatsEdit?: boolean;
   onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
 }) {
   const interactive = Boolean(onSelect);
-  const canQuickEdit = editMode && onQuickUpdate;
+  const canInlineEdit = inlineStatsEdit && editMode && onQuickUpdate;
+  const canQuickEdit = !inlineStatsEdit && editMode && onQuickUpdate;
   const columnCount = squadTableColumnCount(showAge, showMarketValue, showFanRating);
+  const update = (patch: Partial<SquadPlayer>) => onQuickUpdate?.(player.id, patch);
+  const stop = (event: React.SyntheticEvent) => event.stopPropagation();
+
+  if (canInlineEdit) {
+    return (
+      <motion.tr
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: index * 0.02 }}
+        className="border-b border-slate-50 bg-[#214C9B]/[0.03] text-sm last:border-0"
+        onClick={stop}
+        onKeyDown={stop}
+      >
+        <td className={`${cellPad} ${alignClass.center}`}>
+          <input
+            type="number"
+            min={0}
+            value={player.dorsal}
+            onChange={(event) => update({ dorsal: Number(event.target.value) || 0 })}
+            className={`${statInputClass} font-extrabold text-[#214C9B]`}
+            aria-label="Dorsal"
+          />
+        </td>
+        <td className={`max-w-[11.5rem] ${cellPad} ${alignClass.left}`}>
+          <div className="flex min-w-0 flex-col gap-1">
+            <div className="grid grid-cols-2 gap-1">
+              <input
+                value={player.nombre}
+                onChange={(event) => update({ nombre: event.target.value })}
+                placeholder="Nombre"
+                className={inlineFieldClass}
+                aria-label="Nombre"
+              />
+              <input
+                value={player.apellido}
+                onChange={(event) => update({ apellido: event.target.value })}
+                placeholder="Apellido"
+                className={inlineFieldClass}
+                aria-label="Apellido"
+              />
+            </div>
+            <select
+              value={player.posicion}
+              onChange={(event) => update({ posicion: event.target.value as SquadPosition })}
+              className={`${inlineFieldClass} text-[10px] font-bold uppercase`}
+              aria-label="Demarcación"
+            >
+              {SQUAD_POSITIONS.map((pos) => (
+                <option key={pos} value={pos}>{pos}</option>
+              ))}
+            </select>
+          </div>
+        </td>
+        <td className={`${cellPad} ${alignClass.center}`}>
+          <select
+            value={player.rol}
+            onChange={(event) => update({ rol: event.target.value as SquadRoleCode })}
+            className={`${inlineFieldClass} text-[10px] font-bold uppercase`}
+            aria-label="Posición"
+          >
+            {SQUAD_ROLE_CODES.map((rol) => (
+              <option key={rol} value={rol}>{rol}</option>
+            ))}
+          </select>
+        </td>
+        {showAge && (
+          <td className={`${cellPad} tabular-nums text-slate-700 ${alignClass.center}`}>
+            {formatPlayerAge(player.edad)}
+          </td>
+        )}
+        <EditableStatCell
+          value={player.partidos}
+          onChange={(value) => update({ partidos: value })}
+        />
+        <EditableStatCell
+          value={player.goles}
+          highlight={player.goles > 0}
+          onChange={(value) => update({ goles: value })}
+        />
+        <EditableStatCell
+          value={player.asistencias}
+          highlight={player.asistencias > 0}
+          onChange={(value) => update({ asistencias: value })}
+        />
+        <EditableStatCell
+          value={player.amarillas}
+          warn={player.amarillas > 0}
+          onChange={(value) => update({ amarillas: value })}
+        />
+        <EditableStatCell
+          value={player.rojas}
+          warn={player.rojas > 0}
+          onChange={(value) => update({ rojas: value })}
+        />
+        {showFanRating && (
+          <td className={`${cellPad} text-center text-xs font-extrabold tabular-nums text-[#214C9B] ${alignClass.center}`}>
+            {fanRating ? formatFanRating(fanRating.average) : "—"}
+          </td>
+        )}
+        {showMarketValue && (
+          <td className={`${cellPad} text-[10px] font-bold leading-tight tabular-nums text-slate-600 ${alignClass.center}`}>
+            {player.valorMercado ?? "—"}
+          </td>
+        )}
+        <td className={`${cellPad} ${alignClass.center}`}>
+          <input
+            type="date"
+            value={player.contratoHasta}
+            onChange={(event) => update({ contratoHasta: event.target.value })}
+            className={`${inlineFieldClass} max-w-[7.5rem] text-[10px]`}
+            aria-label="Contrato"
+          />
+        </td>
+      </motion.tr>
+    );
+  }
 
   if (canQuickEdit) {
     return (
@@ -273,6 +416,7 @@ function PlayerMobileRow({
   showFanRating,
   fanRating,
   editMode,
+  inlineStatsEdit,
   onQuickUpdate,
 }: {
   player: SquadPlayer;
@@ -282,9 +426,94 @@ function PlayerMobileRow({
   showFanRating: boolean;
   fanRating?: PlayerRatingAverage;
   editMode?: boolean;
+  inlineStatsEdit?: boolean;
   onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
 }) {
-  const canQuickEdit = editMode && onQuickUpdate;
+  const canInlineEdit = inlineStatsEdit && editMode && onQuickUpdate;
+  const canQuickEdit = !inlineStatsEdit && editMode && onQuickUpdate;
+  const update = (patch: Partial<SquadPlayer>) => onQuickUpdate?.(player.id, patch);
+
+  if (canInlineEdit) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.03 }}
+        className="space-y-2 border-b border-slate-100 bg-[#214C9B]/[0.03] p-4"
+      >
+        <div className="grid grid-cols-[2.5rem_1fr_1fr] gap-1.5">
+          <input
+            type="number"
+            min={0}
+            value={player.dorsal}
+            onChange={(event) => update({ dorsal: Number(event.target.value) || 0 })}
+            className={`${statInputClass} font-extrabold text-[#214C9B]`}
+            aria-label="Dorsal"
+          />
+          <input
+            value={player.nombre}
+            onChange={(event) => update({ nombre: event.target.value })}
+            placeholder="Nombre"
+            className={inlineFieldClass}
+            aria-label="Nombre"
+          />
+          <input
+            value={player.apellido}
+            onChange={(event) => update({ apellido: event.target.value })}
+            placeholder="Apellido"
+            className={inlineFieldClass}
+            aria-label="Apellido"
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-1.5">
+          <select
+            value={player.posicion}
+            onChange={(event) => update({ posicion: event.target.value as SquadPosition })}
+            className={`${inlineFieldClass} text-[10px] font-bold uppercase`}
+            aria-label="Demarcación"
+          >
+            {SQUAD_POSITIONS.map((pos) => (
+              <option key={pos} value={pos}>{pos}</option>
+            ))}
+          </select>
+          <select
+            value={player.rol}
+            onChange={(event) => update({ rol: event.target.value as SquadRoleCode })}
+            className={`${inlineFieldClass} text-[10px] font-bold uppercase`}
+            aria-label="Posición"
+          >
+            {SQUAD_ROLE_CODES.map((rol) => (
+              <option key={rol} value={rol}>{rol}</option>
+            ))}
+          </select>
+        </div>
+        <div className="grid grid-cols-5 gap-1.5">
+          {(["partidos", "goles", "asistencias", "amarillas", "rojas"] as SquadStatKey[]).map((key) => (
+            <label key={key} className="text-center">
+              <span className="text-[9px] font-bold uppercase text-slate-400">
+                {key === "partidos" ? "PJ" : key === "goles" ? "G" : key === "asistencias" ? "A" : key === "amarillas" ? "TA" : "TR"}
+              </span>
+              <input
+                type="number"
+                min={0}
+                value={player[key]}
+                onChange={(event) => update({ [key]: parseStatValue(event.target.value) })}
+                className={`${statInputClass} mt-0.5`}
+                aria-label={key}
+              />
+            </label>
+          ))}
+        </div>
+        <input
+          type="date"
+          value={player.contratoHasta}
+          onChange={(event) => update({ contratoHasta: event.target.value })}
+          className={`${inlineFieldClass} w-full text-[10px]`}
+          aria-label="Contrato"
+        />
+      </motion.div>
+    );
+  }
 
   if (canQuickEdit) {
     return (
@@ -379,6 +608,33 @@ function StatCell({ value, highlight = false, warn = false }: { value: number; h
       }`}
     >
       {value}
+    </td>
+  );
+}
+
+function EditableStatCell({
+  value,
+  highlight = false,
+  warn = false,
+  onChange,
+}: {
+  value: number;
+  highlight?: boolean;
+  warn?: boolean;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <td className={`${cellPad} ${alignClass.center}`}>
+      <input
+        type="number"
+        min={0}
+        value={value}
+        onChange={(event) => onChange(parseStatValue(event.target.value))}
+        className={`${statInputClass} font-extrabold ${
+          warn && value > 0 ? "text-red-600" : highlight ? "text-[#214C9B]" : "text-slate-700"
+        }`}
+        aria-label="Estadística"
+      />
     </td>
   );
 }
