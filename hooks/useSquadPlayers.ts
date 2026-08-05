@@ -8,6 +8,11 @@ import {
   aggregateAvilesStatsFromChronicles,
   buildChronicleAggregationMatches,
 } from "@/lib/aviles-chronicle-stats";
+import { applyCompetitionFilterToSquadPlayers } from "@/lib/competition/squad-player-stats-filter";
+import {
+  DEFAULT_STATS_COMPETITION_FILTER,
+  type StatsCompetitionFilter,
+} from "@/lib/competition/stats-filters";
 import { getAvilesMatchesFromSource } from "@/lib/season/aviles-matches";
 import { deleteSquadPlayer, upsertSquadPlayer, upsertSquadPlayersBatch } from "@/lib/cms/players";
 import { getSquadBundle, upsertSeasonBundle } from "@/lib/cms/season-bundles";
@@ -23,7 +28,10 @@ import type { CanteraSquadImport } from "@/types/cantera-squad-import";
 import type { SquadClubInfo, SquadPlayer, SquadPosition } from "@/types/squad";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
-export function useSquadPlayers(gender: PrimerEquipoGender) {
+export function useSquadPlayers(
+  gender: PrimerEquipoGender,
+  statsFilter: StatsCompetitionFilter = DEFAULT_STATS_COMPETITION_FILTER,
+) {
   const { getOverride, saveValue, clearValue, overrides } = useInlineEditing();
   const { viewedSeasonId, bundles, bundlesLoading, refreshBundles, getFixtureSource } = useSeason();
   const [baseSquad, setBaseSquad] = useState<SquadPlayer[]>([]);
@@ -68,8 +76,10 @@ export function useSquadPlayers(gender: PrimerEquipoGender) {
       getOverride,
       aggregationMatches,
     );
-    return applyChronicleStatsToSquad(withAge, chronicleStats);
-  }, [baseSquad, bundles, bundlesLoading, gender, getFixtureSource, getOverride, overrides]);
+    const withChronicleStats = applyChronicleStatsToSquad(withAge, chronicleStats);
+    if (statsFilter === "todos") return withChronicleStats;
+    return applyCompetitionFilterToSquadPlayers(withChronicleStats, statsFilter);
+  }, [baseSquad, bundles, bundlesLoading, gender, getFixtureSource, getOverride, overrides, statsFilter]);
 
   const persistSquadToCms = useCallback(
     async (players: SquadPlayer[], clubInfoPatch?: Partial<SquadClubInfo>) => {

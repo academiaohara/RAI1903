@@ -1,7 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
 import { bebasNeue } from "@/lib/fonts";
+import {
+  statsCompetitionFilterHeading,
+  type StatsCompetitionFilter,
+} from "@/lib/competition/stats-filters";
 import type { SquadClubStats } from "@/types/squad";
 
 const seasonStatItems = [
@@ -16,23 +21,50 @@ const seasonStatItems = [
 
 type SquadStatsBarProps = {
   stats: SquadClubStats;
+  competitionFilter?: StatsCompetitionFilter;
+  competitionFilterOptions?: Array<{ id: StatsCompetitionFilter; label: string }>;
+  onCompetitionFilterChange?: (filter: StatsCompetitionFilter) => void;
   className?: string;
 };
 
-export function SquadStatsBar({ stats, className = "" }: SquadStatsBarProps) {
+export function SquadStatsBar({
+  stats,
+  competitionFilter,
+  competitionFilterOptions = [],
+  onCompetitionFilterChange,
+  className = "",
+}: SquadStatsBarProps) {
+  const heading = statsCompetitionFilterHeading(competitionFilter ?? "liga");
+  const showFilter =
+    competitionFilter !== undefined &&
+    onCompetitionFilterChange !== undefined &&
+    competitionFilterOptions.length > 1;
+
   return (
     <motion.aside
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.06, duration: 0.35 }}
-      aria-label="Estadisticas en la temporada actual"
+      aria-label={heading}
       className={`w-full rounded-3xl border border-slate-200/90 bg-white px-2 py-3 shadow-[0_1px_3px_rgba(15,23,42,0.06)] sm:px-8 sm:py-7 ${className}`}
     >
-      <h2 className="text-[8px] font-extrabold uppercase tracking-[0.08em] text-[#981915] sm:text-xs sm:tracking-[0.14em]">
-        Estadisticas en la temporada actual
-      </h2>
+      <div className="flex flex-col gap-3 sm:gap-4">
+        <h2 className="text-[8px] font-extrabold uppercase tracking-[0.08em] text-[#981915] sm:text-xs sm:tracking-[0.14em]">
+          {heading}
+        </h2>
 
-      <div className="mt-2 grid grid-cols-7 gap-0.5 sm:mt-7 sm:flex sm:flex-wrap sm:items-end sm:justify-between sm:gap-x-4 sm:gap-y-8 lg:mt-8 lg:flex-nowrap lg:gap-x-2">
+        {showFilter ? (
+          <QuinielaViewToggle
+            value={competitionFilter}
+            onChange={onCompetitionFilterChange}
+            options={competitionFilterOptions}
+            layoutId="squad-stats-competition-filter"
+            className="max-w-full sm:max-w-xl"
+          />
+        ) : null}
+      </div>
+
+      <div className="mt-2 grid grid-cols-7 gap-0.5 sm:mt-5 sm:flex sm:flex-wrap sm:items-end sm:justify-between sm:gap-x-4 sm:gap-y-8 lg:mt-6 lg:flex-nowrap lg:gap-x-2">
         {seasonStatItems.map((item, index) => (
           <motion.div
             key={item.key}
