@@ -6,6 +6,10 @@ import { EditableText } from "@/components/inline-editing/EditableText";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { SquadStatsBar } from "@/components/squad/SquadStatsBar";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import {
+  statsCompetitionFilterOptions,
+  type StatsCompetitionFilter,
+} from "@/lib/competition/stats-filters";
 import type { SquadClubInfo, SquadClubStats } from "@/types/squad";
 
 type SquadHeaderProps = {
@@ -13,6 +17,9 @@ type SquadHeaderProps = {
   stats: SquadClubStats;
   gender: PrimerEquipoGender;
   onStadiumClick: () => void;
+  /** Solo primer equipo: filtro por competición en estadísticas. */
+  competitionFilter?: StatsCompetitionFilter;
+  onCompetitionFilterChange?: (filter: StatsCompetitionFilter) => void;
   /** Rivales: cada club tiene su entrenador (no la clave inline del Real Avilés). */
   perTeamEntrenador?: boolean;
   onEntrenadorChange?: (value: string) => void;
@@ -23,12 +30,15 @@ export function SquadHeader({
   stats,
   gender,
   onStadiumClick,
+  competitionFilter,
+  onCompetitionFilterChange,
   perTeamEntrenador = false,
   onEntrenadorChange,
 }: SquadHeaderProps) {
   const { editMode } = useInlineEditing();
   const ownClubEntrenadorKey = `squad-club:${gender}:entrenador`;
   const useOwnClubEntrenadorKey = !perTeamEntrenador;
+  const showCompetitionFilter = competitionFilter !== undefined && onCompetitionFilterChange !== undefined;
 
   return (
     <div className="flex w-full flex-col items-start gap-4 sm:gap-5">
@@ -106,7 +116,12 @@ export function SquadHeader({
         </button>
       </div>
 
-      <SquadStatsBar stats={stats} />
+      <SquadStatsBar
+        stats={stats}
+        competitionFilter={competitionFilter}
+        competitionFilterOptions={showCompetitionFilter ? statsCompetitionFilterOptions(gender) : []}
+        onCompetitionFilterChange={onCompetitionFilterChange}
+      />
     </div>
   );
 }

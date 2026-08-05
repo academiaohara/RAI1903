@@ -86,6 +86,7 @@ function registerAppearance(
     fecha: toDateKey(match.date),
     rival: rivalFromMatch(match, raiTeamId),
     competicion: matchCompetitionShortLabel(match),
+    competitionId: match.competition,
     minutos: minutes,
     goles: 0,
     asistencias: 0,

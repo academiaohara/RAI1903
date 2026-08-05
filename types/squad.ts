@@ -1,4 +1,4 @@
-import type { PlayerRoleCode, PlayerStatus } from "@/types";
+import type { CompetitionId, PlayerRoleCode, PlayerStatus } from "@/types";
 
 export type SquadPosition = "Portero" | "Defensa" | "Centrocampista" | "Delantero";
 
@@ -10,6 +10,7 @@ export type PlayerMatchRecord = {
   fecha: string;
   rival: string;
   competicion: string;
+  competitionId?: CompetitionId;
   minutos: number;
   goles: number;
   asistencias: number;

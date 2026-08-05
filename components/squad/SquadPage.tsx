@@ -5,9 +5,12 @@ import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvi
 import { AnimatePresence, motion } from "framer-motion";
 import type { SquadPlayer, SquadViewMode } from "@/types/squad";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
+import { useStatsCompetitionFilter } from "@/hooks/useStatsCompetitionFilter";
 import { useSeasonPlayerRatings } from "@/hooks/useSeasonPlayerRatings";
 import { useSeason } from "@/components/season/SeasonProvider";
-import { getLeagueMatchdaysForGender } from "@/lib/season/aviles-matches";
+import { getAvilesMatchesFromSource } from "@/lib/season/aviles-matches";
+import { filterMatchesForStatsCompetition } from "@/lib/competition/stats-filters";
+import { computeClubStatsForGenderFromMatches } from "@/lib/season/club-league-stats";
 import { resolveSquadClubInfo } from "@/lib/season/squad-source";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { defaultRosterEstado, splitSquadByAvailability } from "@/lib/squad-utils";
@@ -31,15 +34,27 @@ type SquadPageProps = {
 };
 
 export function SquadPage({ gender }: SquadPageProps) {
-  const { squad, updatePlayer, addPlayer, removePlayer, importSquad } = useSquadPlayers(gender);
+  const { viewedSeasonId, bundles, viewedSeason, getFixtureSource } = useSeason();
+  const { filter: statsCompetitionFilter, setFilter: setStatsCompetitionFilter } = useStatsCompetitionFilter(
+    gender,
+    viewedSeasonId,
+  );
+  const { squad, updatePlayer, addPlayer, removePlayer, importSquad } = useSquadPlayers(gender, statsCompetitionFilter);
   const { averages: fanRatings } = useSeasonPlayerRatings();
-  const { bundles, viewedSeason, getFixtureSource } = useSeason();
   const { editMode, getValue } = useInlineEditing();
   const [addBusy, setAddBusy] = useState(false);
   const [stadiumOverride, setStadiumOverride] = useState<StadiumInfo | null>(null);
-  const leagueMatchdays = useMemo(
-    () => getLeagueMatchdaysForGender(getFixtureSource(gender), gender),
+  const avilesMatches = useMemo(
+    () => getAvilesMatchesFromSource(getFixtureSource(gender), gender),
     [gender, getFixtureSource],
+  );
+  const filteredClubMatches = useMemo(
+    () => filterMatchesForStatsCompetition(avilesMatches, statsCompetitionFilter),
+    [avilesMatches, statsCompetitionFilter],
+  );
+  const clubStats = useMemo(
+    () => computeClubStatsForGenderFromMatches(gender, filteredClubMatches),
+    [filteredClubMatches, gender],
   );
   const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
 
@@ -60,17 +75,18 @@ export function SquadPage({ gender }: SquadPageProps) {
   );
 
   const club = useMemo(() => {
-    const base = resolveSquadClubInfo(gender, viewedSeason.label, bundles, squad.length, leagueMatchdays);
+    const base = resolveSquadClubInfo(gender, viewedSeason.label, bundles, squad.length, []);
     const merged = {
       ...base,
       entrenador: getValue(`squad-club:${gender}:entrenador`, base.entrenador),
+      stats: clubStats,
     };
     if (stadiumOverride) {
       merged.estadio = stadiumOverride.nombre;
       merged.estadioInfo = stadiumOverride;
     }
     return merged;
-  }, [bundles, gender, getValue, leagueMatchdays, squad.length, stadiumOverride, viewedSeason.label]);
+  }, [bundles, clubStats, gender, getValue, squad.length, stadiumOverride, viewedSeason.label]);
   const isFemenino = gender === "femenino";
   const showPlayerProfile = !isFemenino;
 
@@ -122,6 +138,8 @@ export function SquadPage({ gender }: SquadPageProps) {
         stats={club.stats}
         gender={gender}
         onStadiumClick={handleStadiumClick}
+        competitionFilter={statsCompetitionFilter}
+        onCompetitionFilterChange={setStatsCompetitionFilter}
       />
       <SquadToolbar viewMode={viewMode} onViewModeChange={setViewMode} showViewToggle={!isFemenino} />
 

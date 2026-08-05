@@ -98,11 +98,12 @@ export function buildPlayerMatchHistory(
   const records = fixtures.map((match, index) => {
     const played = playedIndices.has(index);
     if (!played) {
-      return {
-        fecha: toDateKey(match.date),
-        rival: rivalFromMatch(match, raiTeamId),
-        competicion: matchCompetitionShortLabel(match),
-        minutos: 0,
+    return {
+      fecha: toDateKey(match.date),
+      rival: rivalFromMatch(match, raiTeamId),
+      competicion: matchCompetitionShortLabel(match),
+      competitionId: match.competition,
+      minutos: 0,
         goles: 0,
         asistencias: 0,
         amarillas: 0,
@@ -117,6 +118,7 @@ export function buildPlayerMatchHistory(
       fecha: toDateKey(match.date),
       rival: rivalFromMatch(match, raiTeamId),
       competicion: matchCompetitionShortLabel(match),
+      competitionId: match.competition,
       minutos: minutes,
       goles: goalsByIndex.get(index) ?? 0,
       asistencias: assistsByIndex.get(index) ?? 0,
