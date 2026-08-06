@@ -93,43 +93,45 @@ function PlayerModalContent({
       exit={{ opacity: 0, y: 24, scale: 0.98 }}
       transition={{ type: "spring", stiffness: 320, damping: 30 }}
       onClick={(event) => event.stopPropagation()}
-      className="flex h-[100dvh] w-full max-w-5xl flex-col overflow-hidden rounded-none border-0 border-[#214C9B]/20 bg-white shadow-2xl sm:h-auto sm:max-h-[94vh] sm:rounded-[2rem] sm:border"
+      className="flex h-[100dvh] w-full max-w-4xl flex-col overflow-hidden rounded-none border-0 border-[#214C9B]/20 bg-white shadow-2xl sm:h-auto sm:max-h-[92vh] sm:rounded-[1.75rem] sm:border"
     >
-      <div className="relative z-20 shrink-0 overflow-hidden bg-gradient-to-br from-[#0f2347] via-[#173a78] to-[#214C9B] px-4 pb-4 pt-[max(1rem,env(safe-area-inset-top))] text-white sm:px-8 sm:pb-8 sm:pt-6">
+      <div className="relative z-20 shrink-0 overflow-hidden bg-gradient-to-br from-[#0f2347] via-[#173a78] to-[#214C9B] px-4 pb-4 pt-[max(1rem,env(safe-area-inset-top))] text-white sm:px-6 sm:pb-5 sm:pt-5">
+        <div className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full border border-white/10 bg-white/[0.04]" />
+        <div className="pointer-events-none absolute -bottom-24 left-1/3 h-40 w-40 rounded-full bg-blue-300/10 blur-2xl" />
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-10 rounded-full border border-white/25 bg-white/10 p-2 text-white transition hover:bg-white/20 sm:right-4 sm:top-4"
+          className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-10 rounded-full border border-white/20 bg-slate-950/15 p-2 text-white transition hover:border-white/35 hover:bg-white/15 sm:right-4 sm:top-4"
           aria-label="Cerrar"
         >
           <X size={18} />
         </button>
 
-        <div className="flex items-start gap-4 pr-10 sm:gap-6 sm:pr-0">
-          <div className="relative w-[6.75rem] shrink-0 sm:w-[160px]">
+        <div className="relative flex items-start gap-3 pr-9 sm:gap-5 sm:pr-10">
+          <div className="relative w-24 shrink-0 sm:w-[7.5rem]">
             <PlayerAvatar
               player={player}
               size="xl"
               priority
-              className="aspect-[4/5] w-full rounded-xl shadow-2xl sm:rounded-[1.5rem]"
+              className="aspect-[4/5] w-full rounded-xl border border-white/15 shadow-2xl sm:rounded-2xl"
             />
-            <div className="absolute -bottom-2 -right-1 rounded-xl bg-white px-2.5 py-1 text-2xl font-extrabold text-[#214C9B] shadow-xl sm:-bottom-3 sm:-right-2 sm:rounded-2xl sm:px-4 sm:py-2 sm:text-4xl">
+            <div className="absolute -bottom-2 -right-1 rounded-lg bg-white px-2.5 py-1 text-xl font-extrabold leading-none text-[#214C9B] shadow-xl sm:-bottom-2 sm:-right-2 sm:rounded-xl sm:px-3 sm:py-1.5 sm:text-2xl">
               {player.dorsal}
             </div>
           </div>
 
           <div className="min-w-0 flex-1">
             <div className="text-left">
-              <span className="inline-flex rounded-full border border-white/25 bg-white/10 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] sm:px-3 sm:py-1 sm:text-[10px] sm:tracking-[0.16em]">
+              <span className="inline-flex rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] sm:text-[10px] sm:tracking-[0.16em]">
                 {player.rol}
               </span>
-              <h2 className="mt-2 text-xl font-extrabold uppercase leading-tight tracking-tight sm:mt-3 sm:text-3xl">{playerName}</h2>
-              <p className="mt-1 text-xs font-semibold text-white/80 sm:mt-2 sm:text-sm">
+              <h2 className="mt-1.5 text-xl font-extrabold uppercase leading-tight tracking-tight sm:mt-2 sm:text-2xl">{playerName}</h2>
+              <p className="mt-1 text-xs font-semibold text-white/75">
                 {player.nacionalidad} · {formatPlayerAgeWithUnit(player.edad)}
               </p>
             </div>
 
-            <div className="mt-3 grid grid-cols-2 gap-1.5 sm:grid-cols-3 sm:gap-2">
+            <div className="mt-3 grid grid-cols-2 gap-1.5 md:grid-cols-4">
               {player.valorMercado && (
                 <InfoChip label="Valor mercado" value={player.valorMercado} />
               )}
@@ -450,12 +452,12 @@ function InfoChip({
   className?: string;
 }) {
   return (
-    <div className={`rounded-xl border border-white/15 bg-white/10 px-2.5 py-1.5 sm:px-3 sm:py-2 ${className ?? ""}`}>
-      <p className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide text-white/60 sm:text-[10px]">
+    <div className={`min-w-0 rounded-lg border border-white/10 bg-white/[0.08] px-2.5 py-1.5 backdrop-blur-sm ${className ?? ""}`}>
+      <p className="flex items-center gap-1 text-[8px] font-bold uppercase tracking-wide text-white/55 sm:text-[9px]">
         {Icon && <Icon size={11} className="shrink-0 sm:h-3 sm:w-3" />}
         <span className="truncate">{label}</span>
       </p>
-      <p className="mt-0.5 truncate text-[11px] font-semibold text-white sm:mt-1 sm:text-xs">{value}</p>
+      <p className="mt-0.5 truncate text-[11px] font-semibold leading-tight text-white sm:text-xs">{value}</p>
     </div>
   );
 }
