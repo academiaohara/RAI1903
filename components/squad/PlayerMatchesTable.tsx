@@ -2,9 +2,26 @@
 
 import { useMemo } from "react";
 import { motion } from "framer-motion";
+import { Armchair } from "lucide-react";
 import type { SquadPlayer } from "@/types/squad";
 
 const STAT_COLUMNS = ["Min", "G", "A", "TA", "TR"] as const;
+
+function formatMatchMinutes(match: { minutos: number; onBench?: boolean }): string {
+  if (match.onBench && match.minutos === 0) return "—";
+  return String(match.minutos);
+}
+
+function MatchMinutesCell({ minutos, onBench }: { minutos: number; onBench?: boolean }) {
+  if (onBench && minutos === 0) {
+    return (
+      <span className="inline-flex items-center justify-center gap-0.5 text-slate-400" title="En banquillo, sin jugar">
+        <Armchair size={14} aria-hidden />
+      </span>
+    );
+  }
+  return <>{minutos}</>;
+}
 
 export function PlayerMatchesTable({ player }: { player: SquadPlayer }) {
   const matches = player.historialPartidos;
@@ -41,7 +58,9 @@ export function PlayerMatchesTable({ player }: { player: SquadPlayer }) {
                 </p>
               </div>
               <div className="mt-3 grid grid-cols-5 gap-1 text-center text-[10px] font-bold text-slate-600 sm:mt-3 sm:gap-2 sm:text-xs">
-                <span className="rounded-lg bg-slate-100 px-1.5 py-1 tabular-nums sm:rounded-xl sm:px-2">Min {match.minutos}</span>
+                <span className="rounded-lg bg-slate-100 px-1.5 py-1 tabular-nums sm:rounded-xl sm:px-2">
+                  Min {formatMatchMinutes(match)}
+                </span>
                 <span className="rounded-lg bg-blue-50 px-1.5 py-1 tabular-nums text-[#214C9B] sm:rounded-xl sm:px-2">G {match.goles}</span>
                 <span className="rounded-lg bg-slate-100 px-1.5 py-1 tabular-nums sm:rounded-xl sm:px-2">A {match.asistencias}</span>
                 <span className="rounded-lg bg-amber-50 px-1.5 py-1 tabular-nums text-amber-700 sm:rounded-xl sm:px-2">TA {match.amarillas}</span>
@@ -87,7 +106,9 @@ export function PlayerMatchesTable({ player }: { player: SquadPlayer }) {
                   </td>
                   <td className="truncate px-3 py-3 font-bold text-slate-900">{match.rival}</td>
                   <td className="truncate px-3 py-3 text-slate-600">{match.competicion}</td>
-                  <td className="px-2 py-3 text-center font-bold tabular-nums text-slate-700">{match.minutos}</td>
+                  <td className="px-2 py-3 text-center font-bold tabular-nums text-slate-700">
+                    <MatchMinutesCell minutos={match.minutos} onBench={match.onBench} />
+                  </td>
                   <td className="px-2 py-3 text-center font-extrabold tabular-nums text-[#214C9B]">{match.goles}</td>
                   <td className="px-2 py-3 text-center font-extrabold tabular-nums">{match.asistencias}</td>
                   <td className="px-2 py-3 text-center font-extrabold tabular-nums text-amber-600">{match.amarillas}</td>

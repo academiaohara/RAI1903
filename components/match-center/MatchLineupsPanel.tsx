@@ -6,7 +6,7 @@ import { MatchSquadPlayerSelect } from "@/components/match-center/MatchSquadPlay
 import { useMatchTeamSquadOptions } from "@/hooks/useMatchTeamSquadOptions";
 import { MatchJsonPasteSection } from "@/components/match-center/MatchJsonPasteSection";
 import { useMatchDetailStorageKeys } from "@/components/match-center/useMatchDetailOverrides";
-import { parseMatchLineupsJson } from "@/lib/match-center/parse-match-json";
+import { parseMatchLineupsJson, serializeMatchLineups } from "@/lib/match-center/parse-match-json";
 import type { LineupPlayer, MatchLineup, PrimerEquipoGender } from "@/types";
 import type { MatchSquadOption } from "@/lib/match-availability-squad";
 import type { SquadPlayer } from "@/types/squad";
@@ -258,6 +258,9 @@ export function MatchLineupsPanel({
   const homeSquadOptions = isOwnClub(homeTeamId) ? getOptions(homeTeamId) : null;
   const awaySquadOptions = isOwnClub(awayTeamId) ? getOptions(awayTeamId) : null;
 
+  const parseLineupsJson = (input: string) => parseMatchLineupsJson(input, ownSquad);
+  const lineupsCurrentData = { home: currentHome, away: currentAway };
+
   const updateHome = (lineup: MatchLineup) => saveValue(keys.homeLineup, lineup);
   const updateAway = (lineup: MatchLineup) => saveValue(keys.awayLineup, lineup);
 
@@ -317,21 +320,19 @@ export function MatchLineupsPanel({
       {editMode && (
         <div className="mt-4">
           <MatchJsonPasteSection
-            title="Importar alineaciones JSON"
-            hint='Un equipo: { "formation", "starters", "bench" }. Ambos: { "home"/"local": { … }, "away"/"visitante": { … } }. Jugador: number/dorsal, name/nombre.'
+            title="Alineaciones JSON"
+            hint='Un equipo: { "formation", "starters", "bench" }. Ambos: { "home": { … }, "away": { … } }. Jugador: number/dorsal + name/nombre. El dorsal vincula con la plantilla del Avilés.'
             applyLabel="Aplicar alineaciones"
             placeholder={`{
   "home": {
     "formation": "4-4-2",
     "starters": [{ "number": 1, "name": "Portero" }],
-    "bench": [{ "number": 13, "name": "Suplente" }]
-  },
-  "away": {
-    "formation": "4-3-3",
-    "starters": [{ "number": 9, "name": "Delantero" }]
+    "bench": [{ "dorsal": 14, "name": "Cayarga" }]
   }
 }`}
-            parse={parseMatchLineupsJson}
+            parse={parseLineupsJson}
+            serialize={(data) => serializeMatchLineups(data.home, data.away)}
+            currentData={lineupsCurrentData}
             onImport={(data) => {
               if (data.home) updateHome(data.home);
               if (data.away) updateAway(data.away);

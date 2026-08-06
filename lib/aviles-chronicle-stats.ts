@@ -6,6 +6,7 @@ import { isMatchPlayed } from "@/lib/match-result";
 import { findMatchInBundles } from "@/lib/season/find-match-in-bundles";
 import { findSquadPlayerByDorsal, findSquadPlayerByName } from "@/lib/squad-lineup";
 import { resolveSquadPlayerByName } from "@/lib/squad-player-resolve";
+import { getPlayerDisplayName } from "@/lib/squad-utils";
 import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { LineupPlayer, Match, MatchEvent, MatchLineup } from "@/types";
@@ -21,7 +22,10 @@ export type ChronicleAggregatedStats = {
   historialPartidos: PlayerMatchRecord[];
 };
 
-type MutableStats = ChronicleAggregatedStats & { playedMatchIds: Set<string> };
+type MutableStats = ChronicleAggregatedStats & {
+  playedMatchIds: Set<string>;
+  matchRows: Map<string, PlayerMatchRecord>;
+};
 
 function matchEventsKey(matchId: string) {
   return `match:${matchId}:events`;
@@ -49,6 +53,7 @@ function emptyMutable(): MutableStats {
     rojas: 0,
     historialPartidos: [],
     playedMatchIds: new Set(),
+    matchRows: new Map(),
   };
 }
 
@@ -72,27 +77,49 @@ function ensurePlayerStats(
   return created;
 }
 
-function registerAppearance(
+function ensureMatchRow(
   stats: MutableStats,
   match: Match,
   raiTeamId: string,
-  minutes: number,
-): void {
-  if (stats.playedMatchIds.has(match.id)) return;
-  stats.playedMatchIds.add(match.id);
-  stats.partidos += 1;
-  stats.minutos += minutes;
-  stats.historialPartidos.push({
+): PlayerMatchRecord {
+  const existing = stats.matchRows.get(match.id);
+  if (existing) return existing;
+
+  const row: PlayerMatchRecord = {
     fecha: toDateKey(match.date),
     rival: rivalFromMatch(match, raiTeamId),
     competicion: matchCompetitionShortLabel(match),
     competitionId: match.competition,
-    minutos: minutes,
+    minutos: 0,
     goles: 0,
     asistencias: 0,
     amarillas: 0,
     rojas: 0,
-  });
+  };
+
+  stats.matchRows.set(match.id, row);
+  stats.historialPartidos.push(row);
+
+  if (!stats.playedMatchIds.has(match.id)) {
+    stats.playedMatchIds.add(match.id);
+    stats.partidos += 1;
+  }
+
+  return row;
+}
+
+function setMatchMinutes(
+  stats: MutableStats,
+  match: Match,
+  raiTeamId: string,
+  minutes: number,
+  onBench = false,
+): void {
+  const row = ensureMatchRow(stats, match, raiTeamId);
+  const delta = minutes - row.minutos;
+  row.minutos = minutes;
+  row.onBench = onBench && minutes === 0;
+  stats.minutos += delta;
 }
 
 function lastHistorialRow(stats: MutableStats): PlayerMatchRecord | undefined {
@@ -197,8 +224,8 @@ export function aggregateAvilesStatsFromChronicles(
         const playerId = resolveLineupPlayerId(squad, entry);
         if (!playerId) continue;
         const stats = ensurePlayerStats(map, squad, playerId);
-        const minutes = isLineupStarter(avilesLineup, entry) ? 90 : 0;
-        registerAppearance(stats, match, raiTeamId, minutes > 0 ? minutes : 1);
+        const isStarter = isLineupStarter(avilesLineup, entry);
+        setMatchMinutes(stats, match, raiTeamId, isStarter ? 90 : 0, !isStarter);
       }
     }
 
@@ -209,18 +236,18 @@ export function aggregateAvilesStatsFromChronicles(
         const scorerId = resolvePlayerId(squad, event.player);
         if (scorerId) {
           const stats = ensurePlayerStats(map, squad, scorerId);
-          if (!stats.playedMatchIds.has(match.id)) registerAppearance(stats, match, raiTeamId, 90);
+          if (!stats.playedMatchIds.has(match.id)) setMatchMinutes(stats, match, raiTeamId, 90);
           stats.goles += 1;
-          const row = lastHistorialRow(stats);
+          const row = stats.matchRows.get(match.id) ?? lastHistorialRow(stats);
           if (row) row.goles += 1;
 
           if (event.detail) {
             const assistId = resolvePlayerId(squad, event.detail);
             if (assistId) {
               const assistStats = ensurePlayerStats(map, squad, assistId);
-              if (!assistStats.playedMatchIds.has(match.id)) registerAppearance(assistStats, match, raiTeamId, 90);
+              if (!assistStats.playedMatchIds.has(match.id)) setMatchMinutes(assistStats, match, raiTeamId, 90);
               assistStats.asistencias += 1;
-              const assistRow = lastHistorialRow(assistStats);
+              const assistRow = assistStats.matchRows.get(match.id) ?? lastHistorialRow(assistStats);
               if (assistRow) assistRow.asistencias += 1;
             }
           }
@@ -232,15 +259,14 @@ export function aggregateAvilesStatsFromChronicles(
         const playerId = resolvePlayerId(squad, event.player);
         if (!playerId) continue;
         const stats = ensurePlayerStats(map, squad, playerId);
-        if (!stats.playedMatchIds.has(match.id)) registerAppearance(stats, match, raiTeamId, 90);
+        if (!stats.playedMatchIds.has(match.id)) setMatchMinutes(stats, match, raiTeamId, 90);
+        const row = stats.matchRows.get(match.id) ?? ensureMatchRow(stats, match, raiTeamId);
         if (event.type === "yellow") {
           stats.amarillas += 1;
-          const row = lastHistorialRow(stats);
-          if (row) row.amarillas += 1;
+          row.amarillas += 1;
         } else {
           stats.rojas += 1;
-          const row = lastHistorialRow(stats);
-          if (row) row.rojas += 1;
+          row.rojas += 1;
         }
         continue;
       }
@@ -249,13 +275,13 @@ export function aggregateAvilesStatsFromChronicles(
         const inId = resolvePlayerId(squad, event.player);
         if (inId) {
           const stats = ensurePlayerStats(map, squad, inId);
-          registerAppearance(stats, match, raiTeamId, Math.max(1, 90 - event.minute));
+          setMatchMinutes(stats, match, raiTeamId, Math.max(0, 90 - event.minute), false);
         }
         if (event.detail) {
           const outId = resolvePlayerId(squad, event.detail);
           if (outId) {
             const stats = ensurePlayerStats(map, squad, outId);
-            registerAppearance(stats, match, raiTeamId, Math.min(90, event.minute));
+            setMatchMinutes(stats, match, raiTeamId, Math.min(90, event.minute), false);
           }
         }
       }
@@ -301,4 +327,35 @@ export function applyChronicleStatsToSquad(
       historialPartidos: stats.historialPartidos,
     };
   });
+}
+
+/** Resuelve nombres de eventos JSON al nombre de plantilla usando dorsal o nombre. */
+export function resolveEventPlayersWithSquad(
+  events: MatchEvent[],
+  squad: SquadPlayer[],
+): MatchEvent[] {
+  const resolveName = (name: string, dorsal?: number): string => {
+    if (dorsal && dorsal > 0) {
+      const byDorsal = findSquadPlayerByDorsal(squad, dorsal);
+      if (byDorsal) return getPlayerDisplayName(byDorsal);
+    }
+    const resolved = resolveSquadPlayerByName(squad, name);
+    return resolved ? getPlayerDisplayName(resolved) : name;
+  };
+
+  return events.map((event) => {
+    const playerDorsal = extractDorsalFromName(event.player);
+    const detailDorsal = event.detail ? extractDorsalFromName(event.detail) : undefined;
+    return {
+      ...event,
+      player: resolveName(event.player, playerDorsal),
+      ...(event.detail ? { detail: resolveName(event.detail, detailDorsal) } : {}),
+    };
+  });
+}
+
+function extractDorsalFromName(name: string): number | undefined {
+  const match = /^#?(\d{1,2})\s/.exec(name.trim());
+  if (match) return Number(match[1]);
+  return undefined;
 }

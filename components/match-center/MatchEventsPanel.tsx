@@ -7,15 +7,25 @@ import { MatchSquadPlayerSelect } from "@/components/match-center/MatchSquadPlay
 import { useMatchTeamSquadOptions } from "@/hooks/useMatchTeamSquadOptions";
 import { MatchJsonPasteSection } from "@/components/match-center/MatchJsonPasteSection";
 import { createMatchEventId, matchEventTypeLabels } from "@/lib/match-events";
-import { parseMatchEventsJson } from "@/lib/match-center/parse-match-json";
+import {
+  parseMatchEventsJson,
+  serializeMatchEvents,
+} from "@/lib/match-center/parse-match-json";
 import { getRaiTeamId } from "@/lib/fixtures";
 import type { MatchEvent, MatchEventType, PrimerEquipoGender } from "@/types";
+import type { MatchSquadOption } from "@/lib/match-availability-squad";
 import { useMatchDetailStorageKeys } from "@/components/match-center/useMatchDetailOverrides";
 
 const eventTypes: MatchEventType[] = ["goal", "goal_disallowed", "yellow", "red", "substitution"];
 
 function formatMatchMinute(minute: number): string {
   return `${minute}'`;
+}
+
+function isCustomEventPlayer(name: string, options: MatchSquadOption[]): boolean {
+  const trimmed = name.trim();
+  if (!trimmed) return false;
+  return !options.some((option) => option.name === trimmed);
 }
 
 function CardIcon({ type }: { type: "yellow" | "red" }) {
@@ -211,6 +221,8 @@ function EventPlayerField({
     return getOptions(teamId);
   }, [event.type, getOptions, getQuinielaScorerOptions, ownClub, teamId]);
 
+  const useFreeText = !ownClub || isCustomEventPlayer(event.player, playerOptions);
+
   if (!ownClub) {
     return (
       <input
@@ -223,16 +235,46 @@ function EventPlayerField({
     );
   }
 
+  if (useFreeText) {
+    return (
+      <div className="flex min-w-0 flex-col gap-1 sm:col-span-2">
+        <input
+          value={event.player}
+          onChange={(change) => onUpdate({ player: change.target.value })}
+          placeholder="Nombre del jugador (fuera de plantilla)"
+          aria-label="Jugador del evento"
+          className="rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm font-semibold text-slate-800 outline-none focus:border-[#214C9B]"
+        />
+        <button
+          type="button"
+          onClick={() => onUpdate({ player: "" })}
+          className="self-start text-[10px] font-bold uppercase text-[#214C9B] hover:underline"
+        >
+          Elegir de plantilla
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <MatchSquadPlayerSelect
-      options={playerOptions}
-      value={event.player}
-      onChange={(name) => onUpdate({ player: name })}
-      squadForResolve={ownSquad}
-      placeholder="Jugador de la plantilla…"
-      aria-label="Jugador del evento"
-      className="rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm font-semibold text-slate-800 outline-none focus:border-[#214C9B] sm:col-span-2"
-    />
+    <div className="flex min-w-0 flex-col gap-1 sm:col-span-2">
+      <MatchSquadPlayerSelect
+        options={playerOptions}
+        value={event.player}
+        onChange={(name) => onUpdate({ player: name })}
+        squadForResolve={ownSquad}
+        placeholder="Jugador de la plantilla…"
+        aria-label="Jugador del evento"
+        className="rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm font-semibold text-slate-800 outline-none focus:border-[#214C9B]"
+      />
+      <button
+        type="button"
+        onClick={() => onUpdate({ player: " " })}
+        className="self-start text-[10px] font-bold uppercase text-slate-600 hover:underline"
+      >
+        Fuera de plantilla
+      </button>
+    </div>
   );
 }
 
@@ -260,6 +302,8 @@ function EventDetailField({
   const placeholder =
     event.type === "substitution" ? "Jugador que sale" : "Asistencia (opcional)";
 
+  const useFreeText = !ownClub || isCustomEventPlayer(event.detail ?? "", detailOptions);
+
   if (!ownClub || detailOptions.length === 0) {
     return (
       <input
@@ -272,17 +316,47 @@ function EventDetailField({
     );
   }
 
+  if (useFreeText && event.detail) {
+    return (
+      <div className="flex min-w-0 flex-col gap-1 sm:col-span-2 lg:col-span-4">
+        <input
+          value={event.detail ?? ""}
+          onChange={(change) => onUpdate({ detail: change.target.value || undefined })}
+          placeholder={placeholder}
+          aria-label="Detalle del evento"
+          className="rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm text-slate-600 outline-none focus:border-[#214C9B]"
+        />
+        <button
+          type="button"
+          onClick={() => onUpdate({ detail: undefined })}
+          className="self-start text-[10px] font-bold uppercase text-[#214C9B] hover:underline"
+        >
+          Elegir de plantilla
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <MatchSquadPlayerSelect
-      options={detailOptions}
-      value={event.detail ?? ""}
-      onChange={(name) => onUpdate({ detail: name || undefined })}
-      squadForResolve={ownSquad}
-      allowEmpty
-      placeholder={placeholder}
-      aria-label="Detalle del evento"
-      className="rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm text-slate-600 outline-none focus:border-[#214C9B] sm:col-span-2 lg:col-span-4"
-    />
+    <div className="flex min-w-0 flex-col gap-1 sm:col-span-2 lg:col-span-4">
+      <MatchSquadPlayerSelect
+        options={detailOptions}
+        value={event.detail ?? ""}
+        onChange={(name) => onUpdate({ detail: name || undefined })}
+        squadForResolve={ownSquad}
+        allowEmpty
+        placeholder={placeholder}
+        aria-label="Detalle del evento"
+        className="rounded-lg border border-[#214C9B]/25 px-2 py-1.5 text-sm text-slate-600 outline-none focus:border-[#214C9B]"
+      />
+      <button
+        type="button"
+        onClick={() => onUpdate({ detail: " " })}
+        className="self-start text-[10px] font-bold uppercase text-slate-600 hover:underline"
+      >
+        Fuera de plantilla
+      </button>
+    </div>
   );
 }
 
@@ -309,6 +383,9 @@ export function MatchEventsPanel({
   const raiTeamId = getRaiTeamId(gender);
   const hasAviles = homeTeamId === raiTeamId || awayTeamId === raiTeamId;
   const squadHelpers = useMatchTeamSquadOptions(gender);
+  const { ownSquad } = squadHelpers;
+
+  const parseEventsJson = (input: string) => parseMatchEventsJson(input, ownSquad);
 
   const updateEvents = (next: MatchEvent[]) => {
     saveValue(keys.events, next);
@@ -351,14 +428,16 @@ export function MatchEventsPanel({
     <section className="space-y-6">
       {editMode && (
         <MatchJsonPasteSection
-          title="Importar eventos JSON"
-          hint='Array de eventos o { "events": [ … ] }. Campos: minute/minuto, type/tipo (goal, yellow, red, substitution), team/equipo (home/local, away/visitante), player/jugador, detail/asistencia/sale.'
+          title="Eventos JSON"
+          hint='Array de eventos o { "events": [ … ] }. Campos: minute, type (goal, yellow, red, substitution), team (home/away), player, detail. Usa dorsal/number para vincular con la plantilla: { "dorsal": 14, "player": "Cayarga" }.'
           applyLabel="Aplicar eventos"
           placeholder={`[
-  { "minute": 12, "type": "goal", "team": "home", "player": "J. Santamaria", "detail": "J. Cueto" },
-  { "minute": 67, "type": "substitution", "team": "away", "player": "Entra", "detail": "Sale" }
+  { "minute": 12, "type": "goal", "team": "home", "dorsal": 9, "player": "Santamaria", "detail_dorsal": 7, "detail": "Cueto" },
+  { "minute": 67, "type": "substitution", "team": "home", "dorsal": 14, "player": "Cayarga", "sale_dorsal": 6, "detail": "Ba" }
 ]`}
-          parse={parseMatchEventsJson}
+          parse={parseEventsJson}
+          serialize={serializeMatchEvents}
+          currentData={currentEvents}
           onImport={(data) => updateEvents(data)}
         />
       )}
@@ -369,7 +448,7 @@ export function MatchEventsPanel({
             Modo edición de eventos
             {hasAviles && (
               <span className="ml-2 font-medium normal-case text-slate-600">
-                — jugadores del Avilés desde la plantilla (goles: mismos nombres que la quiniela)
+                — plantilla o «Fuera de plantilla» (canteranos, rivales en convocatoria, etc.)
               </span>
             )}
           </p>
