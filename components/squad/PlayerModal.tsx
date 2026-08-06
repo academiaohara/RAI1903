@@ -105,8 +105,8 @@ function PlayerModalContent({
           <X size={18} />
         </button>
 
-        <div className="flex items-start gap-4 pr-10 sm:items-end sm:gap-6 sm:pr-0">
-          <div className="relative w-[6.75rem] shrink-0 sm:w-[200px]">
+        <div className="flex items-start gap-4 pr-10 sm:gap-6 sm:pr-0">
+          <div className="relative w-[6.75rem] shrink-0 sm:w-[160px]">
             <PlayerAvatar
               player={player}
               size="xl"
@@ -118,57 +118,53 @@ function PlayerModalContent({
             </div>
           </div>
 
-          <div className="min-w-0 flex-1 text-left">
-            <span className="inline-flex rounded-full border border-white/25 bg-white/10 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] sm:px-3 sm:py-1 sm:text-[10px] sm:tracking-[0.16em]">
-              {player.rol}
-            </span>
-            <h2 className="mt-2 text-xl font-extrabold uppercase leading-tight tracking-tight sm:mt-3 sm:text-4xl">{playerName}</h2>
-            <p className="mt-1 text-xs font-semibold text-white/80 sm:mt-2 sm:text-sm">
-              {player.nacionalidad} · {formatPlayerAgeWithUnit(player.edad)}
-            </p>
-          </div>
-        </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-left">
+              <span className="inline-flex rounded-full border border-white/25 bg-white/10 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] sm:px-3 sm:py-1 sm:text-[10px] sm:tracking-[0.16em]">
+                {player.rol}
+              </span>
+              <h2 className="mt-2 text-xl font-extrabold uppercase leading-tight tracking-tight sm:mt-3 sm:text-3xl">{playerName}</h2>
+              <p className="mt-1 text-xs font-semibold text-white/80 sm:mt-2 sm:text-sm">
+                {player.nacionalidad} · {formatPlayerAgeWithUnit(player.edad)}
+              </p>
+            </div>
 
-        <div className="mt-3 -mx-1 flex touch-pan-x flex-nowrap gap-2 overflow-x-auto overscroll-x-contain scroll-px-1 px-1 pb-0.5 no-scrollbar sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-2 sm:overflow-visible sm:px-0 sm:pb-0">
-          {player.valorMercado && (
-            <InfoChip label="Valor mercado" value={player.valorMercado} className="min-w-[8.75rem] shrink-0 sm:min-w-0" />
-          )}
-          <InfoChip
-            icon={Star}
-            label="Valoración media"
-            value={fanRating ? formatFanRating(fanRating.average) : "Sin valoraciones"}
-            className="min-w-[8.75rem] shrink-0 sm:min-w-0"
-          />
-          <InfoChip
-            icon={Calendar}
-            label="Nacimiento"
-            value={formatBirthDate(player.fechaNacimiento)}
-            className="min-w-[8.75rem] shrink-0 sm:min-w-0"
-          />
-          <InfoChip
-            icon={MapPin}
-            label="Lugar"
-            value={player.lugarNacimiento}
-            className="min-w-[8.75rem] shrink-0 sm:min-w-0"
-          />
-          <InfoChip
-            icon={Ruler}
-            label="Altura"
-            value={player.altura}
-            className="min-w-[8.75rem] shrink-0 sm:min-w-0"
-          />
-          <InfoChip
-            icon={Scale}
-            label="Peso"
-            value={player.peso}
-            className="min-w-[8.75rem] shrink-0 sm:min-w-0"
-          />
-          <InfoChip label="Pierna" value={player.piernaBuena} className="min-w-[8.75rem] shrink-0 sm:min-w-0" />
-          <InfoChip
-            label="Contrato"
-            value={formatContractDate(player.contratoHasta)}
-            className="min-w-[8.75rem] shrink-0 sm:min-w-0"
-          />
+            <div className="mt-3 grid grid-cols-2 gap-1.5 sm:grid-cols-3 sm:gap-2">
+              {player.valorMercado && (
+                <InfoChip label="Valor mercado" value={player.valorMercado} />
+              )}
+              <InfoChip
+                icon={Star}
+                label="Valoración media"
+                value={fanRating ? formatFanRating(fanRating.average) : "Sin valoraciones"}
+              />
+              <InfoChip
+                icon={Calendar}
+                label="Nacimiento"
+                value={formatBirthDate(player.fechaNacimiento)}
+              />
+              <InfoChip
+                icon={MapPin}
+                label="Lugar"
+                value={player.lugarNacimiento}
+              />
+              <InfoChip
+                icon={Ruler}
+                label="Altura"
+                value={player.altura}
+              />
+              <InfoChip
+                icon={Scale}
+                label="Peso"
+                value={player.peso}
+              />
+              <InfoChip label="Pierna" value={player.piernaBuena} />
+              <InfoChip
+                label="Contrato"
+                value={formatContractDate(player.contratoHasta)}
+              />
+            </div>
+          </div>
         </div>
       </div>
 

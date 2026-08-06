@@ -12,6 +12,8 @@ export type PlayerMatchRecord = {
   competicion: string;
   competitionId?: CompetitionId;
   minutos: number;
+  /** En banquillo sin entrar al juego (0 minutos). */
+  onBench?: boolean;
   goles: number;
   asistencias: number;
   amarillas: number;

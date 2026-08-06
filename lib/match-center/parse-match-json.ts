@@ -1,5 +1,9 @@
 import { createMatchEventId } from "@/lib/match-events";
+import { findSquadPlayerByDorsal } from "@/lib/squad-lineup";
+import { resolveSquadPlayerByName } from "@/lib/squad-player-resolve";
+import { getPlayerDisplayName } from "@/lib/squad-utils";
 import type { LineupPlayer, MatchEvent, MatchEventType, MatchLineup, MatchStatCategory, MatchStatRow } from "@/types";
+import type { SquadPlayer } from "@/types/squad";
 
 export type ParseMatchJsonResult<T> =
   | { ok: true; data: T; summary: string }
@@ -95,7 +99,24 @@ function extractEventsArray(payload: unknown): unknown[] | null {
   return Array.isArray(nested) ? nested : null;
 }
 
-function parseMatchEvent(raw: unknown, index: number): MatchEvent | string {
+function resolvePlayerNameFromJson(
+  name: string,
+  dorsal: number | null,
+  squad?: SquadPlayer[],
+): string {
+  if (squad?.length) {
+    if (dorsal !== null && dorsal > 0) {
+      const byDorsal = findSquadPlayerByDorsal(squad, dorsal);
+      if (byDorsal) return getPlayerDisplayName(byDorsal);
+    }
+    const resolved = resolveSquadPlayerByName(squad, name);
+    if (resolved) return getPlayerDisplayName(resolved);
+  }
+  if (dorsal !== null && dorsal > 0) return `#${dorsal} ${name}`;
+  return name;
+}
+
+function parseMatchEvent(raw: unknown, index: number, squad?: SquadPlayer[]): MatchEvent | string {
   const record = asRecord(raw);
   if (!record) {
     return `Evento ${index + 1}: debe ser un objeto.`;
@@ -116,12 +137,15 @@ function parseMatchEvent(raw: unknown, index: number): MatchEvent | string {
     return `Evento ${index + 1}: equipo no reconocido (home/local o away/visitante).`;
   }
 
-  const player = readString(record.player ?? record.jugador ?? record.nombre);
-  if (!player) {
+  const rawPlayer = readString(record.player ?? record.jugador ?? record.nombre);
+  if (!rawPlayer) {
     return `Evento ${index + 1}: falta el jugador (player / jugador).`;
   }
 
-  const detail =
+  const playerDorsal = readNumber(record.dorsal ?? record.numero ?? record.number);
+  const player = resolvePlayerNameFromJson(rawPlayer, playerDorsal, squad);
+
+  const rawDetail =
     readString(
       record.detail ??
         record.detalle ??
@@ -130,6 +154,14 @@ function parseMatchEvent(raw: unknown, index: number): MatchEvent | string {
         record.sale ??
         record.out,
     ) ?? undefined;
+
+  let detail: string | undefined;
+  if (rawDetail) {
+    const detailDorsal = readNumber(
+      record.detail_dorsal ?? record.sale_dorsal ?? record.out_dorsal ?? record.asistencia_dorsal,
+    );
+    detail = resolvePlayerNameFromJson(rawDetail, detailDorsal, squad);
+  }
 
   const id = readString(record.id) ?? createMatchEventId();
 
@@ -143,7 +175,43 @@ function parseMatchEvent(raw: unknown, index: number): MatchEvent | string {
   };
 }
 
-export function parseMatchEventsJson(input: string): ParseMatchJsonResult<MatchEvent[]> {
+export function serializeMatchEvents(events: MatchEvent[]): string {
+  const payload = events.map((event) => {
+    const entry: Record<string, unknown> = {
+      minute: event.minute,
+      type: event.type,
+      team: event.team,
+      player: event.player,
+    };
+    if (event.detail) entry.detail = event.detail;
+    return entry;
+  });
+  return JSON.stringify(payload, null, 2);
+}
+
+export function serializeMatchLineups(home?: MatchLineup, away?: MatchLineup): string {
+  const payload: Record<string, unknown> = {};
+  if (home) {
+    payload.home = {
+      formation: home.formation,
+      starters: home.starters.map((p) => ({ number: p.number, name: p.name })),
+      bench: home.bench.map((p) => ({ number: p.number, name: p.name })),
+    };
+  }
+  if (away) {
+    payload.away = {
+      formation: away.formation,
+      starters: away.starters.map((p) => ({ number: p.number, name: p.name })),
+      bench: away.bench.map((p) => ({ number: p.number, name: p.name })),
+    };
+  }
+  return JSON.stringify(payload, null, 2);
+}
+
+export function parseMatchEventsJson(
+  input: string,
+  squad?: SquadPlayer[],
+): ParseMatchJsonResult<MatchEvent[]> {
   const parsed = parseJsonInput(input);
   if (!parsed.ok) return parsed;
 
@@ -161,7 +229,7 @@ export function parseMatchEventsJson(input: string): ParseMatchJsonResult<MatchE
 
   const events: MatchEvent[] = [];
   for (let index = 0; index < items.length; index += 1) {
-    const result = parseMatchEvent(items[index], index);
+    const result = parseMatchEvent(items[index], index, squad);
     if (typeof result === "string") {
       return { ok: false, error: result };
     }
@@ -287,35 +355,41 @@ export function parseMatchStatsJson(input: string): ParseMatchJsonResult<MatchSt
   };
 }
 
-function parseLineupPlayer(raw: unknown, index: number): LineupPlayer | string {
+function parseLineupPlayer(raw: unknown, index: number, squad?: SquadPlayer[]): LineupPlayer | string {
   const record = asRecord(raw);
   if (!record) {
     return `Jugador ${index + 1}: debe ser un objeto.`;
   }
 
-  const name = readString(record.name ?? record.nombre ?? record.jugador ?? record.player);
-  if (!name) {
+  const rawName = readString(record.name ?? record.nombre ?? record.jugador ?? record.player);
+  if (!rawName) {
     return `Jugador ${index + 1}: falta el nombre (name / nombre).`;
   }
 
   const number = readNumber(record.number ?? record.dorsal ?? record.numero ?? record.num) ?? 0;
+  const resolvedName = resolvePlayerNameFromJson(rawName, number > 0 ? number : null, squad);
   const role = readString(record.role ?? record.posicion ?? record.position) ?? undefined;
+  const isCustom = squad
+    ? !resolveSquadPlayerByName(squad, resolvedName) &&
+      !(number > 0 && findSquadPlayerByDorsal(squad, number))
+    : false;
 
   return {
     number: Math.max(0, Math.round(number)),
-    name,
+    name: resolvedName,
     ...(role ? { role } : {}),
+    ...(isCustom ? { custom: true } : {}),
   };
 }
 
-function parseLineupList(raw: unknown, listName: string): LineupPlayer[] | string {
+function parseLineupList(raw: unknown, listName: string, squad?: SquadPlayer[]): LineupPlayer[] | string {
   if (!Array.isArray(raw)) {
     return `Falta el array "${listName}".`;
   }
 
   const players: LineupPlayer[] = [];
   for (let index = 0; index < raw.length; index += 1) {
-    const result = parseLineupPlayer(raw[index], index);
+    const result = parseLineupPlayer(raw[index], index, squad);
     if (typeof result === "string") {
       return `${listName}: ${result}`;
     }
@@ -324,18 +398,18 @@ function parseLineupList(raw: unknown, listName: string): LineupPlayer[] | strin
   return players;
 }
 
-function parseSingleLineup(raw: unknown): MatchLineup | string {
+function parseSingleLineup(raw: unknown, squad?: SquadPlayer[]): MatchLineup | string {
   const record = asRecord(raw);
   if (!record) {
     return "La alineación debe ser un objeto con formation, starters y bench.";
   }
 
   const formation = readString(record.formation ?? record.formacion ?? record.sistema) ?? "";
-  const starters = parseLineupList(record.starters ?? record.titulares ?? record.xi, "starters");
+  const starters = parseLineupList(record.starters ?? record.titulares ?? record.xi, "starters", squad);
   if (typeof starters === "string") return starters;
 
   const benchRaw = record.bench ?? record.suplentes ?? record.substitutes;
-  const bench = benchRaw === undefined ? [] : parseLineupList(benchRaw, "bench");
+  const bench = benchRaw === undefined ? [] : parseLineupList(benchRaw, "bench", squad);
   if (typeof bench === "string") return bench;
 
   return { formation, starters, bench };
@@ -346,7 +420,7 @@ export type ParsedMatchLineups = {
   away?: MatchLineup;
 };
 
-function extractLineupSides(payload: unknown): ParsedMatchLineups | string {
+function extractLineupSides(payload: unknown, squad?: SquadPlayer[]): ParsedMatchLineups | string {
   const record = asRecord(payload);
   if (!record) {
     return "La alineación debe ser un objeto.";
@@ -358,12 +432,12 @@ function extractLineupSides(payload: unknown): ParsedMatchLineups | string {
   if (hasHome || hasAway) {
     const result: ParsedMatchLineups = {};
     if (record.home !== undefined || record.local !== undefined) {
-      const home = parseSingleLineup(record.home ?? record.local);
+      const home = parseSingleLineup(record.home ?? record.local, squad);
       if (typeof home === "string") return `Local: ${home}`;
       result.home = home;
     }
     if (record.away !== undefined || record.visitante !== undefined) {
-      const away = parseSingleLineup(record.away ?? record.visitante);
+      const away = parseSingleLineup(record.away ?? record.visitante, squad);
       if (typeof away === "string") return `Visitante: ${away}`;
       result.away = away;
     }
@@ -373,16 +447,19 @@ function extractLineupSides(payload: unknown): ParsedMatchLineups | string {
     return result;
   }
 
-  const single = parseSingleLineup(record);
+  const single = parseSingleLineup(record, squad);
   if (typeof single === "string") return single;
   return { home: single };
 }
 
-export function parseMatchLineupsJson(input: string): ParseMatchJsonResult<ParsedMatchLineups> {
+export function parseMatchLineupsJson(
+  input: string,
+  squad?: SquadPlayer[],
+): ParseMatchJsonResult<ParsedMatchLineups> {
   const parsed = parseJsonInput(input);
   if (!parsed.ok) return parsed;
 
-  const result = extractLineupSides(parsed.data);
+  const result = extractLineupSides(parsed.data, squad);
   if (typeof result === "string") {
     return { ok: false, error: result };
   }
