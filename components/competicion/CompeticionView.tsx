@@ -173,7 +173,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
         </>
       ) : (
         <>
-          {isMasculino && <GuiaLiga gender={gender} teams={teams} grupo={grupo} />}
+          <GuiaLiga gender={gender} teams={teams} grupo={grupo} />
 
           <section className={`grid min-w-0 gap-6${showSidebarColumn ? " xl:grid-cols-2" : ""}`}>
             <StandingsLeagueTableCard

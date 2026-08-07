@@ -27,7 +27,7 @@ export function MatchFixtureTeamLinks({
   scorePillClassName,
   showCrests: showCrestsProp,
 }: MatchFixtureTeamLinksProps) {
-  const showCrests = showCrestsProp ?? gender !== "femenino";
+  const showCrests = showCrestsProp ?? true;
   const avilesHome = match.homeTeamId === highlightTeamId;
   const avilesAway = match.awayTeamId === highlightTeamId;
 
