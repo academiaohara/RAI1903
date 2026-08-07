@@ -519,7 +519,7 @@ export function CanteraEditorPanel({ scope, onClose, variant = "panel" }: Canter
       {tab === "calendario" && (
         <div className="space-y-4">
           <FixturesJsonPasteSection
-            hint='Basta con jornadas, partidos (local, visitante) y fecha de cada partido. Los goles no se importan: quedan pendientes para rellenarlos a mano. Tras aplicar, pulsa «Guardar» y revisa los equipos en Competición.'
+            hint='Importa jornadas completas con fecha, hora, local, visitante, goles y estado. Tras aplicar, pulsa «Guardar» y revisa los equipos en Competición.'
             onImport={(data) => {
               setFixtures(data);
               const lastRound = data.jornadas.at(-1)?.jornada ?? 0;

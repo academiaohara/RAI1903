@@ -35,6 +35,8 @@ export type SeasonCompetitionConfigBundle = {
   matchCompetition?: CompetitionId;
   /** Plazas del grupo editables desde la guía de la liga. */
   groupTeams?: Partial<Record<RfefGrupoId, GroupTeamSlot[]>>;
+  /** ID del equipo del club (calendario, jornadas, clasificación). */
+  clubTeamId?: string;
 };
 
 /** Muestra selector Grupo I / II cuando hay más de un grupo. */
@@ -123,6 +125,23 @@ export function resolveCompetitionConfig(
   gender: PrimerEquipoGender,
 ): SeasonCompetitionConfigBundle {
   return getCompetitionConfigBundle(bundles, gender) ?? defaultCompetitionConfig(gender);
+}
+
+const CLUB_NAME_PATTERN = /avil[eé]s/i;
+
+/** Resuelve el ID del equipo del club desde la config CMS (o el id canónico del mock). */
+export function resolvePrimerEquipoClubTeamId(
+  bundles: SeasonBundlesMap,
+  gender: PrimerEquipoGender,
+): string {
+  const config = resolveCompetitionConfig(bundles, gender);
+  const slots = config.groupTeams?.["1"] ?? [];
+  if (config.clubTeamId && slots.some((slot) => slot.id === config.clubTeamId)) {
+    return config.clubTeamId;
+  }
+  const avilesSlot = slots.find((slot) => CLUB_NAME_PATTERN.test(slot.name));
+  if (avilesSlot) return avilesSlot.id;
+  return gender === "femenino" ? "real-aviles-industrial-femenino" : "real-aviles-industrial";
 }
 
 export function zonesToLegacyConfig(zones: CompetitionZoneRule[]): StandingsZonesConfig {

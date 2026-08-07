@@ -58,6 +58,7 @@ type RawPrimerEquipoBundle = {
   matchdaysFemenino?: unknown;
   matchdaysGrupo2?: unknown;
   meta?: unknown;
+  clubTeamId?: unknown;
 };
 
 const SPANISH_MONTH_INDEX: Record<string, number> = {
@@ -105,6 +106,24 @@ function parseKickoffIso(fecha: string, hora: string | null | undefined): string
   return new Date(Date.UTC(year, month, day, 0, 0)).toISOString();
 }
 
+function parseOptionalScore(value: unknown): number | null {
+  if (value === null || value === undefined || value === "") return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function parsePartidoStatus(
+  estado: unknown,
+  golesLocal: number | null,
+  golesVisitante: number | null,
+): "finalizado" | "pendiente" {
+  const estadoStr = String(estado ?? "").trim().toLowerCase();
+  if (estadoStr === "finalizado" || estadoStr === "finished") return "finalizado";
+  if (estadoStr === "pendiente" || estadoStr === "scheduled") return "pendiente";
+  if (golesLocal !== null && golesVisitante !== null) return "finalizado";
+  return "pendiente";
+}
+
 function normalizeCanteraPartido(raw: unknown, index: number, jornada: number): FilialFixturePartido | string {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
     return `Jornada ${jornada}, partido ${index + 1}: debe ser un objeto.`;
@@ -118,15 +137,18 @@ function normalizeCanteraPartido(raw: unknown, index: number, jornada: number): 
   if (!visitante) return `Jornada ${jornada}, partido ${index + 1}: falta visitante.`;
 
   const hora = row.hora === null || row.hora === undefined || row.hora === "" ? null : String(row.hora);
+  const goles_local = parseOptionalScore(row.goles_local);
+  const goles_visitante = parseOptionalScore(row.goles_visitante);
+  const estado = parsePartidoStatus(row.estado, goles_local, goles_visitante);
 
   return {
     fecha,
     hora,
     local,
     visitante,
-    goles_local: null,
-    goles_visitante: null,
-    estado: "pendiente",
+    goles_local,
+    goles_visitante,
+    estado,
   };
 }
 
@@ -233,6 +255,13 @@ function buildMatchFromPartido(
 
   const home = lookup.resolve(local);
   const away = lookup.resolve(visitante);
+  const homeScore = parseOptionalScore(partido.goles_local);
+  const awayScore = parseOptionalScore(partido.goles_visitante);
+  const estadoStr = String(partido.estado ?? "").trim().toLowerCase();
+  const finished =
+    estadoStr === "finalizado" ||
+    estadoStr === "finished" ||
+    (homeScore !== null && awayScore !== null);
 
   return {
     id: `${idPrefix}j${round}-${home.id}-${away.id}`,
@@ -244,7 +273,10 @@ function buildMatchFromPartido(
     date,
     competition,
     venue: home.stadium,
-    status: "scheduled",
+    status: finished ? "finished" : "scheduled",
+    ...(finished && homeScore !== null && awayScore !== null
+      ? { homeScore, awayScore }
+      : {}),
   };
 }
 
@@ -289,6 +321,12 @@ function normalizeMatchdayList(
           error: `${label} jornada ${round}, partido ${mIndex + 1}: faltan campos obligatorios del partido.`,
         };
       }
+      const homeScore = parseOptionalScore(match.homeScore);
+      const awayScore = parseOptionalScore(match.awayScore);
+      const statusRaw = String(match.status ?? "").trim().toLowerCase();
+      const finished =
+        statusRaw === "finished" ||
+        (homeScore !== null && awayScore !== null);
       matches.push({
         id,
         matchday: round,
@@ -299,7 +337,10 @@ function normalizeMatchdayList(
         date,
         competition,
         venue: String(match.venue ?? ""),
-        status: "scheduled",
+        status: finished ? "finished" : "scheduled",
+        ...(finished && homeScore !== null && awayScore !== null
+          ? { homeScore, awayScore }
+          : {}),
       });
     }
     matchdays.push({ round, matches });
@@ -380,6 +421,7 @@ export type PrimerEquipoFixturesImport = {
   matchdaysGrupo2?: Matchday[];
   meta: { lastRound: number };
   touchedGrupos: { grupo1: boolean; grupo2: boolean };
+  clubTeamId?: string;
 };
 
 /** Parsea JSON de calendario de primer equipo (masculino o femenino). */
@@ -420,6 +462,10 @@ export function parsePrimerEquipoFixturesJson(
   }
 
   const payload = root as RawJornadasPayload & RawPrimerEquipoBundle;
+  const clubTeamIdFromJson =
+    typeof payload.clubTeamId === "string" && payload.clubTeamId.trim()
+      ? payload.clubTeamId.trim()
+      : undefined;
 
   const directKey = options.gender === "femenino" ? "matchdaysFemenino" : "matchdays";
   const directMatchdays = payload[directKey as keyof RawPrimerEquipoBundle];
@@ -450,6 +496,7 @@ export function parsePrimerEquipoFixturesJson(
         ...(matchdaysGrupo2 ? { matchdaysGrupo2 } : {}),
         meta: { lastRound },
         touchedGrupos: { grupo1: true, grupo2: Boolean(matchdaysGrupo2?.length) },
+        ...(clubTeamIdFromJson ? { clubTeamId: clubTeamIdFromJson } : {}),
       },
       summary: `${matchdaysResult.data.length} jornadas${matchdaysGrupo2 ? ` + ${matchdaysGrupo2.length} grupo II` : ""} · ${matchCount} partidos`,
     };
@@ -517,6 +564,7 @@ export function parsePrimerEquipoFixturesJson(
       ...(matchdaysGrupo2 ? { matchdaysGrupo2 } : {}),
       meta: { lastRound },
       touchedGrupos: { grupo1: touchedGrupo1, grupo2: touchedGrupo2 },
+      ...(clubTeamIdFromJson ? { clubTeamId: clubTeamIdFromJson } : {}),
     },
     summary: `${matchdaysResult.data.length} jornadas${matchdaysGrupo2 ? ` + ${matchdaysGrupo2.length} grupo II` : ""} · ${matchCount} partidos`,
   };

@@ -8,7 +8,7 @@ import { useEditedJornadasDataset } from "@/components/jornadas/useEditedJornada
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { SectionUnderConstructionGate } from "@/components/season/SectionUnderConstructionGate";
 import { useSeason } from "@/components/season/SeasonProvider";
-import { hasMultipleGrupos } from "@/lib/cms/competition-config-bundle";
+import { hasMultipleGrupos, resolvePrimerEquipoClubTeamId } from "@/lib/cms/competition-config-bundle";
 import { buildJornadasDataset, groupFixturesByCalendarDay, jornadaSectionTitle } from "@/lib/jornadas-data";
 import { getRaiTeamId } from "@/lib/fixtures";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -21,7 +21,7 @@ type JornadasViewProps = {
 };
 
 export function JornadasView({ gender }: JornadasViewProps) {
-  const { getEnrichedFixtureSource, getCompetitionConfig } = useSeason();
+  const { getEnrichedFixtureSource, getCompetitionConfig, bundles } = useSeason();
   const { getValue } = useInlineEditing();
   const competitionConfig = useMemo(() => getCompetitionConfig(gender), [gender, getCompetitionConfig]);
   const baseDataset = useMemo(
@@ -29,7 +29,8 @@ export function JornadasView({ gender }: JornadasViewProps) {
     [gender, getEnrichedFixtureSource],
   );
   const dataset = useEditedJornadasDataset(baseDataset, gender);
-  const raiTeamId = getRaiTeamId(gender);
+  const raiTeamId =
+    gender === "femenino" ? resolvePrimerEquipoClubTeamId(bundles, gender) : getRaiTeamId(gender);
   const [manualRoundId, setManualRoundId] = useState<JornadaRoundId | null>(null);
   const selectedRoundId = manualRoundId ?? dataset.currentRoundId;
   const [grupo, setGrupo] = useState<RfefGrupoId>("1");
