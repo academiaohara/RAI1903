@@ -1,10 +1,24 @@
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
+import type { CanteraCmsScope } from "@/lib/cantera/cantera-cms";
 
 const LEGACY_MATCH_RESULT_PREFIX = "match-result:";
 const LEGACY_JORNADA_ROUND_PREFIX = "jornada-round:";
+const CANTERA_MATCH_RESULT_PREFIX = "cantera-match:";
 
 export function matchResultOverrideKey(gender: PrimerEquipoGender, matchId: string): string {
   return `${LEGACY_MATCH_RESULT_PREFIX}${gender}:${matchId}`;
+}
+
+export function canteraMatchResultOverrideKey(scope: CanteraCmsScope, matchId: string): string {
+  return `${CANTERA_MATCH_RESULT_PREFIX}${scope}:${matchId}`;
+}
+
+export function readCanteraMatchResultOverride<T>(
+  getOverride: (key: string) => unknown,
+  scope: CanteraCmsScope,
+  matchId: string,
+): T | undefined {
+  return getOverride(canteraMatchResultOverrideKey(scope, matchId)) as T | undefined;
 }
 
 export function jornadaRoundOverrideKey(
@@ -47,6 +61,7 @@ export function readJornadaRoundOverride<T>(
 }
 
 export function shouldCopyInlineOverrideKey(key: string): boolean {
+  if (key.startsWith(CANTERA_MATCH_RESULT_PREFIX)) return true;
   if (key.startsWith(LEGACY_MATCH_RESULT_PREFIX)) {
     const rest = key.slice(LEGACY_MATCH_RESULT_PREFIX.length);
     return rest.startsWith("masculino:") || rest.startsWith("femenino:");

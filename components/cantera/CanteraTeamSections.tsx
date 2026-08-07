@@ -183,6 +183,7 @@ export function CanteraTeamSections({ teamId, cmsScope: cmsScopeProp }: CanteraT
               teamId={teamId}
               filialMatches={cmsMatches}
               clubTeamId={avilesTeamId}
+              cmsScope={cmsScope}
             />
           </SectionUnderConstructionGate>
         ) : (
@@ -190,6 +191,7 @@ export function CanteraTeamSections({ teamId, cmsScope: cmsScopeProp }: CanteraT
             teamId={teamId}
             filialMatches={cmsMatches}
             clubTeamId={avilesTeamId}
+            cmsScope={canteraTeamIdToCmsScope(teamId)}
           />
         ))}
     </div>

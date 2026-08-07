@@ -2,14 +2,20 @@
 
 import { CanteraJornadaMatchRow } from "@/components/cantera/CanteraJornadaMatchRow";
 import { groupFixturesByCalendarDay } from "@/lib/jornadas-data";
+import type { CanteraCmsScope } from "@/lib/cantera/cantera-cms";
 import type { JornadaFixture } from "@/types/jornadas";
 
 type CanteraJornadaMatchesByDayProps = {
   fixtures: JornadaFixture[];
   highlightTeamId: string;
+  scope: CanteraCmsScope;
 };
 
-export function CanteraJornadaMatchesByDay({ fixtures, highlightTeamId }: CanteraJornadaMatchesByDayProps) {
+export function CanteraJornadaMatchesByDay({
+  fixtures,
+  highlightTeamId,
+  scope,
+}: CanteraJornadaMatchesByDayProps) {
   const groups = groupFixturesByCalendarDay(fixtures);
 
   if (groups.length === 0) {
@@ -28,6 +34,7 @@ export function CanteraJornadaMatchesByDay({ fixtures, highlightTeamId }: Canter
                 fixture={fixture}
                 highlighted={fixture.involvesRai}
                 highlightTeamId={highlightTeamId}
+                scope={scope}
               />
             ))}
           </div>

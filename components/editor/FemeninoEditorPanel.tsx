@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { EditorPanelFrame } from "@/components/editor/EditorPanelFrame";
+import { FixturesJsonExportSection } from "@/components/editor/FixturesJsonExportSection";
 import { FixturesJsonPasteSection } from "@/components/editor/FixturesJsonPasteSection";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { applyLeagueTemplate, buildFixturesPayloadForConfig } from "@/lib/cms/apply-league-template";
@@ -21,12 +22,18 @@ import {
   upsertSeasonBundlesBatch,
   type SeasonFemeninoFixturesBundle,
 } from "@/lib/cms/season-bundles";
+import { exportFemeninoFixturesJson } from "@/lib/cms/export-fixtures-json";
+import {
+  extractTeamNamesFromMatchdays,
+  teamNamesToGroupSlots,
+} from "@/lib/cms/extract-teams-from-matchdays";
+import { withGroupTeamsInConfig } from "@/lib/cms/group-teams";
 import { PLACEHOLDER_MATCH_DATE } from "@/lib/competition/normalize-fixtures";
+import { resolvePrimerEquipoClubTeamId } from "@/lib/cms/competition-config-bundle";
 import {
   leagueTemplatesForGender,
   type LeagueTemplateId,
 } from "@/lib/competition/league-templates";
-import { RAI_FEM_TEAM_ID } from "@/data/mock";
 import type { Match, Matchday } from "@/types";
 
 type EditorTab = "competicion" | "calendario";
@@ -94,6 +101,28 @@ export function FemeninoEditorPanel({ onClose, variant = "panel" }: FemeninoEdit
   const rounds = leagueRoundCount(competition.teamsPerGroup);
   const matchesPerRound = matchesPerLeagueRound(competition.teamsPerGroup);
   const genderTemplates = leagueTemplatesForGender("femenino");
+
+  const clubTeamId = competition.clubTeamId ?? resolvePrimerEquipoClubTeamId(bundles, "femenino");
+  const groupTeams = competition.groupTeams?.["1"] ?? [];
+
+  const syncTeamsFromFixtures = () => {
+    const names = extractTeamNamesFromMatchdays(fixturesDraft.matchdaysFemenino);
+    if (!names.length) return;
+    const slots = teamNamesToGroupSlots(names, groupTeams);
+    setConfig((current) => {
+      const base = current ?? competition;
+      const next = withGroupTeamsInConfig(base, "1", slots);
+      const clubStillValid =
+        base.clubTeamId && slots.some((slot) => slot.id === base.clubTeamId)
+          ? base.clubTeamId
+          : undefined;
+      return {
+        ...next,
+        teamsPerGroup: Math.max(next.teamsPerGroup, slots.length),
+        clubTeamId: clubStillValid,
+      };
+    });
+  };
 
   const jornadaNumbers = useMemo(
     () => [...fixturesDraft.matchdaysFemenino].sort((a, b) => a.round - b.round).map((md) => md.round),
@@ -275,6 +304,42 @@ export function FemeninoEditorPanel({ onClose, variant = "panel" }: FemeninoEdit
             </div>
           </div>
 
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Equipos del grupo</p>
+              <button
+                type="button"
+                onClick={syncTeamsFromFixtures}
+                className="rounded-lg border border-[#981915]/25 px-3 py-1.5 text-[10px] font-extrabold uppercase text-[#981915]"
+              >
+                Extraer del calendario
+              </button>
+            </div>
+            {groupTeams.length === 0 ? (
+              <p className="text-[10px] text-slate-500">
+                Importa un calendario JSON o pulsa «Extraer del calendario» para listar equipos y marcar el nuestro.
+              </p>
+            ) : (
+              <div className="max-h-48 space-y-2 overflow-y-auto">
+                {groupTeams.map((team) => (
+                  <label
+                    key={team.id}
+                    className="flex items-center gap-2 rounded-lg border border-slate-100 bg-white px-2 py-1.5 text-xs"
+                  >
+                    <input
+                      type="radio"
+                      name="femenino-club-team"
+                      checked={competition.clubTeamId === team.id}
+                      onChange={() => setConfig((c) => (c ? { ...c, clubTeamId: team.id } : c))}
+                    />
+                    <span className="font-semibold text-slate-700">{team.name || team.id}</span>
+                    <span className="ml-auto text-[9px] text-slate-400">{team.id}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+
           <ul className="max-h-[40vh] space-y-3 overflow-y-auto pr-1">
             {competition.zones.map((zone) => (
               <li key={zone.id} className="rounded-xl border border-slate-200 p-2">
@@ -314,7 +379,7 @@ export function FemeninoEditorPanel({ onClose, variant = "panel" }: FemeninoEdit
         <div className="space-y-4">
           <FixturesJsonPasteSection
             accent="femenino"
-            hint='Basta con jornadas, partidos (local, visitante) y fecha. Los goles no se importan. Tras aplicar, pulsa «Guardar femenino».'
+            hint='Importa jornadas completas: fecha, hora, local, visitante, goles y estado. También vale el bundle CMS ({ matchdaysFemenino }) con clubTeamId. Tras aplicar, marca «Nuestro equipo» en Competición y pulsa «Guardar femenino».'
             parse={(input) =>
               parsePrimerEquipoFixturesJson(input, { gender: "femenino", bundles })
             }
@@ -324,7 +389,33 @@ export function FemeninoEditorPanel({ onClose, variant = "panel" }: FemeninoEdit
                 matchdaysFemenino: data.matchdays,
                 meta: { lastRound: data.meta.lastRound },
               }));
+              if (data.clubTeamId) {
+                setConfig((current) => (current ? { ...current, clubTeamId: data.clubTeamId } : current));
+              }
+              const names = extractTeamNamesFromMatchdays(data.matchdays);
+              if (names.length) {
+                const slots = teamNamesToGroupSlots(names, groupTeams);
+                setConfig((current) => {
+                  const base = current ?? competition;
+                  const next = withGroupTeamsInConfig(base, "1", slots);
+                  return {
+                    ...next,
+                    teamsPerGroup: Math.max(next.teamsPerGroup, slots.length),
+                    clubTeamId: data.clubTeamId ?? base.clubTeamId,
+                  };
+                });
+              }
             }}
+          />
+
+          <FixturesJsonExportSection
+            accent="femenino"
+            getJson={() =>
+              exportFemeninoFixturesJson(fixturesDraft, {
+                format: "jornadas",
+                clubTeamId: competition.clubTeamId,
+              })
+            }
           />
 
           <button
@@ -343,7 +434,7 @@ export function FemeninoEditorPanel({ onClose, variant = "panel" }: FemeninoEdit
                   <p className="mb-2 text-xs font-extrabold uppercase text-[#981915]">Jornada {round}</p>
                   {matchday.matches.map((match, mIndex) => {
                     const isRai =
-                      match.homeTeamId === RAI_FEM_TEAM_ID || match.awayTeamId === RAI_FEM_TEAM_ID;
+                      match.homeTeamId === clubTeamId || match.awayTeamId === clubTeamId;
                     return (
                       <div
                         key={match.id}
