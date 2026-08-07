@@ -49,8 +49,6 @@ export function JornadasView({ gender }: JornadasViewProps) {
 
   const customLabel = getValue(`jornada-round:${summary.id}:label`, summary.label);
   const title = jornadaSectionTitle(summary, customLabel === summary.label ? undefined : customLabel);
-  const showCrests = gender !== "femenino";
-
   return (
     <SectionUnderConstructionGate scope={gender} section="jornadas">
     <div className="space-y-6">
@@ -59,7 +57,6 @@ export function JornadasView({ gender }: JornadasViewProps) {
         rounds={dataset.rounds}
         selectedId={selectedRoundId}
         onSelect={handleSelectRound}
-        showCrests={showCrests}
         gender={gender}
       />
 
@@ -79,7 +76,6 @@ export function JornadasView({ gender }: JornadasViewProps) {
               groups={matchesByDay}
               highlightTeamId={raiTeamId}
               gender={gender}
-              showCrests={showCrests}
               grupo={grupo}
             />
           </div>

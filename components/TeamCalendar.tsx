@@ -55,7 +55,7 @@ export function TeamCalendar({
   showCrests: showCrestsProp,
   showVenue = true,
 }: TeamCalendarProps) {
-  const showCrests = showCrestsProp ?? gender !== "femenino";
+  const showCrests = showCrestsProp ?? true;
   const listData = listMatches ?? matches;
   const initial = initialViewDate();
   const [isMobileViewport, setIsMobileViewport] = useState(false);

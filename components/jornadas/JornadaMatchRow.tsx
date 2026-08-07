@@ -54,7 +54,7 @@ export function JornadaMatchRow({
   const { bundles } = useSeason();
   const override = readMatchResultOverride<Partial<JornadaFixture>>(getOverride, gender, fixture.id) ?? {};
   const editedFixture = applyJornadaFixtureOverride(fixture, override);
-  const showCrests = showCrestsProp ?? gender !== "femenino";
+  const showCrests = showCrestsProp ?? true;
   const home = getJornadaTeam(editedFixture.homeTeamId);
   const away = getJornadaTeam(editedFixture.awayTeamId);
   const highlightHome = Boolean(highlightTeamId && editedFixture.homeTeamId === highlightTeamId);

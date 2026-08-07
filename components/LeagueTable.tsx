@@ -62,7 +62,7 @@ export function LeagueTable({
 }: LeagueTableProps) {
   const season = useSeasonOptional();
   const legend = zoneLegend ?? STANDINGS_ZONE_LEGEND;
-  const showCrests = showCrestsProp ?? gender !== "femenino";
+  const showCrests = showCrestsProp ?? true;
   const visibleRows = [...teams].sort((a, b) => a.position - b.position);
   const showFormColumn = !compact;
 
