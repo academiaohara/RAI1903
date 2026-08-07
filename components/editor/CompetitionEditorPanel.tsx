@@ -218,8 +218,9 @@ export function CompetitionEditorPanel({ onClose }: CompetitionEditorPanelProps)
   const editorBody = (
     <>
       <p className="mb-3 text-[10px] leading-relaxed text-slate-500">
-        Masculino y femenino tienen calendarios separados. Para el femenino usa el panel{" "}
-        <strong className="text-[#981915]">Femenino</strong> (competición y calendario como en cantera).
+        Masculino y femenino tienen calendarios separados. Para el femenino (importar JSON, marcar nuestro equipo) usa el
+        bloque <strong className="text-[#981915]">Editar calendario femenino</strong> en Jornadas, Calendario o Competición
+        femenina, o el panel <strong className="text-[#981915]">Femenino</strong> de la barra.
       </p>
 
       <div className="mb-4 flex flex-wrap gap-2">

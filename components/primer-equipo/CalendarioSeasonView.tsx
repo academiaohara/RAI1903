@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { Card } from "@/components/Card";
+import { FemeninoPageEditor } from "@/components/editor/FemeninoPageEditor";
 import { TeamCalendar } from "@/components/TeamCalendar";
 import { ExtraFixturesOnPageEditor } from "@/components/editor/ExtraFixturesOnPageEditor";
 import { useEditedCalendarMatches } from "@/components/calendar/CalendarMatchEditor";
@@ -27,6 +28,7 @@ export function CalendarioSeasonView({ gender }: CalendarioSeasonViewProps) {
 
   return (
     <SectionUnderConstructionGate scope={gender} section="calendario">
+    {gender === "femenino" ? <FemeninoPageEditor /> : null}
     <Card eyebrow="Temporada" title="Partidos del equipo">
       <ExtraFixturesOnPageEditor gender={gender} />
       <div className="mb-6 flex flex-wrap gap-4 text-sm font-bold text-slate-600">

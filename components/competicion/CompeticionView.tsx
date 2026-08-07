@@ -9,6 +9,7 @@ import { EditableText } from "@/components/inline-editing/EditableText";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
 import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
 import { ExtraFixturesOnPageEditor } from "@/components/editor/ExtraFixturesOnPageEditor";
+import { FemeninoPageEditor } from "@/components/editor/FemeninoPageEditor";
 import { SectionUnderConstructionGate } from "@/components/season/SectionUnderConstructionGate";
 import { MatchCard } from "@/components/MatchCard";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
@@ -123,6 +124,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
   return (
     <SectionUnderConstructionGate scope={gender} section="competicion">
     <div className="space-y-6">
+      {gender === "femenino" ? <FemeninoPageEditor /> : null}
       {isMasculino && (
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
           <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3">

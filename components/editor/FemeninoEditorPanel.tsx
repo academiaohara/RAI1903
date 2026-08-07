@@ -39,8 +39,9 @@ import type { Match, Matchday } from "@/types";
 type EditorTab = "competicion" | "calendario";
 
 type FemeninoEditorPanelProps = {
-  onClose: () => void;
+  onClose?: () => void;
   variant?: "panel" | "inline";
+  defaultTab?: EditorTab;
 };
 
 function newZone(): CompetitionZoneRule {
@@ -68,9 +69,13 @@ function emptyMatch(round: number, index: number): Match {
   };
 }
 
-export function FemeninoEditorPanel({ onClose, variant = "panel" }: FemeninoEditorPanelProps) {
+export function FemeninoEditorPanel({
+  onClose,
+  variant = "panel",
+  defaultTab = "calendario",
+}: FemeninoEditorPanelProps) {
   const { viewedSeasonId, viewedSeason, bundles, refreshBundles } = useSeason();
-  const [tab, setTab] = useState<EditorTab>("competicion");
+  const [tab, setTab] = useState<EditorTab>(defaultTab);
   const [config, setConfig] = useState<SeasonCompetitionConfigBundle | null>(null);
   const [fixtures, setFixtures] = useState<SeasonFemeninoFixturesBundle | null>(null);
   const [busy, setBusy] = useState(false);
@@ -500,7 +505,7 @@ export function FemeninoEditorPanel({ onClose, variant = "panel" }: FemeninoEdit
     <EditorPanelFrame
       title="Femenino"
       subtitle={`${viewedSeason.label} · calendario independiente`}
-      onClose={onClose}
+      onClose={onClose ?? (() => {})}
       busy={busy}
       message={message}
       footer={footer}
