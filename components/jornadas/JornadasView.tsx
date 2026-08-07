@@ -1,6 +1,7 @@
 "use client";
 
 import { Card } from "@/components/Card";
+import { FemeninoPageEditor } from "@/components/editor/FemeninoPageEditor";
 import { JornadaMatchesByDay } from "@/components/jornadas/JornadaMatchesByDay";
 import { JornadaRoundCarousel } from "@/components/jornadas/JornadaRoundCarousel";
 import { JornadasGrupoSwitcher } from "@/components/jornadas/JornadasGrupoSwitcher";
@@ -53,6 +54,7 @@ export function JornadasView({ gender }: JornadasViewProps) {
   return (
     <SectionUnderConstructionGate scope={gender} section="jornadas">
     <div className="space-y-6">
+      {gender === "femenino" ? <FemeninoPageEditor /> : null}
       <JornadaRoundCarousel
         rounds={dataset.rounds}
         selectedId={selectedRoundId}
