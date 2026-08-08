@@ -14,6 +14,7 @@ import {
 } from "@/lib/calendar-match-overrides";
 import { getTeamsBundle, resolveFixtureTeamDisplayName } from "@/lib/cms/teams-bundle";
 import { matchResultOverrideKey, readMatchResultOverride } from "@/lib/fixture-inline-keys";
+import { resolveClubTeamIds } from "@/lib/season/club-team-ids";
 import { fixtureEditorTeamOptions } from "@/lib/fixtures/editor-team-options";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { DEFAULT_KICKOFF_LOCAL, spainDateInputValue } from "@/lib/match-kickoff-time";
@@ -38,11 +39,28 @@ function useResolveTeamName(gender: PrimerEquipoGender) {
   );
 }
 
+function useClubTeamIds(gender: PrimerEquipoGender) {
+  const { bundles, getEnrichedFixtureSource } = useSeason();
+  const fixtureSource = useMemo(() => getEnrichedFixtureSource(gender), [gender, getEnrichedFixtureSource]);
+  return useMemo(() => {
+    if (gender === "femenino") {
+      return resolveClubTeamIds(bundles, gender, "1", fixtureSource.matchdaysFemenino);
+    }
+    return [
+      ...new Set([
+        ...resolveClubTeamIds(bundles, gender, "1", fixtureSource.matchdays),
+        ...resolveClubTeamIds(bundles, gender, "2", fixtureSource.matchdaysGrupo2),
+      ]),
+    ];
+  }, [bundles, fixtureSource, gender]);
+}
+
 export function useEditedCalendarMatch(match: CalendarMatch, gender: PrimerEquipoGender = "masculino"): CalendarMatch {
   const { getOverride } = useInlineEditing();
   const resolveTeamName = useResolveTeamName(gender);
+  const clubTeamIds = useClubTeamIds(gender);
   const override = readMatchResultOverride<MatchResultOverride>(getOverride, gender, match.id);
-  return applyCalendarMatchOverride(match, override, gender, resolveTeamName);
+  return applyCalendarMatchOverride(match, override, gender, resolveTeamName, clubTeamIds);
 }
 
 export function useEditedCalendarMatches(
@@ -51,10 +69,11 @@ export function useEditedCalendarMatches(
 ): CalendarMatch[] {
   const { getOverride } = useInlineEditing();
   const resolveTeamName = useResolveTeamName(gender);
+  const clubTeamIds = useClubTeamIds(gender);
   return matches
     .map((match) => {
       const override = readMatchResultOverride<MatchResultOverride>(getOverride, gender, match.id);
-      return applyCalendarMatchOverride(match, override, gender, resolveTeamName);
+      return applyCalendarMatchOverride(match, override, gender, resolveTeamName, clubTeamIds);
     })
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }

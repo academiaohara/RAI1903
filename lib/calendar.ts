@@ -1,5 +1,6 @@
 import { formatMatchKickoffTime } from "@/lib/match-kickoff-time";
 import { getAvilesMatchesByGender, getRaiTeamId, getTeamsByGender } from "@/lib/fixtures";
+import { resolveClubSideInMatch } from "@/lib/season/club-team-ids";
 import { defaultCronicaId } from "@/lib/match-article-factory";
 import { getMatchArticlePageHref } from "@/lib/match-article-url";
 import { getMatchArticleForMatch } from "@/lib/match-articles";
@@ -13,14 +14,16 @@ function formatKickoffTime(date: string): string | null {
   return formatMatchKickoffTime(date);
 }
 
-function avilesResult(match: Match, raiId: string): string | null {
+function avilesResult(match: Match, clubTeamIds: readonly string[]): string | null {
   if (!isMatchPlayed(match) || match.homeScore === undefined || match.awayScore === undefined) {
     return null;
   }
 
-  const avilesHome = match.homeTeamId === raiId;
-  const avilesGoals = avilesHome ? match.homeScore : match.awayScore;
-  const rivalGoals = avilesHome ? match.awayScore : match.homeScore;
+  const clubSide = resolveClubSideInMatch(match, clubTeamIds);
+  if (!clubSide) return null;
+
+  const avilesGoals = clubSide.isHome ? match.homeScore : match.awayScore;
+  const rivalGoals = clubSide.isHome ? match.awayScore : match.homeScore;
   return `${avilesGoals}-${rivalGoals}`;
 }
 
@@ -35,6 +38,8 @@ type MatchArticleLookup = {
   /** Resuelve nombres desde guía de liga / bundle teams (p. ej. sustituye «Equipo 42»). */
   resolveTeamName?: (teamId: string, fallback: string) => string;
   venueOptions?: ResolveMatchVenueOptions;
+  /** IDs del club (CMS + canónico) para local/visitante y rival en el calendario. */
+  clubTeamIds?: readonly string[];
 };
 
 export function matchToCalendarMatch(
@@ -42,8 +47,9 @@ export function matchToCalendarMatch(
   gender: PrimerEquipoGender,
   articles?: MatchArticleLookup,
 ): CalendarMatch {
-  const raiId = getRaiTeamId(gender);
-  const avilesHome = match.homeTeamId === raiId;
+  const clubTeamIds = articles?.clubTeamIds ?? [getRaiTeamId(gender)];
+  const clubSide = resolveClubSideInMatch(match, clubTeamIds);
+  const avilesHome = clubSide?.isHome ?? match.homeTeamId === getRaiTeamId(gender);
   const rivalId = avilesHome ? match.awayTeamId : match.homeTeamId;
   const rival = getTeamsByGender(gender).find((team) => team.id === rivalId);
   const matchArticle =
@@ -82,7 +88,7 @@ export function matchToCalendarMatch(
     isHome: avilesHome,
     time: played ? null : formatKickoffTime(match.date),
     played,
-    result: avilesResult(match, raiId),
+    result: avilesResult(match, clubTeamIds),
     homeScore: match.homeScore,
     awayScore: match.awayScore,
     chronicleUrl: matchPageUrl,
