@@ -109,10 +109,14 @@ export function applyCalendarMatchOverride(
   override: MatchResultOverride | undefined,
   gender: PrimerEquipoGender,
   resolveName?: ResolveFixtureTeamName,
+  clubTeamIds?: readonly string[],
 ): CalendarMatch {
   if (!override || Object.keys(override).length === 0) return calendarMatch;
   const match = applyMatchResultOverride(calendarMatchToMatch(calendarMatch), override, gender, resolveName);
-  const rebuilt = matchToCalendarMatch(match, gender, { resolveTeamName: resolveName });
+  const rebuilt = matchToCalendarMatch(match, gender, {
+    resolveTeamName: resolveName,
+    clubTeamIds,
+  });
   return {
     ...rebuilt,
     chronicleUrl: calendarMatch.chronicleUrl,

@@ -54,6 +54,20 @@ export function isClubTeamMatch(match: Match, clubTeamIds: readonly string[]): b
   return CLUB_NAME_PATTERN.test(match.homeTeam) || CLUB_NAME_PATTERN.test(match.awayTeam);
 }
 
+/** Local o visitante del club en un partido (por ID CMS o nombre Avilés). */
+export function resolveClubSideInMatch(
+  match: Match,
+  clubTeamIds: readonly string[],
+): { isHome: boolean } | null {
+  if (clubTeamIds.includes(match.homeTeamId) || CLUB_NAME_PATTERN.test(match.homeTeam)) {
+    return { isHome: true };
+  }
+  if (clubTeamIds.includes(match.awayTeamId) || CLUB_NAME_PATTERN.test(match.awayTeam)) {
+    return { isHome: false };
+  }
+  return null;
+}
+
 function dedupeMatchesById(matches: Match[]): Match[] {
   const byId = new Map<string, Match>();
   for (const match of matches) {

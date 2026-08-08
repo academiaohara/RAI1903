@@ -10,6 +10,7 @@ import { PLACEHOLDER_MATCH_DATE } from "@/lib/competition/normalize-fixtures";
 import { isMatchPlayed } from "@/lib/match-result";
 import { getTeam } from "@/lib/fixtures";
 import { getLastPlayedLeagueRound } from "@/lib/standings";
+import { isClubTeamMatch, resolveClubSideInMatch } from "@/lib/season/club-team-ids";
 import type { Match, Matchday } from "@/types";
 import type {
   JornadaFixture,
@@ -36,9 +37,9 @@ function matchToFixture(
   match: Match,
   jornadaId: JornadaRoundId,
   grupo: JornadaGrupo,
-  raiId: string,
+  clubTeamIds: readonly string[],
 ): JornadaFixture {
-  const involvesRai = match.homeTeamId === raiId || match.awayTeamId === raiId;
+  const involvesRai = isClubTeamMatch(match, clubTeamIds);
   return {
     id: match.id,
     jornadaId,
@@ -57,34 +58,56 @@ function matchToFixture(
   };
 }
 
-function opponentFromRaiMatch(matches: Match[], raiId: string): { teamId: string; name: string } | undefined {
-  const raiMatch = matches.find((m) => m.homeTeamId === raiId || m.awayTeamId === raiId);
+function opponentFromRaiMatch(
+  matches: Match[],
+  clubTeamIds: readonly string[],
+): { teamId: string; name: string } | undefined {
+  const raiMatch = matches.find((match) => isClubTeamMatch(match, clubTeamIds));
   if (!raiMatch) return undefined;
-  const isHome = raiMatch.homeTeamId === raiId;
+  const clubSide = resolveClubSideInMatch(raiMatch, clubTeamIds);
+  if (!clubSide) return undefined;
+  const isHome = clubSide.isHome;
   return {
     teamId: isHome ? raiMatch.awayTeamId : raiMatch.homeTeamId,
     name: isHome ? raiMatch.awayTeam : raiMatch.homeTeam,
   };
 }
 
-/** Fecha del partido del Real Avilés; si no hay, la del primer partido de la jornada. */
-function representativeDate(matches: Match[], raiId: string): string {
+function representativeDate(matches: Match[], clubTeamIds: readonly string[]): string {
   return representativeDateFromFixtures(
     matches.map((match) => ({
       homeTeamId: match.homeTeamId,
       awayTeamId: match.awayTeamId,
+      homeTeamName: match.homeTeam,
+      awayTeamName: match.awayTeam,
       date: match.date,
     })),
-    raiId,
+    clubTeamIds,
   );
 }
 
 /** Igual que representativeDate pero sobre fixtures ya enriquecidos (p. ej. con overrides). */
 export function representativeDateFromFixtures(
-  fixtures: Array<{ homeTeamId: string; awayTeamId: string; date: string }>,
-  raiId: string,
+  fixtures: Array<{
+    homeTeamId: string;
+    awayTeamId: string;
+    homeTeamName?: string;
+    awayTeamName?: string;
+    date: string;
+  }>,
+  clubTeamIds: readonly string[],
 ): string {
-  const raiFixture = fixtures.find((fixture) => fixture.homeTeamId === raiId || fixture.awayTeamId === raiId);
+  const raiFixture = fixtures.find((fixture) =>
+    isClubTeamMatch(
+      {
+        homeTeamId: fixture.homeTeamId,
+        awayTeamId: fixture.awayTeamId,
+        homeTeam: fixture.homeTeamName ?? "",
+        awayTeam: fixture.awayTeamName ?? "",
+      } as Match,
+      clubTeamIds,
+    ),
+  );
   if (raiFixture) return raiFixture.date;
   if (fixtures.length === 0) return PLACEHOLDER_MATCH_DATE;
   const sorted = [...fixtures].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -137,12 +160,12 @@ export function groupFixturesByCalendarDay(fixtures: JornadaFixture[]): JornadaD
 
 function buildLeagueRoundSummary(
   matchday: Matchday,
-  raiId: string,
+  clubTeamIds: readonly string[],
   currentRound: number,
 ): JornadaRoundSummary {
   const id: JornadaRoundId = `j${matchday.round}`;
-  const opponent = opponentFromRaiMatch(matchday.matches, raiId);
-  const date = representativeDate(matchday.matches, raiId);
+  const opponent = opponentFromRaiMatch(matchday.matches, clubTeamIds);
+  const date = representativeDate(matchday.matches, clubTeamIds);
 
   return {
     id,
@@ -168,10 +191,10 @@ function buildRoundData(
   summary: JornadaRoundSummary,
   grupo1Matches: Match[],
   grupo2Matches: Match[],
-  raiId: string,
+  clubTeamIds: readonly string[],
 ): JornadaRoundData {
-  const grupo1 = sortFixtures(grupo1Matches.map((m) => matchToFixture(m, summary.id, "1", raiId)));
-  const grupo2 = sortFixtures(grupo2Matches.map((m) => matchToFixture(m, summary.id, "2", raiId)));
+  const grupo1 = sortFixtures(grupo1Matches.map((m) => matchToFixture(m, summary.id, "1", clubTeamIds)));
+  const grupo2 = sortFixtures(grupo2Matches.map((m) => matchToFixture(m, summary.id, "2", clubTeamIds)));
 
   return {
     summary,
@@ -187,14 +210,16 @@ function matchdayByRound(matchdaysList: Matchday[], round: number): Matchday | u
  * Construye el dataset de jornadas para la UI.
  * Los partidos de liga provienen del calendario de la temporada (CMS o mock).
  */
-function buildFemeninoJornadasDataset(source: JornadasFixtureSource): JornadasDataset {
-  const raiId = RAI_FEM_TEAM_ID;
+function buildFemeninoJornadasDataset(
+  source: JornadasFixtureSource,
+  clubTeamIds: readonly string[],
+): JornadasDataset {
   const currentRound = getLastPlayedLeagueRound(source.matchdaysFemenino);
   const currentRoundId: JornadaRoundId = `j${currentRound}`;
 
   const leagueSummaries = [...source.matchdaysFemenino]
     .sort((a, b) => a.round - b.round)
-    .map((md) => buildLeagueRoundSummary(md, raiId, currentRound));
+    .map((md) => buildLeagueRoundSummary(md, clubTeamIds, currentRound));
 
   const rounds: JornadaRoundSummary[] = leagueSummaries;
   const leagueRoundDataCache = new Map<JornadaRoundId, JornadaRoundData>();
@@ -202,7 +227,7 @@ function buildFemeninoJornadasDataset(source: JornadasFixtureSource): JornadasDa
   for (const summary of leagueSummaries) {
     const round = summary.roundNumber!;
     const matches = matchdayByRound(source.matchdaysFemenino, round)?.matches ?? [];
-    leagueRoundDataCache.set(summary.id, buildRoundData(summary, matches, [], raiId));
+    leagueRoundDataCache.set(summary.id, buildRoundData(summary, matches, [], clubTeamIds));
   }
 
   return {
@@ -217,18 +242,18 @@ function buildFemeninoJornadasDataset(source: JornadasFixtureSource): JornadasDa
 export function buildJornadasDataset(
   gender: PrimerEquipoGender,
   source: JornadasFixtureSource = getDefaultFixtureSource(),
+  clubTeamIds: readonly string[] = [raiTeamId(gender)],
 ): JornadasDataset {
   if (gender === "femenino") {
-    return buildFemeninoJornadasDataset(source);
+    return buildFemeninoJornadasDataset(source, clubTeamIds);
   }
 
-  const raiId = raiTeamId(gender);
   const currentRound = getLastPlayedLeagueRound(source.matchdays);
   const currentRoundId: JornadaRoundId = `j${currentRound}`;
 
   const leagueSummaries = [...source.matchdays]
     .sort((a, b) => a.round - b.round)
-    .map((md) => buildLeagueRoundSummary(md, raiId, currentRound));
+    .map((md) => buildLeagueRoundSummary(md, clubTeamIds, currentRound));
 
   const rounds: JornadaRoundSummary[] = leagueSummaries;
   const leagueRoundDataCache = new Map<JornadaRoundId, JornadaRoundData>();
@@ -237,7 +262,7 @@ export function buildJornadasDataset(
     const round = summary.roundNumber!;
     const g1 = matchdayByRound(source.matchdays, round)?.matches ?? [];
     const g2 = matchdayByRound(source.matchdaysGrupo2, round)?.matches ?? [];
-    leagueRoundDataCache.set(summary.id, buildRoundData(summary, g1, g2, raiId));
+    leagueRoundDataCache.set(summary.id, buildRoundData(summary, g1, g2, clubTeamIds));
   }
 
   return {

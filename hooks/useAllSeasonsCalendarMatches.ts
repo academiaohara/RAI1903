@@ -49,6 +49,7 @@ export function useAllSeasonsCalendarMatches(gender: PrimerEquipoGender) {
       crestMap,
       resolveTeamName,
       venueOptions: { bundles },
+      clubTeamIds,
     });
   }, [bundles, gender, getForMatch, getEnrichedFixtureSource, crestMap, mapMatch, resolveTeamName, clubTeamIds]);
 

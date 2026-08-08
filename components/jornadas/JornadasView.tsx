@@ -12,6 +12,7 @@ import { useSeason } from "@/components/season/SeasonProvider";
 import { hasMultipleGrupos, resolvePrimerEquipoClubTeamId } from "@/lib/cms/competition-config-bundle";
 import { buildJornadasDataset, groupFixturesByCalendarDay, jornadaSectionTitle } from "@/lib/jornadas-data";
 import { getRaiTeamId } from "@/lib/fixtures";
+import { resolveClubTeamIds } from "@/lib/season/club-team-ids";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import type { JornadaRoundId } from "@/types/jornadas";
@@ -25,11 +26,23 @@ export function JornadasView({ gender }: JornadasViewProps) {
   const { getEnrichedFixtureSource, getCompetitionConfig, bundles } = useSeason();
   const { getValue } = useInlineEditing();
   const competitionConfig = useMemo(() => getCompetitionConfig(gender), [gender, getCompetitionConfig]);
+  const fixtureSource = useMemo(() => getEnrichedFixtureSource(gender), [gender, getEnrichedFixtureSource]);
+  const clubTeamIds = useMemo(() => {
+    if (gender === "femenino") {
+      return resolveClubTeamIds(bundles, gender, "1", fixtureSource.matchdaysFemenino);
+    }
+    return [
+      ...new Set([
+        ...resolveClubTeamIds(bundles, gender, "1", fixtureSource.matchdays),
+        ...resolveClubTeamIds(bundles, gender, "2", fixtureSource.matchdaysGrupo2),
+      ]),
+    ];
+  }, [bundles, fixtureSource, gender]);
   const baseDataset = useMemo(
-    () => buildJornadasDataset(gender, getEnrichedFixtureSource(gender)),
-    [gender, getEnrichedFixtureSource],
+    () => buildJornadasDataset(gender, fixtureSource, clubTeamIds),
+    [clubTeamIds, fixtureSource, gender],
   );
-  const dataset = useEditedJornadasDataset(baseDataset, gender);
+  const dataset = useEditedJornadasDataset(baseDataset, gender, clubTeamIds);
   const raiTeamId =
     gender === "femenino" ? resolvePrimerEquipoClubTeamId(bundles, gender) : getRaiTeamId(gender);
   const [manualRoundId, setManualRoundId] = useState<JornadaRoundId | null>(null);
