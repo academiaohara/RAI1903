@@ -39,7 +39,7 @@ export function ClasificacionUserModal({
 
   const hasSubmission = data?.hasSubmission ?? false;
   const countPoints = data?.countPoints ?? false;
-  const formMode = hasSubmission && countPoints ? "compare" : hasSubmission ? "edit" : countPoints ? "results" : "edit";
+  const formMode = hasSubmission ? "compare" : countPoints ? "results" : "edit";
 
   return (
     <Modal open={open} title={`Clasificación de ${handle}`} onClose={onClose}>

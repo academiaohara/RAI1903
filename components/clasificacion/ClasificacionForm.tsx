@@ -74,6 +74,16 @@ export function ClasificacionForm({
   };
 
   const showDiff = mode === "compare" || mode === "results";
+  const hasScoringData = useMemo(
+    () =>
+      orderedTeamIds.some((teamId) => {
+        const predicted = predictions[teamId]?.position;
+        const actual = actualPositions.get(teamId);
+        return predicted !== undefined && actual !== undefined;
+      }),
+    [orderedTeamIds, predictions, actualPositions],
+  );
+  const showTeamScoring = hasScoringData;
 
   return (
     <div className="space-y-2">
@@ -83,7 +93,7 @@ export function ClasificacionForm({
         </p>
       ) : null}
 
-      {showDiff ? (
+      {showTeamScoring ? (
         <div className="mb-2 flex flex-wrap gap-3 text-[10px] font-bold uppercase tracking-wide text-slate-600 sm:text-xs">
           <span className="inline-flex items-center gap-1.5">
             <span className="inline-flex items-center gap-0.5 rounded-md bg-emerald-50 px-1.5 py-0.5 text-emerald-700">
@@ -117,6 +127,8 @@ export function ClasificacionForm({
             prediction && actual !== undefined
               ? scoreClasificacionPosition(prediction.position, actual)
               : null;
+          const showRowScoring =
+            showTeamScoring && predictedPosition !== undefined && actual !== undefined;
           const crest = getTeamCrestById(team.id, team.crestInitials);
           const isDragging = dragIndex === index;
           const isDropTarget = overIndex === index && dragIndex !== null && dragIndex !== index;
@@ -151,7 +163,7 @@ export function ClasificacionForm({
                 isDropTarget ? "border-[#214C9B] ring-2 ring-[#214C9B]/20" : "",
               )}
             >
-              <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+              <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
                 {mode === "edit" && !readOnly ? (
                   <span
                     className="cursor-grab text-slate-400 active:cursor-grabbing"
@@ -175,15 +187,19 @@ export function ClasificacionForm({
                 >
                   {team.name}
                 </TeamLink>
+                {showRowScoring ? (
+                  <ClasificacionPositionIndicator predicted={predictedPosition} actual={actual} />
+                ) : null}
               </div>
 
               <div className="flex flex-wrap items-center gap-2 sm:justify-end sm:gap-3">
-                {showDiff && predictedPosition !== undefined && actual !== undefined ? (
+                {showRowScoring ? (
                   <>
-                    <span className="text-xs font-bold text-slate-500">
-                      Predicho: <span className="tabular-nums text-[#214C9B]">{predictedPosition}º</span>
-                    </span>
-                    <ClasificacionPositionIndicator predicted={predictedPosition} actual={actual} />
+                    {showDiff ? (
+                      <span className="text-xs font-bold text-slate-500">
+                        Predicho: <span className="tabular-nums text-[#214C9B]">{predictedPosition}º</span>
+                      </span>
+                    ) : null}
                     {points !== null ? (
                       <span
                         className={cn(
