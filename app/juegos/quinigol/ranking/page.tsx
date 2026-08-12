@@ -2,13 +2,13 @@
 
 import { Card } from "@/components/Card";
 import { PageHero } from "@/components/PageHero";
-import { GameRankingList } from "@/components/juegos/GameRankingList";
+import { QuinigolRankingList } from "@/components/quinigol/QuinigolRankingList";
 import { useQuinigolSeasonRanking } from "@/hooks/useGameRankings";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export default function QuinigolRankingPage() {
-  const { seasonId } = useQuinielaSeason();
+  const { seasonId, matchdays, currentRound, totalRounds } = useQuinielaSeason();
   const { entries, loading, error } = useQuinigolSeasonRanking(seasonId);
 
   return (
@@ -24,8 +24,12 @@ export default function QuinigolRankingPage() {
         ) : error ? (
           <p className="text-sm font-semibold text-[#981915]">{error}</p>
         ) : (
-          <GameRankingList
+          <QuinigolRankingList
             entries={entries}
+            seasonId={seasonId}
+            matchdays={matchdays}
+            totalRounds={totalRounds}
+            currentRound={currentRound}
             emptyMessage={
               isSupabaseConfigured()
                 ? "Aún no hay quinigoles guardados en esta temporada."

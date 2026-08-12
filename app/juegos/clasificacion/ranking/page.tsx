@@ -2,12 +2,12 @@
 
 import { Card } from "@/components/Card";
 import { PageHero } from "@/components/PageHero";
-import { GameRankingList } from "@/components/juegos/GameRankingList";
+import { ClasificacionRankingList } from "@/components/clasificacion/ClasificacionRankingList";
 import { useClasificacionRanking } from "@/hooks/useGameRankings";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
 
 export default function ClasificacionRankingPage() {
-  const { seasonId } = useQuinielaSeason();
+  const { seasonId, teams, leagueMatchdays } = useQuinielaSeason();
   const { entries, loading, error } = useClasificacionRanking(seasonId);
 
   return (
@@ -23,8 +23,11 @@ export default function ClasificacionRankingPage() {
         ) : error ? (
           <p className="text-sm font-semibold text-[#981915]">{error}</p>
         ) : (
-          <GameRankingList
+          <ClasificacionRankingList
             entries={entries}
+            seasonId={seasonId}
+            teams={teams}
+            leagueMatchdays={leagueMatchdays}
             emptyMessage="Aún no hay predicciones de clasificación enviadas en esta temporada."
           />
         )}

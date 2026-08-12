@@ -5,10 +5,14 @@ import type { CompetitionSeasonId } from "@/data/mock";
 import {
   countPointsForQuinigolRound,
   fetchClasificacionRanking,
+  fetchClasificacionUserSubmission,
   fetchQuinigolRoundRanking,
   fetchQuinigolSeasonRanking,
+  fetchQuinigolUserRound,
+  type ClasificacionUserSubmissionResult,
   type GameRankingEntry,
   type GameSeasonRankingEntry,
+  type QuinigolUserRoundResult,
 } from "@/lib/game-rankings";
 import { buildLeagueMatchdaysFromBundles, buildQuinielaMatchdaysFromBundles } from "@/lib/quiniela/build-matchdays";
 import { getMatchdayByRound } from "@/lib/quiniela";
@@ -82,4 +86,23 @@ export async function computeClasificacionRankingFromSupabase(
     countPoints,
   );
   return { countPoints, entries, matchdays: leagueMatchdays, teams };
+}
+
+export async function computeQuinigolUserRoundFromSupabase(
+  supabase: SupabaseClient,
+  seasonId: CompetitionSeasonId,
+  userId: string,
+  round?: number,
+): Promise<QuinigolUserRoundResult> {
+  const { quinielaMatchdays } = await loadGameMatchdays(supabase, seasonId);
+  return fetchQuinigolUserRound(supabase, seasonId, userId, quinielaMatchdays, round);
+}
+
+export async function computeClasificacionUserSubmissionFromSupabase(
+  supabase: SupabaseClient,
+  seasonId: CompetitionSeasonId,
+  userId: string,
+): Promise<ClasificacionUserSubmissionResult> {
+  const { leagueMatchdays, teams } = await loadGameMatchdays(supabase, seasonId);
+  return fetchClasificacionUserSubmission(supabase, seasonId, userId, teams, leagueMatchdays);
 }

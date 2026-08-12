@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { Card } from "@/components/Card";
 import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
-import { GameRankingList } from "@/components/juegos/GameRankingList";
+import { QuinigolRankingList } from "@/components/quinigol/QuinigolRankingList";
 import { QuinigolMatchForm } from "@/components/quinigol/QuinigolMatchForm";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
 import { useQuinigolRoundRanking } from "@/hooks/useGameRankings";
@@ -62,8 +62,13 @@ function QuinigolResultadoBody({
           <p className="text-sm font-semibold text-[#981915]">{error}</p>
         ) : (
           <>
-            <GameRankingList
+            <QuinigolRankingList
               entries={entries}
+              seasonId={seasonId}
+              matchdays={matchdays}
+              totalRounds={totalRounds}
+              currentRound={currentRound}
+              initialModalRound={round}
               emptyMessage={
                 isSupabaseConfigured()
                   ? "Nadie ha guardado el quinigol de esta jornada todavía."
