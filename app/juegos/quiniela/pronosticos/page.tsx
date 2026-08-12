@@ -99,6 +99,7 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
   const readOnly = isLocked || (isSaved && !isEditing);
   const canEdit = isSaved && !isLocked;
   const canSave = !isLocked && (!isSaved || isEditing);
+  const saveDisabled = quinielaRequiresAuth() && !userId;
   const finishedMatches = countFinishedMatches(selectedMatchday);
   const jornadaFinalizada = isMatchdayFullyFinished(selectedMatchday);
   const hits = countOutcomeHits(selectedMatchday, predictions);
@@ -267,7 +268,8 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
             <button
               type="button"
               onClick={() => void handleSave()}
-              className="rounded-xl bg-[#214C9B] px-4 py-2.5 text-xs font-extrabold uppercase text-white transition hover:bg-[#173a78] sm:rounded-2xl sm:px-6 sm:py-3 sm:text-sm"
+              disabled={saveDisabled}
+              className="rounded-xl bg-[#214C9B] px-4 py-2.5 text-xs font-extrabold uppercase text-white transition hover:bg-[#173a78] disabled:cursor-not-allowed disabled:opacity-50 sm:rounded-2xl sm:px-6 sm:py-3 sm:text-sm"
             >
               Guardar
             </button>

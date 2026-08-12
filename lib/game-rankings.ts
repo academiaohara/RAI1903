@@ -314,3 +314,102 @@ export function countPointsForQuinigolRound(matchdays: Matchday[], round: number
   const matchday = getMatchdayByRound(matchdays, round);
   return shouldCountQuinielaPoints(matchday, now);
 }
+
+export type QuinigolUserRoundResult = {
+  userId: string;
+  handle: string;
+  avatarUrl: string | null;
+  round: number;
+  savedRounds: number[];
+  hasSavedRound: boolean;
+  predictions: Record<string, QuinigolPrediction>;
+  points: number;
+  hits: number;
+  countPoints: boolean;
+};
+
+export async function fetchQuinigolUserRound(
+  supabase: SupabaseClient,
+  seasonId: CompetitionSeasonId,
+  userId: string,
+  matchdays: Matchday[],
+  requestedRound?: number,
+): Promise<QuinigolUserRoundResult> {
+  const savedRows = await fetchQuinigolSavedRounds(supabase, seasonId);
+  const userSaved = savedRows.filter((row) => row.user_id === userId);
+  const savedRounds = [...new Set(userSaved.map((row) => row.round))].sort((a, b) => b - a);
+  const round = requestedRound ?? savedRounds[0] ?? 1;
+
+  const matchday = getMatchdayByRound(matchdays, round);
+  const hasSavedRound = savedRounds.includes(round);
+
+  const [predictionRows, profileMap] = await Promise.all([
+    fetchQuinigolPredictions(supabase, seasonId, [userId], round),
+    fetchProfiles(supabase, [userId]),
+  ]);
+
+  const predictions = quinigolPredictionsByUser(predictionRows).get(userId) ?? {};
+  const countPoints = countPointsForQuinigolRound(matchdays, round);
+  const points = countPoints && hasSavedRound ? scoreQuinigolMatchday(matchday, predictions) : 0;
+  const hits = countPoints && hasSavedRound ? countQuinigolHits(matchday, predictions) : 0;
+  const profile = profileMap.get(userId);
+
+  return {
+    userId,
+    handle: profile ? getProfileHandle(profile) : "@usuario",
+    avatarUrl: profile ? getProfileAvatarUrl(profile) : null,
+    round,
+    savedRounds,
+    hasSavedRound,
+    predictions,
+    points,
+    hits,
+    countPoints,
+  };
+}
+
+export type ClasificacionUserSubmissionResult = {
+  userId: string;
+  handle: string;
+  avatarUrl: string | null;
+  hasSubmission: boolean;
+  predictions: Record<string, ClasificacionPrediction>;
+  points: number;
+  countPoints: boolean;
+  submittedAt: string | null;
+};
+
+export async function fetchClasificacionUserSubmission(
+  supabase: SupabaseClient,
+  seasonId: CompetitionSeasonId,
+  userId: string,
+  teams: Team[],
+  matchdays: Matchday[],
+): Promise<ClasificacionUserSubmissionResult> {
+  const submissionRows = await fetchClasificacionSubmissions(supabase, seasonId);
+  const submission = submissionRows.find((row) => row.user_id === userId) ?? null;
+  const hasSubmission = submission !== null;
+
+  const [predictionRows, profileMap] = await Promise.all([
+    fetchClasificacionPredictions(supabase, seasonId, [userId]),
+    fetchProfiles(supabase, [userId]),
+  ]);
+
+  const predictions = clasificacionPredictionsByUser(predictionRows).get(userId) ?? {};
+  const countPoints = matchdays.some((matchday) => countPointsForQuinigolRound(matchdays, matchday.round));
+  const actualPositions = buildActualStandingsByTeamId(teams, matchdays);
+  const points =
+    countPoints && hasSubmission ? scoreClasificacionPrediction(predictions, actualPositions) : 0;
+  const profile = profileMap.get(userId);
+
+  return {
+    userId,
+    handle: profile ? getProfileHandle(profile) : "@usuario",
+    avatarUrl: profile ? getProfileAvatarUrl(profile) : null,
+    hasSubmission,
+    predictions,
+    points,
+    countPoints,
+    submittedAt: submission?.submitted_at ?? null,
+  };
+}
