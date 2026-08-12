@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
-export default function QuinielaPronosticosAliasPage() {
+export default function JuegosPage() {
   redirect("/juegos/quiniela/pronosticos");
 }

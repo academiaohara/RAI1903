@@ -2,8 +2,8 @@ import type { LucideIcon } from "lucide-react";
 import {
   CalendarCheck2,
   CalendarDays,
-  ClipboardList,
   Columns3,
+  Gamepad2,
   LayoutGrid,
   Ship,
   Home,
@@ -13,7 +13,6 @@ import {
   Radio,
   Newspaper,
   Shield,
-  Swords,
   Target,
   Clapperboard,
   Landmark,
@@ -75,13 +74,13 @@ export const navItems: NavItem[] = [
     ],
   },
   {
-    href: "/quiniela",
-    label: "Quiniela",
-    icon: CalendarCheck2,
+    href: "/juegos",
+    label: "Juegos",
+    icon: Gamepad2,
     children: [
-      { href: "/quiniela/quiniela", label: "Pronosticos", icon: ClipboardList },
-      { href: "/quiniela/resultado", label: "Resultado", icon: Swords },
-      { href: "/quiniela/ranking", label: "Ranking", icon: Medal },
+      { href: "/juegos/quiniela/pronosticos", label: "Quiniela", icon: CalendarCheck2 },
+      { href: "/juegos/quinigol/pronosticos", label: "Quinigol", icon: Target },
+      { href: "/juegos/clasificacion/pronosticos", label: "Clasificación", icon: Trophy },
     ],
   },
   {
@@ -144,8 +143,8 @@ export const mobileNavSections: MobileNavSection[] = [
     items: navChildrenByHref("/noticias"),
   },
   {
-    title: "QUINIELA",
-    items: navChildrenByHref("/quiniela"),
+    title: "JUEGOS",
+    items: navChildrenByHref("/juegos"),
   },
   {
     title: "MEDIA RAI",
