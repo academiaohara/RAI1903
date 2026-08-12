@@ -9,7 +9,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export default function QuinielaRankingPage() {
   const { seasonId, matchdays, currentRound, totalRounds } = useQuinielaSeason();
-  const { entries, loading, error } = useQuinielaSeasonRanking(seasonId);
+  const { entries, loading, countPoints, error } = useQuinielaSeasonRanking(seasonId);
 
   return (
     <div className="space-y-6">
@@ -25,7 +25,8 @@ export default function QuinielaRankingPage() {
         ) : error ? (
           <p className="text-sm font-semibold text-[#981915]">{error}</p>
         ) : (
-          <QuinielaRankingList
+          <>
+            <QuinielaRankingList
             entries={entries}
             seasonId={seasonId}
             matchdays={matchdays}
@@ -37,6 +38,12 @@ export default function QuinielaRankingPage() {
                 : "Conecta Supabase e inicia sesión para ver la clasificación."
             }
           />
+          {!countPoints && entries.length > 0 && (
+            <p className="mt-3 text-xs text-slate-500 sm:mt-4 sm:text-sm">
+              Los puntos se publican cuando empiece la primera jornada disputada o haya resultados oficiales cargados.
+            </p>
+          )}
+          </>
         )}
       </Card>
     </div>

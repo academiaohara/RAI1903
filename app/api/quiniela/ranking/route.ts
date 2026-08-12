@@ -59,6 +59,7 @@ export async function GET(request: Request) {
     });
     return NextResponse.json({
       scope: "season",
+      countPoints: result.countPoints,
       entries: result.entries,
     });
   } catch (error) {

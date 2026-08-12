@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { getProfileAvatarUrl, getProfileHandle } from "@/lib/auth/user-display";
 import {
   buildActualStandingsByTeamId,
+  canScoreClasificacionStandings,
   scoreClasificacionPrediction,
   type ClasificacionPrediction,
 } from "@/lib/clasificacion-prediction";
@@ -278,7 +279,6 @@ export async function fetchClasificacionRanking(
   seasonId: CompetitionSeasonId,
   teams: Team[],
   matchdays: Matchday[],
-  countPoints: boolean,
 ): Promise<GameRankingEntry[]> {
   const submissionRows = await fetchClasificacionSubmissions(supabase, seasonId);
   if (submissionRows.length === 0) return [];
@@ -292,10 +292,11 @@ export async function fetchClasificacionRanking(
   const byUser = clasificacionPredictionsByUser(predictionRows);
   const submittedAtByUser = new Map(submissionRows.map((row) => [row.user_id, row.submitted_at]));
   const actualPositions = buildActualStandingsByTeamId(teams, matchdays);
+  const canScore = canScoreClasificacionStandings(teams, matchdays);
 
   const entries = userIds.map((userId) => {
     const predictions = byUser.get(userId) ?? {};
-    const points = countPoints ? scoreClasificacionPrediction(predictions, actualPositions) : 0;
+    const points = canScore ? scoreClasificacionPrediction(predictions, actualPositions) : 0;
     const profile = profileMap.get(userId);
     return {
       userId,
@@ -307,7 +308,7 @@ export async function fetchClasificacionRanking(
     };
   });
 
-  return sortRankingEntries(entries, countPoints);
+  return sortRankingEntries(entries, canScore);
 }
 
 export function countPointsForQuinigolRound(matchdays: Matchday[], round: number, now = new Date()): boolean {
@@ -396,10 +397,9 @@ export async function fetchClasificacionUserSubmission(
   ]);
 
   const predictions = clasificacionPredictionsByUser(predictionRows).get(userId) ?? {};
-  const countPoints = matchdays.some((matchday) => countPointsForQuinigolRound(matchdays, matchday.round));
   const actualPositions = buildActualStandingsByTeamId(teams, matchdays);
-  const points =
-    countPoints && hasSubmission ? scoreClasificacionPrediction(predictions, actualPositions) : 0;
+  const canScore = canScoreClasificacionStandings(teams, matchdays);
+  const points = canScore && hasSubmission ? scoreClasificacionPrediction(predictions, actualPositions) : 0;
   const profile = profileMap.get(userId);
 
   return {
@@ -409,7 +409,7 @@ export async function fetchClasificacionUserSubmission(
     hasSubmission,
     predictions,
     points,
-    countPoints,
+    countPoints: canScore,
     submittedAt: submission?.submitted_at ?? null,
   };
 }

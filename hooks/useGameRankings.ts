@@ -78,6 +78,7 @@ export function useQuinigolRoundRanking(
 
 export function useQuinigolSeasonRanking(seasonId: CompetitionSeasonId) {
   const [entries, setEntries] = useState<GameSeasonRankingEntry[]>([]);
+  const [countPoints, setCountPoints] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -100,6 +101,7 @@ export function useQuinigolSeasonRanking(seasonId: CompetitionSeasonId) {
         const response = await fetch(`/api/quinigol/ranking?${params.toString()}`);
         const payload = (await response.json()) as {
           entries?: GameSeasonRankingEntry[];
+          countPoints?: boolean;
           error?: string;
         };
 
@@ -107,16 +109,19 @@ export function useQuinigolSeasonRanking(seasonId: CompetitionSeasonId) {
 
         if (!response.ok) {
           setEntries([]);
+          setCountPoints(false);
           setError(payload.error ?? "No se pudo cargar el ranking");
           setLoading(false);
           return;
         }
 
         setEntries(payload.entries ?? []);
+        setCountPoints(Boolean(payload.countPoints));
         setLoading(false);
       } catch {
         if (cancelled) return;
         setEntries([]);
+        setCountPoints(false);
         setError("No se pudo cargar el ranking");
         setLoading(false);
       }
@@ -129,7 +134,7 @@ export function useQuinigolSeasonRanking(seasonId: CompetitionSeasonId) {
     };
   }, [seasonId]);
 
-  return { entries, loading, error, needsAuth: isSupabaseConfigured() };
+  return { entries, loading, countPoints, error, needsAuth: isSupabaseConfigured() };
 }
 
 export function useClasificacionRanking(seasonId: CompetitionSeasonId) {
