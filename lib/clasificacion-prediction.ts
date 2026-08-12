@@ -16,6 +16,11 @@ export function scoreClasificacionPosition(predicted: number, actual: number): n
   return Math.max(0, CLASIFICACION_MAX_POSITION_POINTS - diff);
 }
 
+export function canScoreClasificacionStandings(teams: Team[], matchdays: Matchday[]): boolean {
+  if (teams.length === 0 || matchdays.length === 0) return false;
+  return buildActualStandingsByTeamId(teams, matchdays).size > 0;
+}
+
 export function buildActualStandingsByTeamId(teams: Team[], matchdays: Matchday[]): Map<string, number> {
   if (matchdays.length === 0 || teams.length === 0) {
     return new Map();

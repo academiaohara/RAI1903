@@ -78,6 +78,7 @@ export function useQuinielaRoundRanking(
 
 export function useQuinielaSeasonRanking(seasonId: CompetitionSeasonId) {
   const [entries, setEntries] = useState<QuinielaSeasonRankingEntry[]>([]);
+  const [countPoints, setCountPoints] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -100,6 +101,7 @@ export function useQuinielaSeasonRanking(seasonId: CompetitionSeasonId) {
         const response = await fetch(`/api/quiniela/ranking?${params.toString()}`);
         const payload = (await response.json()) as {
           entries?: QuinielaSeasonRankingEntry[];
+          countPoints?: boolean;
           error?: string;
         };
 
@@ -107,16 +109,19 @@ export function useQuinielaSeasonRanking(seasonId: CompetitionSeasonId) {
 
         if (!response.ok) {
           setEntries([]);
+          setCountPoints(false);
           setError(payload.error ?? "No se pudo cargar el ranking");
           setLoading(false);
           return;
         }
 
         setEntries(payload.entries ?? []);
+        setCountPoints(Boolean(payload.countPoints));
         setLoading(false);
       } catch {
         if (cancelled) return;
         setEntries([]);
+        setCountPoints(false);
         setError("No se pudo cargar el ranking");
         setLoading(false);
       }
@@ -129,5 +134,5 @@ export function useQuinielaSeasonRanking(seasonId: CompetitionSeasonId) {
     };
   }, [seasonId]);
 
-  return { entries, loading, error, needsAuth: isSupabaseConfigured() };
+  return { entries, loading, countPoints, error, needsAuth: isSupabaseConfigured() };
 }

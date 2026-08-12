@@ -37,6 +37,7 @@ export type QuinielaRankingComputeResult =
       scope: "season";
       entries: QuinielaSeasonRankingEntry[];
       matchdays: Matchday[];
+      countPoints: boolean;
     };
 
 export async function computeQuinielaRankingFromSupabase(
@@ -70,7 +71,8 @@ export async function computeQuinielaRankingFromSupabase(
     countPointsForRound,
     scoringContext,
   );
-  return { scope: "season", entries, matchdays };
+  const countPoints = matchdays.some((matchday) => shouldCountQuinielaPoints(matchday));
+  return { scope: "season", entries, matchdays, countPoints };
 }
 
 export async function computeQuinielaUserRoundFromSupabase(

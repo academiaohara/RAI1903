@@ -17,6 +17,7 @@ import {
 import { buildLeagueMatchdaysFromBundles, buildQuinielaMatchdaysFromBundles } from "@/lib/quiniela/build-matchdays";
 import { getMatchdayByRound } from "@/lib/quiniela";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
+import { canScoreClasificacionStandings } from "@/lib/clasificacion-prediction";
 import type { Matchday, Team } from "@/types";
 
 async function loadGameMatchdays(supabase: SupabaseClient, seasonId: CompetitionSeasonId) {
@@ -42,6 +43,7 @@ export type QuinigolRankingComputeResult =
       scope: "season";
       entries: GameSeasonRankingEntry[];
       matchdays: Matchday[];
+      countPoints: boolean;
     };
 
 export async function computeQuinigolRankingFromSupabase(
@@ -60,7 +62,8 @@ export async function computeQuinigolRankingFromSupabase(
 
   const countPointsForRound = (round: number) => countPointsForQuinigolRound(quinielaMatchdays, round);
   const entries = await fetchQuinigolSeasonRanking(supabase, seasonId, quinielaMatchdays, countPointsForRound);
-  return { scope: "season", entries, matchdays: quinielaMatchdays };
+  const countPoints = quinielaMatchdays.some((matchday) => countPointsForQuinigolRound(quinielaMatchdays, matchday.round));
+  return { scope: "season", entries, matchdays: quinielaMatchdays, countPoints };
 }
 
 export type ClasificacionRankingComputeResult = {
@@ -75,16 +78,8 @@ export async function computeClasificacionRankingFromSupabase(
   seasonId: CompetitionSeasonId,
 ): Promise<ClasificacionRankingComputeResult> {
   const { leagueMatchdays, teams } = await loadGameMatchdays(supabase, seasonId);
-  const countPoints = leagueMatchdays.some((matchday) =>
-    countPointsForQuinigolRound(leagueMatchdays, matchday.round),
-  );
-  const entries = await fetchClasificacionRanking(
-    supabase,
-    seasonId,
-    teams,
-    leagueMatchdays,
-    countPoints,
-  );
+  const countPoints = canScoreClasificacionStandings(teams, leagueMatchdays);
+  const entries = await fetchClasificacionRanking(supabase, seasonId, teams, leagueMatchdays);
   return { countPoints, entries, matchdays: leagueMatchdays, teams };
 }
 

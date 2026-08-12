@@ -8,7 +8,7 @@ import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
 
 export default function ClasificacionRankingPage() {
   const { seasonId, teams, leagueMatchdays } = useQuinielaSeason();
-  const { entries, loading, error } = useClasificacionRanking(seasonId);
+  const { entries, loading, countPoints, error } = useClasificacionRanking(seasonId);
 
   return (
     <div className="space-y-6">
@@ -23,13 +23,20 @@ export default function ClasificacionRankingPage() {
         ) : error ? (
           <p className="text-sm font-semibold text-[#981915]">{error}</p>
         ) : (
-          <ClasificacionRankingList
-            entries={entries}
-            seasonId={seasonId}
-            teams={teams}
-            leagueMatchdays={leagueMatchdays}
-            emptyMessage="Aún no hay predicciones de clasificación enviadas en esta temporada."
-          />
+          <>
+            <ClasificacionRankingList
+              entries={entries}
+              seasonId={seasonId}
+              teams={teams}
+              leagueMatchdays={leagueMatchdays}
+              emptyMessage="Aún no hay predicciones de clasificación enviadas en esta temporada."
+            />
+            {!countPoints && entries.length > 0 && (
+              <p className="mt-3 text-xs text-slate-500 sm:mt-4 sm:text-sm">
+                Aún no hay clasificación oficial con la que puntuar. Los puntos aparecerán cuando haya datos de liga cargados.
+              </p>
+            )}
+          </>
         )}
       </Card>
     </div>
