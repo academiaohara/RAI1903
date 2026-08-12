@@ -5,7 +5,6 @@ import { PageHero } from "@/components/PageHero";
 import { GameRankingList } from "@/components/juegos/GameRankingList";
 import { useClasificacionRanking } from "@/hooks/useGameRankings";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
-import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export default function ClasificacionRankingPage() {
   const { seasonId } = useQuinielaSeason();
@@ -26,11 +25,7 @@ export default function ClasificacionRankingPage() {
         ) : (
           <GameRankingList
             entries={entries}
-            emptyMessage={
-              isSupabaseConfigured()
-                ? "Aún no hay predicciones de clasificación enviadas en esta temporada."
-                : "Conecta Supabase e inicia sesión para ver la clasificación."
-            }
+            emptyMessage="Aún no hay predicciones de clasificación enviadas en esta temporada."
           />
         )}
       </Card>

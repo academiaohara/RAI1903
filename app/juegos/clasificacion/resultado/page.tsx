@@ -1,83 +1,46 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Card } from "@/components/Card";
-import { ClasificacionForm } from "@/components/clasificacion/ClasificacionForm";
+import { useMemo } from "react";
 import { PageHero } from "@/components/PageHero";
-import { GameRankingList } from "@/components/juegos/GameRankingList";
-import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
-import { useClasificacionRanking } from "@/hooks/useGameRankings";
+import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard";
+import { useSeason } from "@/components/season/SeasonProvider";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
-import { buildActualStandingsByTeamId } from "@/lib/clasificacion-prediction";
-import { isSupabaseConfigured } from "@/lib/supabase/env";
-
-type ResultadoView = "clasificacion" | "ranking";
+import { zonesToLegacyConfig } from "@/lib/cms/competition-config-bundle";
+import { PRIMERA_RFEF_RULES } from "@/lib/rfef-rules";
 
 export default function ClasificacionResultadoPage() {
-  const { teams, matchdays, seasonId } = useQuinielaSeason();
-  const [view, setView] = useState<ResultadoView>("clasificacion");
-  const actualPositions = useMemo(
-    () => buildActualStandingsByTeamId(teams, matchdays),
-    [teams, matchdays],
+  const { getCompetitionConfig } = useSeason();
+  const { teams, leagueMatchdays, highlightTeamId, bundlesLoading } = useQuinielaSeason();
+  const competitionConfig = useMemo(() => getCompetitionConfig("masculino"), [getCompetitionConfig]);
+  const standingsZones = useMemo(
+    () => zonesToLegacyConfig(competitionConfig.zones),
+    [competitionConfig.zones],
   );
-  const { entries, loading, countPoints, error } = useClasificacionRanking(seasonId);
 
   return (
     <div className="space-y-6">
       <PageHero
         eyebrow="Clasificación"
         title="Resultado"
-        description="Compara la clasificación actual del Grupo I con el ranking de predicciones enviadas."
+        description="Clasificación actual del Grupo I con puntos, goles, forma y zonas de ascenso y descenso."
       />
 
-      <Card eyebrow="Temporada" title="Clasificación y ranking">
-        <QuinielaViewToggle
-          value={view}
-          onChange={setView}
-          layoutId="clasificacion-resultado-view"
-          options={[
-            { id: "clasificacion", label: "Clasificación actual" },
-            { id: "ranking", label: "Ranking predicciones" },
-          ]}
-          className="mb-3 sm:mb-5"
+      {bundlesLoading ? (
+        <p className="text-sm font-bold text-slate-500">Cargando clasificación…</p>
+      ) : (
+        <StandingsLeagueTableCard
+          eyebrow="Grupo I"
+          title="Clasificación"
+          sourceTeams={teams}
+          matchdays={leagueMatchdays}
+          highlightTeamId={highlightTeamId}
+          centerOnHighlight={false}
+          gender="masculino"
+          zones={standingsZones}
+          zoneRules={competitionConfig.zones}
+          tiebreak={PRIMERA_RFEF_RULES.tiebreak}
         />
-
-        {view === "clasificacion" ? (
-          <div className="space-y-4">
-            <p className="text-xs leading-5 text-slate-600 sm:text-sm">
-              Clasificación actual del Grupo I según los resultados oficiales disputados.
-            </p>
-            <ClasificacionForm
-              teams={teams}
-              predictions={{}}
-              actualPositions={actualPositions}
-              readOnly
-              mode="results"
-              onChange={() => undefined}
-            />
-          </div>
-        ) : loading ? (
-          <p className="text-sm text-slate-500">Cargando participantes…</p>
-        ) : error ? (
-          <p className="text-sm font-semibold text-[#981915]">{error}</p>
-        ) : (
-          <>
-            <GameRankingList
-              entries={entries}
-              emptyMessage={
-                isSupabaseConfigured()
-                  ? "Nadie ha enviado su predicción de clasificación todavía."
-                  : "Conecta Supabase e inicia sesión para ver el ranking."
-              }
-            />
-            {!countPoints && entries.length > 0 && (
-              <p className="mt-3 text-xs text-slate-500 sm:mt-4 sm:text-sm">
-                Los puntos se actualizan según la clasificación actual de la liga.
-              </p>
-            )}
-          </>
-        )}
-      </Card>
+      )}
     </div>
   );
 }

@@ -10,10 +10,9 @@ import {
   type GameRankingEntry,
   type GameSeasonRankingEntry,
 } from "@/lib/game-rankings";
-import { buildQuinielaMatchdaysFromBundles } from "@/lib/quiniela/build-matchdays";
+import { buildLeagueMatchdaysFromBundles, buildQuinielaMatchdaysFromBundles } from "@/lib/quiniela/build-matchdays";
 import { getMatchdayByRound } from "@/lib/quiniela";
-import { getTeamsForRfefGrupo } from "@/lib/rfef-grupos";
-import { mergeTeamsWithCms, getTeamsBundle } from "@/lib/cms/teams-bundle";
+import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import type { Matchday, Team } from "@/types";
 
 async function loadGameMatchdays(supabase: SupabaseClient, seasonId: CompetitionSeasonId) {
@@ -21,10 +20,10 @@ async function loadGameMatchdays(supabase: SupabaseClient, seasonId: Competition
     fetchSeasonBundlesWithClient(supabase, seasonId),
     fetchInlineOverridesWithClient(supabase, seasonId),
   ]);
-  const matchdays = buildQuinielaMatchdaysFromBundles(bundles, inlineOverrides);
-  const baseTeams = getTeamsForRfefGrupo("1");
-  const teams = mergeTeamsWithCms(baseTeams, getTeamsBundle(bundles, "masculino"));
-  return { bundles, matchdays, teams };
+  const quinielaMatchdays = buildQuinielaMatchdaysFromBundles(bundles, inlineOverrides);
+  const leagueMatchdays = buildLeagueMatchdaysFromBundles(bundles, inlineOverrides);
+  const teams = resolveGroupTeams(bundles, "masculino", "1");
+  return { bundles, quinielaMatchdays, leagueMatchdays, teams };
 }
 
 export type QuinigolRankingComputeResult =
@@ -46,18 +45,18 @@ export async function computeQuinigolRankingFromSupabase(
   seasonId: CompetitionSeasonId,
   options: { scope: "round"; round: number } | { scope: "season" },
 ): Promise<QuinigolRankingComputeResult> {
-  const { matchdays } = await loadGameMatchdays(supabase, seasonId);
+  const { quinielaMatchdays } = await loadGameMatchdays(supabase, seasonId);
 
   if (options.scope === "round") {
-    const matchday = getMatchdayByRound(matchdays, options.round);
-    const countPoints = countPointsForQuinigolRound(matchdays, options.round);
+    const matchday = getMatchdayByRound(quinielaMatchdays, options.round);
+    const countPoints = countPointsForQuinigolRound(quinielaMatchdays, options.round);
     const entries = await fetchQuinigolRoundRanking(supabase, seasonId, matchday, countPoints);
-    return { scope: "round", round: options.round, countPoints, entries, matchdays };
+    return { scope: "round", round: options.round, countPoints, entries, matchdays: quinielaMatchdays };
   }
 
-  const countPointsForRound = (round: number) => countPointsForQuinigolRound(matchdays, round);
-  const entries = await fetchQuinigolSeasonRanking(supabase, seasonId, matchdays, countPointsForRound);
-  return { scope: "season", entries, matchdays };
+  const countPointsForRound = (round: number) => countPointsForQuinigolRound(quinielaMatchdays, round);
+  const entries = await fetchQuinigolSeasonRanking(supabase, seasonId, quinielaMatchdays, countPointsForRound);
+  return { scope: "season", entries, matchdays: quinielaMatchdays };
 }
 
 export type ClasificacionRankingComputeResult = {
@@ -71,16 +70,16 @@ export async function computeClasificacionRankingFromSupabase(
   supabase: SupabaseClient,
   seasonId: CompetitionSeasonId,
 ): Promise<ClasificacionRankingComputeResult> {
-  const { matchdays, teams } = await loadGameMatchdays(supabase, seasonId);
-  const countPoints = matchdays.some((matchday) =>
-    countPointsForQuinigolRound(matchdays, matchday.round),
+  const { leagueMatchdays, teams } = await loadGameMatchdays(supabase, seasonId);
+  const countPoints = leagueMatchdays.some((matchday) =>
+    countPointsForQuinigolRound(leagueMatchdays, matchday.round),
   );
   const entries = await fetchClasificacionRanking(
     supabase,
     seasonId,
     teams,
-    matchdays,
+    leagueMatchdays,
     countPoints,
   );
-  return { countPoints, entries, matchdays, teams };
+  return { countPoints, entries, matchdays: leagueMatchdays, teams };
 }
