@@ -53,6 +53,8 @@ export default function ClasificacionPronosticosPage() {
   const saveDisabled = clasificacionRequiresAuth() && !userId;
   const needsLogin = clasificacionRequiresAuth() && hydrated && !userId;
   const showCompare = isLocked && Object.keys(effectivePredictions).length > 0;
+  const hasStandingsData = actualPositions.size > 0;
+  const showScoring = hasStandingsData && Object.keys(effectivePredictions).length > 0;
   const totalPoints = useMemo(
     () => scoreClasificacionPrediction(effectivePredictions, actualPositions),
     [effectivePredictions, actualPositions],
@@ -145,7 +147,7 @@ export default function ClasificacionPronosticosPage() {
         eyebrow="Temporada"
         title={showCompare ? "Tu predicción frente a la clasificación" : "Tu predicción de clasificación"}
         action={
-          hydrated && Object.keys(effectivePredictions).length > 0 && (showCompare || isSubmitted) ? (
+          hydrated && showScoring ? (
             <div className="flex min-w-[4.5rem] flex-col items-center rounded-2xl border border-[#214C9B]/15 bg-slate-50/80 px-3 py-2 text-center sm:min-w-[5.5rem] sm:px-4 sm:py-2.5">
               <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[#981915] sm:text-xs">Puntos</p>
               <p
