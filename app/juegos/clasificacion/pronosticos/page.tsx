@@ -28,7 +28,7 @@ import type { User } from "@supabase/supabase-js";
 
 export default function ClasificacionPronosticosPage() {
   const { alert } = useAppDialog();
-  const { teams, matchdays, seasonId } = useQuinielaSeason();
+  const { teams, matchdays, leagueMatchdays, seasonId } = useQuinielaSeason();
   const [predictions, setPredictions] = useState<Record<string, ClasificacionPrediction>>({});
   const [submittedAt, setSubmittedAt] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -42,8 +42,8 @@ export default function ClasificacionPronosticosPage() {
   const effectivePredictions = Object.keys(predictions).length > 0 ? predictions : defaultPredictions;
 
   const actualPositions = useMemo(
-    () => buildActualStandingsByTeamId(teams, matchdays),
-    [teams, matchdays],
+    () => buildActualStandingsByTeamId(teams, leagueMatchdays),
+    [teams, leagueMatchdays],
   );
   const isLocked = isClasificacionLocked(matchdays);
   const isSubmitted = submittedAt !== null;

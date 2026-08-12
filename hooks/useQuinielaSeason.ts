@@ -4,11 +4,10 @@ import { useMemo } from "react";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { RAI_TEAM_ID } from "@/data/mock";
 import { getCompetitionConfigBundle, leagueRoundCount } from "@/lib/cms/competition-config-bundle";
-import { getTeamsBundle, mergeTeamsWithCms } from "@/lib/cms/teams-bundle";
+import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { useEditedMatchdays } from "@/hooks/useEditedMatchdays";
 import { filterQuinielaMatchdays } from "@/lib/quiniela";
 import { getLeagueMatchdaysEnriched } from "@/lib/season/enriched-fixtures";
-import { getTeamsForRfefGrupo } from "@/lib/rfef-grupos";
 import { getLastPlayedLeagueRound } from "@/lib/standings";
 import type { CompetitionSeasonId } from "@/data/mock";
 import type { Matchday, Team } from "@/types";
@@ -26,10 +25,7 @@ export function useQuinielaSeason() {
     () => filterQuinielaMatchdays(editedMatchdays),
     [editedMatchdays],
   );
-  const teams = useMemo(() => {
-    const base = getTeamsForRfefGrupo("1");
-    return mergeTeamsWithCms(base, getTeamsBundle(bundles, "masculino"));
-  }, [bundles]);
+  const teams = useMemo(() => resolveGroupTeams(bundles, "masculino", "1"), [bundles]);
   const totalRounds = useMemo(() => {
     const config = getCompetitionConfigBundle(bundles, "masculino");
     if (config) return leagueRoundCount(config.teamsPerGroup);
@@ -46,6 +42,7 @@ export function useQuinielaSeason() {
 
   return {
     matchdays,
+    leagueMatchdays: editedMatchdays,
     teams,
     currentRound,
     totalRounds,
@@ -57,6 +54,7 @@ export function useQuinielaSeason() {
 
 export type QuinielaSeason = {
   matchdays: Matchday[];
+  leagueMatchdays: Matchday[];
   teams: Team[];
   currentRound: number;
   totalRounds: number;

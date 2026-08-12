@@ -1,4 +1,5 @@
-import { computeStandings, extractLeagueMatches } from "@/lib/standings";
+import { computeStandings, extractLeagueMatches, getLastPlayedLeagueRound, getTeamsAtRound, qualifyingRoundAfterJornada } from "@/lib/standings";
+import { PRIMERA_RFEF_RULES } from "@/lib/rfef-rules";
 import { hasSeasonStarted } from "@/lib/quinigol";
 import type { Matchday, Team } from "@/types";
 
@@ -16,11 +17,31 @@ export function scoreClasificacionPosition(predicted: number, actual: number): n
 }
 
 export function buildActualStandingsByTeamId(teams: Team[], matchdays: Matchday[]): Map<string, number> {
+  if (matchdays.length === 0 || teams.length === 0) {
+    return new Map();
+  }
+
+  const lastPlayed = getLastPlayedLeagueRound(matchdays);
+  const qualifyingRound = qualifyingRoundAfterJornada(lastPlayed);
+  const standingsTeams = getTeamsAtRound(
+    teams,
+    matchdays,
+    qualifyingRound,
+    PRIMERA_RFEF_RULES.zones,
+    PRIMERA_RFEF_RULES.tiebreak,
+  );
+
+  if (standingsTeams.length > 0) {
+    return new Map(standingsTeams.map((team) => [team.id, team.position]));
+  }
+
   const allMatches = matchdays.flatMap((matchday) => matchday.matches);
   const leagueMatches = extractLeagueMatches(allMatches);
   const standings = computeStandings(
     teams.map((team) => team.id),
     leagueMatches,
+    PRIMERA_RFEF_RULES.zones,
+    PRIMERA_RFEF_RULES.tiebreak,
   );
   return new Map(standings.map((row) => [row.teamId, row.position]));
 }
