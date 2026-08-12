@@ -11,9 +11,9 @@ import {
 import type { GoalsPick, Match, Matchday, Prediction, PredictionOutcome, Team } from "@/types";
 
 export const QUINIELA_TABS = [
-  { href: "/quiniela/quiniela", label: "Pronosticos" },
-  { href: "/quiniela/resultado", label: "Resultado" },
-  { href: "/quiniela/ranking", label: "Ranking" },
+  { href: "/juegos/quiniela/pronosticos", label: "Pronosticos" },
+  { href: "/juegos/quiniela/resultado", label: "Resultado" },
+  { href: "/juegos/quiniela/ranking", label: "Ranking" },
 ] as const;
 
 export function normalizeGoalsPick(value: unknown): GoalsPick | undefined {
