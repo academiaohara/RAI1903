@@ -55,3 +55,47 @@ export function isClasificacionComplete(
 export function isClasificacionLocked(matchdays: Matchday[], now = new Date()): boolean {
   return hasSeasonStarted(matchdays, now);
 }
+
+/** Positivo = el equipo acaba peor de lo predicho; negativo = mejor. */
+export function getPositionDiff(predicted: number, actual: number): number {
+  return actual - predicted;
+}
+
+export type PositionDiffKind = "exact" | "above" | "below";
+
+export function getPositionDiffKind(predicted: number, actual: number): PositionDiffKind {
+  const diff = getPositionDiff(predicted, actual);
+  if (diff === 0) return "exact";
+  return diff > 0 ? "below" : "above";
+}
+
+export function predictionsToOrderedTeamIds(
+  teams: Team[],
+  predictions: Record<string, ClasificacionPrediction>,
+): string[] {
+  const ranked = teams
+    .filter((team) => predictions[team.id])
+    .sort(
+      (a, b) =>
+        (predictions[a.id]?.position ?? 999) - (predictions[b.id]?.position ?? 999) ||
+        a.name.localeCompare(b.name, "es"),
+    )
+    .map((team) => team.id);
+
+  const unranked = teams
+    .filter((team) => !predictions[team.id])
+    .sort((a, b) => a.name.localeCompare(b.name, "es"))
+    .map((team) => team.id);
+
+  return [...ranked, ...unranked];
+}
+
+export function orderedTeamIdsToPredictions(orderedTeamIds: string[]): Record<string, ClasificacionPrediction> {
+  const updatedAt = new Date().toISOString();
+  return Object.fromEntries(
+    orderedTeamIds.map((teamId, index) => [
+      teamId,
+      { teamId, position: index + 1, updatedAt } satisfies ClasificacionPrediction,
+    ]),
+  );
+}

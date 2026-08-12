@@ -11,6 +11,8 @@ import {
   buildActualStandingsByTeamId,
   isClasificacionComplete,
   isClasificacionLocked,
+  orderedTeamIdsToPredictions,
+  predictionsToOrderedTeamIds,
   scoreClasificacionPrediction,
   type ClasificacionPrediction,
 } from "@/lib/clasificacion-prediction";
@@ -33,6 +35,12 @@ export default function ClasificacionPronosticosPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
+  const defaultPredictions = useMemo(() => {
+    if (teams.length === 0) return {};
+    return orderedTeamIdsToPredictions(predictionsToOrderedTeamIds(teams, {}));
+  }, [teams]);
+  const effectivePredictions = Object.keys(predictions).length > 0 ? predictions : defaultPredictions;
+
   const actualPositions = useMemo(
     () => buildActualStandingsByTeamId(teams, matchdays),
     [teams, matchdays],
@@ -43,9 +51,10 @@ export default function ClasificacionPronosticosPage() {
   const canEdit = isSubmitted && !isLocked;
   const canSave = !isLocked && (!isSubmitted || isEditing);
   const needsLogin = clasificacionRequiresAuth() && hydrated && !userId;
+  const showCompare = isLocked && Object.keys(effectivePredictions).length > 0;
   const totalPoints = useMemo(
-    () => scoreClasificacionPrediction(predictions, actualPositions),
-    [predictions, actualPositions],
+    () => scoreClasificacionPrediction(effectivePredictions, actualPositions),
+    [effectivePredictions, actualPositions],
   );
 
   useEffect(() => {
@@ -83,32 +92,23 @@ export default function ClasificacionPronosticosPage() {
     };
   }, [seasonId]);
 
-  const handleChange = useCallback(
-    (teamId: string, position: number) => {
-      setPredictions((current) => {
-        const next = {
-          ...current,
-          [teamId]: {
-            teamId,
-            position,
-            updatedAt: new Date().toISOString(),
-          },
-        };
-        if (!isSubmitted || isEditing) {
-          void saveClasificacionPredictions(userId, next, seasonId);
-        }
-        return next;
-      });
+  const handleReorder = useCallback(
+    (orderedTeamIds: string[]) => {
+      const next = orderedTeamIdsToPredictions(orderedTeamIds);
+      setPredictions(next);
+      if (!isSubmitted || isEditing) {
+        void saveClasificacionPredictions(userId, next, seasonId);
+      }
     },
     [isSubmitted, isEditing, userId, seasonId],
   );
 
   const handleSave = async () => {
-    if (!isClasificacionComplete(predictions, teams.length)) {
-      await alert("Asigna una posición distinta del 1 al último puesto a cada equipo antes de guardar.");
+    if (!isClasificacionComplete(effectivePredictions, teams.length)) {
+      await alert("Ordena todos los equipos antes de guardar.");
       return;
     }
-    void saveClasificacionPredictions(userId, predictions, seasonId);
+    void saveClasificacionPredictions(userId, effectivePredictions, seasonId);
     void saveClasificacionSubmission(userId, seasonId);
     setSubmittedAt(new Date().toISOString());
     setIsEditing(false);
@@ -124,7 +124,7 @@ export default function ClasificacionPronosticosPage() {
 
       {needsLogin && (
         <p className="rounded-xl border border-[#214C9B]/25 bg-blue-50 px-3 py-2 text-xs font-bold text-[#214C9B] sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
-          Inicia sesión para guardar tu predicción en Supabase y aparecer en el ranking.
+          Inicia sesión para guardar tu predicción y aparecer en el ranking.
         </p>
       )}
 
@@ -136,15 +136,15 @@ export default function ClasificacionPronosticosPage() {
 
       {hydrated && !isSubmitted && !isLocked && (
         <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
-          Completa las 20 posiciones y pulsa Guardar antes del pitido inicial de la primera jornada.
+          Ordena los equipos y pulsa Guardar antes del pitido inicial de la primera jornada.
         </p>
       )}
 
       <Card
         eyebrow="Temporada"
-        title="Tu predicción de clasificación"
+        title={showCompare ? "Tu predicción frente a la clasificación" : "Tu predicción de clasificación"}
         action={
-          hydrated && Object.keys(predictions).length > 0 ? (
+          hydrated && Object.keys(effectivePredictions).length > 0 && (showCompare || isSubmitted) ? (
             <div className="flex min-w-[4.5rem] flex-col items-center rounded-2xl border border-[#214C9B]/15 bg-slate-50/80 px-3 py-2 text-center sm:min-w-[5.5rem] sm:px-4 sm:py-2.5">
               <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[#981915] sm:text-xs">Puntos</p>
               <p
@@ -158,11 +158,11 @@ export default function ClasificacionPronosticosPage() {
       >
         <ClasificacionForm
           teams={teams}
-          predictions={predictions}
+          predictions={effectivePredictions}
           actualPositions={actualPositions}
           readOnly={readOnly}
-          mode="edit"
-          onChange={handleChange}
+          mode={showCompare ? "compare" : "edit"}
+          onReorder={handleReorder}
         />
 
         <div className="mt-4 flex flex-wrap gap-2 border-t border-[#214C9B]/15 pt-3 sm:mt-6 sm:gap-3 sm:pt-5">
