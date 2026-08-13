@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>RAIniela - Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --paper: #fdf9f1;
+    --ink-red: #d43b2f;
+    --ink-red-dark: #b5281f;
+    --ink-blue: #1c3f6e;
+    --pencil: #1a1a1a;
+    --line: #e8b4ae;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Oswald',sans-serif;
+    background:#2b2b2b;
+    color:#eee;
+    padding:32px 16px 80px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:24px;
+  }
+  h1{font-size:1.1rem;font-weight:500;letter-spacing:.04em;opacity:.8;margin:0;}
+
+  #ticket{
+    width:640px;
+    background:var(--paper);
+    border:3px solid var(--ink-red);
+    border-radius:4px;
+    padding:18px 22px 22px;
+    position:relative;
+    background-image:
+      repeating-linear-gradient(transparent 0 27px, rgba(0,0,0,0.025) 27px 28px);
+  }
+  .header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:2px solid var(--ink-red);
+    padding-bottom:8px;
+    margin-bottom:10px;
+  }
+  .header .brand{
+    font-weight:600;
+    font-size:1.15rem;
+    color:var(--ink-blue);
+    letter-spacing:.03em;
+  }
+  .header .brand span{color:var(--ink-red);}
+  .header .meta{
+    text-align:right;
+    font-size:.7rem;
+    color:#555;
+    line-height:1.4;
+  }
+  .subheader{
+    background:var(--ink-blue);
+    color:#fff;
+    font-size:.75rem;
+    letter-spacing:.06em;
+    padding:5px 10px;
+    border-radius:2px;
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:10px;
+  }
+
+  table{width:100%;border-collapse:collapse;}
+  td, th{padding:0;}
+  .row{border-bottom:1px solid var(--line);}
+  .num{
+    width:22px;
+    text-align:center;
+    font-size:.75rem;
+    color:#888;
+    font-weight:500;
+  }
+  .teams{
+    padding:5px 8px 5px 4px;
+    font-size:.82rem;
+    font-weight:500;
+    color:#222;
+    white-space:nowrap;
+  }
+  .signs{
+    display:flex;
+    gap:6px;
+    justify-content:flex-end;
+    padding:4px 2px;
+  }
+  .box{
+    width:26px;
+    height:26px;
+    border:1.5px solid var(--ink-red);
+    border-radius:3px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:.78rem;
+    color:var(--ink-red-dark);
+    font-weight:600;
+    position:relative;
+    cursor:pointer;
+    user-select:none;
+    background:#fffdf9;
+    transition:background .1s;
+  }
+  .box:hover{background:#ffece9;}
+  .box .mark{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Kalam',cursive;
+    font-size:1.5rem;
+    color:var(--pencil);
+    pointer-events:none;
+  }
+
+  /* Separador antes del bloque de marcador */
+  .goals-section{
+    margin-top:4px;
+    padding-top:10px;
+  }
+  .goals-title{
+    font-size:.7rem;
+    font-weight:600;
+    color:var(--ink-blue);
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    margin-bottom:8px;
+  }
+  .featured-extra{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:2px 4px 4px 4px;
+  }
+  .score-block{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+  }
+  .score-block .who{
+    font-size:.6rem;
+    font-weight:600;
+    color:var(--ink-blue);
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  .score-opts{
+    display:flex;
+    gap:4px;
+  }
+  .score-opt{
+    width:20px;
+    height:20px;
+    border:1.5px solid var(--ink-red);
+    border-radius:3px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:.6rem;
+    color:var(--ink-red-dark);
+    font-weight:600;
+    position:relative;
+    background:#fffdf9;
+    cursor:pointer;
+  }
+  .score-opt .mark{
+    position:absolute;
+    inset:-5px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Kalam',cursive;
+    font-size:1.25rem;
+    color:var(--pencil);
+    pointer-events:none;
+  }
+  .goleador-block{
+    display:flex;
+    align-items:baseline;
+    gap:6px;
+    font-size:.68rem;
+    color:#555;
+  }
+  .goleador-block .label{
+    font-weight:600;
+    color:var(--ink-blue);
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  .goleador-block .name{
+    font-family:'Kalam',cursive;
+    font-size:1.05rem;
+    color:var(--pencil);
+    transform:rotate(-1.5deg);
+    display:inline-block;
+  }
+
+  .footer{
+    margin-top:10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:.65rem;
+    color:#777;
+    border-top:1px solid var(--line);
+    padding-top:6px;
+  }
+  .footer .handle{
+    font-family:'Kalam',cursive;
+    font-size:.9rem;
+    color:var(--ink-blue);
+  }
+
+  #controls{
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+  button{
+    font-family:'Oswald',sans-serif;
+    background:var(--ink-red);
+    color:#fff;
+    border:none;
+    padding:10px 18px;
+    border-radius:4px;
+    font-size:.85rem;
+    letter-spacing:.03em;
+    cursor:pointer;
+  }
+  button:hover{background:var(--ink-red-dark);}
+  #hint{font-size:.75rem;opacity:.6;max-width:640px;text-align:center;}
+</style>
+</head>
+<body>
+
+<h1>DEMO — RAIniela (encabezado y filas del boleto clásico)</h1>
+
+<div id="ticket">
+  <div class="header">
+    <div class="brand">RAI<span>niela</span></div>
+    <div class="meta">1ª RFEF — Grupo 1<br>Jornada 3 · 12-10-2025</div>
+  </div>
+  <div class="subheader">
+    <span>PRONÓSTICO</span><span>Toca el recuadro para marcar</span>
+  </div>
+
+  <table id="rows"></table>
+
+  <div class="goals-section">
+    <div class="goals-title">Marcador — Real Avilés Industrial</div>
+    <div class="featured-extra">
+      <div class="score-block">
+        <span class="who">Real Avilés</span>
+        <div class="score-opts" data-team="local">
+          <div class="score-opt" data-val="0">0<span class="mark"></span></div>
+          <div class="score-opt" data-val="1">1<span class="mark"></span></div>
+          <div class="score-opt" data-val="2">2<span class="mark"></span></div>
+          <div class="score-opt" data-val="M">M<span class="mark"></span></div>
+        </div>
+      </div>
+      <div class="goleador-block">
+        <span class="label">Goleador</span>
+        <span class="name" id="goleadorName">—</span>
+      </div>
+      <div class="score-block">
+        <span class="who">Pontevedra</span>
+        <div class="score-opts" data-team="visitante">
+          <div class="score-opt" data-val="0">0<span class="mark"></span></div>
+          <div class="score-opt" data-val="1">1<span class="mark"></span></div>
+          <div class="score-opt" data-val="2">2<span class="mark"></span></div>
+          <div class="score-opt" data-val="M">M<span class="mark"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Generado en realaviles.com/rainiela</span>
+    <span class="handle">@usuario</span>
+    <span>Acierta y comparte ↗</span>
+  </div>
+</div>
+
+<div id="controls">
+  <button id="randomBtn">Rellenar al azar</button>
+  <button id="downloadBtn">Descargar imagen</button>
+</div>
+<p id="hint">Mismo encabezado, líneas de papel y filas de tabla que la primera demo, pero cerrando con la fila del Real Avilés Industrial, que añade el marcador 0/1/2/M por equipo y el goleador, todo con la misma X manuscrita sin resaltados de color.</p>
+
+<script>
+const grupo = [
+  "Amorebieta - Sestao River",
+  "Real Unión - Zamora",
+  "Arenas Club - Racing Ferrol",
+  "Guijuelo - Numancia",
+  "Tudelano - Osasuna B",
+  "Gimnástica - Mérida",
+  "Celta B - Salamanca UDS",
+  "Unionistas - Ourense",
+  "Bilbao Ath. - Barakaldo"
+];
+
+const tbody = document.getElementById('rows');
+
+grupo.forEach((p, i) => {
+  const tr = document.createElement('tr');
+  tr.className = 'row';
+  tr.innerHTML = `
+    <td class="num">${i+1}</td>
+    <td class="teams">${p}</td>
+    <td>
+      <div class="signs" data-row="${i}">
+        <div class="box" data-val="1">1<span class="mark"></span></div>
+        <div class="box" data-val="X">X<span class="mark"></span></div>
+        <div class="box" data-val="2">2<span class="mark"></span></div>
+      </div>
+    </td>`;
+  tbody.appendChild(tr);
+});
+
+// Fila 10: partido del Real Avilés Industrial — misma estructura que el resto de filas
+const featTr = document.createElement('tr');
+featTr.className = 'row';
+featTr.innerHTML = `
+  <td class="num">10</td>
+  <td class="teams">Real Avilés Industrial - Pontevedra CF</td>
+  <td>
+    <div class="signs" data-row="featured">
+      <div class="box" data-val="1">1<span class="mark"></span></div>
+      <div class="box" data-val="X">X<span class="mark"></span></div>
+      <div class="box" data-val="2">2<span class="mark"></span></div>
+    </div>
+  </td>`;
+tbody.appendChild(featTr);
+
+function markBox(group, val){
+  group.querySelectorAll('.box').forEach(b=>{
+    const mark = b.querySelector('.mark');
+    if(b.dataset.val === val){
+      const rot = (Math.random()*14 - 7).toFixed(1);
+      mark.textContent = 'X';
+      mark.style.transform = `rotate(${rot}deg)`;
+    } else {
+      mark.textContent = '';
+    }
+  });
+}
+
+function markScore(group, val){
+  group.querySelectorAll('.score-opt').forEach(o=>{
+    const mark = o.querySelector('.mark');
+    if(o.dataset.val === val){
+      const rot = (Math.random()*14 - 7).toFixed(1);
+      mark.textContent = 'X';
+      mark.style.transform = `rotate(${rot}deg)`;
+    } else {
+      mark.textContent = '';
+    }
+  });
+}
+
+document.querySelectorAll('.signs').forEach(group=>{
+  group.addEventListener('click', e=>{
+    const box = e.target.closest('.box');
+    if(!box) return;
+    markBox(group, box.dataset.val);
+  });
+});
+
+document.querySelectorAll('.score-opts').forEach(group=>{
+  group.addEventListener('click', e=>{
+    const opt = e.target.closest('.score-opt');
+    if(!opt) return;
+    markScore(group, opt.dataset.val);
+  });
+});
+
+const goleadores = ["Rai Nova", "Culebras", "Borja Sánchez", "Álvaro Bustos"];
+
+document.getElementById('randomBtn').addEventListener('click', ()=>{
+  const opts = ['1','X','2'];
+  document.querySelectorAll('.signs').forEach(group=>{
+    markBox(group, opts[Math.floor(Math.random()*3)]);
+  });
+  document.getElementById('goleadorName').textContent =
+    goleadores[Math.floor(Math.random()*goleadores.length)];
+  document.querySelectorAll('.score-opts').forEach(group=>{
+    const scoreOpts = group.querySelectorAll('.score-opt');
+    const chosen = scoreOpts[Math.floor(Math.random()*scoreOpts.length)];
+    markScore(group, chosen.dataset.val);
+  });
+});
+
+document.getElementById('downloadBtn').addEventListener('click', async ()=>{
+  const canvas = await html2canvas(document.getElementById('ticket'), {scale: 3, backgroundColor:'#fdf9f1'});
+  const link = document.createElement('a');
+  link.download = 'mi-rainiela.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
+
+document.getElementById('randomBtn').click();
+</script>
+
+</body>
+</html>

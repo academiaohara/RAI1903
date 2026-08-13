@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Rainigol - Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --paper: #fdf9f1;
+    --ink-red: #d43b2f;
+    --ink-red-dark: #b5281f;
+    --ink-blue: #1c3f6e;
+    --pencil: #1a1a1a;
+    --line: #e8b4ae;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Oswald',sans-serif;
+    background:#2b2b2b;
+    color:#eee;
+    padding:32px 16px 80px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:24px;
+  }
+  h1{font-size:1.1rem;font-weight:500;letter-spacing:.04em;opacity:.8;margin:0;}
+
+  #ticket{
+    width:640px;
+    background:var(--paper);
+    border:3px solid var(--ink-red);
+    border-radius:4px;
+    padding:18px 22px 22px;
+    position:relative;
+    background-image:
+      repeating-linear-gradient(transparent 0 27px, rgba(0,0,0,0.025) 27px 28px);
+  }
+  .header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:2px solid var(--ink-red);
+    padding-bottom:8px;
+    margin-bottom:10px;
+  }
+  .header .brand{
+    font-weight:600;
+    font-size:1.15rem;
+    color:var(--ink-blue);
+    letter-spacing:.03em;
+  }
+  .header .brand span{color:var(--ink-red);}
+  .header .meta{
+    text-align:right;
+    font-size:.7rem;
+    color:#555;
+    line-height:1.4;
+  }
+  .subheader{
+    background:var(--ink-blue);
+    color:#fff;
+    font-size:.75rem;
+    letter-spacing:.06em;
+    padding:5px 10px;
+    border-radius:2px;
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:10px;
+  }
+
+  table{width:100%;border-collapse:collapse;}
+  td, th{padding:0;}
+  .row{border-bottom:1px solid var(--line);}
+  .num{
+    width:22px;
+    text-align:center;
+    font-size:.75rem;
+    color:#888;
+    font-weight:500;
+  }
+  .teams{
+    padding:6px 8px 6px 4px;
+    font-size:.8rem;
+    font-weight:500;
+    color:#222;
+    white-space:nowrap;
+  }
+
+  /* Marcador exacto por partido: dos grupos de 0/1/2/M separados por guion */
+  .rainigol-scores{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:6px;
+    padding:6px 2px;
+  }
+  .score-opts{
+    display:flex;
+    gap:4px;
+  }
+  .score-opt{
+    width:20px;
+    height:20px;
+    border:1.5px solid var(--ink-red);
+    border-radius:3px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:.62rem;
+    color:var(--ink-red-dark);
+    font-weight:600;
+    position:relative;
+    background:#fffdf9;
+    cursor:pointer;
+  }
+  .score-opt:hover{background:#ffece9;}
+  .score-opt .mark{
+    position:absolute;
+    inset:-6px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Kalam',cursive;
+    font-size:1.3rem;
+    color:var(--pencil);
+    pointer-events:none;
+  }
+  .dash{
+    font-size:.75rem;
+    color:var(--ink-blue);
+    font-weight:600;
+  }
+
+  .footer{
+    margin-top:10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:.65rem;
+    color:#777;
+    border-top:1px solid var(--line);
+    padding-top:6px;
+  }
+  .footer .handle{
+    font-family:'Kalam',cursive;
+    font-size:.9rem;
+    color:var(--ink-blue);
+  }
+
+  #controls{
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+  button{
+    font-family:'Oswald',sans-serif;
+    background:var(--ink-red);
+    color:#fff;
+    border:none;
+    padding:10px 18px;
+    border-radius:4px;
+    font-size:.85rem;
+    letter-spacing:.03em;
+    cursor:pointer;
+  }
+  button:hover{background:var(--ink-red-dark);}
+  #hint{font-size:.75rem;opacity:.6;max-width:640px;text-align:center;}
+</style>
+</head>
+<body>
+
+<h1>DEMO — Rainigol (marcador exacto, sin goleadores)</h1>
+
+<div id="ticket">
+  <div class="header">
+    <div class="brand">RAI<span>nigol</span></div>
+    <div class="meta">1ª RFEF — Grupo 1<br>Jornada 3 · 12-10-2025</div>
+  </div>
+  <div class="subheader">
+    <span>MARCADOR EXACTO</span><span>Toca el recuadro para marcar</span>
+  </div>
+
+  <table id="rows"></table>
+
+  <div class="footer">
+    <span>Generado en realaviles.com/rainigol</span>
+    <span class="handle">@usuario</span>
+    <span>Acierta y comparte ↗</span>
+  </div>
+</div>
+
+<div id="controls">
+  <button id="randomBtn">Rellenar al azar</button>
+  <button id="downloadBtn">Descargar imagen</button>
+</div>
+<p id="hint">Mismo boleto clásico que la Rainiela, pero cada partido lleva dos grupos de casillas 0/1/2/M (goles del local y del visitante) en vez de 1/X/2, y no hay línea de goleador en ningún partido.</p>
+
+<script>
+const partidos = [
+  "Real Avilés Industrial - Pontevedra CF",
+  "Amorebieta - Sestao River",
+  "Real Unión - Zamora",
+  "Arenas Club - Racing Ferrol",
+  "Guijuelo - Numancia",
+  "Tudelano - Osasuna B",
+  "Gimnástica - Mérida",
+  "Celta B - Salamanca UDS",
+  "Unionistas - Ourense",
+  "Bilbao Ath. - Barakaldo"
+];
+
+const tbody = document.getElementById('rows');
+
+partidos.forEach((p, i) => {
+  const tr = document.createElement('tr');
+  tr.className = 'row';
+  tr.innerHTML = `
+    <td class="num">${i+1}</td>
+    <td class="teams">${p}</td>
+    <td>
+      <div class="rainigol-scores">
+        <div class="score-opts" data-row="${i}" data-team="local">
+          <div class="score-opt" data-val="0">0<span class="mark"></span></div>
+          <div class="score-opt" data-val="1">1<span class="mark"></span></div>
+          <div class="score-opt" data-val="2">2<span class="mark"></span></div>
+          <div class="score-opt" data-val="M">M<span class="mark"></span></div>
+        </div>
+        <span class="dash">-</span>
+        <div class="score-opts" data-row="${i}" data-team="visitante">
+          <div class="score-opt" data-val="0">0<span class="mark"></span></div>
+          <div class="score-opt" data-val="1">1<span class="mark"></span></div>
+          <div class="score-opt" data-val="2">2<span class="mark"></span></div>
+          <div class="score-opt" data-val="M">M<span class="mark"></span></div>
+        </div>
+      </div>
+    </td>`;
+  tbody.appendChild(tr);
+});
+
+function markScore(group, val){
+  group.querySelectorAll('.score-opt').forEach(o=>{
+    const mark = o.querySelector('.mark');
+    if(o.dataset.val === val){
+      const rot = (Math.random()*14 - 7).toFixed(1);
+      mark.textContent = 'X';
+      mark.style.transform = `rotate(${rot}deg)`;
+    } else {
+      mark.textContent = '';
+    }
+  });
+}
+
+document.querySelectorAll('.score-opts').forEach(group=>{
+  group.addEventListener('click', e=>{
+    const opt = e.target.closest('.score-opt');
+    if(!opt) return;
+    markScore(group, opt.dataset.val);
+  });
+});
+
+document.getElementById('randomBtn').addEventListener('click', ()=>{
+  const vals = ['0','1','2','M'];
+  document.querySelectorAll('.score-opts').forEach(group=>{
+    markScore(group, vals[Math.floor(Math.random()*vals.length)]);
+  });
+});
+
+document.getElementById('downloadBtn').addEventListener('click', async ()=>{
+  const canvas = await html2canvas(document.getElementById('ticket'), {scale: 3, backgroundColor:'#fdf9f1'});
+  const link = document.createElement('a');
+  link.download = 'mi-rainigol.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
+
+document.getElementById('randomBtn').click();
+</script>
+
+</body>
+</html>
