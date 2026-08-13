@@ -39,14 +39,18 @@ const logoByKind = {
 
 function TicketBrand({ kind }: { kind: TicketKind }) {
   const logo = logoByKind[kind];
+  const label = kind === "quiniela" ? "RAIniela" : kind === "quinigol" ? "RAIGol" : "El Oráculo";
   if (logo) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        className={`game-ticket-logo game-ticket-logo--${kind}`}
-        src={logo}
-        alt={kind === "quiniela" ? "RAIniela" : kind === "quinigol" ? "RAIGol" : "El Oráculo"}
-      />
+      <div className="game-ticket-brand" aria-label={label}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          className={`game-ticket-logo game-ticket-logo--${kind}`}
+          src={logo}
+          alt=""
+        />
+        <strong>{label}</strong>
+      </div>
     );
   }
   return null;
