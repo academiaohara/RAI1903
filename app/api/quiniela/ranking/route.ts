@@ -53,9 +53,14 @@ export async function GET(request: Request) {
   }
 
   try {
+    const throughRound = roundParam ? Number(roundParam) : undefined;
+    if (throughRound !== undefined && (!Number.isFinite(throughRound) || throughRound < 1)) {
+      return NextResponse.json({ error: "round inválido." }, { status: 400 });
+    }
     const supabase = await createQuinielaRankingClient();
     const result = await computeQuinielaRankingFromSupabase(supabase, seasonId as CompetitionSeasonId, {
       scope: "season",
+      throughRound,
     });
     return NextResponse.json({
       scope: "season",

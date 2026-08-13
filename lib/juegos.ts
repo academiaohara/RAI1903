@@ -8,7 +8,6 @@ export type GameModeId = (typeof GAME_MODES)[number]["id"];
 
 export const GAME_TABS = [
   { slug: "pronosticos", label: "Pronósticos" },
-  { slug: "resultado", label: "Resultado" },
   { slug: "ranking", label: "Ranking" },
 ] as const;
 

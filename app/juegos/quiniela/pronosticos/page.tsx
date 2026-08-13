@@ -6,7 +6,6 @@ import { Card } from "@/components/Card";
 import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
 import { QuinielaTicket } from "@/components/juegos/GameTicket";
-import { bebasNeue } from "@/lib/fonts";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { QuinielaHowItWorks } from "@/components/QuinielaHowItWorks";
 import { useSeason } from "@/components/season/SeasonProvider";
@@ -22,11 +21,15 @@ import {
   hasFirstMatchStarted,
   isMatchdayComplete,
   isMatchdayFullyFinished,
+  isScorerPredictionCorrect,
+  isAvilesMatch,
   sortQuinielaMatches,
 } from "@/lib/quiniela";
 import { loadQuinielaState, saveQuinielaPredictions, saveQuinielaRound } from "@/lib/quiniela-storage";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { getUserDisplayName } from "@/lib/auth/user-display";
+import { scorerLabelForPlayer } from "@/lib/squad-player-resolve";
 import type { Matchday, Prediction } from "@/types";
 import type { User } from "@supabase/supabase-js";
 
@@ -51,6 +54,7 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
   const [predictions, setPredictions] = useState<Record<string, Prediction>>({});
   const [savedRounds, setSavedRounds] = useState<Record<number, string>>({});
   const [userId, setUserId] = useState<string | null>(null);
+  const [userHandle, setUserHandle] = useState("@usuario");
   const [isEditing, setIsEditing] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
@@ -63,6 +67,7 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
       setPredictions(state.predictions);
       setSavedRounds(state.savedRounds);
       setUserId(user?.id ?? null);
+      setUserHandle(user ? getUserDisplayName(user) : "@usuario");
       setIsEditing(false);
       setHydrated(true);
     };
@@ -113,6 +118,26 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
   );
   const needsLogin = quinielaRequiresAuth() && hydrated && !userId;
   const showScore = hydrated && finishedMatches > 0;
+  const scorerCorrectByMatch = useMemo(
+    () =>
+      Object.fromEntries(
+        selectedMatchday.matches
+          .filter((match) => match.status === "finished" && isAvilesMatch(match) && predictions[match.id]?.scorer)
+          .map((match) => [
+            match.id,
+            isScorerPredictionCorrect(
+              match,
+              predictions[match.id]!,
+              scoringOptionsForMatch(scoringContext, match),
+            ),
+          ]),
+      ),
+    [predictions, scoringContext, selectedMatchday.matches],
+  );
+  const validScorers = useMemo(
+    () => new Set(scoringContext.squad.map((player) => scorerLabelForPlayer(player))),
+    [scoringContext.squad],
+  );
 
   const statusBanner = useMemo(() => {
     if (jornadaFinalizada) return "finished" as const;
@@ -138,6 +163,15 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
   const handleSave = async () => {
     if (!isMatchdayComplete(selectedMatchday, predictions)) {
       await alert("Completa los 10 partidos (signo 1-X-2 y porra del Avilés si aplica) antes de guardar.");
+      return;
+    }
+    const hasInvalidScorer = selectedMatchday.matches.some((match) => {
+      if (!isAvilesMatch(match)) return false;
+      const scorer = predictions[match.id]?.scorer;
+      return scorer !== "nadie" && (!scorer || !validScorers.has(scorer));
+    });
+    if (hasInvalidScorer) {
+      await alert("Selecciona el goleador del Avilés en la lista de la plantilla.");
       return;
     }
     void saveQuinielaPredictions(userId, predictions, seasonId);
@@ -195,25 +229,7 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
         </p>
       )}
 
-      <Card
-        eyebrow={`Jornada ${selectedMatchday.round}`}
-        title="Tu RAIniela"
-        action={
-          showScore ? (
-            <div
-              className="flex min-w-[4.5rem] flex-col items-center rounded-2xl border border-[#214C9B]/15 bg-slate-50/80 px-3 py-2 text-center sm:min-w-[5.5rem] sm:px-4 sm:py-2.5"
-              aria-label={`Puntuación de la jornada: ${matchdayPoints} puntos`}
-            >
-              <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[#981915] sm:text-xs">Puntos</p>
-              <p
-                className={`${bebasNeue.className} text-[1.35rem] font-normal leading-[0.9] tracking-[0.25px] text-[#214C9B] tabular-nums sm:text-[64px] sm:tracking-[1px] lg:text-[72px]`}
-              >
-                {matchdayPoints}
-              </p>
-            </div>
-          ) : undefined
-        }
-      >
+      <Card eyebrow={`Jornada ${selectedMatchday.round}`} title="Tu boleto">
         {!bundlesLoading && !hasMatchesForRound && (
           <p className="mb-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 sm:mb-4 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
             {isCmsEditor ? (
@@ -247,10 +263,13 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
             competitionLabel={getCompetitionConfig("masculino").ligaLabel ?? "1ª RFEF — Grupo 1"}
             readOnly={readOnly}
             onChange={updatePrediction}
+            creatorHandle={userHandle}
+            points={showScore ? matchdayPoints : undefined}
+            scorerCorrectByMatch={scorerCorrectByMatch}
           />
         ) : null}
 
-        <div className="mt-4 flex flex-wrap gap-2 border-t border-[#214C9B]/15 pt-3 sm:mt-6 sm:gap-3 sm:pt-5">
+        <div className="mt-3 flex max-w-[900px] flex-wrap gap-2 sm:gap-3">
           {canSave && (
             <button
               type="button"

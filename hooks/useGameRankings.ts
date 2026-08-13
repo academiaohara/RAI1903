@@ -76,7 +76,7 @@ export function useQuinigolRoundRanking(
   return { entries, loading, countPoints, error, needsAuth: isSupabaseConfigured() };
 }
 
-export function useQuinigolSeasonRanking(seasonId: CompetitionSeasonId) {
+export function useQuinigolSeasonRanking(seasonId: CompetitionSeasonId, throughRound?: number) {
   const [entries, setEntries] = useState<GameSeasonRankingEntry[]>([]);
   const [countPoints, setCountPoints] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -98,6 +98,7 @@ export function useQuinigolSeasonRanking(seasonId: CompetitionSeasonId) {
 
       try {
         const params = new URLSearchParams({ seasonId, scope: "season" });
+        if (throughRound) params.set("round", String(throughRound));
         const response = await fetch(`/api/quinigol/ranking?${params.toString()}`);
         const payload = (await response.json()) as {
           entries?: GameSeasonRankingEntry[];
@@ -132,7 +133,7 @@ export function useQuinigolSeasonRanking(seasonId: CompetitionSeasonId) {
     return () => {
       cancelled = true;
     };
-  }, [seasonId]);
+  }, [seasonId, throughRound]);
 
   return { entries, loading, countPoints, error, needsAuth: isSupabaseConfigured() };
 }
