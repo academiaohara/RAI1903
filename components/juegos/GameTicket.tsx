@@ -296,17 +296,26 @@ export function QuinielaTicket({
                   </div>
                   <label className="game-ticket-scorer">
                     <span>Goleador</span>
-                    <select
-                      value={prediction?.scorer ?? ""}
+                    <input
+                      type="text"
+                      list={`game-ticket-scorers-${match.id}`}
+                      value={prediction?.scorer === "nadie" ? "Nadie" : prediction?.scorer ?? ""}
                       disabled={readOnly || avilesGoals === 0}
-                      onChange={(event) => update(match, prediction, { scorer: event.target.value || undefined })}
-                    >
-                      <option value="">Elige jugador</option>
-                      <option value="nadie">Nadie</option>
+                      placeholder="Elige o escribe"
+                      onChange={(event) =>
+                        update(match, prediction, {
+                          scorer: event.target.value.toLocaleLowerCase("es") === "nadie"
+                            ? "nadie"
+                            : event.target.value || undefined,
+                        })
+                      }
+                    />
+                    <datalist id={`game-ticket-scorers-${match.id}`}>
+                      <option value="Nadie" />
                       {scorerOptions.map((scorer) => (
-                        <option key={scorer} value={scorer}>{scorer}</option>
+                        <option key={scorer} value={scorer} />
                       ))}
-                    </select>
+                    </datalist>
                   </label>
                 </div>
               ) : null}
