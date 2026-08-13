@@ -6,6 +6,7 @@ import { Card } from "@/components/Card";
 import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
 import { PredictionForm } from "@/components/PredictionForm";
+import { QuinielaTicket } from "@/components/juegos/GameTicket";
 import { bebasNeue } from "@/lib/fonts";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { QuinielaHowItWorks } from "@/components/QuinielaHowItWorks";
@@ -33,14 +34,15 @@ import type { User } from "@supabase/supabase-js";
 type PronosticosBodyProps = {
   seasonId: CompetitionSeasonId;
   matchdays: Matchday[];
+  teams: ReturnType<typeof useQuinielaSeason>["teams"];
   currentRound: number;
   totalRounds: number;
   bundlesLoading: boolean;
 };
 
-function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundlesLoading }: PronosticosBodyProps) {
+function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds, bundlesLoading }: PronosticosBodyProps) {
   const { alert } = useAppDialog();
-  const { bundles } = useSeason();
+  const { bundles, viewedSeason, getCompetitionConfig } = useSeason();
   const { canEdit: isCmsEditor } = useInlineEditing();
   const scoringContext = useMemo(
     () => buildQuinielaScoringContext(bundles, matchdays),
@@ -263,6 +265,17 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
           ))}
         </div>
 
+        {hasMatchesForRound ? (
+          <QuinielaTicket
+            matches={orderedMatches}
+            teams={teams}
+            predictions={predictions}
+            round={round}
+            seasonLabel={viewedSeason.label}
+            competitionLabel={getCompetitionConfig("masculino").ligaLabel ?? "1ª RFEF — Grupo 1"}
+          />
+        ) : null}
+
         <div className="mt-4 flex flex-wrap gap-2 border-t border-[#214C9B]/15 pt-3 sm:mt-6 sm:gap-3 sm:pt-5">
           {canSave && (
             <button
@@ -291,7 +304,7 @@ function PronosticosBody({ seasonId, matchdays, currentRound, totalRounds, bundl
 }
 
 export default function MiQuinielaPage() {
-  const { matchdays, currentRound, totalRounds, seasonId, bundlesLoading } = useQuinielaSeason();
+  const { matchdays, teams, currentRound, totalRounds, seasonId, bundlesLoading } = useQuinielaSeason();
 
   return (
     <div className="space-y-6">
@@ -308,6 +321,7 @@ export default function MiQuinielaPage() {
         key={seasonId}
         seasonId={seasonId}
         matchdays={matchdays}
+        teams={teams}
         currentRound={currentRound}
         totalRounds={totalRounds}
         bundlesLoading={bundlesLoading}
