@@ -181,6 +181,16 @@ function formatTicketDate(matches: Match[]): string {
   return new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" }).format(firstDate);
 }
 
+function normalizeScorerValue(value: unknown): string {
+  if (typeof value === "string") return value === "[object Object]" ? "" : value;
+  if (!value || typeof value !== "object") return "";
+  const candidate = value as Record<string, unknown>;
+  for (const key of ["label", "value", "displayName", "name"]) {
+    if (typeof candidate[key] === "string") return candidate[key];
+  }
+  return "";
+}
+
 type MatchTicketProps = {
   matches: Match[];
   teams: Team[];
@@ -221,7 +231,7 @@ export function QuinielaTicket({
       outcome: current?.outcome,
       goalsHome: current?.goalsHome,
       goalsAway: current?.goalsAway,
-      scorer: current?.scorer,
+      scorer: normalizeScorerValue(current?.scorer) || undefined,
       ...patch,
       updatedAt: new Date().toISOString(),
     };
@@ -251,6 +261,7 @@ export function QuinielaTicket({
       <ol className="game-ticket-list">
         {matches.map((match, index) => {
           const prediction = predictions[match.id];
+          const scorerValue = normalizeScorerValue(prediction?.scorer);
           const avilesMatch = isAvilesMatch(match);
           const derivedOutcome = avilesMatch
             ? outcomeFromGoalsPicks(prediction?.goalsHome, prediction?.goalsAway)
@@ -303,7 +314,7 @@ export function QuinielaTicket({
                     <input
                       type="text"
                       list={`game-ticket-scorers-${match.id}`}
-                      value={prediction?.scorer === "nadie" ? "Nadie" : prediction?.scorer ?? ""}
+                      value={scorerValue === "nadie" ? "Nadie" : scorerValue}
                       disabled={readOnly || avilesGoals === 0}
                       placeholder="Elige o escribe"
                       onChange={(event) =>
