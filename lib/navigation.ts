@@ -25,6 +25,8 @@ export type NavChild = {
   href: string;
   label: string;
   icon: LucideIcon;
+  /** Si está definido, el mega menú muestra solo el logo (sin icono Lucide ni texto). */
+  logo?: string;
 };
 
 export type NavItem = {
@@ -78,9 +80,24 @@ export const navItems: NavItem[] = [
     label: "Juegos",
     icon: Gamepad2,
     children: [
-      { href: "/juegos/quiniela/pronosticos", label: "RAIniela", icon: CalendarCheck2 },
-      { href: "/juegos/quinigol/pronosticos", label: "RAIGol", icon: Target },
-      { href: "/juegos/clasificacion/pronosticos", label: "El Oráculo", icon: Trophy },
+      {
+        href: "/juegos/quiniela/pronosticos",
+        label: "RAIniela",
+        icon: CalendarCheck2,
+        logo: "/juegos/rainiela.svg",
+      },
+      {
+        href: "/juegos/quinigol/pronosticos",
+        label: "RAIGol",
+        icon: Target,
+        logo: "/juegos/raigol.svg",
+      },
+      {
+        href: "/juegos/clasificacion/pronosticos",
+        label: "El Oráculo",
+        icon: Trophy,
+        logo: "/api/game-logo/oraculo",
+      },
     ],
   },
   {
