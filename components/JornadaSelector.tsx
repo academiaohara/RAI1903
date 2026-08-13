@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, type WheelEvent } from "react";
 import { scrollAlignForIndex, scrollElementHorizontally } from "@/lib/scroll-horizontal";
 import { cn } from "@/lib/utils";
@@ -68,54 +69,57 @@ export function JornadaSelector({
         </p>
       </div>
 
-      <input
-        type="range"
-        min={1}
-        max={total}
-        value={value}
-        onChange={(event) => onChange(Number(event.target.value))}
-        className={cn(
-          "h-2 w-full min-w-0 cursor-pointer appearance-none rounded-full bg-[#214C9B]/15 accent-[#214C9B]",
-          compact ? "mt-2" : "mt-3 sm:mt-4",
-        )}
-        aria-label="Barra de jornadas"
-      />
+      <div className={cn("flex items-center gap-2", compact ? "mt-2" : "mt-3 sm:mt-4")}>
+        <button
+          type="button"
+          disabled={value <= 1}
+          onClick={() => onChange(value - 1)}
+          aria-label="Jornada anterior"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded border-2 border-[#d43b2f] bg-[#fdf9f1] text-[#981915] disabled:opacity-30"
+        >
+          <ChevronLeft size={18} />
+        </button>
 
-      <div
-        ref={listRef}
-        onWheel={handleWheel}
-        className={cn(
-          "relative no-scrollbar flex w-full min-w-0 touch-pan-x scroll-px-1 flex-nowrap overflow-x-auto overscroll-x-contain pb-1",
-          compact ? "mt-2 gap-1.5" : "mt-2 gap-1.5 sm:mt-3 sm:gap-2",
-        )}
-      >
-        {Array.from({ length: total }, (_, index) => {
-          const round = index + 1;
-          const isCurrent = round === currentRound;
-          const isSelected = value === round;
+        <div
+          ref={listRef}
+          onWheel={handleWheel}
+          className="no-scrollbar flex min-w-0 flex-1 touch-pan-x gap-2 overflow-x-auto overscroll-x-contain py-1"
+        >
+          {Array.from({ length: total }, (_, index) => {
+            const round = index + 1;
+            const isCurrent = round === currentRound;
+            const isSelected = value === round;
 
-          return (
-            <button
-              key={round}
-              type="button"
-              data-round={round}
-              onClick={() => onChange(round)}
-              className={cn(
-                "shrink-0 rounded-2xl border font-extrabold transition",
-                compact ? "h-9 min-w-9 text-xs" : "h-9 min-w-9 text-xs sm:h-11 sm:min-w-11 sm:text-sm",
-                isSelected
-                  ? isCurrent
-                    ? "border-[#981915] bg-[#981915] text-white"
-                    : "border-[#214C9B] bg-[#214C9B] text-white"
-                  : isCurrent
-                    ? "border-[#981915]/50 bg-[#981915]/10 text-[#981915] hover:border-[#214C9B] hover:bg-blue-50 hover:text-[#214C9B]"
-                    : "border-[#214C9B]/20 bg-white text-slate-700 hover:border-[#214C9B] hover:bg-blue-50 hover:text-[#214C9B]",
-              )}
-            >
-              {round}
-            </button>
-          );
-        })}
+            return (
+              <button
+                key={round}
+                type="button"
+                data-round={round}
+                onClick={() => onChange(round)}
+                className={cn(
+                  "relative h-10 min-w-10 shrink-0 rounded border-2 border-[#d43b2f] bg-[#fdf9f1] text-xs font-extrabold text-[#981915] transition hover:bg-red-50 sm:h-11 sm:min-w-11 sm:text-sm",
+                  isCurrent && "ring-2 ring-[#214C9B]/25 ring-offset-1",
+                )}
+              >
+                {round}
+                {isSelected ? (
+                  <b className="absolute inset-0 flex rotate-[-7deg] items-center justify-center font-['Comic_Sans_MS',cursive] text-2xl font-bold text-[#171717]" aria-hidden>
+                    X
+                  </b>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+        <button
+          type="button"
+          disabled={value >= total}
+          onClick={() => onChange(value + 1)}
+          aria-label="Jornada siguiente"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded border-2 border-[#d43b2f] bg-[#fdf9f1] text-[#981915] disabled:opacity-30"
+        >
+          <ChevronRight size={18} />
+        </button>
       </div>
     </div>
   );

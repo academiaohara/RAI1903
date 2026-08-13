@@ -12,7 +12,7 @@ import {
 } from "@/lib/game-ticket-share";
 import type { ClasificacionPrediction } from "@/lib/clasificacion-prediction";
 import type { QuinigolPrediction } from "@/lib/quinigol";
-import { isAvilesMatch, outcomeFromGoalsPicks } from "@/lib/quiniela";
+import { actualOutcome, isAvilesMatch, outcomeFromGoalsPicks } from "@/lib/quiniela";
 import { scorerLabelForPlayer } from "@/lib/squad-player-resolve";
 import { getTeamCrestById, isTeamCrestUrl } from "@/lib/team-crests";
 import type { GoalsPick, Match, Prediction, PredictionOutcome, Team } from "@/types";
@@ -28,13 +28,15 @@ type TicketFrameProps = {
   hint?: string;
   fileName: string;
   shareText: string;
+  creatorHandle?: string;
+  points?: number;
   children: ReactNode;
 };
 
 const logoByKind = {
   quiniela: "/juegos/rainiela.svg",
   quinigol: "/juegos/raigol.svg",
-  clasificacion: "/juegos/el-oraculo.svg",
+  clasificacion: "/api/game-logo/oraculo",
 } satisfies Record<TicketKind, string | null>;
 
 function TicketBrand({ kind }: { kind: TicketKind }) {
@@ -49,7 +51,6 @@ function TicketBrand({ kind }: { kind: TicketKind }) {
           src={logo}
           alt=""
         />
-        <strong>{label}</strong>
       </div>
     );
   }
@@ -65,6 +66,8 @@ function TicketFrame({
   hint,
   fileName,
   shareText,
+  creatorHandle = "@usuario",
+  points,
   children,
 }: TicketFrameProps) {
   const ticketRef = useRef<HTMLDivElement>(null);
@@ -87,28 +90,6 @@ function TicketFrame({
 
   return (
     <section className="game-ticket-preview" aria-label="Boleto">
-      <p className="game-ticket-preview-label">Tu boleto</p>
-      <div ref={ticketRef} className={`game-ticket game-ticket--${kind}`}>
-        <header className="game-ticket-header">
-          <TicketBrand kind={kind} />
-          <div className="game-ticket-meta">
-            <strong>{competitionLabel}</strong>
-            <span>{seasonLabel}</span>
-            <span>{contextLabel}</span>
-          </div>
-        </header>
-        <div className="game-ticket-subheader">
-          <strong>{title}</strong>
-          {hint ? <span>{hint}</span> : null}
-        </div>
-        {children}
-        <footer className="game-ticket-footer">
-          <span>Generado en realaviles.com/juegos</span>
-          <strong>#RealAviles</strong>
-          <span>Acierta y comparte ↗</span>
-        </footer>
-      </div>
-
       <div className="game-ticket-actions">
         {canNativeShare ? (
           <button type="button" disabled={sharing} onClick={() => void run("share")}>
@@ -125,6 +106,29 @@ function TicketFrame({
           Descargar imagen
         </button>
       </div>
+      <div ref={ticketRef} className={`game-ticket game-ticket--${kind}`}>
+        <header className="game-ticket-header">
+          <TicketBrand kind={kind} />
+          <div className="game-ticket-meta">
+            <strong>{competitionLabel}</strong>
+            <span>{seasonLabel}</span>
+            <span>{contextLabel}</span>
+          </div>
+        </header>
+        <div className="game-ticket-subheader">
+          <strong>{title}</strong>
+          <span className="game-ticket-subheader-meta">
+            {typeof points === "number" ? <b>{points} puntos</b> : null}
+            {hint ? <span>{hint}</span> : null}
+          </span>
+        </div>
+        {children}
+        <footer className="game-ticket-footer">
+          <span>Generado en realaviles.com/juegos</span>
+          <strong>{creatorHandle.startsWith("@") ? creatorHandle : `@${creatorHandle}`}</strong>
+          <span>Acierta y comparte ↗</span>
+        </footer>
+      </div>
     </section>
   );
 }
@@ -135,15 +139,35 @@ function teamName(match: Match, side: "home" | "away", teamsById: Map<string, Te
   return teamsById.get(teamId)?.name ?? fallback;
 }
 
+function teamForMatch(match: Match, side: "home" | "away", teamsById: Map<string, Team>): Team {
+  const teamId = side === "home" ? match.homeTeamId : match.awayTeamId;
+  const fallbackName = side === "home" ? match.homeTeam : match.awayTeam;
+  return teamsById.get(teamId) ?? {
+    id: teamId,
+    name: fallbackName,
+    shortName: fallbackName,
+    city: "",
+    stadium: "",
+    coach: "",
+    founded: 0,
+    crestInitials: fallbackName.slice(0, 3).toUpperCase(),
+    colors: [],
+    position: 0,
+    form: [],
+    stats: { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 },
+  };
+}
+
 function outcomeMark(
   outcome: PredictionOutcome,
   selected: PredictionOutcome | undefined,
-  options?: { disabled?: boolean; onPick?: (outcome: PredictionOutcome) => void },
+  options?: { actual?: PredictionOutcome | null; disabled?: boolean; onPick?: (outcome: PredictionOutcome) => void },
 ) {
+  const missedCorrectOutcome = Boolean(options?.actual === outcome && selected !== outcome);
   return (
     <button
       type="button"
-      className="game-ticket-pick"
+      className={`game-ticket-pick${missedCorrectOutcome ? " game-ticket-pick--correct" : ""}`}
       key={outcome}
       disabled={options?.disabled}
       onClick={() => options?.onPick?.(outcome)}
@@ -151,6 +175,7 @@ function outcomeMark(
     >
       <span>{outcome}</span>
       {selected === outcome ? <b aria-label={`Marcado ${outcome}`}>X</b> : null}
+      {missedCorrectOutcome ? <b aria-label={`Resultado correcto ${outcome}`}>X</b> : null}
     </button>
   );
 }
@@ -158,12 +183,13 @@ function outcomeMark(
 function scoreMark(
   option: GoalsPick,
   selected: GoalsPick | undefined,
-  options?: { disabled?: boolean; onPick?: (option: GoalsPick) => void },
+  options?: { actual?: GoalsPick; disabled?: boolean; onPick?: (option: GoalsPick) => void },
 ) {
+  const missedCorrectScore = options?.actual === option && selected !== option;
   return (
     <button
       type="button"
-      className="game-ticket-score-pick"
+      className={`game-ticket-score-pick${missedCorrectScore ? " game-ticket-pick--correct" : ""}`}
       key={String(option)}
       disabled={options?.disabled}
       onClick={() => options?.onPick?.(option)}
@@ -171,6 +197,7 @@ function scoreMark(
     >
       <span>{option}</span>
       {selected === option ? <b aria-label={`Marcado ${option}`}>X</b> : null}
+      {missedCorrectScore ? <b aria-label={`Resultado correcto ${option}`}>X</b> : null}
     </button>
   );
 }
@@ -197,6 +224,8 @@ type MatchTicketProps = {
   round: number;
   seasonLabel: string;
   competitionLabel: string;
+  creatorHandle?: string;
+  points?: number;
 };
 
 export function QuinielaTicket({
@@ -206,12 +235,16 @@ export function QuinielaTicket({
   round,
   seasonLabel,
   competitionLabel,
+  creatorHandle,
+  points,
   readOnly,
   onChange,
+  scorerCorrectByMatch,
 }: MatchTicketProps & {
   predictions: Record<string, Prediction>;
   readOnly?: boolean;
   onChange?: (prediction: Prediction) => void;
+  scorerCorrectByMatch?: Record<string, boolean | undefined>;
 }) {
   const teamsById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
   const { squad } = useSquadPlayers("masculino");
@@ -257,6 +290,8 @@ export function QuinielaTicket({
       hint={readOnly ? "Boleto cerrado" : "Toca una casilla para marcar"}
       fileName={`mi-rainiela-jornada-${round}.png`}
       shareText={`Mi RAIniela de la jornada ${round} #RealAviles`}
+      creatorHandle={creatorHandle}
+      points={points}
     >
       <ol className="game-ticket-list">
         {matches.map((match, index) => {
@@ -267,6 +302,13 @@ export function QuinielaTicket({
             ? outcomeFromGoalsPicks(prediction?.goalsHome, prediction?.goalsAway)
             : null;
           const selectedOutcome = derivedOutcome ?? prediction?.outcome;
+          const officialOutcome = actualOutcome(match);
+          const officialHome = match.status === "finished" && match.homeScore !== undefined
+            ? (match.homeScore >= 3 ? "M" : match.homeScore) as GoalsPick
+            : undefined;
+          const officialAway = match.status === "finished" && match.awayScore !== undefined
+            ? (match.awayScore >= 3 ? "M" : match.awayScore) as GoalsPick
+            : undefined;
           const avilesGoals = match.homeTeamId === RAI_TEAM_ID
             ? prediction?.goalsHome
             : prediction?.goalsAway;
@@ -274,11 +316,20 @@ export function QuinielaTicket({
             <li className={`game-ticket-match-row${avilesMatch ? " game-ticket-match-row--featured" : ""}`} key={match.id}>
               <span className="game-ticket-number">{index + 1}</span>
               <span className="game-ticket-teams">
-                {teamName(match, "home", teamsById)} <i>–</i> {teamName(match, "away", teamsById)}
+                <span>
+                  <TicketCrest team={teamForMatch(match, "home", teamsById)} />
+                  {teamName(match, "home", teamsById)}
+                </span>
+                <i>–</i>
+                <span>
+                  <TicketCrest team={teamForMatch(match, "away", teamsById)} />
+                  {teamName(match, "away", teamsById)}
+                </span>
               </span>
               <span className="game-ticket-picks">
                 {(["1", "X", "2"] as PredictionOutcome[]).map((outcome) =>
                   outcomeMark(outcome, selectedOutcome, {
+                    actual: officialOutcome,
                     disabled: readOnly || derivedOutcome !== null,
                     onPick: (picked) => update(match, prediction, { outcome: picked }),
                   }),
@@ -286,12 +337,12 @@ export function QuinielaTicket({
               </span>
               {avilesMatch ? (
                 <div className="game-ticket-featured">
-                  <span className="game-ticket-featured-label">Marcador</span>
                   <div className="game-ticket-featured-score">
                     <span>{teamName(match, "home", teamsById)}</span>
                     <div>
                       {([0, 1, 2, "M"] as GoalsPick[]).map((option) =>
                         scoreMark(option, prediction?.goalsHome, {
+                          actual: officialHome,
                           disabled: readOnly,
                           onPick: (picked) => update(match, prediction, { goalsHome: picked }),
                         }),
@@ -303,6 +354,7 @@ export function QuinielaTicket({
                     <div>
                       {([0, 1, 2, "M"] as GoalsPick[]).map((option) =>
                         scoreMark(option, prediction?.goalsAway, {
+                          actual: officialAway,
                           disabled: readOnly,
                           onPick: (picked) => update(match, prediction, { goalsAway: picked }),
                         }),
@@ -311,12 +363,11 @@ export function QuinielaTicket({
                   </div>
                   <label className="game-ticket-scorer">
                     <span>Goleador</span>
-                    <input
-                      type="text"
-                      list={`game-ticket-scorers-${match.id}`}
+                    <select
                       value={scorerValue === "nadie" ? "Nadie" : scorerValue}
                       disabled={readOnly || avilesGoals === 0}
-                      placeholder="Elige o escribe"
+                      className={scorerCorrectByMatch?.[match.id] === false ? "game-ticket-scorer--wrong" : undefined}
+                      required={avilesGoals !== 0}
                       onChange={(event) =>
                         update(match, prediction, {
                           scorer: event.target.value.toLocaleLowerCase("es") === "nadie"
@@ -324,13 +375,13 @@ export function QuinielaTicket({
                             : event.target.value || undefined,
                         })
                       }
-                    />
-                    <datalist id={`game-ticket-scorers-${match.id}`}>
-                      <option value="Nadie" />
+                    >
+                      <option value="">Selecciona</option>
+                      <option value="Nadie">Nadie</option>
                       {scorerOptions.map((scorer) => (
                         <option key={scorer} value={scorer} />
                       ))}
-                    </datalist>
+                    </select>
                   </label>
                 </div>
               ) : null}
@@ -349,6 +400,8 @@ export function QuinigolTicket({
   round,
   seasonLabel,
   competitionLabel,
+  creatorHandle,
+  points,
   readOnly,
   onChange,
 }: MatchTicketProps & {
@@ -370,10 +423,18 @@ export function QuinigolTicket({
       hint="M = 3 o más goles"
       fileName={`mi-raigol-jornada-${round}.png`}
       shareText={`Mi RAIGol de la jornada ${round} #RealAviles`}
+      creatorHandle={creatorHandle}
+      points={points}
     >
       <ol className="game-ticket-list">
         {matches.map((match, index) => {
           const prediction = predictions[match.id];
+          const officialHome = match.status === "finished" && match.homeScore !== undefined
+            ? (match.homeScore >= 3 ? "M" : match.homeScore) as GoalsPick
+            : undefined;
+          const officialAway = match.status === "finished" && match.awayScore !== undefined
+            ? (match.awayScore >= 3 ? "M" : match.awayScore) as GoalsPick
+            : undefined;
           const update = (patch: Partial<Pick<QuinigolPrediction, "goalsHome" | "goalsAway">>) => {
             if (readOnly || !onChange) return;
             onChange({
@@ -388,12 +449,15 @@ export function QuinigolTicket({
             <li className="game-ticket-match-row game-ticket-match-row--score" key={match.id}>
               <span className="game-ticket-number">{index + 1}</span>
               <span className="game-ticket-teams">
-                {teamName(match, "home", teamsById)} <i>–</i> {teamName(match, "away", teamsById)}
+                <span><TicketCrest team={teamForMatch(match, "home", teamsById)} />{teamName(match, "home", teamsById)}</span>
+                <i>–</i>
+                <span><TicketCrest team={teamForMatch(match, "away", teamsById)} />{teamName(match, "away", teamsById)}</span>
               </span>
               <span className="game-ticket-score">
                 <span>
                   {scoreOptions.map((option) =>
                     scoreMark(option, prediction?.goalsHome, {
+                      actual: officialHome,
                       disabled: readOnly,
                       onPick: (picked) => update({ goalsHome: picked }),
                     }),
@@ -403,6 +467,7 @@ export function QuinigolTicket({
                 <span>
                   {scoreOptions.map((option) =>
                     scoreMark(option, prediction?.goalsAway, {
+                      actual: officialAway,
                       disabled: readOnly,
                       onPick: (picked) => update({ goalsAway: picked }),
                     }),
@@ -471,6 +536,8 @@ export function ClasificacionTicket({
   zones,
   seasonLabel,
   competitionLabel,
+  creatorHandle,
+  points,
   readOnly,
   onReorder,
 }: {
@@ -479,6 +546,8 @@ export function ClasificacionTicket({
   zones: CompetitionZoneRule[];
   seasonLabel: string;
   competitionLabel: string;
+  creatorHandle?: string;
+  points?: number;
   readOnly?: boolean;
   onReorder?: (teamIds: string[]) => void;
 }) {
@@ -513,6 +582,8 @@ export function ClasificacionTicket({
       hint={readOnly ? "Pronóstico cerrado" : "Usa las flechas para ordenar"}
       fileName={`mi-oraculo-${seasonLabel.replaceAll("/", "-")}.png`}
       shareText={`Mi Oráculo para la clasificación final de la temporada ${seasonLabel} #RealAviles`}
+      creatorHandle={creatorHandle}
+      points={points}
     >
       <ol className="game-ticket-list game-ticket-standings">
         {orderedTeams.map((team, index) => {

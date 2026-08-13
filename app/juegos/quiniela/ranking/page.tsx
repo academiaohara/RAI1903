@@ -1,25 +1,47 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { Card } from "@/components/Card";
+import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
 import { QuinielaRankingList } from "@/components/quiniela/QuinielaRankingList";
-import { useQuinielaSeasonRanking } from "@/hooks/useQuinielaRoundRanking";
+import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
+import { useQuinielaRoundRanking, useQuinielaSeasonRanking } from "@/hooks/useQuinielaRoundRanking";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { getMatchdayByRound } from "@/lib/quiniela";
 
 export default function QuinielaRankingPage() {
   const { seasonId, matchdays, currentRound, totalRounds } = useQuinielaSeason();
-  const { entries, loading, countPoints, error } = useQuinielaSeasonRanking(seasonId);
+  const [round, setRound] = useState(currentRound);
+  const [scope, setScope] = useState<"round" | "season">("round");
+  const matchday = useMemo(() => getMatchdayByRound(matchdays, round), [matchdays, round]);
+  const roundRanking = useQuinielaRoundRanking(seasonId, matchday);
+  const seasonRanking = useQuinielaSeasonRanking(seasonId, round);
+  const ranking = scope === "round" ? roundRanking : seasonRanking;
+  const { entries, loading, countPoints, error } = ranking;
 
   return (
     <div className="space-y-6">
       <PageHero
         eyebrow="RAIniela"
         title="Ranking"
-        description="Clasificación de la temporada según las RAInielas guardadas antes de cada jornada. Solo suman puntos las jornadas ya iniciadas."
+        description="Consulta la clasificación de cada jornada o la clasificación acumulada hasta la jornada seleccionada."
       />
 
-      <Card eyebrow="Ranking" title="Clasificación general">
+      <JornadaSelector value={round} total={totalRounds} currentRound={currentRound} onChange={setRound} />
+
+      <Card eyebrow={`Jornada ${round}`} title={scope === "round" ? "Clasificación de la jornada" : `Clasificación global hasta J${round}`}>
+        <QuinielaViewToggle
+          value={scope}
+          onChange={setScope}
+          layoutId="quiniela-ranking-scope"
+          options={[
+            { id: "round", label: `Jornada ${round}` },
+            { id: "season", label: `Global hasta J${round}` },
+          ]}
+          className="mb-4"
+        />
         {loading ? (
           <p className="text-sm text-slate-500">Cargando clasificación…</p>
         ) : error ? (
@@ -32,9 +54,10 @@ export default function QuinielaRankingPage() {
             matchdays={matchdays}
             totalRounds={totalRounds}
             currentRound={currentRound}
+            initialModalRound={round}
             emptyMessage={
               isSupabaseConfigured()
-                ? "Aún no hay quinielas guardadas en esta temporada."
+                ? `Aún no hay quinielas puntuables hasta la jornada ${round}.`
                 : "Conecta Supabase e inicia sesión para ver la clasificación."
             }
           />

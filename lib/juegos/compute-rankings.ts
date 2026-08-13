@@ -49,7 +49,7 @@ export type QuinigolRankingComputeResult =
 export async function computeQuinigolRankingFromSupabase(
   supabase: SupabaseClient,
   seasonId: CompetitionSeasonId,
-  options: { scope: "round"; round: number } | { scope: "season" },
+  options: { scope: "round"; round: number } | { scope: "season"; throughRound?: number },
 ): Promise<QuinigolRankingComputeResult> {
   const { quinielaMatchdays } = await loadGameMatchdays(supabase, seasonId);
 
@@ -60,9 +60,12 @@ export async function computeQuinigolRankingFromSupabase(
     return { scope: "round", round: options.round, countPoints, entries, matchdays: quinielaMatchdays };
   }
 
-  const countPointsForRound = (round: number) => countPointsForQuinigolRound(quinielaMatchdays, round);
-  const entries = await fetchQuinigolSeasonRanking(supabase, seasonId, quinielaMatchdays, countPointsForRound);
-  const countPoints = quinielaMatchdays.some((matchday) => countPointsForQuinigolRound(quinielaMatchdays, matchday.round));
+  const rankingMatchdays = options.throughRound
+    ? quinielaMatchdays.filter((matchday) => matchday.round <= options.throughRound!)
+    : quinielaMatchdays;
+  const countPointsForRound = (round: number) => countPointsForQuinigolRound(rankingMatchdays, round);
+  const entries = await fetchQuinigolSeasonRanking(supabase, seasonId, rankingMatchdays, countPointsForRound);
+  const countPoints = rankingMatchdays.some((matchday) => countPointsForQuinigolRound(rankingMatchdays, matchday.round));
   return { scope: "season", entries, matchdays: quinielaMatchdays, countPoints };
 }
 
