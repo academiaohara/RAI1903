@@ -1,0 +1,96 @@
+import { matchdays as mockMatchdays, teams as mockTeams } from "@/data/mock";
+import { buildActualStandingsByTeamId } from "@/lib/clasificacion-prediction";
+import { getTeamCrestsBundle } from "@/lib/cms/team-crests-bundle";
+import { fetchSeasonBundlesWithClient } from "@/lib/cms/fetch-season-bundles-server";
+import { resolveGroupTeams } from "@/lib/cms/group-teams";
+import { fetchInlineOverridesWithClient } from "@/lib/cms/inline-overrides-server";
+import { fetchDefaultSeasonIdServer } from "@/lib/cms/seasons-server";
+import { shouldUseMockCompetitionFallback } from "@/lib/season/cms-data-policy";
+import { buildLeagueMatchdaysFromBundles } from "@/lib/quiniela/build-matchdays";
+import { getSiteOrigin } from "@/lib/auth/site-url";
+import { getTeamCrestById } from "@/lib/team-crests";
+import { createClient as createServerClient } from "@/lib/supabase/server";
+import { RAI_TEAM_ID } from "@/data/mock";
+import type { Team } from "@/types";
+
+export type ClasificacionOgRow = {
+  position: number;
+  teamId: string;
+  name: string;
+  shortName: string;
+  crestUrl: string;
+  points: number | null;
+  isAviles: boolean;
+};
+
+export type ClasificacionOgShareData = {
+  seasonLabel: string;
+  rows: ClasificacionOgRow[];
+  hasStandings: boolean;
+};
+
+function resolveCrestUrl(team: Team, cmsCrests: Record<string, string>, origin: string): string {
+  const path = cmsCrests[team.id] ?? getTeamCrestById(team.id, team.crestInitials);
+  if (path.startsWith("http")) return path;
+  return `${origin}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+function buildRows(
+  teams: Team[],
+  standings: Map<string, number>,
+  cmsCrests: Record<string, string>,
+  origin: string,
+): ClasificacionOgRow[] {
+  const ordered =
+    standings.size > 0
+      ? [...teams].sort((a, b) => {
+          const posA = standings.get(a.id) ?? 999;
+          const posB = standings.get(b.id) ?? 999;
+          return posA - posB || a.name.localeCompare(b.name, "es");
+        })
+      : [...teams].sort((a, b) => a.name.localeCompare(b.name, "es"));
+
+  return ordered.map((team, index) => {
+    const position = standings.get(team.id) ?? index + 1;
+    return {
+      position,
+      teamId: team.id,
+      name: team.name,
+      shortName: team.shortName || team.name,
+      crestUrl: resolveCrestUrl(team, cmsCrests, origin),
+      points: team.stats.played > 0 ? team.stats.points : null,
+      isAviles: team.id === RAI_TEAM_ID,
+    };
+  });
+}
+
+export async function loadClasificacionOgShareData(): Promise<ClasificacionOgShareData> {
+  const origin = getSiteOrigin();
+  const seasonId = await fetchDefaultSeasonIdServer();
+  const seasonLabel = seasonId.replace("-", "/");
+
+  if (shouldUseMockCompetitionFallback()) {
+    const standings = buildActualStandingsByTeamId(mockTeams, mockMatchdays);
+    return {
+      seasonLabel,
+      hasStandings: standings.size > 0,
+      rows: buildRows(mockTeams, standings, {}, origin),
+    };
+  }
+
+  const supabase = await createServerClient();
+  const [bundles, inlineOverrides] = await Promise.all([
+    fetchSeasonBundlesWithClient(supabase, seasonId),
+    fetchInlineOverridesWithClient(supabase, seasonId),
+  ]);
+  const teams = resolveGroupTeams(bundles, "masculino", "1");
+  const leagueMatchdays = buildLeagueMatchdaysFromBundles(bundles, inlineOverrides);
+  const standings = buildActualStandingsByTeamId(teams, leagueMatchdays);
+  const cmsCrests = getTeamCrestsBundle(bundles).crests;
+
+  return {
+    seasonLabel,
+    hasStandings: standings.size > 0,
+    rows: buildRows(teams, standings, cmsCrests, origin),
+  };
+}
