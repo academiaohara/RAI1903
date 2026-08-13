@@ -14,9 +14,9 @@ export default function QuinielaRankingPage() {
   return (
     <div className="space-y-6">
       <PageHero
-        eyebrow="Quiniela"
+        eyebrow="RAIniela"
         title="Ranking"
-        description="Clasificación de la temporada según las quinielas guardadas antes de cada jornada. Solo suman puntos las jornadas ya iniciadas."
+        description="Clasificación de la temporada según las RAInielas guardadas antes de cada jornada. Solo suman puntos las jornadas ya iniciadas."
       />
 
       <Card eyebrow="Ranking" title="Clasificación general">

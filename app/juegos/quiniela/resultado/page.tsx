@@ -117,7 +117,7 @@ export default function QuinielaResultadoPage() {
   return (
     <div className="space-y-6">
       <PageHero
-        eyebrow="Quiniela"
+        eyebrow="RAIniela"
         title="Resultado"
         description="Consulta el resultado oficial de la jornada del Grupo I o la clasificacion de quienes enviaron pronostico."
       />

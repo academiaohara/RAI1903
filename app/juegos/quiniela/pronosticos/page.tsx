@@ -5,7 +5,6 @@ import { useAppDialog } from "@/components/AppDialogProvider";
 import { Card } from "@/components/Card";
 import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
-import { PredictionForm } from "@/components/PredictionForm";
 import { QuinielaTicket } from "@/components/juegos/GameTicket";
 import { bebasNeue } from "@/lib/fonts";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
@@ -113,7 +112,6 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
     [selectedMatchday, predictions, scoringContext],
   );
   const needsLogin = quinielaRequiresAuth() && hydrated && !userId;
-  const showCompare = readOnly && (isLocked || finishedMatches > 0);
   const showScore = hydrated && finishedMatches > 0;
 
   const statusBanner = useMemo(() => {
@@ -187,7 +185,7 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
 
       {hydrated && statusBanner === "saved" && (
         <p className="rounded-xl border border-[#214C9B]/20 bg-blue-50 px-3 py-2 text-xs font-bold text-[#214C9B] sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
-          Quiniela guardada. Pulsa Editar si quieres modificar algo antes del pitido inicial.
+          RAIniela guardada. Pulsa Editar si quieres modificar algo antes del pitido inicial.
         </p>
       )}
 
@@ -199,7 +197,7 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
 
       <Card
         eyebrow={`Jornada ${selectedMatchday.round}`}
-        title="Tu quiniela"
+        title="Tu RAIniela"
         action={
           showScore ? (
             <div
@@ -239,32 +237,6 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
           </p>
         )}
 
-        {hydrated && showCompare && (
-          <div className="mb-3 flex flex-wrap gap-3 text-[10px] font-bold uppercase tracking-wide text-slate-600 sm:mb-4 sm:gap-4 sm:text-xs">
-            <span className="inline-flex items-center gap-2">
-              <span className="h-3 w-3 rounded bg-[#214C9B]" aria-hidden />
-              Tu pronostico
-            </span>
-            <span className="inline-flex items-center gap-2">
-              <span className="h-3 w-3 rounded bg-[#981915]" aria-hidden />
-              Resultado real
-            </span>
-          </div>
-        )}
-
-        <div className="space-y-2.5 sm:space-y-4">
-          {orderedMatches.map((match) => (
-            <PredictionForm
-              key={match.id}
-              match={match}
-              prediction={predictions[match.id]}
-              readOnly={readOnly}
-              mode={showCompare ? "compare" : "edit"}
-              onChange={updatePrediction}
-            />
-          ))}
-        </div>
-
         {hasMatchesForRound ? (
           <QuinielaTicket
             matches={orderedMatches}
@@ -273,6 +245,8 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
             round={round}
             seasonLabel={viewedSeason.label}
             competitionLabel={getCompetitionConfig("masculino").ligaLabel ?? "1ª RFEF — Grupo 1"}
+            readOnly={readOnly}
+            onChange={updatePrediction}
           />
         ) : null}
 
@@ -309,9 +283,9 @@ export default function MiQuinielaPage() {
   return (
     <div className="space-y-6">
       <PageHero
-        eyebrow="Juegos"
+        eyebrow="RAIniela"
         title="Pronósticos"
-        description="Rellena la quiniela con los 10 partidos del Grupo I de cada jornada. Al guardar queda bloqueada hasta que pulses editar. Cuando empiece el primer partido ya no podras cambiarla."
+        description="Marca directamente tu RAIniela con los 10 partidos del Grupo I. Al guardar queda bloqueada hasta que pulses editar; cuando empiece el primer partido ya no podrás cambiarla."
       />
       <QuinielaHowItWorks />
       {bundlesLoading ? (

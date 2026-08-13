@@ -5,7 +5,6 @@ import { useAppDialog } from "@/components/AppDialogProvider";
 import { Card } from "@/components/Card";
 import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
-import { QuinigolMatchForm } from "@/components/quinigol/QuinigolMatchForm";
 import { QuinigolTicket } from "@/components/juegos/GameTicket";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { bebasNeue } from "@/lib/fonts";
@@ -96,7 +95,6 @@ function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, b
     [selectedMatchday, predictions],
   );
   const needsLogin = quinigolRequiresAuth() && hydrated && !userId;
-  const showCompare = readOnly && (isLocked || finishedMatches > 0);
   const showScore = hydrated && finishedMatches > 0;
 
   const updatePrediction = useCallback(
@@ -155,7 +153,7 @@ function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, b
 
       {hydrated && isSaved && !isLocked && !isEditing && (
         <p className="rounded-xl border border-[#214C9B]/20 bg-blue-50 px-3 py-2 text-xs font-bold text-[#214C9B] sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
-          Quinigol guardado. Pulsa Editar si quieres modificar algo antes del pitido inicial.
+          RAIGol guardado. Pulsa Editar si quieres modificar algo antes del pitido inicial.
         </p>
       )}
 
@@ -167,7 +165,7 @@ function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, b
 
       <Card
         eyebrow={`Jornada ${selectedMatchday.round}`}
-        title="Tu quinigol"
+        title="Tu RAIGol"
         action={
           showScore ? (
             <div
@@ -198,19 +196,6 @@ function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, b
           </p>
         )}
 
-        <div className="space-y-2.5 sm:space-y-4">
-          {selectedMatchday.matches.map((match) => (
-            <QuinigolMatchForm
-              key={match.id}
-              match={match}
-              prediction={predictions[match.id]}
-              readOnly={readOnly}
-              mode={showCompare ? "compare" : "edit"}
-              onChange={updatePrediction}
-            />
-          ))}
-        </div>
-
         {hasMatchesForRound ? (
           <QuinigolTicket
             matches={selectedMatchday.matches}
@@ -219,6 +204,8 @@ function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, b
             round={round}
             seasonLabel={viewedSeason.label}
             competitionLabel={getCompetitionConfig("masculino").ligaLabel ?? "1ª RFEF — Grupo 1"}
+            readOnly={readOnly}
+            onChange={updatePrediction}
           />
         ) : null}
 
@@ -255,9 +242,9 @@ export default function QuinigolPronosticosPage() {
   return (
     <div className="space-y-6">
       <PageHero
-        eyebrow="Quinigol"
+        eyebrow="RAIGol"
         title="Pronósticos"
-        description="Marca el resultado de cada partido con 0, 1, 2 o M (3 o más goles) por equipo. Un punto por acierto. Cierra antes del primer partido de la jornada."
+        description="Marca directamente tu RAIGol con 0, 1, 2 o M (3 o más goles) por equipo. Un punto por acierto. Cierra antes del primer partido de la jornada."
       />
       {bundlesLoading ? <p className="text-sm font-bold text-slate-500">Cargando partidos…</p> : null}
       <QuinigolBody

@@ -78,9 +78,9 @@ export const navItems: NavItem[] = [
     label: "Juegos",
     icon: Gamepad2,
     children: [
-      { href: "/juegos/quiniela/pronosticos", label: "Quiniela", icon: CalendarCheck2 },
-      { href: "/juegos/quinigol/pronosticos", label: "Quinigol", icon: Target },
-      { href: "/juegos/clasificacion/pronosticos", label: "Clasificación", icon: Trophy },
+      { href: "/juegos/quiniela/pronosticos", label: "RAIniela", icon: CalendarCheck2 },
+      { href: "/juegos/quinigol/pronosticos", label: "RAIGol", icon: Target },
+      { href: "/juegos/clasificacion/pronosticos", label: "El Oráculo", icon: Trophy },
     ],
   },
   {

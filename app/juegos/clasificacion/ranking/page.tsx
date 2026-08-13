@@ -13,7 +13,7 @@ export default function ClasificacionRankingPage() {
   return (
     <div className="space-y-6">
       <PageHero
-        eyebrow="Clasificación"
+        eyebrow="El Oráculo"
         title="Ranking"
         description="Clasificación según las predicciones enviadas antes del inicio de la temporada. 20 puntos por acierto exacto, menos 1 por cada puesto de diferencia."
       />

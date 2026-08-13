@@ -1,7 +1,7 @@
 export const GAME_MODES = [
-  { id: "quiniela", label: "Quiniela" },
-  { id: "quinigol", label: "Quinigol" },
-  { id: "clasificacion", label: "Clasificación" },
+  { id: "quiniela", label: "RAIniela" },
+  { id: "quinigol", label: "RAIGol" },
+  { id: "clasificacion", label: "El Oráculo" },
 ] as const;
 
 export type GameModeId = (typeof GAME_MODES)[number]["id"];
@@ -27,7 +27,7 @@ export function isGameModeId(value: string): value is GameModeId {
 }
 
 export const GAME_MODE_LABELS: Record<GameModeId, string> = {
-  quiniela: "Quiniela",
-  quinigol: "Quinigol",
-  clasificacion: "Clasificación",
+  quiniela: "RAIniela",
+  quinigol: "RAIGol",
+  clasificacion: "El Oráculo",
 };

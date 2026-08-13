@@ -29,34 +29,36 @@ function waitForLayout(): Promise<void> {
 
 export async function captureGameTicket(node: HTMLElement): Promise<Blob> {
   await waitForImages(node);
-
-  const previousStyles = {
-    width: node.style.width,
-    maxWidth: node.style.maxWidth,
-    minWidth: node.style.minWidth,
-  };
-
-  node.style.width = `${GAME_TICKET_EXPORT_WIDTH}px`;
-  node.style.maxWidth = `${GAME_TICKET_EXPORT_WIDTH}px`;
-  node.style.minWidth = `${GAME_TICKET_EXPORT_WIDTH}px`;
-  node.classList.add("game-ticket--capture");
+  const captureRoot = document.createElement("div");
+  const captureNode = node.cloneNode(true) as HTMLElement;
+  captureRoot.setAttribute("aria-hidden", "true");
+  captureRoot.style.position = "fixed";
+  captureRoot.style.left = "-10000px";
+  captureRoot.style.top = "0";
+  captureRoot.style.width = `${GAME_TICKET_EXPORT_WIDTH}px`;
+  captureRoot.style.pointerEvents = "none";
+  captureRoot.style.zIndex = "-1";
+  captureNode.style.width = `${GAME_TICKET_EXPORT_WIDTH}px`;
+  captureNode.style.maxWidth = `${GAME_TICKET_EXPORT_WIDTH}px`;
+  captureNode.style.minWidth = `${GAME_TICKET_EXPORT_WIDTH}px`;
+  captureNode.classList.add("game-ticket--capture");
+  captureRoot.appendChild(captureNode);
+  document.body.appendChild(captureRoot);
+  await waitForImages(captureNode);
   await waitForLayout();
 
   try {
-    const dataUrl = await toPng(node, {
+    const dataUrl = await toPng(captureNode, {
       cacheBust: true,
       pixelRatio: 2,
-      width: node.offsetWidth,
-      height: node.offsetHeight,
+      width: captureNode.offsetWidth,
+      height: captureNode.offsetHeight,
       backgroundColor: "#fdf9f1",
       onImageErrorHandler: () => undefined,
     });
     return await (await fetch(dataUrl)).blob();
   } finally {
-    node.classList.remove("game-ticket--capture");
-    node.style.width = previousStyles.width;
-    node.style.maxWidth = previousStyles.maxWidth;
-    node.style.minWidth = previousStyles.minWidth;
+    captureRoot.remove();
   }
 }
 

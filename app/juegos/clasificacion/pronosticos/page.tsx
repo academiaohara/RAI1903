@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDialog } from "@/components/AppDialogProvider";
 import { Card } from "@/components/Card";
 import { ClasificacionCompareBoard } from "@/components/clasificacion/ClasificacionCompareBoard";
-import { ClasificacionForm } from "@/components/clasificacion/ClasificacionForm";
 import { ClasificacionTicket } from "@/components/juegos/GameTicket";
 import { PageHero } from "@/components/PageHero";
 import { useSeason } from "@/components/season/SeasonProvider";
@@ -125,9 +124,9 @@ export default function ClasificacionPronosticosPage() {
   return (
     <div className="space-y-6">
       <PageHero
-        eyebrow="Clasificación"
+        eyebrow="El Oráculo"
         title="Pronósticos"
-        description="Ordena los equipos del Grupo I según crees que acabará la liga. 20 puntos por acierto exacto y se resta 1 por cada puesto de diferencia. Solo puedes enviarla hasta que empiece el primer partido de la temporada."
+        description="Ordena directamente en El Oráculo los equipos del Grupo I según crees que acabará la liga. 20 puntos por acierto exacto y se resta 1 por cada puesto de diferencia. Solo puedes enviarlo hasta que empiece el primer partido."
       />
 
       {needsLogin && (
@@ -150,7 +149,7 @@ export default function ClasificacionPronosticosPage() {
 
       <Card
         eyebrow="Temporada"
-        title={showCompare ? "Tu predicción frente a la clasificación" : "Tu predicción de clasificación"}
+        title={showCompare ? "Tu Oráculo frente a la clasificación" : "Tu Oráculo"}
         action={
           hydrated && showScoring ? (
             <div className="flex min-w-[4.5rem] flex-col items-center rounded-2xl border border-[#214C9B]/15 bg-slate-50/80 px-3 py-2 text-center sm:min-w-[5.5rem] sm:px-4 sm:py-2.5">
@@ -172,23 +171,25 @@ export default function ClasificacionPronosticosPage() {
             predictionLabel="Tu predicción"
           />
         ) : (
-          <ClasificacionForm
-            teams={teams}
-            predictions={effectivePredictions}
-            actualPositions={actualPositions}
-            readOnly={readOnly}
-            mode="edit"
-            onReorder={handleReorder}
-          />
-        )}
-
-        {teams.length > 0 ? (
           <ClasificacionTicket
             teams={teams}
             predictions={effectivePredictions}
             zones={competitionConfig.zones}
             seasonLabel={viewedSeason.label}
             competitionLabel={competitionConfig.ligaLabel ?? "1ª RFEF — Grupo 1"}
+            readOnly={readOnly}
+            onReorder={handleReorder}
+          />
+        )}
+
+        {showCompare && teams.length > 0 ? (
+          <ClasificacionTicket
+            teams={teams}
+            predictions={effectivePredictions}
+            zones={competitionConfig.zones}
+            seasonLabel={viewedSeason.label}
+            competitionLabel={competitionConfig.ligaLabel ?? "1ª RFEF — Grupo 1"}
+            readOnly
           />
         ) : null}
 

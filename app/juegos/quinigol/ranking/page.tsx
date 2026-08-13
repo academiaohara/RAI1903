@@ -14,9 +14,9 @@ export default function QuinigolRankingPage() {
   return (
     <div className="space-y-6">
       <PageHero
-        eyebrow="Quinigol"
+        eyebrow="RAIGol"
         title="Ranking"
-        description="Clasificación de la temporada según los quinigoles guardados. Solo suman puntos las jornadas ya iniciadas."
+        description="Clasificación de la temporada según los RAIGoles guardados. Solo suman puntos las jornadas ya iniciadas."
       />
       <Card eyebrow="Ranking" title="Clasificación general">
         {loading ? (
