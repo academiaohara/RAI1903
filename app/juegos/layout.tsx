@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import type { Route } from "next";
 import { SectionTabs } from "@/components/SectionTabs";
 import { SeasonSelector } from "@/components/SeasonSelector";
 import { SectionUnderConstructionGate } from "@/components/season/SectionUnderConstructionGate";
@@ -47,7 +48,7 @@ export default function JuegosLayout({ children }: { children: React.ReactNode }
               return (
                 <Link
                   key={mode.id}
-                  href={href}
+                  href={href as Route}
                   aria-label={mode.label}
                   title={mode.label}
                   aria-current={active ? "page" : undefined}
