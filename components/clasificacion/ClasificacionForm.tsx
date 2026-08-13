@@ -1,10 +1,12 @@
 "use client";
 
 import { ChevronDown, ChevronUp, GripVertical } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ClasificacionPositionIndicator } from "@/components/clasificacion/ClasificacionPositionIndicator";
+import { ClasificacionPositionInput } from "@/components/clasificacion/ClasificacionPositionInput";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamLink } from "@/components/TeamLink";
+import { useDragAutoScroll } from "@/hooks/useDragAutoScroll";
 import {
   CLASIFICACION_MAX_POSITION_POINTS,
   predictionsToOrderedTeamIds,
@@ -34,6 +36,14 @@ function moveItem<T>(items: T[], from: number, to: number): T[] {
   return next;
 }
 
+function rowIndexFromPoint(clientX: number, clientY: number): number | null {
+  const target = document.elementFromPoint(clientX, clientY);
+  const row = target?.closest<HTMLElement>("[data-clasificacion-row]");
+  if (!row) return null;
+  const index = Number(row.dataset.clasificacionRow);
+  return Number.isNaN(index) ? null : index;
+}
+
 export function ClasificacionForm({
   teams,
   predictions,
@@ -45,6 +55,11 @@ export function ClasificacionForm({
   const teamById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [overIndex, setOverIndex] = useState<number | null>(null);
+  const pointerDragIndexRef = useRef<number | null>(null);
+  const overIndexRef = useRef<number | null>(null);
+  const orderedTeamIdsRef = useRef<string[]>([]);
+  const applyReorderRef = useRef<(nextIds: string[]) => void>(() => undefined);
+  const canReorder = mode === "edit" && !readOnly;
 
   const orderedTeamIds = useMemo(() => {
     if (mode === "edit") {
@@ -66,12 +81,81 @@ export function ClasificacionForm({
     [onReorder],
   );
 
-  const handleMove = (from: number, to: number) => {
-    if (readOnly || from === to || from < 0 || to < 0 || from >= orderedTeamIds.length || to >= orderedTeamIds.length) {
-      return;
-    }
-    applyReorder(moveItem(orderedTeamIds, from, to));
-  };
+  useEffect(() => {
+    orderedTeamIdsRef.current = orderedTeamIds;
+    applyReorderRef.current = applyReorder;
+  }, [orderedTeamIds, applyReorder]);
+
+  const handleMove = useCallback(
+    (from: number, to: number) => {
+      if (
+        !canReorder ||
+        from === to ||
+        from < 0 ||
+        to < 0 ||
+        from >= orderedTeamIds.length ||
+        to >= orderedTeamIds.length
+      ) {
+        return;
+      }
+      applyReorder(moveItem(orderedTeamIds, from, to));
+    },
+    [applyReorder, canReorder, orderedTeamIds],
+  );
+
+  const handlePositionCommit = useCallback(
+    (index: number, nextPosition: number) => {
+      handleMove(index, nextPosition - 1);
+    },
+    [handleMove],
+  );
+
+  const clearDragState = useCallback(() => {
+    pointerDragIndexRef.current = null;
+    overIndexRef.current = null;
+    setDragIndex(null);
+    setOverIndex(null);
+  }, []);
+
+  const isDragging = dragIndex !== null;
+  useDragAutoScroll(isDragging);
+
+  useEffect(() => {
+    overIndexRef.current = overIndex;
+  }, [overIndex]);
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const onPointerMove = (event: PointerEvent) => {
+      if (pointerDragIndexRef.current === null) return;
+      const rowIndex = rowIndexFromPoint(event.clientX, event.clientY);
+      if (rowIndex !== null) {
+        overIndexRef.current = rowIndex;
+        setOverIndex(rowIndex);
+      }
+    };
+
+    const onPointerUp = (event: PointerEvent) => {
+      const from = pointerDragIndexRef.current;
+      if (from !== null) {
+        const target = rowIndexFromPoint(event.clientX, event.clientY) ?? overIndexRef.current;
+        if (target !== null && target !== from) {
+          applyReorderRef.current(moveItem(orderedTeamIdsRef.current, from, target));
+        }
+      }
+      clearDragState();
+    };
+
+    document.addEventListener("pointermove", onPointerMove);
+    document.addEventListener("pointerup", onPointerUp);
+    document.addEventListener("pointercancel", onPointerUp);
+    return () => {
+      document.removeEventListener("pointermove", onPointerMove);
+      document.removeEventListener("pointerup", onPointerUp);
+      document.removeEventListener("pointercancel", onPointerUp);
+    };
+  }, [clearDragState, isDragging]);
 
   const showDiff = mode === "compare" || mode === "results";
   const hasScoringData = useMemo(
@@ -83,13 +167,13 @@ export function ClasificacionForm({
       }),
     [orderedTeamIds, predictions, actualPositions],
   );
-  const showTeamScoring = hasScoringData;
+  const showTeamScoring = hasScoringData && mode !== "edit";
 
   return (
     <div className="space-y-2">
-      {mode === "edit" && !readOnly ? (
+      {canReorder ? (
         <p className="text-xs font-bold text-slate-600 sm:text-sm">
-          Arrastra los equipos para ordenar la clasificación. El primero de la lista es el campeón.
+          Arrastra, usa las flechas o escribe la posición para ordenar la clasificación. El primero es el campeón.
         </p>
       ) : null}
 
@@ -130,20 +214,18 @@ export function ClasificacionForm({
           const showRowScoring =
             showTeamScoring && predictedPosition !== undefined && actual !== undefined;
           const crest = getTeamCrestById(team.id, team.crestInitials);
-          const isDragging = dragIndex === index;
+          const isRowDragging = dragIndex === index;
           const isDropTarget = overIndex === index && dragIndex !== null && dragIndex !== index;
 
           return (
             <li
               key={team.id}
-              draggable={mode === "edit" && !readOnly}
+              data-clasificacion-row={index}
+              draggable={canReorder}
               onDragStart={() => setDragIndex(index)}
-              onDragEnd={() => {
-                setDragIndex(null);
-                setOverIndex(null);
-              }}
+              onDragEnd={clearDragState}
               onDragOver={(event) => {
-                if (mode !== "edit" || readOnly) return;
+                if (!canReorder) return;
                 event.preventDefault();
                 setOverIndex(index);
               }}
@@ -151,59 +233,84 @@ export function ClasificacionForm({
                 if (overIndex === index) setOverIndex(null);
               }}
               onDrop={(event) => {
-                if (mode !== "edit" || readOnly || dragIndex === null) return;
+                if (!canReorder || dragIndex === null) return;
                 event.preventDefault();
                 handleMove(dragIndex, index);
-                setDragIndex(null);
-                setOverIndex(null);
+                clearDragState();
               }}
               className={cn(
-                "flex flex-col gap-2 rounded-xl border bg-white p-2.5 transition sm:flex-row sm:items-center sm:justify-between sm:rounded-2xl sm:p-4",
-                isDragging ? "border-[#214C9B] opacity-60" : "border-[#214C9B]/20",
+                "flex items-center gap-2 rounded-xl border bg-white p-2.5 transition sm:gap-3 sm:rounded-2xl sm:p-3",
+                isRowDragging ? "border-[#214C9B] opacity-60" : "border-[#214C9B]/20",
                 isDropTarget ? "border-[#214C9B] ring-2 ring-[#214C9B]/20" : "",
               )}
             >
-              <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
-                {mode === "edit" && !readOnly ? (
-                  <span
-                    className="cursor-grab text-slate-400 active:cursor-grabbing"
-                    aria-hidden
-                    onMouseDown={(event) => event.stopPropagation()}
-                  >
-                    <GripVertical size={18} />
-                  </span>
-                ) : null}
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#214C9B]/10 text-[11px] font-extrabold text-[#214C9B] tabular-nums sm:h-8 sm:w-8 sm:text-xs">
+              {canReorder ? (
+                <button
+                  type="button"
+                  aria-label={`Arrastrar ${team.name}`}
+                  className="touch-none shrink-0 cursor-grab rounded-lg p-1 text-slate-400 active:cursor-grabbing"
+                  onPointerDown={(event) => {
+                    event.preventDefault();
+                    pointerDragIndexRef.current = index;
+                    setDragIndex(index);
+                    setOverIndex(index);
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                  }}
+                  onPointerUp={(event) => {
+                    if (pointerDragIndexRef.current === null) return;
+                    const from = pointerDragIndexRef.current;
+                    const target = rowIndexFromPoint(event.clientX, event.clientY) ?? overIndexRef.current;
+                    if (target !== null && target !== from) {
+                      applyReorderRef.current(moveItem(orderedTeamIdsRef.current, from, target));
+                    }
+                    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+                      event.currentTarget.releasePointerCapture(event.pointerId);
+                    }
+                    clearDragState();
+                  }}
+                >
+                  <GripVertical size={18} />
+                </button>
+              ) : null}
+
+              {canReorder ? (
+                <ClasificacionPositionInput
+                  key={`${team.id}-${index + 1}`}
+                  position={index + 1}
+                  max={orderedTeamIds.length}
+                  onCommit={(nextPosition) => handlePositionCommit(index, nextPosition)}
+                />
+              ) : (
+                <span className="flex h-8 w-10 shrink-0 items-center justify-center rounded-full bg-[#214C9B]/10 text-xs font-extrabold text-[#214C9B] tabular-nums sm:h-9 sm:w-11 sm:text-sm">
                   {displayPosition}
                 </span>
-                <TeamLink gender="masculino" teamId={team.id} teamName={team.name} className="shrink-0">
-                  <OpponentCrest logo={crest} opponent={team.name} size="sm" />
-                </TeamLink>
+              )}
+
+              <TeamLink gender="masculino" teamId={team.id} teamName={team.name} className="shrink-0">
+                <OpponentCrest logo={crest} opponent={team.name} size="sm" />
+              </TeamLink>
+
+              <div className="min-w-0 flex-1">
                 <TeamLink
                   gender="masculino"
                   teamId={team.id}
                   teamName={team.name}
-                  className="min-w-0 truncate text-sm font-extrabold text-slate-800"
+                  className="block truncate text-sm font-extrabold text-slate-800"
                 >
                   {team.name}
                 </TeamLink>
                 {showRowScoring ? (
-                  <ClasificacionPositionIndicator predicted={predictedPosition} actual={actual} />
-                ) : null}
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2 sm:justify-end sm:gap-3">
-                {showRowScoring ? (
-                  <>
+                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                    <ClasificacionPositionIndicator predicted={predictedPosition!} actual={actual!} />
                     {showDiff ? (
-                      <span className="text-xs font-bold text-slate-500">
+                      <span className="text-[11px] font-bold text-slate-500 sm:text-xs">
                         Predicho: <span className="tabular-nums text-[#214C9B]">{predictedPosition}º</span>
                       </span>
                     ) : null}
                     {points !== null ? (
                       <span
                         className={cn(
-                          "rounded-lg px-2 py-1 text-xs font-extrabold tabular-nums",
+                          "rounded-lg px-2 py-0.5 text-[11px] font-extrabold tabular-nums sm:text-xs",
                           points === CLASIFICACION_MAX_POSITION_POINTS
                             ? "bg-[#214C9B] text-white"
                             : "bg-slate-100 text-slate-700",
@@ -212,32 +319,32 @@ export function ClasificacionForm({
                         {points} pts
                       </span>
                     ) : null}
-                  </>
-                ) : null}
-
-                {mode === "edit" && !readOnly ? (
-                  <div className="flex items-center gap-1 sm:hidden">
-                    <button
-                      type="button"
-                      disabled={index === 0}
-                      onClick={() => handleMove(index, index - 1)}
-                      className="rounded-lg border border-[#214C9B]/20 p-1.5 text-[#214C9B] disabled:opacity-40"
-                      aria-label={`Subir ${team.name}`}
-                    >
-                      <ChevronUp size={16} />
-                    </button>
-                    <button
-                      type="button"
-                      disabled={index === orderedTeamIds.length - 1}
-                      onClick={() => handleMove(index, index + 1)}
-                      className="rounded-lg border border-[#214C9B]/20 p-1.5 text-[#214C9B] disabled:opacity-40"
-                      aria-label={`Bajar ${team.name}`}
-                    >
-                      <ChevronDown size={16} />
-                    </button>
                   </div>
                 ) : null}
               </div>
+
+              {canReorder ? (
+                <div className="flex shrink-0 flex-col gap-0.5">
+                  <button
+                    type="button"
+                    disabled={index === 0}
+                    onClick={() => handleMove(index, index - 1)}
+                    className="rounded-lg border border-[#214C9B]/20 p-1.5 text-[#214C9B] transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    aria-label={`Subir ${team.name}`}
+                  >
+                    <ChevronUp size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={index === orderedTeamIds.length - 1}
+                    onClick={() => handleMove(index, index + 1)}
+                    className="rounded-lg border border-[#214C9B]/20 p-1.5 text-[#214C9B] transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    aria-label={`Bajar ${team.name}`}
+                  >
+                    <ChevronDown size={16} />
+                  </button>
+                </div>
+              ) : null}
             </li>
           );
         })}
