@@ -20,7 +20,7 @@ export default function ClasificacionResultadoPage() {
   return (
     <div className="space-y-6">
       <PageHero
-        eyebrow="Clasificación"
+        eyebrow="El Oráculo"
         title="Resultado"
         description="Clasificación actual del Grupo I con puntos, goles, forma y zonas de ascenso y descenso."
       />

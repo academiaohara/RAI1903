@@ -93,7 +93,7 @@ export default function QuinigolResultadoPage() {
   return (
     <div className="space-y-6">
       <PageHero
-        eyebrow="Quinigol"
+        eyebrow="RAIGol"
         title="Resultado"
         description="Consulta los resultados oficiales en formato quinigol o el ranking de la jornada."
       />
