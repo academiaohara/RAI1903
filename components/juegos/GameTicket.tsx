@@ -21,7 +21,7 @@ type TicketFrameProps = {
   seasonLabel: string;
   contextLabel: string;
   title: string;
-  hint: string;
+  hint?: string;
   fileName: string;
   shareText: string;
   children: ReactNode;
@@ -96,7 +96,7 @@ function TicketFrame({
         </header>
         <div className="game-ticket-subheader">
           <strong>{title}</strong>
-          <span>{hint}</span>
+          {hint ? <span>{hint}</span> : null}
         </div>
         {children}
         <footer className="game-ticket-footer">
@@ -337,7 +337,6 @@ export function ClasificacionTicket({
       seasonLabel={seasonLabel}
       contextLabel="Clasificación final"
       title="Clasificación final prevista"
-      hint="Mi pronóstico"
       fileName={`mi-clasificacion-${seasonLabel.replaceAll("/", "-")}.png`}
       shareText={`Mi clasificación final prevista para la temporada ${seasonLabel} #RealAviles`}
     >
