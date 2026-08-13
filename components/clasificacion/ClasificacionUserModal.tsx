@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { UserAvatar } from "@/components/auth/UserAvatar";
+import { ClasificacionCompareBoard } from "@/components/clasificacion/ClasificacionCompareBoard";
 import { ClasificacionForm } from "@/components/clasificacion/ClasificacionForm";
 import { Modal } from "@/components/Modal";
 import { useClasificacionUserSubmission } from "@/hooks/useClasificacionUserSubmission";
@@ -69,7 +70,7 @@ export function ClasificacionUserModal({
 
         {formMode === "compare" ? (
           <p className="text-xs leading-5 text-slate-600 sm:text-sm">
-            Flechas y colores indican la diferencia entre la predicción y la clasificación actual.
+            Predicción del usuario frente a la clasificación actual, con diferencia de puestos y puntos por equipo.
           </p>
         ) : null}
 
@@ -78,14 +79,23 @@ export function ClasificacionUserModal({
         ) : error ? (
           <p className="text-sm font-semibold text-[#981915]">{error}</p>
         ) : data?.hasSubmission ? (
-          <ClasificacionForm
-            teams={teams}
-            predictions={data.predictions}
-            actualPositions={actualPositions}
-            readOnly
-            mode={formMode}
-            onReorder={() => undefined}
-          />
+          formMode === "compare" ? (
+            <ClasificacionCompareBoard
+              teams={teams}
+              predictions={data.predictions}
+              actualPositions={actualPositions}
+              predictionLabel="Su predicción"
+            />
+          ) : (
+            <ClasificacionForm
+              teams={teams}
+              predictions={data.predictions}
+              actualPositions={actualPositions}
+              readOnly
+              mode={formMode}
+              onReorder={() => undefined}
+            />
+          )
         ) : null}
       </div>
     </Modal>
