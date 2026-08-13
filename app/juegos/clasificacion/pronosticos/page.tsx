@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDialog } from "@/components/AppDialogProvider";
 import { Card } from "@/components/Card";
+import { ClasificacionCompareBoard } from "@/components/clasificacion/ClasificacionCompareBoard";
 import { ClasificacionForm } from "@/components/clasificacion/ClasificacionForm";
 import { PageHero } from "@/components/PageHero";
 import { bebasNeue } from "@/lib/fonts";
@@ -159,14 +160,23 @@ export default function ClasificacionPronosticosPage() {
           ) : undefined
         }
       >
-        <ClasificacionForm
-          teams={teams}
-          predictions={effectivePredictions}
-          actualPositions={actualPositions}
-          readOnly={readOnly}
-          mode={showCompare ? "compare" : "edit"}
-          onReorder={handleReorder}
-        />
+        {showCompare ? (
+          <ClasificacionCompareBoard
+            teams={teams}
+            predictions={effectivePredictions}
+            actualPositions={actualPositions}
+            predictionLabel="Tu predicción"
+          />
+        ) : (
+          <ClasificacionForm
+            teams={teams}
+            predictions={effectivePredictions}
+            actualPositions={actualPositions}
+            readOnly={readOnly}
+            mode="edit"
+            onReorder={handleReorder}
+          />
+        )}
 
         <div className="mt-4 flex flex-wrap gap-2 border-t border-[#214C9B]/15 pt-3 sm:mt-6 sm:gap-3 sm:pt-5">
           {canSave && (
