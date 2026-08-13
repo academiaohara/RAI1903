@@ -6,6 +6,8 @@ import { Card } from "@/components/Card";
 import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
 import { QuinigolMatchForm } from "@/components/quinigol/QuinigolMatchForm";
+import { QuinigolTicket } from "@/components/juegos/GameTicket";
+import { useSeason } from "@/components/season/SeasonProvider";
 import { bebasNeue } from "@/lib/fonts";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
@@ -26,13 +28,15 @@ import type { User } from "@supabase/supabase-js";
 type QuinigolBodyProps = {
   seasonId: CompetitionSeasonId;
   matchdays: Matchday[];
+  teams: ReturnType<typeof useQuinielaSeason>["teams"];
   currentRound: number;
   totalRounds: number;
   bundlesLoading: boolean;
 };
 
-function QuinigolBody({ seasonId, matchdays, currentRound, totalRounds, bundlesLoading }: QuinigolBodyProps) {
+function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, bundlesLoading }: QuinigolBodyProps) {
   const { alert } = useAppDialog();
+  const { viewedSeason, getCompetitionConfig } = useSeason();
   const { canEdit: isCmsEditor } = useInlineEditing();
   const [round, setRound] = useState(currentRound);
   const [predictions, setPredictions] = useState<Record<string, QuinigolPrediction>>({});
@@ -207,6 +211,17 @@ function QuinigolBody({ seasonId, matchdays, currentRound, totalRounds, bundlesL
           ))}
         </div>
 
+        {hasMatchesForRound ? (
+          <QuinigolTicket
+            matches={selectedMatchday.matches}
+            teams={teams}
+            predictions={predictions}
+            round={round}
+            seasonLabel={viewedSeason.label}
+            competitionLabel={getCompetitionConfig("masculino").ligaLabel ?? "1ª RFEF — Grupo 1"}
+          />
+        ) : null}
+
         <div className="mt-4 flex flex-wrap gap-2 border-t border-[#214C9B]/15 pt-3 sm:mt-6 sm:gap-3 sm:pt-5">
           {canSave && (
             <button
@@ -235,7 +250,7 @@ function QuinigolBody({ seasonId, matchdays, currentRound, totalRounds, bundlesL
 }
 
 export default function QuinigolPronosticosPage() {
-  const { matchdays, currentRound, totalRounds, seasonId, bundlesLoading } = useQuinielaSeason();
+  const { matchdays, teams, currentRound, totalRounds, seasonId, bundlesLoading } = useQuinielaSeason();
 
   return (
     <div className="space-y-6">
@@ -249,6 +264,7 @@ export default function QuinigolPronosticosPage() {
         key={seasonId}
         seasonId={seasonId}
         matchdays={matchdays}
+        teams={teams}
         currentRound={currentRound}
         totalRounds={totalRounds}
         bundlesLoading={bundlesLoading}

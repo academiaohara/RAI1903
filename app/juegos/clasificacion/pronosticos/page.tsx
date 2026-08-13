@@ -5,7 +5,9 @@ import { useAppDialog } from "@/components/AppDialogProvider";
 import { Card } from "@/components/Card";
 import { ClasificacionCompareBoard } from "@/components/clasificacion/ClasificacionCompareBoard";
 import { ClasificacionForm } from "@/components/clasificacion/ClasificacionForm";
+import { ClasificacionTicket } from "@/components/juegos/GameTicket";
 import { PageHero } from "@/components/PageHero";
+import { useSeason } from "@/components/season/SeasonProvider";
 import { bebasNeue } from "@/lib/fonts";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
 import {
@@ -29,7 +31,9 @@ import type { User } from "@supabase/supabase-js";
 
 export default function ClasificacionPronosticosPage() {
   const { alert } = useAppDialog();
+  const { viewedSeason, getCompetitionConfig } = useSeason();
   const { teams, matchdays, leagueMatchdays, seasonId } = useQuinielaSeason();
+  const competitionConfig = getCompetitionConfig("masculino");
   const [predictions, setPredictions] = useState<Record<string, ClasificacionPrediction>>({});
   const [submittedAt, setSubmittedAt] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -177,6 +181,16 @@ export default function ClasificacionPronosticosPage() {
             onReorder={handleReorder}
           />
         )}
+
+        {teams.length > 0 ? (
+          <ClasificacionTicket
+            teams={teams}
+            predictions={effectivePredictions}
+            zones={competitionConfig.zones}
+            seasonLabel={viewedSeason.label}
+            competitionLabel={competitionConfig.ligaLabel ?? "1ª RFEF — Grupo 1"}
+          />
+        ) : null}
 
         <div className="mt-4 flex flex-wrap gap-2 border-t border-[#214C9B]/15 pt-3 sm:mt-6 sm:gap-3 sm:pt-5">
           {canSave && (
