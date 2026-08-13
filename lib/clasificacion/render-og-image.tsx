@@ -2,11 +2,12 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { ImageResponse } from "next/og";
 import type { ClasificacionOgShareData } from "@/lib/clasificacion/og-share-data";
+import { crestSpriteBackgroundPosition, type CrestSpriteSheet } from "@/lib/clasificacion/og-crest";
 
 export const OG_IMAGE_SIZE = { width: 1200, height: 630 } as const;
 
-async function loadBebasFont(): Promise<ArrayBuffer> {
-  const fontPath = path.join(process.cwd(), "lib/clasificacion/fonts/BebasNeue-Regular.ttf");
+async function loadFont(fileName: string): Promise<ArrayBuffer> {
+  const fontPath = path.join(process.cwd(), "lib/clasificacion/fonts", fileName);
   const buffer = await readFile(fontPath);
   return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
 }
@@ -19,61 +20,103 @@ function splitRows(rows: ClasificacionOgShareData["rows"]) {
   };
 }
 
+function CrestBadge({
+  sprite,
+  crestIndex,
+  initials,
+  isAviles,
+}: {
+  sprite: CrestSpriteSheet;
+  crestIndex: number;
+  initials: string;
+  isAviles: boolean;
+}) {
+  const { x, y } = crestSpriteBackgroundPosition(sprite, crestIndex);
+
+  return (
+    <div
+      style={{
+        width: 22,
+        height: 22,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundImage: `url(${sprite.dataUri})`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: `${sprite.width}px ${sprite.height}px`,
+        backgroundPosition: `-${x}px -${y}px`,
+      }}
+    >
+      {!sprite.dataUri ? (
+        <span
+          style={{
+            fontFamily: "Inter",
+            fontSize: 8,
+            fontWeight: 600,
+            color: isAviles ? "#214C9B" : "#475569",
+          }}
+        >
+          {initials.slice(0, 3)}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 function StandingsColumn({
   rows,
+  sprite,
   startIndex,
 }: {
   rows: ClasificacionOgShareData["rows"];
+  sprite: CrestSpriteSheet;
   startIndex: number;
 }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1 }}>
       {rows.map((row, index) => (
         <div
           key={row.teamId}
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 8,
-            padding: "5px 8px",
-            borderRadius: 10,
+            gap: 6,
+            padding: "4px 6px",
+            borderRadius: 8,
             background: row.isAviles ? "rgba(33, 76, 155, 0.14)" : "rgba(255,255,255,0.72)",
             border: row.isAviles ? "2px solid #214C9B" : "1px solid rgba(33, 76, 155, 0.12)",
           }}
         >
           <span
             style={{
-              width: 24,
-              fontSize: 18,
+              width: 18,
+              fontSize: 14,
               fontWeight: 700,
               color: row.isAviles ? "#214C9B" : "#475569",
               textAlign: "center",
+              fontFamily: "Inter",
             }}
           >
             {startIndex + index + 1}
           </span>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={row.crestUrl}
-            alt=""
-            width={24}
-            height={24}
-            style={{ objectFit: "contain" }}
+          <CrestBadge
+            sprite={sprite}
+            crestIndex={row.crestIndex}
+            initials={row.crestInitials}
+            isAviles={row.isAviles}
           />
           <span
             style={{
               flex: 1,
-              fontSize: 15,
-              fontWeight: 700,
+              fontSize: 11,
+              fontWeight: 600,
+              lineHeight: 1.15,
               color: row.isAviles ? "#214C9B" : "#0f172a",
-              overflow: "hidden",
+              fontFamily: "Inter",
             }}
           >
-            {row.shortName}
+            {row.name}
           </span>
-          {row.points !== null ? (
-            <span style={{ fontSize: 14, fontWeight: 700, color: "#64748b" }}>{row.points} pts</span>
-          ) : null}
         </div>
       ))}
     </div>
@@ -81,7 +124,7 @@ function StandingsColumn({
 }
 
 export async function renderClasificacionOgImage(data: ClasificacionOgShareData) {
-  const bebas = await loadBebasFont();
+  const [bebas, inter] = await Promise.all([loadFont("BebasNeue-Regular.ttf"), loadFont("Inter-SemiBold.ttf")]);
   const { left, right } = splitRows(data.rows);
   const standingsLabel = data.hasStandings ? "Clasificación actual" : "20 equipos del Grupo I";
 
@@ -126,39 +169,39 @@ export async function renderClasificacionOgImage(data: ClasificacionOgShareData)
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            width: 430,
-            padding: "48px 40px",
+            width: 360,
+            padding: "44px 32px",
             color: "white",
           }}
         >
           <div
             style={{
-              fontSize: 22,
+              fontSize: 20,
               letterSpacing: 3,
               textTransform: "uppercase",
               color: "rgba(255,255,255,0.82)",
-              marginBottom: 12,
+              marginBottom: 10,
             }}
           >
             Juego de clasificación
           </div>
           <div
             style={{
-              fontSize: 74,
+              fontSize: 68,
               lineHeight: 0.92,
               letterSpacing: 1,
-              marginBottom: 18,
+              marginBottom: 16,
             }}
           >
             ¿CÓMO ACABARÁ LA LIGA?
           </div>
           <div
             style={{
-              fontSize: 24,
+              fontSize: 22,
               lineHeight: 1.2,
               color: "rgba(255,255,255,0.9)",
-              marginBottom: 28,
-              maxWidth: 360,
+              marginBottom: 24,
+              maxWidth: 320,
             }}
           >
             Ordena el Grupo I, compite en el ranking y comparte tu pronóstico.
@@ -172,7 +215,7 @@ export async function renderClasificacionOgImage(data: ClasificacionOgShareData)
               borderRadius: 999,
               background: "rgba(255,255,255,0.14)",
               border: "1px solid rgba(255,255,255,0.22)",
-              fontSize: 20,
+              fontSize: 18,
               letterSpacing: 1,
               alignSelf: "flex-start",
             }}
@@ -181,8 +224,8 @@ export async function renderClasificacionOgImage(data: ClasificacionOgShareData)
           </div>
           <div
             style={{
-              marginTop: 28,
-              fontSize: 18,
+              marginTop: 24,
+              fontSize: 16,
               letterSpacing: 2,
               color: "rgba(255,255,255,0.75)",
             }}
@@ -194,14 +237,14 @@ export async function renderClasificacionOgImage(data: ClasificacionOgShareData)
         <div
           style={{
             position: "absolute",
-            right: 34,
-            top: 34,
-            width: 700,
-            height: 560,
+            right: 24,
+            top: 28,
+            width: 790,
+            height: 572,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            transform: "rotate(-5deg)",
+            transform: "rotate(-3deg)",
           }}
         >
           <div
@@ -210,7 +253,7 @@ export async function renderClasificacionOgImage(data: ClasificacionOgShareData)
               height: "100%",
               display: "flex",
               flexDirection: "column",
-              padding: "22px 24px",
+              padding: "18px 20px",
               borderRadius: 24,
               background: "rgba(255,255,255,0.95)",
               boxShadow: "0 28px 80px rgba(0,0,0,0.35)",
@@ -222,26 +265,27 @@ export async function renderClasificacionOgImage(data: ClasificacionOgShareData)
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                marginBottom: 14,
+                marginBottom: 10,
               }}
             >
-              <div style={{ fontSize: 30, color: "#214C9B", letterSpacing: 1 }}>{standingsLabel}</div>
+              <div style={{ fontSize: 28, color: "#214C9B", letterSpacing: 1 }}>{standingsLabel}</div>
               <div
                 style={{
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: 700,
                   color: "#981915",
                   background: "rgba(152, 25, 21, 0.1)",
-                  padding: "6px 12px",
+                  padding: "5px 10px",
                   borderRadius: 999,
+                  fontFamily: "Inter",
                 }}
               >
                 Pronósticos
               </div>
             </div>
-            <div style={{ display: "flex", gap: 10, flex: 1 }}>
-              <StandingsColumn rows={left} startIndex={0} />
-              <StandingsColumn rows={right} startIndex={left.length} />
+            <div style={{ display: "flex", gap: 8, flex: 1 }}>
+              <StandingsColumn rows={left} sprite={data.crestSprite} startIndex={0} />
+              <StandingsColumn rows={right} sprite={data.crestSprite} startIndex={left.length} />
             </div>
           </div>
         </div>
@@ -249,7 +293,10 @@ export async function renderClasificacionOgImage(data: ClasificacionOgShareData)
     ),
     {
       ...OG_IMAGE_SIZE,
-      fonts: [{ name: "Bebas Neue", data: bebas, style: "normal", weight: 400 }],
+      fonts: [
+        { name: "Bebas Neue", data: bebas, style: "normal", weight: 400 },
+        { name: "Inter", data: inter, style: "normal", weight: 600 },
+      ],
     },
   );
 }
