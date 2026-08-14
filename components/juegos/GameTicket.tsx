@@ -35,7 +35,7 @@ type TicketFrameProps = {
 };
 
 const logoByKind = {
-  quiniela: "/juegos/rainiela.svg",
+  quiniela: "/juegos/rainielav2.svg",
   quinigol: "/juegos/raigol.svg",
   clasificacion: "/api/game-logo/oraculo",
 } satisfies Record<TicketKind, string | null>;

@@ -278,8 +278,9 @@ a {
 }
 
 .game-ticket-logo--quiniela {
-  width: 58px;
-  height: 58px;
+  width: auto;
+  height: 48px;
+  max-width: 96px;
 }
 
 .game-ticket-logo--quinigol {

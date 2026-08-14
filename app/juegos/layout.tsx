@@ -41,7 +41,7 @@ export default function JuegosLayout({ children }: { children: React.ReactNode }
               const href = gameModeHref(mode.id);
               const active = gameMode === mode.id;
               const logo = mode.id === "quiniela"
-                ? "/juegos/rainiela.svg"
+                ? "/juegos/rainielav2.svg"
                 : mode.id === "quinigol"
                   ? "/juegos/raigol.svg"
                   : "/api/game-logo/oraculo";

@@ -84,7 +84,7 @@ export const navItems: NavItem[] = [
         href: "/juegos/quiniela/pronosticos",
         label: "RAIniela",
         icon: CalendarCheck2,
-        logo: "/juegos/rainiela.svg",
+        logo: "/juegos/rainielav2.svg",
       },
       {
         href: "/juegos/quinigol/pronosticos",
