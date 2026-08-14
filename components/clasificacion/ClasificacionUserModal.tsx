@@ -48,7 +48,7 @@ export function ClasificacionUserModal({
   const showCompare = showPoints && actualPositions.size > 0;
 
   return (
-    <Modal open={open} title={`Clasificación de ${handle}`} onClose={onClose} wide>
+    <Modal open={open} title={`Clasificación de ${handle}`} onClose={onClose} wide variant="ticket">
       <div className="space-y-4">
         <div className="flex items-center gap-3">
           <UserAvatar avatarUrl={avatarUrl} label={handle} size="md" />

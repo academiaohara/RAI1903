@@ -237,110 +237,6 @@ function QuinigolReceipt({
   );
 }
 
-function formatReceiptPositionDiff(predicted: number, actual: number): string {
-  const diff = getPositionDiff(predicted, actual);
-  if (diff === 0) return "=";
-  return diff > 0 ? `+${diff}` : `${diff}`;
-}
-
-function ClasificacionCompareReceipt({
-  teams,
-  predictions,
-  actualPositions,
-  seasonLabel,
-  competitionLabel,
-  creatorHandle = "@usuario",
-  savedAt,
-  points,
-}: {
-  teams: Team[];
-  predictions: Record<string, ClasificacionPrediction>;
-  actualPositions: Map<string, number>;
-  seasonLabel: string;
-  competitionLabel: string;
-  creatorHandle?: string;
-  savedAt?: string;
-  points?: number;
-}) {
-  const orderedByActual = useMemo(
-    () =>
-      [...teams].sort(
-        (a, b) =>
-          (actualPositions.get(a.id) ?? Number.MAX_SAFE_INTEGER) -
-            (actualPositions.get(b.id) ?? Number.MAX_SAFE_INTEGER) ||
-          a.name.localeCompare(b.name, "es"),
-      ),
-    [actualPositions, teams],
-  );
-  const savedDate = savedAt ? new Date(savedAt) : null;
-  const refCode = savedDate
-    ? String(savedDate.getTime()).slice(-5)
-    : String(orderedByActual.length * 23).padStart(5, "0").slice(-5);
-  const metaDate = savedDate
-    ? savedDate.toLocaleDateString("es-ES")
-    : new Date().toLocaleDateString("es-ES");
-  const metaTime = savedDate
-    ? savedDate.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
-    : new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-  const handle = creatorHandle.startsWith("@") ? creatorHandle : `@${creatorHandle}`;
-
-  return (
-    <aside className="game-ticket-receipt" aria-label="Comprobante clasificación real">
-      <div className="game-ticket-receipt-tri game-ticket-receipt-tri--top" />
-      <div className="game-ticket-receipt-inner">
-        <ReceiptGameLogo kind="clasificacion" />
-        <span className="game-ticket-receipt-subtitle">CLASIFICACIÓN REAL</span>
-        <hr className="game-ticket-receipt-hr" />
-        <div className="game-ticket-receipt-line game-ticket-receipt-line--heading">
-          <span>Equipo</span>
-          <span>Pts</span>
-          <span>Dif</span>
-        </div>
-        <div className="game-ticket-receipt-lines">
-          {orderedByActual.map((team) => {
-            const predicted = predictions[team.id]?.position;
-            const actual = actualPositions.get(team.id);
-            if (predicted === undefined || actual === undefined) return null;
-            const teamPoints = scoreClasificacionPosition(predicted, actual);
-            return (
-              <div className="game-ticket-receipt-line game-ticket-receipt-line--compare" key={team.id}>
-                <span>
-                  {actual}. {team.shortName || team.name}
-                </span>
-                <span>{teamPoints}</span>
-                <span>{formatReceiptPositionDiff(predicted, actual)}</span>
-              </div>
-            );
-          })}
-        </div>
-        {typeof points === "number" ? (
-          <>
-            <hr className="game-ticket-receipt-hr" />
-            <div className="game-ticket-receipt-line game-ticket-receipt-line--compare game-ticket-receipt-line--points">
-              <span>Total</span>
-              <span>{points}</span>
-              <span />
-            </div>
-          </>
-        ) : null}
-        <hr className="game-ticket-receipt-hr" />
-        <p className="game-ticket-receipt-meta">
-          {seasonLabel} · {competitionLabel}
-          <br />
-          Ref. {refCode}
-          <br />
-          {metaDate} · {metaTime}h
-        </p>
-        <p className="game-ticket-receipt-stamp">
-          {savedAt ? "GUARDADO CORRECTAMENTE" : "BORRADOR"}
-        </p>
-        <p className="game-ticket-receipt-handle">{handle}</p>
-      </div>
-      <div className="game-ticket-receipt-tri game-ticket-receipt-tri--bottom" />
-    </aside>
-  );
-}
-
 function ClasificacionReceipt({
   teams,
   predictions,
@@ -463,8 +359,7 @@ function TicketMatchPreview({ match }: { match: Match }) {
     return getMatchArticlePageHref(match.id, "masculino", article?.id ?? defaultCronicaId(match.id, "masculino"));
   }, [avilesMatch, getForMatch, match.id]);
   const avilesArticleLabel = isMatchPlayed(match) ? "Crónica" : "Previa";
-  const previewClass =
-    "game-ticket-match-preview inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[#214C9B]/25 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50";
+  const previewClass = "game-ticket-match-preview";
 
   if (avilesMatch && avilesArticleHref) {
     return (
@@ -582,10 +477,19 @@ function TicketFrame({
   );
 }
 
-function teamName(match: Match, side: "home" | "away", teamsById: Map<string, Team>): string {
-  const teamId = side === "home" ? match.homeTeamId : match.awayTeamId;
-  const fallback = side === "home" ? match.homeTeam : match.awayTeam;
-  return teamsById.get(teamId)?.name ?? fallback;
+/**
+ * Nombre de equipo con variante corta: en pantallas pequeñas se muestra el
+ * nombre corto para que el boleto quepa; en la exportación a imagen se fuerza
+ * siempre el nombre completo vía `.game-ticket--capture`.
+ */
+function TicketTeamName({ team }: { team: Team }) {
+  const short = team.shortName || team.name;
+  return (
+    <>
+      <span className="game-ticket-team-name game-ticket-team-name--full">{team.name}</span>
+      <span className="game-ticket-team-name game-ticket-team-name--short">{short}</span>
+    </>
+  );
 }
 
 function teamForMatch(match: Match, side: "home" | "away", teamsById: Map<string, Team>): Team {
@@ -906,12 +810,12 @@ export function QuinielaTicket({
               <span className="game-ticket-teams">
                 <span>
                   <TicketCrest team={teamForMatch(match, "home", teamsById)} />
-                  {teamName(match, "home", teamsById)}
+                  <TicketTeamName team={teamForMatch(match, "home", teamsById)} />
                 </span>
                 <i>–</i>
                 <span>
                   <TicketCrest team={teamForMatch(match, "away", teamsById)} />
-                  {teamName(match, "away", teamsById)}
+                  <TicketTeamName team={teamForMatch(match, "away", teamsById)} />
                 </span>
               </span>
               <TicketMatchPreview match={match} />
@@ -927,7 +831,9 @@ export function QuinielaTicket({
               {avilesMatch ? (
                 <div className="game-ticket-featured">
                   <div className="game-ticket-featured-score">
-                    <span>{teamName(match, "home", teamsById)}</span>
+                    <span>
+                      <TicketTeamName team={teamForMatch(match, "home", teamsById)} />
+                    </span>
                     <div>
                       {([0, 1, 2, "M"] as GoalsPick[]).map((option) =>
                         scoreMark(option, prediction?.goalsHome, {
@@ -939,7 +845,9 @@ export function QuinielaTicket({
                     </div>
                   </div>
                   <div className="game-ticket-featured-score">
-                    <span>{teamName(match, "away", teamsById)}</span>
+                    <span>
+                      <TicketTeamName team={teamForMatch(match, "away", teamsById)} />
+                    </span>
                     <div>
                       {([0, 1, 2, "M"] as GoalsPick[]).map((option) =>
                         scoreMark(option, prediction?.goalsAway, {
@@ -1048,9 +956,9 @@ export function QuinigolTicket({
             <li className="game-ticket-match-row game-ticket-match-row--score" key={match.id}>
               <span className="game-ticket-number">{index + 1}</span>
               <span className="game-ticket-teams">
-                <span><TicketCrest team={teamForMatch(match, "home", teamsById)} />{teamName(match, "home", teamsById)}</span>
+                <span><TicketCrest team={teamForMatch(match, "home", teamsById)} /><TicketTeamName team={teamForMatch(match, "home", teamsById)} /></span>
                 <i>–</i>
-                <span><TicketCrest team={teamForMatch(match, "away", teamsById)} />{teamName(match, "away", teamsById)}</span>
+                <span><TicketCrest team={teamForMatch(match, "away", teamsById)} /><TicketTeamName team={teamForMatch(match, "away", teamsById)} /></span>
               </span>
               <TicketMatchPreview match={match} />
               <span className="game-ticket-score">
@@ -1178,7 +1086,16 @@ export function ClasificacionTicket({
     onReorder(next);
   };
 
-  const showCompareReceipt = actualPositions !== undefined && actualPositions.size > 0;
+  const showCompare = actualPositions !== undefined && actualPositions.size > 0;
+  const teamsByActualPosition = useMemo(() => {
+    const map = new Map<number, Team>();
+    if (!actualPositions) return map;
+    for (const team of teams) {
+      const actualPosition = actualPositions.get(team.id);
+      if (actualPosition !== undefined) map.set(actualPosition, team);
+    }
+    return map;
+  }, [actualPositions, teams]);
 
   return (
     <TicketFrame
@@ -1186,7 +1103,7 @@ export function ClasificacionTicket({
       competitionLabel={competitionLabel}
       seasonLabel={seasonLabel}
       contextLabel="Clasificación final"
-      title={showCompareReceipt ? "Tu predicción" : "El Oráculo · clasificación final"}
+      title={showCompare ? "Tu predicción" : "El Oráculo · clasificación final"}
       hint={readOnly ? "Pronóstico cerrado" : "Usa las flechas para ordenar"}
       fileName={`mi-oraculo-${seasonLabel.replaceAll("/", "-")}.png`}
       shareText={`Mi Oráculo para la clasificación final de la temporada ${seasonLabel} #RealAviles`}
@@ -1194,43 +1111,82 @@ export function ClasificacionTicket({
       points={points}
       showActions={showActions}
       receipt={
-        showCompareReceipt ? (
-          <ClasificacionCompareReceipt
-            teams={teams}
-            predictions={predictions}
-            actualPositions={actualPositions}
-            seasonLabel={seasonLabel}
-            competitionLabel={competitionLabel}
-            creatorHandle={creatorHandle}
-            savedAt={savedAt}
-            points={points}
-          />
-        ) : (
-          <ClasificacionReceipt
-            teams={teams}
-            predictions={predictions}
-            seasonLabel={seasonLabel}
-            competitionLabel={competitionLabel}
-            creatorHandle={creatorHandle}
-            savedAt={savedAt}
-            points={points}
-          />
-        )
+        <ClasificacionReceipt
+          teams={teams}
+          predictions={predictions}
+          seasonLabel={seasonLabel}
+          competitionLabel={competitionLabel}
+          creatorHandle={creatorHandle}
+          savedAt={savedAt}
+          points={points}
+        />
       }
     >
+      {showCompare ? (
+        <div className="game-ticket-standings-head" aria-hidden>
+          <span>Tu predicción</span>
+          <span>Clasificación real</span>
+        </div>
+      ) : null}
       <ol className="game-ticket-list game-ticket-standings">
         {orderedTeams.map((team, index) => {
           const position = index + 1;
           const zone = positionZones.get(position);
+          const actual = showCompare ? actualPositions?.get(team.id) : undefined;
+          const diff = actual !== undefined ? getPositionDiff(position, actual) : undefined;
+          const teamPoints = actual !== undefined ? scoreClasificacionPosition(position, actual) : undefined;
+          const actualTeam = showCompare ? teamsByActualPosition.get(position) : undefined;
           return (
             <li
-              className="game-ticket-standing-row"
+              className={`game-ticket-standing-row${showCompare ? " game-ticket-standing-row--compare" : ""}`}
               key={team.id}
               style={zone ? { borderLeftColor: zone.color, backgroundColor: `${zone.color}12` } : undefined}
             >
               <span className="game-ticket-number">{position}</span>
               <TicketCrest team={team} />
-              <strong>{team.name}</strong>
+              <strong>
+                <TicketTeamName team={team} />
+              </strong>
+              {showCompare ? (
+                <span className="game-ticket-standing-compare">
+                  {diff !== undefined ? (
+                    diff === 0 ? (
+                      <b
+                        className="game-ticket-standing-diff game-ticket-standing-diff--exact"
+                        title="Posición exacta"
+                        aria-label="Posición exacta"
+                      >
+                        =
+                      </b>
+                    ) : (
+                      <b
+                        className={`game-ticket-standing-diff ${
+                          diff < 0 ? "game-ticket-standing-diff--up" : "game-ticket-standing-diff--down"
+                        }`}
+                        title={`${team.shortName || team.name} va ${Math.abs(diff)} ${Math.abs(diff) === 1 ? "puesto" : "puestos"} ${diff < 0 ? "por encima" : "por debajo"} de tu predicción`}
+                        aria-label={`Fallo de ${Math.abs(diff)} ${Math.abs(diff) === 1 ? "posición" : "posiciones"} ${diff < 0 ? "hacia arriba" : "hacia abajo"}`}
+                      >
+                        <i aria-hidden>{diff < 0 ? "▲" : "▼"}</i>
+                        {Math.abs(diff)}
+                      </b>
+                    )
+                  ) : null}
+                  {teamPoints !== undefined ? (
+                    <b className="game-ticket-standing-points" title={`Puntos por ${team.shortName || team.name}`}>
+                      {teamPoints}
+                      <i>pts</i>
+                    </b>
+                  ) : null}
+                </span>
+              ) : null}
+              {showCompare ? (
+                <span
+                  className="game-ticket-standing-actual"
+                  title={actualTeam ? `${position}º real: ${actualTeam.name}` : undefined}
+                >
+                  {actualTeam ? <TicketTeamName team={actualTeam} /> : "—"}
+                </span>
+              ) : null}
               {!readOnly && onReorder ? (
                 <span className="game-ticket-order-controls">
                   <button type="button" disabled={index === 0} onClick={() => moveTeam(index, index - 1)} aria-label={`Subir ${team.name}`}>
