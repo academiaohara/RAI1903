@@ -7,6 +7,7 @@ import { Pagination } from "@/components/Pagination";
 import { usePagination } from "@/hooks/usePagination";
 import type { CompetitionSeasonId } from "@/data/mock";
 import type { GameRankingEntry } from "@/lib/game-rankings";
+import type { CompetitionZoneRule } from "@/lib/cms/competition-config-bundle";
 import type { Matchday, Team } from "@/types";
 
 type ClasificacionRankingListProps = {
@@ -15,6 +16,9 @@ type ClasificacionRankingListProps = {
   seasonId: CompetitionSeasonId;
   teams: Team[];
   leagueMatchdays: Matchday[];
+  zones: CompetitionZoneRule[];
+  seasonLabel: string;
+  competitionLabel: string;
 };
 
 export function ClasificacionRankingList({
@@ -23,6 +27,9 @@ export function ClasificacionRankingList({
   seasonId,
   teams,
   leagueMatchdays,
+  zones,
+  seasonLabel,
+  competitionLabel,
 }: ClasificacionRankingListProps) {
   const pagination = usePagination(entries);
   const [selectedUser, setSelectedUser] = useState<GameRankingEntry | null>(null);
@@ -87,6 +94,9 @@ export function ClasificacionRankingList({
           avatarUrl={selectedUser.avatarUrl}
           teams={teams}
           leagueMatchdays={leagueMatchdays}
+          zones={zones}
+          seasonLabel={seasonLabel}
+          competitionLabel={competitionLabel}
         />
       ) : null}
     </>

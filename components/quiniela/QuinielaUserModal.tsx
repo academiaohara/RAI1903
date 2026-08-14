@@ -3,12 +3,12 @@
 import { useMemo, useState } from "react";
 import { UserAvatar } from "@/components/auth/UserAvatar";
 import { JornadaSelector } from "@/components/JornadaSelector";
+import { QuinielaTicket } from "@/components/juegos/GameTicket";
 import { Modal } from "@/components/Modal";
-import { PredictionForm, type PredictionFormMode } from "@/components/PredictionForm";
 import { useQuinielaUserRound } from "@/hooks/useQuinielaUserRound";
 import type { CompetitionSeasonId } from "@/data/mock";
 import { getMatchdayByRound, sortQuinielaMatches } from "@/lib/quiniela";
-import type { Matchday } from "@/types";
+import type { Matchday, Team } from "@/types";
 
 type QuinielaUserModalProps = {
   open: boolean;
@@ -18,16 +18,13 @@ type QuinielaUserModalProps = {
   handle: string;
   avatarUrl: string | null;
   matchdays: Matchday[];
+  teams: Team[];
+  seasonLabel: string;
+  competitionLabel: string;
   totalRounds: number;
   currentRound: number;
   initialRound?: number;
 };
-
-function getPredictionFormMode(hasSavedRound: boolean, countPoints: boolean): PredictionFormMode {
-  if (hasSavedRound && countPoints) return "compare";
-  if (!hasSavedRound && countPoints) return "results";
-  return "edit";
-}
 
 export function QuinielaUserModal({
   open,
@@ -37,6 +34,9 @@ export function QuinielaUserModal({
   handle,
   avatarUrl,
   matchdays,
+  teams,
+  seasonLabel,
+  competitionLabel,
   totalRounds,
   currentRound,
   initialRound,
@@ -48,14 +48,10 @@ export function QuinielaUserModal({
   const matchday = useMemo(() => getMatchdayByRound(matchdays, round), [matchdays, round]);
   const orderedMatches = useMemo(() => sortQuinielaMatches(matchday.matches), [matchday.matches]);
   const hasMatches = orderedMatches.length > 0;
-
-  const hasSavedRound = data?.hasSavedRound ?? false;
-  const countPoints = data?.countPoints ?? false;
-  const formMode = getPredictionFormMode(hasSavedRound, countPoints);
-  const showCompareLegend = formMode === "compare";
+  const showPoints = Boolean(data?.hasSavedRound && data.countPoints);
 
   return (
-    <Modal open={open} title={`Quiniela de ${handle}`} onClose={onClose}>
+    <Modal open={open} title={`Quiniela de ${handle}`} onClose={onClose} wide>
       <div className="space-y-4">
         <div className="flex items-center gap-3">
           <UserAvatar avatarUrl={avatarUrl} label={handle} size="md" />
@@ -74,26 +70,13 @@ export function QuinielaUserModal({
           />
         </div>
 
-        {data?.hasSavedRound && data.countPoints ? (
-          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#214C9B]/20 bg-white px-3 py-2.5 sm:px-4 sm:py-3">
-            <p className="text-xs font-bold text-slate-700 sm:text-sm">Puntos de la jornada</p>
-            <p className="text-lg font-extrabold text-[#214C9B] sm:text-xl">{data.points} pts</p>
-          </div>
-        ) : data?.hasSavedRound && !loading ? (
+        {data?.hasSavedRound && !data.countPoints && !loading ? (
           <p className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600 sm:text-sm">
             Los puntos se publican cuando empiece la jornada o haya resultados oficiales cargados.
           </p>
         ) : data && !data.hasSavedRound && data.countPoints && !loading ? (
           <p className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600 sm:text-sm">
-            No participó en esta jornada. Resultados oficiales de los partidos jugados.
-          </p>
-        ) : null}
-
-        {showCompareLegend ? (
-          <p className="text-xs leading-5 text-slate-600 sm:text-sm">
-            <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#214C9B]" aria-hidden /> Pronóstico
-            {" · "}
-            <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#981915]" aria-hidden /> Resultado oficial
+            No participó en esta jornada.
           </p>
         ) : null}
 
@@ -101,19 +84,19 @@ export function QuinielaUserModal({
           <p className="text-sm text-slate-500">Cargando quiniela…</p>
         ) : error ? (
           <p className="text-sm font-semibold text-[#981915]">{error}</p>
-        ) : hasMatches ? (
-          <div className="space-y-3 sm:space-y-4">
-            {orderedMatches.map((match) => (
-              <PredictionForm
-                key={match.id}
-                match={match}
-                prediction={data?.predictions[match.id]}
-                mode={formMode}
-                readOnly
-                onChange={() => undefined}
-              />
-            ))}
-          </div>
+        ) : hasMatches && data?.hasSavedRound ? (
+          <QuinielaTicket
+            matches={orderedMatches}
+            teams={teams}
+            predictions={data.predictions}
+            round={round}
+            seasonLabel={seasonLabel}
+            competitionLabel={competitionLabel}
+            readOnly
+            creatorHandle={handle}
+            points={showPoints ? data.points : undefined}
+            showActions={false}
+          />
         ) : null}
       </div>
     </Modal>

@@ -7,6 +7,7 @@ import { PageHero } from "@/components/PageHero";
 import { PredictionForm } from "@/components/PredictionForm";
 import { QuinielaRankingList } from "@/components/quiniela/QuinielaRankingList";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
+import { useSeason } from "@/components/season/SeasonProvider";
 import { useQuinielaRoundRanking } from "@/hooks/useQuinielaRoundRanking";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
 import type { CompetitionSeasonId } from "@/data/mock";
@@ -19,11 +20,22 @@ type ResultadoView = "quiniela" | "ranking";
 type ResultadoBodyProps = {
   seasonId: CompetitionSeasonId;
   matchdays: Matchday[];
+  teams: ReturnType<typeof useQuinielaSeason>["teams"];
+  seasonLabel: string;
+  competitionLabel: string;
   currentRound: number;
   totalRounds: number;
 };
 
-function ResultadoBody({ seasonId, matchdays, currentRound, totalRounds }: ResultadoBodyProps) {
+function ResultadoBody({
+  seasonId,
+  matchdays,
+  teams,
+  seasonLabel,
+  competitionLabel,
+  currentRound,
+  totalRounds,
+}: ResultadoBodyProps) {
   const [round, setRound] = useState(currentRound);
   const [view, setView] = useState<ResultadoView>("quiniela");
 
@@ -88,6 +100,9 @@ function ResultadoBody({ seasonId, matchdays, currentRound, totalRounds }: Resul
               entries={rankingEntries}
               seasonId={seasonId}
               matchdays={matchdays}
+              teams={teams}
+              seasonLabel={seasonLabel}
+              competitionLabel={competitionLabel}
               totalRounds={totalRounds}
               currentRound={currentRound}
               initialModalRound={round}
@@ -112,7 +127,9 @@ function ResultadoBody({ seasonId, matchdays, currentRound, totalRounds }: Resul
 }
 
 export default function QuinielaResultadoPage() {
-  const { matchdays, currentRound, totalRounds, seasonId } = useQuinielaSeason();
+  const { viewedSeason, getCompetitionConfig } = useSeason();
+  const { matchdays, teams, currentRound, totalRounds, seasonId } = useQuinielaSeason();
+  const competitionLabel = getCompetitionConfig("masculino").ligaLabel ?? "1ª RFEF — Grupo 1";
 
   return (
     <div className="space-y-6">
@@ -125,6 +142,9 @@ export default function QuinielaResultadoPage() {
         key={seasonId}
         seasonId={seasonId}
         matchdays={matchdays}
+        teams={teams}
+        seasonLabel={viewedSeason.label}
+        competitionLabel={competitionLabel}
         currentRound={currentRound}
         totalRounds={totalRounds}
       />
