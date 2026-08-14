@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { resolveGroupTeams } from "../lib/cms/group-teams";
 import { remapFixturesBundleTeamIds } from "../lib/cms/remap-fixture-team-ids";
 import { resolveFixtureTeamDisplayName } from "../lib/cms/teams-bundle";
 import type { SeasonBundlesMap, SeasonFixturesBundle } from "../lib/cms/season-bundles";
@@ -57,7 +58,27 @@ function testRemapFixtureTeamIds() {
   assert.equal(remapped.matchdays[0]?.matches[0]?.homeTeamId, "real-irun");
 }
 
+function testResolveGroupTeamsUsesCmsShortName() {
+  const bundles = {
+    "masculino:competition_config": {
+      teamsPerGroup: 20,
+      groupCount: 1,
+      groupTeams: {
+        "1": [{ id: "ponferradina", name: "SD Ponferradina" }],
+      },
+    },
+    "masculino:teams": {
+      teams: [{ id: "ponferradina", name: "SD Ponferradina", shortName: "Ponfe" }],
+    },
+  } as SeasonBundlesMap;
+
+  const teams = resolveGroupTeams(bundles, "masculino", "1");
+  const ponfe = teams.find((team) => team.id === "ponferradina");
+  assert.equal(ponfe?.shortName, "Ponfe", "usa shortName del bundle teams en la guía de liga");
+}
+
 testResolveFromGroupTeams();
+testResolveGroupTeamsUsesCmsShortName();
 testResolveFromCmsWhenNoGroup();
 testRemapFixtureTeamIds();
 console.log("verify-team-display-names: ok");
