@@ -36,8 +36,15 @@ async function waitForFonts(): Promise<void> {
   }
 }
 
+function resolveTicketElement(node: HTMLElement): HTMLElement {
+  if (node.classList.contains("game-ticket")) return node;
+  const ticket = node.querySelector(".game-ticket");
+  if (ticket instanceof HTMLElement) return ticket;
+  throw new Error("Game ticket element not found");
+}
+
 function prepareCaptureNode(node: HTMLElement): HTMLElement {
-  const captureNode = node.cloneNode(true) as HTMLElement;
+  const captureNode = resolveTicketElement(node).cloneNode(true) as HTMLElement;
   captureNode.querySelectorAll('[data-ticket-export-hidden="true"]').forEach((element) => {
     element.remove();
   });
@@ -45,12 +52,12 @@ function prepareCaptureNode(node: HTMLElement): HTMLElement {
 }
 
 export async function captureGameTicket(node: HTMLElement): Promise<Blob> {
-  await waitForImages(node);
+  const ticketElement = resolveTicketElement(node);
+  await waitForImages(ticketElement);
   await waitForFonts();
   const captureRoot = document.createElement("div");
   const captureNode = prepareCaptureNode(node);
-  const innerTicket = captureNode.querySelector(".game-ticket");
-  innerTicket?.classList.add("game-ticket--capture");
+  captureNode.classList.add("game-ticket--capture");
   captureRoot.setAttribute("aria-hidden", "true");
   captureRoot.style.position = "fixed";
   captureRoot.style.left = "-10000px";
