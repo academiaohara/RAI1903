@@ -126,28 +126,41 @@ export function Header() {
                   key={child.href}
                   href={child.href as Route}
                   prefetch={prefetch}
+                  aria-label={child.label}
                   aria-current={childActive ? "page" : undefined}
                   className={cn(
                     "group flex flex-col items-center justify-center rounded-xl border border-[#e0e0e0] bg-white px-4 py-6 text-center text-[0.95rem] font-medium text-[#444] transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]",
+                    child.logo ? "py-4" : "",
                     childActive
                       ? "border-[var(--rai-red)] text-[var(--rai-red)] shadow-[0_4px_12px_rgba(33,76,155,0.15)]"
                       : "hover:-translate-y-0.5 hover:border-[var(--rai-red)]/40 hover:shadow-[0_6px_16px_rgba(0,0,0,0.08)]",
                   )}
                 >
-                  <Icon
-                    size={40}
-                    strokeWidth={2}
-                    className="mb-3 h-10 w-10 shrink-0 text-[var(--rai-red)] transition-transform duration-300 group-hover:scale-105"
-                    aria-hidden
-                  />
-                  <span
-                    className={cn(
-                      "line-clamp-2 leading-snug",
-                      childActive ? "text-[var(--rai-red)]" : "text-[#444]",
-                    )}
-                  >
-                    {child.label}
-                  </span>
+                  {child.logo ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={child.logo}
+                      alt=""
+                      className="h-16 w-full max-w-[140px] object-contain transition-transform duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <>
+                      <Icon
+                        size={40}
+                        strokeWidth={2}
+                        className="mb-3 h-10 w-10 shrink-0 text-[var(--rai-red)] transition-transform duration-300 group-hover:scale-105"
+                        aria-hidden
+                      />
+                      <span
+                        className={cn(
+                          "line-clamp-2 leading-snug",
+                          childActive ? "text-[var(--rai-red)]" : "text-[#444]",
+                        )}
+                      >
+                        {child.label}
+                      </span>
+                    </>
+                  )}
                 </Link>
               );
             })}
