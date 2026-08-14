@@ -14,6 +14,10 @@ import {
   shareGameTicketOnX,
 } from "@/lib/game-ticket-share";
 import type { ClasificacionPrediction } from "@/lib/clasificacion-prediction";
+import {
+  getPositionDiff,
+  scoreClasificacionPosition,
+} from "@/lib/clasificacion-prediction";
 import { defaultCronicaId } from "@/lib/match-article-factory";
 import { getMatchArticlePageHref } from "@/lib/match-article-url";
 import { isMatchPlayed } from "@/lib/match-result";
@@ -37,6 +41,7 @@ type TicketFrameProps = {
   creatorHandle?: string;
   points?: number;
   receipt?: ReactNode;
+  showActions?: boolean;
   children: ReactNode;
 };
 
@@ -100,7 +105,6 @@ function QuinielaReceipt({
       <div className="game-ticket-receipt-tri game-ticket-receipt-tri--top" />
       <div className="game-ticket-receipt-inner">
         <ReceiptGameLogo kind="quiniela" />
-        <strong className="game-ticket-receipt-title">RAINIELA</strong>
         <span className="game-ticket-receipt-subtitle">COMPROBANTE</span>
         <hr className="game-ticket-receipt-hr" />
         <div className="game-ticket-receipt-lines">
@@ -193,7 +197,6 @@ function QuinigolReceipt({
       <div className="game-ticket-receipt-tri game-ticket-receipt-tri--top" />
       <div className="game-ticket-receipt-inner">
         <ReceiptGameLogo kind="quinigol" />
-        <strong className="game-ticket-receipt-title">RAIGOL</strong>
         <span className="game-ticket-receipt-subtitle">COMPROBANTE</span>
         <hr className="game-ticket-receipt-hr" />
         <div className="game-ticket-receipt-lines">
@@ -219,6 +222,110 @@ function QuinigolReceipt({
         <hr className="game-ticket-receipt-hr" />
         <p className="game-ticket-receipt-meta">
           Jornada {round} · {competitionLabel}
+          <br />
+          Ref. {refCode}
+          <br />
+          {metaDate} · {metaTime}h
+        </p>
+        <p className="game-ticket-receipt-stamp">
+          {savedAt ? "GUARDADO CORRECTAMENTE" : "BORRADOR"}
+        </p>
+        <p className="game-ticket-receipt-handle">{handle}</p>
+      </div>
+      <div className="game-ticket-receipt-tri game-ticket-receipt-tri--bottom" />
+    </aside>
+  );
+}
+
+function formatReceiptPositionDiff(predicted: number, actual: number): string {
+  const diff = getPositionDiff(predicted, actual);
+  if (diff === 0) return "=";
+  return diff > 0 ? `+${diff}` : `${diff}`;
+}
+
+function ClasificacionCompareReceipt({
+  teams,
+  predictions,
+  actualPositions,
+  seasonLabel,
+  competitionLabel,
+  creatorHandle = "@usuario",
+  savedAt,
+  points,
+}: {
+  teams: Team[];
+  predictions: Record<string, ClasificacionPrediction>;
+  actualPositions: Map<string, number>;
+  seasonLabel: string;
+  competitionLabel: string;
+  creatorHandle?: string;
+  savedAt?: string;
+  points?: number;
+}) {
+  const orderedByActual = useMemo(
+    () =>
+      [...teams].sort(
+        (a, b) =>
+          (actualPositions.get(a.id) ?? Number.MAX_SAFE_INTEGER) -
+            (actualPositions.get(b.id) ?? Number.MAX_SAFE_INTEGER) ||
+          a.name.localeCompare(b.name, "es"),
+      ),
+    [actualPositions, teams],
+  );
+  const savedDate = savedAt ? new Date(savedAt) : null;
+  const refCode = savedDate
+    ? String(savedDate.getTime()).slice(-5)
+    : String(orderedByActual.length * 23).padStart(5, "0").slice(-5);
+  const metaDate = savedDate
+    ? savedDate.toLocaleDateString("es-ES")
+    : new Date().toLocaleDateString("es-ES");
+  const metaTime = savedDate
+    ? savedDate.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+    : new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const handle = creatorHandle.startsWith("@") ? creatorHandle : `@${creatorHandle}`;
+
+  return (
+    <aside className="game-ticket-receipt" aria-label="Comprobante clasificación real">
+      <div className="game-ticket-receipt-tri game-ticket-receipt-tri--top" />
+      <div className="game-ticket-receipt-inner">
+        <ReceiptGameLogo kind="clasificacion" />
+        <span className="game-ticket-receipt-subtitle">CLASIFICACIÓN REAL</span>
+        <hr className="game-ticket-receipt-hr" />
+        <div className="game-ticket-receipt-line game-ticket-receipt-line--heading">
+          <span>Equipo</span>
+          <span>Pts</span>
+          <span>Dif</span>
+        </div>
+        <div className="game-ticket-receipt-lines">
+          {orderedByActual.map((team) => {
+            const predicted = predictions[team.id]?.position;
+            const actual = actualPositions.get(team.id);
+            if (predicted === undefined || actual === undefined) return null;
+            const teamPoints = scoreClasificacionPosition(predicted, actual);
+            return (
+              <div className="game-ticket-receipt-line game-ticket-receipt-line--compare" key={team.id}>
+                <span>
+                  {actual}. {team.shortName || team.name}
+                </span>
+                <span>{teamPoints}</span>
+                <span>{formatReceiptPositionDiff(predicted, actual)}</span>
+              </div>
+            );
+          })}
+        </div>
+        {typeof points === "number" ? (
+          <>
+            <hr className="game-ticket-receipt-hr" />
+            <div className="game-ticket-receipt-line game-ticket-receipt-line--compare game-ticket-receipt-line--points">
+              <span>Total</span>
+              <span>{points}</span>
+              <span />
+            </div>
+          </>
+        ) : null}
+        <hr className="game-ticket-receipt-hr" />
+        <p className="game-ticket-receipt-meta">
+          {seasonLabel} · {competitionLabel}
           <br />
           Ref. {refCode}
           <br />
@@ -275,7 +382,6 @@ function ClasificacionReceipt({
       <div className="game-ticket-receipt-tri game-ticket-receipt-tri--top" />
       <div className="game-ticket-receipt-inner">
         <ReceiptGameLogo kind="clasificacion" />
-        <strong className="game-ticket-receipt-title">EL ORÁCULO</strong>
         <span className="game-ticket-receipt-subtitle">COMPROBANTE</span>
         <hr className="game-ticket-receipt-hr" />
         <div className="game-ticket-receipt-lines">
@@ -405,6 +511,7 @@ function TicketFrame({
   creatorHandle = "@usuario",
   points,
   receipt,
+  showActions = true,
   children,
 }: TicketFrameProps) {
   const ticketRef = useRef<HTMLDivElement>(null);
@@ -427,22 +534,24 @@ function TicketFrame({
 
   return (
     <section className="game-ticket-preview" aria-label="Boleto">
-      <div className="game-ticket-actions">
-        {canNativeShare ? (
-          <button type="button" disabled={sharing} onClick={() => void run("share")}>
-            <Share2 size={16} aria-hidden />
-            {sharing ? "Generando…" : "Compartir"}
+      {showActions ? (
+        <div className="game-ticket-actions">
+          {canNativeShare ? (
+            <button type="button" disabled={sharing} onClick={() => void run("share")}>
+              <Share2 size={16} aria-hidden />
+              {sharing ? "Generando…" : "Compartir"}
+            </button>
+          ) : null}
+          <button type="button" disabled={sharing} onClick={() => void run("x")}>
+            X
+            <span>{sharing ? "Generando…" : "Compartir en X"}</span>
           </button>
-        ) : null}
-        <button type="button" disabled={sharing} onClick={() => void run("x")}>
-          X
-          <span>{sharing ? "Generando…" : "Compartir en X"}</span>
-        </button>
-        <button type="button" disabled={sharing} onClick={() => void run("download")}>
-          <Download size={16} aria-hidden />
-          Descargar imagen
-        </button>
-      </div>
+          <button type="button" disabled={sharing} onClick={() => void run("download")}>
+            <Download size={16} aria-hidden />
+            Descargar imagen
+          </button>
+        </div>
+      ) : null}
       <div ref={ticketRef} className="game-ticket-wrap">
         <div className={`game-ticket game-ticket--${kind}`}>
           <header className="game-ticket-header">
@@ -704,12 +813,14 @@ export function QuinielaTicket({
   onChange,
   scorerCorrectByMatch,
   savedAt,
+  showActions = true,
 }: MatchTicketProps & {
   predictions: Record<string, Prediction>;
   readOnly?: boolean;
   onChange?: (prediction: Prediction) => void;
   scorerCorrectByMatch?: Record<string, boolean | undefined>;
   savedAt?: string;
+  showActions?: boolean;
 }) {
   const teamsById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
   const { squad } = useSquadPlayers("masculino");
@@ -757,6 +868,7 @@ export function QuinielaTicket({
       shareText={`Mi RAIniela de la jornada ${round} #RealAviles`}
       creatorHandle={creatorHandle}
       points={points}
+      showActions={showActions}
       receipt={
         <QuinielaReceipt
           matches={matches}
@@ -876,11 +988,13 @@ export function QuinigolTicket({
   readOnly,
   onChange,
   savedAt,
+  showActions = true,
 }: MatchTicketProps & {
   predictions: Record<string, QuinigolPrediction>;
   readOnly?: boolean;
   onChange?: (prediction: QuinigolPrediction) => void;
   savedAt?: string;
+  showActions?: boolean;
 }) {
   const teamsById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
   const date = formatTicketDate(matches);
@@ -898,6 +1012,7 @@ export function QuinigolTicket({
       shareText={`Mi RAIGol de la jornada ${round} #RealAviles`}
       creatorHandle={creatorHandle}
       points={points}
+      showActions={showActions}
       receipt={
         <QuinigolReceipt
           matches={matches}
@@ -1026,6 +1141,8 @@ export function ClasificacionTicket({
   readOnly,
   onReorder,
   savedAt,
+  actualPositions,
+  showActions = true,
 }: {
   teams: Team[];
   predictions: Record<string, ClasificacionPrediction>;
@@ -1037,6 +1154,8 @@ export function ClasificacionTicket({
   readOnly?: boolean;
   onReorder?: (teamIds: string[]) => void;
   savedAt?: string;
+  actualPositions?: Map<string, number>;
+  showActions?: boolean;
 }) {
   const orderedTeams = useMemo(
     () =>
@@ -1059,28 +1178,44 @@ export function ClasificacionTicket({
     onReorder(next);
   };
 
+  const showCompareReceipt = actualPositions !== undefined && actualPositions.size > 0;
+
   return (
     <TicketFrame
       kind="clasificacion"
       competitionLabel={competitionLabel}
       seasonLabel={seasonLabel}
       contextLabel="Clasificación final"
-      title="El Oráculo · clasificación final"
+      title={showCompareReceipt ? "Tu predicción" : "El Oráculo · clasificación final"}
       hint={readOnly ? "Pronóstico cerrado" : "Usa las flechas para ordenar"}
       fileName={`mi-oraculo-${seasonLabel.replaceAll("/", "-")}.png`}
       shareText={`Mi Oráculo para la clasificación final de la temporada ${seasonLabel} #RealAviles`}
       creatorHandle={creatorHandle}
       points={points}
+      showActions={showActions}
       receipt={
-        <ClasificacionReceipt
-          teams={teams}
-          predictions={predictions}
-          seasonLabel={seasonLabel}
-          competitionLabel={competitionLabel}
-          creatorHandle={creatorHandle}
-          savedAt={savedAt}
-          points={points}
-        />
+        showCompareReceipt ? (
+          <ClasificacionCompareReceipt
+            teams={teams}
+            predictions={predictions}
+            actualPositions={actualPositions}
+            seasonLabel={seasonLabel}
+            competitionLabel={competitionLabel}
+            creatorHandle={creatorHandle}
+            savedAt={savedAt}
+            points={points}
+          />
+        ) : (
+          <ClasificacionReceipt
+            teams={teams}
+            predictions={predictions}
+            seasonLabel={seasonLabel}
+            competitionLabel={competitionLabel}
+            creatorHandle={creatorHandle}
+            savedAt={savedAt}
+            points={points}
+          />
+        )
       }
     >
       <ol className="game-ticket-list game-ticket-standings">

@@ -2,10 +2,10 @@
 
 import { useMemo } from "react";
 import { UserAvatar } from "@/components/auth/UserAvatar";
-import { ClasificacionCompareBoard } from "@/components/clasificacion/ClasificacionCompareBoard";
-import { ClasificacionForm } from "@/components/clasificacion/ClasificacionForm";
+import { ClasificacionTicket } from "@/components/juegos/GameTicket";
 import { Modal } from "@/components/Modal";
 import { useClasificacionUserSubmission } from "@/hooks/useClasificacionUserSubmission";
+import type { CompetitionZoneRule } from "@/lib/cms/competition-config-bundle";
 import { buildActualStandingsByTeamId } from "@/lib/clasificacion-prediction";
 import type { CompetitionSeasonId } from "@/data/mock";
 import type { Matchday, Team } from "@/types";
@@ -19,6 +19,9 @@ type ClasificacionUserModalProps = {
   avatarUrl: string | null;
   teams: Team[];
   leagueMatchdays: Matchday[];
+  zones: CompetitionZoneRule[];
+  seasonLabel: string;
+  competitionLabel: string;
 };
 
 export function ClasificacionUserModal({
@@ -30,6 +33,9 @@ export function ClasificacionUserModal({
   avatarUrl,
   teams,
   leagueMatchdays,
+  zones,
+  seasonLabel,
+  competitionLabel,
 }: ClasificacionUserModalProps) {
   const { data, loading, error } = useClasificacionUserSubmission(seasonId, open ? userId : null);
 
@@ -38,12 +44,11 @@ export function ClasificacionUserModal({
     [teams, leagueMatchdays],
   );
 
-  const hasSubmission = data?.hasSubmission ?? false;
-  const countPoints = data?.countPoints ?? false;
-  const formMode = hasSubmission ? "compare" : countPoints ? "results" : "edit";
+  const showPoints = Boolean(data?.hasSubmission && data.countPoints);
+  const showCompare = showPoints && actualPositions.size > 0;
 
   return (
-    <Modal open={open} title={`Clasificación de ${handle}`} onClose={onClose}>
+    <Modal open={open} title={`Clasificación de ${handle}`} onClose={onClose} wide>
       <div className="space-y-4">
         <div className="flex items-center gap-3">
           <UserAvatar avatarUrl={avatarUrl} label={handle} size="md" />
@@ -53,12 +58,7 @@ export function ClasificacionUserModal({
           </div>
         </div>
 
-        {data?.hasSubmission && data.countPoints ? (
-          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#214C9B]/20 bg-white px-3 py-2.5 sm:px-4 sm:py-3">
-            <p className="text-xs font-bold text-slate-700 sm:text-sm">Puntos acumulados</p>
-            <p className="text-lg font-extrabold text-[#214C9B] sm:text-xl">{data.points} pts</p>
-          </div>
-        ) : data?.hasSubmission && !loading ? (
+        {data?.hasSubmission && !data.countPoints && !loading ? (
           <p className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600 sm:text-sm">
             Los puntos se publican cuando empiece la temporada.
           </p>
@@ -68,34 +68,23 @@ export function ClasificacionUserModal({
           </p>
         ) : null}
 
-        {formMode === "compare" ? (
-          <p className="text-xs leading-5 text-slate-600 sm:text-sm">
-            Predicción del usuario frente a la clasificación actual, con diferencia de puestos y puntos por equipo.
-          </p>
-        ) : null}
-
         {loading ? (
           <p className="text-sm text-slate-500">Cargando predicción…</p>
         ) : error ? (
           <p className="text-sm font-semibold text-[#981915]">{error}</p>
         ) : data?.hasSubmission ? (
-          formMode === "compare" ? (
-            <ClasificacionCompareBoard
-              teams={teams}
-              predictions={data.predictions}
-              actualPositions={actualPositions}
-              predictionLabel="Su predicción"
-            />
-          ) : (
-            <ClasificacionForm
-              teams={teams}
-              predictions={data.predictions}
-              actualPositions={actualPositions}
-              readOnly
-              mode={formMode}
-              onReorder={() => undefined}
-            />
-          )
+          <ClasificacionTicket
+            teams={teams}
+            predictions={data.predictions}
+            zones={zones}
+            seasonLabel={seasonLabel}
+            competitionLabel={competitionLabel}
+            readOnly
+            creatorHandle={handle}
+            points={showPoints ? data.points : undefined}
+            actualPositions={showCompare ? actualPositions : undefined}
+            showActions={false}
+          />
         ) : null}
       </div>
     </Modal>

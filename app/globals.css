@@ -202,6 +202,36 @@ a {
   text-align: center;
 }
 
+.game-ticket-receipt-line--heading,
+.game-ticket-receipt-line--compare {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 24px 20px;
+  gap: 4px;
+  align-items: baseline;
+}
+
+.game-ticket-receipt-line--heading {
+  margin-bottom: 2px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.game-ticket-receipt-line--compare > span:nth-child(2),
+.game-ticket-receipt-line--compare > span:nth-child(3),
+.game-ticket-receipt-line--heading > span:nth-child(2),
+.game-ticket-receipt-line--heading > span:nth-child(3) {
+  text-align: right;
+}
+
+.game-ticket-receipt-line--compare > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .game-ticket-receipt-hr {
   border: 0;
   border-top: 1.5px solid #1a1a1a;

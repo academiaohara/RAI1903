@@ -7,6 +7,7 @@ import { PageHero } from "@/components/PageHero";
 import { QuinigolRankingList } from "@/components/quinigol/QuinigolRankingList";
 import { QuinigolMatchForm } from "@/components/quinigol/QuinigolMatchForm";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
+import { useSeason } from "@/components/season/SeasonProvider";
 import { useQuinigolRoundRanking } from "@/hooks/useGameRankings";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
 import type { CompetitionSeasonId } from "@/data/mock";
@@ -19,11 +20,17 @@ type ResultadoView = "quinigol" | "ranking";
 function QuinigolResultadoBody({
   seasonId,
   matchdays,
+  teams,
+  seasonLabel,
+  competitionLabel,
   currentRound,
   totalRounds,
 }: {
   seasonId: CompetitionSeasonId;
   matchdays: Matchday[];
+  teams: ReturnType<typeof useQuinielaSeason>["teams"];
+  seasonLabel: string;
+  competitionLabel: string;
   currentRound: number;
   totalRounds: number;
 }) {
@@ -66,6 +73,9 @@ function QuinigolResultadoBody({
               entries={entries}
               seasonId={seasonId}
               matchdays={matchdays}
+              teams={teams}
+              seasonLabel={seasonLabel}
+              competitionLabel={competitionLabel}
               totalRounds={totalRounds}
               currentRound={currentRound}
               initialModalRound={round}
@@ -88,7 +98,9 @@ function QuinigolResultadoBody({
 }
 
 export default function QuinigolResultadoPage() {
-  const { matchdays, currentRound, totalRounds, seasonId } = useQuinielaSeason();
+  const { viewedSeason, getCompetitionConfig } = useSeason();
+  const { matchdays, teams, currentRound, totalRounds, seasonId } = useQuinielaSeason();
+  const competitionLabel = getCompetitionConfig("masculino").ligaLabel ?? "1ª RFEF — Grupo 1";
 
   return (
     <div className="space-y-6">
@@ -101,6 +113,9 @@ export default function QuinigolResultadoPage() {
         key={seasonId}
         seasonId={seasonId}
         matchdays={matchdays}
+        teams={teams}
+        seasonLabel={viewedSeason.label}
+        competitionLabel={competitionLabel}
         currentRound={currentRound}
         totalRounds={totalRounds}
       />

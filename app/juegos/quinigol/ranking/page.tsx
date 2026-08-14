@@ -6,13 +6,16 @@ import { JornadaSelector } from "@/components/JornadaSelector";
 import { PageHero } from "@/components/PageHero";
 import { QuinigolRankingList } from "@/components/quinigol/QuinigolRankingList";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
+import { useSeason } from "@/components/season/SeasonProvider";
 import { useQuinigolRoundRanking, useQuinigolSeasonRanking } from "@/hooks/useGameRankings";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { getMatchdayByRound } from "@/lib/quiniela";
 
 export default function QuinigolRankingPage() {
-  const { seasonId, matchdays, currentRound, totalRounds } = useQuinielaSeason();
+  const { viewedSeason, getCompetitionConfig } = useSeason();
+  const { seasonId, matchdays, teams, currentRound, totalRounds } = useQuinielaSeason();
+  const competitionLabel = getCompetitionConfig("masculino").ligaLabel ?? "1ª RFEF — Grupo 1";
   const [round, setRound] = useState(currentRound);
   const [scope, setScope] = useState<"round" | "season">("round");
   const matchday = useMemo(() => getMatchdayByRound(matchdays, round), [matchdays, round]);
@@ -50,6 +53,9 @@ export default function QuinigolRankingPage() {
             entries={entries}
             seasonId={seasonId}
             matchdays={matchdays}
+            teams={teams}
+            seasonLabel={viewedSeason.label}
+            competitionLabel={competitionLabel}
             totalRounds={totalRounds}
             currentRound={currentRound}
             initialModalRound={round}

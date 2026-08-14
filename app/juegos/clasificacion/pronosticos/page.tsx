@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDialog } from "@/components/AppDialogProvider";
 import { Card } from "@/components/Card";
-import { ClasificacionCompareBoard } from "@/components/clasificacion/ClasificacionCompareBoard";
 import { ClasificacionTicket } from "@/components/juegos/GameTicket";
 import { PageHero } from "@/components/PageHero";
 import { useSeason } from "@/components/season/SeasonProvider";
@@ -149,42 +148,20 @@ export default function ClasificacionPronosticosPage() {
         </p>
       )}
 
-      <Card eyebrow="Temporada" title={showCompare ? "Tu boleto frente a la clasificación" : "Tu boleto"}>
-        {showCompare ? (
-          <ClasificacionCompareBoard
-            teams={teams}
-            predictions={effectivePredictions}
-            actualPositions={actualPositions}
-            predictionLabel="Tu predicción"
-          />
-        ) : (
-          <ClasificacionTicket
-            teams={teams}
-            predictions={effectivePredictions}
-            zones={competitionConfig.zones}
-            seasonLabel={viewedSeason.label}
-            competitionLabel={competitionConfig.ligaLabel ?? "1ª RFEF — Grupo 1"}
-            readOnly={readOnly}
-            onReorder={handleReorder}
-            creatorHandle={userHandle}
-            points={hydrated && showScoring ? totalPoints : undefined}
-            savedAt={submittedAt ?? undefined}
-          />
-        )}
-
-        {showCompare && teams.length > 0 ? (
-          <ClasificacionTicket
-            teams={teams}
-            predictions={effectivePredictions}
-            zones={competitionConfig.zones}
-            seasonLabel={viewedSeason.label}
-            competitionLabel={competitionConfig.ligaLabel ?? "1ª RFEF — Grupo 1"}
-            readOnly
-            creatorHandle={userHandle}
-            points={hydrated && showScoring ? totalPoints : undefined}
-            savedAt={submittedAt ?? undefined}
-          />
-        ) : null}
+      <Card eyebrow="Temporada" title="Tu boleto">
+        <ClasificacionTicket
+          teams={teams}
+          predictions={effectivePredictions}
+          zones={competitionConfig.zones}
+          seasonLabel={viewedSeason.label}
+          competitionLabel={competitionConfig.ligaLabel ?? "1ª RFEF — Grupo 1"}
+          readOnly={readOnly}
+          onReorder={handleReorder}
+          creatorHandle={userHandle}
+          points={hydrated && showScoring ? totalPoints : undefined}
+          savedAt={submittedAt ?? undefined}
+          actualPositions={showCompare ? actualPositions : undefined}
+        />
 
         <div className="mt-3 flex max-w-[900px] flex-wrap gap-2 sm:gap-3">
           {canSave && (

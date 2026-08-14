@@ -7,13 +7,16 @@ import { QuinielaUserModal } from "@/components/quiniela/QuinielaUserModal";
 import { usePagination } from "@/hooks/usePagination";
 import type { CompetitionSeasonId } from "@/data/mock";
 import type { QuinielaRankingEntry } from "@/lib/quiniela-ranking";
-import type { Matchday } from "@/types";
+import type { Matchday, Team } from "@/types";
 
 type QuinielaRankingListProps = {
   entries: QuinielaRankingEntry[];
   emptyMessage: string;
   seasonId: CompetitionSeasonId;
   matchdays: Matchday[];
+  teams: Team[];
+  seasonLabel: string;
+  competitionLabel: string;
   totalRounds: number;
   currentRound: number;
   initialModalRound?: number;
@@ -24,6 +27,9 @@ export function QuinielaRankingList({
   emptyMessage,
   seasonId,
   matchdays,
+  teams,
+  seasonLabel,
+  competitionLabel,
   totalRounds,
   currentRound,
   initialModalRound,
@@ -90,6 +96,9 @@ export function QuinielaRankingList({
           handle={selectedUser.handle}
           avatarUrl={selectedUser.avatarUrl}
           matchdays={matchdays}
+          teams={teams}
+          seasonLabel={seasonLabel}
+          competitionLabel={competitionLabel}
           totalRounds={totalRounds}
           currentRound={currentRound}
           initialRound={initialModalRound}
