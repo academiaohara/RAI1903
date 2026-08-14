@@ -15,7 +15,7 @@ import { InlineEditingMarketEditShell } from "@/components/inline-editing/Inline
 import { fetchHomeGlobalInlineOverridesServer, fetchInlineOverridesServer, fetchMediaRaiInlineOverridesServer } from "@/lib/cms/inline-overrides-server";
 import { fetchDefaultSeasonIdServer } from "@/lib/cms/seasons-server";
 import type { CompetitionSeasonId } from "@/data/mock";
-import { bebasNeue } from "@/lib/fonts";
+import { bebasNeue, kalam, spaceMono } from "@/lib/fonts";
 
 export const metadata: Metadata = {
   title: "RAI1903 | Real Avilés Industrial",
@@ -38,7 +38,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 
   return (
     <html lang="es">
-      <body className={bebasNeue.variable}>
+      <body className={`${bebasNeue.variable} ${kalam.variable} ${spaceMono.variable}`}>
         <AppDialogProvider>
           <SeasonProvider defaultSeasonId={defaultSeasonId}>
             <InlineEditingProvider initialOverrides={initialOverrides}>

@@ -68,11 +68,20 @@ a {
   text-transform: uppercase;
 }
 
+.game-ticket-wrap {
+  display: flex;
+  width: 100%;
+  max-width: 900px;
+  align-items: flex-start;
+  gap: 18px;
+}
+
 .game-ticket {
   position: relative;
   width: 100%;
-  max-width: 900px;
+  max-width: 600px;
   min-width: 0;
+  flex: 1 1 600px;
   overflow: hidden;
   border: 2px solid #d43b2f;
   border-radius: 4px;
@@ -81,6 +90,162 @@ a {
   color: #222;
   font-family: var(--font-bebas-neue), "Arial Narrow", Arial, sans-serif;
   padding: 22px 26px 18px;
+}
+
+.game-ticket-receipt {
+  width: 230px;
+  flex: 0 0 230px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #fdfdfb;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+  color: #1a1a1a;
+  font-family: var(--font-space-mono), "Space Mono", monospace;
+}
+
+.game-ticket-receipt-tri {
+  height: 10px;
+  background: #fdfdfb;
+}
+
+.game-ticket-receipt-tri--top {
+  clip-path: polygon(
+    0% 0,
+    7.14% 6px,
+    14.29% 0,
+    21.43% 6px,
+    28.57% 0,
+    35.71% 6px,
+    42.86% 0,
+    50% 6px,
+    57.14% 0,
+    64.29% 6px,
+    71.43% 0,
+    78.57% 6px,
+    85.71% 0,
+    92.86% 6px,
+    100% 0,
+    100% 10px,
+    0 10px
+  );
+}
+
+.game-ticket-receipt-tri--bottom {
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 10px,
+    92.86% 4px,
+    85.71% 10px,
+    78.57% 4px,
+    71.43% 10px,
+    64.29% 4px,
+    57.14% 10px,
+    50% 4px,
+    42.86% 10px,
+    35.71% 4px,
+    28.57% 10px,
+    21.43% 4px,
+    14.29% 10px,
+    7.14% 4px,
+    0 10px
+  );
+}
+
+.game-ticket-receipt-inner {
+  padding: 14px 16px 16px;
+}
+
+.game-ticket-receipt-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+
+.game-ticket-receipt-logo span {
+  display: flex;
+  width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #1a1a1a;
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
+.game-ticket-receipt-title {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-align: center;
+}
+
+.game-ticket-receipt-subtitle {
+  display: block;
+  margin: 6px 0 10px;
+  font-size: 0.66rem;
+  letter-spacing: 0.15em;
+  text-align: center;
+}
+
+.game-ticket-receipt-hr {
+  border: 0;
+  border-top: 1.5px solid #1a1a1a;
+  margin: 6px 0;
+}
+
+.game-ticket-receipt-lines {
+  display: grid;
+  gap: 1px;
+}
+
+.game-ticket-receipt-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 0.7rem;
+  line-height: 1.55;
+}
+
+.game-ticket-receipt-line > span:first-child {
+  opacity: 0.7;
+}
+
+.game-ticket-receipt-line--points {
+  margin-top: 4px;
+  font-weight: 700;
+}
+
+.game-ticket-receipt-total {
+  margin: 10px 0 2px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.game-ticket-receipt-meta {
+  margin: 4px 0 0;
+  font-size: 0.66rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.game-ticket-receipt-stamp {
+  margin: 14px 0 0;
+  border-top: 1px dashed #999;
+  font-size: 0.62rem;
+  letter-spacing: 0.05em;
+  padding-top: 8px;
+  text-align: center;
+}
+
+.game-ticket-receipt-handle {
+  margin: 6px 0 0;
+  color: #1c3f6e;
+  font-family: var(--font-kalam), "Kalam", cursive;
+  font-size: 0.85rem;
+  text-align: center;
 }
 
 .game-ticket-header {
@@ -168,9 +333,17 @@ a {
   gap: 12px;
 }
 
-.game-ticket-subheader-meta b {
+.game-ticket-subheader-meta b,
+.game-ticket-points {
   color: #fff3a8;
   font-size: 0.86rem;
+}
+
+.game-ticket-points {
+  border: 1px solid rgba(255, 243, 168, 0.45);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  padding: 1px 8px;
 }
 
 .game-ticket-list {
@@ -271,13 +444,40 @@ a {
   align-items: center;
   justify-content: center;
   color: #171717;
-  font-family: "Comic Sans MS", cursive;
+  font-family: var(--font-kalam), "Kalam", cursive;
   font-size: 1.45rem;
   transform: rotate(-7deg);
 }
 
-.game-ticket-pick--correct b {
+.game-ticket-pick--hit b,
+.game-ticket-score-pick.game-ticket-pick--hit b {
+  color: #214c9b;
+}
+
+.game-ticket-pick--miss b,
+.game-ticket-score-pick.game-ticket-pick--miss b {
   color: #d43b2f;
+}
+
+.game-ticket-pick--actual b,
+.game-ticket-score-pick.game-ticket-pick--actual b {
+  color: #214c9b;
+  opacity: 0.72;
+}
+
+.game-ticket-pick--hit,
+.game-ticket-score-pick.game-ticket-pick--hit {
+  border-color: #214c9b;
+}
+
+.game-ticket-pick--miss,
+.game-ticket-score-pick.game-ticket-pick--miss {
+  border-color: #d43b2f;
+}
+
+.game-ticket-pick--actual,
+.game-ticket-score-pick.game-ticket-pick--actual {
+  border-color: rgba(33, 76, 155, 0.55);
 }
 
 .game-ticket-score-pick {
@@ -346,25 +546,107 @@ a {
   text-transform: uppercase;
 }
 
-.game-ticket-scorer select {
-  width: 100%;
-  height: 24px;
+.game-ticket-scorer-field {
+  position: relative;
+  display: flex;
   min-width: 0;
-  border: 0;
-  border-bottom: 1px solid #1c3f6e;
-  border-radius: 0;
-  background: transparent;
-  color: #171717;
-  font-family: "Comic Sans MS", cursive;
-  font-size: 0.72rem;
-  outline: none;
-  padding: 0 2px;
-  text-transform: none;
+  min-height: 28px;
+  align-items: center;
+  gap: 6px;
 }
 
-.game-ticket-scorer select.game-ticket-scorer--wrong {
-  color: #981915;
+.game-ticket-scorer-display {
+  min-width: 0;
+  flex: 1 1 auto;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.game-ticket-scorer-display:disabled {
+  cursor: default;
+}
+
+.game-ticket-scorer-value {
+  min-width: 0;
+  overflow: hidden;
+  color: #171717;
+  font-family: var(--font-kalam), "Kalam", cursive;
+  font-size: 1.1rem;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  transform: rotate(-1.5deg);
+  white-space: nowrap;
+}
+
+.game-ticket-scorer-value--empty {
+  color: #8a8a8a;
+}
+
+.game-ticket-scorer-value--hit {
+  color: #214c9b;
+}
+
+.game-ticket-scorer-value--miss {
+  color: #d43b2f;
   text-decoration: line-through 2px;
+}
+
+.game-ticket-scorer-control {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.game-ticket-scorer-trigger {
+  border: 1px solid rgba(28, 63, 110, 0.35);
+  border-radius: 4px;
+  background: #fffdf9;
+  color: #1c3f6e;
+  cursor: pointer;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 3px 7px;
+  text-transform: uppercase;
+}
+
+.game-ticket-scorer-menu {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  right: 0;
+  width: min(220px, 70vw);
+  max-height: 220px;
+  overflow: auto;
+  border: 1px solid rgba(28, 63, 110, 0.25);
+  border-radius: 6px;
+  background: #fffdf9;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+}
+
+.game-ticket-scorer-menu button {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #222;
+  cursor: pointer;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 7px 8px;
+  text-align: left;
+}
+
+.game-ticket-scorer-menu button:hover {
+  background: rgba(33, 76, 155, 0.08);
 }
 
 .game-ticket-standing-row {
@@ -468,7 +750,7 @@ a {
 
 .game-ticket-footer strong {
   color: #1c3f6e;
-  font-family: "Comic Sans MS", cursive;
+  font-family: var(--font-kalam), "Kalam", cursive;
   font-size: 0.82rem;
 }
 
@@ -507,6 +789,28 @@ a {
 .game-ticket--capture {
   border-width: 3px;
   padding: 18px 22px 16px;
+}
+
+.game-ticket-wrap.game-ticket--capture,
+.game-ticket--capture {
+  max-width: none;
+}
+
+.game-ticket--capture [data-ticket-export-hidden="true"] {
+  display: none !important;
+}
+
+@media (max-width: 839px) {
+  .game-ticket-wrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .game-ticket-receipt {
+    width: 100%;
+    flex-basis: auto;
+    max-width: 320px;
+  }
 }
 
 @media (max-width: 639px) {

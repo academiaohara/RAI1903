@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDown, ChevronUp, Download, Share2 } from "lucide-react";
-import { useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { RAI_TEAM_ID } from "@/data/mock";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import type { CompetitionZoneRule } from "@/lib/cms/competition-config-bundle";
@@ -30,6 +30,7 @@ type TicketFrameProps = {
   shareText: string;
   creatorHandle?: string;
   points?: number;
+  receipt?: ReactNode;
   children: ReactNode;
 };
 
@@ -38,6 +39,109 @@ const logoByKind = {
   quinigol: "/juegos/raigol.svg",
   clasificacion: "/api/game-logo/oraculo",
 } satisfies Record<TicketKind, string | null>;
+
+const footerUrlByKind = {
+  quiniela: "realaviles.com/rainiela",
+  quinigol: "realaviles.com/rainigol",
+  clasificacion: "realaviles.com/oraculo",
+} satisfies Record<TicketKind, string>;
+
+function QuinielaReceipt({
+  matches,
+  predictions,
+  round,
+  competitionLabel,
+  creatorHandle = "@usuario",
+  savedAt,
+  points,
+}: {
+  matches: Match[];
+  predictions: Record<string, Prediction>;
+  round: number;
+  competitionLabel: string;
+  creatorHandle?: string;
+  savedAt?: string;
+  points?: number;
+}) {
+  const avilesMatch = matches.find((match) => isAvilesMatch(match));
+  const avilesPrediction = avilesMatch ? predictions[avilesMatch.id] : undefined;
+  const picks = matches.map((match) => {
+    const prediction = predictions[match.id];
+    const derivedOutcome = isAvilesMatch(match)
+      ? outcomeFromGoalsPicks(prediction?.goalsHome, prediction?.goalsAway)
+      : null;
+    return derivedOutcome ?? prediction?.outcome ?? "-";
+  });
+  const filledCount = picks.filter((pick) => pick !== "-").length;
+  const marcador = avilesPrediction
+    ? `${avilesPrediction.goalsHome ?? "-"} : ${avilesPrediction.goalsAway ?? "-"}`
+    : "- : -";
+  const goleador = formatScorerLabel(normalizeScorerValue(avilesPrediction?.scorer)) || "-";
+  const savedDate = savedAt ? new Date(savedAt) : null;
+  const refCode = savedDate
+    ? String(savedDate.getTime()).slice(-5)
+    : String(round * 137 + filledCount * 17).padStart(5, "0").slice(-5);
+  const metaDate = savedDate
+    ? savedDate.toLocaleDateString("es-ES")
+    : new Date().toLocaleDateString("es-ES");
+  const metaTime = savedDate
+    ? savedDate.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+    : new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const handle = creatorHandle.startsWith("@") ? creatorHandle : `@${creatorHandle}`;
+
+  return (
+    <aside className="game-ticket-receipt" aria-label="Comprobante RAIniela">
+      <div className="game-ticket-receipt-tri game-ticket-receipt-tri--top" />
+      <div className="game-ticket-receipt-inner">
+        <div className="game-ticket-receipt-logo">
+          <span>RA</span>
+        </div>
+        <strong className="game-ticket-receipt-title">RAINIELA</strong>
+        <span className="game-ticket-receipt-subtitle">COMPROBANTE</span>
+        <hr className="game-ticket-receipt-hr" />
+        <div className="game-ticket-receipt-lines">
+          {picks.map((pick, index) => (
+            <div className="game-ticket-receipt-line" key={`${index + 1}-${pick}`}>
+              <span>{index + 1}.</span>
+              <span>{pick}</span>
+            </div>
+          ))}
+        </div>
+        <p className="game-ticket-receipt-total">
+          {filledCount} / {matches.length} PRONÓSTICOS
+        </p>
+        <hr className="game-ticket-receipt-hr" />
+        <div className="game-ticket-receipt-line">
+          <span>Marcador</span>
+          <span>{marcador}</span>
+        </div>
+        <div className="game-ticket-receipt-line">
+          <span>Goleador</span>
+          <span>{goleador}</span>
+        </div>
+        {typeof points === "number" ? (
+          <div className="game-ticket-receipt-line game-ticket-receipt-line--points">
+            <span>Puntos</span>
+            <span>{points}</span>
+          </div>
+        ) : null}
+        <hr className="game-ticket-receipt-hr" />
+        <p className="game-ticket-receipt-meta">
+          Jornada {round} · {competitionLabel}
+          <br />
+          Ref. {refCode}
+          <br />
+          {metaDate} · {metaTime}h
+        </p>
+        <p className="game-ticket-receipt-stamp">
+          {savedAt ? "GUARDADO CORRECTAMENTE" : "BORRADOR"}
+        </p>
+        <p className="game-ticket-receipt-handle">{handle}</p>
+      </div>
+      <div className="game-ticket-receipt-tri game-ticket-receipt-tri--bottom" />
+    </aside>
+  );
+}
 
 function TicketBrand({ kind }: { kind: TicketKind }) {
   const logo = logoByKind[kind];
@@ -68,6 +172,7 @@ function TicketFrame({
   shareText,
   creatorHandle = "@usuario",
   points,
+  receipt,
   children,
 }: TicketFrameProps) {
   const ticketRef = useRef<HTMLDivElement>(null);
@@ -106,28 +211,31 @@ function TicketFrame({
           Descargar imagen
         </button>
       </div>
-      <div ref={ticketRef} className={`game-ticket game-ticket--${kind}`}>
-        <header className="game-ticket-header">
-          <TicketBrand kind={kind} />
-          <div className="game-ticket-meta">
-            <strong>{competitionLabel}</strong>
-            <span>{seasonLabel}</span>
-            <span>{contextLabel}</span>
+      <div ref={ticketRef} className="game-ticket-wrap">
+        <div className={`game-ticket game-ticket--${kind}`}>
+          <header className="game-ticket-header">
+            <TicketBrand kind={kind} />
+            <div className="game-ticket-meta">
+              <strong>{competitionLabel}</strong>
+              <span>{seasonLabel}</span>
+              <span>{contextLabel}</span>
+            </div>
+          </header>
+          <div className="game-ticket-subheader">
+            <strong>{title}</strong>
+            <span className="game-ticket-subheader-meta">
+              {typeof points === "number" ? <b className="game-ticket-points">{points} pts</b> : null}
+              {hint ? <span>{hint}</span> : null}
+            </span>
           </div>
-        </header>
-        <div className="game-ticket-subheader">
-          <strong>{title}</strong>
-          <span className="game-ticket-subheader-meta">
-            {typeof points === "number" ? <b>{points} puntos</b> : null}
-            {hint ? <span>{hint}</span> : null}
-          </span>
+          {children}
+          <footer className="game-ticket-footer">
+            <span>Generado en {footerUrlByKind[kind]}</span>
+            <strong>{creatorHandle.startsWith("@") ? creatorHandle : `@${creatorHandle}`}</strong>
+            <span>Acierta y comparte ↗</span>
+          </footer>
         </div>
-        {children}
-        <footer className="game-ticket-footer">
-          <span>Generado en realaviles.com/juegos</span>
-          <strong>{creatorHandle.startsWith("@") ? creatorHandle : `@${creatorHandle}`}</strong>
-          <span>Acierta y comparte ↗</span>
-        </footer>
+        {receipt}
       </div>
     </section>
   );
@@ -158,24 +266,43 @@ function teamForMatch(match: Match, side: "home" | "away", teamsById: Map<string
   };
 }
 
+function pickMarkClasses(
+  isSelected: boolean,
+  actual: PredictionOutcome | GoalsPick | null | undefined,
+  value: PredictionOutcome | GoalsPick,
+  baseClass: string,
+): string {
+  const classes = [baseClass];
+  if (actual == null) return classes.join(" ");
+  if (isSelected) {
+    classes.push(actual === value ? "game-ticket-pick--hit" : "game-ticket-pick--miss");
+  } else if (actual === value) {
+    classes.push("game-ticket-pick--actual");
+  }
+  return classes.join(" ");
+}
+
 function outcomeMark(
   outcome: PredictionOutcome,
   selected: PredictionOutcome | undefined,
   options?: { actual?: PredictionOutcome | null; disabled?: boolean; onPick?: (outcome: PredictionOutcome) => void },
 ) {
-  const missedCorrectOutcome = Boolean(options?.actual === outcome && selected !== outcome);
+  const actual = options?.actual;
+  const isSelected = selected === outcome;
+  const showUserMark = isSelected;
+  const showActualMark = actual === outcome && selected !== outcome;
   return (
     <button
       type="button"
-      className={`game-ticket-pick${missedCorrectOutcome ? " game-ticket-pick--correct" : ""}`}
+      className={pickMarkClasses(isSelected, actual, outcome, "game-ticket-pick")}
       key={outcome}
       disabled={options?.disabled}
       onClick={() => options?.onPick?.(outcome)}
-      aria-pressed={selected === outcome}
+      aria-pressed={isSelected}
     >
       <span>{outcome}</span>
-      {selected === outcome ? <b aria-label={`Marcado ${outcome}`}>X</b> : null}
-      {missedCorrectOutcome ? <b aria-label={`Resultado correcto ${outcome}`}>X</b> : null}
+      {showUserMark ? <b aria-label={`Marcado ${outcome}`}>X</b> : null}
+      {showActualMark ? <b aria-label={`Resultado correcto ${outcome}`}>X</b> : null}
     </button>
   );
 }
@@ -185,20 +312,124 @@ function scoreMark(
   selected: GoalsPick | undefined,
   options?: { actual?: GoalsPick; disabled?: boolean; onPick?: (option: GoalsPick) => void },
 ) {
-  const missedCorrectScore = options?.actual === option && selected !== option;
+  const actual = options?.actual;
+  const isSelected = selected === option;
+  const showUserMark = isSelected;
+  const showActualMark = actual === option && selected !== option;
   return (
     <button
       type="button"
-      className={`game-ticket-score-pick${missedCorrectScore ? " game-ticket-pick--correct" : ""}`}
+      className={pickMarkClasses(isSelected, actual, option, "game-ticket-score-pick")}
       key={String(option)}
       disabled={options?.disabled}
       onClick={() => options?.onPick?.(option)}
-      aria-pressed={selected === option}
+      aria-pressed={isSelected}
     >
       <span>{option}</span>
-      {selected === option ? <b aria-label={`Marcado ${option}`}>X</b> : null}
-      {missedCorrectScore ? <b aria-label={`Resultado correcto ${option}`}>X</b> : null}
+      {showUserMark ? <b aria-label={`Marcado ${option}`}>X</b> : null}
+      {showActualMark ? <b aria-label={`Resultado correcto ${option}`}>X</b> : null}
     </button>
+  );
+}
+
+function formatScorerLabel(value: string): string {
+  if (!value || value === "nadie") return "Nadie";
+  return value;
+}
+
+function TicketScorerPicker({
+  value,
+  options,
+  disabled,
+  readOnly,
+  isCorrect,
+  onChange,
+}: {
+  value: string;
+  options: string[];
+  disabled?: boolean;
+  readOnly?: boolean;
+  isCorrect?: boolean;
+  onChange: (value: string) => void;
+}) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  const displayValue = formatScorerLabel(value);
+
+  useEffect(() => {
+    if (!open) return;
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+    };
+  }, [open]);
+
+  const pick = (next: string) => {
+    onChange(next);
+    setOpen(false);
+  };
+
+  const valueClass = [
+    "game-ticket-scorer-value",
+    isCorrect === true ? "game-ticket-scorer-value--hit" : "",
+    isCorrect === false ? "game-ticket-scorer-value--miss" : "",
+    !displayValue || displayValue === "Nadie" ? "game-ticket-scorer-value--empty" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <div className="game-ticket-scorer" ref={rootRef}>
+      <span>Goleador</span>
+      <div className="game-ticket-scorer-field">
+        <button
+          type="button"
+          className={`${valueClass} game-ticket-scorer-display`}
+          aria-live="polite"
+          disabled={readOnly || disabled}
+          onClick={() => {
+            if (!readOnly && !disabled) setOpen((current) => !current);
+          }}
+        >
+          {displayValue || "—"}
+        </button>
+        {!readOnly && !disabled ? (
+          <div className="game-ticket-scorer-control" data-ticket-export-hidden="true">
+            {open ? (
+              <ul className="game-ticket-scorer-menu" role="listbox">
+                <li>
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={value === "nadie"}
+                    onClick={() => pick("nadie")}
+                  >
+                    Nadie
+                  </button>
+                </li>
+                {options.map((scorer) => (
+                  <li key={scorer}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={value === scorer}
+                      onClick={() => pick(scorer)}
+                    >
+                      {scorer}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
@@ -240,11 +471,13 @@ export function QuinielaTicket({
   readOnly,
   onChange,
   scorerCorrectByMatch,
+  savedAt,
 }: MatchTicketProps & {
   predictions: Record<string, Prediction>;
   readOnly?: boolean;
   onChange?: (prediction: Prediction) => void;
   scorerCorrectByMatch?: Record<string, boolean | undefined>;
+  savedAt?: string;
 }) {
   const teamsById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
   const { squad } = useSquadPlayers("masculino");
@@ -292,6 +525,17 @@ export function QuinielaTicket({
       shareText={`Mi RAIniela de la jornada ${round} #RealAviles`}
       creatorHandle={creatorHandle}
       points={points}
+      receipt={
+        <QuinielaReceipt
+          matches={matches}
+          predictions={predictions}
+          round={round}
+          competitionLabel={competitionLabel}
+          creatorHandle={creatorHandle}
+          savedAt={savedAt}
+          points={points}
+        />
+      }
     >
       <ol className="game-ticket-list">
         {matches.map((match, index) => {
@@ -361,28 +605,22 @@ export function QuinielaTicket({
                       )}
                     </div>
                   </div>
-                  <label className="game-ticket-scorer">
-                    <span>Goleador</span>
-                    <select
-                      value={scorerValue === "nadie" ? "Nadie" : scorerValue}
-                      disabled={readOnly || avilesGoals === 0}
-                      className={scorerCorrectByMatch?.[match.id] === false ? "game-ticket-scorer--wrong" : undefined}
-                      required={avilesGoals !== 0}
-                      onChange={(event) =>
-                        update(match, prediction, {
-                          scorer: event.target.value.toLocaleLowerCase("es") === "nadie"
-                            ? "nadie"
-                            : event.target.value || undefined,
-                        })
-                      }
-                    >
-                      <option value="">Selecciona</option>
-                      <option value="Nadie">Nadie</option>
-                      {scorerOptions.map((scorer) => (
-                        <option key={scorer} value={scorer} />
-                      ))}
-                    </select>
-                  </label>
+                  <TicketScorerPicker
+                    value={scorerValue}
+                    options={scorerOptions}
+                    disabled={readOnly || avilesGoals === 0}
+                    readOnly={readOnly}
+                    isCorrect={
+                      match.status === "finished" && scorerValue
+                        ? scorerCorrectByMatch?.[match.id]
+                        : undefined
+                    }
+                    onChange={(next) =>
+                      update(match, prediction, {
+                        scorer: next.toLocaleLowerCase("es") === "nadie" ? "nadie" : next || undefined,
+                      })
+                    }
+                  />
                 </div>
               ) : null}
             </li>
