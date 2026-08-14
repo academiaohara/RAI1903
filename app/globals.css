@@ -972,8 +972,17 @@ a {
 .game-ticket-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
   gap: 8px;
   margin-bottom: 12px;
+}
+
+.game-ticket-actions-share,
+.game-ticket-actions-edit {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .game-ticket-actions button {
@@ -989,6 +998,17 @@ a {
   font-weight: 800;
   padding: 8px 12px;
   transition: background-color 0.15s, color 0.15s;
+}
+
+.game-ticket-actions button.game-ticket-action--primary {
+  background: #214c9b;
+  border-color: #214c9b;
+  color: white;
+}
+
+.game-ticket-actions button.game-ticket-action--primary:hover:not(:disabled) {
+  background: #173a78;
+  color: white;
 }
 
 .game-ticket-actions button:hover {
@@ -1177,12 +1197,23 @@ a {
     gap: 6px;
   }
 
+  .game-ticket-actions-share,
+  .game-ticket-actions-edit {
+    gap: 6px;
+  }
+
   .game-ticket-actions button {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     justify-content: center;
-    gap: 5px;
+    gap: 0;
+    min-width: 40px;
+    min-height: 40px;
     font-size: 0.68rem;
-    padding: 7px 8px;
+    padding: 8px;
+  }
+
+  .game-ticket-actions button .game-ticket-action-label {
+    display: none;
   }
 }
 

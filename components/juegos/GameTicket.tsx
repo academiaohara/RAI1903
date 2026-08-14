@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown, ChevronUp, Download, Eye, Share2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Download, Eye, Pencil, Save, Share2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { MatchPreviewModal } from "@/components/MatchPreviewModal";
 import { RAI_TEAM_ID } from "@/data/mock";
@@ -19,6 +19,7 @@ import {
   scoreClasificacionPosition,
 } from "@/lib/clasificacion-prediction";
 import { defaultCronicaId } from "@/lib/match-article-factory";
+import { getGameTicketFooterUrl } from "@/lib/auth/site-url";
 import { getMatchArticlePageHref } from "@/lib/match-article-url";
 import { isMatchPlayed } from "@/lib/match-result";
 import type { QuinigolPrediction } from "@/lib/quinigol";
@@ -42,6 +43,12 @@ type TicketFrameProps = {
   points?: number;
   receipt?: ReactNode;
   showActions?: boolean;
+  canSave?: boolean;
+  canEdit?: boolean;
+  onSave?: () => void;
+  onEdit?: () => void;
+  saveDisabled?: boolean;
+  isEditing?: boolean;
   children: ReactNode;
 };
 
@@ -50,12 +57,6 @@ const logoByKind = {
   quinigol: "/juegos/raigol.svg",
   clasificacion: "/api/game-logo/oraculo",
 } satisfies Record<TicketKind, string | null>;
-
-const footerUrlByKind = {
-  quiniela: "realaviles.com/rainiela",
-  quinigol: "realaviles.com/rainigol",
-  clasificacion: "realaviles.com/oraculo",
-} satisfies Record<TicketKind, string>;
 
 function QuinielaReceipt({
   matches,
@@ -398,10 +399,17 @@ function TicketFrame({
   points,
   receipt,
   showActions = true,
+  canSave,
+  canEdit,
+  onSave,
+  onEdit,
+  saveDisabled,
+  isEditing,
   children,
 }: TicketFrameProps) {
   const ticketRef = useRef<HTMLDivElement>(null);
   const [sharing, setSharing] = useState(false);
+  const footerUrl = getGameTicketFooterUrl(kind);
 
   const run = async (action: "share" | "x" | "download") => {
     if (!ticketRef.current || sharing) return;
@@ -422,20 +430,69 @@ function TicketFrame({
     <section className="game-ticket-preview" aria-label="Boleto">
       {showActions ? (
         <div className="game-ticket-actions">
-          {canNativeShare ? (
-            <button type="button" disabled={sharing} onClick={() => void run("share")}>
-              <Share2 size={16} aria-hidden />
-              {sharing ? "Generando…" : "Compartir"}
+          <div className="game-ticket-actions-share">
+            {canNativeShare ? (
+              <button
+                type="button"
+                disabled={sharing}
+                onClick={() => void run("share")}
+                aria-label={sharing ? "Generando imagen" : "Compartir"}
+                title="Compartir"
+              >
+                <Share2 size={16} aria-hidden />
+                <span className="game-ticket-action-label">{sharing ? "Generando…" : "Compartir"}</span>
+              </button>
+            ) : null}
+            <button
+              type="button"
+              disabled={sharing}
+              onClick={() => void run("x")}
+              aria-label={sharing ? "Generando imagen" : "Compartir en X"}
+              title="Compartir en X"
+            >
+              <span aria-hidden>X</span>
+              <span className="game-ticket-action-label">{sharing ? "Generando…" : "Compartir en X"}</span>
             </button>
+            <button
+              type="button"
+              disabled={sharing}
+              onClick={() => void run("download")}
+              aria-label={sharing ? "Generando imagen" : "Descargar imagen"}
+              title="Descargar imagen"
+            >
+              <Download size={16} aria-hidden />
+              <span className="game-ticket-action-label">{sharing ? "Generando…" : "Descargar imagen"}</span>
+            </button>
+          </div>
+          {canSave || canEdit ? (
+            <div className="game-ticket-actions-edit">
+              {canSave ? (
+                <button
+                  type="button"
+                  className="game-ticket-action--primary"
+                  disabled={saveDisabled}
+                  onClick={() => onSave?.()}
+                  aria-label="Guardar"
+                  title="Guardar"
+                >
+                  <Save size={16} aria-hidden />
+                  <span className="game-ticket-action-label">Guardar</span>
+                </button>
+              ) : null}
+              {canEdit ? (
+                <button
+                  type="button"
+                  disabled={isEditing}
+                  onClick={() => onEdit?.()}
+                  aria-label="Editar"
+                  title="Editar"
+                >
+                  <Pencil size={16} aria-hidden />
+                  <span className="game-ticket-action-label">Editar</span>
+                </button>
+              ) : null}
+            </div>
           ) : null}
-          <button type="button" disabled={sharing} onClick={() => void run("x")}>
-            X
-            <span>{sharing ? "Generando…" : "Compartir en X"}</span>
-          </button>
-          <button type="button" disabled={sharing} onClick={() => void run("download")}>
-            <Download size={16} aria-hidden />
-            Descargar imagen
-          </button>
         </div>
       ) : null}
       <div ref={ticketRef} className="game-ticket-wrap">
@@ -457,7 +514,7 @@ function TicketFrame({
           </div>
           {children}
           <footer className="game-ticket-footer">
-            <span>Generado en {footerUrlByKind[kind]}</span>
+            <span suppressHydrationWarning>Generado en {footerUrl}</span>
             <strong>{creatorHandle.startsWith("@") ? creatorHandle : `@${creatorHandle}`}</strong>
             <span>Acierta y comparte ↗</span>
           </footer>
@@ -709,6 +766,12 @@ export function QuinielaTicket({
   scorerCorrectByMatch,
   savedAt,
   showActions = true,
+  canSave,
+  canEdit,
+  onSave,
+  onEdit,
+  saveDisabled,
+  isEditing,
 }: MatchTicketProps & {
   predictions: Record<string, Prediction>;
   readOnly?: boolean;
@@ -716,6 +779,12 @@ export function QuinielaTicket({
   scorerCorrectByMatch?: Record<string, boolean | undefined>;
   savedAt?: string;
   showActions?: boolean;
+  canSave?: boolean;
+  canEdit?: boolean;
+  onSave?: () => void;
+  onEdit?: () => void;
+  saveDisabled?: boolean;
+  isEditing?: boolean;
 }) {
   const teamsById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
   const { squad } = useSquadPlayers("masculino");
@@ -764,6 +833,12 @@ export function QuinielaTicket({
       creatorHandle={creatorHandle}
       points={points}
       showActions={showActions}
+      canSave={canSave}
+      canEdit={canEdit}
+      onSave={onSave}
+      onEdit={onEdit}
+      saveDisabled={saveDisabled}
+      isEditing={isEditing}
       receipt={
         <QuinielaReceipt
           matches={matches}
@@ -888,12 +963,24 @@ export function QuinigolTicket({
   onChange,
   savedAt,
   showActions = true,
+  canSave,
+  canEdit,
+  onSave,
+  onEdit,
+  saveDisabled,
+  isEditing,
 }: MatchTicketProps & {
   predictions: Record<string, QuinigolPrediction>;
   readOnly?: boolean;
   onChange?: (prediction: QuinigolPrediction) => void;
   savedAt?: string;
   showActions?: boolean;
+  canSave?: boolean;
+  canEdit?: boolean;
+  onSave?: () => void;
+  onEdit?: () => void;
+  saveDisabled?: boolean;
+  isEditing?: boolean;
 }) {
   const teamsById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
   const date = formatTicketDate(matches);
@@ -912,6 +999,12 @@ export function QuinigolTicket({
       creatorHandle={creatorHandle}
       points={points}
       showActions={showActions}
+      canSave={canSave}
+      canEdit={canEdit}
+      onSave={onSave}
+      onEdit={onEdit}
+      saveDisabled={saveDisabled}
+      isEditing={isEditing}
       receipt={
         <QuinigolReceipt
           matches={matches}
@@ -1079,6 +1172,12 @@ export function ClasificacionTicket({
   savedAt,
   actualPositions,
   showActions = true,
+  canSave,
+  canEdit,
+  onSave,
+  onEdit,
+  saveDisabled,
+  isEditing,
 }: {
   teams: Team[];
   predictions: Record<string, ClasificacionPrediction>;
@@ -1092,6 +1191,12 @@ export function ClasificacionTicket({
   savedAt?: string;
   actualPositions?: Map<string, number>;
   showActions?: boolean;
+  canSave?: boolean;
+  canEdit?: boolean;
+  onSave?: () => void;
+  onEdit?: () => void;
+  saveDisabled?: boolean;
+  isEditing?: boolean;
 }) {
   const orderedTeams = useMemo(
     () =>
@@ -1138,6 +1243,12 @@ export function ClasificacionTicket({
       creatorHandle={creatorHandle}
       points={points}
       showActions={showActions}
+      canSave={canSave}
+      canEdit={canEdit}
+      onSave={onSave}
+      onEdit={onEdit}
+      saveDisabled={saveDisabled}
+      isEditing={isEditing}
       receipt={
         <ClasificacionReceipt
           teams={teams}

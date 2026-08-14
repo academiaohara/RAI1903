@@ -17,3 +17,20 @@ export function getAuthCallbackPath(nextPath = "/"): string {
   const next = nextPath.startsWith("/") ? nextPath : `/${nextPath}`;
   return `/auth/callback?next=${encodeURIComponent(next)}`;
 }
+
+const gameTicketPathByKind = {
+  quiniela: "/juegos/quiniela/pronosticos",
+  quinigol: "/juegos/quinigol/pronosticos",
+  clasificacion: "/juegos/clasificacion/pronosticos",
+} as const;
+
+export type GameTicketKind = keyof typeof gameTicketPathByKind;
+
+/** Host + path shown on exported game tickets (e.g. rai1903web.vercel.app/juegos/quiniela/pronosticos). */
+export function getGameTicketFooterUrl(kind: GameTicketKind): string {
+  const path = gameTicketPathByKind[kind];
+  if (typeof window !== "undefined") {
+    return `${window.location.host}${path}`;
+  }
+  return `${getSiteOrigin().replace(/^https?:\/\//, "")}${path}`;
+}
