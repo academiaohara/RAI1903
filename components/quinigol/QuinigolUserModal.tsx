@@ -51,7 +51,7 @@ export function QuinigolUserModal({
   const showPoints = Boolean(data?.hasSavedRound && data.countPoints);
 
   return (
-    <Modal open={open} title={`Quinigol de ${handle}`} onClose={onClose} wide>
+    <Modal open={open} title={`Quinigol de ${handle}`} onClose={onClose} wide variant="ticket">
       <div className="space-y-4">
         <div className="flex items-center gap-3">
           <UserAvatar avatarUrl={avatarUrl} label={handle} size="md" />

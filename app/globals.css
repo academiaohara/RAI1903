@@ -556,6 +556,37 @@ a {
   font-weight: 800;
 }
 
+.game-ticket-match-preview {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #d43b2f;
+  border-radius: 3px;
+  background: #fffdf9;
+  color: #b5281f;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.game-ticket-match-preview:hover {
+  background: #b5281f;
+  color: #fffdf9;
+}
+
+.game-ticket-team-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.game-ticket-team-name--short {
+  display: none;
+}
+
 .game-ticket-match-row--featured {
   overflow: visible;
   padding-bottom: 6px;
@@ -734,6 +765,99 @@ a {
   white-space: nowrap;
 }
 
+.game-ticket-standing-row--compare {
+  grid-template-columns: 28px 29px minmax(0, 1.15fr) auto minmax(0, 1fr);
+}
+
+.game-ticket-standings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid #e8b4ae;
+  color: #1c3f6e;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 2px 4px 4px;
+  text-transform: uppercase;
+}
+
+.game-ticket-standing-compare {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  padding: 0 5px;
+  font-family: "Arial Narrow", Arial, sans-serif;
+}
+
+.game-ticket-standing-diff {
+  display: inline-flex;
+  min-width: 26px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  color: #555;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.game-ticket-standing-diff i {
+  font-size: 0.58rem;
+  font-style: normal;
+  line-height: 1;
+}
+
+.game-ticket-standing-diff--up {
+  color: #22a06b;
+}
+
+.game-ticket-standing-diff--down {
+  color: #d81f43;
+}
+
+.game-ticket-standing-diff--exact {
+  color: #22a06b;
+  font-size: 0.82rem;
+}
+
+.game-ticket-standing-points {
+  display: inline-flex;
+  min-width: 30px;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 2px;
+  color: #1c3f6e;
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.game-ticket-standing-points i {
+  font-size: 0.55rem;
+  font-style: normal;
+  font-weight: 700;
+  opacity: 0.75;
+  text-transform: uppercase;
+}
+
+.game-ticket-standing-actual {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  color: #555;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.84rem;
+  font-weight: 500;
+  padding: 4px 6px 4px 0;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .game-ticket-order-controls {
   display: flex;
   gap: 3px;
@@ -882,17 +1006,47 @@ a {
 
 @media (max-width: 639px) {
   .game-ticket {
-    padding: 14px 10px 12px;
+    padding: 12px 8px 10px;
+  }
+
+  .game-ticket-header {
+    min-height: 0;
+    gap: 10px;
+    padding-bottom: 6px;
+  }
+
+  .game-ticket-logo--quiniela {
+    height: 34px;
+    max-width: 72px;
+  }
+
+  .game-ticket-logo--quinigol {
+    width: 50px;
+    height: 42px;
+  }
+
+  .game-ticket-logo--clasificacion {
+    width: 58px;
+    height: 46px;
+  }
+
+  .game-ticket-meta {
+    font-size: 0.66rem;
+  }
+
+  .game-ticket-subheader {
+    font-size: 0.68rem;
+    padding: 4px 7px;
   }
 
   .game-ticket-match-row {
-    grid-template-columns: 22px minmax(0, 1fr) 26px auto;
+    grid-template-columns: 20px minmax(0, 1fr) 28px auto;
     min-height: 40px;
     font-size: 0.72rem;
   }
 
   .game-ticket-match-row--score {
-    grid-template-columns: 19px minmax(0, 1fr) 26px;
+    grid-template-columns: 18px minmax(0, 1fr) 28px;
     padding: 3px 0;
   }
 
@@ -901,8 +1055,36 @@ a {
     padding: 0 3px 3px;
   }
 
+  /* Sin escudos en las filas de partido: dejan sitio a los nombres. */
+  .game-ticket-teams .game-ticket-crest,
+  .game-ticket-teams .game-ticket-crest-fallback {
+    display: none;
+  }
+
+  .game-ticket-teams {
+    gap: 4px;
+    padding: 4px 6px 4px 2px;
+    font-size: 0.84rem;
+  }
+
+  .game-ticket-match-row--score .game-ticket-teams {
+    font-size: 0.94rem;
+  }
+
+  .game-ticket-team-name--full {
+    display: none;
+  }
+
+  .game-ticket-team-name--short {
+    display: inline;
+  }
+
   .game-ticket-featured {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .game-ticket-featured-score > span {
+    font-size: 0.7rem;
   }
 
   .game-ticket-scorer {
@@ -919,14 +1101,70 @@ a {
     height: 23px;
   }
 
+  .game-ticket-picks {
+    gap: 3px;
+  }
+
+  .game-ticket-match-preview {
+    width: 25px;
+    height: 25px;
+  }
+
   .game-ticket-subheader span,
   .game-ticket-footer span:last-child {
     display: none;
   }
 
   .game-ticket-standing-row {
-    min-height: 29px;
-    font-size: 0.7rem;
+    grid-template-columns: 22px 26px minmax(0, 1fr) auto;
+    min-height: 30px;
+    font-size: 0.78rem;
+  }
+
+  .game-ticket-standing-row--compare {
+    grid-template-columns: 20px 22px minmax(0, 1.1fr) auto minmax(0, 0.95fr);
+  }
+
+  .game-ticket-standings-head {
+    font-size: 0.55rem;
+    padding: 2px 2px 4px;
+  }
+
+  .game-ticket-standing-compare {
+    gap: 4px;
+    padding: 0 3px;
+  }
+
+  .game-ticket-standing-diff {
+    min-width: 22px;
+    font-size: 0.66rem;
+  }
+
+  .game-ticket-standing-points {
+    min-width: 24px;
+    font-size: 0.72rem;
+  }
+
+  .game-ticket-standing-actual {
+    font-size: 0.72rem;
+    padding-right: 3px;
+  }
+
+  .game-ticket-order-controls button {
+    width: 26px;
+    height: 26px;
+  }
+
+  .game-ticket-actions {
+    gap: 6px;
+  }
+
+  .game-ticket-actions button {
+    flex: 1 1 auto;
+    justify-content: center;
+    gap: 5px;
+    font-size: 0.68rem;
+    padding: 7px 8px;
   }
 }
 
@@ -956,6 +1194,156 @@ a {
 .game-ticket--capture .game-ticket-subheader span,
 .game-ticket--capture .game-ticket-footer span:last-child {
   display: initial;
+}
+
+/* La exportación a imagen se hace a 640px de ancho aunque el viewport sea
+   móvil: se restauran las métricas de escritorio del boleto. */
+.game-ticket.game-ticket--capture {
+  padding: 18px 22px 16px;
+}
+
+.game-ticket--capture .game-ticket-header {
+  min-height: 64px;
+  gap: 16px;
+  padding-bottom: 7px;
+}
+
+.game-ticket--capture .game-ticket-logo--quiniela {
+  height: 48px;
+  max-width: 96px;
+}
+
+.game-ticket--capture .game-ticket-logo--quinigol {
+  width: 68px;
+  height: 58px;
+}
+
+.game-ticket--capture .game-ticket-logo--clasificacion {
+  width: 78px;
+  height: 62px;
+}
+
+.game-ticket--capture .game-ticket-meta {
+  font-size: 0.78rem;
+}
+
+.game-ticket--capture .game-ticket-subheader {
+  font-size: 0.76rem;
+  padding: 5px 9px;
+}
+
+.game-ticket--capture .game-ticket-match-row,
+.game-ticket--capture .game-ticket-match-row--score {
+  font-size: 0.92rem;
+}
+
+.game-ticket--capture .game-ticket-teams {
+  gap: 7px;
+  padding: 5px 10px 5px 3px;
+  font-size: 1.02rem;
+}
+
+.game-ticket--capture .game-ticket-match-row--score .game-ticket-teams {
+  font-size: 1.14rem;
+}
+
+.game-ticket--capture .game-ticket-teams .game-ticket-crest,
+.game-ticket--capture .game-ticket-teams .game-ticket-crest-fallback {
+  display: flex;
+}
+
+.game-ticket--capture .game-ticket-team-name--full {
+  display: inline;
+}
+
+.game-ticket--capture .game-ticket-team-name--short {
+  display: none;
+}
+
+.game-ticket--capture .game-ticket-featured-score > span {
+  font-size: 0.78rem;
+}
+
+.game-ticket--capture .game-ticket-pick {
+  width: 31px;
+  height: 31px;
+}
+
+.game-ticket--capture .game-ticket-score-pick {
+  width: 27px;
+  height: 27px;
+}
+
+.game-ticket--capture .game-ticket-picks {
+  gap: 4px;
+}
+
+.game-ticket--capture .game-ticket-standing-row {
+  grid-template-columns: 28px 29px minmax(0, 1fr) auto;
+  min-height: 31px;
+  font-size: 0.9rem;
+}
+
+.game-ticket--capture .game-ticket-standing-row--compare {
+  grid-template-columns: 28px 29px minmax(0, 1.15fr) auto minmax(0, 1fr);
+}
+
+.game-ticket--capture .game-ticket-standing-compare {
+  gap: 7px;
+  padding: 0 5px;
+}
+
+.game-ticket--capture .game-ticket-standing-diff {
+  min-width: 26px;
+  font-size: 0.72rem;
+}
+
+.game-ticket--capture .game-ticket-standing-points {
+  min-width: 30px;
+  font-size: 0.8rem;
+}
+
+.game-ticket--capture .game-ticket-standing-actual {
+  font-size: 0.84rem;
+  padding-right: 6px;
+}
+
+.ticket-modal {
+  border: 2px solid #d43b2f;
+  border-radius: 6px;
+  background-color: #fdf9f1;
+  background-image: repeating-linear-gradient(transparent 0 27px, rgba(0, 0, 0, 0.025) 27px 28px);
+  box-shadow: 0 25px 50px -12px rgba(2, 6, 23, 0.45);
+  color: #222;
+}
+
+.ticket-modal-header {
+  border-bottom: 2px solid #d43b2f;
+  background: rgba(253, 249, 241, 0.96);
+}
+
+.ticket-modal-title {
+  color: #1c3f6e;
+  font-family: var(--font-bebas-neue), "Arial Narrow", Arial, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+}
+
+.ticket-modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #d43b2f;
+  border-radius: 3px;
+  background: #fffdf9;
+  color: #b5281f;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.ticket-modal-close:hover {
+  background: #b5281f;
+  color: #fffdf9;
 }
 
 .athletic-shell {
