@@ -27,25 +27,45 @@ function waitForLayout(): Promise<void> {
   });
 }
 
+async function waitForFonts(): Promise<void> {
+  if (typeof document === "undefined" || !document.fonts?.ready) return;
+  try {
+    await document.fonts.ready;
+  } catch {
+    // Ignore font loading failures and continue with capture.
+  }
+}
+
+function prepareCaptureNode(node: HTMLElement): HTMLElement {
+  const captureNode = node.cloneNode(true) as HTMLElement;
+  captureNode.querySelectorAll('[data-ticket-export-hidden="true"]').forEach((element) => {
+    element.remove();
+  });
+  return captureNode;
+}
+
 export async function captureGameTicket(node: HTMLElement): Promise<Blob> {
   await waitForImages(node);
+  await waitForFonts();
   const captureRoot = document.createElement("div");
-  const captureNode = node.cloneNode(true) as HTMLElement;
+  const captureNode = prepareCaptureNode(node);
+  const innerTicket = captureNode.querySelector(".game-ticket");
+  innerTicket?.classList.add("game-ticket--capture");
   captureRoot.setAttribute("aria-hidden", "true");
   captureRoot.style.position = "fixed";
   captureRoot.style.left = "-10000px";
   captureRoot.style.top = "0";
-  captureRoot.style.width = `${GAME_TICKET_EXPORT_WIDTH}px`;
   captureRoot.style.pointerEvents = "none";
   captureRoot.style.zIndex = "-1";
-  captureNode.style.width = `${GAME_TICKET_EXPORT_WIDTH}px`;
-  captureNode.style.maxWidth = `${GAME_TICKET_EXPORT_WIDTH}px`;
-  captureNode.style.minWidth = `${GAME_TICKET_EXPORT_WIDTH}px`;
-  captureNode.classList.add("game-ticket--capture");
   captureRoot.appendChild(captureNode);
   document.body.appendChild(captureRoot);
   await waitForImages(captureNode);
   await waitForLayout();
+
+  const exportWidth = Math.max(captureNode.scrollWidth, GAME_TICKET_EXPORT_WIDTH);
+  captureRoot.style.width = `${exportWidth}px`;
+  captureNode.style.width = `${exportWidth}px`;
+  captureNode.style.maxWidth = `${exportWidth}px`;
 
   try {
     const dataUrl = await toPng(captureNode, {
@@ -53,7 +73,7 @@ export async function captureGameTicket(node: HTMLElement): Promise<Blob> {
       pixelRatio: 2,
       width: captureNode.offsetWidth,
       height: captureNode.offsetHeight,
-      backgroundColor: "#fdf9f1",
+      backgroundColor: "#f0ebe3",
       onImageErrorHandler: () => undefined,
     });
     return await (await fetch(dataUrl)).blob();

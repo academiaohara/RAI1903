@@ -266,6 +266,7 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
             creatorHandle={userHandle}
             points={showScore ? matchdayPoints : undefined}
             scorerCorrectByMatch={scorerCorrectByMatch}
+            savedAt={savedRounds[round]}
           />
         ) : null}
 
