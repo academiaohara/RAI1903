@@ -4,7 +4,7 @@ import { resolveCompetitionConfig } from "@/lib/cms/competition-config-bundle";
 import { defaultTeamsForLeagueTemplate } from "@/lib/competition/league-team-sources";
 import type { RfefGrupoId } from "@/lib/rfef-grupos";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
-import { getTeamsBundle } from "@/lib/cms/teams-bundle";
+import { getTeamsBundle, mergeTeamsWithCms } from "@/lib/cms/teams-bundle";
 import { getTeam } from "@/lib/fixtures";
 import { resolveTeamColorsFromSources } from "@/lib/team-stripes";
 import type { Team } from "@/types";
@@ -155,12 +155,14 @@ export function resolveGroupTeams(
   grupo: RfefGrupoId,
 ): Team[] {
   const slots = getGroupTeamSlots(bundles, gender, grupo);
+  const teamsBundle = getTeamsBundle(bundles, gender);
   const cmsColorsByTeamId = new Map(
-    (getTeamsBundle(bundles, gender)?.teams ?? [])
+    (teamsBundle?.teams ?? [])
       .filter((team) => team.colors?.length)
       .map((team) => [team.id, team.colors!]),
   );
-  return teamsFromGroupSlots(slots, cmsColorsByTeamId);
+  const baseTeams = teamsFromGroupSlots(slots, cmsColorsByTeamId);
+  return mergeTeamsWithCms(baseTeams, teamsBundle);
 }
 
 export function slotsFromTeamNames(

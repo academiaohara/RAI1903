@@ -1,4 +1,4 @@
-import { getGroupTeamSlots, slotDisplayName } from "@/lib/cms/group-teams";
+import { getGroupTeamSlots, slotDisplayName, slugFromTeamName } from "@/lib/cms/group-teams";
 import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import { bundleMapKey } from "@/lib/cms/season-bundles";
 import { getTeamByGender } from "@/lib/fixtures";
@@ -98,6 +98,23 @@ export function resolveTeamDisplayName(
   return "Equipo";
 }
 
+export function findCmsTeamRecord(
+  team: Pick<Team, "id" | "name">,
+  cmsTeams: CmsTeamRecord[],
+): CmsTeamRecord | undefined {
+  const direct = cmsTeams.find((entry) => entry.id === team.id);
+  if (direct) return direct;
+
+  const teamSlug = team.name.trim() ? slugFromTeamName(team.name) : "";
+  if (!teamSlug) return undefined;
+
+  return cmsTeams.find((entry) => {
+    if (entry.id === teamSlug) return true;
+    const entrySlug = entry.name.trim() ? slugFromTeamName(entry.name) : "";
+    return entrySlug === teamSlug;
+  });
+}
+
 export function applyCmsTeamToBase(base: Team, record: CmsTeamRecord | undefined, placeholderIndex?: number): Team {
   if (!record) return base;
   if (record.removed) {
@@ -128,13 +145,13 @@ export function applyCmsTeamToBase(base: Team, record: CmsTeamRecord | undefined
 export function mergeTeamsWithCms(sourceTeams: Team[], cmsBundle: SeasonTeamsBundle | null): Team[] {
   if (!cmsBundle?.teams?.length) return sourceTeams;
 
-  const byId = new Map(cmsBundle.teams.map((t, index) => [t.id, { record: t, index }]));
+  const cmsTeams = cmsBundle.teams;
   let placeholderCounter = 1;
 
   return sourceTeams.map((team) => {
-    const entry = byId.get(team.id);
-    if (!entry) return team;
-    const placeholderIndex = entry.record.removed ? placeholderCounter++ : undefined;
-    return applyCmsTeamToBase(team, entry.record, placeholderIndex);
+    const record = findCmsTeamRecord(team, cmsTeams);
+    if (!record) return team;
+    const placeholderIndex = record.removed ? placeholderCounter++ : undefined;
+    return applyCmsTeamToBase(team, record, placeholderIndex);
   });
 }
