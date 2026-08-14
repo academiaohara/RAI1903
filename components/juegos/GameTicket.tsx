@@ -1038,6 +1038,43 @@ function TicketCrest({ team }: { team: Team }) {
   return <span className="game-ticket-crest-fallback">{crest}</span>;
 }
 
+function StandingDiffBadge({
+  diff,
+  teamLabel,
+}: {
+  diff: number;
+  teamLabel: string;
+}) {
+  if (diff === 0) {
+    return (
+      <b
+        className="game-ticket-standing-diff-inline game-ticket-standing-diff--exact"
+        title="Posición exacta"
+        aria-label="Posición exacta"
+      >
+        =
+      </b>
+    );
+  }
+
+  return (
+    <b
+      className={`game-ticket-standing-diff-inline ${
+        diff < 0 ? "game-ticket-standing-diff--up" : "game-ticket-standing-diff--down"
+      }`}
+      title={`${teamLabel} va ${Math.abs(diff)} ${Math.abs(diff) === 1 ? "puesto" : "puestos"} ${
+        diff < 0 ? "por encima" : "por debajo"
+      } de tu predicción`}
+      aria-label={`Fallo de ${Math.abs(diff)} ${Math.abs(diff) === 1 ? "posición" : "posiciones"} ${
+        diff < 0 ? "hacia arriba" : "hacia abajo"
+      }`}
+    >
+      <i aria-hidden>{diff < 0 ? "▲" : "▼"}</i>
+      {Math.abs(diff)}
+    </b>
+  );
+}
+
 export function ClasificacionTicket({
   teams,
   predictions,
@@ -1146,39 +1183,10 @@ export function ClasificacionTicket({
               <TicketCrest team={team} />
               <strong>
                 <TicketTeamName team={team} />
+                {showCompare && diff !== undefined ? (
+                  <StandingDiffBadge diff={diff} teamLabel={team.shortName || team.name} />
+                ) : null}
               </strong>
-              {showCompare ? (
-                <span className="game-ticket-standing-compare">
-                  {diff !== undefined ? (
-                    diff === 0 ? (
-                      <b
-                        className="game-ticket-standing-diff game-ticket-standing-diff--exact"
-                        title="Posición exacta"
-                        aria-label="Posición exacta"
-                      >
-                        =
-                      </b>
-                    ) : (
-                      <b
-                        className={`game-ticket-standing-diff ${
-                          diff < 0 ? "game-ticket-standing-diff--up" : "game-ticket-standing-diff--down"
-                        }`}
-                        title={`${team.shortName || team.name} va ${Math.abs(diff)} ${Math.abs(diff) === 1 ? "puesto" : "puestos"} ${diff < 0 ? "por encima" : "por debajo"} de tu predicción`}
-                        aria-label={`Fallo de ${Math.abs(diff)} ${Math.abs(diff) === 1 ? "posición" : "posiciones"} ${diff < 0 ? "hacia arriba" : "hacia abajo"}`}
-                      >
-                        <i aria-hidden>{diff < 0 ? "▲" : "▼"}</i>
-                        {Math.abs(diff)}
-                      </b>
-                    )
-                  ) : null}
-                  {teamPoints !== undefined ? (
-                    <b className="game-ticket-standing-points" title={`Puntos por ${team.shortName || team.name}`}>
-                      {teamPoints}
-                      <i>pts</i>
-                    </b>
-                  ) : null}
-                </span>
-              ) : null}
               {showCompare ? (
                 <span
                   className="game-ticket-standing-actual"
@@ -1186,6 +1194,12 @@ export function ClasificacionTicket({
                 >
                   {actualTeam ? <TicketTeamName team={actualTeam} /> : "—"}
                 </span>
+              ) : null}
+              {showCompare && teamPoints !== undefined ? (
+                <b className="game-ticket-standing-points" title={`Puntos por ${team.shortName || team.name}`}>
+                  {teamPoints}
+                  <i>pts</i>
+                </b>
               ) : null}
               {!readOnly && onReorder ? (
                 <span className="game-ticket-order-controls">

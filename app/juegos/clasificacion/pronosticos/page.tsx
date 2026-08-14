@@ -56,9 +56,9 @@ export default function ClasificacionPronosticosPage() {
   const canSave = !isLocked && (!isSubmitted || isEditing);
   const saveDisabled = clasificacionRequiresAuth() && !userId;
   const needsLogin = clasificacionRequiresAuth() && hydrated && !userId;
-  const showCompare = isLocked && Object.keys(effectivePredictions).length > 0;
   const hasStandingsData = actualPositions.size > 0;
-  const showScoring = hasStandingsData && Object.keys(effectivePredictions).length > 0;
+  const showCompare = hasStandingsData && Object.keys(effectivePredictions).length > 0;
+  const showScoring = showCompare;
   const totalPoints = useMemo(
     () => scoreClasificacionPrediction(effectivePredictions, actualPositions),
     [effectivePredictions, actualPositions],

@@ -16,7 +16,7 @@ import {
   scoreQuinigolMatchday,
   type QuinigolPrediction,
 } from "@/lib/quinigol";
-import { getMatchdayByRound, countFinishedMatches, hasFirstMatchStarted, isMatchdayFullyFinished, sortQuinielaMatches } from "@/lib/quiniela";
+import { getMatchdayByRound, countFinishedMatches, hasFirstMatchStarted, isMatchdayFullyFinished, sortQuinielaMatches, shouldCountQuinielaPoints } from "@/lib/quiniela";
 import { loadQuinigolState, quinigolRequiresAuth, saveQuinigolPredictions, saveQuinigolRound } from "@/lib/quinigol-storage";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -101,7 +101,7 @@ function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, b
     [selectedMatchday, predictions],
   );
   const needsLogin = quinigolRequiresAuth() && hydrated && !userId;
-  const showScore = hydrated && finishedMatches > 0;
+  const showScore = hydrated && shouldCountQuinielaPoints(selectedMatchday);
 
   const updatePrediction = useCallback(
     (prediction: QuinigolPrediction) => {
