@@ -197,31 +197,14 @@ function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, b
             creatorHandle={userHandle}
             points={showScore ? matchdayPoints : undefined}
             savedAt={savedRounds[round]}
+            canSave={canSave}
+            canEdit={canEdit}
+            onSave={() => void handleSave()}
+            onEdit={() => setIsEditing(true)}
+            saveDisabled={saveDisabled}
+            isEditing={isEditing}
           />
         ) : null}
-
-        <div className="mt-3 flex max-w-[900px] flex-wrap gap-2 sm:gap-3">
-          {canSave && (
-            <button
-              type="button"
-              onClick={() => void handleSave()}
-              disabled={saveDisabled}
-              className="rounded-xl bg-[#214C9B] px-4 py-2.5 text-xs font-extrabold uppercase text-white transition hover:bg-[#173a78] disabled:cursor-not-allowed disabled:opacity-50 sm:rounded-2xl sm:px-6 sm:py-3 sm:text-sm"
-            >
-              Guardar
-            </button>
-          )}
-          {canEdit && (
-            <button
-              type="button"
-              onClick={() => setIsEditing(true)}
-              disabled={isEditing}
-              className="rounded-xl border border-[#214C9B]/30 bg-white px-4 py-2.5 text-xs font-extrabold uppercase text-[#214C9B] transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50 sm:rounded-2xl sm:px-6 sm:py-3 sm:text-sm"
-            >
-              Editar
-            </button>
-          )}
-        </div>
       </Card>
     </>
   );
