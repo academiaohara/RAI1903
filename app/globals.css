@@ -171,18 +171,18 @@ a {
 }
 
 .game-ticket-receipt-game-logo--quiniela {
-  height: 26px;
+  height: 40px;
   max-width: 100%;
   width: auto;
 }
 
 .game-ticket-receipt-game-logo--quinigol {
-  height: 30px;
+  height: 44px;
   width: auto;
 }
 
 .game-ticket-receipt-game-logo--clasificacion {
-  height: 32px;
+  height: 46px;
   width: auto;
 }
 
@@ -258,13 +258,6 @@ a {
 .game-ticket-receipt-line--points {
   margin-top: 4px;
   font-weight: 700;
-}
-
-.game-ticket-receipt-total {
-  margin: 10px 0 2px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-align: center;
 }
 
 .game-ticket-receipt-meta {
@@ -510,33 +503,30 @@ a {
 
 .game-ticket-pick--hit b,
 .game-ticket-score-pick.game-ticket-pick--hit b {
-  color: #214c9b;
+  color: var(--rai-blue);
 }
 
-.game-ticket-pick--miss b,
-.game-ticket-score-pick.game-ticket-pick--miss b {
-  color: #d43b2f;
+.game-ticket-pick--hit::after,
+.game-ticket-score-pick.game-ticket-pick--hit::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border: 2px solid var(--rai-blue);
+  border-radius: 46% 54% 52% 48% / 48% 46% 54% 52%;
+  pointer-events: none;
+  transform: rotate(-4deg);
+}
+
+.game-ticket-score-pick.game-ticket-pick--hit::after {
+  inset: -3px;
+  border-width: 1.5px;
+  border-radius: 52% 48% 46% 54% / 54% 50% 50% 46%;
+  transform: rotate(5deg);
 }
 
 .game-ticket-pick--actual b,
 .game-ticket-score-pick.game-ticket-pick--actual b {
-  color: #214c9b;
-  opacity: 0.72;
-}
-
-.game-ticket-pick--hit,
-.game-ticket-score-pick.game-ticket-pick--hit {
-  border-color: #214c9b;
-}
-
-.game-ticket-pick--miss,
-.game-ticket-score-pick.game-ticket-pick--miss {
-  border-color: #d43b2f;
-}
-
-.game-ticket-pick--actual,
-.game-ticket-score-pick.game-ticket-pick--actual {
-  border-color: rgba(33, 76, 155, 0.55);
+  color: var(--rai-red);
 }
 
 .game-ticket-score-pick {
