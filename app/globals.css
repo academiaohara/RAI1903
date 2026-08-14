@@ -1155,8 +1155,12 @@ a {
   }
 
   .game-ticket-subheader span,
-  .game-ticket-footer span:last-child {
+  .game-ticket-footer span {
     display: none;
+  }
+
+  .game-ticket-footer {
+    justify-content: center;
   }
 
   .game-ticket-standing-row {
@@ -1241,8 +1245,12 @@ a {
 }
 
 .game-ticket--capture .game-ticket-subheader span,
-.game-ticket--capture .game-ticket-footer span:last-child {
+.game-ticket--capture .game-ticket-footer span {
   display: initial;
+}
+
+.game-ticket--capture .game-ticket-footer {
+  justify-content: space-between;
 }
 
 /* La exportación a imagen se hace a 640px de ancho aunque el viewport sea
