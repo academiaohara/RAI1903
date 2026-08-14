@@ -34,6 +34,20 @@ type GuiaLigaGroupEditorProps = {
   onClose: () => void;
 };
 
+function resolveSlotShortName(
+  slot: GroupTeamSlot,
+  bundleTeams: CmsTeamRecord[],
+): string {
+  const cms =
+    bundleTeams.find((team) => team.id === slot.id) ??
+    (slot.name.trim()
+      ? bundleTeams.find((team) => team.id === slugFromTeamName(slot.name))
+      : undefined);
+  if (cms?.shortName?.trim()) return cms.shortName.trim();
+  const name = slot.name.trim();
+  return name ? name.slice(0, 12) : "";
+}
+
 function syncSlotIds(slots: GroupTeamSlot[], grupo: RfefGrupoId): GroupTeamSlot[] {
   const usedIds = new Set<string>();
   return slots.map((slot, index) => {
@@ -57,6 +71,9 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
   );
 
   const [slots, setSlots] = useState<GroupTeamSlot[]>(storedSlots);
+  const [shortNames, setShortNames] = useState<string[]>(() =>
+    storedSlots.map((slot) => resolveSlotShortName(slot, bundleTeams)),
+  );
   const [crests, setCrests] = useState<Record<string, string>>({});
   const [colorOverrides, setColorOverrides] = useState<Record<string, [string, string]>>({});
   const [pickingForIndex, setPickingForIndex] = useState<number | null>(null);
@@ -66,10 +83,11 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
   useEffect(() => {
     queueMicrotask(() => {
       setSlots(storedSlots);
+      setShortNames(storedSlots.map((slot) => resolveSlotShortName(slot, bundleTeams)));
       setCrests({});
       setColorOverrides({});
     });
-  }, [storedSlots]);
+  }, [storedSlots, bundleTeams]);
 
   const effectiveColors = useMemo(() => {
     const map: Record<string, [string, string]> = {};
@@ -97,28 +115,54 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
     setSlots((current) =>
       current.map((slot, slotIndex) => (slotIndex === index ? { ...slot, name } : slot)),
     );
+    setShortNames((current) => {
+      const next = [...current];
+      while (next.length <= index) next.push("");
+      const previousName = slots[index]?.name ?? "";
+      const previousAuto = previousName.trim().slice(0, 12);
+      const currentShort = next[index] ?? "";
+      if (!currentShort || currentShort === previousAuto) {
+        next[index] = name.trim().slice(0, 12);
+      }
+      return next;
+    });
+  };
+
+  const updateShortName = (index: number, shortName: string) => {
+    setShortNames((current) => {
+      const next = [...current];
+      while (next.length <= index) next.push("");
+      next[index] = shortName;
+      return next;
+    });
   };
 
   const importFromOtherGroup = () => {
     const otherGrupo = grupo === "1" ? "2" : "1";
-    const otherNames = getGroupTeamSlots(bundles, gender, otherGrupo)
-      .map((slot) => slot.name.trim())
-      .filter(Boolean);
+    const otherSlots = getGroupTeamSlots(bundles, gender, otherGrupo);
+    const otherNames = otherSlots.map((slot) => slot.name.trim()).filter(Boolean);
     if (!otherNames.length) {
       setMessage(`No hay equipos con nombre en el Grupo ${otherGrupo}.`);
       return;
     }
-    setSlots((current) => {
-      const next = current.map((slot) => ({ ...slot }));
-      let sourceIndex = 0;
-      for (let slotIndex = 0; slotIndex < next.length && sourceIndex < otherNames.length; slotIndex += 1) {
-        if (!next[slotIndex]!.name.trim()) {
-          next[slotIndex] = { ...next[slotIndex]!, name: otherNames[sourceIndex]! };
-          sourceIndex += 1;
-        }
+
+    const nextSlots = slots.map((slot) => ({ ...slot }));
+    const nextShortNames = [...shortNames];
+    while (nextShortNames.length < nextSlots.length) nextShortNames.push("");
+
+    let sourceIndex = 0;
+    for (let slotIndex = 0; slotIndex < nextSlots.length && sourceIndex < otherSlots.length; slotIndex += 1) {
+      const sourceSlot = otherSlots[sourceIndex]!;
+      if (!nextSlots[slotIndex]!.name.trim() && sourceSlot.name.trim()) {
+        nextSlots[slotIndex] = { ...nextSlots[slotIndex]!, name: sourceSlot.name };
+        nextShortNames[slotIndex] =
+          resolveSlotShortName(sourceSlot, bundleTeams) || sourceSlot.name.trim().slice(0, 12);
+        sourceIndex += 1;
       }
-      return syncSlotIds(next, grupo);
-    });
+    }
+
+    setSlots(syncSlotIds(nextSlots, grupo));
+    setShortNames(nextShortNames);
     setMessage(null);
   };
 
@@ -126,6 +170,11 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
     setSlots((current) =>
       current.map((slot, slotIndex) => (slotIndex === index ? { ...slot, name: "" } : slot)),
     );
+    setShortNames((current) => {
+      const next = [...current];
+      next[index] = "";
+      return next;
+    });
   };
 
   const assignCrest = (index: number, path: string) => {
@@ -154,10 +203,11 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
     for (const [index, slot] of normalized.entries()) {
       const name = slotDisplayName(slot, index);
       const previous = byId.get(slot.id);
+      const shortName = (shortNames[index] ?? "").trim() || (slot.name.trim() ? name.slice(0, 12) : "");
       const record: CmsTeamRecord = {
         id: slot.id,
         name: slot.name.trim() ? name : "",
-        shortName: name.slice(0, 12),
+        shortName,
         coach: previous?.coach ?? "",
         stadium: previous?.stadium ?? "",
         crestInitials: previous?.crestInitials ?? name.slice(0, 3).toUpperCase(),
@@ -290,6 +340,14 @@ export function GuiaLigaGroupEditor({ gender, grupo, onClose }: GuiaLigaGroupEdi
                   placeholder={`Equipo ${index + 1}`}
                   className="w-full rounded-md border border-slate-200 px-2 py-1.5 text-xs font-semibold sm:px-1 sm:py-0.5 sm:text-[10px]"
                 />
+                {!empty ? (
+                  <input
+                    value={shortNames[index] ?? ""}
+                    onChange={(event) => updateShortName(index, event.target.value)}
+                    placeholder="Nombre corto"
+                    className="w-full rounded-md border border-slate-200 px-2 py-1.5 text-xs font-semibold text-slate-600 sm:px-1 sm:py-0.5 sm:text-[10px]"
+                  />
+                ) : null}
                 {!empty ? (
                   <TeamColorPairInput
                     fieldId={`guia-liga-${slot.id}`}
