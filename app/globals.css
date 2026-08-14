@@ -503,7 +503,7 @@ a {
 
 .game-ticket-pick--hit b,
 .game-ticket-score-pick.game-ticket-pick--hit b {
-  color: var(--rai-blue);
+  color: #171717;
 }
 
 .game-ticket-pick--hit::after,
@@ -511,7 +511,7 @@ a {
   content: "";
   position: absolute;
   inset: -4px;
-  border: 2px solid var(--rai-blue);
+  border: 3px solid #171717;
   border-radius: 46% 54% 52% 48% / 48% 46% 54% 52%;
   pointer-events: none;
   transform: rotate(-4deg);
@@ -519,7 +519,6 @@ a {
 
 .game-ticket-score-pick.game-ticket-pick--hit::after {
   inset: -3px;
-  border-width: 1.5px;
   border-radius: 52% 48% 46% 54% / 54% 50% 50% 46%;
   transform: rotate(5deg);
 }
