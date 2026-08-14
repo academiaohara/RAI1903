@@ -1,8 +1,11 @@
 "use client";
 
-import { ChevronDown, ChevronUp, Download, Share2 } from "lucide-react";
+import Link from "next/link";
+import { ChevronDown, ChevronUp, Download, Eye, Share2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { MatchPreviewModal } from "@/components/MatchPreviewModal";
 import { RAI_TEAM_ID } from "@/data/mock";
+import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import type { CompetitionZoneRule } from "@/lib/cms/competition-config-bundle";
 import {
@@ -11,6 +14,9 @@ import {
   shareGameTicketOnX,
 } from "@/lib/game-ticket-share";
 import type { ClasificacionPrediction } from "@/lib/clasificacion-prediction";
+import { defaultCronicaId } from "@/lib/match-article-factory";
+import { getMatchArticlePageHref } from "@/lib/match-article-url";
+import { isMatchPlayed } from "@/lib/match-result";
 import type { QuinigolPrediction } from "@/lib/quinigol";
 import { actualOutcome, isAvilesMatch, outcomeFromGoalsPicks } from "@/lib/quiniela";
 import { scorerLabelForPlayer } from "@/lib/squad-player-resolve";
@@ -93,10 +99,7 @@ function QuinielaReceipt({
     <aside className="game-ticket-receipt" aria-label="Comprobante RAIniela">
       <div className="game-ticket-receipt-tri game-ticket-receipt-tri--top" />
       <div className="game-ticket-receipt-inner">
-        <div className="game-ticket-receipt-logo">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="" />
-        </div>
+        <ReceiptGameLogo kind="quiniela" />
         <strong className="game-ticket-receipt-title">RAINIELA</strong>
         <span className="game-ticket-receipt-subtitle">COMPROBANTE</span>
         <hr className="game-ticket-receipt-hr" />
@@ -144,22 +147,250 @@ function QuinielaReceipt({
   );
 }
 
+function formatGoalsPickLabel(value: GoalsPick | undefined): string {
+  if (value === undefined) return "-";
+  return String(value);
+}
+
+function QuinigolReceipt({
+  matches,
+  predictions,
+  round,
+  competitionLabel,
+  creatorHandle = "@usuario",
+  savedAt,
+  points,
+}: {
+  matches: Match[];
+  predictions: Record<string, QuinigolPrediction>;
+  round: number;
+  competitionLabel: string;
+  creatorHandle?: string;
+  savedAt?: string;
+  points?: number;
+}) {
+  const picks = matches.map((match) => {
+    const prediction = predictions[match.id];
+    const home = formatGoalsPickLabel(prediction?.goalsHome);
+    const away = formatGoalsPickLabel(prediction?.goalsAway);
+    return home === "-" && away === "-" ? "-" : `${home}-${away}`;
+  });
+  const filledCount = picks.filter((pick) => pick !== "-").length;
+  const savedDate = savedAt ? new Date(savedAt) : null;
+  const refCode = savedDate
+    ? String(savedDate.getTime()).slice(-5)
+    : String(round * 137 + filledCount * 17).padStart(5, "0").slice(-5);
+  const metaDate = savedDate
+    ? savedDate.toLocaleDateString("es-ES")
+    : new Date().toLocaleDateString("es-ES");
+  const metaTime = savedDate
+    ? savedDate.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+    : new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const handle = creatorHandle.startsWith("@") ? creatorHandle : `@${creatorHandle}`;
+
+  return (
+    <aside className="game-ticket-receipt" aria-label="Comprobante RAIGol">
+      <div className="game-ticket-receipt-tri game-ticket-receipt-tri--top" />
+      <div className="game-ticket-receipt-inner">
+        <ReceiptGameLogo kind="quinigol" />
+        <strong className="game-ticket-receipt-title">RAIGOL</strong>
+        <span className="game-ticket-receipt-subtitle">COMPROBANTE</span>
+        <hr className="game-ticket-receipt-hr" />
+        <div className="game-ticket-receipt-lines">
+          {picks.map((pick, index) => (
+            <div className="game-ticket-receipt-line" key={`${index + 1}-${pick}`}>
+              <span>{index + 1}.</span>
+              <span>{pick}</span>
+            </div>
+          ))}
+        </div>
+        <p className="game-ticket-receipt-total">
+          {filledCount} / {matches.length} MARCADORES
+        </p>
+        {typeof points === "number" ? (
+          <>
+            <hr className="game-ticket-receipt-hr" />
+            <div className="game-ticket-receipt-line game-ticket-receipt-line--points">
+              <span>Puntos</span>
+              <span>{points}</span>
+            </div>
+          </>
+        ) : null}
+        <hr className="game-ticket-receipt-hr" />
+        <p className="game-ticket-receipt-meta">
+          Jornada {round} · {competitionLabel}
+          <br />
+          Ref. {refCode}
+          <br />
+          {metaDate} · {metaTime}h
+        </p>
+        <p className="game-ticket-receipt-stamp">
+          {savedAt ? "GUARDADO CORRECTAMENTE" : "BORRADOR"}
+        </p>
+        <p className="game-ticket-receipt-handle">{handle}</p>
+      </div>
+      <div className="game-ticket-receipt-tri game-ticket-receipt-tri--bottom" />
+    </aside>
+  );
+}
+
+function ClasificacionReceipt({
+  teams,
+  predictions,
+  seasonLabel,
+  competitionLabel,
+  creatorHandle = "@usuario",
+  savedAt,
+  points,
+}: {
+  teams: Team[];
+  predictions: Record<string, ClasificacionPrediction>;
+  seasonLabel: string;
+  competitionLabel: string;
+  creatorHandle?: string;
+  savedAt?: string;
+  points?: number;
+}) {
+  const orderedTeams = [...teams].sort(
+    (a, b) =>
+      (predictions[a.id]?.position ?? Number.MAX_SAFE_INTEGER) -
+        (predictions[b.id]?.position ?? Number.MAX_SAFE_INTEGER) ||
+      a.name.localeCompare(b.name, "es"),
+  );
+  const filledCount = orderedTeams.filter((team) => predictions[team.id]?.position).length;
+  const savedDate = savedAt ? new Date(savedAt) : null;
+  const refCode = savedDate
+    ? String(savedDate.getTime()).slice(-5)
+    : String(filledCount * 19 + orderedTeams.length).padStart(5, "0").slice(-5);
+  const metaDate = savedDate
+    ? savedDate.toLocaleDateString("es-ES")
+    : new Date().toLocaleDateString("es-ES");
+  const metaTime = savedDate
+    ? savedDate.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+    : new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const handle = creatorHandle.startsWith("@") ? creatorHandle : `@${creatorHandle}`;
+
+  return (
+    <aside className="game-ticket-receipt" aria-label="Comprobante El Oráculo">
+      <div className="game-ticket-receipt-tri game-ticket-receipt-tri--top" />
+      <div className="game-ticket-receipt-inner">
+        <ReceiptGameLogo kind="clasificacion" />
+        <strong className="game-ticket-receipt-title">EL ORÁCULO</strong>
+        <span className="game-ticket-receipt-subtitle">COMPROBANTE</span>
+        <hr className="game-ticket-receipt-hr" />
+        <div className="game-ticket-receipt-lines">
+          {orderedTeams.map((team, index) => (
+            <div className="game-ticket-receipt-line" key={team.id}>
+              <span>{index + 1}.</span>
+              <span>{team.shortName || team.name}</span>
+            </div>
+          ))}
+        </div>
+        <p className="game-ticket-receipt-total">
+          {filledCount} / {teams.length} EQUIPOS
+        </p>
+        {typeof points === "number" ? (
+          <>
+            <hr className="game-ticket-receipt-hr" />
+            <div className="game-ticket-receipt-line game-ticket-receipt-line--points">
+              <span>Puntos</span>
+              <span>{points}</span>
+            </div>
+          </>
+        ) : null}
+        <hr className="game-ticket-receipt-hr" />
+        <p className="game-ticket-receipt-meta">
+          {seasonLabel} · {competitionLabel}
+          <br />
+          Ref. {refCode}
+          <br />
+          {metaDate} · {metaTime}h
+        </p>
+        <p className="game-ticket-receipt-stamp">
+          {savedAt ? "GUARDADO CORRECTAMENTE" : "BORRADOR"}
+        </p>
+        <p className="game-ticket-receipt-handle">{handle}</p>
+      </div>
+      <div className="game-ticket-receipt-tri game-ticket-receipt-tri--bottom" />
+    </aside>
+  );
+}
+
+function ReceiptGameLogo({ kind }: { kind: TicketKind }) {
+  const logo = logoByKind[kind];
+  if (!logo) return null;
+  return (
+    <div className="game-ticket-receipt-logo">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        className={`game-ticket-receipt-game-logo game-ticket-receipt-game-logo--${kind}`}
+        src={logo}
+        alt=""
+      />
+    </div>
+  );
+}
+
 function TicketBrand({ kind }: { kind: TicketKind }) {
   const logo = logoByKind[kind];
   const label = kind === "quiniela" ? "RAIniela" : kind === "quinigol" ? "RAIGol" : "El Oráculo";
-  if (logo) {
+  if (!logo) return null;
+  return (
+    <div className="game-ticket-brand" aria-label={label}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        className={`game-ticket-logo game-ticket-logo--${kind}`}
+        src={logo}
+        alt=""
+      />
+    </div>
+  );
+}
+
+function TicketMatchPreview({ match }: { match: Match }) {
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const { getForMatch } = useSeasonMatchArticles();
+  const avilesMatch = isAvilesMatch(match);
+  const avilesArticleHref = useMemo(() => {
+    if (!avilesMatch) return null;
+    const article = getForMatch(match.id, "masculino");
+    return getMatchArticlePageHref(match.id, "masculino", article?.id ?? defaultCronicaId(match.id, "masculino"));
+  }, [avilesMatch, getForMatch, match.id]);
+  const avilesArticleLabel = isMatchPlayed(match) ? "Crónica" : "Previa";
+  const previewClass =
+    "game-ticket-match-preview inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[#214C9B]/25 text-[#214C9B] transition hover:border-[#214C9B] hover:bg-blue-50";
+
+  if (avilesMatch && avilesArticleHref) {
     return (
-      <div className="game-ticket-brand" aria-label={label}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          className={`game-ticket-logo game-ticket-logo--${kind}`}
-          src={logo}
-          alt=""
-        />
-      </div>
+      <Link
+        href={avilesArticleHref}
+        className={previewClass}
+        data-ticket-export-hidden="true"
+        aria-label={avilesArticleLabel}
+        title={avilesArticleLabel}
+      >
+        <Eye size={13} aria-hidden />
+      </Link>
     );
   }
-  return null;
+
+  if (avilesMatch) return null;
+
+  return (
+    <>
+      <button
+        type="button"
+        className={previewClass}
+        data-ticket-export-hidden="true"
+        onClick={() => setPreviewOpen(true)}
+        aria-label="Ver previa"
+        title="Previa"
+      >
+        <Eye size={13} aria-hidden />
+      </button>
+      <MatchPreviewModal match={match} open={previewOpen} onClose={() => setPreviewOpen(false)} />
+    </>
+  );
 }
 
 function TicketFrame({
@@ -571,6 +802,7 @@ export function QuinielaTicket({
                   {teamName(match, "away", teamsById)}
                 </span>
               </span>
+              <TicketMatchPreview match={match} />
               <span className="game-ticket-picks">
                 {(["1", "X", "2"] as PredictionOutcome[]).map((outcome) =>
                   outcomeMark(outcome, selectedOutcome, {
@@ -643,10 +875,12 @@ export function QuinigolTicket({
   points,
   readOnly,
   onChange,
+  savedAt,
 }: MatchTicketProps & {
   predictions: Record<string, QuinigolPrediction>;
   readOnly?: boolean;
   onChange?: (prediction: QuinigolPrediction) => void;
+  savedAt?: string;
 }) {
   const teamsById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
   const date = formatTicketDate(matches);
@@ -664,6 +898,17 @@ export function QuinigolTicket({
       shareText={`Mi RAIGol de la jornada ${round} #RealAviles`}
       creatorHandle={creatorHandle}
       points={points}
+      receipt={
+        <QuinigolReceipt
+          matches={matches}
+          predictions={predictions}
+          round={round}
+          competitionLabel={competitionLabel}
+          creatorHandle={creatorHandle}
+          savedAt={savedAt}
+          points={points}
+        />
+      }
     >
       <ol className="game-ticket-list">
         {matches.map((match, index) => {
@@ -692,6 +937,7 @@ export function QuinigolTicket({
                 <i>–</i>
                 <span><TicketCrest team={teamForMatch(match, "away", teamsById)} />{teamName(match, "away", teamsById)}</span>
               </span>
+              <TicketMatchPreview match={match} />
               <span className="game-ticket-score">
                 <span>
                   {scoreOptions.map((option) =>
@@ -779,6 +1025,7 @@ export function ClasificacionTicket({
   points,
   readOnly,
   onReorder,
+  savedAt,
 }: {
   teams: Team[];
   predictions: Record<string, ClasificacionPrediction>;
@@ -789,6 +1036,7 @@ export function ClasificacionTicket({
   points?: number;
   readOnly?: boolean;
   onReorder?: (teamIds: string[]) => void;
+  savedAt?: string;
 }) {
   const orderedTeams = useMemo(
     () =>
@@ -823,6 +1071,17 @@ export function ClasificacionTicket({
       shareText={`Mi Oráculo para la clasificación final de la temporada ${seasonLabel} #RealAviles`}
       creatorHandle={creatorHandle}
       points={points}
+      receipt={
+        <ClasificacionReceipt
+          teams={teams}
+          predictions={predictions}
+          seasonLabel={seasonLabel}
+          competitionLabel={competitionLabel}
+          creatorHandle={creatorHandle}
+          savedAt={savedAt}
+          points={points}
+        />
+      }
     >
       <ol className="game-ticket-list game-ticket-standings">
         {orderedTeams.map((team, index) => {

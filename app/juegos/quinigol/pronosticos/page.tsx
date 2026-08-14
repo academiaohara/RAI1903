@@ -16,7 +16,7 @@ import {
   scoreQuinigolMatchday,
   type QuinigolPrediction,
 } from "@/lib/quinigol";
-import { getMatchdayByRound, countFinishedMatches, hasFirstMatchStarted, isMatchdayFullyFinished } from "@/lib/quiniela";
+import { getMatchdayByRound, countFinishedMatches, hasFirstMatchStarted, isMatchdayFullyFinished, sortQuinielaMatches } from "@/lib/quiniela";
 import { loadQuinigolState, quinigolRequiresAuth, saveQuinigolPredictions, saveQuinigolRound } from "@/lib/quinigol-storage";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -82,7 +82,11 @@ function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, b
   }, [seasonId]);
 
   const selectedMatchday = useMemo(() => getMatchdayByRound(matchdays, round), [matchdays, round]);
-  const hasMatchesForRound = selectedMatchday.matches.length > 0;
+  const orderedMatches = useMemo(
+    () => sortQuinielaMatches(selectedMatchday.matches),
+    [selectedMatchday.matches],
+  );
+  const hasMatchesForRound = orderedMatches.length > 0;
   const isSaved = Boolean(savedRounds[round]);
   const isLocked = hasFirstMatchStarted(selectedMatchday);
   const readOnly = isLocked || (isSaved && !isEditing);
@@ -182,7 +186,7 @@ function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, b
 
         {hasMatchesForRound ? (
           <QuinigolTicket
-            matches={selectedMatchday.matches}
+            matches={orderedMatches}
             teams={teams}
             predictions={predictions}
             round={round}
@@ -192,6 +196,7 @@ function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, b
             onChange={updatePrediction}
             creatorHandle={userHandle}
             points={showScore ? matchdayPoints : undefined}
+            savedAt={savedRounds[round]}
           />
         ) : null}
 

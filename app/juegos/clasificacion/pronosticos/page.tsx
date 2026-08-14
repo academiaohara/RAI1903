@@ -168,6 +168,7 @@ export default function ClasificacionPronosticosPage() {
             onReorder={handleReorder}
             creatorHandle={userHandle}
             points={hydrated && showScoring ? totalPoints : undefined}
+            savedAt={submittedAt ?? undefined}
           />
         )}
 
@@ -181,6 +182,7 @@ export default function ClasificacionPronosticosPage() {
             readOnly
             creatorHandle={userHandle}
             points={hydrated && showScoring ? totalPoints : undefined}
+            savedAt={submittedAt ?? undefined}
           />
         ) : null}
 

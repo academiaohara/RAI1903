@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useRef, type WheelEvent } from "react";
+import { useEffect, useRef } from "react";
 import { scrollAlignForIndex, scrollElementHorizontally } from "@/lib/scroll-horizontal";
 import { cn } from "@/lib/utils";
 
@@ -38,15 +38,22 @@ export function JornadaSelector({
     return () => cancelAnimationFrame(frame);
   }, [value, total]);
 
-  const handleWheel = (event: WheelEvent<HTMLDivElement>) => {
-    if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
 
-    const list = event.currentTarget;
-    if (list.scrollWidth <= list.clientWidth) return;
+    const handleWheel = (event: WheelEvent) => {
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+      if (list.scrollWidth <= list.clientWidth) return;
 
-    event.preventDefault();
-    list.scrollLeft += event.deltaY;
-  };
+      event.preventDefault();
+      event.stopPropagation();
+      list.scrollLeft += event.deltaY;
+    };
+
+    list.addEventListener("wheel", handleWheel, { passive: false });
+    return () => list.removeEventListener("wheel", handleWheel);
+  }, []);
 
   return (
     <div
@@ -82,8 +89,7 @@ export function JornadaSelector({
 
         <div
           ref={listRef}
-          onWheel={handleWheel}
-          className="no-scrollbar flex min-w-0 flex-1 touch-pan-x gap-2 overflow-x-auto overscroll-x-contain py-1"
+          className="no-scrollbar flex min-w-0 flex-1 touch-pan-x gap-2 overflow-x-auto overscroll-x-contain overscroll-y-none py-1 [overscroll-behavior:contain]"
         >
           {Array.from({ length: total }, (_, index) => {
             const round = index + 1;

@@ -160,14 +160,30 @@ a {
 .game-ticket-receipt-logo {
   display: flex;
   justify-content: center;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
-.game-ticket-receipt-logo img {
+.game-ticket-receipt-game-logo {
   display: block;
-  width: 32px;
-  height: 32px;
+  filter: grayscale(100%);
   object-fit: contain;
+  object-position: center;
+}
+
+.game-ticket-receipt-game-logo--quiniela {
+  height: 26px;
+  max-width: 100%;
+  width: auto;
+}
+
+.game-ticket-receipt-game-logo--quinigol {
+  height: 30px;
+  width: auto;
+}
+
+.game-ticket-receipt-game-logo--clasificacion {
+  height: 32px;
+  width: auto;
 }
 
 .game-ticket-receipt-title {
@@ -353,11 +369,15 @@ a {
 
 .game-ticket-match-row {
   display: grid;
-  grid-template-columns: 32px minmax(0, 1fr) auto;
+  grid-template-columns: 32px minmax(0, 1fr) 30px auto;
   min-height: 46px;
   align-items: center;
   border-bottom: 1px solid #e8b4ae;
   font-size: 0.92rem;
+}
+
+.game-ticket-match-row--featured {
+  grid-template-columns: 32px minmax(0, 1fr) 30px auto;
 }
 
 .game-ticket-number {
@@ -836,18 +856,18 @@ a {
   }
 
   .game-ticket-match-row {
-    grid-template-columns: 22px minmax(0, 1fr) auto;
+    grid-template-columns: 22px minmax(0, 1fr) 26px auto;
     min-height: 40px;
     font-size: 0.72rem;
   }
 
   .game-ticket-match-row--score {
-    grid-template-columns: 19px minmax(0, 1fr);
+    grid-template-columns: 19px minmax(0, 1fr) 26px;
     padding: 3px 0;
   }
 
   .game-ticket-match-row--score .game-ticket-score {
-    grid-column: 2;
+    grid-column: 2 / -1;
     padding: 0 3px 3px;
   }
 
@@ -881,13 +901,13 @@ a {
 }
 
 .game-ticket--capture .game-ticket-match-row {
-  grid-template-columns: 25px minmax(0, 1fr) auto;
+  grid-template-columns: 25px minmax(0, 1fr) 30px auto;
   min-height: 34px;
   padding-top: 0;
 }
 
 .game-ticket--capture .game-ticket-match-row--score {
-  grid-template-columns: 25px minmax(0, 1fr) auto;
+  grid-template-columns: 25px minmax(0, 1fr) 30px auto;
 }
 
 .game-ticket--capture .game-ticket-match-row--score .game-ticket-score {
