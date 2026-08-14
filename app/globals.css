@@ -583,17 +583,17 @@ a {
   text-overflow: ellipsis;
 }
 
-.game-ticket-team-name--full {
+.game-ticket-team-name--short {
+  display: none;
+}
+
+.game-ticket-standing-row strong .game-ticket-team-name--full {
   color: #171717;
   font-family: var(--font-kalam), "Kalam", cursive;
   font-size: 1.05rem;
   font-weight: 400;
   line-height: 1.1;
   transform: rotate(-0.8deg);
-}
-
-.game-ticket-team-name--short {
-  display: none;
 }
 
 .game-ticket-match-row--featured {
