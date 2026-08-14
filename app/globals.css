@@ -77,36 +77,6 @@ a {
   gap: 18px;
 }
 
-.game-ticket-main {
-  display: flex;
-  min-width: 0;
-  flex: 1 1 0;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.game-ticket-logo-above {
-  display: flex;
-  justify-content: center;
-  padding: 2px 0 4px;
-}
-
-.game-ticket-logo--above.game-ticket-logo--quiniela {
-  height: 56px;
-  max-width: 120px;
-  width: auto;
-}
-
-.game-ticket-logo--above.game-ticket-logo--quinigol {
-  height: 62px;
-  width: auto;
-}
-
-.game-ticket-logo--above.game-ticket-logo--clasificacion {
-  height: 66px;
-  width: auto;
-}
-
 .game-ticket {
   position: relative;
   width: 100%;
@@ -190,14 +160,30 @@ a {
 .game-ticket-receipt-logo {
   display: flex;
   justify-content: center;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
-.game-ticket-receipt-logo img {
+.game-ticket-receipt-game-logo {
   display: block;
-  width: 32px;
-  height: 32px;
+  filter: grayscale(100%);
   object-fit: contain;
+  object-position: center;
+}
+
+.game-ticket-receipt-game-logo--quiniela {
+  height: 26px;
+  max-width: 100%;
+  width: auto;
+}
+
+.game-ticket-receipt-game-logo--quinigol {
+  height: 30px;
+  width: auto;
+}
+
+.game-ticket-receipt-game-logo--clasificacion {
+  height: 32px;
+  width: auto;
 }
 
 .game-ticket-receipt-title {
@@ -277,9 +263,9 @@ a {
 
 .game-ticket-header {
   display: flex;
-  min-height: 44px;
+  min-height: 64px;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 16px;
   border-bottom: 2px solid #d43b2f;
   padding-bottom: 7px;

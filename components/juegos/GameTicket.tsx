@@ -99,10 +99,7 @@ function QuinielaReceipt({
     <aside className="game-ticket-receipt" aria-label="Comprobante RAIniela">
       <div className="game-ticket-receipt-tri game-ticket-receipt-tri--top" />
       <div className="game-ticket-receipt-inner">
-        <div className="game-ticket-receipt-logo">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="" />
-        </div>
+        <ReceiptGameLogo kind="quiniela" />
         <strong className="game-ticket-receipt-title">RAINIELA</strong>
         <span className="game-ticket-receipt-subtitle">COMPROBANTE</span>
         <hr className="game-ticket-receipt-hr" />
@@ -195,10 +192,7 @@ function QuinigolReceipt({
     <aside className="game-ticket-receipt" aria-label="Comprobante RAIGol">
       <div className="game-ticket-receipt-tri game-ticket-receipt-tri--top" />
       <div className="game-ticket-receipt-inner">
-        <div className="game-ticket-receipt-logo">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="" />
-        </div>
+        <ReceiptGameLogo kind="quinigol" />
         <strong className="game-ticket-receipt-title">RAIGOL</strong>
         <span className="game-ticket-receipt-subtitle">COMPROBANTE</span>
         <hr className="game-ticket-receipt-hr" />
@@ -280,10 +274,7 @@ function ClasificacionReceipt({
     <aside className="game-ticket-receipt" aria-label="Comprobante El Oráculo">
       <div className="game-ticket-receipt-tri game-ticket-receipt-tri--top" />
       <div className="game-ticket-receipt-inner">
-        <div className="game-ticket-receipt-logo">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="" />
-        </div>
+        <ReceiptGameLogo kind="clasificacion" />
         <strong className="game-ticket-receipt-title">EL ORÁCULO</strong>
         <span className="game-ticket-receipt-subtitle">COMPROBANTE</span>
         <hr className="game-ticket-receipt-hr" />
@@ -325,18 +316,30 @@ function ClasificacionReceipt({
   );
 }
 
-function TicketBrand({ kind, above = false }: { kind: TicketKind; above?: boolean }) {
+function ReceiptGameLogo({ kind }: { kind: TicketKind }) {
+  const logo = logoByKind[kind];
+  if (!logo) return null;
+  return (
+    <div className="game-ticket-receipt-logo">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        className={`game-ticket-receipt-game-logo game-ticket-receipt-game-logo--${kind}`}
+        src={logo}
+        alt=""
+      />
+    </div>
+  );
+}
+
+function TicketBrand({ kind }: { kind: TicketKind }) {
   const logo = logoByKind[kind];
   const label = kind === "quiniela" ? "RAIniela" : kind === "quinigol" ? "RAIGol" : "El Oráculo";
   if (!logo) return null;
   return (
-    <div
-      className={above ? "game-ticket-logo-above" : "game-ticket-brand"}
-      aria-label={label}
-    >
+    <div className="game-ticket-brand" aria-label={label}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        className={`game-ticket-logo game-ticket-logo--${kind}${above ? " game-ticket-logo--above" : ""}`}
+        className={`game-ticket-logo game-ticket-logo--${kind}`}
         src={logo}
         alt=""
       />
@@ -441,30 +444,28 @@ function TicketFrame({
         </button>
       </div>
       <div ref={ticketRef} className="game-ticket-wrap">
-        <div className="game-ticket-main">
-          <TicketBrand kind={kind} above />
-          <div className={`game-ticket game-ticket--${kind}`}>
-            <header className="game-ticket-header">
-              <div className="game-ticket-meta">
-                <strong>{competitionLabel}</strong>
-                <span>{seasonLabel}</span>
-                <span>{contextLabel}</span>
-              </div>
-            </header>
-            <div className="game-ticket-subheader">
-              <strong>{title}</strong>
-              <span className="game-ticket-subheader-meta">
-                {typeof points === "number" ? <b className="game-ticket-points">{points} pts</b> : null}
-                {hint ? <span>{hint}</span> : null}
-              </span>
+        <div className={`game-ticket game-ticket--${kind}`}>
+          <header className="game-ticket-header">
+            <TicketBrand kind={kind} />
+            <div className="game-ticket-meta">
+              <strong>{competitionLabel}</strong>
+              <span>{seasonLabel}</span>
+              <span>{contextLabel}</span>
             </div>
-            {children}
-            <footer className="game-ticket-footer">
-              <span>Generado en {footerUrlByKind[kind]}</span>
-              <strong>{creatorHandle.startsWith("@") ? creatorHandle : `@${creatorHandle}`}</strong>
-              <span>Acierta y comparte ↗</span>
-            </footer>
+          </header>
+          <div className="game-ticket-subheader">
+            <strong>{title}</strong>
+            <span className="game-ticket-subheader-meta">
+              {typeof points === "number" ? <b className="game-ticket-points">{points} pts</b> : null}
+              {hint ? <span>{hint}</span> : null}
+            </span>
           </div>
+          {children}
+          <footer className="game-ticket-footer">
+            <span>Generado en {footerUrlByKind[kind]}</span>
+            <strong>{creatorHandle.startsWith("@") ? creatorHandle : `@${creatorHandle}`}</strong>
+            <span>Acierta y comparte ↗</span>
+          </footer>
         </div>
         {receipt}
       </div>
