@@ -115,9 +115,6 @@ function QuinielaReceipt({
             </div>
           ))}
         </div>
-        <p className="game-ticket-receipt-total">
-          {filledCount} / {matches.length} PRONÓSTICOS
-        </p>
         <hr className="game-ticket-receipt-hr" />
         <div className="game-ticket-receipt-line">
           <span>Marcador</span>
@@ -207,9 +204,6 @@ function QuinigolReceipt({
             </div>
           ))}
         </div>
-        <p className="game-ticket-receipt-total">
-          {filledCount} / {matches.length} MARCADORES
-        </p>
         {typeof points === "number" ? (
           <>
             <hr className="game-ticket-receipt-hr" />
@@ -288,9 +282,6 @@ function ClasificacionReceipt({
             </div>
           ))}
         </div>
-        <p className="game-ticket-receipt-total">
-          {filledCount} / {teams.length} EQUIPOS
-        </p>
         {typeof points === "number" ? (
           <>
             <hr className="game-ticket-receipt-hr" />
