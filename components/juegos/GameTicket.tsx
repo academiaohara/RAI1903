@@ -35,7 +35,7 @@ type TicketFrameProps = {
 };
 
 const logoByKind = {
-  quiniela: "/juegos/rainiela.svg",
+  quiniela: "/juegos/rainielav2.svg",
   quinigol: "/juegos/raigol.svg",
   clasificacion: "/api/game-logo/oraculo",
 } satisfies Record<TicketKind, string | null>;
@@ -94,7 +94,8 @@ function QuinielaReceipt({
       <div className="game-ticket-receipt-tri game-ticket-receipt-tri--top" />
       <div className="game-ticket-receipt-inner">
         <div className="game-ticket-receipt-logo">
-          <span>RA</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="" />
         </div>
         <strong className="game-ticket-receipt-title">RAINIELA</strong>
         <span className="game-ticket-receipt-subtitle">COMPROBANTE</span>

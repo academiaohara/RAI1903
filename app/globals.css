@@ -57,6 +57,7 @@ a {
 
 .game-ticket-preview {
   margin-top: 1.5rem;
+  width: 100%;
 }
 
 .game-ticket-preview-label {
@@ -71,7 +72,7 @@ a {
 .game-ticket-wrap {
   display: flex;
   width: 100%;
-  max-width: 900px;
+  max-width: 100%;
   align-items: flex-start;
   gap: 18px;
 }
@@ -79,10 +80,10 @@ a {
 .game-ticket {
   position: relative;
   width: 100%;
-  max-width: 600px;
+  max-width: none;
   min-width: 0;
-  flex: 1 1 600px;
-  overflow: hidden;
+  flex: 1 1 0;
+  overflow: visible;
   border: 2px solid #d43b2f;
   border-radius: 4px;
   background-color: #fdf9f1;
@@ -162,15 +163,11 @@ a {
   margin-bottom: 2px;
 }
 
-.game-ticket-receipt-logo span {
-  display: flex;
-  width: 22px;
-  height: 22px;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #1a1a1a;
-  font-size: 0.6rem;
-  font-weight: 700;
+.game-ticket-receipt-logo img {
+  display: block;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 
 .game-ticket-receipt-title {
@@ -281,8 +278,9 @@ a {
 }
 
 .game-ticket-logo--quiniela {
-  width: 58px;
-  height: 58px;
+  width: auto;
+  height: 48px;
+  max-width: 96px;
 }
 
 .game-ticket-logo--quinigol {
@@ -350,6 +348,7 @@ a {
   margin: 0;
   padding: 0;
   list-style: none;
+  overflow: visible;
 }
 
 .game-ticket-match-row {
@@ -371,13 +370,23 @@ a {
 .game-ticket-teams {
   min-width: 0;
   overflow: hidden;
-  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 7px;
   padding: 5px 10px 5px 3px;
+  color: #222;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 1.02rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.game-ticket-match-row--score .game-ticket-teams {
+  color: #1c3f6e;
+  font-size: 1.14rem;
+  font-weight: 600;
 }
 
 .game-ticket-teams i {
@@ -498,15 +507,19 @@ a {
 }
 
 .game-ticket-match-row--featured {
+  overflow: visible;
   padding-bottom: 6px;
 }
 
 .game-ticket-featured {
+  position: relative;
+  z-index: 2;
   grid-column: 2 / -1;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(170px, 1.15fr);
   align-items: end;
   gap: 7px;
+  overflow: visible;
   border-top: 1px dashed rgba(28, 63, 110, 0.28);
   margin: 1px 0 0 3px;
   padding: 6px 0 0;
@@ -521,10 +534,10 @@ a {
 
 .game-ticket-featured-score > span {
   overflow: hidden;
-  color: #555;
+  color: #1c3f6e;
   font-family: "Arial Narrow", Arial, sans-serif;
-  font-size: 0.62rem;
-  font-weight: 700;
+  font-size: 0.78rem;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -535,10 +548,13 @@ a {
 }
 
 .game-ticket-scorer {
+  position: relative;
+  z-index: 3;
   display: flex;
   min-width: 0;
   flex-direction: column;
   gap: 3px;
+  overflow: visible;
   color: #1c3f6e;
   font-family: "Arial Narrow", Arial, sans-serif;
   font-size: 0.64rem;
@@ -596,6 +612,7 @@ a {
 
 .game-ticket-scorer-control {
   position: relative;
+  z-index: 4;
   flex: 0 0 auto;
 }
 
@@ -615,7 +632,7 @@ a {
 
 .game-ticket-scorer-menu {
   position: absolute;
-  z-index: 30;
+  z-index: 200;
   top: calc(100% + 4px);
   right: 0;
   width: min(220px, 70vw);
