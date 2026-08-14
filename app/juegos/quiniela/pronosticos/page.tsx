@@ -24,6 +24,7 @@ import {
   isScorerPredictionCorrect,
   isAvilesMatch,
   sortQuinielaMatches,
+  shouldCountQuinielaPoints,
 } from "@/lib/quiniela";
 import { loadQuinielaState, saveQuinielaPredictions, saveQuinielaRound } from "@/lib/quiniela-storage";
 import { createClient } from "@/lib/supabase/client";
@@ -117,7 +118,7 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
     [selectedMatchday, predictions, scoringContext],
   );
   const needsLogin = quinielaRequiresAuth() && hydrated && !userId;
-  const showScore = hydrated && finishedMatches > 0;
+  const showScore = hydrated && shouldCountQuinielaPoints(selectedMatchday);
   const scorerCorrectByMatch = useMemo(
     () =>
       Object.fromEntries(
