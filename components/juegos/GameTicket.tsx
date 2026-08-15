@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { ChevronDown, ChevronUp, Download, Eye, Pencil, Save, Share2 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { GameLoginPromptModal } from "@/components/juegos/GameLoginPromptModal";
 import { MatchPreviewModal } from "@/components/MatchPreviewModal";
 import { RAI_TEAM_ID } from "@/data/mock";
 import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
@@ -19,6 +20,7 @@ import {
   scoreClasificacionPosition,
 } from "@/lib/clasificacion-prediction";
 import { defaultCronicaId } from "@/lib/match-article-factory";
+import { hasSeenGameLoginPrompt, markGameLoginPromptSeen } from "@/lib/game-login-prompt";
 import { getGameTicketFooterUrl } from "@/lib/auth/site-url";
 import { getMatchArticlePageHref } from "@/lib/match-article-url";
 import { isMatchPlayed } from "@/lib/match-result";
@@ -49,6 +51,7 @@ type TicketFrameProps = {
   onEdit?: () => void;
   saveDisabled?: boolean;
   isEditing?: boolean;
+  showLoginPrompt?: boolean;
   children: ReactNode;
 };
 
@@ -405,11 +408,31 @@ function TicketFrame({
   onEdit,
   saveDisabled,
   isEditing,
+  showLoginPrompt = false,
   children,
 }: TicketFrameProps) {
   const ticketRef = useRef<HTMLDivElement>(null);
   const [sharing, setSharing] = useState(false);
+  const [loginPromptOpen, setLoginPromptOpen] = useState(false);
   const footerUrl = getGameTicketFooterUrl(kind);
+
+  const handleTicketInteract = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (!showLoginPrompt || hasSeenGameLoginPrompt()) return;
+
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const interactive = target.closest(
+        "button.game-ticket-pick, button.game-ticket-score-pick, button.game-ticket-scorer-display, .game-ticket-order-controls button",
+      );
+      if (!interactive || (interactive instanceof HTMLButtonElement && interactive.disabled)) return;
+
+      markGameLoginPromptSeen();
+      setLoginPromptOpen(true);
+    },
+    [showLoginPrompt],
+  );
 
   const run = async (action: "share" | "x" | "download") => {
     if (!ticketRef.current || sharing) return;
@@ -428,6 +451,7 @@ function TicketFrame({
 
   return (
     <section className="game-ticket-preview" aria-label="Boleto">
+      <GameLoginPromptModal open={loginPromptOpen} onClose={() => setLoginPromptOpen(false)} />
       {showActions ? (
         <div className="game-ticket-actions">
           <div className="game-ticket-actions-share">
@@ -495,7 +519,7 @@ function TicketFrame({
           ) : null}
         </div>
       ) : null}
-      <div ref={ticketRef} className="game-ticket-wrap">
+      <div ref={ticketRef} className="game-ticket-wrap" onClickCapture={handleTicketInteract}>
         <div className={`game-ticket game-ticket--${kind}`}>
           <header className="game-ticket-header">
             <TicketBrand kind={kind} />
@@ -772,6 +796,7 @@ export function QuinielaTicket({
   onEdit,
   saveDisabled,
   isEditing,
+  showLoginPrompt,
 }: MatchTicketProps & {
   predictions: Record<string, Prediction>;
   readOnly?: boolean;
@@ -785,6 +810,7 @@ export function QuinielaTicket({
   onEdit?: () => void;
   saveDisabled?: boolean;
   isEditing?: boolean;
+  showLoginPrompt?: boolean;
 }) {
   const teamsById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
   const { squad } = useSquadPlayers("masculino");
@@ -839,6 +865,7 @@ export function QuinielaTicket({
       onEdit={onEdit}
       saveDisabled={saveDisabled}
       isEditing={isEditing}
+      showLoginPrompt={showLoginPrompt}
       receipt={
         <QuinielaReceipt
           matches={matches}
@@ -969,6 +996,7 @@ export function QuinigolTicket({
   onEdit,
   saveDisabled,
   isEditing,
+  showLoginPrompt,
 }: MatchTicketProps & {
   predictions: Record<string, QuinigolPrediction>;
   readOnly?: boolean;
@@ -981,6 +1009,7 @@ export function QuinigolTicket({
   onEdit?: () => void;
   saveDisabled?: boolean;
   isEditing?: boolean;
+  showLoginPrompt?: boolean;
 }) {
   const teamsById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
   const date = formatTicketDate(matches);
@@ -1005,6 +1034,7 @@ export function QuinigolTicket({
       onEdit={onEdit}
       saveDisabled={saveDisabled}
       isEditing={isEditing}
+      showLoginPrompt={showLoginPrompt}
       receipt={
         <QuinigolReceipt
           matches={matches}
@@ -1178,6 +1208,7 @@ export function ClasificacionTicket({
   onEdit,
   saveDisabled,
   isEditing,
+  showLoginPrompt,
 }: {
   teams: Team[];
   predictions: Record<string, ClasificacionPrediction>;
@@ -1197,6 +1228,7 @@ export function ClasificacionTicket({
   onEdit?: () => void;
   saveDisabled?: boolean;
   isEditing?: boolean;
+  showLoginPrompt?: boolean;
 }) {
   const orderedTeams = useMemo(
     () =>
@@ -1249,6 +1281,7 @@ export function ClasificacionTicket({
       onEdit={onEdit}
       saveDisabled={saveDisabled}
       isEditing={isEditing}
+      showLoginPrompt={showLoginPrompt}
       receipt={
         <ClasificacionReceipt
           teams={teams}
