@@ -6,10 +6,8 @@ import { SeasonProvider } from "@/components/season/SeasonProvider";
 import { HomeLayoutProvider } from "@/components/home/HomeLayoutProvider";
 import { MediaRaiSectionsProvider } from "@/components/media-rai/MediaRaiSectionsProvider";
 import { EditorBottomSpacer } from "@/components/inline-editing/EditorBottomSpacer";
-import {
-  InlineEditingProvider,
-  InlineEditingToolbar,
-} from "@/components/inline-editing/InlineEditingProvider";
+import { InlineEditingProvider } from "@/components/inline-editing/InlineEditingProvider";
+import { InlineEditingToolbarLazy } from "@/components/inline-editing/InlineEditingToolbarLazy";
 import { AppDialogProvider } from "@/components/AppDialogProvider";
 import { InlineEditingMarketEditShell } from "@/components/inline-editing/InlineEditingMarketEditShell";
 import { fetchHomeGlobalInlineOverridesServer, fetchInlineOverridesServer, fetchMediaRaiInlineOverridesServer } from "@/lib/cms/inline-overrides-server";
@@ -54,7 +52,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                         </main>
                       </div>
                     </TeamCrestResolverProvider>
-                    <InlineEditingToolbar />
+                    <InlineEditingToolbarLazy />
                   </MediaRaiSectionsProvider>
                 </HomeLayoutProvider>
               </InlineEditingMarketEditShell>

@@ -9,7 +9,6 @@ import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
 import type { TransferCarouselMode } from "@/lib/fichajes";
 import { useTransfers } from "@/hooks/useTransfers";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { flushSync } from "react-dom";
 import type { Route } from "next";
 import type { TransferMarketWindowId } from "@/types";
 import { TransferFichaCard } from "@/components/fichajes/TransferFichaCard";
@@ -79,10 +78,7 @@ export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
     getLoopWidth: useTicker ? getLoopWidth : undefined,
   });
 
-  const pendingManualWheelRef = useRef<{ offset: number; deltaY: number } | null>(null);
-
   const resetManualScroll = useCallback(() => {
-    pendingManualWheelRef.current = null;
     const container = containerRef.current;
     const track = trackRef.current;
     if (!track) return;
@@ -97,23 +93,6 @@ export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
     track.style.animationPlayState = "";
     setManualScroll(false);
   }, [smoothScroll, setManualScroll]);
-
-  useLayoutEffect(() => {
-    const pending = pendingManualWheelRef.current;
-    if (!manualScroll || !pending) return;
-
-    const container = containerRef.current;
-    if (!container) return;
-
-    pendingManualWheelRef.current = null;
-    const { offset, deltaY } = pending;
-
-    container.scrollLeft = offset;
-    smoothScroll.syncTarget(container);
-    if (deltaY !== 0) {
-      smoothScroll.addDelta(container, deltaY);
-    }
-  }, [manualScroll, smoothScroll]);
 
   const handleWheel = useCallback(
     (event: WheelEvent) => {
@@ -139,14 +118,21 @@ export function TransfersCarousel({ marketWindowId }: TransfersCarouselProps) {
         track.style.transform = "none";
         track.style.animationPlayState = "";
 
-        pendingManualWheelRef.current = { offset, deltaY: event.deltaY };
-        flushSync(() => setManualScroll(true));
+        const container = containerRef.current;
+        if (container) {
+          container.scrollLeft = offset;
+          smoothScroll.syncTarget(container);
+          if (event.deltaY !== 0) {
+            smoothScroll.addDelta(container, event.deltaY);
+          }
+        }
+        setManualScroll(true);
         return;
       }
 
       handleScrollWheel(event);
     },
-    [handleScrollWheel, manualScroll, useTicker, setManualScroll],
+    [handleScrollWheel, manualScroll, smoothScroll, useTicker, setManualScroll],
   );
 
   useHorizontalWheelScrollListener(containerRef, handleWheel);

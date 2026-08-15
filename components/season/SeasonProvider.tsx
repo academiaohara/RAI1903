@@ -122,8 +122,23 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
       if (rows.some((row) => row.id === current)) return current;
       return pickViewedSeasonId(rows, activeId);
     });
-    await refreshPublishedTransfers(rows);
-  }, [activeSeasonId, refreshPublishedTransfers]);
+  }, [activeSeasonId]);
+
+  useEffect(() => {
+    if (!seasons.length) return;
+
+    const loadTransfers = () => {
+      void refreshPublishedTransfers(seasons);
+    };
+
+    if (typeof requestIdleCallback !== "undefined") {
+      const idleId = requestIdleCallback(loadTransfers, { timeout: 2500 });
+      return () => cancelIdleCallback(idleId);
+    }
+
+    const timeoutId = window.setTimeout(loadTransfers, 800);
+    return () => window.clearTimeout(timeoutId);
+  }, [refreshPublishedTransfers, seasons]);
 
   const refreshBundles = useCallback(async () => {
     const map = await fetchSeasonBundles(viewedSeasonId);

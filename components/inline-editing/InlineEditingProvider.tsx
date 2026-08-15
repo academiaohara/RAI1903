@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import type { User } from "@supabase/supabase-js";
 import {
   ChevronDown,
@@ -36,20 +37,41 @@ import {
   upsertInlineOverridesBatch,
 } from "@/lib/cms/inline-overrides";
 import { isMediaRaiGlobalInlineKey } from "@/lib/fan-videos";
-import { SeasonManagerPanel } from "@/components/editor/SeasonManagerPanel";
-import { SectionStatusEditorPanel } from "@/components/editor/SectionStatusEditorPanel";
-import { TeamCrestEditorPanel } from "@/components/editor/TeamCrestEditorPanel";
-import { HomeLayoutEditorPanel } from "@/components/editor/HomeLayoutEditorPanel";
-import { MediaRaiSectionsEditorPanel } from "@/components/editor/MediaRaiSectionsEditorPanel";
-import { CompetitionEditorPanel } from "@/components/editor/CompetitionEditorPanel";
-import { FemeninoEditorPanel } from "@/components/editor/FemeninoEditorPanel";
-import { PublishFixturesBundleButton } from "@/components/editor/PublishFixturesBundleButton";
-import { EditorMobileMoreMenu } from "@/components/editor/EditorMobileMoreMenu";
-import { TeamsEditorPanel } from "@/components/editor/TeamsEditorPanel";
 import { isJornadasPath } from "@/lib/editor-routes";
 import { useTransferMarketEditOptional } from "@/components/editor/TransferMarketEditProvider";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+
+const SeasonManagerPanel = dynamic(() =>
+  import("@/components/editor/SeasonManagerPanel").then((m) => ({ default: m.SeasonManagerPanel })),
+);
+const SectionStatusEditorPanel = dynamic(() =>
+  import("@/components/editor/SectionStatusEditorPanel").then((m) => ({ default: m.SectionStatusEditorPanel })),
+);
+const TeamCrestEditorPanel = dynamic(() =>
+  import("@/components/editor/TeamCrestEditorPanel").then((m) => ({ default: m.TeamCrestEditorPanel })),
+);
+const HomeLayoutEditorPanel = dynamic(() =>
+  import("@/components/editor/HomeLayoutEditorPanel").then((m) => ({ default: m.HomeLayoutEditorPanel })),
+);
+const MediaRaiSectionsEditorPanel = dynamic(() =>
+  import("@/components/editor/MediaRaiSectionsEditorPanel").then((m) => ({ default: m.MediaRaiSectionsEditorPanel })),
+);
+const CompetitionEditorPanel = dynamic(() =>
+  import("@/components/editor/CompetitionEditorPanel").then((m) => ({ default: m.CompetitionEditorPanel })),
+);
+const FemeninoEditorPanel = dynamic(() =>
+  import("@/components/editor/FemeninoEditorPanel").then((m) => ({ default: m.FemeninoEditorPanel })),
+);
+const PublishFixturesBundleButton = dynamic(() =>
+  import("@/components/editor/PublishFixturesBundleButton").then((m) => ({ default: m.PublishFixturesBundleButton })),
+);
+const EditorMobileMoreMenu = dynamic(() =>
+  import("@/components/editor/EditorMobileMoreMenu").then((m) => ({ default: m.EditorMobileMoreMenu })),
+);
+const TeamsEditorPanel = dynamic(() =>
+  import("@/components/editor/TeamsEditorPanel").then((m) => ({ default: m.TeamsEditorPanel })),
+);
 
 const LEGACY_STORAGE_KEY = "rai1903:inline-edits:v1";
 const MODE_KEY = "rai1903:inline-edit-mode";
@@ -126,7 +148,7 @@ export function InlineEditingProvider({
   const viewedSeasonId = seasonContext?.viewedSeasonId ?? DEFAULT_COMPETITION_SEASON_ID;
   const activeSeasonId = seasonContext?.activeSeasonId ?? DEFAULT_COMPETITION_SEASON_ID;
   const configured = isSupabaseConfigured();
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(configured);
   const [canEdit, setCanEdit] = useState(!configured);
   const [editMode, setEditModeState] = useState(false);
   const [overrides, setOverrides] = useState<InlineOverrides>(() =>
@@ -266,9 +288,18 @@ export function InlineEditingProvider({
       return;
     }
 
+    const legacy = readLegacyOverrides();
+    const serverBaseline = mergeOverrideMaps(
+      legacy,
+      viewedSeasonId === activeSeasonId ? initialOverrides : globalOverridesFromInitial(initialOverrides),
+    );
+    queueMicrotask(() => {
+      setOverrides((current) => (Object.keys(current).length ? current : serverBaseline));
+      setReady(true);
+    });
+
     void Promise.all([fetchInlineOverrides(viewedSeasonId), fetchMediaRaiInlineOverrides(), fetchHomeGlobalInlineOverrides()]).then(
       ([seasonResult, mediaRaiResult, homeGlobalResult]) => {
-        const legacy = readLegacyOverrides();
         setOverrides(
           mergeOverrideMaps(
             legacy,
@@ -282,7 +313,6 @@ export function InlineEditingProvider({
         if (error) {
           setSyncError(`No se pudieron cargar cambios de Supabase: ${error}`);
         }
-        setReady(true);
       },
     );
   }, [activeSeasonId, configured, initialOverrides, viewedSeasonId]);
