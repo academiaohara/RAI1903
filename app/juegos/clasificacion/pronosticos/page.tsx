@@ -167,6 +167,7 @@ export default function ClasificacionPronosticosPage() {
           onEdit={() => setIsEditing(true)}
           saveDisabled={saveDisabled}
           isEditing={isEditing}
+          showLoginPrompt={needsLogin}
         />
       </Card>
     </div>

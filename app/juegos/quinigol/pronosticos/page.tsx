@@ -203,6 +203,7 @@ function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, b
             onEdit={() => setIsEditing(true)}
             saveDisabled={saveDisabled}
             isEditing={isEditing}
+            showLoginPrompt={needsLogin}
           />
         ) : null}
       </Card>

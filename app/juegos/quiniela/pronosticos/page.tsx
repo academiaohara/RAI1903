@@ -274,6 +274,7 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
             onEdit={handleEdit}
             saveDisabled={saveDisabled}
             isEditing={isEditing}
+            showLoginPrompt={needsLogin}
           />
         ) : null}
       </Card>
