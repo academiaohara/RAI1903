@@ -3,8 +3,7 @@
 import { ExternalLink, Mic2 } from "lucide-react";
 import Link from "next/link";
 import type { Route } from "next";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { flushSync } from "react-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   useHorizontalWheelScroll,
   useHorizontalWheelScrollListener,
@@ -101,10 +100,7 @@ export function HomeMediaRaiCarousel({ items }: HomeMediaRaiCarouselProps) {
     getLoopWidth: useTicker ? getLoopWidth : undefined,
   });
 
-  const pendingManualWheelRef = useRef<{ offset: number; deltaY: number } | null>(null);
-
   const resetManualScroll = useCallback(() => {
-    pendingManualWheelRef.current = null;
     const container = containerRef.current;
     const track = trackRef.current;
     if (!track) return;
@@ -119,23 +115,6 @@ export function HomeMediaRaiCarousel({ items }: HomeMediaRaiCarouselProps) {
     track.style.animationPlayState = "";
     setManualScroll(false);
   }, [smoothScroll]);
-
-  useLayoutEffect(() => {
-    const pending = pendingManualWheelRef.current;
-    if (!manualScroll || !pending) return;
-
-    const container = containerRef.current;
-    if (!container) return;
-
-    pendingManualWheelRef.current = null;
-    const { offset, deltaY } = pending;
-
-    container.scrollLeft = offset;
-    smoothScroll.syncTarget(container);
-    if (deltaY !== 0) {
-      smoothScroll.addDelta(container, deltaY);
-    }
-  }, [manualScroll, smoothScroll]);
 
   const handleWheel = useCallback(
     (event: WheelEvent) => {
@@ -161,14 +140,21 @@ export function HomeMediaRaiCarousel({ items }: HomeMediaRaiCarouselProps) {
         track.style.transform = "none";
         track.style.animationPlayState = "";
 
-        pendingManualWheelRef.current = { offset, deltaY: event.deltaY };
-        flushSync(() => setManualScroll(true));
+        const container = containerRef.current;
+        if (container) {
+          container.scrollLeft = offset;
+          smoothScroll.syncTarget(container);
+          if (event.deltaY !== 0) {
+            smoothScroll.addDelta(container, event.deltaY);
+          }
+        }
+        setManualScroll(true);
         return;
       }
 
       handleScrollWheel(event);
     },
-    [handleScrollWheel, manualScroll, useTicker],
+    [handleScrollWheel, manualScroll, smoothScroll, useTicker],
   );
 
   useHorizontalWheelScrollListener(containerRef, handleWheel);

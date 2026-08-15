@@ -8,8 +8,7 @@ import {
 } from "@/lib/use-horizontal-wheel-scroll";
 import { formatDate } from "@/lib/utils";
 import type { NewsItem } from "@/types";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { flushSync } from "react-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export function NewsTicker({ items }: { items: NewsItem[] }) {
   const sorted = sortNewsByDate(items).slice(0, NEWS_TICKER_LIMIT);
@@ -32,10 +31,7 @@ export function NewsTicker({ items }: { items: NewsItem[] }) {
     getLoopWidth: useTicker ? getLoopWidth : undefined,
   });
 
-  const pendingManualWheelRef = useRef<{ offset: number; deltaY: number } | null>(null);
-
   const resetManualScroll = useCallback(() => {
-    pendingManualWheelRef.current = null;
     const container = containerRef.current;
     const track = trackRef.current;
     if (!track) return;
@@ -50,23 +46,6 @@ export function NewsTicker({ items }: { items: NewsItem[] }) {
     track.style.animationPlayState = "";
     setManualScroll(false);
   }, [smoothScroll]);
-
-  useLayoutEffect(() => {
-    const pending = pendingManualWheelRef.current;
-    if (!manualScroll || !pending) return;
-
-    const container = containerRef.current;
-    if (!container) return;
-
-    pendingManualWheelRef.current = null;
-    const { offset, deltaY } = pending;
-
-    container.scrollLeft = offset;
-    smoothScroll.syncTarget(container);
-    if (deltaY !== 0) {
-      smoothScroll.addDelta(container, deltaY);
-    }
-  }, [manualScroll, smoothScroll]);
 
   const handleWheel = useCallback(
     (event: WheelEvent) => {
@@ -92,14 +71,21 @@ export function NewsTicker({ items }: { items: NewsItem[] }) {
         track.style.transform = "none";
         track.style.animationPlayState = "";
 
-        pendingManualWheelRef.current = { offset, deltaY: event.deltaY };
-        flushSync(() => setManualScroll(true));
+        const container = containerRef.current;
+        if (container) {
+          container.scrollLeft = offset;
+          smoothScroll.syncTarget(container);
+          if (event.deltaY !== 0) {
+            smoothScroll.addDelta(container, event.deltaY);
+          }
+        }
+        setManualScroll(true);
         return;
       }
 
       handleScrollWheel(event);
     },
-    [handleScrollWheel, manualScroll, useTicker],
+    [handleScrollWheel, manualScroll, smoothScroll, useTicker],
   );
 
   useHorizontalWheelScrollListener(containerRef, handleWheel);

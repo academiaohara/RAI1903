@@ -41,6 +41,8 @@ export function OpponentCrest({
       <img
         src={logo}
         alt={`Escudo de ${opponent}`}
+        loading="lazy"
+        decoding="async"
         className={cn("object-contain", avilesShadowClass, sizeClass, className)}
       />
     );

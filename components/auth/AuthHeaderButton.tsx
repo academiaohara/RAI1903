@@ -74,8 +74,20 @@ export function AuthHeaderButton({ className }: { className?: string }) {
     router.refresh();
   };
 
-  if (!configured || !ready) {
+  if (!configured) {
     return null;
+  }
+
+  if (!ready) {
+    return (
+      <span
+        className={cn(
+          "inline-flex shrink-0 items-center rounded-full border border-transparent p-2 opacity-0 sm:min-h-[36px] sm:min-w-[36px]",
+          className,
+        )}
+        aria-hidden
+      />
+    );
   }
 
   if (!user) {

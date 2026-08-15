@@ -95,17 +95,18 @@ export function Header() {
           })}
         </nav>
 
-        <AuthHeaderButton className="ml-auto lg:ml-0" />
-
-        <button
-          type="button"
-          onClick={() => setOpen((current) => !current)}
-          className="rounded-full border border-white/40 p-2 text-white lg:hidden"
-          aria-expanded={open}
-          aria-label={open ? "Cerrar navegacion" : "Abrir navegacion"}
-        >
-          {open ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <div className="ml-auto flex shrink-0 items-center gap-2">
+          <AuthHeaderButton />
+          <button
+            type="button"
+            onClick={() => setOpen((current) => !current)}
+            className="rounded-full border border-white/40 p-2 text-white lg:hidden"
+            aria-expanded={open}
+            aria-label={open ? "Cerrar navegacion" : "Abrir navegacion"}
+          >
+            {open ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
 
       {hoveredNav?.children && (
