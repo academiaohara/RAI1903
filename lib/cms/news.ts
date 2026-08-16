@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { readCachedPublishedNews, writeCachedPublishedNews } from "@/lib/cms/client-cache";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import {
   newsItemToPublishedAt,
@@ -119,8 +120,14 @@ export async function fetchPublishedNewsItems(): Promise<NewsItem[]> {
     .eq("published", true)
     .order("published_at", { ascending: false });
 
-  if (error || !data) return [];
-  return data.map((row) => rowToNewsItem(row as CmsNewsRow));
+  if (error || !data) {
+    const cached = await readCachedPublishedNews();
+    return cached ?? [];
+  }
+
+  const items = data.map((row) => rowToNewsItem(row as CmsNewsRow));
+  await writeCachedPublishedNews(items);
+  return items;
 }
 
 export function newsItemToRow(item: NewsItem): Omit<CmsNewsRow, "published"> & { published: boolean } {

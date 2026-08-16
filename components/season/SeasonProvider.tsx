@@ -6,11 +6,21 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import type { CompetitionSeasonId } from "@/data/mock";
 import { DEFAULT_COMPETITION_SEASON_ID } from "@/data/mock";
+import {
+  readAllCachedSeasonBundles,
+  readCachedPublishedSeasons,
+  readCachedSeasonBundles,
+  readCachedTransfersSnapshot,
+  writeCachedPublishedSeasons,
+  writeCachedSeasonBundles,
+  writeCachedTransfersSnapshot,
+} from "@/lib/cms/client-cache";
 import { fetchSeasonBundles, type SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import { fetchPublishedSeasons, type CmsSeason } from "@/lib/cms/seasons";
 import { enrichFixtureSource, type EnrichedFixtureSource } from "@/lib/season/enriched-fixtures";
@@ -87,6 +97,74 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
   const [transfersLoading, setTransfersLoading] = useState(true);
   const [marketWindows, setMarketWindows] = useState<TransferMarketWindow[]>([]);
   const [transferSquadsBySeasonId, setTransferSquadsBySeasonId] = useState<Record<string, SquadPlayer[]>>({});
+  const cacheHydratedRef = useRef(false);
+  const prefetchedSeasonIdsRef = useRef<Set<CompetitionSeasonId>>(new Set());
+
+  const persistSeasonBundles = useCallback(async (seasonId: CompetitionSeasonId, map: SeasonBundlesMap) => {
+    if (!Object.keys(map).length) return;
+    await writeCachedSeasonBundles(seasonId, map);
+  }, []);
+
+  const fetchSeasonBundlesWithCache = useCallback(
+    async (seasonId: CompetitionSeasonId): Promise<SeasonBundlesMap> => {
+      const map = await fetchSeasonBundles(seasonId);
+      if (Object.keys(map).length) {
+        await persistSeasonBundles(seasonId, map);
+      }
+      return map;
+    },
+    [persistSeasonBundles],
+  );
+
+  useEffect(() => {
+    if (cacheHydratedRef.current) return;
+    cacheHydratedRef.current = true;
+
+    let cancelled = false;
+
+    void (async () => {
+      const [cachedSeasons, cachedBundles, cachedTransfers] = await Promise.all([
+        readCachedPublishedSeasons(),
+        readAllCachedSeasonBundles(),
+        readCachedTransfersSnapshot(),
+      ]);
+
+      if (cancelled) return;
+
+      if (cachedSeasons?.length) {
+        setSeasons(cachedSeasons);
+        const active = cachedSeasons.find((row) => row.isDefault) ?? cachedSeasons[cachedSeasons.length - 1];
+        if (active) {
+          const activeId = active.id as CompetitionSeasonId;
+          setActiveSeasonId(activeId);
+          setViewedSeasonIdState((current) =>
+            cachedSeasons.some((row) => row.id === current) ? current : pickViewedSeasonId(cachedSeasons, activeId),
+          );
+        }
+      }
+
+      if (Object.keys(cachedBundles).length) {
+        setBundleCache((current) => ({ ...cachedBundles, ...current }));
+        for (const seasonId of Object.keys(cachedBundles)) {
+          prefetchedSeasonIdsRef.current.add(seasonId as CompetitionSeasonId);
+        }
+      }
+
+      if (cachedTransfers) {
+        setTransfers(cachedTransfers.transfers);
+        setMarketWindows(cachedTransfers.marketWindows);
+        setTransferSquadsBySeasonId(cachedTransfers.squadsBySeasonId);
+        setTransfersLoading(false);
+        if (Object.keys(cachedTransfers.bundlesBySeasonId).length) {
+          setBundleCache((current) => ({ ...current, ...cachedTransfers.bundlesBySeasonId }));
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const refreshPublishedTransfers = useCallback(async (publishedRows: CmsSeason[]) => {
     setTransfersLoading(true);
@@ -96,7 +174,13 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
     setTransferSquadsBySeasonId(snapshot.squadsBySeasonId);
     if (Object.keys(snapshot.bundlesBySeasonId).length) {
       setBundleCache((current) => ({ ...current, ...snapshot.bundlesBySeasonId }));
+      await Promise.all(
+        Object.entries(snapshot.bundlesBySeasonId).map(([seasonId, map]) =>
+          writeCachedSeasonBundles(seasonId, map),
+        ),
+      );
     }
+    await writeCachedTransfersSnapshot(snapshot);
     setTransfersLoading(false);
   }, []);
 
@@ -107,6 +191,7 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
       return;
     }
     setSeasons(rows);
+    await writeCachedPublishedSeasons(rows);
     const active = rows.find((row) => row.isDefault) ?? rows[rows.length - 1];
     if (!active) return;
     const activeId = active.id as CompetitionSeasonId;
@@ -141,14 +226,17 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
   }, [refreshPublishedTransfers, seasons]);
 
   const refreshBundles = useCallback(async () => {
-    const map = await fetchSeasonBundles(viewedSeasonId);
+    const map = await fetchSeasonBundlesWithCache(viewedSeasonId);
     setBundleCache((current) => ({ ...current, [viewedSeasonId]: map }));
     const publishedRows = seasons.length > 0 ? seasons : await fetchPublishedSeasons();
     if (publishedRows.length > 0) {
-      if (!seasons.length) setSeasons(publishedRows);
+      if (!seasons.length) {
+        setSeasons(publishedRows);
+        await writeCachedPublishedSeasons(publishedRows);
+      }
       await refreshPublishedTransfers(publishedRows);
     }
-  }, [refreshPublishedTransfers, seasons, viewedSeasonId]);
+  }, [fetchSeasonBundlesWithCache, refreshPublishedTransfers, seasons, viewedSeasonId]);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -175,7 +263,12 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
       });
     });
 
-    void fetchSeasonBundles(seasonId).then((map) => {
+    void readCachedSeasonBundles(seasonId).then((cached) => {
+      if (cancelled || !cached || !Object.keys(cached).length) return;
+      setBundleCache((current) => (current[seasonId] ? current : { ...current, [seasonId]: cached }));
+    });
+
+    void fetchSeasonBundlesWithCache(seasonId).then((map) => {
       if (cancelled) return;
       setBundleCache((current) => ({ ...current, [seasonId]: map }));
       setPendingBundleLoads((current) => {
@@ -189,7 +282,7 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
     return () => {
       cancelled = true;
     };
-  }, [viewedBundlesLoaded, viewedSeasonId]);
+  }, [fetchSeasonBundlesWithCache, viewedBundlesLoaded, viewedSeasonId]);
 
   useEffect(() => {
     if (activeSeasonId === viewedSeasonId || activeBundlesLoaded) return;
@@ -207,7 +300,12 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
       });
     });
 
-    void fetchSeasonBundles(seasonId).then((map) => {
+    void readCachedSeasonBundles(seasonId).then((cached) => {
+      if (cancelled || !cached || !Object.keys(cached).length) return;
+      setBundleCache((current) => (current[seasonId] ? current : { ...current, [seasonId]: cached }));
+    });
+
+    void fetchSeasonBundlesWithCache(seasonId).then((map) => {
       if (cancelled) return;
       setBundleCache((current) => ({ ...current, [seasonId]: map }));
       setPendingBundleLoads((current) => {
@@ -221,7 +319,35 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
     return () => {
       cancelled = true;
     };
-  }, [activeBundlesLoaded, activeSeasonId, viewedSeasonId]);
+  }, [activeBundlesLoaded, activeSeasonId, fetchSeasonBundlesWithCache, viewedSeasonId]);
+
+  useEffect(() => {
+    if (!seasons.length) return;
+
+    const prefetchRemainingSeasons = () => {
+      for (const season of seasons) {
+        const seasonId = season.id as CompetitionSeasonId;
+        if (prefetchedSeasonIdsRef.current.has(seasonId)) continue;
+        prefetchedSeasonIdsRef.current.add(seasonId);
+
+        void fetchSeasonBundlesWithCache(seasonId)
+          .then((map) => {
+            setBundleCache((current) => ({ ...current, [seasonId]: map }));
+          })
+          .catch(() => {
+            prefetchedSeasonIdsRef.current.delete(seasonId);
+          });
+      }
+    };
+
+    if (typeof requestIdleCallback !== "undefined") {
+      const idleId = requestIdleCallback(prefetchRemainingSeasons, { timeout: 6000 });
+      return () => cancelIdleCallback(idleId);
+    }
+
+    const timeoutId = window.setTimeout(prefetchRemainingSeasons, 1500);
+    return () => window.clearTimeout(timeoutId);
+  }, [fetchSeasonBundlesWithCache, seasons]);
 
   const setViewedSeasonId = useCallback((id: CompetitionSeasonId) => {
     setViewedSeasonIdState(id);
@@ -303,9 +429,15 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
 
         let bundles = getBundles(seasonId);
         if (Object.keys(bundles).length === 0) {
-          const fetched = await fetchSeasonBundles(seasonId);
-          setBundleCache((current) => ({ ...current, [seasonId]: fetched }));
-          bundles = fetched;
+          const cached = await readCachedSeasonBundles(seasonId);
+          if (cached && Object.keys(cached).length) {
+            setBundleCache((current) => ({ ...current, [seasonId]: cached }));
+            bundles = cached;
+          } else {
+            const fetched = await fetchSeasonBundlesWithCache(seasonId);
+            setBundleCache((current) => ({ ...current, [seasonId]: fetched }));
+            bundles = fetched;
+          }
         }
 
         if (findMatchInBundles(bundles, matchId, { gender })) {
@@ -321,7 +453,7 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
       );
       return picked ?? viewedSeasonId;
     },
-    [activeSeasonId, bundleCache, getBundles, seasons, viewedSeasonId],
+    [activeSeasonId, bundleCache, fetchSeasonBundlesWithCache, getBundles, seasons, viewedSeasonId],
   );
 
   const value = useMemo<SeasonContextValue>(
