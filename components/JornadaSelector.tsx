@@ -109,9 +109,7 @@ export function JornadaSelector({
               >
                 {round}
                 {isSelected ? (
-                  <b className="absolute inset-0 flex rotate-[-7deg] items-center justify-center font-['Comic_Sans_MS',cursive] text-2xl font-bold text-[#171717]" aria-hidden>
-                    X
-                  </b>
+                  <b className="hand-mark-x" aria-hidden>X</b>
                 ) : null}
               </button>
             );

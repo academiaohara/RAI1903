@@ -488,6 +488,21 @@ a {
   opacity: 1;
 }
 
+.hand-mark-x {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #171717;
+  font-family: var(--font-kalam), "Kalam", cursive;
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1;
+  transform: rotate(-7deg);
+  pointer-events: none;
+}
+
 .game-ticket-pick b,
 .game-ticket-score-pick b {
   position: absolute;
