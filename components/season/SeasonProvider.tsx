@@ -92,7 +92,6 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
   const [activeSeasonId, setActiveSeasonId] = useState<CompetitionSeasonId>(defaultSeasonId);
   const [viewedSeasonId, setViewedSeasonIdState] = useState<CompetitionSeasonId>(defaultSeasonId);
   const [bundleCache, setBundleCache] = useState<Partial<Record<CompetitionSeasonId, SeasonBundlesMap>>>({});
-  const [pendingBundleLoads, setPendingBundleLoads] = useState<Set<CompetitionSeasonId>>(() => new Set());
   const [transfers, setTransfers] = useState<TransferRumor[]>([]);
   const [transfersLoading, setTransfersLoading] = useState(true);
   const [marketWindows, setMarketWindows] = useState<TransferMarketWindow[]>([]);
@@ -253,16 +252,6 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
     let cancelled = false;
     const seasonId = viewedSeasonId;
 
-    queueMicrotask(() => {
-      if (cancelled) return;
-      setPendingBundleLoads((current) => {
-        if (current.has(seasonId)) return current;
-        const next = new Set(current);
-        next.add(seasonId);
-        return next;
-      });
-    });
-
     void readCachedSeasonBundles(seasonId).then((cached) => {
       if (cancelled || !cached || !Object.keys(cached).length) return;
       setBundleCache((current) => (current[seasonId] ? current : { ...current, [seasonId]: cached }));
@@ -271,12 +260,6 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
     void fetchSeasonBundlesWithCache(seasonId).then((map) => {
       if (cancelled) return;
       setBundleCache((current) => ({ ...current, [seasonId]: map }));
-      setPendingBundleLoads((current) => {
-        if (!current.has(seasonId)) return current;
-        const next = new Set(current);
-        next.delete(seasonId);
-        return next;
-      });
     });
 
     return () => {
@@ -290,16 +273,6 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
     let cancelled = false;
     const seasonId = activeSeasonId;
 
-    queueMicrotask(() => {
-      if (cancelled) return;
-      setPendingBundleLoads((current) => {
-        if (current.has(seasonId)) return current;
-        const next = new Set(current);
-        next.add(seasonId);
-        return next;
-      });
-    });
-
     void readCachedSeasonBundles(seasonId).then((cached) => {
       if (cancelled || !cached || !Object.keys(cached).length) return;
       setBundleCache((current) => (current[seasonId] ? current : { ...current, [seasonId]: cached }));
@@ -308,12 +281,6 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
     void fetchSeasonBundlesWithCache(seasonId).then((map) => {
       if (cancelled) return;
       setBundleCache((current) => ({ ...current, [seasonId]: map }));
-      setPendingBundleLoads((current) => {
-        if (!current.has(seasonId)) return current;
-        const next = new Set(current);
-        next.delete(seasonId);
-        return next;
-      });
     });
 
     return () => {
@@ -367,7 +334,7 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
   }, [activeSeasonId, seasons, viewedSeasonId]);
 
   const bundles = useMemo(() => bundleCache[viewedSeasonId] ?? {}, [bundleCache, viewedSeasonId]);
-  const bundlesLoading = pendingBundleLoads.has(viewedSeasonId) || !viewedBundlesLoaded;
+  const bundlesLoading = !viewedBundlesLoaded;
 
   const getBundles = useCallback(
     (seasonId: CompetitionSeasonId) => bundleCache[seasonId] ?? {},
@@ -375,8 +342,8 @@ export function SeasonProvider({ children, defaultSeasonId = DEFAULT_COMPETITION
   );
 
   const isBundlesLoading = useCallback(
-    (seasonId: CompetitionSeasonId) => pendingBundleLoads.has(seasonId) || bundleCache[seasonId] === undefined,
-    [bundleCache, pendingBundleLoads],
+    (seasonId: CompetitionSeasonId) => bundleCache[seasonId] === undefined,
+    [bundleCache],
   );
 
   const resolveSeasonId = useCallback(

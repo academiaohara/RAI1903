@@ -172,5 +172,13 @@ export function useSquadPlayers(
     [squad],
   );
 
-  return { squad, updatePlayer, addPlayer, removePlayer, importSquad, getPlayerById, loading: bundlesLoading };
+  return {
+    squad,
+    updatePlayer,
+    addPlayer,
+    removePlayer,
+    importSquad,
+    getPlayerById,
+    loading: bundlesLoading && squad.length === 0,
+  };
 }
