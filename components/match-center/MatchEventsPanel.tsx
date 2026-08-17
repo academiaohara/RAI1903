@@ -6,7 +6,8 @@ import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvi
 import { MatchSquadPlayerSelect } from "@/components/match-center/MatchSquadPlayerSelect";
 import { useMatchTeamSquadOptions } from "@/hooks/useMatchTeamSquadOptions";
 import { MatchJsonPasteSection } from "@/components/match-center/MatchJsonPasteSection";
-import { createMatchEventId, matchEventTypeLabels } from "@/lib/match-events";
+import { createMatchEventId, isGoalEventType, matchEventTypeLabels } from "@/lib/match-events";
+import { buildClubMatchJsonContext } from "@/lib/match-center/club-match-json";
 import {
   parseMatchEventsJson,
   serializeMatchEvents,
@@ -16,7 +17,17 @@ import type { MatchEvent, MatchEventType, PrimerEquipoGender } from "@/types";
 import type { MatchSquadOption } from "@/lib/match-availability-squad";
 import { useMatchDetailStorageKeys } from "@/components/match-center/useMatchDetailOverrides";
 
-const eventTypes: MatchEventType[] = ["goal", "goal_disallowed", "yellow", "red", "substitution"];
+const eventTypes: MatchEventType[] = [
+  "goal",
+  "goal_penalty",
+  "goal_free_kick",
+  "goal_disallowed",
+  "post",
+  "yellow",
+  "red",
+  "red_disallowed",
+  "substitution",
+];
 
 function formatMatchMinute(minute: number): string {
   return `${minute}'`;
@@ -46,37 +57,52 @@ function GoalBallIcon() {
   return <span className="shrink-0 text-sm leading-none" aria-hidden>⚽</span>;
 }
 
+function PostIcon() {
+  return <span className="shrink-0 text-xs font-extrabold leading-none text-[#757575]" aria-hidden>PALO</span>;
+}
+
 function EventTimelineRow({ event }: { event: MatchEvent }) {
   const isHome = event.team === "home";
   const minuteLabel = formatMatchMinute(event.minute);
   const playerName = event.player || "Sin nombre";
+  const showAssist =
+    (event.type === "goal" || event.type === "goal_penalty" || event.type === "goal_free_kick") &&
+    Boolean(event.detail);
 
   const minuteEl = <span className="shrink-0 text-sm font-bold tabular-nums text-[#2E7D32]">{minuteLabel}</span>;
 
-  if (event.type === "goal" || event.type === "goal_disallowed") {
+  if (
+    event.type === "goal" ||
+    event.type === "goal_penalty" ||
+    event.type === "goal_free_kick" ||
+    event.type === "goal_disallowed" ||
+    event.type === "post"
+  ) {
+    const icon =
+      event.type === "post" ? <PostIcon /> : event.type === "goal_disallowed" ? <GoalBallIcon /> : <GoalBallIcon />;
     const content = (
       <>
         {isHome ? (
           <>
             <div className="min-w-0 text-left">
               <p className="truncate text-sm font-medium text-[#333333]">{playerName}</p>
-              {event.detail && event.type === "goal" && (
+              {showAssist && (
                 <p className="flex items-center gap-1 truncate text-xs text-[#757575]">
                   <Footprints size={12} className="shrink-0 text-[#333333]" aria-hidden />
                   {event.detail}
                 </p>
               )}
             </div>
-            <GoalBallIcon />
+            {icon}
             {minuteEl}
           </>
         ) : (
           <>
             {minuteEl}
-            <GoalBallIcon />
+            {icon}
             <div className="min-w-0 text-right">
               <p className="truncate text-sm font-medium text-[#333333]">{playerName}</p>
-              {event.detail && event.type === "goal" && (
+              {showAssist && (
                 <p className="flex items-center justify-end gap-1 truncate text-xs text-[#757575]">
                   <Footprints size={12} className="shrink-0 text-[#333333]" aria-hidden />
                   {event.detail}
@@ -104,8 +130,8 @@ function EventTimelineRow({ event }: { event: MatchEvent }) {
     );
   }
 
-  if (event.type === "yellow" || event.type === "red") {
-    const card = <CardIcon type={event.type} />;
+  if (event.type === "yellow" || event.type === "red" || event.type === "red_disallowed") {
+    const card = <CardIcon type={event.type === "red_disallowed" ? "red" : event.type} />;
 
     return (
       <li className="flex border-t border-[#eeeeee] first:border-t-0">
@@ -217,7 +243,7 @@ function EventPlayerField({
 
   const playerOptions = useMemo(() => {
     if (!ownClub) return [];
-    if (event.type === "goal") return getQuinielaScorerOptions(teamId);
+    if (isGoalEventType(event.type)) return getQuinielaScorerOptions(teamId);
     return getOptions(teamId);
   }, [event.type, getOptions, getQuinielaScorerOptions, ownClub, teamId]);
 
@@ -382,10 +408,16 @@ export function MatchEventsPanel({
   const currentEvents = getValue(keys.events, events);
   const raiTeamId = getRaiTeamId(gender);
   const hasAviles = homeTeamId === raiTeamId || awayTeamId === raiTeamId;
+  const clubJsonContext = hasAviles
+    ? buildClubMatchJsonContext(homeTeamId, awayTeamId, gender)
+    : null;
   const squadHelpers = useMatchTeamSquadOptions(gender);
   const { ownSquad } = squadHelpers;
 
-  const parseEventsJson = (input: string) => parseMatchEventsJson(input, ownSquad);
+  const parseEventsJson = (input: string) =>
+    parseMatchEventsJson(input, ownSquad, clubJsonContext ?? undefined);
+  const serializeEventsJson = (data: MatchEvent[]) =>
+    serializeMatchEvents(data, clubJsonContext ?? undefined);
 
   const updateEvents = (next: MatchEvent[]) => {
     saveValue(keys.events, next);
@@ -413,10 +445,10 @@ export function MatchEventsPanel({
   };
 
   const goals = currentEvents
-    .filter((event) => event.type === "goal" || event.type === "goal_disallowed")
+    .filter((event) => isGoalEventType(event.type) || event.type === "goal_disallowed" || event.type === "post")
     .sort((a, b) => a.minute - b.minute);
   const cards = currentEvents
-    .filter((event) => event.type === "yellow" || event.type === "red")
+    .filter((event) => event.type === "yellow" || event.type === "red" || event.type === "red_disallowed")
     .sort((a, b) => a.minute - b.minute);
   const substitutions = currentEvents
     .filter((event) => event.type === "substitution")
@@ -429,14 +461,26 @@ export function MatchEventsPanel({
       {editMode && (
         <MatchJsonPasteSection
           title="Eventos JSON"
-          hint='Array de eventos o { "events": [ … ] }. Campos: minute, type (goal, yellow, red, substitution), team (home/away), player, detail. Usa dorsal/number para vincular con la plantilla: { "dorsal": 14, "player": "Cayarga" }.'
+          hint={
+            clubJsonContext
+              ? `Array de eventos. Equipo: "aviles" o "${clubJsonContext.rivalKey}". Tipos: goal, penalti, falta, gol_anulado, palo, yellow, red, roja_anulada, substitution. Dorsal solo en jugadores del Avilés.`
+              : 'Array de eventos o { "events": [ … ] }. Campos: minute, type, team (home/away), player, detail. Usa dorsal/number para vincular con la plantilla.'
+          }
           applyLabel="Aplicar eventos"
-          placeholder={`[
+          placeholder={
+            clubJsonContext
+              ? `[
+  { "minute": 12, "type": "goal", "team": "aviles", "dorsal": 9, "player": "Santamaria" },
+  { "minute": 55, "type": "penalti", "team": "${clubJsonContext.rivalKey}", "player": "Rival" },
+  { "minute": 78, "type": "palo", "team": "aviles", "dorsal": 14, "player": "Cayarga" }
+]`
+              : `[
   { "minute": 12, "type": "goal", "team": "home", "dorsal": 9, "player": "Santamaria", "detail_dorsal": 7, "detail": "Cueto" },
   { "minute": 67, "type": "substitution", "team": "home", "dorsal": 14, "player": "Cayarga", "sale_dorsal": 6, "detail": "Ba" }
-]`}
+]`
+          }
           parse={parseEventsJson}
-          serialize={serializeMatchEvents}
+          serialize={serializeEventsJson}
           currentData={currentEvents}
           onImport={(data) => updateEvents(data)}
         />

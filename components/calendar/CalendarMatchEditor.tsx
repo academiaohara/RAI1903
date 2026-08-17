@@ -15,6 +15,7 @@ import {
 import { getTeamsBundle, resolveFixtureTeamDisplayName } from "@/lib/cms/teams-bundle";
 import { matchResultOverrideKey, readMatchResultOverride } from "@/lib/fixture-inline-keys";
 import { resolveClubTeamIds } from "@/lib/season/club-team-ids";
+import { clubGoalsFromMatch, homeAwayScoresFromClubGoals } from "@/lib/club-match-scores";
 import { fixtureEditorTeamOptions } from "@/lib/fixtures/editor-team-options";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { DEFAULT_KICKOFF_LOCAL, spainDateInputValue } from "@/lib/match-kickoff-time";
@@ -90,6 +91,17 @@ export function CalendarMatchEditor({
   const override = readMatchResultOverride<MatchResultOverride>(getOverride, gender, match.id) ?? {};
   const editedMatch = applyMatchResultOverride(calendarMatchToMatch(match), override, gender, resolveTeamName);
   const status = editedMatch.status;
+  const clubTeamIds = useClubTeamIds(gender);
+  const clubGoals = clubGoalsFromMatch(editedMatch, clubTeamIds);
+  const rivalName =
+    clubGoals === null
+      ? "Rival"
+      : teamDisplayName(
+          clubGoals.isClubHome ? editedMatch.awayTeamId : editedMatch.homeTeamId,
+          gender,
+          resolveTeamName,
+          clubGoals.isClubHome ? editedMatch.awayTeam : editedMatch.homeTeam,
+        );
 
   const teams = useMemo(() => fixtureEditorTeamOptions(bundles, gender), [bundles, gender]);
 
@@ -240,23 +252,65 @@ export function CalendarMatchEditor({
           <option value="finished">Finalizado</option>
         </select>
         {status === "finished" ? (
-          <div className="flex items-center gap-1">
-            <input
-              type="number"
-              value={editedMatch.homeScore ?? 0}
-              onChange={(event) => savePatch({ homeScore: Number(event.target.value) })}
-              className={cn(fieldClass, "w-12 text-center")}
-              aria-label="Goles local"
-            />
-            <span className="font-extrabold text-slate-400">-</span>
-            <input
-              type="number"
-              value={editedMatch.awayScore ?? 0}
-              onChange={(event) => savePatch({ awayScore: Number(event.target.value) })}
-              className={cn(fieldClass, "w-12 text-center")}
-              aria-label="Goles visitante"
-            />
-          </div>
+          clubGoals ? (
+            <div className="flex flex-wrap items-center gap-1">
+              <label className="grid gap-0.5">
+                <span className="font-extrabold uppercase tracking-wide text-[#214C9B]">Avilés</span>
+                <input
+                  type="number"
+                  value={clubGoals.clubGoals}
+                  onChange={(event) => {
+                    const scores = homeAwayScoresFromClubGoals(
+                      Number(event.target.value),
+                      clubGoals.rivalGoals,
+                      clubGoals.isClubHome,
+                    );
+                    savePatch(scores);
+                  }}
+                  className={cn(fieldClass, "w-12 text-center")}
+                  aria-label="Goles del Avilés"
+                />
+              </label>
+              <span className="mt-4 font-extrabold text-slate-400">-</span>
+              <label className="grid gap-0.5">
+                <span className="max-w-[7rem] truncate font-extrabold uppercase tracking-wide text-slate-500" title={rivalName}>
+                  {rivalName}
+                </span>
+                <input
+                  type="number"
+                  value={clubGoals.rivalGoals}
+                  onChange={(event) => {
+                    const scores = homeAwayScoresFromClubGoals(
+                      clubGoals.clubGoals,
+                      Number(event.target.value),
+                      clubGoals.isClubHome,
+                    );
+                    savePatch(scores);
+                  }}
+                  className={cn(fieldClass, "w-12 text-center")}
+                  aria-label={`Goles de ${rivalName}`}
+                />
+              </label>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1">
+              <input
+                type="number"
+                value={editedMatch.homeScore ?? 0}
+                onChange={(event) => savePatch({ homeScore: Number(event.target.value) })}
+                className={cn(fieldClass, "w-12 text-center")}
+                aria-label="Goles local"
+              />
+              <span className="font-extrabold text-slate-400">-</span>
+              <input
+                type="number"
+                value={editedMatch.awayScore ?? 0}
+                onChange={(event) => savePatch({ awayScore: Number(event.target.value) })}
+                className={cn(fieldClass, "w-12 text-center")}
+                aria-label="Goles visitante"
+              />
+            </div>
+          )
         ) : null}
       </div>
     </div>

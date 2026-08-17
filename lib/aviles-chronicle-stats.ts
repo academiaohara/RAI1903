@@ -1,3 +1,4 @@
+import { isGoalEventType } from "@/lib/match-events";
 import { getAvilesMatchesByGender, getMatchById, getRaiTeamId } from "@/lib/fixtures";
 import { applyMatchInlineOverride } from "@/lib/fixture-overrides";
 import { buildMatchDetail } from "@/lib/match-detail";
@@ -232,7 +233,7 @@ export function aggregateAvilesStatsFromChronicles(
     for (const event of events) {
       if (event.team !== avilesSide) continue;
 
-      if (event.type === "goal") {
+      if (isGoalEventType(event.type)) {
         const scorerId = resolvePlayerId(squad, event.player);
         if (scorerId) {
           const stats = ensurePlayerStats(map, squad, scorerId);
