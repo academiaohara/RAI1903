@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown, ChevronUp, Download, Eye, Pencil, Save, Share2 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { ChevronDown, ChevronUp, Download, Eye, Pencil, Save, Search, Share2 } from "lucide-react";
+import { useCallback, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { GameLoginPromptModal } from "@/components/juegos/GameLoginPromptModal";
 import { MatchPreviewModal } from "@/components/MatchPreviewModal";
+import { Modal } from "@/components/Modal";
+import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 import { RAI_TEAM_ID } from "@/data/mock";
 import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
@@ -26,9 +28,11 @@ import { getMatchArticlePageHref } from "@/lib/match-article-url";
 import { isMatchPlayed } from "@/lib/match-result";
 import type { QuinigolPrediction } from "@/lib/quinigol";
 import { actualOutcome, isAvilesMatch, outcomeFromGoalsPicks } from "@/lib/quiniela";
-import { scorerLabelForPlayer } from "@/lib/squad-player-resolve";
+import { resolveSquadPlayerByName, scorerLabelForPlayer } from "@/lib/squad-player-resolve";
+import { getPlayerDisplayName } from "@/lib/squad-utils";
 import { getTeamCrestById, isTeamCrestUrl } from "@/lib/team-crests";
 import type { GoalsPick, Match, Prediction, PredictionOutcome, Team } from "@/types";
+import type { SquadPlayer } from "@/types/squad";
 
 type TicketKind = "quiniela" | "quinigol" | "clasificacion";
 
@@ -424,7 +428,7 @@ function TicketFrame({
       if (!(target instanceof Element)) return;
 
       const interactive = target.closest(
-        "button.game-ticket-pick, button.game-ticket-score-pick, button.game-ticket-scorer-display, .game-ticket-order-controls button",
+        "button.game-ticket-pick, button.game-ticket-score-pick, button.game-ticket-scorer-display, button.game-ticket-scorer-trigger, .game-ticket-order-controls button",
       );
       if (!interactive || (interactive instanceof HTMLButtonElement && interactive.disabled)) return;
 
@@ -656,39 +660,43 @@ function formatScorerLabel(value: string): string {
 
 function TicketScorerPicker({
   value,
-  options,
+  squad,
   disabled,
   readOnly,
   isCorrect,
   onChange,
 }: {
   value: string;
-  options: string[];
+  squad: SquadPlayer[];
   disabled?: boolean;
   readOnly?: boolean;
   isCorrect?: boolean;
   onChange: (value: string) => void;
 }) {
-  const rootRef = useRef<HTMLDivElement>(null);
+  const searchId = useId();
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const displayValue = formatScorerLabel(value);
+  const selectedPlayer = useMemo(
+    () => (value && value !== "nadie" ? resolveSquadPlayerByName(squad, value) : undefined),
+    [squad, value],
+  );
 
-  useEffect(() => {
-    if (!open) return;
-    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handlePointerDown);
-    document.addEventListener("touchstart", handlePointerDown);
-    return () => {
-      document.removeEventListener("mousedown", handlePointerDown);
-      document.removeEventListener("touchstart", handlePointerDown);
-    };
-  }, [open]);
+  const filteredPlayers = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    const players = squad.filter((player) => player.posicion !== "Portero");
+    if (!normalized) return players;
+    return players.filter((player) => {
+      const label = getPlayerDisplayName(player).toLowerCase();
+      const dorsal = String(player.dorsal);
+      return label.includes(normalized) || dorsal.includes(normalized) || player.posicion.toLowerCase().includes(normalized);
+    });
+  }, [query, squad]);
 
   const pick = (next: string) => {
     onChange(next);
     setOpen(false);
+    setQuery("");
   };
 
   const valueClass = [
@@ -701,52 +709,139 @@ function TicketScorerPicker({
     .join(" ");
 
   return (
-    <div className="game-ticket-scorer" ref={rootRef}>
-      <span>Goleador</span>
-      <div className="game-ticket-scorer-field">
-        <button
-          type="button"
-          className={`${valueClass} game-ticket-scorer-display`}
-          aria-live="polite"
-          disabled={readOnly || disabled}
-          onClick={() => {
-            if (!readOnly && !disabled) setOpen((current) => !current);
-          }}
-        >
-          {displayValue || "—"}
-        </button>
-        {!readOnly && !disabled ? (
-          <div className="game-ticket-scorer-control" data-ticket-export-hidden="true">
-            {open ? (
-              <ul className="game-ticket-scorer-menu" role="listbox">
-                <li>
+    <>
+      <div className="game-ticket-scorer">
+        <span>Goleador</span>
+        <div className="game-ticket-scorer-field">
+          <button
+            type="button"
+            className={`${valueClass} game-ticket-scorer-display`}
+            aria-live="polite"
+            aria-haspopup="dialog"
+            aria-expanded={open}
+            disabled={readOnly || disabled}
+            onClick={() => {
+              if (!readOnly && !disabled) setOpen(true);
+            }}
+          >
+            {displayValue || "—"}
+          </button>
+          {!readOnly && !disabled ? (
+            <button
+              type="button"
+              className="game-ticket-scorer-trigger"
+              data-ticket-export-hidden="true"
+              onClick={() => setOpen(true)}
+            >
+              Elegir
+            </button>
+          ) : null}
+        </div>
+      </div>
+
+      <Modal
+        open={open}
+        title="Elegir goleador"
+        onClose={() => {
+          setOpen(false);
+          setQuery("");
+        }}
+        variant="ticket"
+      >
+        <div className="ticket-scorer-picker">
+          <label className="ticket-scorer-picker-search-wrap" htmlFor={searchId}>
+            <Search size={16} aria-hidden />
+            <input
+              id={searchId}
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Buscar por nombre, dorsal o posición…"
+              className="ticket-scorer-picker-search"
+              autoFocus
+            />
+          </label>
+
+          <ul className="ticket-scorer-picker-list" role="listbox" aria-label="Jugadores del Avilés">
+            <li>
+              <button
+                type="button"
+                role="option"
+                aria-selected={value === "nadie"}
+                className={`ticket-scorer-picker-item${value === "nadie" ? " ticket-scorer-picker-item--selected" : ""}`}
+                onClick={() => pick("nadie")}
+              >
+                <span className="ticket-scorer-picker-avatar ticket-scorer-picker-avatar--nadie" aria-hidden>
+                  —
+                </span>
+                <span className="ticket-scorer-picker-info">
+                  <strong>Nadie</strong>
+                  <span className="ticket-scorer-picker-meta">Sin goleador del Avilés</span>
+                </span>
+              </button>
+            </li>
+
+            {filteredPlayers.map((player) => {
+              const label = scorerLabelForPlayer(player);
+              const isSelected = value === label;
+              return (
+                <li key={player.id}>
                   <button
                     type="button"
                     role="option"
-                    aria-selected={value === "nadie"}
-                    onClick={() => pick("nadie")}
+                    aria-selected={isSelected}
+                    className={`ticket-scorer-picker-item${isSelected ? " ticket-scorer-picker-item--selected" : ""}`}
+                    onClick={() => pick(label)}
                   >
-                    Nadie
+                    <span className="ticket-scorer-picker-avatar" aria-hidden>
+                      <PlayerAvatar
+                        player={player}
+                        bare
+                        placeholderTone="light"
+                        className="h-full w-full rounded-full border-2 border-[#1c3f6e]/20"
+                        imageClassName="object-cover object-top"
+                      />
+                    </span>
+                    <span className="ticket-scorer-picker-info">
+                      <strong>{getPlayerDisplayName(player)}</strong>
+                      <span className="ticket-scorer-picker-meta">
+                        {player.posicion}
+                        {player.dorsal > 0 ? ` · #${player.dorsal}` : ""}
+                      </span>
+                      <span className="ticket-scorer-picker-stats">
+                        <span>
+                          <b>{player.partidos}</b> PJ
+                        </span>
+                        <span>
+                          <b>{player.goles}</b> G
+                        </span>
+                        <span>
+                          <b>{player.asistencias}</b> A
+                        </span>
+                      </span>
+                    </span>
                   </button>
                 </li>
-                {options.map((scorer) => (
-                  <li key={scorer}>
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected={value === scorer}
-                      onClick={() => pick(scorer)}
-                    >
-                      {scorer}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-        ) : null}
-      </div>
-    </div>
+              );
+            })}
+          </ul>
+
+          {filteredPlayers.length === 0 ? (
+            <p className="ticket-scorer-picker-empty">No hay jugadores que coincidan con «{query}».</p>
+          ) : null}
+
+          {selectedPlayer ? (
+            <p className="ticket-scorer-picker-current">
+              Seleccionado: <strong>{getPlayerDisplayName(selectedPlayer)}</strong>
+            </p>
+          ) : value === "nadie" ? (
+            <p className="ticket-scorer-picker-current">
+              Seleccionado: <strong>Nadie</strong>
+            </p>
+          ) : null}
+        </div>
+      </Modal>
+    </>
   );
 }
 
@@ -814,13 +909,6 @@ export function QuinielaTicket({
 }) {
   const teamsById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
   const { squad } = useSquadPlayers("masculino");
-  const scorerOptions = useMemo(
-    () =>
-      squad
-        .filter((player) => player.posicion !== "Portero")
-        .map((player) => scorerLabelForPlayer(player)),
-    [squad],
-  );
   const date = formatTicketDate(matches);
   const update = (match: Match, current: Prediction | undefined, patch: Partial<Prediction>) => {
     if (readOnly || !onChange) return;
@@ -953,7 +1041,7 @@ export function QuinielaTicket({
                   </div>
                   <TicketScorerPicker
                     value={scorerValue}
-                    options={scorerOptions}
+                    squad={squad}
                     disabled={readOnly || avilesGoals === 0}
                     readOnly={readOnly}
                     isCorrect={

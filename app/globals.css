@@ -1412,6 +1412,175 @@ a {
   color: #fffdf9;
 }
 
+.ticket-scorer-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ticket-scorer-picker-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px solid rgba(28, 63, 110, 0.28);
+  border-radius: 6px;
+  background: #fffdf9;
+  color: #1c3f6e;
+  padding: 8px 10px;
+}
+
+.ticket-scorer-picker-search {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: #222;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.ticket-scorer-picker-search::placeholder {
+  color: #7a7a7a;
+}
+
+.ticket-scorer-picker-list {
+  display: flex;
+  max-height: min(58vh, 420px);
+  flex-direction: column;
+  gap: 0;
+  overflow: auto;
+  border: 1.5px solid rgba(212, 59, 47, 0.35);
+  border-radius: 6px;
+  background: #fffdf9;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ticket-scorer-picker-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 12px;
+  border: 0;
+  border-bottom: 1px solid rgba(212, 59, 47, 0.18);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 10px 12px;
+  text-align: left;
+  transition: background-color 0.15s;
+}
+
+.ticket-scorer-picker-item:last-child {
+  border-bottom: 0;
+}
+
+.ticket-scorer-picker-item:hover {
+  background: rgba(33, 76, 155, 0.06);
+}
+
+.ticket-scorer-picker-item--selected {
+  background: rgba(33, 76, 155, 0.1);
+  box-shadow: inset 3px 0 0 #214c9b;
+}
+
+.ticket-scorer-picker-avatar {
+  display: inline-flex;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #dff4ff 0%, #f4fbff 100%);
+}
+
+.ticket-scorer-picker-avatar--nadie {
+  border: 2px dashed rgba(28, 63, 110, 0.35);
+  color: #1c3f6e;
+  font-family: var(--font-kalam), "Kalam", cursive;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.ticket-scorer-picker-info {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ticket-scorer-picker-info strong {
+  overflow: hidden;
+  color: #1c3f6e;
+  font-family: var(--font-kalam), "Kalam", cursive;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ticket-scorer-picker-meta {
+  color: #5a5a5a;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.ticket-scorer-picker-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 2px;
+  color: #333;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.ticket-scorer-picker-stats b {
+  color: #214c9b;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.ticket-scorer-picker-empty,
+.ticket-scorer-picker-current {
+  margin: 0;
+  color: #5a5a5a;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.ticket-scorer-picker-current strong {
+  color: #1c3f6e;
+  font-family: var(--font-kalam), "Kalam", cursive;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+@media (min-width: 640px) {
+  .ticket-scorer-picker-avatar {
+    width: 60px;
+    height: 60px;
+    flex-basis: 60px;
+  }
+
+  .ticket-scorer-picker-info strong {
+    font-size: 1.15rem;
+  }
+}
+
 .athletic-shell {
   background-image:
     linear-gradient(rgba(33, 76, 155, 0.045) 1px, transparent 1px),
