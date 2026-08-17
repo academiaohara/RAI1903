@@ -684,7 +684,13 @@ function TicketScorerPicker({
 
   const filteredPlayers = useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    const players = squad.filter((player) => player.posicion !== "Portero");
+    const players = squad
+      .filter((player) => player.posicion !== "Portero")
+      .sort((a, b) => {
+        if (b.goles !== a.goles) return b.goles - a.goles;
+        if (b.asistencias !== a.asistencias) return b.asistencias - a.asistencias;
+        return getPlayerDisplayName(a).localeCompare(getPlayerDisplayName(b), "es");
+      });
     if (!normalized) return players;
     return players.filter((player) => {
       const label = getPlayerDisplayName(player).toLowerCase();
