@@ -1,3 +1,9 @@
+import {
+  type ClubMatchJsonContext,
+  isAvilesStorageTeam,
+  storageTeamToClubJsonTeam,
+  clubSideToStorageTeam,
+} from "@/lib/match-center/club-match-json";
 import { createMatchEventId } from "@/lib/match-events";
 import { findSquadPlayerByDorsal } from "@/lib/squad-lineup";
 import { resolveSquadPlayerByName } from "@/lib/squad-player-resolve";
@@ -54,9 +60,24 @@ const EVENT_TYPE_ALIASES: Record<string, MatchEventType> = {
   goal: "goal",
   gol: "goal",
   goals: "goal",
+  goal_penalty: "goal_penalty",
+  penalti: "goal_penalty",
+  penalty: "goal_penalty",
+  gol_penalti: "goal_penalty",
+  "gol de penalti": "goal_penalty",
+  goal_free_kick: "goal_free_kick",
+  falta: "goal_free_kick",
+  free_kick: "goal_free_kick",
+  gol_falta: "goal_free_kick",
+  tiro_libre: "goal_free_kick",
+  "gol de falta": "goal_free_kick",
   goal_disallowed: "goal_disallowed",
   gol_anulado: "goal_disallowed",
   "gol anulado": "goal_disallowed",
+  post: "post",
+  palo: "post",
+  tiro_palo: "post",
+  "tiro al palo": "post",
   yellow: "yellow",
   amarilla: "yellow",
   tarjeta_amarilla: "yellow",
@@ -65,6 +86,9 @@ const EVENT_TYPE_ALIASES: Record<string, MatchEventType> = {
   roja: "red",
   tarjeta_roja: "red",
   "tarjeta roja": "red",
+  red_disallowed: "red_disallowed",
+  roja_anulada: "red_disallowed",
+  "roja anulada": "red_disallowed",
   substitution: "substitution",
   cambio: "substitution",
   sustitucion: "substitution",
@@ -78,15 +102,25 @@ function parseEventType(value: unknown): MatchEventType | null {
   return EVENT_TYPE_ALIASES[raw.toLowerCase()] ?? null;
 }
 
-function parseEventTeam(value: unknown): "home" | "away" | null {
+function parseEventTeam(value: unknown, context?: ClubMatchJsonContext): "home" | "away" | null {
   const raw = readString(value);
   if (!raw) return null;
   const normalized = raw.toLowerCase();
+  if (context) {
+    const clubSide = clubSideToStorageTeam(
+      normalized as "aviles" | "local" | "visitante" | "home" | "away",
+      context,
+    );
+    if (clubSide) return clubSide;
+  }
   if (normalized === "home" || normalized === "local" || normalized === "h" || normalized === "casa") {
     return "home";
   }
   if (normalized === "away" || normalized === "visitante" || normalized === "a" || normalized === "fuera") {
     return "away";
+  }
+  if (normalized === "aviles" || normalized === "avilés") {
+    return context ? (context.avilesIsHome ? "home" : "away") : null;
   }
   return null;
 }
@@ -116,7 +150,11 @@ function resolvePlayerNameFromJson(
   return name;
 }
 
-function parseMatchEvent(raw: unknown, index: number, squad?: SquadPlayer[]): MatchEvent | string {
+function parseMatchEvent(
+  raw: unknown,
+  index: number,
+  options?: { squad?: SquadPlayer[]; context?: ClubMatchJsonContext },
+): MatchEvent | string {
   const record = asRecord(raw);
   if (!record) {
     return `Evento ${index + 1}: debe ser un objeto.`;
@@ -129,12 +167,15 @@ function parseMatchEvent(raw: unknown, index: number, squad?: SquadPlayer[]): Ma
 
   const type = parseEventType(record.type ?? record.tipo);
   if (!type) {
-    return `Evento ${index + 1}: tipo no reconocido (goal, yellow, red, substitution…).`;
+    return `Evento ${index + 1}: tipo no reconocido (goal, penalti, falta, yellow, red, substitution…).`;
   }
 
-  const team = parseEventTeam(record.team ?? record.equipo ?? record.side);
+  const team = parseEventTeam(record.team ?? record.equipo ?? record.side, options?.context);
   if (!team) {
-    return `Evento ${index + 1}: equipo no reconocido (home/local o away/visitante).`;
+    const teamHint = options?.context
+      ? `aviles o ${options.context.rivalKey}`
+      : "home/local o away/visitante";
+    return `Evento ${index + 1}: equipo no reconocido (${teamHint}).`;
   }
 
   const rawPlayer = readString(record.player ?? record.jugador ?? record.nombre);
@@ -143,7 +184,11 @@ function parseMatchEvent(raw: unknown, index: number, squad?: SquadPlayer[]): Ma
   }
 
   const playerDorsal = readNumber(record.dorsal ?? record.numero ?? record.number);
-  const player = resolvePlayerNameFromJson(rawPlayer, playerDorsal, squad);
+  const resolveSquad =
+    options?.context && options.squad?.length && isAvilesStorageTeam(team, options.context)
+      ? options.squad
+      : undefined;
+  const player = resolvePlayerNameFromJson(rawPlayer, playerDorsal, resolveSquad);
 
   const rawDetail =
     readString(
@@ -160,7 +205,7 @@ function parseMatchEvent(raw: unknown, index: number, squad?: SquadPlayer[]): Ma
     const detailDorsal = readNumber(
       record.detail_dorsal ?? record.sale_dorsal ?? record.out_dorsal ?? record.asistencia_dorsal,
     );
-    detail = resolvePlayerNameFromJson(rawDetail, detailDorsal, squad);
+    detail = resolvePlayerNameFromJson(rawDetail, detailDorsal, resolveSquad);
   }
 
   const id = readString(record.id) ?? createMatchEventId();
@@ -175,12 +220,12 @@ function parseMatchEvent(raw: unknown, index: number, squad?: SquadPlayer[]): Ma
   };
 }
 
-export function serializeMatchEvents(events: MatchEvent[]): string {
+export function serializeMatchEvents(events: MatchEvent[], context?: ClubMatchJsonContext): string {
   const payload = events.map((event) => {
     const entry: Record<string, unknown> = {
       minute: event.minute,
       type: event.type,
-      team: event.team,
+      team: context ? storageTeamToClubJsonTeam(event.team, context) : event.team,
       player: event.player,
     };
     if (event.detail) entry.detail = event.detail;
@@ -189,28 +234,29 @@ export function serializeMatchEvents(events: MatchEvent[]): string {
   return JSON.stringify(payload, null, 2);
 }
 
-export function serializeMatchLineups(home?: MatchLineup, away?: MatchLineup): string {
+export function serializeMatchLineups(
+  home?: MatchLineup,
+  away?: MatchLineup,
+  context?: ClubMatchJsonContext,
+): string {
   const payload: Record<string, unknown> = {};
-  if (home) {
-    payload.home = {
-      formation: home.formation,
-      starters: home.starters.map((p) => ({ number: p.number, name: p.name })),
-      bench: home.bench.map((p) => ({ number: p.number, name: p.name })),
+  const writeSide = (side: "home" | "away", lineup: MatchLineup) => {
+    const key = context ? storageTeamToClubJsonTeam(side, context) : side;
+    payload[key] = {
+      formation: lineup.formation,
+      starters: lineup.starters.map((p) => ({ number: p.number, name: p.name })),
+      bench: lineup.bench.map((p) => ({ number: p.number, name: p.name })),
     };
-  }
-  if (away) {
-    payload.away = {
-      formation: away.formation,
-      starters: away.starters.map((p) => ({ number: p.number, name: p.name })),
-      bench: away.bench.map((p) => ({ number: p.number, name: p.name })),
-    };
-  }
+  };
+  if (home) writeSide("home", home);
+  if (away) writeSide("away", away);
   return JSON.stringify(payload, null, 2);
 }
 
 export function parseMatchEventsJson(
   input: string,
   squad?: SquadPlayer[],
+  context?: ClubMatchJsonContext,
 ): ParseMatchJsonResult<MatchEvent[]> {
   const parsed = parseJsonInput(input);
   if (!parsed.ok) return parsed;
@@ -229,7 +275,7 @@ export function parseMatchEventsJson(
 
   const events: MatchEvent[] = [];
   for (let index = 0; index < items.length; index += 1) {
-    const result = parseMatchEvent(items[index], index, squad);
+    const result = parseMatchEvent(items[index], index, { squad, context });
     if (typeof result === "string") {
       return { ok: false, error: result };
     }
@@ -420,10 +466,41 @@ export type ParsedMatchLineups = {
   away?: MatchLineup;
 };
 
-function extractLineupSides(payload: unknown, squad?: SquadPlayer[]): ParsedMatchLineups | string {
+function extractLineupSides(
+  payload: unknown,
+  options?: { squad?: SquadPlayer[]; context?: ClubMatchJsonContext },
+): ParsedMatchLineups | string {
   const record = asRecord(payload);
   if (!record) {
     return "La alineación debe ser un objeto.";
+  }
+
+  const context = options?.context;
+  const squad = options?.squad;
+
+  if (record.aviles !== undefined || record.avilés !== undefined) {
+    const result: ParsedMatchLineups = {};
+    const avilesLineup = parseSingleLineup(record.aviles ?? record.avilés, squad);
+    if (typeof avilesLineup === "string") return `Avilés: ${avilesLineup}`;
+
+    const rivalKey = context?.rivalKey ?? "visitante";
+    const rivalRaw = record[rivalKey] ?? (context?.avilesIsHome ? record.visitante : record.local);
+
+    if (context?.avilesIsHome) result.home = avilesLineup;
+    else if (context) result.away = avilesLineup;
+    else result.home = avilesLineup;
+
+    if (rivalRaw !== undefined) {
+      const rivalLineup = parseSingleLineup(rivalRaw, undefined);
+      if (typeof rivalLineup === "string") return `Rival: ${rivalLineup}`;
+      if (context?.avilesIsHome) result.away = rivalLineup;
+      else if (context) result.home = rivalLineup;
+    }
+
+    if (!result.home && !result.away) {
+      return "No se encontró alineación del rival.";
+    }
+    return result;
   }
 
   const hasHome = record.home !== undefined || record.local !== undefined;
@@ -431,13 +508,15 @@ function extractLineupSides(payload: unknown, squad?: SquadPlayer[]): ParsedMatc
 
   if (hasHome || hasAway) {
     const result: ParsedMatchLineups = {};
-    if (record.home !== undefined || record.local !== undefined) {
-      const home = parseSingleLineup(record.home ?? record.local, squad);
+    if (hasHome) {
+      const homeSquad = context && context.avilesIsHome ? squad : undefined;
+      const home = parseSingleLineup(record.home ?? record.local, homeSquad);
       if (typeof home === "string") return `Local: ${home}`;
       result.home = home;
     }
-    if (record.away !== undefined || record.visitante !== undefined) {
-      const away = parseSingleLineup(record.away ?? record.visitante, squad);
+    if (hasAway) {
+      const awaySquad = context && !context.avilesIsHome ? squad : undefined;
+      const away = parseSingleLineup(record.away ?? record.visitante, awaySquad);
       if (typeof away === "string") return `Visitante: ${away}`;
       result.away = away;
     }
@@ -455,11 +534,12 @@ function extractLineupSides(payload: unknown, squad?: SquadPlayer[]): ParsedMatc
 export function parseMatchLineupsJson(
   input: string,
   squad?: SquadPlayer[],
+  context?: ClubMatchJsonContext,
 ): ParseMatchJsonResult<ParsedMatchLineups> {
   const parsed = parseJsonInput(input);
   if (!parsed.ok) return parsed;
 
-  const result = extractLineupSides(parsed.data, squad);
+  const result = extractLineupSides(parsed.data, { squad, context });
   if (typeof result === "string") {
     return { ok: false, error: result };
   }
@@ -473,10 +553,10 @@ export function parseMatchLineupsJson(
 
   const parts: string[] = [];
   if (result.home) {
-    parts.push(`local: ${result.home.starters.length} titulares`);
+    parts.push(`${context?.avilesIsHome ? "aviles" : context ? "local" : "local"}: ${result.home.starters.length} titulares`);
   }
   if (result.away) {
-    parts.push(`visitante: ${result.away.starters.length} titulares`);
+    parts.push(`${context && !context.avilesIsHome ? "aviles" : context ? "visitante" : "visitante"}: ${result.away.starters.length} titulares`);
   }
 
   return {

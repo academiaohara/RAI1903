@@ -47,9 +47,6 @@ function formatListMatchDateShort(date: string): string {
 
 function resultLabel(match: CalendarMatch): string {
   if (match.played && match.result) return match.result;
-  if (match.played && match.homeScore !== undefined && match.awayScore !== undefined) {
-    return `${match.homeScore}-${match.awayScore}`;
-  }
   return "—";
 }
 

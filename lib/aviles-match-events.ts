@@ -1,4 +1,5 @@
 import { RAI_TEAM_ID } from "@/data/mock";
+import { isGoalEventType } from "@/lib/match-events";
 import { resolveSquadPlayerByName, scorerLabelForPlayer } from "@/lib/squad-player-resolve";
 import type { Match, MatchEvent } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
@@ -14,7 +15,7 @@ export function getAvilesScorerFromEvents(
 
   const avilesSide: "home" | "away" = isHome ? "home" : "away";
   const goals = events
-    .filter((event) => event.type === "goal" && event.team === avilesSide && event.player.trim())
+    .filter((event) => isGoalEventType(event.type) && event.team === avilesSide && event.player.trim())
     .sort((a, b) => a.minute - b.minute);
 
   if (goals.length === 0) {
@@ -49,7 +50,7 @@ export function getAllAvilesScorerLabelsFromEvents(
 
   const avilesSide: "home" | "away" = isHome ? "home" : "away";
   const goals = events
-    .filter((event) => event.type === "goal" && event.team === avilesSide && event.player.trim())
+    .filter((event) => isGoalEventType(event.type) && event.team === avilesSide && event.player.trim())
     .sort((a, b) => a.minute - b.minute);
 
   if (goals.length === 0) {

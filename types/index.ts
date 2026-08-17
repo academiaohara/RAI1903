@@ -326,7 +326,16 @@ export type MatchLineup = {
   bench: LineupPlayer[];
 };
 
-export type MatchEventType = "goal" | "goal_disallowed" | "yellow" | "red" | "substitution";
+export type MatchEventType =
+  | "goal"
+  | "goal_penalty"
+  | "goal_free_kick"
+  | "goal_disallowed"
+  | "post"
+  | "yellow"
+  | "red"
+  | "red_disallowed"
+  | "substitution";
 
 export type MatchEvent = {
   id: string;

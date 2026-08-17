@@ -56,7 +56,7 @@ export function isClubTeamMatch(match: Match, clubTeamIds: readonly string[]): b
 
 /** Local o visitante del club en un partido (por ID CMS o nombre Avilés). */
 export function resolveClubSideInMatch(
-  match: Match,
+  match: Pick<Match, "homeTeamId" | "awayTeamId" | "homeTeam" | "awayTeam">,
   clubTeamIds: readonly string[],
 ): { isHome: boolean } | null {
   if (clubTeamIds.includes(match.homeTeamId) || CLUB_NAME_PATTERN.test(match.homeTeam)) {

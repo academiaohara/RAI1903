@@ -21,6 +21,7 @@ import { getCompeticionSquadData } from "@/lib/competicion-squad";
 import { matchResultOverrideKey, readMatchResultOverride } from "@/lib/fixture-inline-keys";
 import { resolveEquipoLigaTeam } from "@/lib/equipo-liga-resolve";
 import { getRaiTeamId, getTeamByGender } from "@/lib/fixtures";
+import { isGoalEventType } from "@/lib/match-events";
 import { resolveMatchVenue } from "@/lib/match-venue";
 import { resolveSquadPlayerByName } from "@/lib/squad-player-resolve";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
@@ -174,10 +175,10 @@ export function MatchCenterHeader({ detail, backHref, backLabel }: MatchCenterHe
 
   const currentEvents = getValue(keys.events, detail.events);
   const homeGoals = currentEvents
-    .filter((event) => event.type === "goal" && event.team === "home")
+    .filter((event) => isGoalEventType(event.type) && event.team === "home")
     .sort((a, b) => a.minute - b.minute);
   const awayGoals = currentEvents
-    .filter((event) => event.type === "goal" && event.team === "away")
+    .filter((event) => isGoalEventType(event.type) && event.team === "away")
     .sort((a, b) => a.minute - b.minute);
   const isFinished = match.status === "finished";
   const jornada = matchJornadaLabel(match);
