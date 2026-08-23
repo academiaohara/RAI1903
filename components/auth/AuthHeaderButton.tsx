@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
-import { LogIn, LogOut } from "lucide-react";
+import { LogIn, LogOut, UserRound } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { UserAvatar } from "@/components/auth/UserAvatar";
 import { syncUserProfile } from "@/lib/auth/sync-profile";
@@ -115,6 +115,17 @@ export function AuthHeaderButton({ className }: { className?: string }) {
 
       {menuOpen ? (
         <div className="absolute right-0 top-full z-50 mt-2 min-w-[10rem] overflow-hidden rounded-xl border border-[#214C9B]/20 bg-white py-1 shadow-lg">
+          <button
+            type="button"
+            onClick={() => {
+              setMenuOpen(false);
+              router.push("/cuenta");
+            }}
+            className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm font-bold text-[#214C9B] hover:bg-slate-50"
+          >
+            <UserRound size={16} aria-hidden />
+            Mi cuenta
+          </button>
           <button
             type="button"
             onClick={() => void signOut()}

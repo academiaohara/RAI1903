@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Route } from "next";
 import { TwitterLoginButton } from "@/components/auth/TwitterLoginButton";
-import { UsernamePasswordForm } from "@/components/auth/UsernamePasswordForm";
+import { EmailPasswordForm } from "@/components/auth/EmailPasswordForm";
 import { isXProfileProviderError } from "@/lib/auth/x-oauth";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -59,7 +59,7 @@ export function LoginPanel() {
         </p>
       ) : null}
 
-      <UsernamePasswordForm nextPath={nextPath} />
+      <EmailPasswordForm nextPath={nextPath} />
 
       <div className="flex items-center gap-3">
         <div className="h-px flex-1 bg-[#214C9B]/15" />
