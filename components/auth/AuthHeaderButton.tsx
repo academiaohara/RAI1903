@@ -5,7 +5,6 @@ import type { User } from "@supabase/supabase-js";
 import { LogIn, LogOut } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { UserAvatar } from "@/components/auth/UserAvatar";
-import { signInWithX } from "@/lib/auth/sign-in-with-x";
 import { syncUserProfile } from "@/lib/auth/sync-profile";
 import { getUserAvatarUrl } from "@/lib/auth/user-display";
 import { createClient } from "@/lib/supabase/client";
@@ -19,7 +18,6 @@ export function AuthHeaderButton({ className }: { className?: string }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(!configured);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [signingIn, setSigningIn] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -57,14 +55,9 @@ export function AuthHeaderButton({ className }: { className?: string }) {
     return () => document.removeEventListener("mousedown", close);
   }, [menuOpen]);
 
-  const handleSignIn = useCallback(async () => {
-    setSigningIn(true);
+  const handleSignIn = useCallback(() => {
     const next = pathname.startsWith("/login") ? "/quiniela" : pathname;
-    const { error } = await signInWithX(next);
-    if (error) {
-      router.push(`/login?error=auth&reason=${encodeURIComponent(error)}`);
-      setSigningIn(false);
-    }
+    router.push(`/login?next=${encodeURIComponent(next)}`);
   }, [pathname, router]);
 
   const signOut = async () => {
@@ -94,18 +87,15 @@ export function AuthHeaderButton({ className }: { className?: string }) {
     return (
       <button
         type="button"
-        onClick={() => void handleSignIn()}
-        disabled={signingIn}
+        onClick={handleSignIn}
         className={cn(
           "inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/50 p-2 text-white transition hover:border-white hover:bg-white/10 sm:px-3",
           className,
         )}
-        aria-label="Entrar con X"
+        aria-label="Entrar"
       >
         <LogIn size={18} aria-hidden />
-        <span className="hidden text-xs font-bold uppercase tracking-wide sm:inline">
-          {signingIn ? "…" : "Entrar"}
-        </span>
+        <span className="hidden text-xs font-bold uppercase tracking-wide sm:inline">Entrar</span>
       </button>
     );
   }

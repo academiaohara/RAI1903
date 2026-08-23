@@ -35,6 +35,7 @@ export function getUserDisplayName(user: User): string {
   const preferred =
     (typeof meta?.preferred_username === "string" && meta.preferred_username) ||
     (typeof meta?.user_name === "string" && meta.user_name) ||
+    (typeof meta?.display_name === "string" && meta.display_name) ||
     (typeof meta?.full_name === "string" && meta.full_name) ||
     (typeof meta?.name === "string" && meta.name);
 
