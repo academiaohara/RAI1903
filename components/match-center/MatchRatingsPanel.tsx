@@ -1,8 +1,9 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { signInWithX } from "@/lib/auth/sign-in-with-x";
+import { OAuthLoginButtons } from "@/components/auth/OAuthLoginButtons";
 import { useMatchRatingsSeasonId } from "@/hooks/useMatchRatingsSeasonId";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { getAvilesPlayersWhoPlayed } from "@/lib/match-rating-eligibility";
@@ -29,6 +30,7 @@ const SLIDER_STEP = 0.5;
 const SLIDER_DEFAULT = 5;
 
 export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
+  const pathname = usePathname();
   const { seasonId: ratingsSeasonId, resolving: resolvingSeason } = useMatchRatingsSeasonId(
     detail.match.id,
     detail.gender,
@@ -49,7 +51,6 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
   const [loadedKey, setLoadedKey] = useState<string | null>(null);
   const loading = configured && (resolvingSeason || !authReady || loadedKey !== sessionKey);
   const [submitting, setSubmitting] = useState(false);
-  const [signingIn, setSigningIn] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -129,13 +130,6 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
     setLoadedKey(sessionKey);
   };
 
-  const handleSignIn = async () => {
-    setSigningIn(true);
-    const { error } = await signInWithX(typeof window !== "undefined" ? window.location.pathname : "/");
-    if (error) setStatusMessage(error);
-    setSigningIn(false);
-  };
-
   if (eligiblePlayers.length === 0) {
     return (
       <section>
@@ -163,14 +157,13 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
       {configured && authReady && !user && (
         <div className="mt-4 rounded-2xl border border-[#214C9B]/15 bg-slate-50 p-4">
           <p className="text-sm text-slate-700">Inicia sesión para enviar tu valoración.</p>
-          <button
-            type="button"
-            onClick={() => void handleSignIn()}
-            disabled={signingIn}
-            className="mt-3 rounded-full bg-[#214C9B] px-5 py-2.5 text-xs font-extrabold uppercase text-white hover:bg-[#1a3d7d] disabled:opacity-60"
-          >
-            {signingIn ? "Conectando…" : "Entrar con X"}
-          </button>
+          <div className="mt-3 max-w-sm">
+            <OAuthLoginButtons
+              nextPath={pathname}
+              googleLabel="Entrar con Google"
+              xLabel="Entrar con X"
+            />
+          </div>
         </div>
       )}
 

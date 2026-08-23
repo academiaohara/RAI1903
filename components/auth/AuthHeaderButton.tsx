@@ -2,10 +2,10 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
-import { LogIn, LogOut } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { LogIn, LogOut, UserRound } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { OAuthLoginButtons } from "@/components/auth/OAuthLoginButtons";
 import { UserAvatar } from "@/components/auth/UserAvatar";
-import { signInWithX } from "@/lib/auth/sign-in-with-x";
 import { syncUserProfile } from "@/lib/auth/sync-profile";
 import { getUserAvatarUrl } from "@/lib/auth/user-display";
 import { createClient } from "@/lib/supabase/client";
@@ -19,8 +19,9 @@ export function AuthHeaderButton({ className }: { className?: string }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(!configured);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [signingIn, setSigningIn] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const nextPath = pathname.startsWith("/login") ? "/quiniela" : pathname;
 
   useEffect(() => {
     if (!configured) return;
@@ -57,16 +58,6 @@ export function AuthHeaderButton({ className }: { className?: string }) {
     return () => document.removeEventListener("mousedown", close);
   }, [menuOpen]);
 
-  const handleSignIn = useCallback(async () => {
-    setSigningIn(true);
-    const next = pathname.startsWith("/login") ? "/quiniela" : pathname;
-    const { error } = await signInWithX(next);
-    if (error) {
-      router.push(`/login?error=auth&reason=${encodeURIComponent(error)}`);
-      setSigningIn(false);
-    }
-  }, [pathname, router]);
-
   const signOut = async () => {
     setMenuOpen(false);
     const supabase = createClient();
@@ -92,21 +83,32 @@ export function AuthHeaderButton({ className }: { className?: string }) {
 
   if (!user) {
     return (
-      <button
-        type="button"
-        onClick={() => void handleSignIn()}
-        disabled={signingIn}
-        className={cn(
-          "inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/50 p-2 text-white transition hover:border-white hover:bg-white/10 sm:px-3",
-          className,
-        )}
-        aria-label="Entrar con X"
-      >
-        <LogIn size={18} aria-hidden />
-        <span className="hidden text-xs font-bold uppercase tracking-wide sm:inline">
-          {signingIn ? "…" : "Entrar"}
-        </span>
-      </button>
+      <div ref={menuRef} className={cn("relative shrink-0", className)}>
+        <button
+          type="button"
+          onClick={() => setMenuOpen((open) => !open)}
+          aria-expanded={menuOpen}
+          aria-label="Entrar"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/50 p-2 text-white transition hover:border-white hover:bg-white/10 sm:px-3"
+        >
+          <LogIn size={18} aria-hidden />
+          <span className="hidden text-xs font-bold uppercase tracking-wide sm:inline">Entrar</span>
+        </button>
+
+        {menuOpen ? (
+          <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-[#214C9B]/20 bg-white p-3 shadow-lg">
+            <p className="mb-2 text-center text-[10px] font-bold uppercase tracking-wide text-slate-500">
+              Elige cómo entrar
+            </p>
+            <OAuthLoginButtons
+              nextPath={nextPath}
+              compact
+              googleLabel="Google"
+              xLabel="X"
+            />
+          </div>
+        ) : null}
+      </div>
     );
   }
 
@@ -125,6 +127,17 @@ export function AuthHeaderButton({ className }: { className?: string }) {
 
       {menuOpen ? (
         <div className="absolute right-0 top-full z-50 mt-2 min-w-[10rem] overflow-hidden rounded-xl border border-[#214C9B]/20 bg-white py-1 shadow-lg">
+          <button
+            type="button"
+            onClick={() => {
+              setMenuOpen(false);
+              router.push("/cuenta");
+            }}
+            className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm font-bold text-[#214C9B] hover:bg-slate-50"
+          >
+            <UserRound size={16} aria-hidden />
+            Mi cuenta
+          </button>
           <button
             type="button"
             onClick={() => void signOut()}
