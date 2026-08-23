@@ -3,15 +3,14 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Route } from "next";
-import { TwitterLoginButton } from "@/components/auth/TwitterLoginButton";
-import { EmailPasswordForm } from "@/components/auth/EmailPasswordForm";
+import { OAuthLoginButtons } from "@/components/auth/OAuthLoginButtons";
 import { isXProfileProviderError } from "@/lib/auth/x-oauth";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 const ERROR_MESSAGES: Record<string, string> = {
   auth: "No se pudo completar el inicio de sesión. Vuelve a intentarlo.",
-  no_code: "X no devolvió el código de autorización. Revisa las Redirect URLs en Supabase.",
+  no_code: "El proveedor no devolvió el código de autorización. Revisa las Redirect URLs en Supabase.",
   config: "Supabase no está configurado en este entorno.",
 };
 
@@ -59,15 +58,7 @@ export function LoginPanel() {
         </p>
       ) : null}
 
-      <EmailPasswordForm nextPath={nextPath} />
-
-      <div className="flex items-center gap-3">
-        <div className="h-px flex-1 bg-[#214C9B]/15" />
-        <span className="text-xs font-bold uppercase tracking-wide text-slate-500">o</span>
-        <div className="h-px flex-1 bg-[#214C9B]/15" />
-      </div>
-
-      <TwitterLoginButton nextPath={nextPath} />
+      <OAuthLoginButtons nextPath={nextPath} />
     </div>
   );
 }

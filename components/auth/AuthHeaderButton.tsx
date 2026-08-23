@@ -3,7 +3,8 @@
 import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { LogIn, LogOut, UserRound } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { OAuthLoginButtons } from "@/components/auth/OAuthLoginButtons";
 import { UserAvatar } from "@/components/auth/UserAvatar";
 import { syncUserProfile } from "@/lib/auth/sync-profile";
 import { getUserAvatarUrl } from "@/lib/auth/user-display";
@@ -19,6 +20,8 @@ export function AuthHeaderButton({ className }: { className?: string }) {
   const [ready, setReady] = useState(!configured);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const nextPath = pathname.startsWith("/login") ? "/quiniela" : pathname;
 
   useEffect(() => {
     if (!configured) return;
@@ -55,11 +58,6 @@ export function AuthHeaderButton({ className }: { className?: string }) {
     return () => document.removeEventListener("mousedown", close);
   }, [menuOpen]);
 
-  const handleSignIn = useCallback(() => {
-    const next = pathname.startsWith("/login") ? "/quiniela" : pathname;
-    router.push(`/login?next=${encodeURIComponent(next)}`);
-  }, [pathname, router]);
-
   const signOut = async () => {
     setMenuOpen(false);
     const supabase = createClient();
@@ -85,18 +83,32 @@ export function AuthHeaderButton({ className }: { className?: string }) {
 
   if (!user) {
     return (
-      <button
-        type="button"
-        onClick={handleSignIn}
-        className={cn(
-          "inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/50 p-2 text-white transition hover:border-white hover:bg-white/10 sm:px-3",
-          className,
-        )}
-        aria-label="Entrar"
-      >
-        <LogIn size={18} aria-hidden />
-        <span className="hidden text-xs font-bold uppercase tracking-wide sm:inline">Entrar</span>
-      </button>
+      <div ref={menuRef} className={cn("relative shrink-0", className)}>
+        <button
+          type="button"
+          onClick={() => setMenuOpen((open) => !open)}
+          aria-expanded={menuOpen}
+          aria-label="Entrar"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/50 p-2 text-white transition hover:border-white hover:bg-white/10 sm:px-3"
+        >
+          <LogIn size={18} aria-hidden />
+          <span className="hidden text-xs font-bold uppercase tracking-wide sm:inline">Entrar</span>
+        </button>
+
+        {menuOpen ? (
+          <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-[#214C9B]/20 bg-white p-3 shadow-lg">
+            <p className="mb-2 text-center text-[10px] font-bold uppercase tracking-wide text-slate-500">
+              Elige cómo entrar
+            </p>
+            <OAuthLoginButtons
+              nextPath={nextPath}
+              compact
+              googleLabel="Google"
+              xLabel="X"
+            />
+          </div>
+        ) : null}
+      </div>
     );
   }
 

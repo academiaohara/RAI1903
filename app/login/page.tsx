@@ -7,7 +7,7 @@ import { PageHero } from "@/components/PageHero";
 
 export const metadata: Metadata = {
   title: "Entrar | RAI1903",
-  description: "Inicia sesión con correo y contraseña, o continúa con tu cuenta de X.",
+  description: "Inicia sesión con Google o con tu cuenta de X.",
 };
 
 export default function LoginPage() {
@@ -16,7 +16,7 @@ export default function LoginPage() {
       <PageHero
         eyebrow="Cuenta"
         title="Entrar"
-        description="Regístrate con correo, nombre de usuario y contraseña, o continúa con tu cuenta de X."
+        description="Entra con Google o con tu cuenta de X para guardar pronósticos y participar en la web."
       />
 
       <Card eyebrow="Acceso" title="Tu cuenta">
