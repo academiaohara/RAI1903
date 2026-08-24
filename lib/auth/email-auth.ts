@@ -1,8 +1,7 @@
 import type { User } from "@supabase/supabase-js";
-import { createClient } from "@/lib/supabase/client";
+import { DISPLAY_NAME_TAKEN_ERROR, isDisplayNameAvailable } from "@/lib/auth/profile";
 import { syncUserProfile } from "@/lib/auth/sync-profile";
-
-const DISPLAY_NAME_TAKEN_ERROR = "Ese nombre ya está en uso. Prueba con otro.";
+import { createClient } from "@/lib/supabase/client";
 
 const USERNAME_PATTERN = /^[a-zA-Z0-9_]{3,24}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -76,12 +75,8 @@ export async function signUpWithEmail(
   const normalizedEmail = normalizeEmail(email);
   const normalizedUsername = normalizeUsername(username);
 
-  const nameAvailable = await supabase.rpc("is_display_name_available", {
-    display_name: normalizedUsername,
-    exclude_user_id: null,
-  });
-
-  if (!nameAvailable.error && nameAvailable.data === false) {
+  const available = await isDisplayNameAvailable(normalizedUsername);
+  if (!available) {
     return { error: DISPLAY_NAME_TAKEN_ERROR, needsEmailConfirmation: false };
   }
 

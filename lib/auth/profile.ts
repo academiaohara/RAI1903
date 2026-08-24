@@ -62,26 +62,8 @@ export async function isDisplayNameAvailable(
     console.error("is_display_name_available rpc", error.message);
   }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return true;
-  }
-
-  let query = supabase.from("profiles").select("id").ilike("display_name", normalized).limit(1);
-  if (excludeUserId) {
-    query = query.neq("id", excludeUserId);
-  }
-
-  const { data: rows, error: queryError } = await query;
-  if (queryError) {
-    console.error("isDisplayNameAvailable fallback", queryError.message);
-    return false;
-  }
-
-  return !rows?.length;
+  // RPC missing or unavailable: defer to the unique index on profiles.display_name.
+  return true;
 }
 
 export async function updateDisplayName(rawName: string): Promise<{ error: string | null }> {
@@ -103,6 +85,15 @@ export async function updateDisplayName(rawName: string): Promise<{ error: strin
   }
 
   const normalized = normalizeUsername(rawName.replace(/^@/, ""));
+
+  const profile = await fetchOwnProfile(user.id);
+  const currentNormalized = profile?.display_name
+    ? normalizeUsername(profile.display_name.replace(/^@/, ""))
+    : "";
+
+  if (currentNormalized === normalized) {
+    return { error: null };
+  }
 
   const available = await isDisplayNameAvailable(normalized, user.id);
   if (!available) {

@@ -81,12 +81,7 @@ export function AccountPanel() {
           <h2 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Cambiar contraseña</h2>
           <ChangePasswordForm email={email} />
         </div>
-      ) : (
-        <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-          Has entrado con X. Para usar correo y contraseña, regístrate con email o solicita un enlace de recuperación
-          desde la pantalla de entrar.
-        </p>
-      )}
+      ) : null}
 
       <p className="text-center text-sm text-slate-600">
         <Link href="/" prefetch={false} className="font-bold text-[#214C9B] underline-offset-2 hover:underline">
