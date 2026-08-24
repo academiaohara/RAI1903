@@ -61,7 +61,9 @@ export function DisplayNameForm({ initialHandle, onSaved, className, compact = f
             pattern="[a-zA-Z0-9_]{3,24}"
           />
         </div>
-        <p className="mt-1 text-xs text-slate-500">Entre 3 y 24 caracteres: letras, números o guion bajo.</p>
+        <p className="mt-1 text-xs text-slate-500">
+          Entre 3 y 24 caracteres: letras, números o guion bajo. Tiene que ser único en la web.
+        </p>
       </label>
 
       {error ? (
