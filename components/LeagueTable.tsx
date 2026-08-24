@@ -30,21 +30,37 @@ type LeagueTableProps = {
   zoneLegend?: StandingsLegendItem[];
 };
 
+const FORM_BADGE_CLASS =
+  "flex h-2.5 w-2.5 items-center justify-center rounded-[2px] text-[6px] font-extrabold leading-none sm:h-3.5 sm:w-3.5 sm:rounded sm:text-[7px] md:h-5 md:w-5 md:text-[9px]";
+
 function TeamFormBadges({ form, className }: { form: FormCode[]; className?: string }) {
+  const recent = form.slice(-5);
+  const slots: Array<FormCode | null> = [
+    ...Array<null>(5 - recent.length).fill(null),
+    ...recent,
+  ];
+
   return (
     <div className={cn("flex gap-px", className)}>
-      {form.map((result, index) => (
-        <span
-          key={`${result}-${index}`}
-          className={cn(
-            "flex h-2.5 w-2.5 items-center justify-center rounded-[2px] text-[6px] font-extrabold leading-none sm:h-3.5 sm:w-3.5 sm:rounded sm:text-[7px] md:h-5 md:w-5 md:text-[9px]",
-            resultTone(result),
-          )}
-          title={result === "G" ? "Victoria" : result === "E" ? "Empate" : "Derrota"}
-        >
-          {result}
-        </span>
-      ))}
+      {slots.map((result, index) =>
+        result === null ? (
+          <span
+            key={`empty-${index}`}
+            className={cn(FORM_BADGE_CLASS, "bg-slate-200 text-slate-400")}
+            title="Sin partido"
+          >
+            —
+          </span>
+        ) : (
+          <span
+            key={`${result}-${index}`}
+            className={cn(FORM_BADGE_CLASS, resultTone(result))}
+            title={result === "G" ? "Victoria" : result === "E" ? "Empate" : "Derrota"}
+          >
+            {result}
+          </span>
+        ),
+      )}
     </div>
   );
 }
@@ -136,9 +152,7 @@ export function LeagueTable({
                       <span className="md:hidden">{team.shortName}</span>
                       <span className="hidden truncate md:inline">{teamLabel}</span>
                     </span>
-                    {team.form.length > 0 ? (
-                      <TeamFormBadges form={team.form} className="mt-0.5 md:hidden" />
-                    ) : null}
+                    <TeamFormBadges form={team.form} className="mt-0.5 md:hidden" />
                   </div>
                 </div>
               );
