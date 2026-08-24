@@ -127,19 +127,25 @@ export function LeagueTable({
               const teamLabel = compact ? team.shortName : team.name;
               const teamLinkable = canLinkEquipoLiga(gender, team.id, season?.bundles);
               const teamCellContent = (
-                <div className="flex min-w-0 items-start gap-0.5 sm:items-center sm:gap-1 md:gap-2">
+                <div
+                  className={cn(
+                    "relative flex min-w-0 items-center gap-0.5 sm:gap-1 md:gap-2",
+                    team.form.length > 0 && "pb-3.5 md:pb-0",
+                  )}
+                >
                   {showCrests ? (
-                    <TeamCrest team={team} size="sm" className="mt-px h-3.5 w-3.5 shrink-0 sm:mt-0 sm:h-7 sm:w-7" />
+                    <TeamCrest team={team} size="sm" className="h-3.5 w-3.5 shrink-0 sm:h-7 sm:w-7" />
                   ) : null}
-                  <div className="min-w-0">
-                    <span className="block min-w-0 font-bold leading-tight group-hover/team:underline group-hover/team:decoration-[#214C9B]/40 group-hover/team:underline-offset-2">
-                      <span className="md:hidden">{team.shortName}</span>
-                      <span className="hidden truncate md:inline">{teamLabel}</span>
-                    </span>
-                    {team.form.length > 0 ? (
-                      <TeamFormBadges form={team.form} className="mt-0.5 md:hidden" />
-                    ) : null}
-                  </div>
+                  <span className="min-w-0 font-bold leading-tight group-hover/team:underline group-hover/team:decoration-[#214C9B]/40 group-hover/team:underline-offset-2">
+                    <span className="md:hidden">{team.shortName}</span>
+                    <span className="hidden truncate md:inline">{teamLabel}</span>
+                  </span>
+                  {team.form.length > 0 ? (
+                    <TeamFormBadges
+                      form={team.form}
+                      className="absolute bottom-0 left-0 pl-4 md:hidden"
+                    />
+                  ) : null}
                 </div>
               );
 
