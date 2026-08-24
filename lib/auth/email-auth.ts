@@ -1,5 +1,4 @@
 import type { User } from "@supabase/supabase-js";
-import { DISPLAY_NAME_TAKEN_ERROR, isDisplayNameAvailable } from "@/lib/auth/profile";
 import { syncUserProfile } from "@/lib/auth/sync-profile";
 import { createClient } from "@/lib/supabase/client";
 
@@ -74,11 +73,6 @@ export async function signUpWithEmail(
   const supabase = createClient();
   const normalizedEmail = normalizeEmail(email);
   const normalizedUsername = normalizeUsername(username);
-
-  const available = await isDisplayNameAvailable(normalizedUsername);
-  if (!available) {
-    return { error: DISPLAY_NAME_TAKEN_ERROR, needsEmailConfirmation: false };
-  }
 
   const { data, error } = await supabase.auth.signUp({
     email: normalizedEmail,

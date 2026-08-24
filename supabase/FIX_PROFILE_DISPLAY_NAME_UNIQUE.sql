@@ -1,4 +1,7 @@
 -- =============================================================================
+-- OBSOLETO: los nombres públicos ya no tienen que ser únicos.
+-- Ejecuta supabase/FIX_REMOVE_DISPLAY_NAME_UNIQUE.sql en su lugar.
+-- =============================================================================
 -- Nombres públicos únicos en profiles — ejecutar en Supabase → SQL Editor
 -- Evita que dos usuarios usen el mismo @nombre en rankings y boletos.
 -- Idempotente: puedes ejecutarlo varias veces.

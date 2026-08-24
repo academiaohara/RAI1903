@@ -8,12 +8,6 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
-export const DISPLAY_NAME_TAKEN_ERROR = "Ese nombre ya está en uso. Prueba con otro.";
-
-function isUniqueViolation(error: { code?: string; message?: string }): boolean {
-  return error.code === "23505" || error.message?.toLowerCase().includes("profiles_display_name_unique") === true;
-}
-
 export async function fetchOwnProfile(userId: string): Promise<ProfileDisplayFields | null> {
   if (!isSupabaseConfigured()) return null;
 
@@ -36,34 +30,6 @@ export async function resolveUserHandle(user: User): Promise<string> {
   const profile = await fetchOwnProfile(user.id);
   if (profile) return getProfileHandle(profile);
   return getUserDisplayName(user);
-}
-
-export async function isDisplayNameAvailable(
-  rawName: string,
-  excludeUserId?: string,
-): Promise<boolean> {
-  const normalized = normalizeUsername(rawName.replace(/^@/, ""));
-  if (!normalized) return false;
-
-  if (!isSupabaseConfigured()) return true;
-
-  const supabase = createClient();
-
-  const { data, error } = await supabase.rpc("is_display_name_available", {
-    display_name: normalized,
-    exclude_user_id: excludeUserId ?? null,
-  });
-
-  if (!error && typeof data === "boolean") {
-    return data;
-  }
-
-  if (error) {
-    console.error("is_display_name_available rpc", error.message);
-  }
-
-  // RPC missing or unavailable: defer to the unique index on profiles.display_name.
-  return true;
 }
 
 export async function updateDisplayName(rawName: string): Promise<{ error: string | null }> {
@@ -95,20 +61,12 @@ export async function updateDisplayName(rawName: string): Promise<{ error: strin
     return { error: null };
   }
 
-  const available = await isDisplayNameAvailable(normalized, user.id);
-  if (!available) {
-    return { error: DISPLAY_NAME_TAKEN_ERROR };
-  }
-
   const { error } = await supabase
     .from("profiles")
     .update({ display_name: normalized, updated_at: new Date().toISOString() })
     .eq("id", user.id);
 
   if (error) {
-    if (isUniqueViolation(error)) {
-      return { error: DISPLAY_NAME_TAKEN_ERROR };
-    }
     return { error: error.message };
   }
 
