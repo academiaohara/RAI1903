@@ -7,24 +7,42 @@ import type { User } from "@supabase/supabase-js";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { loadClasificacionState } from "@/lib/clasificacion-storage";
 import { gameTabHref } from "@/lib/juegos";
+import type { GameRankingEntry, GameSeasonRankingEntry } from "@/lib/game-rankings";
+import { findUserRankingPosition } from "@/lib/ranking-display";
 import { loadQuinielaState } from "@/lib/quiniela-storage";
 import { loadQuinigolState } from "@/lib/quinigol-storage";
-import { formatDate } from "@/lib/utils";
+import type { QuinielaSeasonRankingEntry } from "@/lib/quiniela-ranking";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 type AccountBoletosSummaryProps = {
   user: User;
 };
 
-type BoletosSummary = {
-  quinielaSavedRounds: number;
-  quinigolSavedRounds: number;
-  clasificacionSubmitted: boolean;
-  clasificacionSubmittedAt: string | null;
+type GameId = "quiniela" | "quinigol" | "clasificacion";
+
+type GameParticipation = {
+  id: GameId;
+  label: string;
+  rank: number;
+  pointsLabel: string;
+  href: Route;
+  rankingHref: Route;
 };
+
+type RankingPayload = {
+  entries?: Array<GameRankingEntry | GameSeasonRankingEntry | QuinielaSeasonRankingEntry>;
+  countPoints?: boolean;
+};
+
+async function fetchSeasonRanking(url: string): Promise<RankingPayload> {
+  const response = await fetch(url);
+  if (!response.ok) return { entries: [], countPoints: false };
+  return (await response.json()) as RankingPayload;
+}
 
 export function AccountBoletosSummary({ user }: AccountBoletosSummaryProps) {
   const { viewedSeasonId, viewedSeason } = useSeason();
-  const [summary, setSummary] = useState<BoletosSummary | null>(null);
+  const [participations, setParticipations] = useState<GameParticipation[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,20 +50,103 @@ export function AccountBoletosSummary({ user }: AccountBoletosSummaryProps) {
 
     const load = async () => {
       setLoading(true);
+
       const [quiniela, quinigol, clasificacion] = await Promise.all([
         loadQuinielaState(user.id, viewedSeasonId),
         loadQuinigolState(user.id, viewedSeasonId),
         loadClasificacionState(user.id, viewedSeasonId),
       ]);
 
+      const participates = {
+        quiniela: Object.keys(quiniela.savedRounds).length > 0,
+        quinigol: Object.keys(quinigol.savedRounds).length > 0,
+        clasificacion: clasificacion.submittedAt !== null,
+      };
+
+      if (!participates.quiniela && !participates.quinigol && !participates.clasificacion) {
+        if (!cancelled) {
+          setParticipations([]);
+          setLoading(false);
+        }
+        return;
+      }
+
+      if (!isSupabaseConfigured()) {
+        if (!cancelled) {
+          setParticipations([]);
+          setLoading(false);
+        }
+        return;
+      }
+
+      const params = new URLSearchParams({ seasonId: viewedSeasonId, scope: "season" });
+      const [quinielaRanking, quinigolRanking, clasificacionRanking] = await Promise.all([
+        participates.quiniela
+          ? fetchSeasonRanking(`/api/quiniela/ranking?${params.toString()}`)
+          : Promise.resolve({ entries: [], countPoints: false }),
+        participates.quinigol
+          ? fetchSeasonRanking(`/api/quinigol/ranking?${params.toString()}`)
+          : Promise.resolve({ entries: [], countPoints: false }),
+        participates.clasificacion
+          ? fetchSeasonRanking(`/api/clasificacion/ranking?${new URLSearchParams({ seasonId: viewedSeasonId }).toString()}`)
+          : Promise.resolve({ entries: [], countPoints: false }),
+      ]);
+
       if (cancelled) return;
 
-      setSummary({
-        quinielaSavedRounds: Object.keys(quiniela.savedRounds).length,
-        quinigolSavedRounds: Object.keys(quinigol.savedRounds).length,
-        clasificacionSubmitted: clasificacion.submittedAt !== null,
-        clasificacionSubmittedAt: clasificacion.submittedAt,
-      });
+      const games: GameParticipation[] = [];
+
+      const appendGame = (
+        id: GameId,
+        label: string,
+        href: Route,
+        rankingHref: Route,
+        payload: RankingPayload,
+      ) => {
+        const position = findUserRankingPosition(payload.entries ?? [], user.id);
+        if (!position) return;
+
+        games.push({
+          id,
+          label,
+          rank: position.rank,
+          pointsLabel: payload.countPoints ? `${position.entry.points} pts` : "—",
+          href,
+          rankingHref,
+        });
+      };
+
+      if (participates.quiniela) {
+        appendGame(
+          "quiniela",
+          "RAIniela",
+          gameTabHref("quiniela", "pronosticos") as Route,
+          gameTabHref("quiniela", "ranking") as Route,
+          quinielaRanking,
+        );
+      }
+
+      if (participates.quinigol) {
+        appendGame(
+          "quinigol",
+          "RAIGol",
+          gameTabHref("quinigol", "pronosticos") as Route,
+          gameTabHref("quinigol", "ranking") as Route,
+          quinigolRanking,
+        );
+      }
+
+      if (participates.clasificacion) {
+        appendGame(
+          "clasificacion",
+          "El Oráculo",
+          gameTabHref("clasificacion", "pronosticos") as Route,
+          gameTabHref("clasificacion", "ranking") as Route,
+          clasificacionRanking,
+        );
+      }
+
+      setParticipations(games);
       setLoading(false);
     };
 
@@ -57,70 +158,51 @@ export function AccountBoletosSummary({ user }: AccountBoletosSummaryProps) {
   }, [user.id, viewedSeasonId]);
 
   if (loading) {
-    return <p className="text-sm text-slate-500">Cargando tus boletos…</p>;
+    return (
+      <div className="space-y-3">
+        <h2 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Pronósticos</h2>
+        <p className="text-sm text-slate-500">Cargando tus pronósticos…</p>
+      </div>
+    );
   }
 
-  if (!summary) return null;
-
-  const games = [
-    {
-      id: "quiniela" as const,
-      label: "RAIniela",
-      detail:
-        summary.quinielaSavedRounds > 0
-          ? `${summary.quinielaSavedRounds} jornada${summary.quinielaSavedRounds === 1 ? "" : "s"} guardada${summary.quinielaSavedRounds === 1 ? "" : "s"}`
-          : "Sin boletos guardados",
-      href: gameTabHref("quiniela", "pronosticos"),
-      rankingHref: gameTabHref("quiniela", "ranking"),
-    },
-    {
-      id: "quinigol" as const,
-      label: "RAIGol",
-      detail:
-        summary.quinigolSavedRounds > 0
-          ? `${summary.quinigolSavedRounds} jornada${summary.quinigolSavedRounds === 1 ? "" : "s"} guardada${summary.quinigolSavedRounds === 1 ? "" : "s"}`
-          : "Sin boletos guardados",
-      href: gameTabHref("quinigol", "pronosticos"),
-      rankingHref: gameTabHref("quinigol", "ranking"),
-    },
-    {
-      id: "clasificacion" as const,
-      label: "El Oráculo",
-      detail: summary.clasificacionSubmitted
-        ? `Boleto enviado${summary.clasificacionSubmittedAt ? ` el ${formatDate(summary.clasificacionSubmittedAt)}` : ""}`
-        : "Sin enviar",
-      href: gameTabHref("clasificacion", "pronosticos"),
-      rankingHref: gameTabHref("clasificacion", "ranking"),
-    },
-  ];
+  if (!participations || participations.length === 0) {
+    return null;
+  }
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-slate-600">
-        Temporada <span className="font-bold text-[#214C9B]">{viewedSeason.label}</span>. Solo cuentan los boletos
-        guardados oficialmente.
-      </p>
+      <div>
+        <h2 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Pronósticos</h2>
+        <p className="mt-1 text-sm text-slate-600">
+          Temporada <span className="font-bold text-[#214C9B]">{viewedSeason.label}</span>
+        </p>
+      </div>
 
-      <div className="space-y-2">
-        {games.map((game) => (
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {participations.map((game) => (
           <div
             key={game.id}
-            className="flex flex-col gap-2 rounded-xl border border-[#214C9B]/15 bg-slate-50 p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4"
+            className="flex flex-col gap-3 rounded-xl border border-[#214C9B]/15 bg-slate-50 p-4"
           >
             <div className="min-w-0">
               <p className="font-extrabold text-[#214C9B]">{game.label}</p>
-              <p className="text-sm text-slate-600">{game.detail}</p>
+              <p className="mt-1 text-sm text-slate-600">
+                Posición <span className="font-bold text-[#214C9B]">{game.rank}º</span>
+                <span className="mx-2 text-slate-300">·</span>
+                <span className="font-bold text-slate-900">{game.pointsLabel}</span>
+              </p>
             </div>
-            <div className="flex shrink-0 flex-wrap gap-2">
+            <div className="mt-auto flex flex-wrap gap-2">
               <Link
-                href={game.href as Route}
+                href={game.href}
                 prefetch={false}
                 className="rounded-lg border border-[#214C9B]/25 bg-white px-3 py-1.5 text-xs font-bold text-[#214C9B] transition hover:bg-[#214C9B]/5 sm:text-sm"
               >
                 Pronósticos
               </Link>
               <Link
-                href={game.rankingHref as Route}
+                href={game.rankingHref}
                 prefetch={false}
                 className="rounded-lg border border-[#214C9B]/25 bg-white px-3 py-1.5 text-xs font-bold text-[#214C9B] transition hover:bg-[#214C9B]/5 sm:text-sm"
               >
