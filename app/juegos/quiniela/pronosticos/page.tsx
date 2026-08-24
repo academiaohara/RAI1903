@@ -101,13 +101,13 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
     [selectedMatchday.matches],
   );
   const hasMatchesForRound = selectedMatchday.matches.length > 0;
-  const needsLogin = quinielaRequiresAuth() && hydrated && !userId;
   const isSaved = Boolean(savedRounds[round]);
   const isLocked = hasFirstMatchStarted(selectedMatchday);
-  const readOnly = needsLogin || isLocked || (isSaved && !isEditing);
+  const readOnly = isLocked || (isSaved && !isEditing);
   const canEdit = isSaved && !isLocked;
   const canSave = !isLocked && (!isSaved || isEditing);
   const saveDisabled = quinielaRequiresAuth() && !userId;
+  const needsLogin = quinielaRequiresAuth() && hydrated && !userId;
   const finishedMatches = countFinishedMatches(selectedMatchday);
   const jornadaFinalizada = isMatchdayFullyFinished(selectedMatchday);
   const hits = countOutcomeHits(selectedMatchday, predictions);
@@ -150,7 +150,6 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
 
   const updatePrediction = useCallback(
     (prediction: Prediction) => {
-      if (quinielaRequiresAuth() && !userId) return;
       setPredictions((current) => {
         const next = { ...current, [prediction.matchId]: prediction };
         if (!isSaved || isEditing) {
@@ -163,6 +162,10 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
   );
 
   const handleSave = async () => {
+    if (quinielaRequiresAuth() && !userId) {
+      await alert("Inicia sesión para guardar tu quiniela y aparecer en el ranking.");
+      return;
+    }
     if (!isMatchdayComplete(selectedMatchday, predictions)) {
       await alert("Completa los 10 partidos (signo 1-X-2 y porra del Avilés si aplica) antes de guardar.");
       return;
@@ -203,11 +206,11 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
 
       {needsLogin && (
         <p className="rounded-xl border border-[#214C9B]/25 bg-blue-50 px-3 py-2 text-xs font-bold text-[#214C9B] sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
-          Inicia sesión para participar, guardar tu quiniela y aparecer en los rankings.
+          Puedes rellenar el boleto en tu navegador, pero inicia sesión para guardarlo y aparecer en los rankings.
         </p>
       )}
 
-      {hydrated && !needsLogin && statusBanner === "unsaved" && (
+      {hydrated && statusBanner === "unsaved" && (
         <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
           No has hecho la quiniela de la jornada {round}. Rellena los partidos y pulsa Guardar.
         </p>
@@ -275,7 +278,7 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
             onEdit={handleEdit}
             saveDisabled={saveDisabled}
             isEditing={isEditing}
-            showLoginPrompt={needsLogin}
+            showLoginPrompt={false}
           />
         ) : null}
       </Card>

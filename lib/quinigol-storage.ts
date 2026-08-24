@@ -2,7 +2,6 @@ import { DEFAULT_COMPETITION_SEASON_ID, type CompetitionSeasonId } from "@/data/
 import { normalizeGoalsPick } from "@/lib/quiniela";
 import type { QuinigolPrediction } from "@/lib/quinigol";
 import {
-  clearLocalGameStateIfCloudMode,
   loadQuinigolPredictions as loadLocalQuinigolPredictions,
   loadQuinigolSavedRounds as loadLocalQuinigolSavedRounds,
   saveQuinigolPredictions as saveLocalQuinigolPredictions,
@@ -47,8 +46,10 @@ export async function loadQuinigolState(
 ): Promise<QuinigolState> {
   if (isSupabaseConfigured()) {
     if (!userId) {
-      clearLocalGameStateIfCloudMode();
-      return { predictions: {}, savedRounds: {} };
+      return {
+        predictions: loadLocalQuinigolPredictions(),
+        savedRounds: {},
+      };
     }
 
     const supabase = createClient();
@@ -156,9 +157,12 @@ export async function saveQuinigolRound(
   round: number,
   seasonId: CompetitionSeasonId = DEFAULT_COMPETITION_SEASON_ID,
 ): Promise<void> {
-  saveLocalQuinigolRoundAsSaved(round);
+  if (!isSupabaseConfigured()) {
+    saveLocalQuinigolRoundAsSaved(round);
+    return;
+  }
 
-  if (!isSupabaseConfigured() || !userId) return;
+  if (!userId) return;
 
   const supabase = createClient();
   const { error } = await supabase.from("quinigol_saved_rounds").upsert(

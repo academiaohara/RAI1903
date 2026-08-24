@@ -52,7 +52,7 @@ export default function ClasificacionPronosticosPage() {
   const needsLogin = clasificacionRequiresAuth() && hydrated && !userId;
   const isLocked = isClasificacionLocked(matchdays);
   const isSubmitted = submittedAt !== null;
-  const readOnly = needsLogin || isLocked || (isSubmitted && !isEditing);
+  const readOnly = isLocked || (isSubmitted && !isEditing);
   const canEdit = isSubmitted && !isLocked;
   const canSave = !isLocked && (!isSubmitted || isEditing);
   const saveDisabled = clasificacionRequiresAuth() && !userId;
@@ -102,7 +102,6 @@ export default function ClasificacionPronosticosPage() {
 
   const handleReorder = useCallback(
     (orderedTeamIds: string[]) => {
-      if (clasificacionRequiresAuth() && !userId) return;
       const next = orderedTeamIdsToPredictions(orderedTeamIds);
       setPredictions(next);
       if (!isSubmitted || isEditing) {
@@ -113,6 +112,10 @@ export default function ClasificacionPronosticosPage() {
   );
 
   const handleSave = async () => {
+    if (clasificacionRequiresAuth() && !userId) {
+      await alert("Inicia sesión para guardar tu predicción y aparecer en el ranking.");
+      return;
+    }
     if (!isClasificacionComplete(effectivePredictions, teams.length)) {
       await alert("Ordena todos los equipos antes de guardar.");
       return;
@@ -133,11 +136,11 @@ export default function ClasificacionPronosticosPage() {
 
       {needsLogin && (
         <p className="rounded-xl border border-[#214C9B]/25 bg-blue-50 px-3 py-2 text-xs font-bold text-[#214C9B] sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
-          Inicia sesión para participar, guardar tu predicción y aparecer en el ranking.
+          Puedes ordenar el boleto en tu navegador, pero inicia sesión para guardarlo y aparecer en el ranking.
         </p>
       )}
 
-      {hydrated && !needsLogin && !isSubmitted && !isLocked && (
+      {hydrated && !isSubmitted && !isLocked && (
         <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
           Ordena los equipos y pulsa Guardar antes del pitido inicial de la primera jornada.
         </p>
@@ -168,7 +171,7 @@ export default function ClasificacionPronosticosPage() {
           onEdit={() => setIsEditing(true)}
           saveDisabled={saveDisabled}
           isEditing={isEditing}
-          showLoginPrompt={needsLogin}
+          showLoginPrompt={false}
         />
       </Card>
     </div>

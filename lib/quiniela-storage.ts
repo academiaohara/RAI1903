@@ -1,7 +1,6 @@
 import { DEFAULT_COMPETITION_SEASON_ID, type CompetitionSeasonId } from "@/data/mock";
 import { migratePrediction } from "@/lib/quiniela";
 import {
-  clearLocalGameStateIfCloudMode,
   loadPredictions as loadLocalPredictions,
   loadSavedRounds as loadLocalSavedRounds,
   savePredictions as saveLocalPredictions,
@@ -48,8 +47,10 @@ export async function loadQuinielaState(
 ): Promise<QuinielaState> {
   if (isSupabaseConfigured()) {
     if (!userId) {
-      clearLocalGameStateIfCloudMode();
-      return { predictions: {}, savedRounds: {} };
+      return {
+        predictions: loadLocalPredictions(),
+        savedRounds: {},
+      };
     }
 
     const supabase = createClient();
@@ -152,9 +153,12 @@ export async function saveQuinielaRound(
   round: number,
   seasonId: CompetitionSeasonId = DEFAULT_COMPETITION_SEASON_ID,
 ): Promise<void> {
-  saveLocalRoundAsSaved(round);
+  if (!isSupabaseConfigured()) {
+    saveLocalRoundAsSaved(round);
+    return;
+  }
 
-  if (!isSupabaseConfigured() || !userId) return;
+  if (!userId) return;
 
   const supabase = createClient();
   const { error } = await supabase.from("quiniela_saved_rounds").upsert(

@@ -19,7 +19,8 @@ export function GameLoginPromptModal({ open, onClose }: GameLoginPromptModalProp
           Para guardar tu pronóstico y competir en el ranking necesitas iniciar sesión con Google o X.
         </p>
         <p className="text-sm text-slate-600">
-          Sin sesión no puedes marcar el boleto ni guardar datos en el navegador.
+          Mientras tanto puedes rellenar el boleto en tu navegador, pero no se guardará oficialmente ni aparecerás en
+          la clasificación hasta que entres.
         </p>
         <OAuthLoginButtons
           nextPath={pathname}
