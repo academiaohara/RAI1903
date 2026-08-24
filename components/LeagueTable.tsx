@@ -80,7 +80,7 @@ export function LeagueTable({
   const legend = zoneLegend ?? STANDINGS_ZONE_LEGEND;
   const showCrests = showCrestsProp ?? true;
   const visibleRows = [...teams].sort((a, b) => a.position - b.position);
-  const showFormColumn = !compact;
+  const showFormColumn = true;
 
   const statColClass =
     "w-[1.15rem] px-0 py-1 text-center font-bold tabular-nums sm:w-auto sm:px-1 sm:py-1.5 md:px-2 md:py-2.5";
