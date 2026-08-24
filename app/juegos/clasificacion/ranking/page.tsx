@@ -30,6 +30,7 @@ export default function ClasificacionRankingPage() {
           <>
             <ClasificacionRankingList
               entries={entries}
+              countPoints={countPoints}
               seasonId={seasonId}
               teams={teams}
               leagueMatchdays={leagueMatchdays}

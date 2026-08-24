@@ -98,6 +98,7 @@ function ResultadoBody({
           <>
             <QuinielaRankingList
               entries={rankingEntries}
+              countPoints={countPoints}
               seasonId={seasonId}
               matchdays={matchdays}
               teams={teams}

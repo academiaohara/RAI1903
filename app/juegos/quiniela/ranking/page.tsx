@@ -53,6 +53,7 @@ export default function QuinielaRankingPage() {
           <>
             <QuinielaRankingList
             entries={entries}
+            countPoints={countPoints}
             seasonId={seasonId}
             matchdays={matchdays}
             teams={teams}

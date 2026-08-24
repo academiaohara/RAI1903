@@ -51,6 +51,7 @@ export default function QuinigolRankingPage() {
           <>
             <QuinigolRankingList
             entries={entries}
+            countPoints={countPoints}
             seasonId={seasonId}
             matchdays={matchdays}
             teams={teams}

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import type { Route } from "next";
 import type { User } from "@supabase/supabase-js";
 import { ChangePasswordForm } from "@/components/auth/ChangePasswordForm";
+import { AccountBoletosSummary } from "@/components/auth/AccountBoletosSummary";
 import { DisplayNameForm } from "@/components/auth/DisplayNameForm";
 import { UserAvatar } from "@/components/auth/UserAvatar";
 import { userHasEmailPasswordIdentity } from "@/lib/auth/email-auth";
@@ -62,6 +63,11 @@ export function AccountPanel() {
           <p className="truncate text-lg font-extrabold text-[#214C9B]">{displayHandle}</p>
           {email ? <p className="truncate text-sm text-slate-600">{email}</p> : null}
         </div>
+      </div>
+
+      <div className="space-y-3">
+        <h2 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Tus boletos</h2>
+        <AccountBoletosSummary user={user} />
       </div>
 
       <div className="space-y-3">
