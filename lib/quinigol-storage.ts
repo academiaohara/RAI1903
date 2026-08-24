@@ -4,7 +4,6 @@ import type { QuinigolPrediction } from "@/lib/quinigol";
 import {
   loadQuinigolPredictions as loadLocalQuinigolPredictions,
   loadQuinigolSavedRounds as loadLocalQuinigolSavedRounds,
-  QUINIGOL_SAVED_ROUNDS_KEY,
   saveQuinigolPredictions as saveLocalQuinigolPredictions,
   saveQuinigolRoundAsSaved as saveLocalQuinigolRoundAsSaved,
 } from "@/lib/storage";
@@ -47,7 +46,10 @@ export async function loadQuinigolState(
 ): Promise<QuinigolState> {
   if (isSupabaseConfigured()) {
     if (!userId) {
-      return { predictions: {}, savedRounds: {} };
+      return {
+        predictions: loadLocalQuinigolPredictions(),
+        savedRounds: {},
+      };
     }
 
     const supabase = createClient();
@@ -96,10 +98,6 @@ export async function loadQuinigolState(
       return local;
     }
 
-    saveLocalQuinigolPredictions(cloudPredictions);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(QUINIGOL_SAVED_ROUNDS_KEY, JSON.stringify(cloudSavedRounds));
-    }
     return { predictions: cloudPredictions, savedRounds: cloudSavedRounds };
   }
 
@@ -159,9 +157,12 @@ export async function saveQuinigolRound(
   round: number,
   seasonId: CompetitionSeasonId = DEFAULT_COMPETITION_SEASON_ID,
 ): Promise<void> {
-  saveLocalQuinigolRoundAsSaved(round);
+  if (!isSupabaseConfigured()) {
+    saveLocalQuinigolRoundAsSaved(round);
+    return;
+  }
 
-  if (!isSupabaseConfigured() || !userId) return;
+  if (!userId) return;
 
   const supabase = createClient();
   const { error } = await supabase.from("quinigol_saved_rounds").upsert(

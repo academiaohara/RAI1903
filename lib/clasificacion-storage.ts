@@ -26,7 +26,10 @@ export async function loadClasificacionState(
 ): Promise<ClasificacionState> {
   if (isSupabaseConfigured()) {
     if (!userId) {
-      return { predictions: {}, submittedAt: null };
+      return {
+        predictions: loadLocalClasificacionPredictions(),
+        submittedAt: null,
+      };
     }
 
     const supabase = createClient();
@@ -75,8 +78,6 @@ export async function loadClasificacionState(
       return local;
     }
 
-    saveLocalClasificacionPredictions(cloudPredictions);
-    saveClasificacionSubmittedAt(cloudSubmittedAt);
     return { predictions: cloudPredictions, submittedAt: cloudSubmittedAt };
   }
 

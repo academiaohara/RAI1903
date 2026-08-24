@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { LogIn, LogOut, UserRound } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { OAuthLoginButtons } from "@/components/auth/OAuthLoginButtons";
 import { UserAvatar } from "@/components/auth/UserAvatar";
+import { resolveUserHandle } from "@/lib/auth/profile";
 import { syncUserProfile } from "@/lib/auth/sync-profile";
 import { getUserAvatarUrl } from "@/lib/auth/user-display";
 import { createClient } from "@/lib/supabase/client";
@@ -19,6 +21,7 @@ export function AuthHeaderButton({ className }: { className?: string }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(!configured);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [displayHandle, setDisplayHandle] = useState("@usuario");
   const menuRef = useRef<HTMLDivElement>(null);
 
   const nextPath = pathname.startsWith("/login") ? "/quiniela" : pathname;
@@ -33,6 +36,9 @@ export function AuthHeaderButton({ className }: { className?: string }) {
       setReady(true);
       if (next) {
         void syncUserProfile(supabase, next);
+        void resolveUserHandle(next).then(setDisplayHandle);
+      } else {
+        setDisplayHandle("@usuario");
       }
     };
 
@@ -126,7 +132,18 @@ export function AuthHeaderButton({ className }: { className?: string }) {
       </button>
 
       {menuOpen ? (
-        <div className="absolute right-0 top-full z-50 mt-2 min-w-[10rem] overflow-hidden rounded-xl border border-[#214C9B]/20 bg-white py-1 shadow-lg">
+        <div className="absolute right-0 top-full z-50 mt-2 min-w-[12rem] overflow-hidden rounded-xl border border-[#214C9B]/20 bg-white py-1 shadow-lg">
+          <div className="border-b border-slate-100 px-4 py-3">
+            <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Tu nombre</p>
+            <p className="truncate text-sm font-extrabold text-[#214C9B]">{displayHandle}</p>
+            <Link
+              href="/cuenta"
+              onClick={() => setMenuOpen(false)}
+              className="mt-1 text-xs font-bold text-[#214C9B] underline-offset-2 hover:underline"
+            >
+              Cambiar nombre
+            </Link>
+          </div>
           <button
             type="button"
             onClick={() => {

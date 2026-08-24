@@ -3,7 +3,6 @@ import { migratePrediction } from "@/lib/quiniela";
 import {
   loadPredictions as loadLocalPredictions,
   loadSavedRounds as loadLocalSavedRounds,
-  QUINIELA_SAVED_ROUNDS_KEY,
   savePredictions as saveLocalPredictions,
   saveRoundAsSaved as saveLocalRoundAsSaved,
 } from "@/lib/storage";
@@ -48,7 +47,10 @@ export async function loadQuinielaState(
 ): Promise<QuinielaState> {
   if (isSupabaseConfigured()) {
     if (!userId) {
-      return { predictions: {}, savedRounds: {} };
+      return {
+        predictions: loadLocalPredictions(),
+        savedRounds: {},
+      };
     }
 
     const supabase = createClient();
@@ -92,10 +94,6 @@ export async function loadQuinielaState(
       return local;
     }
 
-    saveLocalPredictions(cloudPredictions);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(QUINIELA_SAVED_ROUNDS_KEY, JSON.stringify(cloudSavedRounds));
-    }
     return { predictions: cloudPredictions, savedRounds: cloudSavedRounds };
   }
 
@@ -155,9 +153,12 @@ export async function saveQuinielaRound(
   round: number,
   seasonId: CompetitionSeasonId = DEFAULT_COMPETITION_SEASON_ID,
 ): Promise<void> {
-  saveLocalRoundAsSaved(round);
+  if (!isSupabaseConfigured()) {
+    saveLocalRoundAsSaved(round);
+    return;
+  }
 
-  if (!isSupabaseConfigured() || !userId) return;
+  if (!userId) return;
 
   const supabase = createClient();
   const { error } = await supabase.from("quiniela_saved_rounds").upsert(

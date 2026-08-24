@@ -2,6 +2,7 @@ import { DEFAULT_COMPETITION_SEASON_ID, type CompetitionSeasonId } from "@/data/
 import type { ClasificacionPrediction } from "@/lib/clasificacion-prediction";
 import { migratePrediction, normalizeGoalsPick } from "@/lib/quiniela";
 import type { QuinigolPrediction } from "@/lib/quinigol";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { GoalsPick, Prediction } from "@/types";
 
 export const PREDICTIONS_STORAGE_KEY = "rai1903.predictions.v2";
@@ -37,7 +38,7 @@ export const loadSavedRounds = (): Record<number, string> => {
 };
 
 export const saveRoundAsSaved = (round: number) => {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || isSupabaseConfigured()) return;
   const saved = loadSavedRounds();
   saved[round] = new Date().toISOString();
   window.localStorage.setItem(QUINIELA_SAVED_ROUNDS_KEY, JSON.stringify(saved));
@@ -120,7 +121,7 @@ export const saveQuinigolPredictions = (predictions: Record<string, QuinigolPred
 };
 
 export const saveQuinigolRoundAsSaved = (round: number) => {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || isSupabaseConfigured()) return;
   const saved = loadQuinigolSavedRounds();
   saved[round] = new Date().toISOString();
   window.localStorage.setItem(QUINIGOL_SAVED_ROUNDS_KEY, JSON.stringify(saved));
@@ -148,7 +149,7 @@ export const saveClasificacionPredictions = (predictions: Record<string, Clasifi
 };
 
 export const saveClasificacionSubmittedAt = (submittedAt: string | null) => {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || isSupabaseConfigured()) return;
   if (!submittedAt) {
     window.localStorage.removeItem(CLASIFICACION_SUBMITTED_KEY);
     return;

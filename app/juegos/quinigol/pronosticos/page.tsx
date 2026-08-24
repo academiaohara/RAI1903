@@ -20,7 +20,7 @@ import { getMatchdayByRound, countFinishedMatches, hasFirstMatchStarted, isMatch
 import { loadQuinigolState, quinigolRequiresAuth, saveQuinigolPredictions, saveQuinigolRound } from "@/lib/quinigol-storage";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { getUserDisplayName } from "@/lib/auth/user-display";
+import { resolveUserHandle } from "@/lib/auth/profile";
 import type { Matchday } from "@/types";
 import type { User } from "@supabase/supabase-js";
 
@@ -54,7 +54,7 @@ function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, b
       setPredictions(state.predictions);
       setSavedRounds(state.savedRounds);
       setUserId(user?.id ?? null);
-      setUserHandle(user ? getUserDisplayName(user) : "@usuario");
+      setUserHandle(user ? await resolveUserHandle(user) : "@usuario");
       setIsEditing(false);
       setHydrated(true);
     };
@@ -87,6 +87,7 @@ function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, b
     [selectedMatchday.matches],
   );
   const hasMatchesForRound = orderedMatches.length > 0;
+  const needsLogin = quinigolRequiresAuth() && hydrated && !userId;
   const isSaved = Boolean(savedRounds[round]);
   const isLocked = hasFirstMatchStarted(selectedMatchday);
   const readOnly = isLocked || (isSaved && !isEditing);
@@ -100,7 +101,6 @@ function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, b
     () => scoreQuinigolMatchday(selectedMatchday, predictions),
     [selectedMatchday, predictions],
   );
-  const needsLogin = quinigolRequiresAuth() && hydrated && !userId;
   const showScore = hydrated && shouldCountQuinielaPoints(selectedMatchday);
 
   const updatePrediction = useCallback(
@@ -117,6 +117,10 @@ function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, b
   );
 
   const handleSave = async () => {
+    if (quinigolRequiresAuth() && !userId) {
+      await alert("Inicia sesión para guardar tu quinigol y aparecer en el ranking.");
+      return;
+    }
     if (!isQuinigolMatchdayComplete(selectedMatchday, predictions)) {
       await alert("Completa el resultado 0-1-2-M de todos los partidos antes de guardar.");
       return;
@@ -141,7 +145,7 @@ function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, b
 
       {needsLogin && (
         <p className="rounded-xl border border-[#214C9B]/25 bg-blue-50 px-3 py-2 text-xs font-bold text-[#214C9B] sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
-          Inicia sesión para guardar tu quinigol en Supabase y aparecer en el ranking.
+          Puedes rellenar el boleto en tu navegador, pero inicia sesión para guardarlo y aparecer en los rankings.
         </p>
       )}
 
@@ -203,7 +207,7 @@ function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, b
             onEdit={() => setIsEditing(true)}
             saveDisabled={saveDisabled}
             isEditing={isEditing}
-            showLoginPrompt={needsLogin}
+            showLoginPrompt={false}
           />
         ) : null}
       </Card>
