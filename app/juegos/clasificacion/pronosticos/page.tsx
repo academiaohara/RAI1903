@@ -24,7 +24,7 @@ import {
 } from "@/lib/clasificacion-storage";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { getUserDisplayName } from "@/lib/auth/user-display";
+import { resolveUserHandle } from "@/lib/auth/profile";
 import type { User } from "@supabase/supabase-js";
 
 export default function ClasificacionPronosticosPage() {
@@ -49,13 +49,13 @@ export default function ClasificacionPronosticosPage() {
     () => buildActualStandingsByTeamId(teams, leagueMatchdays),
     [teams, leagueMatchdays],
   );
+  const needsLogin = clasificacionRequiresAuth() && hydrated && !userId;
   const isLocked = isClasificacionLocked(matchdays);
   const isSubmitted = submittedAt !== null;
-  const readOnly = isLocked || (isSubmitted && !isEditing);
+  const readOnly = needsLogin || isLocked || (isSubmitted && !isEditing);
   const canEdit = isSubmitted && !isLocked;
   const canSave = !isLocked && (!isSubmitted || isEditing);
   const saveDisabled = clasificacionRequiresAuth() && !userId;
-  const needsLogin = clasificacionRequiresAuth() && hydrated && !userId;
   const hasStandingsData = actualPositions.size > 0;
   const showCompare = hasStandingsData && Object.keys(effectivePredictions).length > 0;
   const showScoring = showCompare;
@@ -73,7 +73,7 @@ export default function ClasificacionPronosticosPage() {
       setPredictions(state.predictions);
       setSubmittedAt(state.submittedAt);
       setUserId(user?.id ?? null);
-      setUserHandle(user ? getUserDisplayName(user) : "@usuario");
+      setUserHandle(user ? await resolveUserHandle(user) : "@usuario");
       setIsEditing(false);
       setHydrated(true);
     };
@@ -102,6 +102,7 @@ export default function ClasificacionPronosticosPage() {
 
   const handleReorder = useCallback(
     (orderedTeamIds: string[]) => {
+      if (clasificacionRequiresAuth() && !userId) return;
       const next = orderedTeamIdsToPredictions(orderedTeamIds);
       setPredictions(next);
       if (!isSubmitted || isEditing) {
@@ -132,19 +133,19 @@ export default function ClasificacionPronosticosPage() {
 
       {needsLogin && (
         <p className="rounded-xl border border-[#214C9B]/25 bg-blue-50 px-3 py-2 text-xs font-bold text-[#214C9B] sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
-          Inicia sesión para guardar tu predicción y aparecer en el ranking.
+          Inicia sesión para participar, guardar tu predicción y aparecer en el ranking.
+        </p>
+      )}
+
+      {hydrated && !needsLogin && !isSubmitted && !isLocked && (
+        <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
+          Ordena los equipos y pulsa Guardar antes del pitido inicial de la primera jornada.
         </p>
       )}
 
       {hydrated && isLocked && (
         <p className="rounded-xl border border-[#981915]/30 bg-[#981915]/10 px-3 py-2 text-xs font-bold text-[#981915] sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
           La temporada ya ha empezado: tu predicción de clasificación queda cerrada.
-        </p>
-      )}
-
-      {hydrated && !isSubmitted && !isLocked && (
-        <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
-          Ordena los equipos y pulsa Guardar antes del pitido inicial de la primera jornada.
         </p>
       )}
 

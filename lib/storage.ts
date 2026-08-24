@@ -2,6 +2,7 @@ import { DEFAULT_COMPETITION_SEASON_ID, type CompetitionSeasonId } from "@/data/
 import type { ClasificacionPrediction } from "@/lib/clasificacion-prediction";
 import { migratePrediction, normalizeGoalsPick } from "@/lib/quiniela";
 import type { QuinigolPrediction } from "@/lib/quinigol";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { GoalsPick, Prediction } from "@/types";
 
 export const PREDICTIONS_STORAGE_KEY = "rai1903.predictions.v2";
@@ -36,8 +37,19 @@ export const loadSavedRounds = (): Record<number, string> => {
   }
 };
 
+export function clearLocalGameStateIfCloudMode(): void {
+  if (!isSupabaseConfigured() || typeof window === "undefined") return;
+
+  window.localStorage.removeItem(PREDICTIONS_STORAGE_KEY);
+  window.localStorage.removeItem(QUINIELA_SAVED_ROUNDS_KEY);
+  window.localStorage.removeItem(QUINIGOL_PREDICTIONS_STORAGE_KEY);
+  window.localStorage.removeItem(QUINIGOL_SAVED_ROUNDS_KEY);
+  window.localStorage.removeItem(CLASIFICACION_PREDICTIONS_STORAGE_KEY);
+  window.localStorage.removeItem(CLASIFICACION_SUBMITTED_KEY);
+}
+
 export const saveRoundAsSaved = (round: number) => {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || isSupabaseConfigured()) return;
   const saved = loadSavedRounds();
   saved[round] = new Date().toISOString();
   window.localStorage.setItem(QUINIELA_SAVED_ROUNDS_KEY, JSON.stringify(saved));
@@ -48,7 +60,7 @@ export const isRoundSaved = (round: number): boolean => {
 };
 
 export const savePredictions = (predictions: Record<string, Prediction>) => {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || isSupabaseConfigured()) return;
   window.localStorage.setItem(PREDICTIONS_STORAGE_KEY, JSON.stringify(predictions));
 };
 
@@ -115,12 +127,12 @@ export const loadQuinigolSavedRounds = (): Record<number, string> => {
 };
 
 export const saveQuinigolPredictions = (predictions: Record<string, QuinigolPrediction>) => {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || isSupabaseConfigured()) return;
   window.localStorage.setItem(QUINIGOL_PREDICTIONS_STORAGE_KEY, JSON.stringify(predictions));
 };
 
 export const saveQuinigolRoundAsSaved = (round: number) => {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || isSupabaseConfigured()) return;
   const saved = loadQuinigolSavedRounds();
   saved[round] = new Date().toISOString();
   window.localStorage.setItem(QUINIGOL_SAVED_ROUNDS_KEY, JSON.stringify(saved));
@@ -143,12 +155,12 @@ export const loadClasificacionSubmittedAt = (): string | null => {
 };
 
 export const saveClasificacionPredictions = (predictions: Record<string, ClasificacionPrediction>) => {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || isSupabaseConfigured()) return;
   window.localStorage.setItem(CLASIFICACION_PREDICTIONS_STORAGE_KEY, JSON.stringify(predictions));
 };
 
 export const saveClasificacionSubmittedAt = (submittedAt: string | null) => {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || isSupabaseConfigured()) return;
   if (!submittedAt) {
     window.localStorage.removeItem(CLASIFICACION_SUBMITTED_KEY);
     return;

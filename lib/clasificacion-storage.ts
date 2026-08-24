@@ -1,6 +1,7 @@
 import { DEFAULT_COMPETITION_SEASON_ID, type CompetitionSeasonId } from "@/data/mock";
 import type { ClasificacionPrediction } from "@/lib/clasificacion-prediction";
 import {
+  clearLocalGameStateIfCloudMode,
   loadClasificacionPredictions as loadLocalClasificacionPredictions,
   loadClasificacionSubmittedAt,
   saveClasificacionPredictions as saveLocalClasificacionPredictions,
@@ -26,6 +27,7 @@ export async function loadClasificacionState(
 ): Promise<ClasificacionState> {
   if (isSupabaseConfigured()) {
     if (!userId) {
+      clearLocalGameStateIfCloudMode();
       return { predictions: {}, submittedAt: null };
     }
 
@@ -75,8 +77,6 @@ export async function loadClasificacionState(
       return local;
     }
 
-    saveLocalClasificacionPredictions(cloudPredictions);
-    saveClasificacionSubmittedAt(cloudSubmittedAt);
     return { predictions: cloudPredictions, submittedAt: cloudSubmittedAt };
   }
 

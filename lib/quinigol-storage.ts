@@ -2,9 +2,9 @@ import { DEFAULT_COMPETITION_SEASON_ID, type CompetitionSeasonId } from "@/data/
 import { normalizeGoalsPick } from "@/lib/quiniela";
 import type { QuinigolPrediction } from "@/lib/quinigol";
 import {
+  clearLocalGameStateIfCloudMode,
   loadQuinigolPredictions as loadLocalQuinigolPredictions,
   loadQuinigolSavedRounds as loadLocalQuinigolSavedRounds,
-  QUINIGOL_SAVED_ROUNDS_KEY,
   saveQuinigolPredictions as saveLocalQuinigolPredictions,
   saveQuinigolRoundAsSaved as saveLocalQuinigolRoundAsSaved,
 } from "@/lib/storage";
@@ -47,6 +47,7 @@ export async function loadQuinigolState(
 ): Promise<QuinigolState> {
   if (isSupabaseConfigured()) {
     if (!userId) {
+      clearLocalGameStateIfCloudMode();
       return { predictions: {}, savedRounds: {} };
     }
 
@@ -96,10 +97,6 @@ export async function loadQuinigolState(
       return local;
     }
 
-    saveLocalQuinigolPredictions(cloudPredictions);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(QUINIGOL_SAVED_ROUNDS_KEY, JSON.stringify(cloudSavedRounds));
-    }
     return { predictions: cloudPredictions, savedRounds: cloudSavedRounds };
   }
 

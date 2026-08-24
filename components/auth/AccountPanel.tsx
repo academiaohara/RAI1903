@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 import type { Route } from "next";
 import type { User } from "@supabase/supabase-js";
 import { ChangePasswordForm } from "@/components/auth/ChangePasswordForm";
+import { DisplayNameForm } from "@/components/auth/DisplayNameForm";
 import { UserAvatar } from "@/components/auth/UserAvatar";
 import { userHasEmailPasswordIdentity } from "@/lib/auth/email-auth";
-import { getUserAvatarUrl, getUserDisplayName } from "@/lib/auth/user-display";
+import { resolveUserHandle } from "@/lib/auth/profile";
+import { getUserAvatarUrl } from "@/lib/auth/user-display";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
@@ -17,15 +19,20 @@ export function AccountPanel() {
   const configured = isSupabaseConfigured();
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(!configured);
+  const [displayHandle, setDisplayHandle] = useState("@usuario");
 
   useEffect(() => {
     if (!configured) return;
 
     const supabase = createClient();
-    void supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user);
+    void supabase.auth.getUser().then(async ({ data }) => {
+      const nextUser = data.user;
+      setUser(nextUser);
+      if (nextUser) {
+        setDisplayHandle(await resolveUserHandle(nextUser));
+      }
       setReady(true);
-      if (!data.user) {
+      if (!nextUser) {
         router.replace("/login?next=/cuenta" as Route);
       }
     });
@@ -44,18 +51,29 @@ export function AccountPanel() {
   }
 
   const canChangePassword = userHasEmailPasswordIdentity(user);
-  const displayName = getUserDisplayName(user);
   const avatarUrl = getUserAvatarUrl(user);
   const email = user.email ?? "";
 
   return (
     <div className="mx-auto max-w-md space-y-6">
       <div className="flex items-center gap-4 rounded-2xl border border-[#214C9B]/15 bg-slate-50 p-4">
-        <UserAvatar avatarUrl={avatarUrl} label={displayName} size="md" />
+        <UserAvatar avatarUrl={avatarUrl} label={displayHandle} size="md" />
         <div className="min-w-0">
-          <p className="truncate text-lg font-extrabold text-[#214C9B]">{displayName}</p>
+          <p className="truncate text-lg font-extrabold text-[#214C9B]">{displayHandle}</p>
           {email ? <p className="truncate text-sm text-slate-600">{email}</p> : null}
         </div>
+      </div>
+
+      <div className="space-y-3">
+        <h2 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Tu nombre público</h2>
+        <p className="text-sm text-slate-600">
+          Es el nombre que verás en boletos y rankings. Puedes cambiarlo cuando quieras.
+        </p>
+        <DisplayNameForm
+          key={displayHandle}
+          initialHandle={displayHandle}
+          onSaved={(handle) => setDisplayHandle(handle)}
+        />
       </div>
 
       {canChangePassword ? (

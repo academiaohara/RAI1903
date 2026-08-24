@@ -29,7 +29,7 @@ import {
 import { loadQuinielaState, saveQuinielaPredictions, saveQuinielaRound } from "@/lib/quiniela-storage";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { getUserDisplayName } from "@/lib/auth/user-display";
+import { resolveUserHandle } from "@/lib/auth/profile";
 import { scorerLabelForPlayer } from "@/lib/squad-player-resolve";
 import type { Matchday, Prediction } from "@/types";
 import type { User } from "@supabase/supabase-js";
@@ -68,7 +68,7 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
       setPredictions(state.predictions);
       setSavedRounds(state.savedRounds);
       setUserId(user?.id ?? null);
-      setUserHandle(user ? getUserDisplayName(user) : "@usuario");
+      setUserHandle(user ? await resolveUserHandle(user) : "@usuario");
       setIsEditing(false);
       setHydrated(true);
     };
@@ -101,9 +101,10 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
     [selectedMatchday.matches],
   );
   const hasMatchesForRound = selectedMatchday.matches.length > 0;
+  const needsLogin = quinielaRequiresAuth() && hydrated && !userId;
   const isSaved = Boolean(savedRounds[round]);
   const isLocked = hasFirstMatchStarted(selectedMatchday);
-  const readOnly = isLocked || (isSaved && !isEditing);
+  const readOnly = needsLogin || isLocked || (isSaved && !isEditing);
   const canEdit = isSaved && !isLocked;
   const canSave = !isLocked && (!isSaved || isEditing);
   const saveDisabled = quinielaRequiresAuth() && !userId;
@@ -117,7 +118,6 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
       ),
     [selectedMatchday, predictions, scoringContext],
   );
-  const needsLogin = quinielaRequiresAuth() && hydrated && !userId;
   const showScore = hydrated && shouldCountQuinielaPoints(selectedMatchday);
   const scorerCorrectByMatch = useMemo(
     () =>
@@ -150,6 +150,7 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
 
   const updatePrediction = useCallback(
     (prediction: Prediction) => {
+      if (quinielaRequiresAuth() && !userId) return;
       setPredictions((current) => {
         const next = { ...current, [prediction.matchId]: prediction };
         if (!isSaved || isEditing) {
@@ -202,11 +203,11 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
 
       {needsLogin && (
         <p className="rounded-xl border border-[#214C9B]/25 bg-blue-50 px-3 py-2 text-xs font-bold text-[#214C9B] sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
-          Inicia sesión para guardar tu quiniela en Supabase y aparecer en el ranking de jornada y el ranking general.
+          Inicia sesión para participar, guardar tu quiniela y aparecer en los rankings.
         </p>
       )}
 
-      {hydrated && statusBanner === "unsaved" && (
+      {hydrated && !needsLogin && statusBanner === "unsaved" && (
         <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
           No has hecho la quiniela de la jornada {round}. Rellena los partidos y pulsa Guardar.
         </p>
