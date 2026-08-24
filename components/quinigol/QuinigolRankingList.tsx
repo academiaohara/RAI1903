@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { UserAvatar } from "@/components/auth/UserAvatar";
+import { RankingRow } from "@/components/juegos/RankingRow";
+import { YourRankingPosition } from "@/components/juegos/YourRankingPosition";
 import { Pagination } from "@/components/Pagination";
 import { QuinigolUserModal } from "@/components/quinigol/QuinigolUserModal";
+import { useCurrentUserId } from "@/hooks/useCurrentUserId";
 import { usePagination } from "@/hooks/usePagination";
 import type { CompetitionSeasonId } from "@/data/mock";
 import type { GameRankingEntry } from "@/lib/game-rankings";
@@ -20,6 +22,7 @@ type QuinigolRankingListProps = {
   totalRounds: number;
   currentRound: number;
   initialModalRound?: number;
+  countPoints?: boolean;
 };
 
 export function QuinigolRankingList({
@@ -33,8 +36,10 @@ export function QuinigolRankingList({
   totalRounds,
   currentRound,
   initialModalRound,
+  countPoints = true,
 }: QuinigolRankingListProps) {
   const pagination = usePagination(entries);
+  const currentUserId = useCurrentUserId();
   const [selectedUser, setSelectedUser] = useState<GameRankingEntry | null>(null);
 
   if (entries.length === 0) {
@@ -45,26 +50,34 @@ export function QuinigolRankingList({
 
   return (
     <>
+      <YourRankingPosition
+        className="mb-3 sm:mb-4"
+        entries={entries}
+        page={pagination.page}
+        pageSize={pagination.pageSize}
+        countPoints={countPoints}
+        onSelect={(entry) => {
+          const full = entries.find((row) => row.userId === entry.userId);
+          if (full) setSelectedUser(full);
+        }}
+      />
+
       <div className="space-y-1.5 sm:space-y-2">
-        {pagination.paginatedItems.map((row, index) => (
-          <button
-            key={row.userId}
-            type="button"
-            onClick={() => setSelectedUser(row)}
-            className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-[#214C9B]/20 bg-white p-2.5 text-left text-xs transition hover:border-[#214C9B]/40 hover:bg-blue-50/40 sm:gap-3 sm:rounded-2xl sm:p-4 sm:text-sm"
-          >
-            <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#214C9B]/10 text-[11px] font-extrabold text-[#214C9B] sm:h-8 sm:w-8 sm:text-xs">
-                {rankOffset + index + 1}
-              </span>
-              <UserAvatar avatarUrl={row.avatarUrl} label={row.handle} size="sm" />
-              <div className="min-w-0">
-                <p className="truncate font-extrabold text-[#214C9B]">{row.handle}</p>
-              </div>
-            </div>
-            <span className="shrink-0 font-extrabold text-slate-900">{row.points} pts</span>
-          </button>
-        ))}
+        {pagination.paginatedItems.map((row, index) => {
+          const rank = rankOffset + index + 1;
+          return (
+            <RankingRow
+              key={row.userId}
+              rank={rank}
+              handle={row.handle}
+              avatarUrl={row.avatarUrl}
+              points={row.points}
+              countPoints={countPoints}
+              isCurrentUser={row.userId === currentUserId}
+              onClick={() => setSelectedUser(row)}
+            />
+          );
+        })}
       </div>
 
       <Pagination

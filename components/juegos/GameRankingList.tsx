@@ -1,17 +1,21 @@
 "use client";
 
-import { UserAvatar } from "@/components/auth/UserAvatar";
+import { RankingRow } from "@/components/juegos/RankingRow";
+import { YourRankingPosition } from "@/components/juegos/YourRankingPosition";
 import { Pagination } from "@/components/Pagination";
+import { useCurrentUserId } from "@/hooks/useCurrentUserId";
 import { usePagination } from "@/hooks/usePagination";
 import type { GameRankingEntry } from "@/lib/game-rankings";
 
 type GameRankingListProps = {
   entries: GameRankingEntry[];
   emptyMessage: string;
+  countPoints?: boolean;
 };
 
-export function GameRankingList({ entries, emptyMessage }: GameRankingListProps) {
+export function GameRankingList({ entries, emptyMessage, countPoints = true }: GameRankingListProps) {
   const pagination = usePagination(entries);
+  const currentUserId = useCurrentUserId();
 
   if (entries.length === 0) {
     return <p className="text-sm text-slate-500">{emptyMessage}</p>;
@@ -21,24 +25,29 @@ export function GameRankingList({ entries, emptyMessage }: GameRankingListProps)
 
   return (
     <>
+      <YourRankingPosition
+        className="mb-3 sm:mb-4"
+        entries={entries}
+        page={pagination.page}
+        pageSize={pagination.pageSize}
+        countPoints={countPoints}
+      />
+
       <div className="space-y-1.5 sm:space-y-2">
-        {pagination.paginatedItems.map((row, index) => (
-          <div
-            key={row.userId}
-            className="flex w-full items-center justify-between gap-2 rounded-xl border border-[#214C9B]/20 bg-white p-2.5 text-xs sm:gap-3 sm:rounded-2xl sm:p-4 sm:text-sm"
-          >
-            <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#214C9B]/10 text-[11px] font-extrabold text-[#214C9B] sm:h-8 sm:w-8 sm:text-xs">
-                {rankOffset + index + 1}
-              </span>
-              <UserAvatar avatarUrl={row.avatarUrl} label={row.handle} size="sm" />
-              <div className="min-w-0">
-                <p className="truncate font-extrabold text-[#214C9B]">{row.handle}</p>
-              </div>
-            </div>
-            <span className="shrink-0 font-extrabold text-slate-900">{row.points} pts</span>
-          </div>
-        ))}
+        {pagination.paginatedItems.map((row, index) => {
+          const rank = rankOffset + index + 1;
+          return (
+            <RankingRow
+              key={row.userId}
+              rank={rank}
+              handle={row.handle}
+              avatarUrl={row.avatarUrl}
+              points={row.points}
+              countPoints={countPoints}
+              isCurrentUser={row.userId === currentUserId}
+            />
+          );
+        })}
       </div>
 
       <Pagination

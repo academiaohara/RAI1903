@@ -71,6 +71,7 @@ function QuinigolResultadoBody({
           <>
             <QuinigolRankingList
               entries={entries}
+              countPoints={countPoints}
               seasonId={seasonId}
               matchdays={matchdays}
               teams={teams}

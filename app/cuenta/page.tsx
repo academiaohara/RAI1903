@@ -15,7 +15,7 @@ export default function AccountPage() {
       <PageHero
         eyebrow="Cuenta"
         title="Mi cuenta"
-        description="Consulta tus datos y cambia tu contraseña cuando lo necesites."
+        description="Consulta tus datos, boletos y cambia tu contraseña cuando lo necesites."
       />
 
       <Card eyebrow="Perfil" title="Ajustes">
