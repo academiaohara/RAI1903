@@ -4,6 +4,7 @@ import { UserAvatar } from "@/components/auth/UserAvatar";
 import { useCurrentUserId } from "@/hooks/useCurrentUserId";
 import {
   findUserRankingPosition,
+  getPodiumRowClass,
   isRankOnPage,
   type RankingListEntry,
 } from "@/lib/ranking-display";
@@ -48,9 +49,8 @@ export function YourRankingPosition({
     );
   }
 
-  if (isRankOnPage(position.rank, page, pageSize)) return null;
-
   const { rank, entry } = position;
+  const onCurrentPage = isRankOnPage(rank, page, pageSize);
   const Wrapper = onSelect ? "button" : "div";
 
   return (
@@ -58,8 +58,10 @@ export function YourRankingPosition({
       type={onSelect ? "button" : undefined}
       onClick={onSelect ? () => onSelect(entry) : undefined}
       className={cn(
-        "flex w-full items-center justify-between gap-2 rounded-xl border border-[#214C9B]/35 bg-[#214C9B]/5 p-2.5 text-left text-xs sm:gap-3 sm:rounded-2xl sm:p-4 sm:text-sm",
-        onSelect && "cursor-pointer transition hover:border-[#214C9B]/50 hover:bg-[#214C9B]/10",
+        "flex w-full items-center justify-between gap-2 rounded-xl border p-2.5 text-left text-xs sm:gap-3 sm:rounded-2xl sm:p-4 sm:text-sm",
+        getPodiumRowClass(rank),
+        "ring-2 ring-[#214C9B]/40 ring-offset-1",
+        onSelect && "cursor-pointer transition hover:brightness-[0.98]",
         className,
       )}
     >
@@ -76,6 +78,8 @@ export function YourRankingPosition({
             <p className="truncate font-extrabold text-[#214C9B]">{entry.handle}</p>
             {entry.roundsPlayed !== undefined ? (
               <p className="text-[10px] text-slate-500 sm:text-xs">{entry.roundsPlayed} jornadas</p>
+            ) : onCurrentPage ? (
+              <p className="text-[10px] text-slate-500 sm:text-xs">También en la lista de abajo</p>
             ) : null}
           </div>
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { Route } from "next";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { useSeason } from "@/components/season/SeasonProvider";
@@ -112,14 +113,14 @@ export function AccountBoletosSummary({ user }: AccountBoletosSummaryProps) {
             </div>
             <div className="flex shrink-0 flex-wrap gap-2">
               <Link
-                href={game.href}
+                href={game.href as Route}
                 prefetch={false}
                 className="rounded-lg border border-[#214C9B]/25 bg-white px-3 py-1.5 text-xs font-bold text-[#214C9B] transition hover:bg-[#214C9B]/5 sm:text-sm"
               >
                 Pronósticos
               </Link>
               <Link
-                href={game.rankingHref}
+                href={game.rankingHref as Route}
                 prefetch={false}
                 className="rounded-lg border border-[#214C9B]/25 bg-white px-3 py-1.5 text-xs font-bold text-[#214C9B] transition hover:bg-[#214C9B]/5 sm:text-sm"
               >
