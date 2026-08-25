@@ -249,8 +249,8 @@ function AccountDashboard({
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(320px,1fr)]">
         <SettingsCard
           icon={Gamepad2}
-          title="Tus boletos"
-          subtitle="Lo que llevas guardado en cada juego"
+          title="Tus pronósticos"
+          subtitle="Tu posición y puntos en cada juego"
         >
           <AccountBoletosSummary user={user} />
         </SettingsCard>
