@@ -11,12 +11,14 @@ import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { fetchProfileSupportedTeamId, saveSupportedTeamId } from "@/lib/quiniela-supported-team";
 import { getTeamById } from "@/lib/quiniela";
 import { getTeamCrestById } from "@/lib/team-crests";
+import { cn } from "@/lib/utils";
 
 type SupportedTeamProfileSectionProps = {
   user: User;
+  embedded?: boolean;
 };
 
-export function SupportedTeamProfileSection({ user }: SupportedTeamProfileSectionProps) {
+export function SupportedTeamProfileSection({ user, embedded = false }: SupportedTeamProfileSectionProps) {
   const { bundles } = useSeason();
   const teams = useMemo(() => resolveGroupTeams(bundles, "masculino", "1"), [bundles]);
   const [teamId, setTeamId] = useState<string | null>(null);
@@ -49,35 +51,42 @@ export function SupportedTeamProfileSection({ user }: SupportedTeamProfileSectio
 
   return (
     <>
-      <div className="flex aspect-square flex-col overflow-hidden rounded-2xl border border-[#214C9B]/12 bg-white shadow-sm">
-        <header className="flex items-center justify-between gap-2 px-4 py-3">
-          <h2 className="text-xs font-extrabold uppercase tracking-wide text-[#214C9B]">Tu equipo</h2>
+      <div
+        className={cn(
+          "flex flex-col",
+          embedded
+            ? "p-3"
+            : "overflow-hidden rounded-2xl border border-[#214C9B]/12 bg-white p-3 shadow-sm",
+        )}
+      >
+        <header className="mb-2 flex items-center justify-between gap-2">
+          <h2 className="text-[10px] font-extrabold uppercase tracking-wide text-slate-500">Tu equipo</h2>
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#214C9B]/15 text-[#214C9B] transition hover:border-[#214C9B]/35 hover:bg-[#214C9B]/5"
+            className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[#214C9B]/70 transition hover:bg-[#214C9B]/8 hover:text-[#214C9B]"
             aria-label="Editar equipo"
           >
-            <Pencil size={14} aria-hidden />
+            <Pencil size={12} aria-hidden />
           </button>
         </header>
 
-        <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4 pb-5">
+        <div className="flex flex-1 flex-col items-center justify-center gap-1.5 py-1 text-center">
           {crest && team ? (
             <>
               <OpponentCrest
                 logo={crest}
                 opponent={team.name}
                 teamId={team.id}
-                size="lg"
-                className="h-20 w-20 sm:h-24 sm:w-24"
+                size="md"
+                className="h-12 w-12"
               />
-              <p className="text-center text-sm font-extrabold text-[#214C9B]">{team.shortName ?? team.name}</p>
+              <p className="line-clamp-2 text-xs font-extrabold leading-tight text-[#214C9B]">
+                {team.shortName ?? team.name}
+              </p>
             </>
           ) : (
-            <p className="px-2 text-center text-sm text-slate-600">
-              Aún no has elegido equipo
-            </p>
+            <p className="text-xs leading-snug text-slate-500">Sin equipo</p>
           )}
         </div>
       </div>

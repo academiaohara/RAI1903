@@ -14,7 +14,7 @@ export default function AccountPage() {
       <PageHero
         eyebrow="Cuenta"
         title="Mi cuenta"
-        description="Consulta tu posición en los juegos, tu equipo y tu nombre público."
+        description="Tu equipo, tu nombre y tu posición en los juegos."
       />
 
       <Suspense fallback={<AccountPanelSkeleton />}>

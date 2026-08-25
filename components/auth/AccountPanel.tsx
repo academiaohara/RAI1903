@@ -7,40 +7,10 @@ import type { User } from "@supabase/supabase-js";
 import { AccountBoletosSummary } from "@/components/auth/AccountBoletosSummary";
 import { DisplayNameForm } from "@/components/auth/DisplayNameForm";
 import { SupportedTeamProfileSection } from "@/components/auth/SupportedTeamProfileSection";
-import { UserAvatar } from "@/components/auth/UserAvatar";
 import { resolveUserHandle } from "@/lib/auth/profile";
 import { getUserAvatarUrl } from "@/lib/auth/user-display";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-
-function MemberCard({ displayHandle, avatarUrl }: { displayHandle: string; avatarUrl: string | null }) {
-  return (
-    <section className="relative overflow-hidden rounded-2xl bg-[#173a78] text-white shadow-lg sm:rounded-3xl sm:shadow-xl">
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background: "linear-gradient(128deg, #122c5a 0%, #173a78 48%, #214c9b 100%)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background:
-            "repeating-linear-gradient(115deg, rgba(255,255,255,0.055) 0 44px, transparent 44px 92px)",
-        }}
-      />
-
-      <div className="relative flex items-center gap-3 p-4 sm:gap-4 sm:p-5">
-        <UserAvatar avatarUrl={avatarUrl} label={displayHandle} size="md" fallback="header" className="shadow-md" />
-        <h2 className="min-w-0 truncate font-[family-name:var(--font-bebas-neue)] text-3xl leading-none tracking-wide sm:text-4xl">
-          {displayHandle}
-        </h2>
-      </div>
-    </section>
-  );
-}
 
 function AccountDashboard({
   user,
@@ -54,24 +24,26 @@ function AccountDashboard({
   const avatarUrl = getUserAvatarUrl(user);
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <MemberCard displayHandle={displayHandle} avatarUrl={avatarUrl} />
+    <div className="mx-auto w-full max-w-md">
+      <section className="overflow-hidden rounded-2xl border border-[#214C9B]/12 bg-white shadow-sm">
+        <div className="grid grid-cols-2 divide-x divide-[#214C9B]/8">
+          <SupportedTeamProfileSection user={user} embedded />
+          <DisplayNameForm
+            key={displayHandle}
+            variant="card"
+            embedded
+            avatarUrl={avatarUrl}
+            initialHandle={displayHandle}
+            onSaved={onHandleSaved}
+          />
+        </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
-        <SupportedTeamProfileSection user={user} />
-        <DisplayNameForm
-          key={displayHandle}
-          variant="card"
-          initialHandle={displayHandle}
-          onSaved={onHandleSaved}
-        />
-      </div>
-
-      <section>
-        <h2 className="mb-3 text-xs font-extrabold uppercase tracking-wide text-[#214C9B] sm:text-sm">
-          Tus pronósticos
-        </h2>
-        <AccountBoletosSummary user={user} />
+        <div className="border-t border-[#214C9B]/8 px-3 py-3 sm:px-4">
+          <h2 className="mb-2 text-[10px] font-extrabold uppercase tracking-wide text-slate-500">
+            Tus pronósticos
+          </h2>
+          <AccountBoletosSummary user={user} compact />
+        </div>
       </section>
     </div>
   );
@@ -79,18 +51,19 @@ function AccountDashboard({
 
 export function AccountPanelSkeleton() {
   return (
-    <div className="space-y-4 sm:space-y-6" aria-busy="true" aria-label="Cargando tu cuenta">
-      <div className="h-20 animate-pulse rounded-2xl bg-[#214C9B]/10 sm:h-24" />
-      <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
-        <div className="aspect-square animate-pulse rounded-2xl bg-[#214C9B]/10" />
-        <div className="aspect-square animate-pulse rounded-2xl bg-[#214C9B]/10" />
-      </div>
-      <div className="space-y-3">
-        <div className="h-4 w-32 animate-pulse rounded bg-[#214C9B]/10" />
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {[0, 1, 2].map((row) => (
-            <div key={row} className="aspect-square animate-pulse rounded-2xl bg-[#214C9B]/10" />
-          ))}
+    <div className="mx-auto w-full max-w-md" aria-busy="true" aria-label="Cargando tu cuenta">
+      <div className="overflow-hidden rounded-2xl border border-[#214C9B]/12 bg-white shadow-sm">
+        <div className="grid grid-cols-2 divide-x divide-[#214C9B]/8">
+          <div className="h-28 animate-pulse bg-[#214C9B]/5" />
+          <div className="h-28 animate-pulse bg-[#214C9B]/5" />
+        </div>
+        <div className="space-y-2 border-t border-[#214C9B]/8 px-3 py-3 sm:px-4">
+          <div className="h-3 w-24 animate-pulse rounded bg-[#214C9B]/10" />
+          <div className="grid gap-2">
+            {[0, 1, 2].map((row) => (
+              <div key={row} className="h-12 animate-pulse rounded-xl bg-[#214C9B]/5" />
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -123,7 +96,7 @@ export function AccountPanel() {
 
   if (!configured) {
     return (
-      <p className="rounded-2xl border border-[#981915]/30 bg-[#981915]/10 px-5 py-4 text-sm font-medium text-[#981915]">
+      <p className="mx-auto max-w-md rounded-2xl border border-[#981915]/30 bg-[#981915]/10 px-5 py-4 text-sm font-medium text-[#981915]">
         Supabase no está configurado en este entorno.
       </p>
     );

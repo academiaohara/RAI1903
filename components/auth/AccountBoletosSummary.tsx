@@ -11,9 +11,11 @@ import { loadQuinielaState } from "@/lib/quiniela-storage";
 import { loadQuinigolState } from "@/lib/quinigol-storage";
 import type { QuinielaSeasonRankingEntry } from "@/lib/quiniela-ranking";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { cn } from "@/lib/utils";
 
 type AccountBoletosSummaryProps = {
   user: User;
+  compact?: boolean;
 };
 
 type GameId = "quiniela" | "quinigol" | "clasificacion";
@@ -47,7 +49,7 @@ async function fetchSeasonRanking(url: string): Promise<RankingPayload> {
   return (await response.json()) as RankingPayload;
 }
 
-export function AccountBoletosSummary({ user }: AccountBoletosSummaryProps) {
+export function AccountBoletosSummary({ user, compact = false }: AccountBoletosSummaryProps) {
   const { viewedSeasonId, viewedSeason } = useSeason();
   const [participations, setParticipations] = useState<GameParticipation[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -138,14 +140,17 @@ export function AccountBoletosSummary({ user }: AccountBoletosSummaryProps) {
   if (loading) {
     return (
       <div
-        className="grid grid-cols-2 gap-3 sm:grid-cols-3"
+        className={cn("grid gap-2", compact ? "grid-cols-1" : "grid-cols-2 sm:grid-cols-3")}
         aria-busy="true"
         aria-label="Cargando tus pronósticos"
       >
         {[0, 1, 2].map((row) => (
           <div
             key={row}
-            className="aspect-square animate-pulse rounded-2xl border border-[#214C9B]/10 bg-[#214C9B]/10"
+            className={cn(
+              "animate-pulse rounded-xl bg-[#214C9B]/5",
+              compact ? "h-12" : "aspect-square rounded-2xl border border-[#214C9B]/10 bg-[#214C9B]/10",
+            )}
           />
         ))}
       </div>
@@ -154,49 +159,73 @@ export function AccountBoletosSummary({ user }: AccountBoletosSummaryProps) {
 
   if (!participations || participations.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-[#214C9B]/25 bg-slate-50 px-4 py-8 text-center">
-        <Gamepad2 size={22} className="mx-auto text-[#214C9B]/60" aria-hidden />
-        <p className="mt-2 text-sm font-extrabold text-[#214C9B]">
-          Aún no tienes pronósticos en la temporada {viewedSeason.label}
+      <div
+        className={cn(
+          "rounded-xl border border-dashed border-[#214C9B]/25 bg-slate-50 text-center",
+          compact ? "px-3 py-4" : "rounded-2xl px-4 py-8",
+        )}
+      >
+        <Gamepad2 size={18} className="mx-auto text-[#214C9B]/60" aria-hidden />
+        <p className="mt-1.5 text-xs font-extrabold text-[#214C9B]">
+          Sin pronósticos en {viewedSeason.label}
         </p>
-        <p className="mx-auto mt-1 max-w-sm text-sm text-slate-600">
-          Guarda un boleto en cualquiera de los juegos y aquí verás tu posición y tus puntos.
-        </p>
+        {!compact ? (
+          <p className="mx-auto mt-1 max-w-sm text-sm text-slate-600">
+            Guarda un boleto en cualquiera de los juegos y aquí verás tu posición y tus puntos.
+          </p>
+        ) : null}
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+    <div className={cn(compact ? "space-y-2" : "space-y-3")}>
+      <div className={cn("grid gap-2", compact ? "grid-cols-1" : "grid-cols-2 sm:grid-cols-3")}>
         {participations.map((game) => (
           <article
             key={game.id}
-            className="flex aspect-square flex-col items-center justify-center rounded-2xl border border-[#214C9B]/12 bg-white p-4 text-center shadow-sm"
+            className={cn(
+              "flex items-center gap-2.5 rounded-xl border border-[#214C9B]/10 bg-slate-50/80",
+              compact ? "px-2.5 py-2" : "aspect-square flex-col justify-center rounded-2xl bg-white p-4 text-center shadow-sm",
+            )}
           >
-            <span className="flex h-10 w-12 items-center justify-center">
+            <span
+              className={cn(
+                "flex shrink-0 items-center justify-center",
+                compact ? "h-7 w-8" : "h-10 w-12",
+              )}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={GAME_LOGOS[game.id]} alt="" className="max-h-full max-w-full object-contain" />
             </span>
 
-            <h3 className="mt-2 text-xs font-extrabold uppercase tracking-wide text-[#214C9B]">
-              {game.label}
-            </h3>
+            <div className={cn("min-w-0", compact ? "flex-1" : "text-center")}>
+              <h3
+                className={cn(
+                  "font-extrabold uppercase tracking-wide text-[#214C9B]",
+                  compact ? "text-[10px] leading-tight" : "mt-2 text-xs",
+                )}
+              >
+                {game.label}
+              </h3>
 
-            <p className="mt-2 font-[family-name:var(--font-bebas-neue)] text-3xl leading-none text-[#214C9B]">
-              {game.rank}º
-            </p>
-
-            <p className="mt-1 text-sm font-bold tabular-nums text-slate-600">
-              {formatPoints(game.points)} pts
-            </p>
+              <p
+                className={cn(
+                  "tabular-nums text-slate-600",
+                  compact ? "mt-0.5 text-xs" : "mt-2 text-sm",
+                )}
+              >
+                <span className="font-bold text-[#214C9B]">{game.rank}º</span>
+                <span className="mx-1.5 text-slate-300">·</span>
+                <span className="font-semibold text-slate-700">{formatPoints(game.points)} pts</span>
+              </p>
+            </div>
           </article>
         ))}
       </div>
 
-      <p className="text-xs text-slate-500">
-        Temporada <span className="font-bold text-[#214C9B]">{viewedSeason.label}</span>. Solo aparecen los
-        juegos en los que participas.
+      <p className="text-[10px] text-slate-400">
+        Temporada {viewedSeason.label}
       </p>
     </div>
   );

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Pencil } from "lucide-react";
 import { Modal } from "@/components/Modal";
+import { UserAvatar } from "@/components/auth/UserAvatar";
 import { updateDisplayName } from "@/lib/auth/profile";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +13,8 @@ type DisplayNameFormProps = {
   className?: string;
   compact?: boolean;
   variant?: "form" | "card";
+  embedded?: boolean;
+  avatarUrl?: string | null;
 };
 
 const inputClassName =
@@ -112,6 +115,8 @@ export function DisplayNameForm({
   className,
   compact = false,
   variant = "form",
+  embedded = false,
+  avatarUrl = null,
 }: DisplayNameFormProps) {
   const [editing, setEditing] = useState(false);
 
@@ -120,24 +125,28 @@ export function DisplayNameForm({
       <>
         <div
           className={cn(
-            "flex aspect-square flex-col overflow-hidden rounded-2xl border border-[#214C9B]/12 bg-white shadow-sm",
+            "flex flex-col",
+            embedded
+              ? "p-3"
+              : "overflow-hidden rounded-2xl border border-[#214C9B]/12 bg-white p-3 shadow-sm",
             className,
           )}
         >
-          <header className="flex items-center justify-between gap-2 px-4 py-3">
-            <h2 className="text-xs font-extrabold uppercase tracking-wide text-[#214C9B]">Tu nombre</h2>
+          <header className="mb-2 flex items-center justify-between gap-2">
+            <h2 className="text-[10px] font-extrabold uppercase tracking-wide text-slate-500">Tu nombre</h2>
             <button
               type="button"
               onClick={() => setEditing(true)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#214C9B]/15 text-[#214C9B] transition hover:border-[#214C9B]/35 hover:bg-[#214C9B]/5"
+              className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[#214C9B]/70 transition hover:bg-[#214C9B]/8 hover:text-[#214C9B]"
               aria-label="Editar nombre"
             >
-              <Pencil size={14} aria-hidden />
+              <Pencil size={12} aria-hidden />
             </button>
           </header>
 
-          <div className="flex flex-1 items-center justify-center px-4 pb-5">
-            <p className="text-center font-[family-name:var(--font-bebas-neue)] text-3xl leading-none tracking-wide text-[#214C9B] sm:text-4xl">
+          <div className="flex flex-1 flex-col items-center justify-center gap-1.5 py-1 text-center">
+            <UserAvatar avatarUrl={avatarUrl} label={initialHandle} size="sm" fallback="card" />
+            <p className="max-w-full truncate font-[family-name:var(--font-bebas-neue)] text-xl leading-none tracking-wide text-[#214C9B]">
               {initialHandle}
             </p>
           </div>
