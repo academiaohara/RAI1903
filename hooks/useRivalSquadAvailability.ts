@@ -8,17 +8,18 @@ import {
 } from "@/lib/cms/rival-squads-bundle";
 import { upsertSeasonBundle } from "@/lib/cms/season-bundles";
 import { buildDefaultRivalSquadImport } from "@/lib/rival-squad-defaults";
-import { buildSquadFromImport } from "@/lib/rival-squad-imports";
+import { buildSquadFromImport, rivalImportPlayerId } from "@/lib/rival-squad-imports";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { PlayerStatus } from "@/types";
 import type { Team } from "@/types";
 import type { RivalSquadImport } from "@/types/rival-squad-import";
 
-function parseRivalPlayerDorsal(teamId: string, playerId: string): number | null {
-  const prefix = `${teamId}-d`;
-  if (!playerId.startsWith(prefix)) return null;
-  const dorsal = Number(playerId.slice(prefix.length));
-  return Number.isFinite(dorsal) ? dorsal : null;
+function findImportPlayerIndex(
+  plantilla: RivalSquadImport["plantilla"],
+  teamId: string,
+  playerId: string,
+): number {
+  return plantilla.findIndex((entry, index) => rivalImportPlayerId(teamId, entry, index) === playerId);
 }
 
 const ENTRADOR_SAVE_DEBOUNCE_MS = 450;
@@ -64,12 +65,12 @@ export function useRivalSquadAvailability(gender: PrimerEquipoGender, team: Team
 
   const setPlayerEstado = useCallback(
     (playerId: string, estado: PlayerStatus) => {
-      const dorsal = parseRivalPlayerDorsal(team.id, playerId);
-      if (dorsal == null) return;
-
       setImportDraft((prev) => {
-        const plantilla = prev.plantilla.map((entry) =>
-          entry.dorsal === dorsal ? { ...entry, estado } : entry,
+        const index = findImportPlayerIndex(prev.plantilla, team.id, playerId);
+        if (index < 0) return prev;
+
+        const plantilla = prev.plantilla.map((entry, entryIndex) =>
+          entryIndex === index ? { ...entry, estado } : entry,
         );
         const next = { ...prev, plantilla };
         void persistImport(next);

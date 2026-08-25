@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import type { SquadPlayer, SquadPosition } from "@/types/squad";
 import { SQUAD_POSITION_LABELS, SQUAD_POSITIONS } from "@/types/squad";
-import { formatPlayerAge, getPlayerFullName, groupPlayersByPosition } from "@/lib/squad-utils";
+import { formatPlayerAge, getPlayerFullName, groupPlayersByPosition, hasDisplayDorsal } from "@/lib/squad-utils";
 import { PositionSection } from "@/components/squad/PositionSection";
 import { PreferredFootIcon } from "@/components/squad/PreferredFootIcon";
 
@@ -62,7 +62,9 @@ export function RivalSquadTable({ players }: RivalSquadTableProps) {
                         transition={{ delay: rowIndex * 0.02 }}
                         className="border-b border-slate-50 text-sm"
                       >
-                        <td className={`${cellPad} text-center font-extrabold text-[#214C9B]`}>{player.dorsal}</td>
+                        <td className={`${cellPad} text-center font-extrabold text-[#214C9B]`}>
+                          {hasDisplayDorsal(player.dorsal) ? player.dorsal : "—"}
+                        </td>
                         <td className={`${cellPad} font-semibold text-slate-800`}>{getPlayerFullName(player)}</td>
                         <td className={`${cellPad} text-center text-xs font-bold text-slate-600`}>{player.rol}</td>
                         <td className={`${cellPad} text-center text-slate-700`}>{formatPlayerAge(player.edad)}</td>
@@ -92,7 +94,9 @@ export function RivalSquadTable({ players }: RivalSquadTableProps) {
                     key={player.id}
                     className="grid grid-cols-[2.5rem_minmax(0,1fr)_2.5rem_2.5rem_2.5rem] items-center gap-2 px-3 py-2.5"
                   >
-                    <span className="text-center text-sm font-extrabold text-[#214C9B]">{player.dorsal}</span>
+                    <span className="text-center text-sm font-extrabold text-[#214C9B]">
+                      {hasDisplayDorsal(player.dorsal) ? player.dorsal : "—"}
+                    </span>
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold text-slate-800">{getPlayerFullName(player)}</p>
                       <p className="text-[10px] font-bold uppercase text-slate-500">

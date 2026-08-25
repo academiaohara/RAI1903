@@ -5,7 +5,7 @@ type RawPlayer = Record<string, unknown>;
 
 /** Campos mínimos exportados al JSON editable del editor. */
 export type RivalSquadJsonPlayer = {
-  dorsal: number;
+  dorsal: number | null;
   jugador: string;
   pos: string;
   edad: number | null;
@@ -39,11 +39,28 @@ function asOptionalNumber(value: unknown): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function asOptionalDorsal(value: unknown): number | null {
+  if (value === null || value === undefined || value === "") return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+function sortRivalPlantilla(plantilla: RivalSquadImportPlayer[]): RivalSquadImportPlayer[] {
+  return [...plantilla].sort((a, b) => {
+    const aDorsal = a.dorsal;
+    const bDorsal = b.dorsal;
+    if (aDorsal != null && bDorsal != null) return aDorsal - bDorsal;
+    if (aDorsal != null) return -1;
+    if (bDorsal != null) return 1;
+    return a.jugador.localeCompare(b.jugador, "es");
+  });
+}
+
 function normalizePlayer(raw: RawPlayer): RivalSquadImportPlayer | null {
-  const dorsal = asNumber(raw.dorsal ?? raw.numero ?? raw.number, NaN);
+  const dorsal = asOptionalDorsal(raw.dorsal ?? raw.numero ?? raw.number);
   const jugador = String(raw.jugador ?? raw.nombre ?? raw.name ?? "").trim();
   const pos = String(raw.pos ?? raw.posicion ?? raw.position ?? "").trim();
-  if (!Number.isFinite(dorsal) || !jugador || !pos) return null;
+  if (!jugador || !pos) return null;
 
   const pieRaw = raw.pie ?? raw.pierna ?? raw.foot;
   const pie =
@@ -76,10 +93,10 @@ function normalizePlayer(raw: RawPlayer): RivalSquadImportPlayer | null {
 
 function normalizePlantilla(value: unknown): RivalSquadImportPlayer[] {
   if (!Array.isArray(value)) return [];
-  return value
+  const plantilla = value
     .map((entry) => (entry && typeof entry === "object" ? normalizePlayer(entry as RawPlayer) : null))
-    .filter((entry): entry is RivalSquadImportPlayer => entry !== null)
-    .sort((a, b) => a.dorsal - b.dorsal);
+    .filter((entry): entry is RivalSquadImportPlayer => entry !== null);
+  return sortRivalPlantilla(plantilla);
 }
 
 /** Acepta lista de jugadores o objeto `{ plantilla: [...] }`. */
@@ -106,7 +123,7 @@ export function parseRivalSquadJson(
 
   const plantilla = normalizePlantilla(plantillaSource);
   if (plantilla.length === 0) {
-    return { ok: false, error: "No se encontraron jugadores válidos (dorsal, jugador, pos)." };
+    return { ok: false, error: "No se encontraron jugadores válidos (jugador y pos obligatorios)." };
   }
 
   return {

@@ -35,9 +35,9 @@ const JSON_PLACEHOLDER = `[
   }
 ]`;
 
-function emptyPlayer(dorsal: number): RivalSquadImportPlayer {
+function emptyPlayer(): RivalSquadImportPlayer {
   return {
-    dorsal,
+    dorsal: null,
     jugador: "",
     pos: "Centrocampista",
     edad: null,
@@ -201,8 +201,8 @@ export function RivalSquadOnPageEditor({ gender, team }: RivalSquadOnPageEditorP
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="py-1.5 pr-3 font-semibold text-slate-800">dorsal</td>
-                  <td className="py-1.5 pr-3">number</td>
-                  <td className="py-1.5">1–99</td>
+                  <td className="py-1.5 pr-3">number | null</td>
+                  <td className="py-1.5">1–99 o null si no tiene dorsal</td>
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="py-1.5 pr-3 font-semibold text-slate-800">pos</td>
@@ -320,7 +320,7 @@ export function RivalSquadOnPageEditor({ gender, team }: RivalSquadOnPageEditorP
                       s
                         ? {
                             ...s,
-                            plantilla: [...s.plantilla, emptyPlayer(s.plantilla.length + 1)],
+                            plantilla: [...s.plantilla, emptyPlayer()],
                           }
                         : s,
                     )
@@ -379,7 +379,7 @@ export function RivalSquadOnPageEditor({ gender, team }: RivalSquadOnPageEditorP
                             const plantilla = [...s.plantilla];
                             plantilla[index] = {
                               ...plantilla[index]!,
-                              dorsal: e.target.value === "" ? 0 : Number(e.target.value),
+                              dorsal: e.target.value === "" ? null : Number(e.target.value),
                             };
                             return { ...s, plantilla };
                           })
