@@ -7,24 +7,18 @@ import { RivalSquadTable } from "@/components/squad/RivalSquadTable";
 import { applyMatchdayGoalsToSquad } from "@/lib/rival-squad-goals";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
-import type { SquadPlayer, SquadViewMode, StadiumInfo } from "@/types/squad";
+import type { SquadPlayer, SquadViewMode } from "@/types/squad";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { useRivalSquadAvailability } from "@/hooks/useRivalSquadAvailability";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
-import { getRivalSquadsBundle } from "@/lib/cms/rival-squads-bundle";
-import { saveRivalStadiumForSeason } from "@/lib/cms/stadium-catalog";
 import { getCompeticionSquadData } from "@/lib/competicion-squad";
-import { buildDefaultRivalSquadImport } from "@/lib/rival-squad-defaults";
 import { defaultRosterEstado, splitSquadByAvailability } from "@/lib/squad-utils";
-import { SquadHeader } from "@/components/squad/SquadHeader";
 import { SquadToolbar } from "@/components/squad/SquadToolbar";
 import { SquadAvailability } from "@/components/squad/SquadAvailability";
 import { SquadEditToolbar } from "@/components/squad/SquadEditToolbar";
 import { PlayerTable } from "@/components/squad/PlayerTable";
 import { PlayerGrid } from "@/components/squad/PlayerGrid";
 import { PlayerModal } from "@/components/squad/PlayerModal";
-import { StadiumModal } from "@/components/squad/StadiumModal";
-import { StadiumEditorModal } from "@/components/squad/StadiumEditorModal";
 import type { Matchday, Team } from "@/types";
 import type { RfefGrupoId } from "@/lib/rfef-grupos";
 
@@ -36,20 +30,14 @@ type EquipoLigaSquadProps = {
 };
 
 export function EquipoLigaSquad({ gender, team, grupo = "1", leagueMatchdays = [] }: EquipoLigaSquadProps) {
-  const { bundles, viewedSeason, viewedSeasonId } = useSeason();
-  const { getOverride } = useInlineEditing();
-  const { club: baseClub, squad: baseSquad, isOwnClub } = useMemo(
+  const { bundles, viewedSeason } = useSeason();
+  const { getOverride, editMode } = useInlineEditing();
+  const { squad: baseSquad, isOwnClub } = useMemo(
     () => getCompeticionSquadData(gender, team, bundles, viewedSeason.label),
     [bundles, gender, team, viewedSeason.label],
   );
   const { squad: ownSquad, updatePlayer, addPlayer, removePlayer } = useSquadPlayers(gender);
-  const {
-    squad: rivalSquad,
-    entrenador: rivalEntrenador,
-    setPlayerEstado: setRivalPlayerEstado,
-    setEntrenador: setRivalEntrenador,
-  } = useRivalSquadAvailability(gender, team);
-  const { editMode, getValue } = useInlineEditing();
+  const { squad: rivalSquad, setPlayerEstado: setRivalPlayerEstado } = useRivalSquadAvailability(gender, team);
   const squad = useMemo(() => {
     const base = isOwnClub ? ownSquad : rivalSquad.length > 0 ? rivalSquad : baseSquad;
     if (!isOwnClub && gender === "masculino" && grupo === "1" && leagueMatchdays.length > 0) {
@@ -67,29 +55,6 @@ export function EquipoLigaSquad({ gender, team, grupo = "1", leagueMatchdays = [
     rivalSquad,
     team.id,
   ]);
-  const [stadiumOverride, setStadiumOverride] = useState<StadiumInfo | null>(null);
-  const club = useMemo(() => {
-    const withStadium = stadiumOverride
-      ? {
-          ...baseClub,
-          estadio: stadiumOverride.nombre,
-          estadioInfo: stadiumOverride,
-        }
-      : baseClub;
-
-    if (isOwnClub) {
-      return {
-        ...withStadium,
-        entrenador: getValue(`squad-club:${gender}:entrenador`, withStadium.entrenador),
-      };
-    }
-
-    return {
-      ...withStadium,
-      temporada: viewedSeason.label,
-      entrenador: rivalEntrenador,
-    };
-  }, [baseClub, gender, getValue, isOwnClub, rivalEntrenador, stadiumOverride, viewedSeason.label]);
   const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
 
   const handleMarkUnavailable = useCallback(
@@ -123,7 +88,6 @@ export function EquipoLigaSquad({ gender, team, grupo = "1", leagueMatchdays = [
 
   const [viewMode, setViewMode] = useState<SquadViewMode>(listOnlyView ? "lista" : "fichas");
   const [selected, setSelected] = useState<SquadPlayer | null>(null);
-  const [stadiumOpen, setStadiumOpen] = useState(false);
   const [addBusy, setAddBusy] = useState(false);
 
   const handleSelect = showPlayerModal ? setSelected : undefined;
@@ -139,31 +103,9 @@ export function EquipoLigaSquad({ gender, team, grupo = "1", leagueMatchdays = [
     [addPlayer, isOwnClub],
   );
 
-  const stadiumModalOpen = stadiumOpen && !editMode;
-  const stadiumEditorOpen = stadiumOpen && editMode;
-
-  const rivalImportFallback = useMemo(() => {
-    if (isOwnClub) return undefined;
-    return getRivalSquadsBundle(bundles, gender).squads[team.id] ?? buildDefaultRivalSquadImport(team);
-  }, [bundles, gender, isOwnClub, team]);
-
-  const handleSaveRivalStadium = useCallback(
-    (stadium: StadiumInfo) =>
-      saveRivalStadiumForSeason(viewedSeasonId, gender, bundles, team.id, stadium, rivalImportFallback),
-    [bundles, gender, rivalImportFallback, team.id, viewedSeasonId],
-  );
-
   return (
     <div className="space-y-6">
       {!isOwnClub && <RivalSquadOnPageEditor gender={gender} team={team} />}
-      <SquadHeader
-        club={club}
-        stats={club.stats}
-        gender={gender}
-        onStadiumClick={() => setStadiumOpen(true)}
-        perTeamEntrenador={!isOwnClub}
-        onEntrenadorChange={!isOwnClub ? setRivalEntrenador : undefined}
-      />
       <SquadToolbar
         viewMode={viewMode}
         onViewModeChange={setViewMode}
@@ -228,16 +170,6 @@ export function EquipoLigaSquad({ gender, team, grupo = "1", leagueMatchdays = [
           }
         />
       )}
-      <StadiumModal stadium={club.estadioInfo} open={stadiumModalOpen} onClose={() => setStadiumOpen(false)} />
-      <StadiumEditorModal
-        open={stadiumEditorOpen}
-        onClose={() => setStadiumOpen(false)}
-        gender={gender}
-        clubName={club.nombre}
-        current={club.estadioInfo}
-        onSaved={setStadiumOverride}
-        onSave={!isOwnClub ? handleSaveRivalStadium : undefined}
-      />
     </div>
   );
 }
