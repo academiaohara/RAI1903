@@ -4,15 +4,17 @@ import Link from "next/link";
 import type { Route } from "next";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
+import { Gamepad2, Ticket, Trophy } from "lucide-react";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { loadClasificacionState } from "@/lib/clasificacion-storage";
 import { gameTabHref } from "@/lib/juegos";
 import type { GameRankingEntry, GameSeasonRankingEntry } from "@/lib/game-rankings";
-import { findUserRankingPosition } from "@/lib/ranking-display";
+import { findUserRankingPosition, getPodiumBadgeClass } from "@/lib/ranking-display";
 import { loadQuinielaState } from "@/lib/quiniela-storage";
 import { loadQuinigolState } from "@/lib/quinigol-storage";
 import type { QuinielaSeasonRankingEntry } from "@/lib/quiniela-ranking";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { cn } from "@/lib/utils";
 
 type AccountBoletosSummaryProps = {
   user: User;
@@ -24,7 +26,7 @@ type GameParticipation = {
   id: GameId;
   label: string;
   rank: number;
-  pointsLabel: string;
+  points: number | null;
   href: Route;
   rankingHref: Route;
 };
@@ -32,6 +34,12 @@ type GameParticipation = {
 type RankingPayload = {
   entries?: Array<GameRankingEntry | GameSeasonRankingEntry | QuinielaSeasonRankingEntry>;
   countPoints?: boolean;
+};
+
+const GAME_LOGOS: Record<GameId, string> = {
+  quiniela: "/juegos/rainielav2.svg",
+  quinigol: "/juegos/raigol.svg",
+  clasificacion: "/api/game-logo/oraculo",
 };
 
 async function fetchSeasonRanking(url: string): Promise<RankingPayload> {
@@ -63,15 +71,10 @@ export function AccountBoletosSummary({ user }: AccountBoletosSummaryProps) {
         clasificacion: clasificacion.submittedAt !== null,
       };
 
-      if (!participates.quiniela && !participates.quinigol && !participates.clasificacion) {
-        if (!cancelled) {
-          setParticipations([]);
-          setLoading(false);
-        }
-        return;
-      }
+      const noParticipation =
+        !participates.quiniela && !participates.quinigol && !participates.clasificacion;
 
-      if (!isSupabaseConfigured()) {
+      if (noParticipation || !isSupabaseConfigured()) {
         if (!cancelled) {
           setParticipations([]);
           setLoading(false);
@@ -88,7 +91,9 @@ export function AccountBoletosSummary({ user }: AccountBoletosSummaryProps) {
           ? fetchSeasonRanking(`/api/quinigol/ranking?${params.toString()}`)
           : Promise.resolve({ entries: [], countPoints: false }),
         participates.clasificacion
-          ? fetchSeasonRanking(`/api/clasificacion/ranking?${new URLSearchParams({ seasonId: viewedSeasonId }).toString()}`)
+          ? fetchSeasonRanking(
+              `/api/clasificacion/ranking?${new URLSearchParams({ seasonId: viewedSeasonId }).toString()}`,
+            )
           : Promise.resolve({ entries: [], countPoints: false }),
       ]);
 
@@ -110,7 +115,7 @@ export function AccountBoletosSummary({ user }: AccountBoletosSummaryProps) {
           id,
           label,
           rank: position.rank,
-          pointsLabel: payload.countPoints ? `${position.entry.points} pts` : "—",
+          points: payload.countPoints ? position.entry.points : null,
           href,
           rankingHref,
         });
@@ -159,59 +164,106 @@ export function AccountBoletosSummary({ user }: AccountBoletosSummaryProps) {
 
   if (loading) {
     return (
-      <div className="space-y-3">
-        <h2 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Pronósticos</h2>
-        <p className="text-sm text-slate-500">Cargando tus pronósticos…</p>
+      <div className="space-y-3" aria-busy="true" aria-label="Cargando tus pronósticos">
+        {[0, 1, 2].map((row) => (
+          <div
+            key={row}
+            className="flex items-center gap-4 rounded-2xl border border-[#214C9B]/10 bg-white p-4"
+          >
+            <div className="h-14 w-16 shrink-0 animate-pulse rounded-xl bg-[#214C9B]/10" />
+            <div className="min-w-0 flex-1 space-y-2">
+              <div className="h-3.5 w-28 animate-pulse rounded bg-[#214C9B]/10" />
+              <div className="h-3 w-44 max-w-full animate-pulse rounded bg-slate-200/80" />
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
 
   if (!participations || participations.length === 0) {
-    return null;
+    return (
+      <div className="rounded-2xl border border-dashed border-[#214C9B]/25 bg-slate-50 px-5 py-8 text-center">
+        <Gamepad2 size={22} className="mx-auto text-[#214C9B]/60" aria-hidden />
+        <p className="mt-2 text-sm font-extrabold text-[#214C9B]">
+          Aún no tienes pronósticos en la temporada {viewedSeason.label}
+        </p>
+        <p className="mx-auto mt-1 max-w-sm text-sm text-slate-600">
+          Guarda un boleto en cualquiera de los juegos y aquí verás tu posición y tus puntos.
+        </p>
+        <Link
+          href={"/juegos" as Route}
+          prefetch={false}
+          className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-[#214C9B] bg-[#214C9B] px-4 py-2 text-xs font-extrabold uppercase tracking-wide text-white transition hover:bg-[#1a3d7a]"
+        >
+          <Ticket size={14} aria-hidden />
+          Ir a los juegos
+        </Link>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-3">
-      <div>
-        <h2 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Pronósticos</h2>
-        <p className="mt-1 text-sm text-slate-600">
-          Temporada <span className="font-bold text-[#214C9B]">{viewedSeason.label}</span>
-        </p>
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {participations.map((game) => (
-          <div
-            key={game.id}
-            className="flex flex-col gap-3 rounded-xl border border-[#214C9B]/15 bg-slate-50 p-4"
-          >
+      {participations.map((game) => (
+        <article
+          key={game.id}
+          className="group flex flex-col gap-4 rounded-2xl border border-[#214C9B]/12 bg-white p-4 shadow-sm transition hover:border-[#214C9B]/30 hover:shadow-md sm:flex-row sm:items-center"
+        >
+          <div className="flex min-w-0 flex-1 items-center gap-4">
+            <span className="flex h-14 w-16 shrink-0 items-center justify-center rounded-xl border border-[#214C9B]/10 bg-slate-50 p-1.5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={GAME_LOGOS[game.id]} alt="" className="max-h-full max-w-full object-contain" />
+            </span>
             <div className="min-w-0">
-              <p className="font-extrabold text-[#214C9B]">{game.label}</p>
-              <p className="mt-1 text-sm text-slate-600">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <h3 className="font-extrabold uppercase tracking-wide text-[#214C9B]">{game.label}</h3>
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide",
+                    getPodiumBadgeClass(game.rank),
+                  )}
+                >
+                  <Trophy size={11} aria-hidden />
+                  {game.rank}º
+                </span>
+              </div>
+              <p className="mt-0.5 text-sm text-slate-600">
                 Posición <span className="font-bold text-[#214C9B]">{game.rank}º</span>
                 <span className="mx-2 text-slate-300">·</span>
-                <span className="font-bold text-slate-900">{game.pointsLabel}</span>
+                {game.points !== null ? (
+                  <span className="font-bold text-slate-900">{game.points} pts</span>
+                ) : (
+                  <span>puntos no disponibles</span>
+                )}
               </p>
             </div>
-            <div className="mt-auto flex flex-wrap gap-2">
-              <Link
-                href={game.href}
-                prefetch={false}
-                className="rounded-lg border border-[#214C9B]/25 bg-white px-3 py-1.5 text-xs font-bold text-[#214C9B] transition hover:bg-[#214C9B]/5 sm:text-sm"
-              >
-                Pronósticos
-              </Link>
-              <Link
-                href={game.rankingHref}
-                prefetch={false}
-                className="rounded-lg border border-[#214C9B]/25 bg-white px-3 py-1.5 text-xs font-bold text-[#214C9B] transition hover:bg-[#214C9B]/5 sm:text-sm"
-              >
-                Ranking
-              </Link>
-            </div>
           </div>
-        ))}
-      </div>
+          <div className="flex shrink-0 gap-2">
+            <Link
+              href={game.href}
+              prefetch={false}
+              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full border border-[#214C9B] bg-[#214C9B] px-3.5 py-2 text-xs font-extrabold uppercase tracking-wide text-white transition hover:bg-[#1a3d7a] sm:flex-none"
+            >
+              <Ticket size={14} aria-hidden />
+              Pronósticos
+            </Link>
+            <Link
+              href={game.rankingHref}
+              prefetch={false}
+              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full border border-[#214C9B]/25 bg-white px-3.5 py-2 text-xs font-extrabold uppercase tracking-wide text-[#214C9B] transition hover:border-[#214C9B] hover:bg-[#214C9B]/5 sm:flex-none"
+            >
+              <Trophy size={14} aria-hidden />
+              Ranking
+            </Link>
+          </div>
+        </article>
+      ))}
+
+      <p className="px-1 text-xs text-slate-500">
+        Temporada <span className="font-bold text-[#214C9B]">{viewedSeason.label}</span>. Solo aparecen los
+        juegos en los que participas.
+      </p>
     </div>
   );
 }
