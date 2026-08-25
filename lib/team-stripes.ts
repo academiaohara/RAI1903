@@ -36,10 +36,16 @@ export function teamStripeBackgroundStyle(colors?: string[]): CSSProperties {
 }
 
 /** Franjas diagonales (p. ej. selector de equipo en quiniela). */
-export function teamDiagonalStripeBackgroundStyle(colors?: string[]): CSSProperties {
+export function teamDiagonalStripeBackgroundStyle(
+  colors?: string[],
+  options?: { stripeWidth?: number; angle?: number },
+): CSSProperties {
   const [primary, secondary] = resolveTeamColors(colors);
+  const stripeWidth = options?.stripeWidth ?? 11;
+  const angle = options?.angle ?? -38;
+  const cycle = stripeWidth * 2;
 
   return {
-    background: `repeating-linear-gradient(-38deg, ${primary} 0px, ${primary} 11px, ${secondary} 11px, ${secondary} 22px)`,
+    background: `repeating-linear-gradient(${angle}deg, ${primary} 0px, ${primary} ${stripeWidth}px, ${secondary} ${stripeWidth}px, ${secondary} ${cycle}px)`,
   };
 }
