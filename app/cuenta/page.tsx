@@ -1,28 +1,25 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { AccountPanel } from "@/components/auth/AccountPanel";
-import { Card } from "@/components/Card";
+import { AccountPanel, AccountPanelSkeleton } from "@/components/auth/AccountPanel";
 import { PageHero } from "@/components/PageHero";
 
 export const metadata: Metadata = {
   title: "Mi cuenta | RAI1903",
-  description: "Gestiona tu cuenta y cambia tu contraseña.",
+  description: "Tu carnet blanquiazul: perfil, boletos de los juegos y ajustes de acceso.",
 };
 
 export default function AccountPage() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <PageHero
         eyebrow="Cuenta"
         title="Mi cuenta"
-        description="Consulta tus datos, boletos y cambia tu contraseña cuando lo necesites."
+        description="Tu carnet blanquiazul: consulta tus boletos de los juegos, tu nombre público y tus ajustes de acceso."
       />
 
-      <Card eyebrow="Perfil" title="Ajustes">
-        <Suspense fallback={<p className="text-center text-sm text-slate-600">Cargando…</p>}>
-          <AccountPanel />
-        </Suspense>
-      </Card>
+      <Suspense fallback={<AccountPanelSkeleton />}>
+        <AccountPanel />
+      </Suspense>
     </div>
   );
 }
