@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Pencil } from "lucide-react";
+import { Modal } from "@/components/Modal";
 import { updateDisplayName } from "@/lib/auth/profile";
 import { cn } from "@/lib/utils";
 
@@ -9,12 +11,23 @@ type DisplayNameFormProps = {
   onSaved?: (handle: string) => void;
   className?: string;
   compact?: boolean;
+  variant?: "form" | "card";
 };
 
 const inputClassName =
   "mt-1 w-full rounded-xl border border-[#214C9B]/20 bg-white px-4 py-3 text-sm font-semibold text-slate-900 outline-none transition focus:border-[#214C9B] focus:ring-2 focus:ring-[#214C9B]/20";
 
-export function DisplayNameForm({ initialHandle, onSaved, className, compact = false }: DisplayNameFormProps) {
+function DisplayNameEditor({
+  initialHandle,
+  onSaved,
+  compact = false,
+  onDone,
+}: {
+  initialHandle: string;
+  onSaved?: (handle: string) => void;
+  compact?: boolean;
+  onDone?: () => void;
+}) {
   const [value, setValue] = useState(initialHandle.replace(/^@/, ""));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,10 +50,11 @@ export function DisplayNameForm({ initialHandle, onSaved, className, compact = f
     setSuccess("Nombre actualizado.");
     onSaved?.(handle);
     setLoading(false);
+    onDone?.();
   };
 
   return (
-    <form onSubmit={(event) => void handleSubmit(event)} className={cn("space-y-4", className)}>
+    <form onSubmit={(event) => void handleSubmit(event)} className="space-y-4">
       <label className="block text-left">
         <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
           Nombre en rankings y boletos
@@ -89,5 +103,62 @@ export function DisplayNameForm({ initialHandle, onSaved, className, compact = f
         {loading ? "Guardando…" : "Guardar nombre"}
       </button>
     </form>
+  );
+}
+
+export function DisplayNameForm({
+  initialHandle,
+  onSaved,
+  className,
+  compact = false,
+  variant = "form",
+}: DisplayNameFormProps) {
+  const [editing, setEditing] = useState(false);
+
+  if (variant === "card") {
+    return (
+      <>
+        <div
+          className={cn(
+            "flex aspect-square flex-col overflow-hidden rounded-2xl border border-[#214C9B]/12 bg-white shadow-sm",
+            className,
+          )}
+        >
+          <header className="flex items-center justify-between gap-2 px-4 py-3">
+            <h2 className="text-xs font-extrabold uppercase tracking-wide text-[#214C9B]">Tu nombre</h2>
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#214C9B]/15 text-[#214C9B] transition hover:border-[#214C9B]/35 hover:bg-[#214C9B]/5"
+              aria-label="Editar nombre"
+            >
+              <Pencil size={14} aria-hidden />
+            </button>
+          </header>
+
+          <div className="flex flex-1 items-center justify-center px-4 pb-5">
+            <p className="text-center font-[family-name:var(--font-bebas-neue)] text-3xl leading-none tracking-wide text-[#214C9B] sm:text-4xl">
+              {initialHandle}
+            </p>
+          </div>
+        </div>
+
+        <Modal open={editing} title="Editar nombre público" onClose={() => setEditing(false)}>
+          <DisplayNameEditor
+            key={initialHandle}
+            initialHandle={initialHandle}
+            onSaved={onSaved}
+            compact
+            onDone={() => setEditing(false)}
+          />
+        </Modal>
+      </>
+    );
+  }
+
+  return (
+    <div className={cn("space-y-4", className)}>
+      <DisplayNameEditor initialHandle={initialHandle} onSaved={onSaved} compact={compact} />
+    </div>
   );
 }

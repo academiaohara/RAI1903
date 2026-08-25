@@ -4,74 +4,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Route } from "next";
 import type { User } from "@supabase/supabase-js";
-import {
-  AtSign,
-  Gamepad2,
-  KeyRound,
-  LogOut,
-  ShieldCheck,
-  Star,
-  type LucideIcon,
-} from "lucide-react";
-import { ChangePasswordForm } from "@/components/auth/ChangePasswordForm";
 import { AccountBoletosSummary } from "@/components/auth/AccountBoletosSummary";
 import { DisplayNameForm } from "@/components/auth/DisplayNameForm";
 import { SupportedTeamProfileSection } from "@/components/auth/SupportedTeamProfileSection";
 import { UserAvatar } from "@/components/auth/UserAvatar";
-import { userHasEmailPasswordIdentity } from "@/lib/auth/email-auth";
 import { resolveUserHandle } from "@/lib/auth/profile";
 import { getUserAvatarUrl } from "@/lib/auth/user-display";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-
-const PROVIDER_LABELS: Record<string, string> = {
-  google: "Google",
-  twitter: "X",
-  email: "Correo",
-};
-
-function resolveProviders(user: User): string[] {
-  const providers = new Set<string>();
-  for (const identity of user.identities ?? []) {
-    if (identity.provider) providers.add(identity.provider);
-  }
-  if (providers.size === 0) {
-    const appProviders = (user.app_metadata as { providers?: unknown } | undefined)?.providers;
-    if (Array.isArray(appProviders)) {
-      for (const provider of appProviders) {
-        if (typeof provider === "string") providers.add(provider);
-      }
-    }
-  }
-  return [...providers].map((provider) => PROVIDER_LABELS[provider] ?? provider);
-}
-
-function SettingsCard({
-  icon: Icon,
-  title,
-  subtitle,
-  children,
-}: {
-  icon: LucideIcon;
-  title: string;
-  subtitle: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="overflow-hidden rounded-2xl border border-[#214C9B]/12 bg-white shadow-sm">
-      <header className="flex items-center gap-3 border-b border-[#214C9B]/10 px-4 py-3 sm:px-5 sm:py-4">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#214C9B]/10 text-[#214C9B] sm:h-10 sm:w-10">
-          <Icon size={18} aria-hidden />
-        </span>
-        <div className="min-w-0">
-          <h2 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">{title}</h2>
-          <p className="mt-0.5 hidden text-xs text-slate-500 sm:block">{subtitle}</p>
-        </div>
-      </header>
-      <div className="p-4 sm:p-5">{children}</div>
-    </section>
-  );
-}
 
 function MemberCard({ displayHandle, avatarUrl }: { displayHandle: string; avatarUrl: string | null }) {
   return (
@@ -111,72 +51,28 @@ function AccountDashboard({
   displayHandle: string;
   onHandleSaved: (handle: string) => void;
 }) {
-  const router = useRouter();
-  const [signingOut, setSigningOut] = useState(false);
-  const canChangePassword = userHasEmailPasswordIdentity(user);
-  const providers = resolveProviders(user);
-  const oauthOnlyProvider = providers.find((provider) => provider !== "Correo") ?? providers[0];
   const avatarUrl = getUserAvatarUrl(user);
-
-  const signOut = async () => {
-    setSigningOut(true);
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/" as Route);
-    router.refresh();
-  };
 
   return (
     <div className="space-y-4 sm:space-y-6">
       <MemberCard displayHandle={displayHandle} avatarUrl={avatarUrl} />
 
-      <div className="grid items-start gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(320px,1fr)]">
-        <SettingsCard icon={Gamepad2} title="Tus pronósticos" subtitle="Tu posición y puntos en cada juego">
-          <AccountBoletosSummary user={user} />
-        </SettingsCard>
-
-        <div className="space-y-4 sm:space-y-6">
-          <SettingsCard
-            icon={Star}
-            title="Tu equipo en la RAIniela"
-            subtitle="El equipo que sigues en la quiniela del Grupo I"
-          >
-            <SupportedTeamProfileSection user={user} />
-          </SettingsCard>
-
-          <SettingsCard icon={AtSign} title="Nombre público" subtitle="El que se ve en boletos y rankings">
-            <DisplayNameForm
-              key={displayHandle}
-              initialHandle={displayHandle}
-              onSaved={onHandleSaved}
-            />
-          </SettingsCard>
-
-          {canChangePassword ? (
-            <SettingsCard icon={KeyRound} title="Seguridad" subtitle="Actualiza tu contraseña de acceso">
-              <ChangePasswordForm email={user.email ?? ""} />
-            </SettingsCard>
-          ) : (
-            <SettingsCard icon={ShieldCheck} title="Seguridad" subtitle="Acceso con proveedor externo">
-              <p className="text-sm leading-6 text-slate-600">
-                Entras con <span className="font-bold text-[#214C9B]">{oauthOnlyProvider}</span>, así que no hace
-                falta contraseña aquí: tu acceso y su seguridad se gestionan desde tu cuenta de{" "}
-                {oauthOnlyProvider}.
-              </p>
-            </SettingsCard>
-          )}
-
-          <button
-            type="button"
-            onClick={() => void signOut()}
-            disabled={signingOut}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#214C9B]/15 bg-white px-4 py-3 text-xs font-extrabold uppercase tracking-wide text-[#214C9B] transition hover:bg-[#214C9B]/5 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            <LogOut size={15} aria-hidden />
-            {signingOut ? "Saliendo…" : "Cerrar sesión"}
-          </button>
-        </div>
+      <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
+        <SupportedTeamProfileSection user={user} />
+        <DisplayNameForm
+          key={displayHandle}
+          variant="card"
+          initialHandle={displayHandle}
+          onSaved={onHandleSaved}
+        />
       </div>
+
+      <section>
+        <h2 className="mb-3 text-xs font-extrabold uppercase tracking-wide text-[#214C9B] sm:text-sm">
+          Tus pronósticos
+        </h2>
+        <AccountBoletosSummary user={user} />
+      </section>
     </div>
   );
 }
@@ -185,11 +81,16 @@ export function AccountPanelSkeleton() {
   return (
     <div className="space-y-4 sm:space-y-6" aria-busy="true" aria-label="Cargando tu cuenta">
       <div className="h-20 animate-pulse rounded-2xl bg-[#214C9B]/10 sm:h-24" />
-      <div className="grid items-start gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(320px,1fr)]">
-        <div className="h-56 animate-pulse rounded-2xl bg-[#214C9B]/10 sm:h-64" />
-        <div className="space-y-4 sm:space-y-6">
-          <div className="h-48 animate-pulse rounded-2xl bg-[#214C9B]/10 sm:h-52" />
-          <div className="h-56 animate-pulse rounded-2xl bg-[#214C9B]/10 sm:h-64" />
+      <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
+        <div className="aspect-square animate-pulse rounded-2xl bg-[#214C9B]/10" />
+        <div className="aspect-square animate-pulse rounded-2xl bg-[#214C9B]/10" />
+      </div>
+      <div className="space-y-3">
+        <div className="h-4 w-32 animate-pulse rounded bg-[#214C9B]/10" />
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {[0, 1, 2].map((row) => (
+            <div key={row} className="aspect-square animate-pulse rounded-2xl bg-[#214C9B]/10" />
+          ))}
         </div>
       </div>
     </div>

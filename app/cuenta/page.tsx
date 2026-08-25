@@ -5,7 +5,7 @@ import { PageHero } from "@/components/PageHero";
 
 export const metadata: Metadata = {
   title: "Mi cuenta | RAI1903",
-  description: "Perfil, pronósticos de los juegos y ajustes de acceso.",
+  description: "Perfil, pronósticos de los juegos y nombre público.",
 };
 
 export default function AccountPage() {
@@ -14,7 +14,7 @@ export default function AccountPage() {
       <PageHero
         eyebrow="Cuenta"
         title="Mi cuenta"
-        description="Consulta tu posición en los juegos, tu nombre público y tus ajustes de acceso."
+        description="Consulta tu posición en los juegos, tu equipo y tu nombre público."
       />
 
       <Suspense fallback={<AccountPanelSkeleton />}>
