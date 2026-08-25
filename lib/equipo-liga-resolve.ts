@@ -20,6 +20,22 @@ export function findGrupoForTeamId(
   return undefined;
 }
 
+/** Grupo RFEF del equipo: primero CMS de la temporada, luego mock si no hay Supabase. */
+export function resolveGrupoForTeamId(
+  teamId: string,
+  gender: PrimerEquipoGender,
+  bundles?: SeasonBundlesMap,
+): RfefGrupoId | undefined {
+  if (gender !== "masculino") return undefined;
+
+  const fromSeason = findGrupoForTeamId(teamId, gender, bundles);
+  if (fromSeason) return fromSeason;
+
+  if (isTeamInRfefGrupo1(teamId)) return "1";
+  if (isTeamInRfefGrupo(teamId, "2")) return "2";
+  return undefined;
+}
+
 export function resolveEquipoLigaTeam(
   teamId: string,
   gender: PrimerEquipoGender,

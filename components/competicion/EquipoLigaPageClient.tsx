@@ -7,7 +7,11 @@ import { useSeason } from "@/components/season/SeasonProvider";
 import { zonesToLegacyConfig } from "@/lib/cms/competition-config-bundle";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { applyCustomZoneColors } from "@/lib/competition/standings-zones";
-import { canLinkEquipoLiga, findGrupoForTeamId, resolveEquipoLigaTeam } from "@/lib/equipo-liga-resolve";
+import {
+  canLinkEquipoLiga,
+  resolveEquipoLigaTeam,
+  resolveGrupoForTeamId,
+} from "@/lib/equipo-liga-resolve";
 import { getAllTeamsForGender } from "@/lib/fixtures";
 import { getTeamsForRfefGrupo, isTeamInRfefGrupo1, type RfefGrupoId } from "@/lib/rfef-grupos";
 import { PRIMERA_RFEF_RULES } from "@/lib/rfef-rules";
@@ -54,7 +58,7 @@ export function EquipoLigaPageClient({ gender, teamId }: EquipoLigaPageClientPro
   );
 
   const grupo = useMemo(
-    () => (gender === "masculino" ? findGrupoForTeamId(teamId, gender, bundles) : undefined),
+    () => resolveGrupoForTeamId(teamId, gender, bundles),
     [bundles, gender, teamId],
   );
 
@@ -136,6 +140,7 @@ export function EquipoLigaPageClient({ gender, teamId }: EquipoLigaPageClientPro
     <EquipoLigaView
       gender={gender}
       team={teamWithStandings ?? team}
+      grupo={grupo}
       allTeams={standingsTeams}
       leagueMatchdays={editedLeagueMatchdays}
       standingsZones={standingsZones}
