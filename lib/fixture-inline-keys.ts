@@ -61,6 +61,7 @@ export function readJornadaRoundOverride<T>(
 }
 
 export function shouldCopyInlineOverrideKey(key: string): boolean {
+  if (key.startsWith("match-goals:")) return true;
   if (key.startsWith(CANTERA_MATCH_RESULT_PREFIX)) return true;
   if (key.startsWith(LEGACY_MATCH_RESULT_PREFIX)) {
     const rest = key.slice(LEGACY_MATCH_RESULT_PREFIX.length);

@@ -8,6 +8,7 @@ import type { User } from "@supabase/supabase-js";
 import { ChangePasswordForm } from "@/components/auth/ChangePasswordForm";
 import { AccountBoletosSummary } from "@/components/auth/AccountBoletosSummary";
 import { DisplayNameForm } from "@/components/auth/DisplayNameForm";
+import { SupportedTeamProfileSection } from "@/components/auth/SupportedTeamProfileSection";
 import { UserAvatar } from "@/components/auth/UserAvatar";
 import { userHasEmailPasswordIdentity } from "@/lib/auth/email-auth";
 import { resolveUserHandle } from "@/lib/auth/profile";
@@ -66,6 +67,8 @@ export function AccountPanel() {
       </div>
 
       <AccountBoletosSummary user={user} />
+
+      <SupportedTeamProfileSection user={user} />
 
       <div className="grid gap-8 lg:grid-cols-2 lg:gap-10">
         <div className="space-y-3">

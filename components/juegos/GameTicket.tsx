@@ -27,7 +27,7 @@ import { getGameTicketFooterUrl } from "@/lib/auth/site-url";
 import { getMatchArticlePageHref } from "@/lib/match-article-url";
 import { isMatchPlayed } from "@/lib/match-result";
 import type { QuinigolPrediction } from "@/lib/quinigol";
-import { actualOutcome, isAvilesMatch, outcomeFromGoalsPicks } from "@/lib/quiniela";
+import { actualOutcome, isAvilesMatch, isFeaturedTeamMatch, outcomeFromGoalsPicks } from "@/lib/quiniela";
 import { resolveSquadPlayerByName, scorerLabelForPlayer } from "@/lib/squad-player-resolve";
 import { getPlayerDisplayName } from "@/lib/squad-utils";
 import { getTeamCrestById, isTeamCrestUrl } from "@/lib/team-crests";
@@ -768,7 +768,7 @@ function TicketScorerPicker({
             />
           </label>
 
-          <ul className="ticket-scorer-picker-list" role="listbox" aria-label="Jugadores del Avilés">
+          <ul className="ticket-scorer-picker-list" role="listbox" aria-label="Jugadores de tu equipo">
             <li>
               <button
                 type="button"
@@ -782,7 +782,7 @@ function TicketScorerPicker({
                 </span>
                 <span className="ticket-scorer-picker-info">
                   <strong>Nadie</strong>
-                  <span className="ticket-scorer-picker-meta">Sin goleador del Avilés</span>
+                  <span className="ticket-scorer-picker-meta">Sin goleador de tu equipo</span>
                 </span>
               </button>
             </li>
@@ -898,6 +898,8 @@ export function QuinielaTicket({
   saveDisabled,
   isEditing,
   showLoginPrompt,
+  supportedTeamId = RAI_TEAM_ID,
+  featuredSquad,
 }: MatchTicketProps & {
   predictions: Record<string, Prediction>;
   readOnly?: boolean;
@@ -912,9 +914,12 @@ export function QuinielaTicket({
   saveDisabled?: boolean;
   isEditing?: boolean;
   showLoginPrompt?: boolean;
+  supportedTeamId?: string;
+  featuredSquad?: SquadPlayer[];
 }) {
   const teamsById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
-  const { squad } = useSquadPlayers("masculino");
+  const { squad: avilesSquad } = useSquadPlayers("masculino");
+  const squad = featuredSquad ?? avilesSquad;
   const date = formatTicketDate(matches);
   const update = (match: Match, current: Prediction | undefined, patch: Partial<Prediction>) => {
     if (readOnly || !onChange) return;
@@ -928,12 +933,12 @@ export function QuinielaTicket({
       ...patch,
       updatedAt: new Date().toISOString(),
     };
-    if (isAvilesMatch(match)) {
-      const avilesGoals = match.homeTeamId === RAI_TEAM_ID
+    if (isFeaturedTeamMatch(match, supportedTeamId)) {
+      const teamGoals = match.homeTeamId === supportedTeamId
         ? next.goalsHome
         : next.goalsAway;
-      if (avilesGoals === 0) next.scorer = "nadie";
-      if (avilesGoals !== undefined && avilesGoals !== 0 && next.scorer === "nadie") next.scorer = undefined;
+      if (teamGoals === 0) next.scorer = "nadie";
+      if (teamGoals !== undefined && teamGoals !== 0 && next.scorer === "nadie") next.scorer = undefined;
       const derivedOutcome = outcomeFromGoalsPicks(next.goalsHome, next.goalsAway);
       if (derivedOutcome) next.outcome = derivedOutcome;
     }
@@ -976,8 +981,8 @@ export function QuinielaTicket({
         {matches.map((match, index) => {
           const prediction = predictions[match.id];
           const scorerValue = normalizeScorerValue(prediction?.scorer);
-          const avilesMatch = isAvilesMatch(match);
-          const derivedOutcome = avilesMatch
+          const featuredMatch = isFeaturedTeamMatch(match, supportedTeamId);
+          const derivedOutcome = featuredMatch
             ? outcomeFromGoalsPicks(prediction?.goalsHome, prediction?.goalsAway)
             : null;
           const selectedOutcome = derivedOutcome ?? prediction?.outcome;
@@ -988,11 +993,11 @@ export function QuinielaTicket({
           const officialAway = match.status === "finished" && match.awayScore !== undefined
             ? (match.awayScore >= 3 ? "M" : match.awayScore) as GoalsPick
             : undefined;
-          const avilesGoals = match.homeTeamId === RAI_TEAM_ID
+          const teamGoals = match.homeTeamId === supportedTeamId
             ? prediction?.goalsHome
             : prediction?.goalsAway;
           return (
-            <li className={`game-ticket-match-row${avilesMatch ? " game-ticket-match-row--featured" : ""}`} key={match.id}>
+            <li className={`game-ticket-match-row${featuredMatch ? " game-ticket-match-row--featured" : ""}`} key={match.id}>
               <span className="game-ticket-number">{index + 1}</span>
               <span className="game-ticket-teams">
                 <span>
@@ -1015,7 +1020,7 @@ export function QuinielaTicket({
                   }),
                 )}
               </span>
-              {avilesMatch ? (
+              {featuredMatch ? (
                 <div className="game-ticket-featured">
                   <div className="game-ticket-featured-score">
                     <span>
@@ -1048,7 +1053,7 @@ export function QuinielaTicket({
                   <TicketScorerPicker
                     value={scorerValue}
                     squad={squad}
-                    disabled={readOnly || avilesGoals === 0}
+                    disabled={readOnly || teamGoals === 0}
                     readOnly={readOnly}
                     isCorrect={
                       match.status === "finished" && scorerValue

@@ -137,7 +137,7 @@ export function EquipoLigaPageClient({ gender, teamId }: EquipoLigaPageClientPro
       gender={gender}
       team={teamWithStandings ?? team}
       allTeams={standingsTeams}
-      leagueMatchdays={leagueMatchdays}
+      leagueMatchdays={editedLeagueMatchdays}
       standingsZones={standingsZones}
       tiebreak={PRIMERA_RFEF_RULES.tiebreak}
       evolutionSubtitle={evolutionSubtitle}

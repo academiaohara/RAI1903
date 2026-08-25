@@ -4,6 +4,8 @@ import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamCrest } from "@/components/TeamCrest";
 import { TeamLink } from "@/components/TeamLink";
 import { SplitDateInput } from "@/components/calendar/SplitDateInput";
+import { MatchGoalsEditor } from "@/components/jornadas/MatchGoalsEditor";
+import { MatchGoalsSummary } from "@/components/quiniela/SupportedTeamSection";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { DEFAULT_KICKOFF_UTC } from "@/lib/match-kickoff-time";
@@ -184,6 +186,7 @@ export function JornadaMatchRow({
   };
 
   return (
+    <div className="space-y-1">
     <article
       className={cn(
         "grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1.5 rounded-2xl border p-2.5 sm:gap-3 sm:p-4",
@@ -302,5 +305,8 @@ export function JornadaMatchRow({
         ) : null}
       </div>
     </article>
+    <MatchGoalsEditor fixture={editedFixture} gender={gender} grupo={grupo} />
+    <MatchGoalsSummary fixture={editedFixture} gender={gender} />
+    </div>
   );
 }
