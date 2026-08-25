@@ -71,8 +71,11 @@ export function SupportedTeamPicker({ teams, value, onChange, disabled }: Suppor
   return (
     <div className="rounded-2xl border border-[#214C9B]/15 bg-gradient-to-br from-blue-50/80 to-white p-4 sm:p-5">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <span className="text-sm font-extrabold text-[#214C9B]">Tu equipo:</span>
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <span className="shrink-0 text-sm font-extrabold leading-none text-[#214C9B]">Tu equipo:</span>
+          <span className="truncate text-sm font-bold leading-none text-slate-700">
+            {selectedTeam?.shortName ?? selectedTeam?.name ?? "—"}
+          </span>
           {selectedTeam ? (
             <OpponentCrest
               logo={getTeamCrestById(
@@ -81,12 +84,9 @@ export function SupportedTeamPicker({ teams, value, onChange, disabled }: Suppor
               )}
               opponent={selectedTeam.name}
               size="md"
-              className="h-10 w-10"
+              className="h-10 w-10 shrink-0"
             />
           ) : null}
-          <span className="truncate text-sm font-bold text-slate-700">
-            {selectedTeam?.shortName ?? selectedTeam?.name ?? "—"}
-          </span>
         </div>
         {!disabled ? (
           editing ? (

@@ -46,7 +46,6 @@ type TicketFrameProps = {
   fileName: string;
   shareText: string;
   creatorHandle?: string;
-  creatorTeam?: Pick<Team, "id" | "name" | "shortName" | "crestInitials">;
   points?: number;
   receipt?: ReactNode;
   showActions?: boolean;
@@ -150,7 +149,7 @@ function QuinielaReceipt({
         <p className="game-ticket-receipt-stamp">
           {savedAt ? "GUARDADO CORRECTAMENTE" : "BORRADOR"}
         </p>
-        <p className="game-ticket-receipt-handle">{handle}</p>
+        <ReceiptCreatorHandle creatorHandle={handle} />
       </div>
       <div className="game-ticket-receipt-tri game-ticket-receipt-tri--bottom" />
     </aside>
@@ -233,7 +232,7 @@ function QuinigolReceipt({
         <p className="game-ticket-receipt-stamp">
           {savedAt ? "GUARDADO CORRECTAMENTE" : "BORRADOR"}
         </p>
-        <p className="game-ticket-receipt-handle">{handle}</p>
+        <ReceiptCreatorHandle creatorHandle={handle} />
       </div>
       <div className="game-ticket-receipt-tri game-ticket-receipt-tri--bottom" />
     </aside>
@@ -311,7 +310,7 @@ function ClasificacionReceipt({
         <p className="game-ticket-receipt-stamp">
           {savedAt ? "GUARDADO CORRECTAMENTE" : "BORRADOR"}
         </p>
-        <p className="game-ticket-receipt-handle">{handle}</p>
+        <ReceiptCreatorHandle creatorHandle={handle} />
       </div>
       <div className="game-ticket-receipt-tri game-ticket-receipt-tri--bottom" />
     </aside>
@@ -404,7 +403,6 @@ function TicketFrame({
   fileName,
   shareText,
   creatorHandle = "@usuario",
-  creatorTeam,
   points,
   receipt,
   showActions = true,
@@ -546,7 +544,6 @@ function TicketFrame({
           <footer className="game-ticket-footer">
             <span suppressHydrationWarning>Generado en {footerUrl}</span>
             <span className="game-ticket-footer-user">
-              {creatorTeam ? <TicketCreatorTeam team={creatorTeam} /> : null}
               <strong>{creatorHandle.startsWith("@") ? creatorHandle : `@${creatorHandle}`}</strong>
             </span>
             <span>Acierta y comparte ↗</span>
@@ -923,7 +920,6 @@ export function QuinielaTicket({
   featuredSquad?: SquadPlayer[];
 }) {
   const teamsById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
-  const creatorTeam = teamsById.get(supportedTeamId);
   const { squad: avilesSquad } = useSquadPlayers("masculino");
   const squad = featuredSquad ?? avilesSquad;
   const date = formatTicketDate(matches);
@@ -962,7 +958,6 @@ export function QuinielaTicket({
       fileName={`mi-rainiela-jornada-${round}.png`}
       shareText={`Mi RAIniela de la jornada ${round} #RealAviles`}
       creatorHandle={creatorHandle}
-      creatorTeam={creatorTeam}
       points={points}
       showActions={showActions}
       canSave={canSave}
@@ -1249,24 +1244,12 @@ function zonesByPosition(teamCount: number, zones: CompetitionZoneRule[]): Map<n
   return result;
 }
 
-function TicketCreatorTeam({ team }: { team: Pick<Team, "id" | "name" | "shortName" | "crestInitials"> }) {
-  const crest = getTeamCrestById(team.id, team.crestInitials);
-  const label = team.shortName || team.name;
-
-  if (isTeamCrestUrl(crest)) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        className="game-ticket-footer-crest"
-        src={crest}
-        alt=""
-        title={label}
-        aria-hidden
-      />
-    );
-  }
-
-  return <span className="game-ticket-footer-team-name">{label}</span>;
+function ReceiptCreatorHandle({ creatorHandle }: { creatorHandle: string }) {
+  return (
+    <p className="game-ticket-receipt-handle">
+      <span>{creatorHandle}</span>
+    </p>
+  );
 }
 
 function TicketCrest({ team }: { team: Team }) {
