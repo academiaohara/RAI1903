@@ -667,6 +667,7 @@ function TicketScorerPicker({
   readOnly,
   isCorrect,
   onChange,
+  simpleList = false,
 }: {
   value: string;
   squad: SquadPlayer[];
@@ -674,6 +675,7 @@ function TicketScorerPicker({
   readOnly?: boolean;
   isCorrect?: boolean;
   onChange: (value: string) => void;
+  simpleList?: boolean;
 }) {
   const searchId = useId();
   const [open, setOpen] = useState(false);
@@ -689,6 +691,10 @@ function TicketScorerPicker({
     const players = squad
       .filter((player) => player.posicion !== "Portero")
       .sort((a, b) => {
+        if (simpleList) {
+          if (a.dorsal !== b.dorsal) return a.dorsal - b.dorsal;
+          return getPlayerDisplayName(a).localeCompare(getPlayerDisplayName(b), "es");
+        }
         if (b.goles !== a.goles) return b.goles - a.goles;
         if (b.asistencias !== a.asistencias) return b.asistencias - a.asistencias;
         return getPlayerDisplayName(a).localeCompare(getPlayerDisplayName(b), "es");
@@ -699,7 +705,7 @@ function TicketScorerPicker({
       const dorsal = String(player.dorsal);
       return label.includes(normalized) || dorsal.includes(normalized) || player.posicion.toLowerCase().includes(normalized);
     });
-  }, [query, squad]);
+  }, [query, simpleList, squad]);
 
   const pick = (next: string) => {
     onChange(next);
@@ -756,7 +762,7 @@ function TicketScorerPicker({
         }}
         variant="ticket"
       >
-        <div className="ticket-scorer-picker">
+        <div className={`ticket-scorer-picker${simpleList ? " ticket-scorer-picker--simple" : ""}`}>
           <label className="ticket-scorer-picker-search-wrap" htmlFor={searchId}>
             <Search size={16} aria-hidden />
             <input
@@ -779,13 +785,22 @@ function TicketScorerPicker({
                 className={`ticket-scorer-picker-item${value === "nadie" ? " ticket-scorer-picker-item--selected" : ""}`}
                 onClick={() => pick("nadie")}
               >
-                <span className="ticket-scorer-picker-avatar ticket-scorer-picker-avatar--nadie" aria-hidden>
-                  —
-                </span>
-                <span className="ticket-scorer-picker-info">
-                  <strong>Nadie</strong>
-                  <span className="ticket-scorer-picker-meta">Sin goleador de tu equipo</span>
-                </span>
+                {simpleList ? (
+                  <span className="ticket-scorer-picker-info">
+                    <strong>Nadie</strong>
+                    <span className="ticket-scorer-picker-meta">Sin goleador de tu equipo</span>
+                  </span>
+                ) : (
+                  <>
+                    <span className="ticket-scorer-picker-avatar ticket-scorer-picker-avatar--nadie" aria-hidden>
+                      —
+                    </span>
+                    <span className="ticket-scorer-picker-info">
+                      <strong>Nadie</strong>
+                      <span className="ticket-scorer-picker-meta">Sin goleador de tu equipo</span>
+                    </span>
+                  </>
+                )}
               </button>
             </li>
 
@@ -801,33 +816,50 @@ function TicketScorerPicker({
                     className={`ticket-scorer-picker-item${isSelected ? " ticket-scorer-picker-item--selected" : ""}`}
                     onClick={() => pick(label)}
                   >
-                    <span className="ticket-scorer-picker-avatar" aria-hidden>
-                      <PlayerAvatar
-                        player={player}
-                        bare
-                        placeholderTone="light"
-                        className="h-full w-full rounded-full border-2 border-[#1c3f6e]/20"
-                        imageClassName="object-cover object-top"
-                      />
-                    </span>
-                    <span className="ticket-scorer-picker-info">
-                      <strong>{getPlayerDisplayName(player)}</strong>
-                      <span className="ticket-scorer-picker-meta">
-                        {player.posicion}
-                        {player.dorsal > 0 ? ` · #${player.dorsal}` : ""}
-                      </span>
-                      <span className="ticket-scorer-picker-stats">
-                        <span>
-                          <b>{player.partidos}</b> PJ
+                    {simpleList ? (
+                      <>
+                        <span className="ticket-scorer-picker-dorsal" aria-hidden>
+                          {player.dorsal > 0 ? player.dorsal : "—"}
                         </span>
-                        <span>
-                          <b>{player.goles}</b> G
+                        <span className="ticket-scorer-picker-info">
+                          <strong>{getPlayerDisplayName(player)}</strong>
+                          <span className="ticket-scorer-picker-meta">
+                            {player.rol}
+                            {player.posicion ? ` · ${player.posicion}` : ""}
+                          </span>
                         </span>
-                        <span>
-                          <b>{player.asistencias}</b> A
+                      </>
+                    ) : (
+                      <>
+                        <span className="ticket-scorer-picker-avatar" aria-hidden>
+                          <PlayerAvatar
+                            player={player}
+                            bare
+                            placeholderTone="light"
+                            className="h-full w-full rounded-full border-2 border-[#1c3f6e]/20"
+                            imageClassName="object-cover object-top"
+                          />
                         </span>
-                      </span>
-                    </span>
+                        <span className="ticket-scorer-picker-info">
+                          <strong>{getPlayerDisplayName(player)}</strong>
+                          <span className="ticket-scorer-picker-meta">
+                            {player.posicion}
+                            {player.dorsal > 0 ? ` · #${player.dorsal}` : ""}
+                          </span>
+                          <span className="ticket-scorer-picker-stats">
+                            <span>
+                              <b>{player.partidos}</b> PJ
+                            </span>
+                            <span>
+                              <b>{player.goles}</b> G
+                            </span>
+                            <span>
+                              <b>{player.asistencias}</b> A
+                            </span>
+                          </span>
+                        </span>
+                      </>
+                    )}
                   </button>
                 </li>
               );
@@ -1055,6 +1087,7 @@ export function QuinielaTicket({
                   <TicketScorerPicker
                     value={scorerValue}
                     squad={squad}
+                    simpleList={supportedTeamId !== RAI_TEAM_ID}
                     disabled={readOnly || teamGoals === 0}
                     readOnly={readOnly}
                     isCorrect={
