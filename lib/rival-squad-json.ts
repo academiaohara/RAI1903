@@ -1,0 +1,91 @@
+import type { RivalSquadImport, RivalSquadImportPlayer } from "@/types/rival-squad-import";
+import { normalizeRivalFoot } from "@/lib/match-goals";
+
+type RawPlayer = Record<string, unknown>;
+
+function asNumber(value: unknown, fallback = 0): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function asOptionalNumber(value: unknown): number | null {
+  if (value === null || value === undefined || value === "") return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function normalizePlayer(raw: RawPlayer): RivalSquadImportPlayer | null {
+  const dorsal = asNumber(raw.dorsal ?? raw.numero ?? raw.number, NaN);
+  const jugador = String(raw.jugador ?? raw.nombre ?? raw.name ?? "").trim();
+  const pos = String(raw.pos ?? raw.posicion ?? raw.position ?? "").trim();
+  if (!Number.isFinite(dorsal) || !jugador || !pos) return null;
+
+  const pieRaw = raw.pie ?? raw.pierna ?? raw.foot;
+  const pie =
+    typeof pieRaw === "string"
+      ? (normalizeRivalFoot(pieRaw) as RivalSquadImportPlayer["pie"])
+      : undefined;
+
+  return {
+    dorsal,
+    jugador,
+    pos,
+    pie,
+    edad: asOptionalNumber(raw.edad ?? raw.age),
+    pj: asNumber(raw.pj ?? raw.partidos, 0),
+    g: asNumber(raw.g ?? raw.goles, 0),
+    a: asNumber(raw.a ?? raw.asistencias, 0),
+    ta: asNumber(raw.ta ?? raw.amarillas, 0),
+    tr: asNumber(raw.tr ?? raw.rojas, 0),
+    valor: typeof raw.valor === "string" ? raw.valor : raw.valor == null ? null : String(raw.valor),
+    contrato: asOptionalNumber(raw.contrato),
+    estado: typeof raw.estado === "string" ? (raw.estado as RivalSquadImportPlayer["estado"]) : undefined,
+  };
+}
+
+function normalizePlantilla(value: unknown): RivalSquadImportPlayer[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((entry) => (entry && typeof entry === "object" ? normalizePlayer(entry as RawPlayer) : null))
+    .filter((entry): entry is RivalSquadImportPlayer => entry !== null)
+    .sort((a, b) => a.dorsal - b.dorsal);
+}
+
+/** Acepta lista de jugadores o objeto `{ plantilla: [...] }`. */
+export function parseRivalSquadJson(
+  raw: unknown,
+  fallback?: Partial<RivalSquadImport>,
+): { ok: true; data: RivalSquadImport } | { ok: false; error: string } {
+  let plantillaSource: unknown;
+  let meta: Partial<RivalSquadImport> = {};
+
+  if (Array.isArray(raw)) {
+    plantillaSource = raw;
+  } else if (raw && typeof raw === "object") {
+    const obj = raw as Record<string, unknown>;
+    plantillaSource = obj.plantilla ?? obj.jugadores ?? obj.players;
+    meta = {
+      estadio: typeof obj.estadio === "string" ? obj.estadio : undefined,
+      capacidad: asOptionalNumber(obj.capacidad) ?? undefined,
+      entrenador: typeof obj.entrenador === "string" ? obj.entrenador : undefined,
+    };
+  } else {
+    return { ok: false, error: "El JSON debe ser una lista de jugadores o un objeto con plantilla." };
+  }
+
+  const plantilla = normalizePlantilla(plantillaSource);
+  if (plantilla.length === 0) {
+    return { ok: false, error: "No se encontraron jugadores válidos (dorsal, jugador, pos)." };
+  }
+
+  return {
+    ok: true,
+    data: {
+      estadio: meta.estadio ?? fallback?.estadio ?? "",
+      capacidad: meta.capacidad ?? fallback?.capacidad ?? 0,
+      entrenador: meta.entrenador ?? fallback?.entrenador ?? "",
+      plantilla,
+      estadioInfo: fallback?.estadioInfo,
+    },
+  };
+}

@@ -9,6 +9,7 @@ import {
   withRivalSquadInBundle,
 } from "@/lib/cms/rival-squads-bundle";
 import { upsertSeasonBundle } from "@/lib/cms/season-bundles";
+import { parseRivalSquadJson } from "@/lib/rival-squad-json";
 import { buildDefaultRivalSquadImport } from "@/lib/rival-squad-defaults";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Team } from "@/types";
@@ -50,6 +51,7 @@ export function RivalSquadOnPageEditor({ gender, team }: RivalSquadOnPageEditorP
   const [draft, setDraft] = useState<RivalSquadImport | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [jsonPaste, setJsonPaste] = useState("");
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -114,6 +116,42 @@ export function RivalSquadOnPageEditor({ gender, team }: RivalSquadOnPageEditorP
               className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
             />
           </label>
+        </div>
+
+        <div className="space-y-2 rounded-xl border border-dashed border-[#214C9B]/25 bg-slate-50/80 p-3">
+          <p className="text-xs font-extrabold text-[#214C9B]">Importar JSON (lista mínima)</p>
+          <p className="text-[11px] text-slate-600">
+            Formato: lista con <code className="rounded bg-white px-1">dorsal</code>,{" "}
+            <code className="rounded bg-white px-1">jugador</code>, <code className="rounded bg-white px-1">pos</code> y
+            opcional <code className="rounded bg-white px-1">pie</code> (Derecho/Izquierdo).
+          </p>
+          <textarea
+            value={jsonPaste}
+            onChange={(event) => setJsonPaste(event.target.value)}
+            rows={6}
+            placeholder={'[\n  { "dorsal": 13, "jugador": "Fran Árbol", "pos": "Portero", "pie": "Izquierdo" }\n]'}
+            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 font-mono text-xs"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              try {
+                const parsed = JSON.parse(jsonPaste) as unknown;
+                const result = parseRivalSquadJson(parsed, squadDraft);
+                if (!result.ok) {
+                  setMessage(result.error);
+                  return;
+                }
+                setDraft(result.data);
+                setMessage(`Importados ${result.data.plantilla.length} jugadores (guarda para publicar).`);
+              } catch {
+                setMessage("JSON inválido.");
+              }
+            }}
+            className="rounded-lg bg-[#214C9B] px-3 py-1.5 text-xs font-extrabold text-white"
+          >
+            Aplicar JSON al borrador
+          </button>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-2">

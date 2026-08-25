@@ -21,6 +21,7 @@ import { getTeamCrestById } from "@/lib/team-crests";
 import { buildPlayerMatchHistory } from "@/lib/player-match-history";
 import { getStadiumPhoto } from "@/lib/squad-photos";
 import type { Team } from "@/types";
+import { normalizeRivalFoot } from "@/lib/match-goals";
 import type { RivalSquadImport, RivalSquadImportPlayer } from "@/types/rival-squad-import";
 import type { SquadClubInfo, SquadPlayer, SquadPosition } from "@/types/squad";
 import type { SquadRoleCode } from "@/types/squad";
@@ -100,8 +101,13 @@ function importPlayerToSquadPlayer(team: Team, player: RivalSquadImportPlayer): 
   const status: PlayerStatus = player.estado ?? "titular";
   const { nombre, apellido } = parsePlayerName(player.jugador);
   const { posicion, rol } = mapRivalPosition(player.pos);
-  const birthYear =
-    player.edad != null ? new Date().getFullYear() - player.edad : new Date().getFullYear();
+  const edad = player.edad ?? null;
+  const birthYear = edad != null ? new Date().getFullYear() - edad : new Date().getFullYear();
+  const pj = player.pj ?? 0;
+  const goles = player.g ?? 0;
+  const asistencias = player.a ?? 0;
+  const amarillas = player.ta ?? 0;
+  const rojas = player.tr ?? 0;
 
   return {
     id: `${team.id}-d${player.dorsal}`,
@@ -111,34 +117,34 @@ function importPlayerToSquadPlayer(team: Team, player: RivalSquadImportPlayer): 
     posicion,
     rol,
     estado: status,
-    edad: player.edad ?? 0,
-    fechaNacimiento: player.edad != null ? `${birthYear}-07-01` : "",
+    edad: edad ?? 0,
+    fechaNacimiento: edad != null ? `${birthYear}-07-01` : "",
     lugarNacimiento: team.city,
     nacionalidad: "España",
     altura: "1,78 m",
     peso: "76 kg",
-    piernaBuena: "Derecha",
+    piernaBuena: normalizeRivalFoot(player.pie),
     contratoHasta: player.contrato != null ? `${player.contrato}-06-30` : "—",
-    valorMercado: player.valor,
+    valorMercado: player.valor ?? null,
     descripcion: player.valor
       ? `Valor de mercado: ${player.valor}. Jugador de ${team.shortName} en la temporada 2025/26.`
       : `Jugador de ${team.shortName} en la temporada 2025/26.`,
     foto: null,
-    partidos: player.pj,
-    minutos: player.pj * 72,
-    goles: player.g,
-    asistencias: player.a,
-    amarillas: player.ta,
-    rojas: player.tr,
+    partidos: pj,
+    minutos: pj * 72,
+    goles,
+    asistencias,
+    amarillas,
+    rojas,
     historialPartidos: buildPlayerMatchHistory(
       {
         id: `${team.id}-d${player.dorsal}`,
-        partidos: player.pj,
-        minutos: player.pj * 72,
-        goles: player.g,
-        asistencias: player.a,
-        amarillas: player.ta,
-        rojas: player.tr,
+        partidos: pj,
+        minutos: pj * 72,
+        goles,
+        asistencias,
+        amarillas,
+        rojas,
       },
       "masculino",
     ),
@@ -146,9 +152,9 @@ function importPlayerToSquadPlayer(team: Team, player: RivalSquadImportPlayer): 
       {
         temporada: "2025/26",
         club: team.name,
-        partidos: player.pj,
-        goles: player.g,
-        asistencias: player.a,
+        partidos: pj,
+        goles,
+        asistencias,
       },
     ],
   };

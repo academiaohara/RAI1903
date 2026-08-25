@@ -1,6 +1,12 @@
 import { RAI_TEAM_ID, teams as mockTeams } from "@/data/mock";
 import { isPlaceholderMatch, isSchedulableMatchday } from "@/lib/competition/normalize-fixtures";
 import { getAllAvilesScorerLabelsFromEvents } from "@/lib/aviles-match-events";
+import {
+  getSupportedTeamGoalsPick,
+  getSupportedTeamScorerLabels,
+  isSupportedTeamMatch,
+} from "@/lib/match-goals";
+import type { MatchGoalEntry } from "@/types/match-goals";
 import type { MatchEvent } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
 import {
@@ -81,11 +87,23 @@ export function shouldCountQuinielaPoints(matchday: Matchday, now = new Date()):
 }
 
 export function isAvilesMatch(match: Match): boolean {
-  return match.homeTeamId === RAI_TEAM_ID || match.awayTeamId === RAI_TEAM_ID;
+  return isSupportedTeamMatch(match, RAI_TEAM_ID);
+}
+
+export function isFeaturedTeamMatch(match: Match, supportedTeamId: string): boolean {
+  return isSupportedTeamMatch(match, supportedTeamId);
 }
 
 export function getAvilesGoalsPick(match: Match, prediction: Prediction): GoalsPick | undefined {
-  return match.homeTeamId === RAI_TEAM_ID ? prediction.goalsHome : prediction.goalsAway;
+  return getSupportedTeamGoalsPick(match, RAI_TEAM_ID, prediction);
+}
+
+export function getFeaturedTeamGoalsPick(
+  match: Match,
+  supportedTeamId: string,
+  prediction: Prediction,
+): GoalsPick | undefined {
+  return getSupportedTeamGoalsPick(match, supportedTeamId, prediction);
 }
 
 /** 1/X/2 derivado de los goles elegidos; null si faltan datos o ambos son M. */
@@ -110,12 +128,13 @@ export function isOutcomeLockedByGoals(
   return outcomeFromGoalsPicks(goalsHome, goalsAway) !== null;
 }
 
-/** Signo efectivo del pronóstico (en el Avilés, prioriza el derivado de la porra). */
+/** Signo efectivo del pronóstico (en el equipo seguido, prioriza el derivado de la porra). */
 export function getEffectivePredictionOutcome(
   match: Match,
   prediction: Prediction,
+  supportedTeamId: string = RAI_TEAM_ID,
 ): PredictionOutcome | undefined {
-  if (isAvilesMatch(match)) {
+  if (isFeaturedTeamMatch(match, supportedTeamId)) {
     const fromGoals = outcomeFromGoalsPicks(prediction.goalsHome, prediction.goalsAway);
     if (fromGoals !== null) return fromGoals;
   }
@@ -129,15 +148,30 @@ export function getAvilesScore(match: Match): number | null {
   return match.homeTeamId === RAI_TEAM_ID ? match.homeScore : match.awayScore;
 }
 
-export function actualAvilesScorers(
+export function actualFeaturedTeamScorers(
   match: Match,
-  options?: { events?: MatchEvent[]; squad?: SquadPlayer[] },
+  supportedTeamId: string,
+  options?: {
+    goals?: MatchGoalEntry[];
+    squad?: SquadPlayer[];
+    events?: MatchEvent[];
+  },
 ): string[] {
-  const goals = getAvilesScore(match);
-  if (goals === null) return [];
-  if (goals === 0) return ["nadie"];
+  const teamScore =
+    match.homeTeamId === supportedTeamId
+      ? match.homeScore
+      : match.awayTeamId === supportedTeamId
+        ? match.awayScore
+        : undefined;
+  if (teamScore === undefined || teamScore === null) return [];
+  if (teamScore === 0) return ["nadie"];
 
-  if (options?.events && options.squad) {
+  if (options?.goals && options.squad) {
+    const fromJornada = getSupportedTeamScorerLabels(match, supportedTeamId, options.goals, options.squad);
+    if (fromJornada.length > 0) return fromJornada;
+  }
+
+  if (supportedTeamId === RAI_TEAM_ID && options?.events && options.squad) {
     const fromChronicle = getAllAvilesScorerLabelsFromEvents(match, options.events, options.squad);
     if (fromChronicle.length > 0) return fromChronicle;
   }
@@ -145,21 +179,46 @@ export function actualAvilesScorers(
   return [];
 }
 
+export function actualAvilesScorers(
+  match: Match,
+  options?: { events?: MatchEvent[]; squad?: SquadPlayer[]; goals?: MatchGoalEntry[] },
+): string[] {
+  return actualFeaturedTeamScorers(match, RAI_TEAM_ID, options);
+}
+
+export function actualFeaturedTeamScorer(
+  match: Match,
+  supportedTeamId: string,
+  options?: {
+    goals?: MatchGoalEntry[];
+    squad?: SquadPlayer[];
+    events?: MatchEvent[];
+  },
+): string | null {
+  const all = actualFeaturedTeamScorers(match, supportedTeamId, options);
+  return all.length > 0 ? all[0]! : null;
+}
+
 export function actualAvilesScorer(
   match: Match,
-  options?: { events?: MatchEvent[]; squad?: SquadPlayer[] },
+  options?: { events?: MatchEvent[]; squad?: SquadPlayer[]; goals?: MatchGoalEntry[] },
 ): string | null {
-  const all = actualAvilesScorers(match, options);
-  return all.length > 0 ? all[0]! : null;
+  return actualFeaturedTeamScorer(match, RAI_TEAM_ID, options);
 }
 
 export function isScorerPredictionCorrect(
   match: Match,
   prediction: Prediction,
-  options?: { events?: MatchEvent[]; squad?: SquadPlayer[] },
+  options?: {
+    goals?: MatchGoalEntry[];
+    events?: MatchEvent[];
+    squad?: SquadPlayer[];
+    supportedTeamId?: string;
+  },
 ): boolean {
   if (!prediction.scorer) return false;
-  const actual = actualAvilesScorer(match, options);
+  const supportedTeamId = options?.supportedTeamId ?? RAI_TEAM_ID;
+  const actual = actualFeaturedTeamScorer(match, supportedTeamId, options);
   return actual !== null && prediction.scorer === actual;
 }
 
@@ -210,8 +269,10 @@ export function areGoalsPredictionCorrect(match: Match, prediction: Prediction):
 }
 
 export type ScorePredictionOptions = {
+  goals?: MatchGoalEntry[];
   events?: MatchEvent[];
   squad?: SquadPlayer[];
+  supportedTeamId?: string;
 };
 
 export function scorePredictionPoints(
@@ -222,10 +283,11 @@ export function scorePredictionPoints(
   const outcome = actualOutcome(match);
   if (!outcome || !prediction) return 0;
 
-  const predictedOutcome = getEffectivePredictionOutcome(match, prediction);
+  const supportedTeamId = options?.supportedTeamId ?? RAI_TEAM_ID;
+  const predictedOutcome = getEffectivePredictionOutcome(match, prediction, supportedTeamId);
   if (!predictedOutcome) return 0;
 
-  if (isAvilesMatch(match)) {
+  if (isFeaturedTeamMatch(match, supportedTeamId)) {
     let points = 0;
     if (predictedOutcome === outcome) points += 1;
     if (areGoalsPredictionCorrect(match, prediction)) points += 1;
@@ -248,19 +310,26 @@ export function scoreMatchdayPoints(
   }, 0);
 }
 
-export function sortQuinielaMatches(matches: Match[]): Match[] {
-  return [...matches].sort((a, b) => Number(isAvilesMatch(a)) - Number(isAvilesMatch(b)));
+export function sortQuinielaMatches(matches: Match[], supportedTeamId: string = RAI_TEAM_ID): Match[] {
+  return [...matches].sort(
+    (a, b) =>
+      Number(isFeaturedTeamMatch(a, supportedTeamId)) - Number(isFeaturedTeamMatch(b, supportedTeamId)),
+  );
 }
 
-export function isMatchdayComplete(matchday: Matchday, predictions: Record<string, Prediction>): boolean {
+export function isMatchdayComplete(
+  matchday: Matchday,
+  predictions: Record<string, Prediction>,
+  supportedTeamId: string = RAI_TEAM_ID,
+): boolean {
   return matchday.matches.every((match) => {
     const prediction = predictions[match.id];
     if (!prediction?.outcome) return false;
-    if (!isAvilesMatch(match)) return true;
+    if (!isFeaturedTeamMatch(match, supportedTeamId)) return true;
     if (prediction.goalsHome === undefined || prediction.goalsAway === undefined) return false;
     if (!prediction.outcome) return false;
-    const avilesGoals = getAvilesGoalsPick(match, prediction);
-    if (avilesGoals === 0) return prediction.scorer === "nadie";
+    const teamGoals = getFeaturedTeamGoalsPick(match, supportedTeamId, prediction);
+    if (teamGoals === 0) return prediction.scorer === "nadie";
     return Boolean(prediction.scorer && prediction.scorer !== "nadie");
   });
 }
@@ -273,12 +342,16 @@ export function isMatchdayFullyFinished(matchday: Matchday): boolean {
   return countFinishedMatches(matchday) === matchday.matches.length;
 }
 
-export function countOutcomeHits(matchday: Matchday, predictions: Record<string, Prediction>): number {
+export function countOutcomeHits(
+  matchday: Matchday,
+  predictions: Record<string, Prediction>,
+  supportedTeamId: string = RAI_TEAM_ID,
+): number {
   return matchday.matches.reduce((total, match) => {
     const outcome = actualOutcome(match);
     const prediction = predictions[match.id];
     if (!outcome || !prediction) return total;
-    const predictedOutcome = getEffectivePredictionOutcome(match, prediction);
+    const predictedOutcome = getEffectivePredictionOutcome(match, prediction, supportedTeamId);
     if (!predictedOutcome) return total;
     return total + (predictedOutcome === outcome ? 1 : 0);
   }, 0);

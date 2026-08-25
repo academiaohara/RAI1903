@@ -3,6 +3,8 @@
 import { useCallback, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { RivalSquadOnPageEditor } from "@/components/editor/RivalSquadOnPageEditor";
+import { RivalSquadTable } from "@/components/squad/RivalSquadTable";
+import { applyMatchdayGoalsToSquad } from "@/lib/rival-squad-goals";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
 import type { SquadPlayer, SquadViewMode, StadiumInfo } from "@/types/squad";
@@ -23,15 +25,19 @@ import { PlayerGrid } from "@/components/squad/PlayerGrid";
 import { PlayerModal } from "@/components/squad/PlayerModal";
 import { StadiumModal } from "@/components/squad/StadiumModal";
 import { StadiumEditorModal } from "@/components/squad/StadiumEditorModal";
-import type { Team } from "@/types";
+import type { Matchday, Team } from "@/types";
+import type { RfefGrupoId } from "@/lib/rfef-grupos";
 
 type EquipoLigaSquadProps = {
   gender: PrimerEquipoGender;
   team: Team;
+  grupo?: RfefGrupoId;
+  leagueMatchdays?: Matchday[];
 };
 
-export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
+export function EquipoLigaSquad({ gender, team, grupo = "1", leagueMatchdays = [] }: EquipoLigaSquadProps) {
   const { bundles, viewedSeason, viewedSeasonId } = useSeason();
+  const { getOverride } = useInlineEditing();
   const { club: baseClub, squad: baseSquad, isOwnClub } = useMemo(
     () => getCompeticionSquadData(gender, team, bundles, viewedSeason.label),
     [bundles, gender, team, viewedSeason.label],
@@ -44,7 +50,23 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
     setEntrenador: setRivalEntrenador,
   } = useRivalSquadAvailability(gender, team);
   const { editMode, getValue } = useInlineEditing();
-  const squad = isOwnClub ? ownSquad : rivalSquad.length > 0 ? rivalSquad : baseSquad;
+  const squad = useMemo(() => {
+    const base = isOwnClub ? ownSquad : rivalSquad.length > 0 ? rivalSquad : baseSquad;
+    if (!isOwnClub && gender === "masculino" && grupo === "1" && leagueMatchdays.length > 0) {
+      return applyMatchdayGoalsToSquad(base, team.id, leagueMatchdays, gender, getOverride);
+    }
+    return base;
+  }, [
+    baseSquad,
+    gender,
+    getOverride,
+    grupo,
+    isOwnClub,
+    leagueMatchdays,
+    ownSquad,
+    rivalSquad,
+    team.id,
+  ]);
   const [stadiumOverride, setStadiumOverride] = useState<StadiumInfo | null>(null);
   const club = useMemo(() => {
     const withStadium = stadiumOverride
@@ -171,13 +193,17 @@ export function EquipoLigaSquad({ gender, team }: EquipoLigaSquadProps) {
           transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
         >
           {viewMode === "lista" ? (
-            <PlayerTable
-              players={squad}
-              onSelect={handleSelect}
-              showMarketValue={!isFemenino}
-              showAge={!isFemenino}
-              showEmptyPositions={editMode && isOwnClub}
-            />
+            !isOwnClub && gender === "masculino" ? (
+              <RivalSquadTable players={squad} />
+            ) : (
+              <PlayerTable
+                players={squad}
+                onSelect={handleSelect}
+                showMarketValue={!isFemenino}
+                showAge={!isFemenino}
+                showEmptyPositions={editMode && isOwnClub}
+              />
+            )
           ) : (
             <PlayerGrid
               players={squad}
