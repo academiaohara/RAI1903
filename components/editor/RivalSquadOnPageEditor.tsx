@@ -26,6 +26,14 @@ const STAT_FIELDS = [
 
 const JSON_PLACEHOLDER = `[
   {
+    "dorsal": null,
+    "jugador": "Jugador sin dorsal",
+    "pos": "Portero",
+    "edad": 22,
+    "pie": "Derecho",
+    "altura": "1,88 m"
+  },
+  {
     "dorsal": 13,
     "jugador": "Fran Árbol",
     "pos": "Portero",
