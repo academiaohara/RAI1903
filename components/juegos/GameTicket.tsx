@@ -71,7 +71,6 @@ function QuinielaReceipt({
   round,
   competitionLabel,
   creatorHandle = "@usuario",
-  creatorTeam,
   savedAt,
   points,
 }: {
@@ -80,7 +79,6 @@ function QuinielaReceipt({
   round: number;
   competitionLabel: string;
   creatorHandle?: string;
-  creatorTeam?: Pick<Team, "id" | "name" | "shortName" | "crestInitials">;
   savedAt?: string;
   points?: number;
 }) {
@@ -114,7 +112,7 @@ function QuinielaReceipt({
     <aside className="game-ticket-receipt" aria-label="Comprobante RAIniela">
       <div className="game-ticket-receipt-tri game-ticket-receipt-tri--top" />
       <div className="game-ticket-receipt-inner">
-        <ReceiptGameLogo kind="quiniela" creatorTeam={creatorTeam} />
+        <ReceiptGameLogo kind="quiniela" />
         <span className="game-ticket-receipt-subtitle">COMPROBANTE</span>
         <hr className="game-ticket-receipt-hr" />
         <div className="game-ticket-receipt-lines">
@@ -319,13 +317,7 @@ function ClasificacionReceipt({
   );
 }
 
-function ReceiptGameLogo({
-  kind,
-  creatorTeam,
-}: {
-  kind: TicketKind;
-  creatorTeam?: Pick<Team, "id" | "name" | "shortName" | "crestInitials">;
-}) {
+function ReceiptGameLogo({ kind }: { kind: TicketKind }) {
   const logo = logoByKind[kind];
   if (!logo) return null;
   return (
@@ -336,7 +328,6 @@ function ReceiptGameLogo({
         src={logo}
         alt=""
       />
-      {creatorTeam ? <TicketReceiptTeam team={creatorTeam} kind={kind} /> : null}
     </div>
   );
 }
@@ -929,7 +920,6 @@ export function QuinielaTicket({
   featuredSquad?: SquadPlayer[];
 }) {
   const teamsById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
-  const creatorTeam = teamsById.get(supportedTeamId);
   const { squad: avilesSquad } = useSquadPlayers("masculino");
   const squad = featuredSquad ?? avilesSquad;
   const date = formatTicketDate(matches);
@@ -984,7 +974,6 @@ export function QuinielaTicket({
           round={round}
           competitionLabel={competitionLabel}
           creatorHandle={creatorHandle}
-          creatorTeam={creatorTeam}
           savedAt={savedAt}
           points={points}
         />
@@ -1261,32 +1250,6 @@ function ReceiptCreatorHandle({ creatorHandle }: { creatorHandle: string }) {
       <span>{creatorHandle}</span>
     </p>
   );
-}
-
-function TicketReceiptTeam({
-  team,
-  kind,
-}: {
-  team: Pick<Team, "id" | "name" | "shortName" | "crestInitials">;
-  kind: TicketKind;
-}) {
-  const crest = getTeamCrestById(team.id, team.crestInitials);
-  const label = team.shortName || team.name;
-
-  if (isTeamCrestUrl(crest)) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        className={`game-ticket-receipt-crest game-ticket-receipt-crest--${kind}`}
-        src={crest}
-        alt=""
-        title={label}
-        aria-hidden
-      />
-    );
-  }
-
-  return <span className={`game-ticket-receipt-team-name game-ticket-receipt-team-name--${kind}`}>{label}</span>;
 }
 
 function TicketCrest({ team }: { team: Team }) {
