@@ -18,6 +18,14 @@ import { defaultCronicaId } from "@/lib/match-article-factory";
 import { getMatchArticlePageHref } from "@/lib/match-article-url";
 import { isMatchPlayed } from "@/lib/match-result";
 import { resolveSquadPlayerByName, scorerLabelForPlayer } from "@/lib/squad-player-resolve";
+import {
+  QUINIELA_SCORER_NONE,
+  resolveScorerIdFromPrediction,
+  resolveSquadPlayerById,
+  scorerLabelFromId,
+  scorerSelectionForNone,
+  scorerSelectionForPlayer,
+} from "@/lib/quiniela-scorer";
 import { getPlayerDisplayName } from "@/lib/squad-utils";
 import {
   actualAvilesScorer,
@@ -153,16 +161,19 @@ export function PredictionForm({
   );
   const scorerOptions = useMemo<ScorerOption[]>(
     () => [
-      { value: "nadie", label: "Nadie" },
+      { value: QUINIELA_SCORER_NONE, label: "Nadie" },
       ...squad
         .filter((player) => player.posicion !== "Portero")
         .map((player) => {
           const label = scorerLabelForPlayer(player);
-          return { value: label, label };
+          return { value: player.id, label };
         }),
     ],
     [squad],
   );
+  const selectedScorerId = scorerLockedToNadie
+    ? QUINIELA_SCORER_NONE
+    : resolveScorerIdFromPrediction(squad, prediction ?? {});
   const actualScorer = avilesMatch
     ? actualAvilesScorer(match, { events: chronicleEvents, squad })
     : null;
@@ -177,9 +188,14 @@ export function PredictionForm({
   const applyAvilesRules = (next: Prediction): Prediction => {
     const avilesGoals = getAvilesGoalsPick(match, next);
     if (avilesGoals === 0) {
-      next.scorer = "nadie";
+      const none = scorerSelectionForNone();
+      next.scorerId = none.scorerId;
+      next.scorer = none.scorer;
     } else if (avilesGoals !== undefined) {
-      if (next.scorer === "nadie") next.scorer = undefined;
+      if (next.scorerId === QUINIELA_SCORER_NONE || next.scorer === QUINIELA_SCORER_NONE) {
+        next.scorerId = undefined;
+        next.scorer = undefined;
+      }
     }
 
     const outcome = outcomeFromGoalsPicks(next.goalsHome, next.goalsAway);
@@ -196,6 +212,7 @@ export function PredictionForm({
       outcome: prediction?.outcome,
       goalsHome: prediction?.goalsHome,
       goalsAway: prediction?.goalsAway,
+      scorerId: prediction?.scorerId,
       scorer: prediction?.scorer,
       ...patch,
       updatedAt: new Date().toISOString(),
@@ -206,7 +223,14 @@ export function PredictionForm({
   const handleAvilesGoalsPick = (isHomeSide: boolean, pick: GoalsPick) => {
     const patch: Partial<Prediction> = isHomeSide ? { goalsHome: pick } : { goalsAway: pick };
     if ((avilesIsHome && isHomeSide) || (!avilesIsHome && !isHomeSide)) {
-      patch.scorer = pick === 0 ? "nadie" : undefined;
+      if (pick === 0) {
+        const none = scorerSelectionForNone();
+        patch.scorerId = none.scorerId;
+        patch.scorer = none.scorer;
+      } else {
+        patch.scorerId = undefined;
+        patch.scorer = undefined;
+      }
     }
     update(patch);
   };
@@ -309,7 +333,7 @@ export function PredictionForm({
 
         {avilesMatch && (
           <ScorerCombobox
-            value={scorerLockedToNadie ? "nadie" : prediction?.scorer}
+            value={selectedScorerId}
             readOnly={formReadOnly || scorerLockedToNadie}
             options={scorerOptions}
             squad={squad}
@@ -317,7 +341,17 @@ export function PredictionForm({
             actualScorer={actualScorer}
             actualScorers={actualScorers}
             isCorrect={scorerCorrect}
-            onChange={(scorer) => update({ scorer })}
+            onChange={(scorerId) => {
+              if (scorerId === QUINIELA_SCORER_NONE) {
+                const none = scorerSelectionForNone();
+                update({ scorerId: none.scorerId, scorer: none.scorer });
+                return;
+              }
+              const player = resolveSquadPlayerById(squad, scorerId);
+              if (!player) return;
+              const selection = scorerSelectionForPlayer(player);
+              update({ scorerId: selection.scorerId, scorer: selection.scorer });
+            }}
           />
         )}
       </div>
@@ -327,11 +361,12 @@ export function PredictionForm({
   );
 }
 
-function resolveScorerPlayer(squad: SquadPlayer[], label: string | undefined): SquadPlayer | undefined {
-  if (!label || label === "nadie") return undefined;
-  const byName = resolveSquadPlayerByName(squad, label);
-  if (byName) return byName;
-  return squad.find((player) => scorerLabelForPlayer(player) === label);
+function resolveScorerPlayer(squad: SquadPlayer[], scorerId?: string, fallbackLabel?: string): SquadPlayer | undefined {
+  if (!scorerId || scorerId === QUINIELA_SCORER_NONE) return undefined;
+  const byId = resolveSquadPlayerById(squad, scorerId);
+  if (byId) return byId;
+  if (!fallbackLabel || fallbackLabel === QUINIELA_SCORER_NONE) return undefined;
+  return resolveSquadPlayerByName(squad, fallbackLabel);
 }
 
 function ScorerCombobox({
@@ -361,8 +396,11 @@ function ScorerCombobox({
   const [query, setQuery] = useState("");
   const rootRef = useRef<HTMLDivElement>(null);
 
-  const selectedLabel = options.find((option) => option.value === value)?.label ?? "";
-  const displayValue = open ? query : selectedLabel;
+  const selectedLabel =
+    value === QUINIELA_SCORER_NONE
+      ? "Nadie"
+      : scorerLabelFromId(squad, value, options.find((option) => option.value === value)?.label);
+  const displayValue = open ? query : selectedLabel ?? "";
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -429,7 +467,7 @@ function ScorerCombobox({
           onFocus={() => {
             if (readOnly) return;
             setOpen(true);
-            setQuery(selectedLabel);
+            setQuery(selectedLabel ?? "");
           }}
           onChange={(event) => {
             if (readOnly) return;
@@ -457,7 +495,7 @@ function ScorerCombobox({
           {showUserFichaCompare && (
             <QuinielaScorerFicha
               player={predictedPlayer}
-              label={value === "nadie" ? "Nadie" : value}
+              label={value === QUINIELA_SCORER_NONE ? "Nadie" : selectedLabel}
               tone="user"
               highlight={isCorrect}
             />

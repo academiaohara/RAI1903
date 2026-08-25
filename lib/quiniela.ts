@@ -1,20 +1,26 @@
 import { RAI_TEAM_ID, teams as mockTeams } from "@/data/mock";
 import { isPlaceholderMatch, isSchedulableMatchday } from "@/lib/competition/normalize-fixtures";
-import { getAllAvilesScorerLabelsFromEvents } from "@/lib/aviles-match-events";
+import { getAllAvilesScorerIdsFromEvents, getAllAvilesScorerLabelsFromEvents } from "@/lib/aviles-match-events";
 import {
   getSupportedTeamGoalsPick,
+  getSupportedTeamScorerIds,
   getSupportedTeamScorerLabels,
   isSupportedTeamMatch,
 } from "@/lib/match-goals";
 import type { MatchGoalEntry } from "@/types/match-goals";
 import type { MatchEvent } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
+import type { GoalsPick, Match, Matchday, Prediction, PredictionOutcome, Team } from "@/types";
 import {
   getHomeAwayRecordBeforeRound,
   getTeamsAtRound,
   type HomeAwayRecord,
 } from "@/lib/standings";
-import type { GoalsPick, Match, Matchday, Prediction, PredictionOutcome, Team } from "@/types";
+import {
+  isQuinielaScorerNone,
+  QUINIELA_SCORER_NONE,
+  resolveScorerIdFromPrediction,
+} from "@/lib/quiniela-scorer";
 
 export const QUINIELA_TABS = [
   { href: "/juegos/quiniela/pronosticos", label: "Pronosticos" },
@@ -148,6 +154,37 @@ export function getAvilesScore(match: Match): number | null {
   return match.homeTeamId === RAI_TEAM_ID ? match.homeScore : match.awayScore;
 }
 
+export function actualFeaturedTeamScorerIds(
+  match: Match,
+  supportedTeamId: string,
+  options?: {
+    goals?: MatchGoalEntry[];
+    squad?: SquadPlayer[];
+    events?: MatchEvent[];
+  },
+): string[] {
+  const teamScore =
+    match.homeTeamId === supportedTeamId
+      ? match.homeScore
+      : match.awayTeamId === supportedTeamId
+        ? match.awayScore
+        : undefined;
+  if (teamScore === undefined || teamScore === null) return [];
+  if (teamScore === 0) return [QUINIELA_SCORER_NONE];
+
+  if (options?.goals && options.squad) {
+    const fromJornada = getSupportedTeamScorerIds(match, supportedTeamId, options.goals, options.squad);
+    if (fromJornada.length > 0) return fromJornada;
+  }
+
+  if (supportedTeamId === RAI_TEAM_ID && options?.events && options.squad) {
+    const fromChronicle = getAllAvilesScorerIdsFromEvents(match, options.events, options.squad);
+    if (fromChronicle.length > 0) return fromChronicle;
+  }
+
+  return [];
+}
+
 export function actualFeaturedTeamScorers(
   match: Match,
   supportedTeamId: string,
@@ -186,6 +223,19 @@ export function actualAvilesScorers(
   return actualFeaturedTeamScorers(match, RAI_TEAM_ID, options);
 }
 
+export function actualFeaturedTeamScorerId(
+  match: Match,
+  supportedTeamId: string,
+  options?: {
+    goals?: MatchGoalEntry[];
+    squad?: SquadPlayer[];
+    events?: MatchEvent[];
+  },
+): string | null {
+  const all = actualFeaturedTeamScorerIds(match, supportedTeamId, options);
+  return all.length > 0 ? all[0]! : null;
+}
+
 export function actualFeaturedTeamScorer(
   match: Match,
   supportedTeamId: string,
@@ -216,8 +266,17 @@ export function isScorerPredictionCorrect(
     supportedTeamId?: string;
   },
 ): boolean {
-  if (!prediction.scorer) return false;
   const supportedTeamId = options?.supportedTeamId ?? RAI_TEAM_ID;
+  const predictedId = options?.squad
+    ? resolveScorerIdFromPrediction(options.squad, prediction)
+    : prediction.scorerId;
+  const actualId = actualFeaturedTeamScorerId(match, supportedTeamId, options);
+
+  if (predictedId && actualId) {
+    return predictedId === actualId;
+  }
+
+  if (!prediction.scorer) return false;
   const actual = actualFeaturedTeamScorer(match, supportedTeamId, options);
   return actual !== null && prediction.scorer === actual;
 }
@@ -329,8 +388,12 @@ export function isMatchdayComplete(
     if (prediction.goalsHome === undefined || prediction.goalsAway === undefined) return false;
     if (!prediction.outcome) return false;
     const teamGoals = getFeaturedTeamGoalsPick(match, supportedTeamId, prediction);
-    if (teamGoals === 0) return prediction.scorer === "nadie";
-    return Boolean(prediction.scorer && prediction.scorer !== "nadie");
+    if (teamGoals === 0) {
+      return isQuinielaScorerNone(prediction.scorerId) || prediction.scorer === QUINIELA_SCORER_NONE;
+    }
+    const predictedId = prediction.scorerId;
+    if (predictedId) return !isQuinielaScorerNone(predictedId);
+    return Boolean(prediction.scorer && !isQuinielaScorerNone(prediction.scorer));
   });
 }
 
@@ -358,9 +421,10 @@ export function countOutcomeHits(
 }
 
 export function migratePrediction(
-  raw: Omit<Prediction, "goalsHome" | "goalsAway"> & {
+  raw: Omit<Prediction, "goalsHome" | "goalsAway" | "scorerId"> & {
     goalsHome?: unknown;
     goalsAway?: unknown;
+    scorerId?: unknown;
     exactScore?: { home: number; away: number };
     scorers?: string[];
   },
@@ -372,6 +436,7 @@ export function migratePrediction(
     normalizeGoalsPick(raw.goalsAway) ??
     (raw.exactScore ? normalizeGoalsPick(raw.exactScore.away >= 3 ? "M" : raw.exactScore.away) : undefined);
   const scorer = raw.scorer ?? (raw.scorers && raw.scorers.length > 0 ? raw.scorers[0] : undefined);
+  const scorerId = typeof raw.scorerId === "string" && raw.scorerId.length > 0 ? raw.scorerId : undefined;
 
   return {
     matchId: raw.matchId,
@@ -379,6 +444,7 @@ export function migratePrediction(
     outcome: raw.outcome,
     goalsHome,
     goalsAway,
+    scorerId,
     scorer,
     updatedAt: raw.updatedAt,
   };

@@ -36,3 +36,7 @@ export function resolveSquadPlayerByName(squad: SquadPlayer[], rawName: string):
 export function scorerLabelForPlayer(player: SquadPlayer): string {
   return getPlayerDisplayName(player);
 }
+
+export function squadPlayerGoalKey(player: SquadPlayer): string {
+  return player.id;
+}

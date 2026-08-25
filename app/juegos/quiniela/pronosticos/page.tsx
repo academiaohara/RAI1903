@@ -33,7 +33,10 @@ import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { resolveUserHandle } from "@/lib/auth/profile";
 import { getTeamById } from "@/lib/quiniela";
-import { scorerLabelForPlayer } from "@/lib/squad-player-resolve";
+import {
+  isValidQuinielaScorerSelection,
+  withResolvedScorer,
+} from "@/lib/quiniela-scorer";
 import type { Matchday, Prediction } from "@/types";
 import type { User } from "@supabase/supabase-js";
 
@@ -146,7 +149,7 @@ function PronosticosBody({
     () =>
       Object.fromEntries(
         selectedMatchday.matches
-          .filter((match) => match.status === "finished" && isFeaturedTeamMatch(match, supportedTeamId ?? "") && predictions[match.id]?.scorer)
+          .filter((match) => match.status === "finished" && isFeaturedTeamMatch(match, supportedTeamId ?? "") && (predictions[match.id]?.scorerId || predictions[match.id]?.scorer))
           .map((match) => [
             match.id,
             isScorerPredictionCorrect(
@@ -158,11 +161,7 @@ function PronosticosBody({
       ),
     [predictions, scoringContext, selectedMatchday.matches, supportedTeamId],
   );
-  const validScorers = useMemo(
-    () => new Set(getSupportedTeamSquad(scoringContext).map((player) => scorerLabelForPlayer(player))),
-    [scoringContext],
-  );
-
+  const featuredSquad = useMemo(() => getSupportedTeamSquad(scoringContext), [scoringContext]);
   const statusBanner = useMemo(() => {
     if (jornadaFinalizada) return "finished" as const;
     if (isLocked) return "locked" as const;
@@ -193,16 +192,23 @@ function PronosticosBody({
       await alert("Completa los 10 partidos (signo 1-X-2 y porra de tu equipo si aplica) antes de guardar.");
       return;
     }
+    const normalizedPredictions = Object.fromEntries(
+      Object.entries(predictions).map(([matchId, prediction]) => [
+        matchId,
+        withResolvedScorer(featuredSquad, prediction),
+      ]),
+    );
     const hasInvalidScorer = selectedMatchday.matches.some((match) => {
       if (!isFeaturedTeamMatch(match, supportedTeamId ?? "")) return false;
-      const scorer = predictions[match.id]?.scorer;
-      return scorer !== "nadie" && (!scorer || !validScorers.has(scorer));
+      const prediction = normalizedPredictions[match.id];
+      return !isValidQuinielaScorerSelection(featuredSquad, prediction?.scorerId, prediction?.scorer);
     });
     if (hasInvalidScorer) {
       await alert("Selecciona el goleador de tu equipo en la lista de la plantilla.");
       return;
     }
-    void saveQuinielaPredictions(userId, predictions, seasonId);
+    setPredictions(normalizedPredictions);
+    void saveQuinielaPredictions(userId, normalizedPredictions, seasonId);
     void saveQuinielaRound(userId, round, seasonId);
     setSavedRounds((current) => ({ ...current, [round]: new Date().toISOString() }));
     setIsEditing(false);
