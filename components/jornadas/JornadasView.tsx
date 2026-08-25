@@ -3,6 +3,7 @@
 import { Card } from "@/components/Card";
 import { FemeninoPageEditor } from "@/components/editor/FemeninoPageEditor";
 import { JornadaMatchesByDay } from "@/components/jornadas/JornadaMatchesByDay";
+import { JornadaRoundJsonEditor } from "@/components/jornadas/JornadaRoundJsonEditor";
 import { JornadaRoundCarousel } from "@/components/jornadas/JornadaRoundCarousel";
 import { JornadasGrupoSwitcher } from "@/components/jornadas/JornadasGrupoSwitcher";
 import { useEditedJornadasDataset } from "@/components/jornadas/useEditedJornadasDataset";
@@ -66,6 +67,13 @@ export function JornadasView({ gender }: JornadasViewProps) {
     <SectionUnderConstructionGate scope={gender} section="jornadas">
     <div className="space-y-6">
       {gender === "femenino" ? <FemeninoPageEditor /> : null}
+      <JornadaRoundJsonEditor
+        fixtures={grupoMatches}
+        gender={gender}
+        grupo={grupo}
+        roundNumber={summary.roundNumber}
+        roundLabel={title}
+      />
       <JornadaRoundCarousel
         rounds={dataset.rounds}
         selectedId={selectedRoundId}
