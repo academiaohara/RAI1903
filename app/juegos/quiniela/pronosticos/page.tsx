@@ -10,8 +10,10 @@ import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvi
 import { QuinielaHowItWorks } from "@/components/QuinielaHowItWorks";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
-import { buildQuinielaScoringContext, scoringOptionsForMatch } from "@/lib/quiniela/scoring-context";
+import { buildQuinielaScoringContext, getSupportedTeamSquad, scoringOptionsForMatch } from "@/lib/quiniela/scoring-context";
 import { quinielaRequiresAuth } from "@/lib/quiniela-storage";
+import { loadSupportedTeamId, saveSupportedTeamId } from "@/lib/quiniela-supported-team";
+import { SupportedTeamLastMatch, SupportedTeamPicker } from "@/components/quiniela/SupportedTeamSection";
 import type { CompetitionSeasonId } from "@/data/mock";
 import {
   countFinishedMatches,
@@ -22,7 +24,7 @@ import {
   isMatchdayComplete,
   isMatchdayFullyFinished,
   isScorerPredictionCorrect,
-  isAvilesMatch,
+  isFeaturedTeamMatch,
   sortQuinielaMatches,
   shouldCountQuinielaPoints,
 } from "@/lib/quiniela";
@@ -46,10 +48,17 @@ type PronosticosBodyProps = {
 function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds, bundlesLoading }: PronosticosBodyProps) {
   const { alert } = useAppDialog();
   const { bundles, viewedSeason, getCompetitionConfig } = useSeason();
-  const { canEdit: isCmsEditor } = useInlineEditing();
+  const { canEdit: isCmsEditor, getOverride } = useInlineEditing();
+  const [supportedTeamId, setSupportedTeamId] = useState<string | null>(null);
   const scoringContext = useMemo(
-    () => buildQuinielaScoringContext(bundles, matchdays),
-    [bundles, matchdays],
+    () =>
+      buildQuinielaScoringContext(
+        bundles,
+        matchdays,
+        supportedTeamId ?? undefined,
+        getOverride,
+      ),
+    [bundles, getOverride, matchdays, supportedTeamId],
   );
   const [round, setRound] = useState(currentRound);
   const [predictions, setPredictions] = useState<Record<string, Prediction>>({});
@@ -69,6 +78,10 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
       setSavedRounds(state.savedRounds);
       setUserId(user?.id ?? null);
       setUserHandle(user ? await resolveUserHandle(user) : "@usuario");
+      const hasSaved =
+        Object.keys(state.savedRounds).length > 0 || Object.keys(state.predictions).length > 0;
+      const teamId = await loadSupportedTeamId(user?.id ?? null, { hasSavedQuiniela: hasSaved });
+      setSupportedTeamId(teamId);
       setIsEditing(false);
       setHydrated(true);
     };
@@ -97,8 +110,8 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
 
   const selectedMatchday = useMemo(() => getMatchdayByRound(matchdays, round), [matchdays, round]);
   const orderedMatches = useMemo(
-    () => sortQuinielaMatches(selectedMatchday.matches),
-    [selectedMatchday.matches],
+    () => sortQuinielaMatches(selectedMatchday.matches, supportedTeamId ?? undefined),
+    [selectedMatchday.matches, supportedTeamId],
   );
   const hasMatchesForRound = selectedMatchday.matches.length > 0;
   const isSaved = Boolean(savedRounds[round]);
@@ -123,7 +136,7 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
     () =>
       Object.fromEntries(
         selectedMatchday.matches
-          .filter((match) => match.status === "finished" && isAvilesMatch(match) && predictions[match.id]?.scorer)
+          .filter((match) => match.status === "finished" && isFeaturedTeamMatch(match, supportedTeamId ?? "") && predictions[match.id]?.scorer)
           .map((match) => [
             match.id,
             isScorerPredictionCorrect(
@@ -133,11 +146,11 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
             ),
           ]),
       ),
-    [predictions, scoringContext, selectedMatchday.matches],
+    [predictions, scoringContext, selectedMatchday.matches, supportedTeamId],
   );
   const validScorers = useMemo(
-    () => new Set(scoringContext.squad.map((player) => scorerLabelForPlayer(player))),
-    [scoringContext.squad],
+    () => new Set(getSupportedTeamSquad(scoringContext).map((player) => scorerLabelForPlayer(player))),
+    [scoringContext],
   );
 
   const statusBanner = useMemo(() => {
@@ -166,17 +179,17 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
       await alert("Inicia sesión para guardar tu quiniela y aparecer en el ranking.");
       return;
     }
-    if (!isMatchdayComplete(selectedMatchday, predictions)) {
-      await alert("Completa los 10 partidos (signo 1-X-2 y porra del Avilés si aplica) antes de guardar.");
+    if (!isMatchdayComplete(selectedMatchday, predictions, supportedTeamId ?? undefined)) {
+      await alert("Completa los 10 partidos (signo 1-X-2 y porra de tu equipo si aplica) antes de guardar.");
       return;
     }
     const hasInvalidScorer = selectedMatchday.matches.some((match) => {
-      if (!isAvilesMatch(match)) return false;
+      if (!isFeaturedTeamMatch(match, supportedTeamId ?? "")) return false;
       const scorer = predictions[match.id]?.scorer;
       return scorer !== "nadie" && (!scorer || !validScorers.has(scorer));
     });
     if (hasInvalidScorer) {
-      await alert("Selecciona el goleador del Avilés en la lista de la plantilla.");
+      await alert("Selecciona el goleador de tu equipo en la lista de la plantilla.");
       return;
     }
     void saveQuinielaPredictions(userId, predictions, seasonId);
@@ -195,8 +208,25 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
     setIsEditing(false);
   };
 
+  const handleSupportedTeamChange = (teamId: string) => {
+    setSupportedTeamId(teamId);
+    void saveSupportedTeamId(userId, teamId);
+  };
+
   return (
     <>
+      {hydrated && supportedTeamId ? (
+        <div className="space-y-4">
+          <SupportedTeamPicker
+            teams={teams}
+            value={supportedTeamId}
+            onChange={handleSupportedTeamChange}
+            disabled={isLocked && isSaved && !isEditing}
+          />
+          <SupportedTeamLastMatch supportedTeamId={supportedTeamId} matchdays={matchdays} />
+        </div>
+      ) : null}
+
       <JornadaSelector
         value={round}
         total={totalRounds}
@@ -266,6 +296,8 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
             round={round}
             seasonLabel={viewedSeason.label}
             competitionLabel={getCompetitionConfig("masculino").ligaLabel ?? "1ª RFEF — Grupo 1"}
+            supportedTeamId={supportedTeamId ?? undefined}
+            featuredSquad={getSupportedTeamSquad(scoringContext)}
             readOnly={readOnly}
             onChange={updatePrediction}
             creatorHandle={userHandle}

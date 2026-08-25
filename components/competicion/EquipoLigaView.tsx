@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { Card } from "@/components/Card";
 import { EquipoLigaTeamInfo } from "@/components/competicion/EquipoLigaTeamInfo";
+import { EquipoLigaSquad } from "@/components/competicion/EquipoLigaSquad";
 import { LeagueTable } from "@/components/LeagueTable";
 import { StandingsEvolutionChart } from "@/components/squad/StandingsEvolutionChart";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
 import { getLeagueZoneStandingsWindow } from "@/lib/standings-window";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
+import { isTeamInRfefGrupo1 } from "@/lib/rfef-grupos";
 import type { StandingsZonesConfig } from "@/lib/standings";
 import type { Route } from "next";
 import type { Matchday, Team } from "@/types";
@@ -34,6 +36,9 @@ export function EquipoLigaView({
   const clubHighlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
   const backHref = `${primerEquipoBase(gender)}/competicion` as Route;
 
+  const showGrupo1Squad = gender === "masculino" && isTeamInRfefGrupo1(team.id);
+  const grupo = showGrupo1Squad ? ("1" as const) : undefined;
+
   return (
     <div className="space-y-6">
       <Link
@@ -44,6 +49,12 @@ export function EquipoLigaView({
       </Link>
 
       <EquipoLigaTeamInfo gender={gender} team={team} />
+
+      {showGrupo1Squad ? (
+        <Card eyebrow="Plantilla" title={`Jugadores · ${team.shortName ?? team.name}`} borderlessHeader>
+          <EquipoLigaSquad gender={gender} team={team} grupo={grupo} leagueMatchdays={leagueMatchdays} />
+        </Card>
+      ) : null}
 
       <Card eyebrow="Clasificacion" title="Tu zona en la liga" borderlessHeader>
         <LeagueTable

@@ -12,11 +12,13 @@ import {
   LogOut,
   Mail,
   ShieldCheck,
+  Star,
   type LucideIcon,
 } from "lucide-react";
 import { ChangePasswordForm } from "@/components/auth/ChangePasswordForm";
 import { AccountBoletosSummary } from "@/components/auth/AccountBoletosSummary";
 import { DisplayNameForm } from "@/components/auth/DisplayNameForm";
+import { SupportedTeamProfileSection } from "@/components/auth/SupportedTeamProfileSection";
 import { UserAvatar } from "@/components/auth/UserAvatar";
 import { userHasEmailPasswordIdentity } from "@/lib/auth/email-auth";
 import { resolveUserHandle } from "@/lib/auth/profile";
@@ -256,6 +258,14 @@ function AccountDashboard({
         </SettingsCard>
 
         <div className="space-y-6">
+          <SettingsCard
+            icon={Star}
+            title="Tu equipo en la RAIniela"
+            subtitle="El equipo que sigues en la quiniela del Grupo I"
+          >
+            <SupportedTeamProfileSection user={user} />
+          </SettingsCard>
+
           <SettingsCard
             icon={AtSign}
             title="Nombre público"
