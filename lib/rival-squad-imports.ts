@@ -96,7 +96,25 @@ function mapRivalPosition(pos: string): { posicion: SquadPosition; rol: SquadRol
   return { posicion: "Centrocampista", rol: "MC" };
 }
 
-function importPlayerToSquadPlayer(team: Team, player: RivalSquadImportPlayer): SquadPlayer {
+function rivalImportPlayerId(teamId: string, player: RivalSquadImportPlayer, index: number): string {
+  if (player.dorsal != null) {
+    return `${teamId}-d${player.dorsal}`;
+  }
+  const slug = player.jugador
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return slug ? `${teamId}-n-${slug}` : `${teamId}-i${index}`;
+}
+
+function importPlayerToSquadPlayer(
+  team: Team,
+  player: RivalSquadImportPlayer,
+  index: number,
+): SquadPlayer {
   const status: PlayerStatus = player.estado ?? "titular";
   const { nombre, apellido } = parsePlayerName(player.jugador);
   const { posicion, rol } = mapRivalPosition(player.pos);
@@ -108,11 +126,13 @@ function importPlayerToSquadPlayer(team: Team, player: RivalSquadImportPlayer): 
   const amarillas = player.ta ?? 0;
   const rojas = player.tr ?? 0;
 
+  const playerId = rivalImportPlayerId(team.id, player, index);
+
   return {
-    id: `${team.id}-d${player.dorsal}`,
+    id: playerId,
     nombre,
     apellido,
-    dorsal: player.dorsal,
+    dorsal: player.dorsal ?? 0,
     posicion,
     rol,
     estado: status,
@@ -137,7 +157,7 @@ function importPlayerToSquadPlayer(team: Team, player: RivalSquadImportPlayer): 
     rojas,
     historialPartidos: buildPlayerMatchHistory(
       {
-        id: `${team.id}-d${player.dorsal}`,
+        id: playerId,
         partidos: pj,
         minutos: pj * 72,
         goles,
@@ -164,8 +184,10 @@ export function getImportedRivalSquad(teamId: string): RivalSquadImport | null {
 }
 
 export function buildSquadFromImport(team: Team, data: RivalSquadImport): SquadPlayer[] {
-  return data.plantilla.map((player) => importPlayerToSquadPlayer(team, player));
+  return data.plantilla.map((player, index) => importPlayerToSquadPlayer(team, player, index));
 }
+
+export { rivalImportPlayerId };
 
 export function buildClubInfoFromImport(
   team: Team,

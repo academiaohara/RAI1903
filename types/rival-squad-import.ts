@@ -4,7 +4,7 @@ import type { StadiumInfo } from "@/types/squad";
 export type RivalSquadFoot = "Derecha" | "Izquierda" | "Ambidiestro";
 
 export type RivalSquadImportPlayer = {
-  dorsal: number;
+  dorsal: number | null;
   jugador: string;
   pos: string;
   /** Pierna buena (Transfermarkt: Derecho / Izquierdo). */
