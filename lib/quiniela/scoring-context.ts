@@ -2,7 +2,7 @@ import { RAI_TEAM_ID } from "@/data/mock";
 import { getCmsRivalSquad } from "@/lib/cms/rival-squads-bundle";
 import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import { getSquadBundle } from "@/lib/cms/season-bundles";
-import { buildSquadFromImport, getImportedRivalSquad } from "@/lib/rival-squad-imports";
+import { buildQuinielaSquadFromImport } from "@/lib/rival-squad-imports";
 import { readMatchGoalsOverride } from "@/lib/match-goals";
 import { isFeaturedTeamMatch } from "@/lib/quiniela";
 import type { Match, Matchday } from "@/types";
@@ -25,10 +25,9 @@ function resolveTeamSquad(
   }
 
   const cms = getCmsRivalSquad(bundles, "masculino", teamId);
-  const imported = cms ?? getImportedRivalSquad(teamId);
-  if (!imported) return [];
+  if (!cms) return [];
 
-  return buildSquadFromImport(
+  return buildQuinielaSquadFromImport(
     {
       id: teamId,
       name: teamName,
@@ -51,7 +50,7 @@ function resolveTeamSquad(
         points: 0,
       },
     },
-    imported,
+    cms,
   );
 }
 

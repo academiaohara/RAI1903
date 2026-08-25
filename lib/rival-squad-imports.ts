@@ -96,17 +96,21 @@ function mapRivalPosition(pos: string): { posicion: SquadPosition; rol: SquadRol
   return { posicion: "Centrocampista", rol: "MC" };
 }
 
-function importPlayerToSquadPlayer(team: Team, player: RivalSquadImportPlayer): SquadPlayer {
+function importPlayerToSquadPlayer(
+  team: Team,
+  player: RivalSquadImportPlayer,
+  options?: { forQuiniela?: boolean },
+): SquadPlayer {
   const status: PlayerStatus = player.estado ?? "titular";
   const { nombre, apellido } = parsePlayerName(player.jugador);
   const { posicion, rol } = mapRivalPosition(player.pos);
   const edad = player.edad ?? null;
   const birthYear = edad != null ? new Date().getFullYear() - edad : new Date().getFullYear();
-  const pj = player.pj ?? 0;
-  const goles = player.g ?? 0;
-  const asistencias = player.a ?? 0;
-  const amarillas = player.ta ?? 0;
-  const rojas = player.tr ?? 0;
+  const pj = options?.forQuiniela ? 0 : (player.pj ?? 0);
+  const goles = options?.forQuiniela ? 0 : (player.g ?? 0);
+  const asistencias = options?.forQuiniela ? 0 : (player.a ?? 0);
+  const amarillas = options?.forQuiniela ? 0 : (player.ta ?? 0);
+  const rojas = options?.forQuiniela ? 0 : (player.tr ?? 0);
 
   return {
     id: `${team.id}-d${player.dorsal}`,
@@ -135,27 +139,31 @@ function importPlayerToSquadPlayer(team: Team, player: RivalSquadImportPlayer): 
     asistencias,
     amarillas,
     rojas,
-    historialPartidos: buildPlayerMatchHistory(
-      {
-        id: `${team.id}-d${player.dorsal}`,
-        partidos: pj,
-        minutos: pj * 72,
-        goles,
-        asistencias,
-        amarillas,
-        rojas,
-      },
-      "masculino",
-    ),
-    trayectoria: [
-      {
-        temporada: "2025/26",
-        club: team.name,
-        partidos: pj,
-        goles,
-        asistencias,
-      },
-    ],
+    historialPartidos: options?.forQuiniela
+      ? []
+      : buildPlayerMatchHistory(
+          {
+            id: `${team.id}-d${player.dorsal}`,
+            partidos: pj,
+            minutos: pj * 72,
+            goles,
+            asistencias,
+            amarillas,
+            rojas,
+          },
+          "masculino",
+        ),
+    trayectoria: options?.forQuiniela
+      ? []
+      : [
+          {
+            temporada: "2025/26",
+            club: team.name,
+            partidos: pj,
+            goles,
+            asistencias,
+          },
+        ],
   };
 }
 
@@ -163,8 +171,16 @@ export function getImportedRivalSquad(teamId: string): RivalSquadImport | null {
   return RIVAL_SQUAD_IMPORTS[teamId] ?? null;
 }
 
-export function buildSquadFromImport(team: Team, data: RivalSquadImport): SquadPlayer[] {
-  return data.plantilla.map((player) => importPlayerToSquadPlayer(team, player));
+export function buildSquadFromImport(
+  team: Team,
+  data: RivalSquadImport,
+  options?: { forQuiniela?: boolean },
+): SquadPlayer[] {
+  return data.plantilla.map((player) => importPlayerToSquadPlayer(team, player, options));
+}
+
+export function buildQuinielaSquadFromImport(team: Team, data: RivalSquadImport): SquadPlayer[] {
+  return buildSquadFromImport(team, data, { forQuiniela: true });
 }
 
 export function buildClubInfoFromImport(
