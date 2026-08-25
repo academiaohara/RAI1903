@@ -38,7 +38,7 @@ export function EquipoLigaView({
   const clubHighlightTeamId = gender === "femenino" ? RAI_FEM_TEAM_ID : RAI_TEAM_ID;
   const backHref = `${primerEquipoBase(gender)}/competicion` as Route;
 
-  const showSquad = gender === "masculino" && grupo !== undefined;
+  const showSquad = gender === "masculino" && grupo === "1";
 
   return (
     <div className="space-y-6">
