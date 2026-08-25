@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { Pencil, X } from "lucide-react";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
@@ -17,8 +17,8 @@ import { getTeamById } from "@/lib/quiniela";
 import { getTeamCrestById } from "@/lib/team-crests";
 import {
   DEFAULT_TEAM_COLORS,
+  resolveTeamColors,
   resolveTeamColorsFromSources,
-  teamVerticalStripeBackgroundStyle,
 } from "@/lib/team-stripes";
 import { cn, formatMatchDate } from "@/lib/utils";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -70,33 +70,35 @@ type SupportedTeamPickerProps = {
 };
 
 const CREST_TILT_CLASS = "-rotate-6";
-const STRIPE_SKEW_DEG = 14;
+const STRIPE_WIDTH = 24;
+const STRIPE_ANGLE_DEG = 76;
+const WHITE_MASK_STOP = "46%";
+
+const diagonalMaskStyle: CSSProperties = {
+  maskImage: `linear-gradient(${STRIPE_ANGLE_DEG}deg, #000 0, #000 ${WHITE_MASK_STOP}, transparent ${WHITE_MASK_STOP})`,
+  WebkitMaskImage: `linear-gradient(${STRIPE_ANGLE_DEG}deg, #000 0, #000 ${WHITE_MASK_STOP}, transparent ${WHITE_MASK_STOP})`,
+};
+
+function diagonalStripeStyle(colors: string[], stripeWidth = STRIPE_WIDTH): CSSProperties {
+  const [primary, secondary] = resolveTeamColors(colors);
+  const cycle = stripeWidth * 2;
+
+  return {
+    background: `repeating-linear-gradient(${STRIPE_ANGLE_DEG}deg, ${primary} 0, ${primary} ${stripeWidth}px, ${secondary} ${stripeWidth}px, ${secondary} ${cycle}px)`,
+    backgroundPosition: "0 0",
+  };
+}
 
 function SkewedStripePanel({
   colors,
-  stripeWidth = 22,
+  stripeWidth = STRIPE_WIDTH,
   className,
 }: {
   colors: string[];
   stripeWidth?: number;
   className?: string;
 }) {
-  const bleed = stripeWidth;
-
-  return (
-    <div className={cn("overflow-hidden", className)}>
-      <div
-        className="absolute inset-y-0"
-        style={{
-          left: `-${bleed}px`,
-          width: `calc(100% + ${bleed * 2}px)`,
-          transform: `skewX(-${STRIPE_SKEW_DEG}deg)`,
-          transformOrigin: "left center",
-          ...teamVerticalStripeBackgroundStyle(colors, stripeWidth),
-        }}
-      />
-    </div>
-  );
+  return <div className={cn("overflow-hidden", className)} style={diagonalStripeStyle(colors, stripeWidth)} />;
 }
 
 export function SupportedTeamPicker({ teams, value, onChange, disabled }: SupportedTeamPickerProps) {
@@ -111,8 +113,15 @@ export function SupportedTeamPicker({ teams, value, onChange, disabled }: Suppor
   return (
     <div className="space-y-3">
       <div className="relative overflow-hidden rounded-2xl border border-[#214C9B]/15 bg-white">
+        <SkewedStripePanel colors={selectedColors} className="pointer-events-none absolute inset-0" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-[1] bg-white"
+          style={diagonalMaskStyle}
+        />
+
         <div className="relative flex min-h-[6.5rem] items-stretch sm:min-h-[7.5rem]">
-          <div className="relative z-10 flex w-1/2 min-w-0 flex-col justify-center bg-white px-4 py-4 sm:px-5 sm:py-5">
+          <div className="relative z-10 flex w-[46%] min-w-0 flex-col justify-center px-4 py-4 sm:px-5 sm:py-5">
             <p className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-slate-500">Tu equipo</p>
             <p
               className="mt-1.5 text-[clamp(1.1rem,4.8vw,1.85rem)] font-extrabold uppercase leading-[0.9] tracking-tight"
@@ -121,12 +130,6 @@ export function SupportedTeamPicker({ teams, value, onChange, disabled }: Suppor
               {displayName}
             </p>
           </div>
-
-          <SkewedStripePanel
-            colors={selectedColors}
-            stripeWidth={24}
-            className="pointer-events-none relative w-1/2 self-stretch"
-          />
 
           {selectedTeam ? (
             <div
