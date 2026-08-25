@@ -15,7 +15,8 @@ import {
 import { formatMatchScore } from "@/lib/match-result";
 import { getTeamById } from "@/lib/quiniela";
 import { getTeamCrestById } from "@/lib/team-crests";
-import { formatMatchDate } from "@/lib/utils";
+import { resolveTeamColorsFromSources, teamDiagonalStripeBackgroundStyle } from "@/lib/team-stripes";
+import { cn, formatMatchDate } from "@/lib/utils";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { JornadaFixture } from "@/types/jornadas";
 import type { Matchday } from "@/types";
@@ -58,7 +59,7 @@ export function MatchGoalsSummary({ fixture, gender = "masculino" }: MatchGoalsS
 }
 
 type SupportedTeamPickerProps = {
-  teams: Array<{ id: string; name: string; shortName?: string; crestInitials?: string }>;
+  teams: Array<{ id: string; name: string; shortName?: string; crestInitials?: string; colors?: string[] }>;
   value: string;
   onChange: (teamId: string) => void;
   disabled?: boolean;
@@ -67,33 +68,17 @@ type SupportedTeamPickerProps = {
 export function SupportedTeamPicker({ teams, value, onChange, disabled }: SupportedTeamPickerProps) {
   const [editing, setEditing] = useState(false);
   const selectedTeam = teams.find((team) => team.id === value);
+  const displayName = selectedTeam?.name ?? selectedTeam?.shortName ?? "Elige tu equipo";
 
   return (
-    <div className="rounded-2xl border border-[#214C9B]/15 bg-gradient-to-br from-blue-50/80 to-white p-4 sm:p-5">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-          <span className="shrink-0 text-sm font-extrabold leading-none text-[#214C9B]">Tu equipo:</span>
-          <span className="truncate text-sm font-bold leading-none text-slate-700">
-            {selectedTeam?.shortName ?? selectedTeam?.name ?? "—"}
-          </span>
-          {selectedTeam ? (
-            <OpponentCrest
-              logo={getTeamCrestById(
-                selectedTeam.id,
-                selectedTeam.crestInitials ?? selectedTeam.shortName ?? selectedTeam.name,
-              )}
-              opponent={selectedTeam.name}
-              size="md"
-              className="h-10 w-10 shrink-0"
-            />
-          ) : null}
-        </div>
-        {!disabled ? (
-          editing ? (
+    <div className="relative overflow-hidden rounded-2xl border border-[#214C9B]/15 bg-gradient-to-br from-blue-50/80 to-white p-4 sm:p-5">
+      {!disabled ? (
+        <div className="absolute right-3 top-3 z-30 sm:right-4 sm:top-4">
+          {editing ? (
             <button
               type="button"
               onClick={() => setEditing(false)}
-              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:bg-slate-50"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-500 shadow-sm backdrop-blur transition hover:bg-white"
               aria-label="Cerrar selector de equipo"
             >
               <X size={14} aria-hidden />
@@ -102,40 +87,80 @@ export function SupportedTeamPicker({ teams, value, onChange, disabled }: Suppor
             <button
               type="button"
               onClick={() => setEditing(true)}
-              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#214C9B]/20 text-[#214C9B] transition hover:bg-[#214C9B]/5"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#214C9B]/20 bg-white/90 text-[#214C9B] shadow-sm backdrop-blur transition hover:bg-[#214C9B]/5"
               aria-label="Cambiar equipo"
             >
               <Pencil size={14} aria-hidden />
             </button>
-          )
+          )}
+        </div>
+      ) : null}
+
+      <div className="relative flex min-h-[7.5rem] items-stretch sm:min-h-[9rem]">
+        <div className="relative z-10 flex min-w-0 flex-1 flex-col justify-center pr-[34%] sm:pr-[38%]">
+          <p className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-[#214C9B]/65">Tu equipo</p>
+          <p className="mt-1.5 text-[clamp(1.35rem,5.5vw,2.15rem)] font-extrabold uppercase leading-[0.9] tracking-tight text-[#214C9B]">
+            {displayName}
+          </p>
+        </div>
+
+        {selectedTeam ? (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 right-0 flex w-[58%] items-center justify-end overflow-hidden"
+          >
+            <OpponentCrest
+              logo={getTeamCrestById(
+                selectedTeam.id,
+                selectedTeam.crestInitials ?? selectedTeam.shortName ?? selectedTeam.name,
+              )}
+              opponent={selectedTeam.name}
+              teamId={selectedTeam.id}
+              size="lg"
+              className="h-[9.5rem] w-[9.5rem] max-w-none translate-x-[22%] opacity-95 drop-shadow-[0_18px_28px_rgba(33,76,155,0.22)] sm:h-[11.5rem] sm:w-[11.5rem] sm:translate-x-[18%]"
+            />
+          </div>
         ) : null}
       </div>
 
       {editing && !disabled ? (
-        <div className="mt-3 flex flex-wrap gap-2 border-t border-[#214C9B]/10 pt-3">
-          {teams.map((team) => {
-            const selected = team.id === value;
-            const crest = getTeamCrestById(team.id, team.crestInitials ?? team.shortName ?? team.name);
-            return (
-              <button
-                key={team.id}
-                type="button"
-                onClick={() => {
-                  onChange(team.id);
-                  setEditing(false);
-                }}
-                className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold transition ${
-                  selected
-                    ? "border-[#214C9B] bg-[#214C9B] text-white shadow-sm"
-                    : "border-[#214C9B]/15 bg-white text-slate-700 hover:border-[#214C9B]/35"
-                }`}
-                aria-pressed={selected}
-              >
-                <OpponentCrest logo={crest} opponent={team.name} size="sm" className="h-6 w-6" />
-                <span>{team.shortName ?? team.name}</span>
-              </button>
-            );
-          })}
+        <div className="absolute inset-y-0 left-1/2 right-0 z-20 overflow-y-auto bg-gradient-to-l from-white/95 via-white/88 to-white/55 p-2 backdrop-blur-[2px] sm:p-3">
+          <div className="flex h-full flex-wrap content-center justify-center gap-1.5 sm:gap-2">
+            {teams.map((team) => {
+              const selected = team.id === value;
+              const crest = getTeamCrestById(team.id, team.crestInitials ?? team.shortName ?? team.name);
+              const colors = resolveTeamColorsFromSources(team.id, team.colors);
+
+              return (
+                <button
+                  key={team.id}
+                  type="button"
+                  onClick={() => {
+                    onChange(team.id);
+                    setEditing(false);
+                  }}
+                  className={cn(
+                    "flex aspect-square w-[calc(25%-0.375rem)] min-w-[2.65rem] max-w-[3.35rem] items-center justify-center rounded-xl p-1 shadow-sm ring-1 ring-black/10 transition sm:w-[calc(20%-0.5rem)] sm:max-w-[3.75rem]",
+                    selected
+                      ? "z-10 scale-105 ring-2 ring-[#214C9B] ring-offset-2 ring-offset-white"
+                      : "hover:scale-105 hover:ring-[#214C9B]/35",
+                  )}
+                  style={teamDiagonalStripeBackgroundStyle(colors)}
+                  aria-pressed={selected}
+                  aria-label={team.name}
+                  title={team.name}
+                >
+                  <OpponentCrest
+                    logo={crest}
+                    opponent={team.name}
+                    teamId={team.id}
+                    size="sm"
+                    className="relative z-10 h-[68%] w-[68%] max-w-none drop-shadow-[0_3px_8px_rgba(0,0,0,0.4)]"
+                  />
+                </button>
+              );
+            })}
+          </div>
         </div>
       ) : null}
     </div>

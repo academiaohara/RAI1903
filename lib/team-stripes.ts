@@ -34,3 +34,12 @@ export function teamStripeBackgroundStyle(colors?: string[]): CSSProperties {
     background: `repeating-linear-gradient(90deg, ${primary} 0, ${primary} ${STRIPE_PRIMARY_SHARE}%, ${secondary} ${STRIPE_PRIMARY_SHARE}%, ${secondary} ${STRIPE_CYCLE_PERCENT}%)`,
   };
 }
+
+/** Franjas diagonales (p. ej. selector de equipo en quiniela). */
+export function teamDiagonalStripeBackgroundStyle(colors?: string[]): CSSProperties {
+  const [primary, secondary] = resolveTeamColors(colors);
+
+  return {
+    background: `repeating-linear-gradient(-38deg, ${primary} 0px, ${primary} 11px, ${secondary} 11px, ${secondary} 22px)`,
+  };
+}
