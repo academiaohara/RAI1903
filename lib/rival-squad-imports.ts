@@ -96,9 +96,24 @@ function mapRivalPosition(pos: string): { posicion: SquadPosition; rol: SquadRol
   return { posicion: "Centrocampista", rol: "MC" };
 }
 
+function rivalImportPlayerId(teamId: string, player: RivalSquadImportPlayer, index: number): string {
+  if (player.dorsal != null) {
+    return `${teamId}-d${player.dorsal}`;
+  }
+  const slug = player.jugador
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return slug ? `${teamId}-n-${slug}` : `${teamId}-i${index}`;
+}
+
 function importPlayerToSquadPlayer(
   team: Team,
   player: RivalSquadImportPlayer,
+  index: number,
   options?: { forQuiniela?: boolean },
 ): SquadPlayer {
   const status: PlayerStatus = player.estado ?? "titular";
@@ -112,11 +127,13 @@ function importPlayerToSquadPlayer(
   const amarillas = options?.forQuiniela ? 0 : (player.ta ?? 0);
   const rojas = options?.forQuiniela ? 0 : (player.tr ?? 0);
 
+  const playerId = rivalImportPlayerId(team.id, player, index);
+
   return {
-    id: `${team.id}-d${player.dorsal}`,
+    id: playerId,
     nombre,
     apellido,
-    dorsal: player.dorsal,
+    dorsal: player.dorsal ?? 0,
     posicion,
     rol,
     estado: status,
@@ -143,7 +160,7 @@ function importPlayerToSquadPlayer(
       ? []
       : buildPlayerMatchHistory(
           {
-            id: `${team.id}-d${player.dorsal}`,
+            id: playerId,
             partidos: pj,
             minutos: pj * 72,
             goles,
@@ -176,12 +193,14 @@ export function buildSquadFromImport(
   data: RivalSquadImport,
   options?: { forQuiniela?: boolean },
 ): SquadPlayer[] {
-  return data.plantilla.map((player) => importPlayerToSquadPlayer(team, player, options));
+  return data.plantilla.map((player, index) => importPlayerToSquadPlayer(team, player, index, options));
 }
 
 export function buildQuinielaSquadFromImport(team: Team, data: RivalSquadImport): SquadPlayer[] {
   return buildSquadFromImport(team, data, { forQuiniela: true });
 }
+
+export { rivalImportPlayerId };
 
 export function buildClubInfoFromImport(
   team: Team,
