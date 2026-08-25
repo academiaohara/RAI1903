@@ -277,10 +277,15 @@ a {
 }
 
 .game-ticket-receipt-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   margin: 6px 0 0;
   color: #1c3f6e;
   font-family: var(--font-kalam), "Kalam", cursive;
   font-size: 0.85rem;
+  line-height: 1;
   text-align: center;
 }
 
@@ -990,15 +995,16 @@ a {
   gap: 6px;
 }
 
-.game-ticket-footer-crest {
-  width: 16px;
-  height: 16px;
+.game-ticket-receipt-crest {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
   object-fit: contain;
   filter: grayscale(1) contrast(1.1);
   opacity: 0.9;
 }
 
-.game-ticket-footer-team-name {
+.game-ticket-receipt-team-name {
   color: #1c3f6e;
   font-family: var(--font-kalam), "Kalam", cursive;
   font-size: 0.72rem;
