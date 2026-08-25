@@ -22,6 +22,7 @@ import { buildPlayerMatchHistory } from "@/lib/player-match-history";
 import { getStadiumPhoto } from "@/lib/squad-photos";
 import type { Team } from "@/types";
 import { normalizeRivalFoot } from "@/lib/match-goals";
+import { RIVAL_SQUAD_POS_OPTIONS } from "@/lib/rival-squad-positions";
 import type { RivalSquadImport, RivalSquadImportPlayer } from "@/types/rival-squad-import";
 import type { SquadClubInfo, SquadPlayer, SquadPosition } from "@/types/squad";
 import type { SquadRoleCode } from "@/types/squad";
@@ -58,7 +59,11 @@ function parsePlayerName(jugador: string): { nombre: string; apellido: string } 
 }
 
 function mapRivalPosition(pos: string): { posicion: SquadPosition; rol: SquadRoleCode } {
-  const normalized = pos.toLowerCase();
+  const normalized = pos.trim().toLowerCase();
+  const exact = RIVAL_SQUAD_POS_OPTIONS.find((option) => option.value.toLowerCase() === normalized);
+  if (exact) {
+    return { posicion: exact.grupo as SquadPosition, rol: exact.web };
+  }
 
   if (normalized.includes("portero")) {
     return { posicion: "Portero", rol: "POR" };
@@ -69,16 +74,13 @@ function mapRivalPosition(pos: string): { posicion: SquadPosition; rol: SquadRol
   if (normalized.includes("lateral derecho")) {
     return { posicion: "Defensa", rol: "LD" };
   }
-  if (normalized.includes("defensa central")) {
-    return { posicion: "Defensa", rol: "DFC" };
-  }
-  if (normalized === "defensa") {
+  if (normalized.includes("defensa central") || normalized === "defensa") {
     return { posicion: "Defensa", rol: "DFC" };
   }
   if (normalized.includes("mediocentro ofensivo") || normalized.includes("mediapunta")) {
     return { posicion: "Centrocampista", rol: "MCO" };
   }
-  if (normalized.includes("pivote") || normalized.includes("mediocentro")) {
+  if (normalized.includes("pivote") || normalized.includes("mediocentro") || normalized.includes("centrocampista")) {
     return { posicion: "Centrocampista", rol: "MC" };
   }
   if (normalized.includes("extremo izquierdo")) {
@@ -89,9 +91,6 @@ function mapRivalPosition(pos: string): { posicion: SquadPosition; rol: SquadRol
   }
   if (normalized.includes("delantero") || normalized.includes("atacante")) {
     return { posicion: "Delantero", rol: "DC" };
-  }
-  if (normalized.includes("centrocampista")) {
-    return { posicion: "Centrocampista", rol: "MC" };
   }
 
   return { posicion: "Centrocampista", rol: "MC" };
@@ -121,7 +120,7 @@ function importPlayerToSquadPlayer(team: Team, player: RivalSquadImportPlayer): 
     fechaNacimiento: edad != null ? `${birthYear}-07-01` : "",
     lugarNacimiento: team.city,
     nacionalidad: "España",
-    altura: "1,78 m",
+    altura: player.altura?.trim() || "—",
     peso: "76 kg",
     piernaBuena: normalizeRivalFoot(player.pie),
     contratoHasta: player.contrato != null ? `${player.contrato}-06-30` : "—",
