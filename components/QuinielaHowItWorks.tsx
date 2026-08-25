@@ -1,38 +1,50 @@
 import { CircleDot, LayoutGrid } from "lucide-react";
 
-const rules = [
-  {
-    title: "Signo 1-X-2",
-    description: "En los 10 partidos de la jornada, acierta si gana el local (1), empatan (X) o gana el visitante (2).",
-    points: "+1 pt",
-    iconBg: "bg-[#214C9B]",
-    icon: (
-      <div className="flex gap-0.5 text-[10px] font-extrabold leading-none text-white">
-        <span>1</span>
-        <span className="opacity-80">·</span>
-        <span>X</span>
-        <span className="opacity-80">·</span>
-        <span>2</span>
-      </div>
-    ),
-  },
-  {
-    title: "Porra del Avilés",
-    description: "En el partido del Real Avilés Industrial, acierta los goles de ambos equipos (0, 1, 2 o M si marca 3 o más).",
-    points: "+1 pt",
-    iconBg: "bg-[#214C9B]",
-    icon: <span className="text-sm font-extrabold leading-none text-white">2:0</span>,
-  },
-  {
-    title: "Goleador del Avilés",
-    description: "En el mismo partido, acierta quién marca para el Avilés. Si no anota, elige «Nadie».",
-    points: "+1 pt",
-    iconBg: "bg-violet-600",
-    icon: <CircleDot className="h-6 w-6 text-white" strokeWidth={2.25} aria-hidden />,
-  },
-] as const;
+type QuinielaHowItWorksProps = {
+  featuredTeamName?: string;
+};
 
-export function QuinielaHowItWorks() {
+function buildRules(featuredTeamName: string) {
+  const shortName = featuredTeamName.includes("Avilés") ? "Avilés" : featuredTeamName;
+
+  return [
+    {
+      title: "Signo 1-X-2",
+      description:
+        "En los 10 partidos de la jornada, acierta si gana el local (1), empatan (X) o gana el visitante (2).",
+      points: "+1 pt",
+      iconBg: "bg-[#214C9B]",
+      icon: (
+        <div className="flex gap-0.5 text-[10px] font-extrabold leading-none text-white">
+          <span>1</span>
+          <span className="opacity-80">·</span>
+          <span>X</span>
+          <span className="opacity-80">·</span>
+          <span>2</span>
+        </div>
+      ),
+    },
+    {
+      title: `Porra del ${shortName}`,
+      description: `En el partido de ${featuredTeamName}, acierta los goles de ambos equipos (0, 1, 2 o M si marca 3 o más).`,
+      points: "+1 pt",
+      iconBg: "bg-[#214C9B]",
+      icon: <span className="text-sm font-extrabold leading-none text-white">2:0</span>,
+    },
+    {
+      title: `Goleador del ${shortName}`,
+      description: `En el mismo partido, acierta quién marca para ${featuredTeamName}. Si no anota, elige «Nadie».`,
+      points: "+1 pt",
+      iconBg: "bg-violet-600",
+      icon: <CircleDot className="h-6 w-6 text-white" strokeWidth={2.25} aria-hidden />,
+    },
+  ] as const;
+}
+
+export function QuinielaHowItWorks({ featuredTeamName = "Real Avilés Industrial" }: QuinielaHowItWorksProps) {
+  const rules = buildRules(featuredTeamName);
+  const shortName = featuredTeamName.includes("Avilés") ? "Avilés" : featuredTeamName;
+
   return (
     <section className="space-y-3 sm:space-y-5" aria-labelledby="quiniela-how-it-works-title">
       <div>
@@ -43,8 +55,8 @@ export function QuinielaHowItWorks() {
           ¿Cómo funciona la quiniela?
         </h2>
         <p className="mt-2 max-w-3xl text-sm leading-5 text-slate-600 sm:mt-3 sm:text-base sm:leading-7">
-          La quiniela de Rai1903 es el juego semanal donde demuestras tu instinto azulón. Rellena los 10 partidos de
-          la jornada antes del pitido inicial y compite por el mejor puesto del ranking.
+          La quiniela de Rai1903 es el juego semanal donde demuestras tu instinto con {featuredTeamName}. Rellena los
+          10 partidos de la jornada antes del pitido inicial y compite por el mejor puesto del ranking.
         </p>
       </div>
 
@@ -74,8 +86,8 @@ export function QuinielaHowItWorks() {
       <p className="flex items-start gap-2 text-xs text-slate-500 sm:text-sm">
         <LayoutGrid className="mt-0.5 h-4 w-4 shrink-0 text-[#214C9B]" aria-hidden />
         <span>
-          En el partido del Avilés el signo 1-X-2 se calcula solo a partir de los goles que elijas. Hasta 12 puntos por
-          jornada si aciertas todo.
+          En el partido de {shortName} el signo 1-X-2 se calcula solo a partir de los goles que elijas. Hasta 12 puntos
+          por jornada si aciertas todo.
         </span>
       </p>
     </section>
