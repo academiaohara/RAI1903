@@ -159,7 +159,9 @@ a {
 
 .game-ticket-receipt-logo {
   display: flex;
+  align-items: center;
   justify-content: center;
+  gap: 8px;
   margin-bottom: 4px;
 }
 
@@ -996,19 +998,44 @@ a {
 }
 
 .game-ticket-receipt-crest {
-  width: 18px;
-  height: 18px;
-  flex: 0 0 18px;
+  flex: 0 0 auto;
   object-fit: contain;
   filter: grayscale(1) contrast(1.1);
   opacity: 0.9;
 }
 
+.game-ticket-receipt-crest--quiniela {
+  height: 40px;
+  width: 40px;
+}
+
+.game-ticket-receipt-crest--quinigol {
+  height: 44px;
+  width: 44px;
+}
+
+.game-ticket-receipt-crest--clasificacion {
+  height: 46px;
+  width: 46px;
+}
+
 .game-ticket-receipt-team-name {
   color: #1c3f6e;
   font-family: var(--font-kalam), "Kalam", cursive;
-  font-size: 0.72rem;
   font-weight: 700;
+  line-height: 1;
+}
+
+.game-ticket-receipt-team-name--quiniela {
+  font-size: 0.95rem;
+}
+
+.game-ticket-receipt-team-name--quinigol {
+  font-size: 1rem;
+}
+
+.game-ticket-receipt-team-name--clasificacion {
+  font-size: 1.05rem;
 }
 
 .game-ticket-actions {

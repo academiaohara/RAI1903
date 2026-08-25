@@ -114,7 +114,7 @@ function QuinielaReceipt({
     <aside className="game-ticket-receipt" aria-label="Comprobante RAIniela">
       <div className="game-ticket-receipt-tri game-ticket-receipt-tri--top" />
       <div className="game-ticket-receipt-inner">
-        <ReceiptGameLogo kind="quiniela" />
+        <ReceiptGameLogo kind="quiniela" creatorTeam={creatorTeam} />
         <span className="game-ticket-receipt-subtitle">COMPROBANTE</span>
         <hr className="game-ticket-receipt-hr" />
         <div className="game-ticket-receipt-lines">
@@ -151,7 +151,7 @@ function QuinielaReceipt({
         <p className="game-ticket-receipt-stamp">
           {savedAt ? "GUARDADO CORRECTAMENTE" : "BORRADOR"}
         </p>
-        <ReceiptCreatorHandle creatorHandle={handle} creatorTeam={creatorTeam} />
+        <ReceiptCreatorHandle creatorHandle={handle} />
       </div>
       <div className="game-ticket-receipt-tri game-ticket-receipt-tri--bottom" />
     </aside>
@@ -169,7 +169,6 @@ function QuinigolReceipt({
   round,
   competitionLabel,
   creatorHandle = "@usuario",
-  creatorTeam,
   savedAt,
   points,
 }: {
@@ -178,7 +177,6 @@ function QuinigolReceipt({
   round: number;
   competitionLabel: string;
   creatorHandle?: string;
-  creatorTeam?: Pick<Team, "id" | "name" | "shortName" | "crestInitials">;
   savedAt?: string;
   points?: number;
 }) {
@@ -236,7 +234,7 @@ function QuinigolReceipt({
         <p className="game-ticket-receipt-stamp">
           {savedAt ? "GUARDADO CORRECTAMENTE" : "BORRADOR"}
         </p>
-        <ReceiptCreatorHandle creatorHandle={handle} creatorTeam={creatorTeam} />
+        <ReceiptCreatorHandle creatorHandle={handle} />
       </div>
       <div className="game-ticket-receipt-tri game-ticket-receipt-tri--bottom" />
     </aside>
@@ -249,7 +247,6 @@ function ClasificacionReceipt({
   seasonLabel,
   competitionLabel,
   creatorHandle = "@usuario",
-  creatorTeam,
   savedAt,
   points,
 }: {
@@ -258,7 +255,6 @@ function ClasificacionReceipt({
   seasonLabel: string;
   competitionLabel: string;
   creatorHandle?: string;
-  creatorTeam?: Pick<Team, "id" | "name" | "shortName" | "crestInitials">;
   savedAt?: string;
   points?: number;
 }) {
@@ -316,14 +312,20 @@ function ClasificacionReceipt({
         <p className="game-ticket-receipt-stamp">
           {savedAt ? "GUARDADO CORRECTAMENTE" : "BORRADOR"}
         </p>
-        <ReceiptCreatorHandle creatorHandle={handle} creatorTeam={creatorTeam} />
+        <ReceiptCreatorHandle creatorHandle={handle} />
       </div>
       <div className="game-ticket-receipt-tri game-ticket-receipt-tri--bottom" />
     </aside>
   );
 }
 
-function ReceiptGameLogo({ kind }: { kind: TicketKind }) {
+function ReceiptGameLogo({
+  kind,
+  creatorTeam,
+}: {
+  kind: TicketKind;
+  creatorTeam?: Pick<Team, "id" | "name" | "shortName" | "crestInitials">;
+}) {
   const logo = logoByKind[kind];
   if (!logo) return null;
   return (
@@ -334,6 +336,7 @@ function ReceiptGameLogo({ kind }: { kind: TicketKind }) {
         src={logo}
         alt=""
       />
+      {creatorTeam ? <TicketReceiptTeam team={creatorTeam} kind={kind} /> : null}
     </div>
   );
 }
@@ -1252,22 +1255,21 @@ function zonesByPosition(teamCount: number, zones: CompetitionZoneRule[]): Map<n
   return result;
 }
 
-function ReceiptCreatorHandle({
-  creatorHandle,
-  creatorTeam,
-}: {
-  creatorHandle: string;
-  creatorTeam?: Pick<Team, "id" | "name" | "shortName" | "crestInitials">;
-}) {
+function ReceiptCreatorHandle({ creatorHandle }: { creatorHandle: string }) {
   return (
     <p className="game-ticket-receipt-handle">
-      {creatorTeam ? <TicketReceiptTeam team={creatorTeam} /> : null}
       <span>{creatorHandle}</span>
     </p>
   );
 }
 
-function TicketReceiptTeam({ team }: { team: Pick<Team, "id" | "name" | "shortName" | "crestInitials"> }) {
+function TicketReceiptTeam({
+  team,
+  kind,
+}: {
+  team: Pick<Team, "id" | "name" | "shortName" | "crestInitials">;
+  kind: TicketKind;
+}) {
   const crest = getTeamCrestById(team.id, team.crestInitials);
   const label = team.shortName || team.name;
 
@@ -1275,7 +1277,7 @@ function TicketReceiptTeam({ team }: { team: Pick<Team, "id" | "name" | "shortNa
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        className="game-ticket-receipt-crest"
+        className={`game-ticket-receipt-crest game-ticket-receipt-crest--${kind}`}
         src={crest}
         alt=""
         title={label}
@@ -1284,7 +1286,7 @@ function TicketReceiptTeam({ team }: { team: Pick<Team, "id" | "name" | "shortNa
     );
   }
 
-  return <span className="game-ticket-receipt-team-name">{label}</span>;
+  return <span className={`game-ticket-receipt-team-name game-ticket-receipt-team-name--${kind}`}>{label}</span>;
 }
 
 function TicketCrest({ team }: { team: Team }) {
