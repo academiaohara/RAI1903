@@ -3,6 +3,31 @@ import { normalizeRivalFoot } from "@/lib/match-goals";
 
 type RawPlayer = Record<string, unknown>;
 
+/** Campos mínimos exportados al JSON editable del editor. */
+export type RivalSquadJsonPlayer = {
+  dorsal: number;
+  jugador: string;
+  pos: string;
+  edad: number | null;
+  pie?: string;
+  altura?: string | null;
+};
+
+export function serializeRivalSquadPlantillaJson(plantilla: RivalSquadImportPlayer[]): string {
+  const minimal: RivalSquadJsonPlayer[] = plantilla.map((player) => {
+    const entry: RivalSquadJsonPlayer = {
+      dorsal: player.dorsal,
+      jugador: player.jugador,
+      pos: player.pos,
+      edad: player.edad ?? null,
+    };
+    if (player.pie) entry.pie = player.pie;
+    if (player.altura?.trim()) entry.altura = player.altura.trim();
+    return entry;
+  });
+  return JSON.stringify(minimal, null, 2);
+}
+
 function asNumber(value: unknown, fallback = 0): number {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
@@ -32,6 +57,12 @@ function normalizePlayer(raw: RawPlayer): RivalSquadImportPlayer | null {
     pos,
     pie,
     edad: asOptionalNumber(raw.edad ?? raw.age),
+    altura:
+      typeof raw.altura === "string"
+        ? raw.altura.trim() || null
+        : typeof raw.height === "string"
+          ? raw.height.trim() || null
+          : null,
     pj: asNumber(raw.pj ?? raw.partidos, 0),
     g: asNumber(raw.g ?? raw.goles, 0),
     a: asNumber(raw.a ?? raw.asistencias, 0),

@@ -10,6 +10,8 @@ export type RivalSquadImportPlayer = {
   /** Pierna buena (Transfermarkt: Derecho / Izquierdo). */
   pie?: RivalSquadFoot | "Derecho" | "Izquierdo";
   edad?: number | null;
+  /** Altura mostrada en la tabla (ej. "1,85 m"). */
+  altura?: string | null;
   pj?: number;
   g?: number;
   a?: number;
