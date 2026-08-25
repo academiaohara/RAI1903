@@ -10,7 +10,8 @@ import {
   readMatchGoalsOverride,
 } from "@/lib/match-goals";
 import { matchResultOverrideKey } from "@/lib/fixture-inline-keys";
-import { getPlayerDisplayName } from "@/lib/squad-utils";
+import { getPlayerDisplayName, hasDisplayDorsal } from "@/lib/squad-utils";
+import { squadPlayerGoalKey } from "@/lib/squad-player-resolve";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { JornadaFixture } from "@/types/jornadas";
 import type { MatchGoalEntry } from "@/types/match-goals";
@@ -34,8 +35,8 @@ function squadOptions(squad: SquadPlayer[]): { value: string; label: string }[] 
     .slice()
     .sort((a, b) => a.dorsal - b.dorsal)
     .map((player) => ({
-      value: String(player.dorsal),
-      label: `#${player.dorsal} ${getPlayerDisplayName(player)}`,
+      value: squadPlayerGoalKey(player),
+      label: `${hasDisplayDorsal(player.dorsal) ? `#${player.dorsal} ` : ""}${getPlayerDisplayName(player)}`,
     }));
 }
 
@@ -64,7 +65,7 @@ export function MatchGoalsSide({
       ...goals,
       {
         teamSide: side,
-        playerKey: squad[0] ? String(squad[0].dorsal) : "1",
+        playerKey: squad[0] ? squadPlayerGoalKey(squad[0]) : "1",
         minute: 0,
       },
     ]);

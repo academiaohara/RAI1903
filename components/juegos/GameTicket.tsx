@@ -28,7 +28,15 @@ import { getMatchArticlePageHref } from "@/lib/match-article-url";
 import { isMatchPlayed } from "@/lib/match-result";
 import type { QuinigolPrediction } from "@/lib/quinigol";
 import { actualOutcome, isAvilesMatch, isFeaturedTeamMatch, outcomeFromGoalsPicks } from "@/lib/quiniela";
-import { resolveSquadPlayerByName, scorerLabelForPlayer } from "@/lib/squad-player-resolve";
+import {
+  QUINIELA_SCORER_NONE,
+  isQuinielaScorerNone,
+  resolveScorerIdFromPrediction,
+  resolveSquadPlayerById,
+  scorerLabelFromId,
+  scorerSelectionForNone,
+  scorerSelectionForPlayer,
+} from "@/lib/quiniela-scorer";
 import { getPlayerDisplayName } from "@/lib/squad-utils";
 import { getTeamCrestById, isTeamCrestUrl } from "@/lib/team-crests";
 import type { GoalsPick, Match, Prediction, PredictionOutcome, Team } from "@/types";
@@ -95,7 +103,7 @@ function QuinielaReceipt({
   const marcador = avilesPrediction
     ? `${avilesPrediction.goalsHome ?? "-"} : ${avilesPrediction.goalsAway ?? "-"}`
     : "- : -";
-  const goleador = formatScorerLabel(normalizeScorerValue(avilesPrediction?.scorer)) || "-";
+  const goleador = formatScorerLabel(avilesPrediction?.scorer ?? "") || "-";
   const savedDate = savedAt ? new Date(savedAt) : null;
   const refCode = savedDate
     ? String(savedDate.getTime()).slice(-5)
@@ -656,13 +664,14 @@ function scoreMark(
 }
 
 function formatScorerLabel(value: string): string {
-  if (!value || value === "nadie") return "Nadie";
+  if (!value || isQuinielaScorerNone(value)) return "Nadie";
   return value;
 }
 
 function TicketScorerPicker({
   value,
   squad,
+  fallbackLabel,
   disabled,
   readOnly,
   isCorrect,
@@ -671,6 +680,7 @@ function TicketScorerPicker({
 }: {
   value: string;
   squad: SquadPlayer[];
+  fallbackLabel?: string;
   disabled?: boolean;
   readOnly?: boolean;
   isCorrect?: boolean;
@@ -680,10 +690,16 @@ function TicketScorerPicker({
   const searchId = useId();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const displayValue = formatScorerLabel(value);
   const selectedPlayer = useMemo(
-    () => (value && value !== "nadie" ? resolveSquadPlayerByName(squad, value) : undefined),
+    () => (value && !isQuinielaScorerNone(value) ? resolveSquadPlayerById(squad, value) : undefined),
     [squad, value],
+  );
+  const displayValue = formatScorerLabel(
+    isQuinielaScorerNone(value)
+      ? QUINIELA_SCORER_NONE
+      : selectedPlayer
+        ? getPlayerDisplayName(selectedPlayer)
+        : scorerLabelFromId(squad, value, fallbackLabel) ?? "",
   );
 
   const filteredPlayers = useMemo(() => {
@@ -781,9 +797,9 @@ function TicketScorerPicker({
               <button
                 type="button"
                 role="option"
-                aria-selected={value === "nadie"}
-                className={`ticket-scorer-picker-item${value === "nadie" ? " ticket-scorer-picker-item--selected" : ""}`}
-                onClick={() => pick("nadie")}
+                aria-selected={value === QUINIELA_SCORER_NONE}
+                className={`ticket-scorer-picker-item${value === QUINIELA_SCORER_NONE ? " ticket-scorer-picker-item--selected" : ""}`}
+                onClick={() => pick(QUINIELA_SCORER_NONE)}
               >
                 {simpleList ? (
                   <span className="ticket-scorer-picker-info">
@@ -805,8 +821,7 @@ function TicketScorerPicker({
             </li>
 
             {filteredPlayers.map((player) => {
-              const label = scorerLabelForPlayer(player);
-              const isSelected = value === label;
+              const isSelected = value === player.id;
               return (
                 <li key={player.id}>
                   <button
@@ -814,7 +829,7 @@ function TicketScorerPicker({
                     role="option"
                     aria-selected={isSelected}
                     className={`ticket-scorer-picker-item${isSelected ? " ticket-scorer-picker-item--selected" : ""}`}
-                    onClick={() => pick(label)}
+                    onClick={() => pick(player.id)}
                   >
                     {simpleList ? (
                       <>
@@ -874,7 +889,7 @@ function TicketScorerPicker({
             <p className="ticket-scorer-picker-current">
               Seleccionado: <strong>{getPlayerDisplayName(selectedPlayer)}</strong>
             </p>
-          ) : value === "nadie" ? (
+          ) : value === QUINIELA_SCORER_NONE ? (
             <p className="ticket-scorer-picker-current">
               Seleccionado: <strong>Nadie</strong>
             </p>
@@ -889,16 +904,6 @@ function formatTicketDate(matches: Match[]): string {
   const firstDate = matches.map((match) => new Date(match.date)).find((date) => !Number.isNaN(date.getTime()));
   if (!firstDate) return "";
   return new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" }).format(firstDate);
-}
-
-function normalizeScorerValue(value: unknown): string {
-  if (typeof value === "string") return value === "[object Object]" ? "" : value;
-  if (!value || typeof value !== "object") return "";
-  const candidate = value as Record<string, unknown>;
-  for (const key of ["label", "value", "displayName", "name"]) {
-    if (typeof candidate[key] === "string") return candidate[key];
-  }
-  return "";
 }
 
 type MatchTicketProps = {
@@ -963,7 +968,8 @@ export function QuinielaTicket({
       outcome: current?.outcome,
       goalsHome: current?.goalsHome,
       goalsAway: current?.goalsAway,
-      scorer: normalizeScorerValue(current?.scorer) || undefined,
+      scorerId: current?.scorerId,
+      scorer: current?.scorer,
       ...patch,
       updatedAt: new Date().toISOString(),
     };
@@ -971,8 +977,15 @@ export function QuinielaTicket({
       const teamGoals = match.homeTeamId === supportedTeamId
         ? next.goalsHome
         : next.goalsAway;
-      if (teamGoals === 0) next.scorer = "nadie";
-      if (teamGoals !== undefined && teamGoals !== 0 && next.scorer === "nadie") next.scorer = undefined;
+      if (teamGoals === 0) {
+        const none = scorerSelectionForNone();
+        next.scorerId = none.scorerId;
+        next.scorer = none.scorer;
+      }
+      if (teamGoals !== undefined && teamGoals !== 0 && isQuinielaScorerNone(next.scorerId ?? next.scorer)) {
+        next.scorerId = undefined;
+        next.scorer = undefined;
+      }
       const derivedOutcome = outcomeFromGoalsPicks(next.goalsHome, next.goalsAway);
       if (derivedOutcome) next.outcome = derivedOutcome;
     }
@@ -1014,7 +1027,8 @@ export function QuinielaTicket({
       <ol className="game-ticket-list">
         {matches.map((match, index) => {
           const prediction = predictions[match.id];
-          const scorerValue = normalizeScorerValue(prediction?.scorer);
+          const scorerValue = resolveScorerIdFromPrediction(squad, prediction ?? {});
+          const scorerLabel = prediction?.scorer;
           const featuredMatch = isFeaturedTeamMatch(match, supportedTeamId);
           const derivedOutcome = featuredMatch
             ? outcomeFromGoalsPicks(prediction?.goalsHome, prediction?.goalsAway)
@@ -1085,7 +1099,8 @@ export function QuinielaTicket({
                     </div>
                   </div>
                   <TicketScorerPicker
-                    value={scorerValue}
+                    value={scorerValue ?? ""}
+                    fallbackLabel={scorerLabel}
                     squad={squad}
                     simpleList={supportedTeamId !== RAI_TEAM_ID}
                     disabled={readOnly || teamGoals === 0}
@@ -1095,11 +1110,20 @@ export function QuinielaTicket({
                         ? scorerCorrectByMatch?.[match.id]
                         : undefined
                     }
-                    onChange={(next) =>
+                    onChange={(nextId) => {
+                      if (isQuinielaScorerNone(nextId)) {
+                        const none = scorerSelectionForNone();
+                        update(match, prediction, { scorerId: none.scorerId, scorer: none.scorer });
+                        return;
+                      }
+                      const player = resolveSquadPlayerById(squad, nextId);
+                      if (!player) return;
+                      const selection = scorerSelectionForPlayer(player);
                       update(match, prediction, {
-                        scorer: next.toLocaleLowerCase("es") === "nadie" ? "nadie" : next || undefined,
-                      })
-                    }
+                        scorerId: selection.scorerId,
+                        scorer: selection.scorer,
+                      });
+                    }}
                   />
                 </div>
               ) : null}

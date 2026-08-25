@@ -46,6 +46,7 @@ function rowToPrediction(row: {
   outcome: string | null;
   goals_home: string | null;
   goals_away: string | null;
+  scorer_id: string | null;
   scorer: string | null;
   updated_at: string;
 }): Prediction {
@@ -55,6 +56,7 @@ function rowToPrediction(row: {
     outcome: (row.outcome as Prediction["outcome"]) ?? undefined,
     goalsHome: row.goals_home,
     goalsAway: row.goals_away,
+    scorerId: row.scorer_id ?? undefined,
     scorer: row.scorer ?? undefined,
     updatedAt: row.updated_at,
   });
@@ -101,6 +103,7 @@ type PredictionRow = {
   outcome: string | null;
   goals_home: string | null;
   goals_away: string | null;
+  scorer_id: string | null;
   scorer: string | null;
   updated_at: string;
 };
@@ -143,7 +146,7 @@ async function fetchPredictions(
 
   let query = supabase
     .from("quiniela_predictions")
-    .select("user_id, match_id, matchday, outcome, goals_home, goals_away, scorer, updated_at")
+    .select("user_id, match_id, matchday, outcome, goals_home, goals_away, scorer_id, scorer, updated_at")
     .eq("season_id", seasonId)
     .in("user_id", userIds);
 

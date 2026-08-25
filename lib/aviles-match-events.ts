@@ -1,8 +1,35 @@
 import { RAI_TEAM_ID } from "@/data/mock";
 import { isGoalEventType } from "@/lib/match-events";
+import { QUINIELA_SCORER_NONE } from "@/lib/quiniela-scorer";
 import { resolveSquadPlayerByName, scorerLabelForPlayer } from "@/lib/squad-player-resolve";
 import type { Match, MatchEvent } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
+
+export function getAvilesScorerIdFromEvents(
+  match: Match,
+  events: MatchEvent[],
+  squad: SquadPlayer[],
+): string | null {
+  const isHome = match.homeTeamId === RAI_TEAM_ID;
+  const isAway = match.awayTeamId === RAI_TEAM_ID;
+  if (!isHome && !isAway) return null;
+
+  const avilesSide: "home" | "away" = isHome ? "home" : "away";
+  const goals = events
+    .filter((event) => isGoalEventType(event.type) && event.team === avilesSide && event.player.trim())
+    .sort((a, b) => a.minute - b.minute);
+
+  if (goals.length === 0) {
+    const homeScore = match.homeScore ?? 0;
+    const awayScore = match.awayScore ?? 0;
+    const avilesGoals = isHome ? homeScore : awayScore;
+    return avilesGoals === 0 ? QUINIELA_SCORER_NONE : null;
+  }
+
+  const firstGoal = goals[0]!;
+  const player = resolveSquadPlayerByName(squad, firstGoal.player);
+  return player?.id ?? null;
+}
 
 export function getAvilesScorerFromEvents(
   match: Match,
@@ -36,6 +63,38 @@ function goalScorerLabel(goal: MatchEvent, squad: SquadPlayer[]): string {
   const player = resolveSquadPlayerByName(squad, goal.player);
   if (player) return scorerLabelForPlayer(player);
   return goal.player.trim();
+}
+
+/** Todos los goleadores del Avilés en el partido (orden cronológico, sin duplicar id). */
+export function getAllAvilesScorerIdsFromEvents(
+  match: Match,
+  events: MatchEvent[],
+  squad: SquadPlayer[],
+): string[] {
+  const isHome = match.homeTeamId === RAI_TEAM_ID;
+  const isAway = match.awayTeamId === RAI_TEAM_ID;
+  if (!isHome && !isAway) return [];
+
+  const avilesSide: "home" | "away" = isHome ? "home" : "away";
+  const goals = events
+    .filter((event) => isGoalEventType(event.type) && event.team === avilesSide && event.player.trim())
+    .sort((a, b) => a.minute - b.minute);
+
+  if (goals.length === 0) {
+    const homeScore = match.homeScore ?? 0;
+    const awayScore = match.awayScore ?? 0;
+    const avilesGoals = isHome ? homeScore : awayScore;
+    if (avilesGoals === 0) return [QUINIELA_SCORER_NONE];
+    return [];
+  }
+
+  const ids: string[] = [];
+  for (const goal of goals) {
+    const player = resolveSquadPlayerByName(squad, goal.player);
+    const id = player?.id;
+    if (id && !ids.includes(id)) ids.push(id);
+  }
+  return ids;
 }
 
 /** Todos los goleadores del Avilés en el partido (orden cronológico, sin duplicar etiqueta). */

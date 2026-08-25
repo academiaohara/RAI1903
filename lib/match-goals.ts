@@ -1,5 +1,5 @@
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
-import { getPlayerDisplayName } from "@/lib/squad-utils";
+import { getPlayerDisplayName, hasDisplayDorsal } from "@/lib/squad-utils";
 import type { GoalsPick, Match, Matchday } from "@/types";
 import type { MatchGoalEntry, MatchGoalsPayload } from "@/types/match-goals";
 import type { SquadPlayer } from "@/types/squad";
@@ -59,6 +59,18 @@ export function countGoalsFromEntries(goals: MatchGoalEntry[]): { home: number; 
   );
 }
 
+export function squadPlayerFromGoalKey(squad: SquadPlayer[], playerKey: string): SquadPlayer | undefined {
+  const byId = squad.find((player) => player.id === playerKey);
+  if (byId) return byId;
+
+  const dorsal = Number(playerKey);
+  if (Number.isFinite(dorsal) && hasDisplayDorsal(dorsal)) {
+    return squad.find((player) => player.dorsal === dorsal);
+  }
+
+  return undefined;
+}
+
 export function goalEntryLabel(
   goal: MatchGoalEntry,
   homeTeamName: string,
@@ -72,12 +84,8 @@ export function goalEntryLabel(
   }
 
   const squad = goal.teamSide === "home" ? homeSquad : awaySquad;
-  const dorsal = Number(goal.playerKey);
-  const byDorsal = squad.find((player) => player.dorsal === dorsal);
-  if (byDorsal) return getPlayerDisplayName(byDorsal);
-
-  const byId = squad.find((player) => player.id === goal.playerKey);
-  if (byId) return getPlayerDisplayName(byId);
+  const player = squadPlayerFromGoalKey(squad, goal.playerKey);
+  if (player) return getPlayerDisplayName(player);
 
   return `#${goal.playerKey}`;
 }
@@ -147,15 +155,36 @@ export function getSupportedTeamScorerLabels(
 
   const labels: string[] = [];
   for (const goal of teamGoals) {
-    const dorsal = Number(goal.playerKey);
-    const player =
-      squad.find((entry) => entry.dorsal === dorsal) ??
-      squad.find((entry) => entry.id === goal.playerKey);
+    const player = squadPlayerFromGoalKey(squad, goal.playerKey);
     if (!player) continue;
     const label = getPlayerDisplayName(player);
     if (!labels.includes(label)) labels.push(label);
   }
   return labels;
+}
+
+export function getSupportedTeamScorerIds(
+  match: Match,
+  supportedTeamId: string,
+  goals: MatchGoalEntry[],
+  squad: SquadPlayer[],
+): string[] {
+  const isHome = match.homeTeamId === supportedTeamId;
+  const isAway = match.awayTeamId === supportedTeamId;
+  if (!isHome && !isAway) return [];
+
+  const teamSide = isHome ? "home" : "away";
+  const teamGoals = goals
+    .filter((goal) => goal.teamSide === teamSide && goal.playerKey !== OWN_GOAL_PLAYER_KEY)
+    .sort((a, b) => a.minute - b.minute);
+
+  const ids: string[] = [];
+  for (const goal of teamGoals) {
+    const player = squadPlayerFromGoalKey(squad, goal.playerKey);
+    if (!player) continue;
+    if (!ids.includes(player.id)) ids.push(player.id);
+  }
+  return ids;
 }
 
 export function isSupportedTeamMatch(match: Match, supportedTeamId: string): boolean {

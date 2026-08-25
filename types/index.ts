@@ -182,7 +182,9 @@ export type Prediction = {
   outcome?: PredictionOutcome;
   goalsHome?: GoalsPick;
   goalsAway?: GoalsPick;
-  /** Un solo goleador del Aviles o "nadie". */
+  /** player.id del goleador pronosticado, o "nadie". */
+  scorerId?: string;
+  /** Etiqueta legible del goleador (snapshot / compatibilidad). */
   scorer?: string;
   updatedAt: string;
 };
