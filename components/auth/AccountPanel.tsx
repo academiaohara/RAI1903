@@ -56,38 +56,37 @@ export function AccountPanel() {
   const email = user.email ?? "";
 
   return (
-    <div className="mx-auto max-w-md space-y-6">
-      <div className="flex items-center gap-4 rounded-2xl border border-[#214C9B]/15 bg-slate-50 p-4">
+    <div className="mx-auto max-w-3xl space-y-8 lg:max-w-5xl">
+      <div className="flex items-center gap-4 rounded-2xl border border-[#214C9B]/15 bg-slate-50 p-4 sm:p-5">
         <UserAvatar avatarUrl={avatarUrl} label={displayHandle} size="md" />
         <div className="min-w-0">
-          <p className="truncate text-lg font-extrabold text-[#214C9B]">{displayHandle}</p>
+          <p className="truncate text-lg font-extrabold text-[#214C9B] sm:text-xl">{displayHandle}</p>
           {email ? <p className="truncate text-sm text-slate-600">{email}</p> : null}
         </div>
       </div>
 
-      <div className="space-y-3">
-        <h2 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Tus boletos</h2>
-        <AccountBoletosSummary user={user} />
-      </div>
+      <AccountBoletosSummary user={user} />
 
-      <div className="space-y-3">
-        <h2 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Tu nombre público</h2>
-        <p className="text-sm text-slate-600">
-          Es el nombre que verás en boletos y rankings. Puedes cambiarlo cuando quieras.
-        </p>
-        <DisplayNameForm
-          key={displayHandle}
-          initialHandle={displayHandle}
-          onSaved={(handle) => setDisplayHandle(handle)}
-        />
-      </div>
-
-      {canChangePassword ? (
+      <div className="grid gap-8 lg:grid-cols-2 lg:gap-10">
         <div className="space-y-3">
-          <h2 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Cambiar contraseña</h2>
-          <ChangePasswordForm email={email} />
+          <h2 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Tu nombre público</h2>
+          <p className="text-sm text-slate-600">
+            Es el nombre que verás en boletos y rankings. Puedes cambiarlo cuando quieras.
+          </p>
+          <DisplayNameForm
+            key={displayHandle}
+            initialHandle={displayHandle}
+            onSaved={(handle) => setDisplayHandle(handle)}
+          />
         </div>
-      ) : null}
+
+        {canChangePassword ? (
+          <div className="space-y-3">
+            <h2 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Cambiar contraseña</h2>
+            <ChangePasswordForm email={email} />
+          </div>
+        ) : null}
+      </div>
 
       <p className="text-center text-sm text-slate-600">
         <Link href="/" prefetch={false} className="font-bold text-[#214C9B] underline-offset-2 hover:underline">
