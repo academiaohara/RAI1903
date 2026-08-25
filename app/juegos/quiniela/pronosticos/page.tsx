@@ -32,6 +32,7 @@ import { loadQuinielaState, saveQuinielaPredictions, saveQuinielaRound } from "@
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { resolveUserHandle } from "@/lib/auth/profile";
+import { getTeamById } from "@/lib/quiniela";
 import { scorerLabelForPlayer } from "@/lib/squad-player-resolve";
 import type { Matchday, Prediction } from "@/types";
 import type { User } from "@supabase/supabase-js";
@@ -43,9 +44,18 @@ type PronosticosBodyProps = {
   currentRound: number;
   totalRounds: number;
   bundlesLoading: boolean;
+  onFeaturedTeamNameChange?: (name: string) => void;
 };
 
-function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds, bundlesLoading }: PronosticosBodyProps) {
+function PronosticosBody({
+  seasonId,
+  matchdays,
+  teams,
+  currentRound,
+  totalRounds,
+  bundlesLoading,
+  onFeaturedTeamNameChange,
+}: PronosticosBodyProps) {
   const { alert } = useAppDialog();
   const { bundles, viewedSeason, getCompetitionConfig } = useSeason();
   const { canEdit: isCmsEditor, getOverride } = useInlineEditing();
@@ -213,6 +223,16 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
     void saveSupportedTeamId(userId, teamId);
   };
 
+  const featuredTeam = useMemo(
+    () => (supportedTeamId ? getTeamById(supportedTeamId, teams) : null),
+    [supportedTeamId, teams],
+  );
+  const featuredTeamName = featuredTeam?.name ?? "Real Avilés Industrial";
+
+  useEffect(() => {
+    onFeaturedTeamNameChange?.(featuredTeamName);
+  }, [featuredTeamName, onFeaturedTeamNameChange]);
+
   return (
     <>
       {hydrated && supportedTeamId ? (
@@ -320,6 +340,7 @@ function PronosticosBody({ seasonId, matchdays, teams, currentRound, totalRounds
 
 export default function MiQuinielaPage() {
   const { matchdays, teams, currentRound, totalRounds, seasonId, bundlesLoading } = useQuinielaSeason();
+  const [featuredTeamName, setFeaturedTeamName] = useState("Real Avilés Industrial");
 
   return (
     <div className="space-y-6">
@@ -328,7 +349,7 @@ export default function MiQuinielaPage() {
         title="Pronósticos"
         description="Marca directamente tu RAIniela con los 10 partidos del Grupo I. Al guardar queda bloqueada hasta que pulses editar; cuando empiece el primer partido ya no podrás cambiarla."
       />
-      <QuinielaHowItWorks />
+      <QuinielaHowItWorks featuredTeamName={featuredTeamName} />
       {bundlesLoading ? (
         <p className="text-sm font-bold text-slate-500">Cargando partidos…</p>
       ) : null}
@@ -340,6 +361,7 @@ export default function MiQuinielaPage() {
         currentRound={currentRound}
         totalRounds={totalRounds}
         bundlesLoading={bundlesLoading}
+        onFeaturedTeamNameChange={setFeaturedTeamName}
       />
     </div>
   );

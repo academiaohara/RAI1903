@@ -237,7 +237,12 @@ export function AccountBoletosSummary({ user }: AccountBoletosSummaryProps) {
               aria-label={`Pronósticos de ${game.label}`}
               className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#214C9B] bg-[#214C9B] text-white transition hover:bg-[#1a3d7a] sm:h-10 sm:w-10"
             >
-              <Ticket size={16} aria-hidden />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={GAME_LOGOS[game.id]}
+                alt=""
+                className="h-5 w-5 object-contain brightness-0 invert"
+              />
             </Link>
             <Link
               href={game.rankingHref}

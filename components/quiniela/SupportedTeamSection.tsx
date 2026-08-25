@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { Pencil, X } from "lucide-react";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
@@ -64,32 +65,79 @@ type SupportedTeamPickerProps = {
 };
 
 export function SupportedTeamPicker({ teams, value, onChange, disabled }: SupportedTeamPickerProps) {
+  const [editing, setEditing] = useState(false);
+  const selectedTeam = teams.find((team) => team.id === value);
+
   return (
     <div className="rounded-2xl border border-[#214C9B]/15 bg-gradient-to-br from-blue-50/80 to-white p-4 sm:p-5">
-      <p className="text-sm font-extrabold text-[#214C9B]">El equipo al que sigues es:</p>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {teams.map((team) => {
-          const selected = team.id === value;
-          const crest = getTeamCrestById(team.id, team.crestInitials ?? team.shortName ?? team.name);
-          return (
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="text-sm font-extrabold text-[#214C9B]">Tu equipo:</span>
+          {selectedTeam ? (
+            <OpponentCrest
+              logo={getTeamCrestById(
+                selectedTeam.id,
+                selectedTeam.crestInitials ?? selectedTeam.shortName ?? selectedTeam.name,
+              )}
+              opponent={selectedTeam.name}
+              size="md"
+              className="h-10 w-10"
+            />
+          ) : null}
+          <span className="truncate text-sm font-bold text-slate-700">
+            {selectedTeam?.shortName ?? selectedTeam?.name ?? "—"}
+          </span>
+        </div>
+        {!disabled ? (
+          editing ? (
             <button
-              key={team.id}
               type="button"
-              disabled={disabled}
-              onClick={() => onChange(team.id)}
-              className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold transition ${
-                selected
-                  ? "border-[#214C9B] bg-[#214C9B] text-white shadow-sm"
-                  : "border-[#214C9B]/15 bg-white text-slate-700 hover:border-[#214C9B]/35"
-              }`}
-              aria-pressed={selected}
+              onClick={() => setEditing(false)}
+              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:bg-slate-50"
+              aria-label="Cerrar selector de equipo"
             >
-              <OpponentCrest logo={crest} opponent={team.name} size="sm" className="h-6 w-6" />
-              <span>{team.shortName ?? team.name}</span>
+              <X size={14} aria-hidden />
             </button>
-          );
-        })}
+          ) : (
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#214C9B]/20 text-[#214C9B] transition hover:bg-[#214C9B]/5"
+              aria-label="Cambiar equipo"
+            >
+              <Pencil size={14} aria-hidden />
+            </button>
+          )
+        ) : null}
       </div>
+
+      {editing && !disabled ? (
+        <div className="mt-3 flex flex-wrap gap-2 border-t border-[#214C9B]/10 pt-3">
+          {teams.map((team) => {
+            const selected = team.id === value;
+            const crest = getTeamCrestById(team.id, team.crestInitials ?? team.shortName ?? team.name);
+            return (
+              <button
+                key={team.id}
+                type="button"
+                onClick={() => {
+                  onChange(team.id);
+                  setEditing(false);
+                }}
+                className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold transition ${
+                  selected
+                    ? "border-[#214C9B] bg-[#214C9B] text-white shadow-sm"
+                    : "border-[#214C9B]/15 bg-white text-slate-700 hover:border-[#214C9B]/35"
+                }`}
+                aria-pressed={selected}
+              >
+                <OpponentCrest logo={crest} opponent={team.name} size="sm" className="h-6 w-6" />
+                <span>{team.shortName ?? team.name}</span>
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 }

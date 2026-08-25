@@ -145,11 +145,7 @@ function AccountDashboard({
           </SettingsCard>
 
           <SettingsCard icon={AtSign} title="Nombre público" subtitle="El que se ve en boletos y rankings">
-            <DisplayNameForm
-              key={displayHandle}
-              initialHandle={displayHandle}
-              onSaved={onHandleSaved}
-            />
+            <DisplayNameForm key={displayHandle} initialHandle={displayHandle} onSaved={onHandleSaved} compact />
           </SettingsCard>
 
           {canChangePassword ? (
