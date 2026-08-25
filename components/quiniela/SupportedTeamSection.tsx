@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { Pencil, X } from "lucide-react";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
@@ -15,7 +15,12 @@ import {
 import { formatMatchScore } from "@/lib/match-result";
 import { getTeamById } from "@/lib/quiniela";
 import { getTeamCrestById } from "@/lib/team-crests";
-import { formatMatchDate } from "@/lib/utils";
+import {
+  DEFAULT_TEAM_COLORS,
+  resolveTeamColors,
+  resolveTeamColorsFromSources,
+} from "@/lib/team-stripes";
+import { cn, formatMatchDate } from "@/lib/utils";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { JornadaFixture } from "@/types/jornadas";
 import type { Matchday } from "@/types";
@@ -58,84 +63,167 @@ export function MatchGoalsSummary({ fixture, gender = "masculino" }: MatchGoalsS
 }
 
 type SupportedTeamPickerProps = {
-  teams: Array<{ id: string; name: string; shortName?: string; crestInitials?: string }>;
+  teams: Array<{ id: string; name: string; shortName?: string; crestInitials?: string; colors?: string[] }>;
   value: string;
   onChange: (teamId: string) => void;
   disabled?: boolean;
 };
 
+const CREST_TILT_CLASS = "-rotate-6";
+const STRIPE_WIDTH = 24;
+const STRIPE_ANGLE_DEG = 76;
+const WHITE_MASK_STOP = "46%";
+
+const diagonalMaskStyle: CSSProperties = {
+  maskImage: `linear-gradient(${STRIPE_ANGLE_DEG}deg, #000 0, #000 ${WHITE_MASK_STOP}, transparent ${WHITE_MASK_STOP})`,
+  WebkitMaskImage: `linear-gradient(${STRIPE_ANGLE_DEG}deg, #000 0, #000 ${WHITE_MASK_STOP}, transparent ${WHITE_MASK_STOP})`,
+};
+
+function diagonalStripeStyle(colors: string[], stripeWidth = STRIPE_WIDTH): CSSProperties {
+  const [primary, secondary] = resolveTeamColors(colors);
+  const cycle = stripeWidth * 2;
+
+  return {
+    background: `repeating-linear-gradient(${STRIPE_ANGLE_DEG}deg, ${primary} 0, ${primary} ${stripeWidth}px, ${secondary} ${stripeWidth}px, ${secondary} ${cycle}px)`,
+    backgroundPosition: "0 0",
+  };
+}
+
+function SkewedStripePanel({
+  colors,
+  stripeWidth = STRIPE_WIDTH,
+  className,
+}: {
+  colors: string[];
+  stripeWidth?: number;
+  className?: string;
+}) {
+  return <div className={cn("overflow-hidden", className)} style={diagonalStripeStyle(colors, stripeWidth)} />;
+}
+
 export function SupportedTeamPicker({ teams, value, onChange, disabled }: SupportedTeamPickerProps) {
   const [editing, setEditing] = useState(false);
   const selectedTeam = teams.find((team) => team.id === value);
+  const displayName = selectedTeam?.name ?? selectedTeam?.shortName ?? "Elige tu equipo";
+  const selectedColors = selectedTeam
+    ? resolveTeamColorsFromSources(selectedTeam.id, selectedTeam.colors)
+    : DEFAULT_TEAM_COLORS;
+  const [primaryColor] = selectedColors;
 
   return (
-    <div className="rounded-2xl border border-[#214C9B]/15 bg-gradient-to-br from-blue-50/80 to-white p-4 sm:p-5">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-          <span className="shrink-0 text-sm font-extrabold leading-none text-[#214C9B]">Tu equipo:</span>
-          <span className="truncate text-sm font-bold leading-none text-slate-700">
-            {selectedTeam?.shortName ?? selectedTeam?.name ?? "—"}
-          </span>
+    <div className="space-y-3">
+      <div className="relative overflow-hidden rounded-2xl border border-[#214C9B]/15 bg-white">
+        <SkewedStripePanel colors={selectedColors} className="pointer-events-none absolute inset-0" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-[1] bg-white"
+          style={diagonalMaskStyle}
+        />
+
+        <div className="relative flex min-h-[6.5rem] items-stretch sm:min-h-[7.5rem]">
+          <div className="relative z-10 flex w-[46%] min-w-0 flex-col justify-center px-4 py-4 sm:px-5 sm:py-5">
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-slate-500">Tu equipo</p>
+            <p
+              className="mt-1.5 text-[clamp(1.1rem,4.8vw,1.85rem)] font-extrabold uppercase leading-[0.9] tracking-tight"
+              style={{ color: primaryColor }}
+            >
+              {displayName}
+            </p>
+          </div>
+
           {selectedTeam ? (
-            <OpponentCrest
-              logo={getTeamCrestById(
-                selectedTeam.id,
-                selectedTeam.crestInitials ?? selectedTeam.shortName ?? selectedTeam.name,
-              )}
-              opponent={selectedTeam.name}
-              size="md"
-              className="h-10 w-10 shrink-0"
-            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 right-0 z-10 flex w-[62%] items-center justify-end overflow-hidden"
+            >
+              <OpponentCrest
+                logo={getTeamCrestById(
+                  selectedTeam.id,
+                  selectedTeam.crestInitials ?? selectedTeam.shortName ?? selectedTeam.name,
+                )}
+                opponent={selectedTeam.name}
+                teamId={selectedTeam.id}
+                size="lg"
+                className={cn(
+                  "h-[10.5rem] w-[10.5rem] max-w-none translate-x-[24%] drop-shadow-[0_16px_24px_rgba(0,0,0,0.28)] sm:h-[12.5rem] sm:w-[12.5rem] sm:translate-x-[20%]",
+                  CREST_TILT_CLASS,
+                )}
+              />
+            </div>
           ) : null}
         </div>
+
         {!disabled ? (
-          editing ? (
-            <button
-              type="button"
-              onClick={() => setEditing(false)}
-              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:bg-slate-50"
-              aria-label="Cerrar selector de equipo"
-            >
-              <X size={14} aria-hidden />
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setEditing(true)}
-              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#214C9B]/20 text-[#214C9B] transition hover:bg-[#214C9B]/5"
-              aria-label="Cambiar equipo"
-            >
-              <Pencil size={14} aria-hidden />
-            </button>
-          )
+          <div className="absolute right-3 top-3 z-30 sm:right-4 sm:top-4">
+            {editing ? (
+              <button
+                type="button"
+                onClick={() => setEditing(false)}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-white/95 text-slate-500 shadow-sm transition hover:bg-white"
+                aria-label="Cerrar selector de equipo"
+              >
+                <X size={14} aria-hidden />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setEditing(true)}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-white/95 text-slate-700 shadow-sm transition hover:bg-white"
+                aria-label="Cambiar equipo"
+              >
+                <Pencil size={14} aria-hidden />
+              </button>
+            )}
+          </div>
         ) : null}
       </div>
 
       {editing && !disabled ? (
-        <div className="mt-3 flex flex-wrap gap-2 border-t border-[#214C9B]/10 pt-3">
-          {teams.map((team) => {
-            const selected = team.id === value;
-            const crest = getTeamCrestById(team.id, team.crestInitials ?? team.shortName ?? team.name);
-            return (
-              <button
-                key={team.id}
-                type="button"
-                onClick={() => {
-                  onChange(team.id);
-                  setEditing(false);
-                }}
-                className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold transition ${
-                  selected
-                    ? "border-[#214C9B] bg-[#214C9B] text-white shadow-sm"
-                    : "border-[#214C9B]/15 bg-white text-slate-700 hover:border-[#214C9B]/35"
-                }`}
-                aria-pressed={selected}
-              >
-                <OpponentCrest logo={crest} opponent={team.name} size="sm" className="h-6 w-6" />
-                <span>{team.shortName ?? team.name}</span>
-              </button>
-            );
-          })}
+        <div className="rounded-2xl border border-[#214C9B]/15 bg-white p-3 sm:p-4">
+          <p className="mb-3 text-center text-[10px] font-extrabold uppercase tracking-[0.18em] text-slate-500">
+            Elige tu equipo
+          </p>
+          <div className="grid grid-cols-5 gap-2 sm:grid-cols-8 sm:gap-2.5 md:grid-cols-10">
+            {teams.map((team) => {
+              const selected = team.id === value;
+              const crest = getTeamCrestById(team.id, team.crestInitials ?? team.shortName ?? team.name);
+              const colors = resolveTeamColorsFromSources(team.id, team.colors);
+
+              return (
+                <button
+                  key={team.id}
+                  type="button"
+                  onClick={() => {
+                    onChange(team.id);
+                    setEditing(false);
+                  }}
+                  className={cn(
+                    "relative aspect-square overflow-hidden rounded-xl shadow-sm ring-1 ring-black/10 transition",
+                    selected
+                      ? "z-10 scale-105 ring-2 ring-[#214C9B] ring-offset-2"
+                      : "hover:scale-105 hover:ring-[#214C9B]/35",
+                  )}
+                  aria-pressed={selected}
+                  aria-label={team.name}
+                  title={team.name}
+                >
+                  <SkewedStripePanel colors={colors} stripeWidth={12} className="absolute inset-0" />
+                  <span className="absolute inset-0 flex items-center justify-center p-1.5">
+                    <OpponentCrest
+                      logo={crest}
+                      opponent={team.name}
+                      teamId={team.id}
+                      size="sm"
+                      className={cn(
+                        "relative z-10 h-[72%] w-[72%] max-w-none drop-shadow-[0_3px_8px_rgba(0,0,0,0.4)]",
+                        CREST_TILT_CLASS,
+                      )}
+                    />
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       ) : null}
     </div>
