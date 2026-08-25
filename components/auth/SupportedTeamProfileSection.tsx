@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { Pencil } from "lucide-react";
+import type { User } from "@supabase/supabase-js";
 import { OpponentCrest } from "@/components/OpponentCrest";
-import { ProfileEditableRow } from "@/components/auth/ProfileEditableRow";
+import { Modal } from "@/components/Modal";
+import { SupportedTeamPicker } from "@/components/quiniela/SupportedTeamSection";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import {
@@ -13,18 +16,19 @@ import {
 } from "@/lib/quiniela-supported-team";
 import { getTeamById } from "@/lib/quiniela";
 import { getTeamCrestById } from "@/lib/team-crests";
-import type { User } from "@supabase/supabase-js";
+import { cn } from "@/lib/utils";
 
 type SupportedTeamProfileSectionProps = {
   user: User;
+  embedded?: boolean;
 };
 
-export function SupportedTeamProfileSection({ user }: SupportedTeamProfileSectionProps) {
+export function SupportedTeamProfileSection({ user, embedded = false }: SupportedTeamProfileSectionProps) {
   const { bundles } = useSeason();
   const teams = useMemo(() => resolveGroupTeams(bundles, "masculino", "1"), [bundles]);
   const [teamId, setTeamId] = useState<string>(DEFAULT_SUPPORTED_TEAM_ID);
-  const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -45,6 +49,7 @@ export function SupportedTeamProfileSection({ user }: SupportedTeamProfileSectio
   }, [user.id]);
 
   const team = getTeamById(teamId, teams);
+  const crest = team ? getTeamCrestById(team.id, team.crestInitials) : null;
 
   const onChange = async (nextTeamId: string) => {
     setBusy(true);
@@ -52,65 +57,64 @@ export function SupportedTeamProfileSection({ user }: SupportedTeamProfileSectio
     await saveSupportedTeamId(user.id, nextTeamId);
     setBusy(false);
     setTeamId(nextTeamId);
-    setEditing(false);
     setMessage("Equipo actualizado.");
+    setEditing(false);
   };
 
   return (
-    <div className="space-y-3">
-      <ProfileEditableRow
-        label="Tu equipo"
-        editing={editing}
-        onEdit={() => {
-          setMessage(null);
-          setEditing(true);
-        }}
-        onCancel={() => setEditing(false)}
-        editContent={
-          <div className="space-y-3">
-            <div className="flex flex-wrap gap-2">
-              {teams.map((entry) => {
-                const selected = entry.id === teamId;
-                const crest = getTeamCrestById(entry.id, entry.crestInitials);
-                return (
-                  <button
-                    key={entry.id}
-                    type="button"
-                    disabled={busy}
-                    onClick={() => void onChange(entry.id)}
-                    className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold transition ${
-                      selected
-                        ? "border-[#214C9B] bg-[#214C9B] text-white shadow-sm"
-                        : "border-[#214C9B]/15 bg-white text-slate-700 hover:border-[#214C9B]/35"
-                    }`}
-                    aria-pressed={selected}
-                  >
-                    <OpponentCrest logo={crest} opponent={entry.name} size="sm" className="h-6 w-6" />
-                    <span>{entry.shortName ?? entry.name}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        }
+    <>
+      <div
+        className={cn(
+          "flex flex-col",
+          embedded
+            ? "p-3"
+            : "overflow-hidden rounded-2xl border border-[#214C9B]/12 bg-white p-3 shadow-sm",
+        )}
       >
-        <div className="flex items-center gap-3">
-          {team ? (
-            <OpponentCrest
-              logo={getTeamCrestById(team.id, team.crestInitials)}
-              opponent={team.name}
-              size="lg"
-              className="h-14 w-14"
-            />
+        <header className="mb-2 flex items-center justify-between gap-2">
+          <h2 className="text-[10px] font-extrabold uppercase tracking-wide text-slate-500">Tu equipo</h2>
+          <button
+            type="button"
+            onClick={() => {
+              setMessage(null);
+              setEditing(true);
+            }}
+            className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[#214C9B]/70 transition hover:bg-[#214C9B]/8 hover:text-[#214C9B]"
+            aria-label="Editar equipo"
+          >
+            <Pencil size={12} aria-hidden />
+          </button>
+        </header>
+
+        <div className="flex flex-1 flex-col items-center justify-center gap-1.5 py-1 text-center">
+          {crest && team ? (
+            <>
+              <OpponentCrest
+                logo={crest}
+                opponent={team.name}
+                teamId={team.id}
+                size="md"
+                className="h-12 w-12"
+              />
+              <p className="line-clamp-2 text-xs font-extrabold leading-tight text-[#214C9B]">
+                {team.shortName ?? team.name}
+              </p>
+            </>
           ) : (
-            <span className="flex h-14 w-14 items-center justify-center rounded-full border border-dashed border-[#214C9B]/25 bg-slate-50 text-xs font-bold text-slate-400">
-              ?
-            </span>
+            <p className="text-xs leading-snug text-slate-500">Sin equipo</p>
           )}
-          <span className="sr-only">{team?.name ?? "Sin equipo"}</span>
         </div>
-      </ProfileEditableRow>
-      {message ? <p className="text-sm font-semibold text-[#214C9B]">{message}</p> : null}
-    </div>
+      </div>
+
+      <Modal open={editing} title="Elige tu equipo" onClose={() => setEditing(false)}>
+        <SupportedTeamPicker
+          teams={teams}
+          value={teamId}
+          onChange={(nextTeamId) => void onChange(nextTeamId)}
+          disabled={busy}
+        />
+        {message ? <p className="mt-3 text-sm font-semibold text-[#214C9B]">{message}</p> : null}
+      </Modal>
+    </>
   );
 }

@@ -4,188 +4,87 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Route } from "next";
 import type { User } from "@supabase/supabase-js";
-import {
-  AtSign,
-  Gamepad2,
-  KeyRound,
-  LogOut,
-  ShieldCheck,
-  Star,
-  type LucideIcon,
-} from "lucide-react";
-import { ChangePasswordForm } from "@/components/auth/ChangePasswordForm";
 import { AccountBoletosSummary } from "@/components/auth/AccountBoletosSummary";
 import { DisplayNameForm } from "@/components/auth/DisplayNameForm";
 import { SupportedTeamProfileSection } from "@/components/auth/SupportedTeamProfileSection";
-import { UserAvatar } from "@/components/auth/UserAvatar";
-import { userHasEmailPasswordIdentity } from "@/lib/auth/email-auth";
 import { resolveUserHandle } from "@/lib/auth/profile";
 import { getUserAvatarUrl } from "@/lib/auth/user-display";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { cn } from "@/lib/utils";
 
-const PROVIDER_LABELS: Record<string, string> = {
-  google: "Google",
-  twitter: "X",
-  email: "Correo",
-};
-
-function resolveProviders(user: User): string[] {
-  const providers = new Set<string>();
-  for (const identity of user.identities ?? []) {
-    if (identity.provider) providers.add(identity.provider);
-  }
-  if (providers.size === 0) {
-    const appProviders = (user.app_metadata as { providers?: unknown } | undefined)?.providers;
-    if (Array.isArray(appProviders)) {
-      for (const provider of appProviders) {
-        if (typeof provider === "string") providers.add(provider);
-      }
-    }
-  }
-  return [...providers].map((provider) => PROVIDER_LABELS[provider] ?? provider);
-}
-
-function SettingsCard({
-  icon: Icon,
-  title,
-  subtitle,
-  children,
-}: {
-  icon: LucideIcon;
-  title: string;
-  subtitle: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="overflow-hidden rounded-2xl border border-[#214C9B]/12 bg-white shadow-sm">
-      <header className="flex items-center gap-3 border-b border-[#214C9B]/10 px-4 py-3 sm:px-5 sm:py-4">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#214C9B]/10 text-[#214C9B] sm:h-10 sm:w-10">
-          <Icon size={18} aria-hidden />
-        </span>
-        <div className="min-w-0">
-          <h2 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">{title}</h2>
-          <p className="mt-0.5 hidden text-xs text-slate-500 sm:block">{subtitle}</p>
-        </div>
-      </header>
-      <div className="p-4 sm:p-5">{children}</div>
-    </section>
-  );
-}
-
-function MemberCard({ displayHandle, avatarUrl }: { displayHandle: string; avatarUrl: string | null }) {
-  return (
-    <section className="relative overflow-hidden rounded-2xl bg-[#173a78] text-white shadow-lg sm:rounded-3xl sm:shadow-xl">
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background: "linear-gradient(128deg, #122c5a 0%, #173a78 48%, #214c9b 100%)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background:
-            "repeating-linear-gradient(115deg, rgba(255,255,255,0.055) 0 44px, transparent 44px 92px)",
-        }}
-      />
-
-      <div className="relative flex items-center gap-3 p-4 sm:gap-4 sm:p-5">
-        <UserAvatar avatarUrl={avatarUrl} label={displayHandle} size="md" fallback="header" className="shadow-md" />
-        <h2 className="min-w-0 truncate font-[family-name:var(--font-bebas-neue)] text-3xl leading-none tracking-wide sm:text-4xl">
-          {displayHandle}
-        </h2>
-      </div>
-    </section>
-  );
-}
-
-function AccountDashboard({
+export function AccountDashboard({
   user,
   displayHandle,
   onHandleSaved,
+  embedded = false,
 }: {
   user: User;
   displayHandle: string;
   onHandleSaved: (handle: string) => void;
+  embedded?: boolean;
 }) {
-  const router = useRouter();
-  const [signingOut, setSigningOut] = useState(false);
-  const canChangePassword = userHasEmailPasswordIdentity(user);
-  const providers = resolveProviders(user);
-  const oauthOnlyProvider = providers.find((provider) => provider !== "Correo") ?? providers[0];
   const avatarUrl = getUserAvatarUrl(user);
 
-  const signOut = async () => {
-    setSigningOut(true);
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/" as Route);
-    router.refresh();
-  };
-
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <MemberCard displayHandle={displayHandle} avatarUrl={avatarUrl} />
-
-      <div className="grid items-start gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(320px,1fr)]">
-        <SettingsCard icon={Gamepad2} title="Tus pronósticos" subtitle="Tu posición y puntos en cada juego">
-          <AccountBoletosSummary user={user} />
-        </SettingsCard>
-
-        <div className="space-y-4 sm:space-y-6">
-          <SettingsCard
-            icon={Star}
-            title="Tu equipo en la RAIniela"
-            subtitle="El equipo que sigues en la quiniela del Grupo I"
-          >
-            <SupportedTeamProfileSection user={user} />
-          </SettingsCard>
-
-          <SettingsCard icon={AtSign} title="Nombre público" subtitle="El que se ve en boletos y rankings">
-            <DisplayNameForm key={displayHandle} initialHandle={displayHandle} onSaved={onHandleSaved} compact />
-          </SettingsCard>
-
-          {canChangePassword ? (
-            <SettingsCard icon={KeyRound} title="Seguridad" subtitle="Actualiza tu contraseña de acceso">
-              <ChangePasswordForm email={user.email ?? ""} />
-            </SettingsCard>
-          ) : (
-            <SettingsCard icon={ShieldCheck} title="Seguridad" subtitle="Acceso con proveedor externo">
-              <p className="text-sm leading-6 text-slate-600">
-                Entras con <span className="font-bold text-[#214C9B]">{oauthOnlyProvider}</span>, así que no hace
-                falta contraseña aquí: tu acceso y su seguridad se gestionan desde tu cuenta de{" "}
-                {oauthOnlyProvider}.
-              </p>
-            </SettingsCard>
-          )}
-
-          <button
-            type="button"
-            onClick={() => void signOut()}
-            disabled={signingOut}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#214C9B]/15 bg-white px-4 py-3 text-xs font-extrabold uppercase tracking-wide text-[#214C9B] transition hover:bg-[#214C9B]/5 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            <LogOut size={15} aria-hidden />
-            {signingOut ? "Saliendo…" : "Cerrar sesión"}
-          </button>
+    <div className={cn(!embedded && "mx-auto w-full max-w-md")}>
+      <section
+        className={cn(
+          "overflow-hidden",
+          embedded
+            ? "rounded-xl border border-[#214C9B]/10 bg-slate-50/50"
+            : "rounded-2xl border border-[#214C9B]/12 bg-white shadow-sm",
+        )}
+      >
+        <div className="grid grid-cols-2 divide-x divide-[#214C9B]/8">
+          <SupportedTeamProfileSection user={user} embedded />
+          <DisplayNameForm
+            key={displayHandle}
+            variant="card"
+            embedded
+            avatarUrl={avatarUrl}
+            initialHandle={displayHandle}
+            onSaved={onHandleSaved}
+          />
         </div>
-      </div>
+
+        <div className="border-t border-[#214C9B]/8 px-3 py-3 sm:px-4">
+          <h2 className="mb-2 text-[10px] font-extrabold uppercase tracking-wide text-slate-500">
+            Tus pronósticos
+          </h2>
+          <AccountBoletosSummary user={user} compact />
+        </div>
+      </section>
     </div>
   );
 }
 
-export function AccountPanelSkeleton() {
+export function AccountPanelSkeleton({ embedded = false }: { embedded?: boolean }) {
   return (
-    <div className="space-y-4 sm:space-y-6" aria-busy="true" aria-label="Cargando tu cuenta">
-      <div className="h-20 animate-pulse rounded-2xl bg-[#214C9B]/10 sm:h-24" />
-      <div className="grid items-start gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(320px,1fr)]">
-        <div className="h-56 animate-pulse rounded-2xl bg-[#214C9B]/10 sm:h-64" />
-        <div className="space-y-4 sm:space-y-6">
-          <div className="h-48 animate-pulse rounded-2xl bg-[#214C9B]/10 sm:h-52" />
-          <div className="h-56 animate-pulse rounded-2xl bg-[#214C9B]/10 sm:h-64" />
+    <div
+      className={cn(!embedded && "mx-auto w-full max-w-md")}
+      aria-busy="true"
+      aria-label="Cargando tu cuenta"
+    >
+      <div
+        className={cn(
+          "overflow-hidden",
+          embedded
+            ? "rounded-xl border border-[#214C9B]/10 bg-slate-50/50"
+            : "rounded-2xl border border-[#214C9B]/12 bg-white shadow-sm",
+        )}
+      >
+        <div className="grid grid-cols-2 divide-x divide-[#214C9B]/8">
+          <div className="h-28 animate-pulse bg-[#214C9B]/5" />
+          <div className="h-28 animate-pulse bg-[#214C9B]/5" />
+        </div>
+        <div className="space-y-2 border-t border-[#214C9B]/8 px-3 py-3 sm:px-4">
+          <div className="h-3 w-24 animate-pulse rounded bg-[#214C9B]/10" />
+          <div className="grid gap-2">
+            {[0, 1, 2].map((row) => (
+              <div key={row} className="h-12 animate-pulse rounded-xl bg-[#214C9B]/5" />
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -211,14 +110,14 @@ export function AccountPanel() {
       }
       setReady(true);
       if (!nextUser) {
-        router.replace("/login?next=/cuenta" as Route);
+        router.replace("/login?next=/?cuenta=1" as Route);
       }
     });
   }, [configured, router]);
 
   if (!configured) {
     return (
-      <p className="rounded-2xl border border-[#981915]/30 bg-[#981915]/10 px-5 py-4 text-sm font-medium text-[#981915]">
+      <p className="mx-auto max-w-md rounded-2xl border border-[#981915]/30 bg-[#981915]/10 px-5 py-4 text-sm font-medium text-[#981915]">
         Supabase no está configurado en este entorno.
       </p>
     );

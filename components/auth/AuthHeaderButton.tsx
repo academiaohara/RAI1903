@@ -1,10 +1,11 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import type { Route } from "next";
 import type { User } from "@supabase/supabase-js";
 import { LogIn, LogOut, UserRound } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AccountModal } from "@/components/auth/AccountModal";
 import { OAuthLoginButtons } from "@/components/auth/OAuthLoginButtons";
 import { UserAvatar } from "@/components/auth/UserAvatar";
 import { resolveUserHandle } from "@/lib/auth/profile";
@@ -14,17 +15,40 @@ import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { cn } from "@/lib/utils";
 
-export function AuthHeaderButton({ className }: { className?: string }) {
+function AuthHeaderButtonInner({ className }: { className?: string }) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const configured = isSupabaseConfigured();
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(!configured);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [accountOpenManual, setAccountOpenManual] = useState(false);
   const [displayHandle, setDisplayHandle] = useState("@usuario");
   const menuRef = useRef<HTMLDivElement>(null);
 
   const nextPath = pathname.startsWith("/login") ? "/quiniela" : pathname;
+
+  const clearAccountQuery = useCallback(() => {
+    if (searchParams.get("cuenta") !== "1") return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("cuenta");
+    const query = params.toString();
+    router.replace(`${pathname}${query ? `?${query}` : ""}` as Route, { scroll: false });
+  }, [pathname, router, searchParams]);
+
+  const accountFromUrl = ready && Boolean(user) && searchParams.get("cuenta") === "1";
+  const accountOpen = accountOpenManual || accountFromUrl;
+
+  const openAccount = useCallback(() => {
+    setMenuOpen(false);
+    setAccountOpenManual(true);
+  }, []);
+
+  const closeAccount = useCallback(() => {
+    setAccountOpenManual(false);
+    clearAccountQuery();
+  }, [clearAccountQuery]);
 
   useEffect(() => {
     if (!configured) return;
@@ -39,6 +63,7 @@ export function AuthHeaderButton({ className }: { className?: string }) {
         void resolveUserHandle(next).then(setDisplayHandle);
       } else {
         setDisplayHandle("@usuario");
+        setAccountOpenManual(false);
       }
     };
 
@@ -66,6 +91,8 @@ export function AuthHeaderButton({ className }: { className?: string }) {
 
   const signOut = async () => {
     setMenuOpen(false);
+    setAccountOpenManual(false);
+    clearAccountQuery();
     const supabase = createClient();
     await supabase.auth.signOut();
     router.refresh();
@@ -121,50 +148,62 @@ export function AuthHeaderButton({ className }: { className?: string }) {
   const avatarUrl = getUserAvatarUrl(user);
 
   return (
-    <div ref={menuRef} className={cn("relative shrink-0", className)}>
-      <button
-        type="button"
-        onClick={() => setMenuOpen((open) => !open)}
-        aria-expanded={menuOpen}
-        aria-label="Cuenta"
-      >
-        <UserAvatar avatarUrl={avatarUrl} label="?" size="md" fallback="header" />
-      </button>
+    <>
+      <div ref={menuRef} className={cn("relative shrink-0", className)}>
+        <button
+          type="button"
+          onClick={() => setMenuOpen((open) => !open)}
+          aria-expanded={menuOpen}
+          aria-label="Cuenta"
+        >
+          <UserAvatar avatarUrl={avatarUrl} label="?" size="md" fallback="header" />
+        </button>
 
-      {menuOpen ? (
-        <div className="absolute right-0 top-full z-50 mt-2 min-w-[12rem] overflow-hidden rounded-xl border border-[#214C9B]/20 bg-white py-1 shadow-lg">
-          <div className="border-b border-slate-100 px-4 py-3">
-            <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Tu nombre</p>
-            <p className="truncate text-sm font-extrabold text-[#214C9B]">{displayHandle}</p>
-            <Link
-              href="/cuenta"
-              onClick={() => setMenuOpen(false)}
-              className="mt-1 text-xs font-bold text-[#214C9B] underline-offset-2 hover:underline"
+        {menuOpen ? (
+          <div className="absolute right-0 top-full z-50 mt-2 min-w-[12rem] overflow-hidden rounded-xl border border-[#214C9B]/20 bg-white py-1 shadow-lg">
+            <div className="border-b border-slate-100 px-4 py-3">
+              <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Tu nombre</p>
+              <p className="truncate text-sm font-extrabold text-[#214C9B]">{displayHandle}</p>
+              <button
+                type="button"
+                onClick={openAccount}
+                className="mt-1 text-xs font-bold text-[#214C9B] underline-offset-2 hover:underline"
+              >
+                Editar perfil
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={openAccount}
+              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm font-bold text-[#214C9B] hover:bg-slate-50"
             >
-              Cambiar nombre
-            </Link>
+              <UserRound size={16} aria-hidden />
+              Mi cuenta
+            </button>
+            <button
+              type="button"
+              onClick={() => void signOut()}
+              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm font-bold text-[#981915] hover:bg-red-50"
+            >
+              <LogOut size={16} aria-hidden />
+              Cerrar sesión
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              setMenuOpen(false);
-              router.push("/cuenta");
-            }}
-            className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm font-bold text-[#214C9B] hover:bg-slate-50"
-          >
-            <UserRound size={16} aria-hidden />
-            Mi cuenta
-          </button>
-          <button
-            type="button"
-            onClick={() => void signOut()}
-            className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm font-bold text-[#981915] hover:bg-red-50"
-          >
-            <LogOut size={16} aria-hidden />
-            Cerrar sesión
-          </button>
-        </div>
-      ) : null}
-    </div>
+        ) : null}
+      </div>
+
+      <AccountModal
+        open={accountOpen}
+        onClose={closeAccount}
+        user={user}
+        ready={ready}
+        displayHandle={displayHandle}
+        onHandleSaved={setDisplayHandle}
+      />
+    </>
   );
+}
+
+export function AuthHeaderButton({ className }: { className?: string }) {
+  return <AuthHeaderButtonInner className={className} />;
 }
