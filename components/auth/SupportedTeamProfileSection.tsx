@@ -8,7 +8,12 @@ import { Modal } from "@/components/Modal";
 import { SupportedTeamPicker } from "@/components/quiniela/SupportedTeamSection";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
-import { fetchProfileSupportedTeamId, saveSupportedTeamId } from "@/lib/quiniela-supported-team";
+import {
+  DEFAULT_SUPPORTED_TEAM_ID,
+  fetchProfileSupportedTeamId,
+  loadSupportedTeamId,
+  saveSupportedTeamId,
+} from "@/lib/quiniela-supported-team";
 import { getTeamById } from "@/lib/quiniela";
 import { getTeamCrestById } from "@/lib/team-crests";
 import { cn } from "@/lib/utils";
@@ -21,22 +26,29 @@ type SupportedTeamProfileSectionProps = {
 export function SupportedTeamProfileSection({ user, embedded = false }: SupportedTeamProfileSectionProps) {
   const { bundles } = useSeason();
   const teams = useMemo(() => resolveGroupTeams(bundles, "masculino", "1"), [bundles]);
-  const [teamId, setTeamId] = useState<string | null>(null);
+  const [teamId, setTeamId] = useState<string>(DEFAULT_SUPPORTED_TEAM_ID);
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    void fetchProfileSupportedTeamId(user.id).then((value) => {
-      if (!cancelled) setTeamId(value);
-    });
+    void (async () => {
+      const profileTeam = await fetchProfileSupportedTeamId(user.id);
+      if (cancelled) return;
+      if (profileTeam) {
+        setTeamId(profileTeam);
+        return;
+      }
+      const resolved = await loadSupportedTeamId(user.id);
+      if (!cancelled) setTeamId(resolved);
+    })();
     return () => {
       cancelled = true;
     };
   }, [user.id]);
 
-  const team = teamId ? getTeamById(teamId, teams) : null;
+  const team = getTeamById(teamId, teams);
   const crest = team ? getTeamCrestById(team.id, team.crestInitials) : null;
 
   const onChange = async (nextTeamId: string) => {
@@ -63,7 +75,10 @@ export function SupportedTeamProfileSection({ user, embedded = false }: Supporte
           <h2 className="text-[10px] font-extrabold uppercase tracking-wide text-slate-500">Tu equipo</h2>
           <button
             type="button"
-            onClick={() => setEditing(true)}
+            onClick={() => {
+              setMessage(null);
+              setEditing(true);
+            }}
             className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[#214C9B]/70 transition hover:bg-[#214C9B]/8 hover:text-[#214C9B]"
             aria-label="Editar equipo"
           >
@@ -94,7 +109,7 @@ export function SupportedTeamProfileSection({ user, embedded = false }: Supporte
       <Modal open={editing} title="Elige tu equipo" onClose={() => setEditing(false)}>
         <SupportedTeamPicker
           teams={teams}
-          value={teamId ?? teams[0]?.id ?? ""}
+          value={teamId}
           onChange={(nextTeamId) => void onChange(nextTeamId)}
           disabled={busy}
         />

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Pencil } from "lucide-react";
 import { Modal } from "@/components/Modal";
+import { ProfileEditableRow } from "@/components/auth/ProfileEditableRow";
 import { UserAvatar } from "@/components/auth/UserAvatar";
 import { updateDisplayName } from "@/lib/auth/profile";
 import { cn } from "@/lib/utils";
@@ -31,7 +32,8 @@ function DisplayNameEditor({
   compact?: boolean;
   onDone?: () => void;
 }) {
-  const [value, setValue] = useState(initialHandle.replace(/^@/, ""));
+  const normalizedInitial = initialHandle.replace(/^@/, "");
+  const [value, setValue] = useState(normalizedInitial);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -109,6 +111,121 @@ function DisplayNameEditor({
   );
 }
 
+function DisplayNameInlineForm({
+  initialHandle,
+  onSaved,
+  className,
+  compact = false,
+}: Pick<DisplayNameFormProps, "initialHandle" | "onSaved" | "className" | "compact">) {
+  const normalizedInitial = initialHandle.replace(/^@/, "");
+  const [value, setValue] = useState(normalizedInitial);
+  const [displayValue, setDisplayValue] = useState(normalizedInitial);
+  const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    const result = await updateDisplayName(value);
+    if (result.error) {
+      setError(result.error);
+      setLoading(false);
+      return;
+    }
+
+    const handle = `@${value.trim().toLowerCase()}`;
+    const nextValue = value.trim().toLowerCase();
+    setDisplayValue(nextValue);
+    setSuccess("Nombre actualizado.");
+    onSaved?.(handle);
+    setLoading(false);
+    setEditing(false);
+  };
+
+  const cancelEdit = () => {
+    setValue(displayValue);
+    setError(null);
+    setSuccess(null);
+    setEditing(false);
+  };
+
+  return (
+    <div className={cn(className)}>
+      <ProfileEditableRow
+        label=""
+        editing={editing}
+        onEdit={() => {
+          setValue(displayValue);
+          setError(null);
+          setSuccess(null);
+          setEditing(true);
+        }}
+        onCancel={cancelEdit}
+        editContent={
+          <form onSubmit={(event) => void handleSubmit(event)} className="space-y-4">
+            <label className="block text-left">
+              <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                Nombre en rankings y boletos
+              </span>
+              <div className="mt-1 flex items-center gap-2">
+                <span className="text-sm font-extrabold text-[#214C9B]">@</span>
+                <input
+                  type="text"
+                  name="displayName"
+                  autoComplete="username"
+                  value={value}
+                  onChange={(event) => setValue(event.target.value)}
+                  className={cn(inputClassName, "mt-0")}
+                  placeholder="tu_nombre"
+                  required
+                  minLength={3}
+                  maxLength={24}
+                  pattern="[a-zA-Z0-9_]{3,24}"
+                />
+              </div>
+              <p className="mt-1 text-xs text-slate-500">
+                Entre 3 y 24 caracteres: letras, números o guion bajo.
+              </p>
+            </label>
+
+            {error ? (
+              <p className="rounded-lg border border-[#981915]/30 bg-[#981915]/10 px-4 py-3 text-sm font-medium text-[#981915]">
+                {error}
+              </p>
+            ) : null}
+
+            {success ? (
+              <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
+                {success}
+              </p>
+            ) : null}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className={cn(
+                "inline-flex items-center justify-center rounded-full border-2 border-[#214C9B] bg-[#214C9B] font-extrabold uppercase tracking-wide text-white transition hover:bg-[#1a3d7a] disabled:cursor-not-allowed disabled:opacity-60",
+                compact ? "w-full px-4 py-2 text-xs" : "w-full px-6 py-3 text-sm",
+              )}
+            >
+              {loading ? "Guardando…" : "Guardar nombre"}
+            </button>
+          </form>
+        }
+      >
+        <p className="font-[family-name:var(--font-bebas-neue)] text-4xl leading-none tracking-wide text-[#214C9B]">
+          @{displayValue}
+        </p>
+      </ProfileEditableRow>
+    </div>
+  );
+}
+
 export function DisplayNameForm({
   initialHandle,
   onSaved,
@@ -166,8 +283,11 @@ export function DisplayNameForm({
   }
 
   return (
-    <div className={cn("space-y-4", className)}>
-      <DisplayNameEditor initialHandle={initialHandle} onSaved={onSaved} compact={compact} />
-    </div>
+    <DisplayNameInlineForm
+      initialHandle={initialHandle}
+      onSaved={onSaved}
+      className={className}
+      compact={compact}
+    />
   );
 }

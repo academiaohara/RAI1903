@@ -31,7 +31,9 @@ export function AccountDashboard({
       <section
         className={cn(
           "overflow-hidden",
-          embedded ? "rounded-xl border border-[#214C9B]/10 bg-slate-50/50" : "rounded-2xl border border-[#214C9B]/12 bg-white shadow-sm",
+          embedded
+            ? "rounded-xl border border-[#214C9B]/10 bg-slate-50/50"
+            : "rounded-2xl border border-[#214C9B]/12 bg-white shadow-sm",
         )}
       >
         <div className="grid grid-cols-2 divide-x divide-[#214C9B]/8">
@@ -67,7 +69,9 @@ export function AccountPanelSkeleton({ embedded = false }: { embedded?: boolean 
       <div
         className={cn(
           "overflow-hidden",
-          embedded ? "rounded-xl border border-[#214C9B]/10 bg-slate-50/50" : "rounded-2xl border border-[#214C9B]/12 bg-white shadow-sm",
+          embedded
+            ? "rounded-xl border border-[#214C9B]/10 bg-slate-50/50"
+            : "rounded-2xl border border-[#214C9B]/12 bg-white shadow-sm",
         )}
       >
         <div className="grid grid-cols-2 divide-x divide-[#214C9B]/8">

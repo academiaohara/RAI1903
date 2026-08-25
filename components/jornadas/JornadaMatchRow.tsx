@@ -4,10 +4,10 @@ import { OpponentCrest } from "@/components/OpponentCrest";
 import { TeamCrest } from "@/components/TeamCrest";
 import { TeamLink } from "@/components/TeamLink";
 import { SplitDateInput } from "@/components/calendar/SplitDateInput";
-import { MatchGoalsEditor } from "@/components/jornadas/MatchGoalsEditor";
-import { MatchGoalsSummary } from "@/components/quiniela/SupportedTeamSection";
+import { MatchGoalsInCard } from "@/components/jornadas/MatchGoalsSide";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
+import { getCompeticionSquadData } from "@/lib/competicion-squad";
 import { DEFAULT_KICKOFF_UTC } from "@/lib/match-kickoff-time";
 import {
   mergeUtcDateAndTime,
@@ -53,7 +53,7 @@ export function JornadaMatchRow({
   grupo = "1",
 }: JornadaMatchRowProps) {
   const { editMode, getOverride, mergeSaveValue } = useInlineEditing();
-  const { bundles } = useSeason();
+  const { bundles, viewedSeason } = useSeason();
   const override = readMatchResultOverride<Partial<JornadaFixture>>(getOverride, gender, fixture.id) ?? {};
   const editedFixture = applyJornadaFixtureOverride(fixture, override);
   const showCrests = showCrestsProp ?? true;
@@ -68,6 +68,24 @@ export function JornadaMatchRow({
     }
     return resolveGroupTeams(bundles, gender, "1");
   }, [bundles, gender, grupo]);
+
+  const homeTeam = groupTeams.find((team) => team.id === editedFixture.homeTeamId);
+  const awayTeam = groupTeams.find((team) => team.id === editedFixture.awayTeamId);
+  const homeSquad = useMemo(
+    () =>
+      homeTeam
+        ? getCompeticionSquadData(gender, homeTeam, bundles, viewedSeason.label).squad
+        : [],
+    [bundles, gender, homeTeam, viewedSeason.label],
+  );
+  const awaySquad = useMemo(
+    () =>
+      awayTeam
+        ? getCompeticionSquadData(gender, awayTeam, bundles, viewedSeason.label).squad
+        : [],
+    [bundles, gender, awayTeam, viewedSeason.label],
+  );
+  const showGoalsEditor = gender === "masculino" && grupo === "1";
 
   const savePatch = (patch: Partial<JornadaFixture>) => {
     const next: Partial<JornadaFixture> = { ...patch };
@@ -186,15 +204,15 @@ export function JornadaMatchRow({
   };
 
   return (
-    <div className="space-y-1">
     <article
       className={cn(
-        "grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1.5 rounded-2xl border p-2.5 sm:gap-3 sm:p-4",
+        "flex flex-col gap-1 rounded-2xl border p-2.5 sm:gap-1.5 sm:p-4",
         highlighted
           ? "border-[#981915]/40 bg-gradient-to-br from-[#981915]/6 via-white to-[#214C9B]/5 shadow-[0_10px_28px_rgba(152,25,21,0.12)]"
           : "border-[#214C9B]/12 bg-slate-50/80",
       )}
     >
+      <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1.5 sm:gap-3">
       <div className="flex min-w-0 items-center gap-0.5 sm:gap-2">
         {showCrests ? (
           <TeamLink gender={gender} teamId={editedFixture.homeTeamId} teamName={editedFixture.homeTeamName} className="shrink-0">
@@ -304,9 +322,18 @@ export function JornadaMatchRow({
           </TeamLink>
         ) : null}
       </div>
+      </div>
+
+      <MatchGoalsInCard
+        fixture={editedFixture}
+        gender={gender}
+        homeSquad={homeSquad}
+        awaySquad={awaySquad}
+        editMode={editMode}
+        showGoalsEditor={showGoalsEditor}
+        getOverride={getOverride}
+        mergeSaveValue={mergeSaveValue}
+      />
     </article>
-    <MatchGoalsEditor fixture={editedFixture} gender={gender} grupo={grupo} />
-    <MatchGoalsSummary fixture={editedFixture} gender={gender} />
-    </div>
   );
 }

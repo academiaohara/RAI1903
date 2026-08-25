@@ -224,9 +224,7 @@ export function AccountBoletosSummary({ user, compact = false }: AccountBoletosS
         ))}
       </div>
 
-      <p className="text-[10px] text-slate-400">
-        Temporada {viewedSeason.label}
-      </p>
+      <p className="text-[10px] text-slate-400">Temporada {viewedSeason.label}</p>
     </div>
   );
 }
