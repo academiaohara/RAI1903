@@ -43,10 +43,6 @@ export function SupportedTeamProfileSection({ user }: SupportedTeamProfileSectio
 
   return (
     <div className="space-y-3">
-      <h2 className="text-sm font-extrabold uppercase tracking-wide text-[#214C9B]">Tu equipo en la RAIniela</h2>
-      <p className="text-sm text-slate-600">
-        El equipo que sigues en la quiniela del Grupo I. Aparece también al rellenar pronósticos.
-      </p>
       {team ? (
         <div className="flex items-center gap-3 rounded-xl border border-[#214C9B]/15 bg-slate-50 px-4 py-3">
           <OpponentCrest
