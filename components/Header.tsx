@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Route } from "next";
 import { ChevronDown, Menu, X } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, Suspense } from "react";
 import { AuthHeaderButton } from "@/components/auth/AuthHeaderButton";
 import { MobileNavDrawer } from "@/components/MobileNavDrawer";
 import { useNavigationItems } from "@/lib/use-navigation-items";
@@ -96,7 +96,9 @@ export function Header() {
         </nav>
 
         <div className="ml-auto flex shrink-0 items-center gap-2">
-          <AuthHeaderButton />
+          <Suspense fallback={<span className="inline-flex shrink-0 p-2 opacity-0 sm:min-h-[36px] sm:min-w-[36px]" aria-hidden />}>
+            <AuthHeaderButton />
+          </Suspense>
           <button
             type="button"
             onClick={() => setOpen((current) => !current)}

@@ -11,6 +11,7 @@ export function Modal({
   children,
   onClose,
   wide = false,
+  size = "default",
   variant = "default",
 }: {
   open: boolean;
@@ -20,6 +21,7 @@ export function Modal({
   children: React.ReactNode;
   onClose: () => void;
   wide?: boolean;
+  size?: "default" | "wide" | "sm";
   /** "ticket" replica el estilo de los boletos de la quiniela. */
   variant?: "default" | "ticket";
 }) {
@@ -35,7 +37,8 @@ export function Modal({
   if (!open) return null;
 
   const isTicket = variant === "ticket";
-  const maxWidth = wide ? "max-w-6xl" : "max-w-4xl";
+  const maxWidth =
+    size === "sm" ? "max-w-md" : size === "wide" || wide ? "max-w-6xl" : "max-w-4xl";
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/60 p-2 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true">

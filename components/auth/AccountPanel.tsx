@@ -11,21 +11,29 @@ import { resolveUserHandle } from "@/lib/auth/profile";
 import { getUserAvatarUrl } from "@/lib/auth/user-display";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { cn } from "@/lib/utils";
 
-function AccountDashboard({
+export function AccountDashboard({
   user,
   displayHandle,
   onHandleSaved,
+  embedded = false,
 }: {
   user: User;
   displayHandle: string;
   onHandleSaved: (handle: string) => void;
+  embedded?: boolean;
 }) {
   const avatarUrl = getUserAvatarUrl(user);
 
   return (
-    <div className="mx-auto w-full max-w-md">
-      <section className="overflow-hidden rounded-2xl border border-[#214C9B]/12 bg-white shadow-sm">
+    <div className={cn(!embedded && "mx-auto w-full max-w-md")}>
+      <section
+        className={cn(
+          "overflow-hidden",
+          embedded ? "rounded-xl border border-[#214C9B]/10 bg-slate-50/50" : "rounded-2xl border border-[#214C9B]/12 bg-white shadow-sm",
+        )}
+      >
         <div className="grid grid-cols-2 divide-x divide-[#214C9B]/8">
           <SupportedTeamProfileSection user={user} embedded />
           <DisplayNameForm
@@ -49,10 +57,19 @@ function AccountDashboard({
   );
 }
 
-export function AccountPanelSkeleton() {
+export function AccountPanelSkeleton({ embedded = false }: { embedded?: boolean }) {
   return (
-    <div className="mx-auto w-full max-w-md" aria-busy="true" aria-label="Cargando tu cuenta">
-      <div className="overflow-hidden rounded-2xl border border-[#214C9B]/12 bg-white shadow-sm">
+    <div
+      className={cn(!embedded && "mx-auto w-full max-w-md")}
+      aria-busy="true"
+      aria-label="Cargando tu cuenta"
+    >
+      <div
+        className={cn(
+          "overflow-hidden",
+          embedded ? "rounded-xl border border-[#214C9B]/10 bg-slate-50/50" : "rounded-2xl border border-[#214C9B]/12 bg-white shadow-sm",
+        )}
+      >
         <div className="grid grid-cols-2 divide-x divide-[#214C9B]/8">
           <div className="h-28 animate-pulse bg-[#214C9B]/5" />
           <div className="h-28 animate-pulse bg-[#214C9B]/5" />
@@ -89,7 +106,7 @@ export function AccountPanel() {
       }
       setReady(true);
       if (!nextUser) {
-        router.replace("/login?next=/cuenta" as Route);
+        router.replace("/login?next=/?cuenta=1" as Route);
       }
     });
   }, [configured, router]);
