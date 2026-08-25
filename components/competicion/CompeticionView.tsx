@@ -11,7 +11,6 @@ import { StandingsLeagueTableCard } from "@/components/StandingsLeagueTableCard"
 import { ExtraFixturesOnPageEditor } from "@/components/editor/ExtraFixturesOnPageEditor";
 import { FemeninoPageEditor } from "@/components/editor/FemeninoPageEditor";
 import { SectionUnderConstructionGate } from "@/components/season/SectionUnderConstructionGate";
-import { MatchCard } from "@/components/MatchCard";
 import { RecentMatchCard } from "@/components/RecentMatchCard";
 import { UpcomingMatchCard } from "@/components/UpcomingMatchCard";
 import { useAllSeasonsCalendarMatches } from "@/hooks/useAllSeasonsCalendarMatches";
@@ -21,7 +20,6 @@ import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { isSectionUnderConstruction } from "@/lib/cms/section-status-bundle";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { useEditedMatchdays } from "@/hooks/useEditedMatchdays";
 import {
   getCopaDelReyMatchesFromSource,
   getGrupo2Matchdays,
@@ -29,7 +27,6 @@ import {
 } from "@/lib/season/aviles-matches";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { RfefGrupoId } from "@/lib/rfef-grupos";
-import { getPlayedLeagueRounds } from "@/lib/standings";
 import { isMatchPlayed } from "@/lib/match-result";
 import type { Route } from "next";
 import type { Match } from "@/types";
@@ -57,8 +54,6 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
     [fixtureSource, gender],
   );
   const baseMatchdaysGrupo2 = useMemo(() => getGrupo2Matchdays(fixtureSource), [fixtureSource]);
-  const editedLeagueMatchdays = useEditedMatchdays(leagueMatchdays, gender);
-  const editedMatchdaysGrupo2 = useEditedMatchdays(baseMatchdaysGrupo2, gender);
   const copaMatches = useMemo(
     () => getCopaDelReyMatchesFromSource(fixtureSource, gender),
     [fixtureSource, gender],
@@ -83,11 +78,6 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
       ? baseMatchdaysGrupo2
       : leagueMatchdays
     : leagueMatchdays;
-  const editedStandingsMatchdays = isMasculino
-    ? grupo === "2"
-      ? editedMatchdaysGrupo2
-      : editedLeagueMatchdays
-    : editedLeagueMatchdays;
   const multiGrupo = hasMultipleGrupos(competitionConfig);
   const showAvilesSidebar = !isMasculino || !multiGrupo || grupo === "1";
   const matchSectionsActive =
@@ -107,19 +97,6 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
           : `${baseLigaLabel} - Grupo II`
         : baseLigaLabel
       : `Copa del Rey ${viewedSeason.label}`;
-
-  const lastGrupoJornada = useMemo(() => {
-    if (showAvilesSidebar) return null;
-    const playedRounds = getPlayedLeagueRounds(editedStandingsMatchdays);
-    const lastRound = playedRounds[playedRounds.length - 1];
-    if (!lastRound) return null;
-    const matchday = editedStandingsMatchdays.find((round) => round.round === lastRound);
-    if (!matchday) return null;
-    return { round: lastRound, matches: matchday.matches };
-  }, [showAvilesSidebar, editedStandingsMatchdays]);
-
-  const showSidebarColumn =
-    showAvilesMatchCards || (isMasculino && multiGrupo && !showAvilesSidebar && lastGrupoJornada != null);
 
   return (
     <SectionUnderConstructionGate scope={gender} section="competicion">
@@ -175,7 +152,7 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
         <>
           <GuiaLiga gender={gender} teams={teams} grupo={grupo} />
 
-          <section className={`grid min-w-0 gap-6${showSidebarColumn ? " xl:grid-cols-2" : ""}`}>
+          <section className={`grid gap-6${showAvilesMatchCards ? " min-w-0 xl:grid-cols-2" : ""}`}>
             <StandingsLeagueTableCard
               key={`${gender}-${grupo}`}
               eyebrow="Liga"
@@ -190,48 +167,35 @@ export function CompeticionView({ gender, highlightTeamId, initialGrupo = "1" }:
               zoneRules={competitionConfig.zones}
               {...(isMasculino ? {} : { tiebreak: undefined })}
             />
-            {showSidebarColumn ? (
+            {showAvilesMatchCards ? (
             <div className="grid min-w-0 gap-6">
-              {showAvilesMatchCards && (
-                <>
-                  <Card eyebrow="Forma reciente" title="Ultimos resultados" borderlessHeader>
-                    <div className="space-y-2">
-                      {latest.length > 0 ? (
-                        latest.map((match) => (
-                          <RecentMatchCard key={match.id} match={match} gender={gender} />
-                        ))
-                      ) : (
-                        <p className="text-sm font-bold text-slate-500">Sin partidos finalizados.</p>
-                      )}
-                    </div>
-                  </Card>
-                  <Card
-                    eyebrow="Calendario"
-                    title="Proximos partidos"
-                    borderlessHeader
-                    action={<CalendarNavButton href={calendarHref} />}
-                  >
-                    <div className="space-y-2">
-                      {upcoming.length > 0 ? (
-                        upcoming.map((match) => (
-                          <UpcomingMatchCard key={match.id} match={match} gender={gender} />
-                        ))
-                      ) : (
-                        <p className="text-sm font-bold text-slate-500">Sin partidos programados.</p>
-                      )}
-                    </div>
-                  </Card>
-                </>
-              )}
-              {isMasculino && multiGrupo && !showAvilesSidebar && lastGrupoJornada && (
-                <Card eyebrow="Grupo II" title={`Ultima jornada · J${lastGrupoJornada.round}`} borderlessHeader>
-                  <div className="space-y-3">
-                    {lastGrupoJornada.matches.map((match) => (
-                      <MatchCard key={match.id} match={match} compact highlightTeamId="" gender={gender} layout="stripe" />
-                    ))}
-                  </div>
-                </Card>
-              )}
+              <Card eyebrow="Forma reciente" title="Ultimos resultados" borderlessHeader>
+                <div className="space-y-2">
+                  {latest.length > 0 ? (
+                    latest.map((match) => (
+                      <RecentMatchCard key={match.id} match={match} gender={gender} />
+                    ))
+                  ) : (
+                    <p className="text-sm font-bold text-slate-500">Sin partidos finalizados.</p>
+                  )}
+                </div>
+              </Card>
+              <Card
+                eyebrow="Calendario"
+                title="Proximos partidos"
+                borderlessHeader
+                action={<CalendarNavButton href={calendarHref} />}
+              >
+                <div className="space-y-2">
+                  {upcoming.length > 0 ? (
+                    upcoming.map((match) => (
+                      <UpcomingMatchCard key={match.id} match={match} gender={gender} />
+                    ))
+                  ) : (
+                    <p className="text-sm font-bold text-slate-500">Sin partidos programados.</p>
+                  )}
+                </div>
+              </Card>
             </div>
             ) : null}
           </section>
