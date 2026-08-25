@@ -70,7 +70,7 @@ type SupportedTeamPickerProps = {
 };
 
 const CREST_TILT_CLASS = "-rotate-6";
-const STRIPE_SKEW_CLASS = "-skew-x-[14deg]";
+const STRIPE_SKEW_DEG = 14;
 
 function SkewedStripePanel({
   colors,
@@ -81,11 +81,19 @@ function SkewedStripePanel({
   stripeWidth?: number;
   className?: string;
 }) {
+  const bleed = stripeWidth;
+
   return (
     <div className={cn("overflow-hidden", className)}>
       <div
-        className={cn("absolute inset-y-0 -left-[28%] w-[156%] origin-center", STRIPE_SKEW_CLASS)}
-        style={teamVerticalStripeBackgroundStyle(colors, stripeWidth)}
+        className="absolute inset-y-0"
+        style={{
+          left: `-${bleed}px`,
+          width: `calc(100% + ${bleed * 2}px)`,
+          transform: `skewX(-${STRIPE_SKEW_DEG}deg)`,
+          transformOrigin: "left center",
+          ...teamVerticalStripeBackgroundStyle(colors, stripeWidth),
+        }}
       />
     </div>
   );
@@ -134,7 +142,7 @@ export function SupportedTeamPicker({ teams, value, onChange, disabled }: Suppor
         ) : null}
 
         <div className="relative flex min-h-[6.5rem] items-stretch sm:min-h-[7.5rem]">
-          <div className="relative z-10 flex w-1/2 min-w-0 flex-col justify-center px-4 py-4 sm:px-5 sm:py-5">
+          <div className="relative z-10 flex w-1/2 min-w-0 flex-col justify-center bg-white px-4 py-4 sm:px-5 sm:py-5">
             <p className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-slate-500">Tu equipo</p>
             <p
               className="mt-1.5 text-[clamp(1.1rem,4.8vw,1.85rem)] font-extrabold uppercase leading-[0.9] tracking-tight"
