@@ -111,11 +111,44 @@ export function SupportedTeamPicker({ teams, value, onChange, disabled }: Suppor
   return (
     <div className="space-y-3">
       <div className="relative overflow-hidden rounded-2xl border border-[#214C9B]/15 bg-white">
-        <SkewedStripePanel
-          colors={selectedColors}
-          stripeWidth={24}
-          className="pointer-events-none absolute inset-y-0 left-1/2 right-0"
-        />
+        <div className="relative flex min-h-[6.5rem] items-stretch sm:min-h-[7.5rem]">
+          <div className="relative z-10 flex w-1/2 min-w-0 flex-col justify-center bg-white px-4 py-4 sm:px-5 sm:py-5">
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-slate-500">Tu equipo</p>
+            <p
+              className="mt-1.5 text-[clamp(1.1rem,4.8vw,1.85rem)] font-extrabold uppercase leading-[0.9] tracking-tight"
+              style={{ color: primaryColor }}
+            >
+              {displayName}
+            </p>
+          </div>
+
+          <SkewedStripePanel
+            colors={selectedColors}
+            stripeWidth={24}
+            className="pointer-events-none relative w-1/2 self-stretch"
+          />
+
+          {selectedTeam ? (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 right-0 z-10 flex w-[62%] items-center justify-end overflow-hidden"
+            >
+              <OpponentCrest
+                logo={getTeamCrestById(
+                  selectedTeam.id,
+                  selectedTeam.crestInitials ?? selectedTeam.shortName ?? selectedTeam.name,
+                )}
+                opponent={selectedTeam.name}
+                teamId={selectedTeam.id}
+                size="lg"
+                className={cn(
+                  "h-[10.5rem] w-[10.5rem] max-w-none translate-x-[24%] drop-shadow-[0_16px_24px_rgba(0,0,0,0.28)] sm:h-[12.5rem] sm:w-[12.5rem] sm:translate-x-[20%]",
+                  CREST_TILT_CLASS,
+                )}
+              />
+            </div>
+          ) : null}
+        </div>
 
         {!disabled ? (
           <div className="absolute right-3 top-3 z-30 sm:right-4 sm:top-4">
@@ -140,39 +173,6 @@ export function SupportedTeamPicker({ teams, value, onChange, disabled }: Suppor
             )}
           </div>
         ) : null}
-
-        <div className="relative flex min-h-[6.5rem] items-stretch sm:min-h-[7.5rem]">
-          <div className="relative z-10 flex w-1/2 min-w-0 flex-col justify-center bg-white px-4 py-4 sm:px-5 sm:py-5">
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-slate-500">Tu equipo</p>
-            <p
-              className="mt-1.5 text-[clamp(1.1rem,4.8vw,1.85rem)] font-extrabold uppercase leading-[0.9] tracking-tight"
-              style={{ color: primaryColor }}
-            >
-              {displayName}
-            </p>
-          </div>
-
-          {selectedTeam ? (
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-y-0 right-0 z-10 flex w-[62%] items-center justify-end overflow-hidden"
-            >
-              <OpponentCrest
-                logo={getTeamCrestById(
-                  selectedTeam.id,
-                  selectedTeam.crestInitials ?? selectedTeam.shortName ?? selectedTeam.name,
-                )}
-                opponent={selectedTeam.name}
-                teamId={selectedTeam.id}
-                size="lg"
-                className={cn(
-                  "h-[10.5rem] w-[10.5rem] max-w-none translate-x-[24%] drop-shadow-[0_16px_24px_rgba(0,0,0,0.28)] sm:h-[12.5rem] sm:w-[12.5rem] sm:translate-x-[20%]",
-                  CREST_TILT_CLASS,
-                )}
-              />
-            </div>
-          ) : null}
-        </div>
       </div>
 
       {editing && !disabled ? (
