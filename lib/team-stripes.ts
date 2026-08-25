@@ -35,7 +35,17 @@ export function teamStripeBackgroundStyle(colors?: string[]): CSSProperties {
   };
 }
 
-/** Franjas diagonales (p. ej. selector de equipo en quiniela). */
+/** Franjas verticales para aplicar con skew y que crucen toda la altura sin cortes bruscos. */
+export function teamVerticalStripeBackgroundStyle(colors?: string[], stripeWidth = 22): CSSProperties {
+  const [primary, secondary] = resolveTeamColors(colors);
+  const cycle = stripeWidth * 2;
+
+  return {
+    background: `repeating-linear-gradient(90deg, ${primary} 0, ${primary} ${stripeWidth}px, ${secondary} ${stripeWidth}px, ${secondary} ${cycle}px)`,
+  };
+}
+
+/** Franjas diagonales (p. ej. celdas pequeñas). */
 export function teamDiagonalStripeBackgroundStyle(
   colors?: string[],
   options?: { stripeWidth?: number; angle?: number },

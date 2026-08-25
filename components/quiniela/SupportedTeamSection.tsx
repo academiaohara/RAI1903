@@ -15,7 +15,11 @@ import {
 import { formatMatchScore } from "@/lib/match-result";
 import { getTeamById } from "@/lib/quiniela";
 import { getTeamCrestById } from "@/lib/team-crests";
-import { resolveTeamColorsFromSources, teamDiagonalStripeBackgroundStyle, DEFAULT_TEAM_COLORS } from "@/lib/team-stripes";
+import {
+  DEFAULT_TEAM_COLORS,
+  resolveTeamColorsFromSources,
+  teamVerticalStripeBackgroundStyle,
+} from "@/lib/team-stripes";
 import { cn, formatMatchDate } from "@/lib/utils";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { JornadaFixture } from "@/types/jornadas";
@@ -65,6 +69,28 @@ type SupportedTeamPickerProps = {
   disabled?: boolean;
 };
 
+const CREST_TILT_CLASS = "-rotate-6";
+const STRIPE_SKEW_CLASS = "-skew-x-[14deg]";
+
+function SkewedStripePanel({
+  colors,
+  stripeWidth = 22,
+  className,
+}: {
+  colors: string[];
+  stripeWidth?: number;
+  className?: string;
+}) {
+  return (
+    <div className={cn("overflow-hidden", className)}>
+      <div
+        className={cn("absolute inset-y-0 -left-[28%] w-[156%] origin-center", STRIPE_SKEW_CLASS)}
+        style={teamVerticalStripeBackgroundStyle(colors, stripeWidth)}
+      />
+    </div>
+  );
+}
+
 export function SupportedTeamPicker({ teams, value, onChange, disabled }: SupportedTeamPickerProps) {
   const [editing, setEditing] = useState(false);
   const selectedTeam = teams.find((team) => team.id === value);
@@ -75,70 +101,78 @@ export function SupportedTeamPicker({ teams, value, onChange, disabled }: Suppor
   const [primaryColor] = selectedColors;
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-[#214C9B]/15 bg-white">
-      <div
-        aria-hidden
-        className="absolute inset-y-0 left-1/2 right-0"
-        style={teamDiagonalStripeBackgroundStyle(selectedColors, { stripeWidth: 18, angle: -52 })}
-      />
+    <div className="space-y-3">
+      <div className="relative overflow-hidden rounded-2xl border border-[#214C9B]/15 bg-white">
+        <SkewedStripePanel
+          colors={selectedColors}
+          stripeWidth={24}
+          className="pointer-events-none absolute inset-y-0 left-1/2 right-0"
+        />
 
-      {!disabled ? (
-        <div className="absolute right-3 top-3 z-30 sm:right-4 sm:top-4">
-          {editing ? (
-            <button
-              type="button"
-              onClick={() => setEditing(false)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-white/95 text-slate-500 shadow-sm transition hover:bg-white"
-              aria-label="Cerrar selector de equipo"
-            >
-              <X size={14} aria-hidden />
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setEditing(true)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-white/95 text-slate-700 shadow-sm transition hover:bg-white"
-              aria-label="Cambiar equipo"
-            >
-              <Pencil size={14} aria-hidden />
-            </button>
-          )}
-        </div>
-      ) : null}
-
-      <div className="relative flex min-h-[6.5rem] items-stretch sm:min-h-[7.5rem]">
-        <div className="relative z-10 flex w-1/2 min-w-0 flex-col justify-center px-4 py-4 sm:px-5 sm:py-5">
-          <p className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-slate-500">Tu equipo</p>
-          <p
-            className="mt-1.5 text-[clamp(1.1rem,4.8vw,1.85rem)] font-extrabold uppercase leading-[0.9] tracking-tight"
-            style={{ color: primaryColor }}
-          >
-            {displayName}
-          </p>
-        </div>
-
-        {selectedTeam && !editing ? (
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-y-0 right-0 z-10 flex w-[62%] items-center justify-end overflow-hidden"
-          >
-            <OpponentCrest
-              logo={getTeamCrestById(
-                selectedTeam.id,
-                selectedTeam.crestInitials ?? selectedTeam.shortName ?? selectedTeam.name,
-              )}
-              opponent={selectedTeam.name}
-              teamId={selectedTeam.id}
-              size="lg"
-              className="h-[10.5rem] w-[10.5rem] max-w-none translate-x-[24%] drop-shadow-[0_16px_24px_rgba(0,0,0,0.28)] sm:h-[12.5rem] sm:w-[12.5rem] sm:translate-x-[20%]"
-            />
+        {!disabled ? (
+          <div className="absolute right-3 top-3 z-30 sm:right-4 sm:top-4">
+            {editing ? (
+              <button
+                type="button"
+                onClick={() => setEditing(false)}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-white/95 text-slate-500 shadow-sm transition hover:bg-white"
+                aria-label="Cerrar selector de equipo"
+              >
+                <X size={14} aria-hidden />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setEditing(true)}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-white/95 text-slate-700 shadow-sm transition hover:bg-white"
+                aria-label="Cambiar equipo"
+              >
+                <Pencil size={14} aria-hidden />
+              </button>
+            )}
           </div>
         ) : null}
+
+        <div className="relative flex min-h-[6.5rem] items-stretch sm:min-h-[7.5rem]">
+          <div className="relative z-10 flex w-1/2 min-w-0 flex-col justify-center px-4 py-4 sm:px-5 sm:py-5">
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-slate-500">Tu equipo</p>
+            <p
+              className="mt-1.5 text-[clamp(1.1rem,4.8vw,1.85rem)] font-extrabold uppercase leading-[0.9] tracking-tight"
+              style={{ color: primaryColor }}
+            >
+              {displayName}
+            </p>
+          </div>
+
+          {selectedTeam ? (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 right-0 z-10 flex w-[62%] items-center justify-end overflow-hidden"
+            >
+              <OpponentCrest
+                logo={getTeamCrestById(
+                  selectedTeam.id,
+                  selectedTeam.crestInitials ?? selectedTeam.shortName ?? selectedTeam.name,
+                )}
+                opponent={selectedTeam.name}
+                teamId={selectedTeam.id}
+                size="lg"
+                className={cn(
+                  "h-[10.5rem] w-[10.5rem] max-w-none translate-x-[24%] drop-shadow-[0_16px_24px_rgba(0,0,0,0.28)] sm:h-[12.5rem] sm:w-[12.5rem] sm:translate-x-[20%]",
+                  CREST_TILT_CLASS,
+                )}
+              />
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {editing && !disabled ? (
-        <div className="absolute inset-y-0 left-1/2 right-0 z-20 overflow-y-auto p-2 sm:p-3">
-          <div className="flex h-full flex-wrap content-center justify-center gap-1.5 sm:gap-2">
+        <div className="rounded-2xl border border-[#214C9B]/15 bg-white p-3 sm:p-4">
+          <p className="mb-3 text-center text-[10px] font-extrabold uppercase tracking-[0.18em] text-slate-500">
+            Elige tu equipo
+          </p>
+          <div className="grid grid-cols-5 gap-2 sm:grid-cols-8 sm:gap-2.5 md:grid-cols-10">
             {teams.map((team) => {
               const selected = team.id === value;
               const crest = getTeamCrestById(team.id, team.crestInitials ?? team.shortName ?? team.name);
@@ -153,23 +187,28 @@ export function SupportedTeamPicker({ teams, value, onChange, disabled }: Suppor
                     setEditing(false);
                   }}
                   className={cn(
-                    "flex aspect-square w-[calc(25%-0.375rem)] min-w-[2.65rem] max-w-[3.35rem] items-center justify-center rounded-xl p-1 shadow-sm ring-1 ring-black/10 transition sm:w-[calc(20%-0.5rem)] sm:max-w-[3.75rem]",
+                    "relative aspect-square overflow-hidden rounded-xl shadow-sm ring-1 ring-black/10 transition",
                     selected
-                      ? "z-10 scale-105 ring-2 ring-white ring-offset-2 ring-offset-transparent"
-                      : "hover:scale-105 hover:ring-white/80",
+                      ? "z-10 scale-105 ring-2 ring-[#214C9B] ring-offset-2"
+                      : "hover:scale-105 hover:ring-[#214C9B]/35",
                   )}
-                  style={teamDiagonalStripeBackgroundStyle(colors, { stripeWidth: 10, angle: -52 })}
                   aria-pressed={selected}
                   aria-label={team.name}
                   title={team.name}
                 >
-                  <OpponentCrest
-                    logo={crest}
-                    opponent={team.name}
-                    teamId={team.id}
-                    size="sm"
-                    className="relative z-10 h-[68%] w-[68%] max-w-none drop-shadow-[0_3px_8px_rgba(0,0,0,0.4)]"
-                  />
+                  <SkewedStripePanel colors={colors} stripeWidth={12} className="absolute inset-0" />
+                  <span className="absolute inset-0 flex items-center justify-center p-1.5">
+                    <OpponentCrest
+                      logo={crest}
+                      opponent={team.name}
+                      teamId={team.id}
+                      size="sm"
+                      className={cn(
+                        "relative z-10 h-[72%] w-[72%] max-w-none drop-shadow-[0_3px_8px_rgba(0,0,0,0.4)]",
+                        CREST_TILT_CLASS,
+                      )}
+                    />
+                  </span>
                 </button>
               );
             })}
