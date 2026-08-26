@@ -34,6 +34,7 @@ export type QuinielaUserRoundResult = {
   round: number;
   savedRounds: number[];
   hasSavedRound: boolean;
+  savedAt: string | null;
   predictions: Record<string, Prediction>;
   points: number;
   hits: number;
@@ -301,6 +302,7 @@ export async function fetchQuinielaUserRound(
 
   const matchday = getMatchdayByRound(matchdays, round);
   const hasSavedRound = savedRounds.includes(round);
+  const savedAt = userSaved.find((row) => row.round === round)?.saved_at ?? null;
 
   const [predictionRows, profileMap] = await Promise.all([
     fetchPredictions(supabase, seasonId, [userId], round),
@@ -324,6 +326,7 @@ export async function fetchQuinielaUserRound(
     round,
     savedRounds,
     hasSavedRound,
+    savedAt,
     predictions,
     points,
     hits,

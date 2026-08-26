@@ -94,6 +94,7 @@ export function QuinigolUserModal({
             competitionLabel={competitionLabel}
             readOnly
             creatorHandle={handle}
+            savedAt={data.savedAt ?? undefined}
             points={showPoints ? data.points : undefined}
             showActions={false}
           />

@@ -323,6 +323,7 @@ export type QuinigolUserRoundResult = {
   round: number;
   savedRounds: number[];
   hasSavedRound: boolean;
+  savedAt: string | null;
   predictions: Record<string, QuinigolPrediction>;
   points: number;
   hits: number;
@@ -343,6 +344,7 @@ export async function fetchQuinigolUserRound(
 
   const matchday = getMatchdayByRound(matchdays, round);
   const hasSavedRound = savedRounds.includes(round);
+  const savedAt = userSaved.find((row) => row.round === round)?.saved_at ?? null;
 
   const [predictionRows, profileMap] = await Promise.all([
     fetchQuinigolPredictions(supabase, seasonId, [userId], round),
@@ -362,6 +364,7 @@ export async function fetchQuinigolUserRound(
     round,
     savedRounds,
     hasSavedRound,
+    savedAt,
     predictions,
     points,
     hits,
