@@ -45,7 +45,7 @@ export function teamVerticalStripeBackgroundStyle(colors?: string[], stripeWidth
   };
 }
 
-/** Franjas diagonales (p. ej. celdas pequeñas). */
+/** Franjas diagonales (p. ej. celdas pequeñas o cabecera de quiniela). */
 export function teamDiagonalStripeBackgroundStyle(
   colors?: string[],
   options?: { stripeWidth?: number; angle?: number },
@@ -56,6 +56,10 @@ export function teamDiagonalStripeBackgroundStyle(
   const cycle = stripeWidth * 2;
 
   return {
-    background: `repeating-linear-gradient(${angle}deg, ${primary} 0px, ${primary} ${stripeWidth}px, ${secondary} ${stripeWidth}px, ${secondary} ${cycle}px)`,
+    backgroundImage: `repeating-linear-gradient(${angle}deg, ${primary} 0px, ${primary} ${stripeWidth}px, ${secondary} ${stripeWidth}px, ${secondary} ${cycle}px)`,
+    backgroundPosition: "0 0",
+    transform: "translateZ(0)",
+    willChange: "transform",
+    backfaceVisibility: "hidden" as const,
   };
 }
