@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useState } from "react";
 import { Pencil, X } from "lucide-react";
 import { OpponentCrest } from "@/components/OpponentCrest";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
@@ -17,8 +17,8 @@ import { getTeamById } from "@/lib/quiniela";
 import { getTeamCrestById } from "@/lib/team-crests";
 import {
   DEFAULT_TEAM_COLORS,
-  resolveTeamColors,
   resolveTeamColorsFromSources,
+  teamDiagonalStripeBackgroundStyle,
 } from "@/lib/team-stripes";
 import { cn, formatMatchDate } from "@/lib/utils";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
@@ -72,33 +72,39 @@ type SupportedTeamPickerProps = {
 const CREST_TILT_CLASS = "-rotate-6";
 const STRIPE_WIDTH = 24;
 const STRIPE_ANGLE_DEG = 76;
-const WHITE_MASK_STOP = "46%";
 
-const diagonalMaskStyle: CSSProperties = {
-  maskImage: `linear-gradient(${STRIPE_ANGLE_DEG}deg, #000 0, #000 ${WHITE_MASK_STOP}, transparent ${WHITE_MASK_STOP})`,
-  WebkitMaskImage: `linear-gradient(${STRIPE_ANGLE_DEG}deg, #000 0, #000 ${WHITE_MASK_STOP}, transparent ${WHITE_MASK_STOP})`,
-};
-
-function diagonalStripeStyle(colors: string[], stripeWidth = STRIPE_WIDTH): CSSProperties {
-  const [primary, secondary] = resolveTeamColors(colors);
-  const cycle = stripeWidth * 2;
-
-  return {
-    background: `repeating-linear-gradient(${STRIPE_ANGLE_DEG}deg, ${primary} 0, ${primary} ${stripeWidth}px, ${secondary} ${stripeWidth}px, ${secondary} ${cycle}px)`,
-    backgroundPosition: "0 0",
-  };
-}
+const HEADER_WHITE_CLIP = "polygon(0 0, 78% 0, 100% 100%, 0 100%)";
 
 function SkewedStripePanel({
   colors,
   stripeWidth = STRIPE_WIDTH,
   className,
+  oversize = true,
 }: {
   colors: string[];
   stripeWidth?: number;
   className?: string;
+  oversize?: boolean;
 }) {
-  return <div className={cn("overflow-hidden", className)} style={diagonalStripeStyle(colors, stripeWidth)} />;
+  const stripeStyle = teamDiagonalStripeBackgroundStyle(colors, {
+    stripeWidth,
+    angle: STRIPE_ANGLE_DEG,
+  });
+
+  return (
+    <div
+      className={cn("overflow-hidden", oversize && "translate-z-0 will-change-transform", className)}
+      style={oversize ? { transform: "translateZ(0)", willChange: "transform" } : undefined}
+    >
+      <div
+        className={oversize ? "absolute left-1/2 top-1/2 h-[220%] w-[220%]" : "absolute inset-0"}
+        style={{
+          ...stripeStyle,
+          transform: oversize ? "translate(-50%, -50%) translateZ(0)" : stripeStyle.transform,
+        }}
+      />
+    </div>
+  );
 }
 
 export function SupportedTeamPicker({ teams, value, onChange, disabled }: SupportedTeamPickerProps) {
@@ -113,22 +119,51 @@ export function SupportedTeamPicker({ teams, value, onChange, disabled }: Suppor
   return (
     <div className="space-y-3">
       <div className="relative overflow-hidden rounded-2xl border border-[#214C9B]/15 bg-white">
-        <SkewedStripePanel colors={selectedColors} className="pointer-events-none absolute inset-0" />
+        <SkewedStripePanel colors={selectedColors} className="pointer-events-none absolute inset-0 z-0" />
+
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 z-[1] bg-white"
-          style={diagonalMaskStyle}
+          className="pointer-events-none absolute inset-y-0 left-0 z-[1] w-[52%] bg-white sm:w-[48%]"
+          style={{
+            clipPath: HEADER_WHITE_CLIP,
+            WebkitClipPath: HEADER_WHITE_CLIP,
+          }}
         />
 
-        <div className="relative flex min-h-[6.5rem] items-stretch sm:min-h-[7.5rem]">
-          <div className="relative z-10 flex w-[46%] min-w-0 flex-col justify-center px-4 py-4 sm:px-5 sm:py-5">
+        <div className="relative z-10 flex min-h-[6.5rem] items-stretch sm:min-h-[7.5rem]">
+          <div className="relative flex w-[46%] min-w-0 flex-col justify-center px-4 py-4 sm:px-5 sm:py-5">
             <p className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-slate-500">Tu equipo</p>
-            <p
-              className="mt-1.5 text-[clamp(1.1rem,4.8vw,1.85rem)] font-extrabold uppercase leading-[0.9] tracking-tight"
-              style={{ color: primaryColor }}
-            >
-              {displayName}
-            </p>
+            <div className="mt-1.5 flex min-w-0 items-start gap-2">
+              <p
+                className="min-w-0 text-[clamp(1.1rem,4.8vw,1.85rem)] font-extrabold uppercase leading-[0.9] tracking-tight"
+                style={{ color: primaryColor }}
+              >
+                {displayName}
+              </p>
+              {!disabled ? (
+                <div className="shrink-0 pt-0.5">
+                  {editing ? (
+                    <button
+                      type="button"
+                      onClick={() => setEditing(false)}
+                      className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:bg-slate-50"
+                      aria-label="Cerrar selector de equipo"
+                    >
+                      <X size={13} aria-hidden />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setEditing(true)}
+                      className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50"
+                      aria-label="Cambiar equipo"
+                    >
+                      <Pencil size={13} aria-hidden />
+                    </button>
+                  )}
+                </div>
+              ) : null}
+            </div>
           </div>
 
           {selectedTeam ? (
@@ -152,30 +187,6 @@ export function SupportedTeamPicker({ teams, value, onChange, disabled }: Suppor
             </div>
           ) : null}
         </div>
-
-        {!disabled ? (
-          <div className="absolute right-3 top-3 z-30 sm:right-4 sm:top-4">
-            {editing ? (
-              <button
-                type="button"
-                onClick={() => setEditing(false)}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-white/95 text-slate-500 shadow-sm transition hover:bg-white"
-                aria-label="Cerrar selector de equipo"
-              >
-                <X size={14} aria-hidden />
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setEditing(true)}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-white/95 text-slate-700 shadow-sm transition hover:bg-white"
-                aria-label="Cambiar equipo"
-              >
-                <Pencil size={14} aria-hidden />
-              </button>
-            )}
-          </div>
-        ) : null}
       </div>
 
       {editing && !disabled ? (
@@ -207,7 +218,7 @@ export function SupportedTeamPicker({ teams, value, onChange, disabled }: Suppor
                   aria-label={team.name}
                   title={team.name}
                 >
-                  <SkewedStripePanel colors={colors} stripeWidth={12} className="absolute inset-0" />
+                  <SkewedStripePanel colors={colors} stripeWidth={12} className="absolute inset-0" oversize />
                   <span className="absolute inset-0 flex items-center justify-center p-1.5">
                     <OpponentCrest
                       logo={crest}
