@@ -1,9 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { SquadPlayer, SquadPosition } from "@/types/squad";
-import { SQUAD_POSITION_LABELS, SQUAD_POSITIONS } from "@/types/squad";
-import { formatPlayerAge, getPlayerFullName, groupPlayersByPosition, hasDisplayDorsal } from "@/lib/squad-utils";
+import type { SquadPlayer } from "@/types/squad";
+import { SQUAD_SECTION_LABELS, SQUAD_SECTIONS } from "@/types/squad";
+import { formatPlayerAge, getPlayerFullName, groupPlayersBySquadSection, hasDisplayDorsal } from "@/lib/squad-utils";
 import { PositionSection } from "@/components/squad/PositionSection";
 import { PreferredFootIcon } from "@/components/squad/PreferredFootIcon";
 
@@ -28,16 +28,16 @@ function RivalSquadColGroup() {
 const cellPad = "px-4 py-3";
 
 export function RivalSquadTable({ players }: RivalSquadTableProps) {
-  const grouped = groupPlayersByPosition(players);
+  const grouped = groupPlayersBySquadSection(players);
 
   return (
     <div className="space-y-5 md:space-y-8">
-      {SQUAD_POSITIONS.map((position, sectionIndex) => {
-        const list = grouped[position];
+      {SQUAD_SECTIONS.map((section, sectionIndex) => {
+        const list = grouped[section];
         if (list.length === 0) return null;
 
         return (
-          <PositionSection key={position} position={position} delay={sectionIndex * 0.04} hideHeadingOnMobile>
+          <PositionSection key={section} section={section} delay={sectionIndex * 0.04} hideHeadingOnMobile>
             <div className="overflow-hidden rounded-2xl border border-[#214C9B]/12 bg-white shadow-[0_16px_40px_rgba(17,24,39,0.05)]">
               <div className="hidden overflow-x-auto md:block">
                 <table className="w-full min-w-[640px] table-fixed border-collapse">
@@ -84,7 +84,7 @@ export function RivalSquadTable({ players }: RivalSquadTableProps) {
               <div className="divide-y divide-slate-100 md:hidden">
                 <div className="grid grid-cols-[2.5rem_minmax(0,1fr)_2.5rem_2.5rem_2.5rem] gap-2 bg-slate-50/90 px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-slate-500">
                   <span>#</span>
-                  <span>{SQUAD_POSITION_LABELS[position as SquadPosition]}</span>
+                  <span>{SQUAD_SECTION_LABELS[section]}</span>
                   <span className="text-center">Ed</span>
                   <span className="text-center">Pie</span>
                   <span className="text-center">G</span>

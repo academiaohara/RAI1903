@@ -3,13 +3,13 @@
 import { useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import type { SquadPlayer, SquadPosition } from "@/types/squad";
-import { SQUAD_POSITION_LABELS, SQUAD_POSITIONS, SQUAD_ROLE_CODES } from "@/types/squad";
-import type { SquadRoleCode } from "@/types/squad";
+import { SQUAD_POSITIONS, SQUAD_ROLE_CODES, SQUAD_SECTION_LABELS, SQUAD_SECTIONS } from "@/types/squad";
+import type { SquadRoleCode, SquadSection } from "@/types/squad";
 import {
   formatContractDate,
   formatPlayerAge,
   getPlayerFullName,
-  groupPlayersByPosition,
+  groupPlayersBySquadSection,
 } from "@/lib/squad-utils";
 import { PositionSection } from "@/components/squad/PositionSection";
 import { SquadListColGroup } from "@/components/squad/SquadListColGroup";
@@ -70,7 +70,7 @@ export function PlayerTable({
   onQuickUpdate,
 }: PlayerTableProps) {
   const [mobileDataView, setMobileDataView] = useState<MobileDataView>("stats");
-  const grouped = groupPlayersByPosition(players);
+  const grouped = groupPlayersBySquadSection(players);
 
   const columns = [
     { key: "jugador", label: "Jugador", align: "left" as const },
@@ -98,12 +98,12 @@ export function PlayerTable({
         </p>
       ) : null}
       <MobileDataToggle value={mobileDataView} onChange={setMobileDataView} />
-      {SQUAD_POSITIONS.map((position, sectionIndex) => {
-        const list = grouped[position];
+      {SQUAD_SECTIONS.map((section, sectionIndex) => {
+        const list = grouped[section];
         if (list.length === 0 && !showEmptyPositions) return null;
 
         return (
-          <PositionSection key={position} position={position} delay={sectionIndex * 0.04} hideHeadingOnMobile>
+          <PositionSection key={section} section={section} delay={sectionIndex * 0.04} hideHeadingOnMobile>
             <div className="overflow-hidden rounded-2xl border border-[#214C9B]/12 bg-white shadow-[0_16px_40px_rgba(17,24,39,0.05)] md:rounded-[1.5rem]">
               <div className="hidden overflow-x-auto md:block">
                 <table className="w-full min-w-[640px] table-fixed border-collapse">
@@ -153,7 +153,7 @@ export function PlayerTable({
 
               <div className="divide-y divide-slate-100 md:hidden">
                 <MobileSectionHeader
-                  position={position}
+                  section={section}
                   view={mobileDataView}
                   showFanRating={showFanRating}
                 />
@@ -675,11 +675,11 @@ function MobileDataToggle({
 }
 
 function MobileSectionHeader({
-  position,
+  section,
   view,
   showFanRating,
 }: {
-  position: (typeof SQUAD_POSITIONS)[number];
+  section: SquadSection;
   view: MobileDataView;
   showFanRating: boolean;
 }) {
@@ -687,7 +687,7 @@ function MobileSectionHeader({
     <div
       className={`grid items-center gap-1.5 border-b border-slate-100 bg-slate-50/90 px-2 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 ${mobileGridClass[view]}`}
     >
-      <span>{SQUAD_POSITION_LABELS[position]}</span>
+      <span>{SQUAD_SECTION_LABELS[section]}</span>
       {view === "stats" ? (
         <>
           <span className="text-center">PJ</span>

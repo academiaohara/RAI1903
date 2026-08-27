@@ -104,3 +104,56 @@ export const SQUAD_POSITION_LABELS: Record<SquadPosition, string> = {
   Centrocampista: "Centrocampistas",
   Delantero: "Delanteros",
 };
+
+/** Bloques de visualización en plantilla (agrupados por rol). */
+export type SquadSection =
+  | "porteros"
+  | "laterales"
+  | "centrales"
+  | "centrocampistas"
+  | "extremos"
+  | "delanteros";
+
+export const SQUAD_SECTIONS: SquadSection[] = [
+  "porteros",
+  "laterales",
+  "centrales",
+  "centrocampistas",
+  "extremos",
+  "delanteros",
+];
+
+export const SQUAD_SECTION_LABELS: Record<SquadSection, string> = {
+  porteros: "Porteros",
+  laterales: "Laterales",
+  centrales: "Centrales",
+  centrocampistas: "Centrocampistas",
+  extremos: "Extremos",
+  delanteros: "Delanteros",
+};
+
+const ROLE_TO_SQUAD_SECTION: Record<SquadRoleCode, SquadSection> = {
+  POR: "porteros",
+  LI: "laterales",
+  LD: "laterales",
+  DFC: "centrales",
+  MC: "centrocampistas",
+  MCO: "centrocampistas",
+  MCD: "centrocampistas",
+  EI: "extremos",
+  ED: "extremos",
+  SD: "delanteros",
+  DC: "delanteros",
+  MP: "delanteros",
+};
+
+const POSITION_TO_SQUAD_SECTION: Record<SquadPosition, SquadSection> = {
+  Portero: "porteros",
+  Defensa: "centrales",
+  Centrocampista: "centrocampistas",
+  Delantero: "delanteros",
+};
+
+export function getSquadSection(player: Pick<SquadPlayer, "rol" | "posicion">): SquadSection {
+  return ROLE_TO_SQUAD_SECTION[player.rol] ?? POSITION_TO_SQUAD_SECTION[player.posicion];
+}

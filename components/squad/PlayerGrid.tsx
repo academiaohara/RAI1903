@@ -1,8 +1,8 @@
 "use client";
 
 import type { SquadPlayer } from "@/types/squad";
-import { SQUAD_POSITIONS } from "@/types/squad";
-import { groupPlayersByPosition } from "@/lib/squad-utils";
+import { SQUAD_SECTIONS } from "@/types/squad";
+import { groupPlayersBySquadSection } from "@/lib/squad-utils";
 import { PositionSection } from "@/components/squad/PositionSection";
 import { PlayerCard } from "@/components/squad/PlayerCard";
 import type { PlayerRatingAverage } from "@/lib/match-ratings-storage";
@@ -28,17 +28,17 @@ export function PlayerGrid({
   onQuickUpdate,
   seasonLabel,
 }: PlayerGridProps) {
-  const grouped = groupPlayersByPosition(players);
+  const grouped = groupPlayersBySquadSection(players);
   const isFichas = variant === "fichas";
 
   const content = (
     <div className="space-y-7 sm:space-y-10">
-      {SQUAD_POSITIONS.map((position, sectionIndex) => {
-        const list = grouped[position];
+      {SQUAD_SECTIONS.map((section, sectionIndex) => {
+        const list = grouped[section];
         if (list.length === 0 && !showEmptyPositions) return null;
 
         return (
-          <PositionSection key={position} position={position} delay={sectionIndex * 0.05} variant={variant}>
+          <PositionSection key={section} section={section} delay={sectionIndex * 0.05} variant={variant}>
             <div
               className={
                 isFichas
