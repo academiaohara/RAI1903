@@ -1,6 +1,6 @@
 import type { PlayerStatus } from "@/types";
-import type { SquadPlayer, SquadPosition, SquadRoleCode } from "@/types/squad";
-import { SQUAD_POSITIONS } from "@/types/squad";
+import type { SquadPlayer, SquadPosition, SquadRoleCode, SquadSection } from "@/types/squad";
+import { getSquadSection, SQUAD_POSITIONS, SQUAD_SECTIONS } from "@/types/squad";
 
 const ROSTER_ESTADOS: PlayerStatus[] = ["titular", "suplente", "cantera", "nuevo fichaje"];
 
@@ -82,6 +82,23 @@ export function groupPlayersByPosition(players: SquadPlayer[]): Record<SquadPosi
 
   for (const pos of SQUAD_POSITIONS) {
     groups[pos].sort((a, b) => a.dorsal - b.dorsal);
+  }
+
+  return groups;
+}
+
+export function groupPlayersBySquadSection(players: SquadPlayer[]): Record<SquadSection, SquadPlayer[]> {
+  const groups = Object.fromEntries(SQUAD_SECTIONS.map((section) => [section, [] as SquadPlayer[]])) as Record<
+    SquadSection,
+    SquadPlayer[]
+  >;
+
+  for (const player of players) {
+    groups[getSquadSection(player)].push(player);
+  }
+
+  for (const section of SQUAD_SECTIONS) {
+    groups[section].sort((a, b) => a.dorsal - b.dorsal);
   }
 
   return groups;
