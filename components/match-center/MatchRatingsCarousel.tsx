@@ -137,7 +137,7 @@ export function MatchRatingsCarousel({
           <ChevronRight size={20} />
         </button>
 
-        <div className="mx-auto flex max-w-2xl items-end justify-center gap-3 px-14">
+        <div className="mx-auto flex max-w-2xl items-center justify-center gap-3 px-14">
           {players.length > 1 ? (
             <button
               type="button"
@@ -151,7 +151,7 @@ export function MatchRatingsCarousel({
             <div className="w-28 shrink-0" aria-hidden />
           )}
 
-          <div className="flex items-end gap-3">
+          <div className="flex items-center gap-3">
             <MatchRatingsCardStack
               player={currentPlayer}
               community={community}
