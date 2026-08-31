@@ -26,6 +26,7 @@ import { SquadEditToolbar } from "@/components/squad/SquadEditToolbar";
 import { FixturesJsonPasteSection } from "@/components/editor/FixturesJsonPasteSection";
 import { parseCanteraSquadJson } from "@/lib/cms/parse-squad-json";
 import { SectionUnderConstructionGate } from "@/components/season/SectionUnderConstructionGate";
+import { SeasonRatingsRanking } from "@/components/squad/SeasonRatingsRanking";
 import { StandingsEvolutionChart } from "@/components/squad/StandingsEvolutionChart";
 import type { StadiumInfo } from "@/types/squad";
 
@@ -40,7 +41,7 @@ export function SquadPage({ gender }: SquadPageProps) {
     viewedSeasonId,
   );
   const { squad, updatePlayer, addPlayer, removePlayer, importSquad } = useSquadPlayers(gender, statsCompetitionFilter);
-  const { averages: fanRatings } = useSeasonPlayerRatings();
+  const { averages: fanRatings, loading: fanRatingsLoading } = useSeasonPlayerRatings();
   const { editMode, getValue } = useInlineEditing();
   const [addBusy, setAddBusy] = useState(false);
   const [stadiumOverride, setStadiumOverride] = useState<StadiumInfo | null>(null);
@@ -166,6 +167,10 @@ export function SquadPage({ gender }: SquadPageProps) {
         onMarkUnavailable={editMode ? handleMarkUnavailable : undefined}
         onMarkAvailable={editMode ? handleMarkAvailable : undefined}
       />
+
+      {!isFemenino ? (
+        <SeasonRatingsRanking squad={squad} averages={fanRatings} loading={fanRatingsLoading} />
+      ) : null}
 
       <AnimatePresence mode="wait">
         <motion.div

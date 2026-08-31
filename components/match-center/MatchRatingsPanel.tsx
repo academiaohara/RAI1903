@@ -1,12 +1,16 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { LayoutGrid, List, Loader2 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { OAuthLoginButtons } from "@/components/auth/OAuthLoginButtons";
+import { MatchRatingsCarousel } from "@/components/match-center/MatchRatingsCarousel";
+import { MatchRatingsCountdown } from "@/components/match-center/MatchRatingsCountdown";
+import { MatchRatingsTop3 } from "@/components/match-center/MatchRatingsTop3";
 import { useMatchRatingsSeasonId } from "@/hooks/useMatchRatingsSeasonId";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { getAvilesPlayersWhoPlayed } from "@/lib/match-rating-eligibility";
+import { isMatchRatingVotingOpen } from "@/lib/match-rating-voting";
 import { formatFanRating } from "@/lib/format-fan-rating";
 import {
   fetchMatchRatingAverages,
@@ -24,6 +28,8 @@ type MatchRatingsPanelProps = {
   detail: MatchDetail;
 };
 
+type RatingsViewMode = "lista" | "carrusel";
+
 const SLIDER_MIN = 0;
 const SLIDER_MAX = 10;
 const SLIDER_STEP = 0.5;
@@ -37,6 +43,7 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
   );
   const { squad } = useSquadPlayers(detail.gender);
   const configured = isSupabaseConfigured();
+  const votingOpen = isMatchRatingVotingOpen(detail.match.date);
 
   const eligiblePlayers = useMemo(
     () => getAvilesPlayersWhoPlayed(detail, squad),
@@ -47,11 +54,24 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
   const [authReady, setAuthReady] = useState(!configured);
   const [draftRatings, setDraftRatings] = useState<Record<string, number>>({});
   const [averages, setAverages] = useState<Record<string, { average: number; count: number }>>({});
+  const [viewMode, setViewMode] = useState<RatingsViewMode>("carrusel");
   const sessionKey = `${ratingsSeasonId}:${detail.match.id}:${user?.id ?? "guest"}`;
   const [loadedKey, setLoadedKey] = useState<string | null>(null);
   const loading = configured && (resolvingSeason || !authReady || loadedKey !== sessionKey);
   const [submitting, setSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+
+  const topRatedPlayers = useMemo(() => {
+    return eligiblePlayers
+      .map((player) => {
+        const average = averages[player.id];
+        if (!average || average.count <= 0) return null;
+        return { player, average };
+      })
+      .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
+      .sort((a, b) => b.average.average - a.average.average)
+      .slice(0, 3);
+  }, [averages, eligiblePlayers]);
 
   useEffect(() => {
     if (!configured) return;
@@ -106,8 +126,12 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
     };
   }, [authReady, configured, detail.gender, detail.match.id, ratingsSeasonId, resolvingSeason, sessionKey, user]);
 
+  const handleRatingChange = useCallback((playerId: string, value: number) => {
+    setDraftRatings((current) => ({ ...current, [playerId]: value }));
+  }, []);
+
   const handleSubmit = async () => {
-    if (!user) return;
+    if (!user || !votingOpen) return;
     setSubmitting(true);
     setStatusMessage(null);
 
@@ -117,6 +141,7 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
       gender: detail.gender,
       ratings: draftRatings,
       seasonId: ratingsSeasonId,
+      matchDate: detail.match.date,
     });
 
     setSubmitting(false);
@@ -141,11 +166,13 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
     );
   }
 
+  const canVote = Boolean(user && configured && votingOpen);
+
   return (
     <section>
       <h2 className="text-lg font-extrabold uppercase tracking-normal text-[#214C9B]">Valoraciones</h2>
       <p className="mt-2 text-sm leading-relaxed text-slate-600">
-        Puntúa solo a quienes han jugado. Tu nota se suma a la media de la afición (usuarios registrados).
+        Puntúa solo a quienes han jugado. Tienes 3 días tras el partido para enviar tu valoración.
       </p>
 
       {!configured && (
@@ -154,7 +181,7 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
         </p>
       )}
 
-      {configured && authReady && !user && (
+      {configured && authReady && !user && votingOpen && (
         <div className="mt-4 rounded-2xl border border-[#214C9B]/15 bg-slate-50 p-4">
           <p className="text-sm text-slate-700">Inicia sesión para enviar tu valoración.</p>
           <div className="mt-3 max-w-sm">
@@ -167,11 +194,56 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
         </div>
       )}
 
+      <div className="mt-5 space-y-4">
+        {topRatedPlayers.length > 0 ? <MatchRatingsTop3 players={topRatedPlayers} /> : null}
+        <MatchRatingsCountdown matchDate={detail.match.date} />
+      </div>
+
+      <div className="mt-5 flex flex-wrap items-center gap-2">
+        <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Vista</span>
+        <div className="inline-flex rounded-full border border-[#214C9B]/20 bg-slate-50 p-0.5">
+          <button
+            type="button"
+            onClick={() => setViewMode("carrusel")}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-extrabold uppercase transition ${
+              viewMode === "carrusel"
+                ? "bg-[#214C9B] text-white"
+                : "text-[#214C9B] hover:bg-blue-50"
+            }`}
+          >
+            <LayoutGrid size={14} aria-hidden />
+            Carrusel
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("lista")}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-extrabold uppercase transition ${
+              viewMode === "lista"
+                ? "bg-[#214C9B] text-white"
+                : "text-[#214C9B] hover:bg-blue-50"
+            }`}
+          >
+            <List size={14} aria-hidden />
+            Lista
+          </button>
+        </div>
+      </div>
+
       {loading ? (
         <p className="mt-6 inline-flex items-center gap-2 text-sm text-slate-500">
           <Loader2 size={16} className="animate-spin" aria-hidden />
           Cargando valoraciones…
         </p>
+      ) : viewMode === "carrusel" ? (
+        <div className="mt-6">
+          <MatchRatingsCarousel
+            players={eligiblePlayers}
+            draftRatings={draftRatings}
+            averages={averages}
+            onRatingChange={handleRatingChange}
+            disabled={!canVote}
+          />
+        </div>
       ) : (
         <ul className="mt-6 space-y-4">
           {eligiblePlayers.map((player) => {
@@ -199,13 +271,8 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
                         max={SLIDER_MAX}
                         step={SLIDER_STEP}
                         value={sliderValue}
-                        disabled={!user}
-                        onChange={(event) =>
-                          setDraftRatings((current) => ({
-                            ...current,
-                            [player.id]: Number(event.target.value),
-                          }))
-                        }
+                        disabled={!canVote}
+                        onChange={(event) => handleRatingChange(player.id, Number(event.target.value))}
                         className="h-2 min-w-0 flex-1 cursor-pointer appearance-none rounded-full bg-[#214C9B]/15 accent-[#214C9B] disabled:opacity-50"
                         aria-label={`Valoración de ${getPlayerFullName(player)}`}
                       />
@@ -234,7 +301,7 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
         </ul>
       )}
 
-      {user && configured && !loading && (
+      {user && configured && !loading && votingOpen ? (
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <button
             type="button"
@@ -246,7 +313,11 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
           </button>
           {statusMessage && <p className="text-sm text-slate-600">{statusMessage}</p>}
         </div>
-      )}
+      ) : null}
+
+      {user && configured && !loading && !votingOpen && statusMessage ? (
+        <p className="mt-4 text-sm text-slate-600">{statusMessage}</p>
+      ) : null}
     </section>
   );
 }

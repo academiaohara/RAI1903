@@ -1,4 +1,5 @@
 import type { CompetitionSeasonId } from "@/data/mock";
+import { isMatchRatingVotingOpen } from "@/lib/match-rating-voting";
 import { loadSeasonId } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -115,9 +116,15 @@ export async function submitMatchRatings(params: {
   gender: PrimerEquipoGender;
   ratings: Record<string, number>;
   seasonId?: CompetitionSeasonId;
+  /** Si se indica, se comprueba que la votación siga abierta (3 días tras el partido). */
+  matchDate?: string;
 }): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!isSupabaseConfigured()) {
     return { ok: false, error: "Supabase no configurado" };
+  }
+
+  if (params.matchDate && !isMatchRatingVotingOpen(params.matchDate)) {
+    return { ok: false, error: "El plazo de votación de este partido ha finalizado." };
   }
 
   const entries = Object.entries(params.ratings).filter(([, rating]) => Number.isFinite(rating));
