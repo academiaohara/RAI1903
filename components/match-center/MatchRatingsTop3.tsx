@@ -75,7 +75,7 @@ export function MatchRatingsTop3({ players }: MatchRatingsTop3Props) {
                     <span className="min-w-0 truncate font-semibold text-white/90">
                       {getPlayerFullName(entry.player)}
                     </span>
-                    <span className="ml-auto shrink-0 font-extrabold tabular-nums text-amber-200">
+                    <span className="shrink-0 font-extrabold tabular-nums text-amber-200">
                       {formatFanRating(entry.average.average)}
                     </span>
                   </li>
