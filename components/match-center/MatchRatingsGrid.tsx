@@ -26,8 +26,6 @@ export function MatchRatingsGrid({ players, draftRatings, averages }: MatchRatin
             community={community}
             userRating={userRating}
             fallbackUserRating
-            widthClass="w-full"
-            className="mx-auto max-w-[9rem]"
           />
         );
       })}

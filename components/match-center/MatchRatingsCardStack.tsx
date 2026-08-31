@@ -24,7 +24,7 @@ export function MatchRatingsCardStack({
   community,
   userRating,
   variant = "default",
-  widthClass,
+  widthClass = "w-full max-w-[9rem]",
   className = "",
   fallbackUserRating = false,
 }: MatchRatingsCardStackProps) {
@@ -32,7 +32,7 @@ export function MatchRatingsCardStack({
   const showUserFallback = fallbackUserRating && !showCommunity && userRating !== undefined;
 
   return (
-    <div className={`flex flex-col items-center ${className}`}>
+    <div className={`flex w-full flex-col items-center ${className}`}>
       {showCommunity ? (
         <p
           className="mb-2 text-center text-2xl font-black tabular-nums leading-none sm:text-3xl"
@@ -51,7 +51,12 @@ export function MatchRatingsCardStack({
         <div className="mb-2 h-8" aria-hidden />
       )}
 
-      <MatchRatingsPlayerCard player={player} variant={variant} widthClass={widthClass} />
+      <MatchRatingsPlayerCard
+        player={player}
+        variant={variant}
+        widthClass={widthClass}
+        className="mx-auto"
+      />
 
       {showCommunity ? (
         <p className="mt-2 text-center text-[10px] text-slate-400">
