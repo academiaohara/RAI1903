@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Minus, Plus } from "lucide-react";
+import { MatchRatingsCardStack } from "@/components/match-center/MatchRatingsCardStack";
 import { MatchRatingsPlayerCard } from "@/components/match-center/MatchRatingsPlayerCard";
 import { formatFanRating } from "@/lib/format-fan-rating";
 import type { PlayerRatingAverage } from "@/lib/match-ratings-storage";
@@ -12,6 +13,7 @@ const SLIDER_MIN = 0;
 const SLIDER_MAX = 10;
 const SLIDER_STEP = 0.5;
 const SLIDER_DEFAULT = 5;
+const GARNET = "#981915";
 
 type MatchRatingsCarouselProps = {
   players: SquadPlayer[];
@@ -25,14 +27,12 @@ function clampRating(value: number): number {
   return Math.min(SLIDER_MAX, Math.max(SLIDER_MIN, Math.round(value / SLIDER_STEP) * SLIDER_STEP));
 }
 
-function RatingControls({
+function UserRatingControls({
   sliderValue,
-  community,
   disabled,
   onAdjust,
 }: {
   sliderValue: number;
-  community?: PlayerRatingAverage;
   disabled: boolean;
   onAdjust: (delta: number) => void;
 }) {
@@ -49,7 +49,10 @@ function RatingControls({
       </button>
 
       <div className="text-center">
-        <p className="text-4xl font-black tabular-nums leading-none text-[#981915] sm:text-5xl">
+        <p
+          className="text-4xl font-black tabular-nums leading-none sm:text-5xl"
+          style={{ color: GARNET }}
+        >
           {formatFanRating(sliderValue)}
         </p>
         <p className="mt-1 text-[10px] font-bold uppercase tracking-wide text-slate-500">Tu nota</p>
@@ -64,18 +67,6 @@ function RatingControls({
       >
         <Minus size={22} />
       </button>
-
-      {community ? (
-        <div className="mt-1 rounded-xl border border-[#214C9B]/15 bg-slate-50 px-2.5 py-2 text-center">
-          <p className="text-[10px] font-bold uppercase text-slate-500">Comunidad</p>
-          <p className="text-base font-extrabold tabular-nums text-[#214C9B] sm:text-lg">
-            {formatFanRating(community.average)}
-          </p>
-          <p className="text-[10px] text-slate-400">
-            {community.count} voto{community.count === 1 ? "" : "s"}
-          </p>
-        </div>
-      ) : null}
     </div>
   );
 }
@@ -160,11 +151,14 @@ export function MatchRatingsCarousel({
             <div className="w-28 shrink-0" aria-hidden />
           )}
 
-          <div className="flex items-end gap-2">
-            <MatchRatingsPlayerCard player={currentPlayer} widthClass="w-40" />
-            <RatingControls
-              sliderValue={sliderValue}
+          <div className="flex items-end gap-3">
+            <MatchRatingsCardStack
+              player={currentPlayer}
               community={community}
+              widthClass="w-40"
+            />
+            <UserRatingControls
+              sliderValue={sliderValue}
               disabled={disabled}
               onAdjust={adjustRating}
             />
@@ -226,10 +220,13 @@ export function MatchRatingsCarousel({
                 key={player.id}
                 className="flex w-[min(88vw,20rem)] shrink-0 snap-center items-end gap-2"
               >
-                <MatchRatingsPlayerCard player={player} widthClass="w-[min(52vw,11rem)]" />
-                <RatingControls
-                  sliderValue={playerSliderValue}
+                <MatchRatingsCardStack
+                  player={player}
                   community={playerCommunity}
+                  widthClass="w-[min(52vw,11rem)]"
+                />
+                <UserRatingControls
+                  sliderValue={playerSliderValue}
                   disabled={disabled}
                   onAdjust={adjustPlayerRating}
                 />
