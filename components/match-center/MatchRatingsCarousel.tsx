@@ -37,7 +37,7 @@ function UserRatingControls({
   onAdjust: (delta: number) => void;
 }) {
   return (
-    <div className="flex shrink-0 flex-col items-center gap-2 self-end pb-1">
+    <div className="flex shrink-0 flex-col items-center gap-2">
       <button
         type="button"
         onClick={() => onAdjust(SLIDER_STEP)}
@@ -218,7 +218,7 @@ export function MatchRatingsCarousel({
             return (
               <div
                 key={player.id}
-                className="flex w-[min(88vw,20rem)] shrink-0 snap-center items-end gap-2"
+                className="flex w-[min(88vw,20rem)] shrink-0 snap-center items-center gap-2"
               >
                 <MatchRatingsCardStack
                   player={player}
