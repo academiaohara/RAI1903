@@ -1,4 +1,4 @@
-import { isLeagueCompetition, type LeagueCompetitionId } from "@/lib/competition-labels";
+import { countsAsLeagueCompetition, type LeagueCompetitionId } from "@/lib/competition-labels";
 import { isMatchPlayed } from "@/lib/match-result";
 import { RESULTADOS_2526_LAST_ROUND } from "@/lib/resultados-2526";
 import { sortStandingsByRfefRules } from "@/lib/rfef-rules/tiebreak";
@@ -145,7 +145,7 @@ export function matchToFinishedLeagueMatch(match: Match): FinishedLeagueMatch | 
   if (!isMatchPlayed(match) || match.homeScore === undefined || match.awayScore === undefined) {
     return null;
   }
-  if (!isLeagueCompetition(match.competition)) return null;
+  if (!countsAsLeagueCompetition(match.competition)) return null;
   return {
     homeTeamId: match.homeTeamId,
     awayTeamId: match.awayTeamId,

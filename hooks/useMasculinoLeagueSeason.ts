@@ -94,6 +94,7 @@ export function useMasculinoLeagueSeason(seasonScope: SeasonDataScope = "viewed"
     leagueMatchdays: editedLeagueMatchdays,
     editedLeagueMatchdays,
     avilesMatches,
+    clubTeamIds,
     latestMatches,
     upcomingMatches,
     nextMatch,
@@ -110,6 +111,7 @@ export type MasculinoLeagueSeason = {
   leagueMatchdays: Matchday[];
   editedLeagueMatchdays: Matchday[];
   avilesMatches: Match[];
+  clubTeamIds: string[];
   latestMatches: Match[];
   upcomingMatches: Match[];
   nextMatch: Match | undefined;

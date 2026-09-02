@@ -1,4 +1,4 @@
-import { isLeagueCompetition } from "@/lib/competition-labels";
+import { countsAsLeagueCompetition } from "@/lib/competition-labels";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { CompetitionId, Match } from "@/types";
 
@@ -44,7 +44,7 @@ export function matchesStatsCompetitionFilter(
   if (filter === "todos") return true;
   if (filter === "copa-rey") return match.competition === "copa-rey";
   if (filter === "amistoso") return match.competition === "amistoso";
-  return isLeagueCompetition(match.competition);
+  return countsAsLeagueCompetition(match.competition);
 }
 
 export function filterMatchesForStatsCompetition(

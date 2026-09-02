@@ -66,7 +66,9 @@ function ensureMatchdayMatches(
   competition: CompetitionId,
   gender: PrimerEquipoGender,
 ): Matchday {
-  const matches = [...(existing?.matches ?? [])];
+  const matches = [...(existing?.matches ?? [])].map((match) =>
+    match.competition ? match : { ...match, competition },
+  );
   while (matches.length < expectedCount) {
     matches.push(createPlaceholderMatch(round, matches.length, grupo, competition, gender));
   }

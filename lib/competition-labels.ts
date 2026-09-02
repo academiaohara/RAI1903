@@ -36,6 +36,12 @@ export function isLeagueCompetition(competitionId: string): competitionId is Lea
   return (LEAGUE_COMPETITION_IDS as readonly string[]).includes(competitionId);
 }
 
+/** Partidos del calendario de liga sin `competition` explícito (CMS antiguo) cuentan como liga. */
+export function countsAsLeagueCompetition(competitionId: string | undefined): boolean {
+  if (!competitionId) return true;
+  return isLeagueCompetition(competitionId);
+}
+
 function copaStageBadgeLabel(stage: string): string {
   const normalized = stage.toLowerCase();
   if (normalized.includes("primera")) return "1ª Elim.";
