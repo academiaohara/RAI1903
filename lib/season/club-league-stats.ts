@@ -1,6 +1,7 @@
 import { getRaiTeamId } from "@/lib/fixtures";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { isMatchPlayed } from "@/lib/match-result";
+import { resolveClubSideInMatch } from "@/lib/season/club-team-ids";
 import { matchToFinishedLeagueMatch } from "@/lib/standings";
 import type { Match, Matchday } from "@/types";
 import type { SquadClubStats } from "@/types/squad";
@@ -77,19 +78,20 @@ export function computeClubLeagueStatsForGender(
 export function computeClubStatsFromMatches(
   teamId: string,
   matches: readonly Match[],
+  clubTeamIds?: readonly string[],
 ): SquadClubStats {
+  const ids = clubTeamIds?.length ? clubTeamIds : [teamId];
   const stats = { ...EMPTY_SQUAD_CLUB_STATS };
 
   for (const match of matches) {
     const finished = matchToFinishedClubMatch(match);
     if (!finished) continue;
 
-    const isHome = finished.homeTeamId === teamId;
-    const isAway = finished.awayTeamId === teamId;
-    if (!isHome && !isAway) continue;
+    const side = resolveClubSideInMatch(match, ids);
+    if (!side) continue;
 
-    const goalsFor = isHome ? finished.homeScore : finished.awayScore;
-    const goalsAgainst = isHome ? finished.awayScore : finished.homeScore;
+    const goalsFor = side.isHome ? finished.homeScore : finished.awayScore;
+    const goalsAgainst = side.isHome ? finished.awayScore : finished.homeScore;
 
     stats.partidos += 1;
     stats.golesFavor += goalsFor;
@@ -106,6 +108,7 @@ export function computeClubStatsFromMatches(
 export function computeClubStatsForGenderFromMatches(
   gender: PrimerEquipoGender,
   matches: readonly Match[],
+  clubTeamIds?: readonly string[],
 ): SquadClubStats {
-  return computeClubStatsFromMatches(getRaiTeamId(gender), matches);
+  return computeClubStatsFromMatches(getRaiTeamId(gender), matches, clubTeamIds);
 }

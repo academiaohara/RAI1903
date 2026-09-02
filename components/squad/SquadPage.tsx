@@ -8,7 +8,7 @@ import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { useStatsCompetitionFilter } from "@/hooks/useStatsCompetitionFilter";
 import { useSeasonPlayerRatings } from "@/hooks/useSeasonPlayerRatings";
 import { useSeason } from "@/components/season/SeasonProvider";
-import { getAvilesMatchesFromSource } from "@/lib/season/aviles-matches";
+import { usePrimerEquipoLeagueSeason } from "@/hooks/usePrimerEquipoLeagueSeason";
 import { filterMatchesForStatsCompetition } from "@/lib/competition/stats-filters";
 import { computeClubStatsForGenderFromMatches } from "@/lib/season/club-league-stats";
 import { resolveSquadClubInfo } from "@/lib/season/squad-source";
@@ -35,7 +35,8 @@ type SquadPageProps = {
 };
 
 export function SquadPage({ gender }: SquadPageProps) {
-  const { viewedSeasonId, bundles, viewedSeason, getFixtureSource } = useSeason();
+  const { viewedSeasonId, bundles, viewedSeason } = useSeason();
+  const { avilesMatches, clubTeamIds } = usePrimerEquipoLeagueSeason(gender);
   const { filter: statsCompetitionFilter, setFilter: setStatsCompetitionFilter } = useStatsCompetitionFilter(
     gender,
     viewedSeasonId,
@@ -45,17 +46,13 @@ export function SquadPage({ gender }: SquadPageProps) {
   const { editMode, getValue } = useInlineEditing();
   const [addBusy, setAddBusy] = useState(false);
   const [stadiumOverride, setStadiumOverride] = useState<StadiumInfo | null>(null);
-  const avilesMatches = useMemo(
-    () => getAvilesMatchesFromSource(getFixtureSource(gender), gender),
-    [gender, getFixtureSource],
-  );
   const filteredClubMatches = useMemo(
     () => filterMatchesForStatsCompetition(avilesMatches, statsCompetitionFilter),
     [avilesMatches, statsCompetitionFilter],
   );
   const clubStats = useMemo(
-    () => computeClubStatsForGenderFromMatches(gender, filteredClubMatches),
-    [filteredClubMatches, gender],
+    () => computeClubStatsForGenderFromMatches(gender, filteredClubMatches, clubTeamIds),
+    [filteredClubMatches, clubTeamIds, gender],
   );
   const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
 
