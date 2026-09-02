@@ -76,6 +76,7 @@ export function usePrimerEquipoLeagueSeason(
     leagueMatchdays: editedLeagueMatchdays,
     editedLeagueMatchdays,
     avilesMatches,
+    clubTeamIds,
     latestMatches,
     upcomingMatches,
     nextMatch,
@@ -92,6 +93,7 @@ export type PrimerEquipoLeagueSeason = {
   leagueMatchdays: Matchday[];
   editedLeagueMatchdays: Matchday[];
   avilesMatches: Match[];
+  clubTeamIds: string[];
   latestMatches: Match[];
   upcomingMatches: Match[];
   nextMatch: Match | undefined;
