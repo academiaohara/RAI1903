@@ -39,7 +39,9 @@ export const EMPTY_SQUAD_CLUB_STATS: SquadClubStats = {
 export function computeClubLeagueStatsFromMatchdays(
   teamId: string,
   matchdays: readonly Matchday[],
+  clubTeamIds?: readonly string[],
 ): SquadClubStats {
+  const ids = clubTeamIds?.length ? clubTeamIds : [teamId];
   const stats = { ...EMPTY_SQUAD_CLUB_STATS };
 
   for (const matchday of matchdays) {
@@ -47,12 +49,11 @@ export function computeClubLeagueStatsFromMatchdays(
       const finished = matchToFinishedLeagueMatch(match);
       if (!finished) continue;
 
-      const isHome = finished.homeTeamId === teamId;
-      const isAway = finished.awayTeamId === teamId;
-      if (!isHome && !isAway) continue;
+      const side = resolveClubSideInMatch(match, ids);
+      if (!side) continue;
 
-      const goalsFor = isHome ? finished.homeScore : finished.awayScore;
-      const goalsAgainst = isHome ? finished.awayScore : finished.homeScore;
+      const goalsFor = side.isHome ? finished.homeScore : finished.awayScore;
+      const goalsAgainst = side.isHome ? finished.awayScore : finished.homeScore;
 
       stats.partidos += 1;
       stats.golesFavor += goalsFor;

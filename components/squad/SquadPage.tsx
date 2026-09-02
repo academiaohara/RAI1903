@@ -8,9 +8,14 @@ import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { useStatsCompetitionFilter } from "@/hooks/useStatsCompetitionFilter";
 import { useSeasonPlayerRatings } from "@/hooks/useSeasonPlayerRatings";
 import { useSeason } from "@/components/season/SeasonProvider";
+import { useMasculinoLeagueSeason } from "@/hooks/useMasculinoLeagueSeason";
 import { usePrimerEquipoLeagueSeason } from "@/hooks/usePrimerEquipoLeagueSeason";
 import { filterMatchesForStatsCompetition } from "@/lib/competition/stats-filters";
-import { computeClubStatsForGenderFromMatches } from "@/lib/season/club-league-stats";
+import {
+  computeClubLeagueStatsFromMatchdays,
+  computeClubStatsForGenderFromMatches,
+} from "@/lib/season/club-league-stats";
+import { getRaiTeamId } from "@/lib/fixtures";
 import { resolveSquadClubInfo } from "@/lib/season/squad-source";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import { defaultRosterEstado, splitSquadByAvailability } from "@/lib/squad-utils";
@@ -36,7 +41,16 @@ type SquadPageProps = {
 
 export function SquadPage({ gender }: SquadPageProps) {
   const { viewedSeasonId, bundles, viewedSeason } = useSeason();
-  const { avilesMatches, clubTeamIds } = usePrimerEquipoLeagueSeason(gender);
+  const masculinoSeason = useMasculinoLeagueSeason();
+  const primerEquipoSeason = usePrimerEquipoLeagueSeason(gender);
+  const { avilesMatches, clubTeamIds, editedLeagueMatchdays } =
+    gender === "masculino"
+      ? masculinoSeason
+      : {
+          avilesMatches: primerEquipoSeason.avilesMatches,
+          clubTeamIds: primerEquipoSeason.clubTeamIds,
+          editedLeagueMatchdays: primerEquipoSeason.editedLeagueMatchdays,
+        };
   const { filter: statsCompetitionFilter, setFilter: setStatsCompetitionFilter } = useStatsCompetitionFilter(
     gender,
     viewedSeasonId,
@@ -46,14 +60,23 @@ export function SquadPage({ gender }: SquadPageProps) {
   const { editMode, getValue } = useInlineEditing();
   const [addBusy, setAddBusy] = useState(false);
   const [stadiumOverride, setStadiumOverride] = useState<StadiumInfo | null>(null);
-  const filteredClubMatches = useMemo(
-    () => filterMatchesForStatsCompetition(avilesMatches, statsCompetitionFilter),
-    [avilesMatches, statsCompetitionFilter],
-  );
-  const clubStats = useMemo(
-    () => computeClubStatsForGenderFromMatches(gender, filteredClubMatches, clubTeamIds),
-    [filteredClubMatches, clubTeamIds, gender],
-  );
+  const clubStats = useMemo(() => {
+    if (statsCompetitionFilter === "liga") {
+      return computeClubLeagueStatsFromMatchdays(
+        getRaiTeamId(gender),
+        editedLeagueMatchdays,
+        clubTeamIds,
+      );
+    }
+    const filtered = filterMatchesForStatsCompetition(avilesMatches, statsCompetitionFilter);
+    return computeClubStatsForGenderFromMatches(gender, filtered, clubTeamIds);
+  }, [
+    avilesMatches,
+    clubTeamIds,
+    editedLeagueMatchdays,
+    gender,
+    statsCompetitionFilter,
+  ]);
   const { injured, suspended, available } = useMemo(() => splitSquadByAvailability(squad), [squad]);
 
   const handleMarkUnavailable = useCallback(

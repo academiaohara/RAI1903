@@ -20,6 +20,7 @@ const unplayedLeagueMatch: Match = {
   date: "2026-08-30T17:00:00.000Z",
   competition: "primera-rfef",
   matchday: 1,
+  venue: "",
   status: "scheduled",
 };
 
@@ -69,5 +70,25 @@ const cmsStats = computeClubStatsForGenderFromMatches(
   [...clubTeamIds, cmsTeamId],
 );
 assert.equal(cmsStats.partidos, 1, "alternate CMS team id should count with clubTeamIds");
+
+const missingCompetitionMatch: Match = {
+  ...unplayedLeagueMatch,
+  id: "verify-squad-stats-no-competition",
+  competition: undefined as unknown as Match["competition"],
+  status: "finished",
+  homeScore: 2,
+  awayScore: 1,
+};
+assert.equal(
+  filterMatchesForStatsCompetition([missingCompetitionMatch], "liga").length,
+  1,
+  "liga filter should include matches without competition id",
+);
+const missingCompStats = computeClubStatsForGenderFromMatches(
+  "masculino",
+  filterMatchesForStatsCompetition([missingCompetitionMatch], "liga"),
+  clubTeamIds,
+);
+assert.equal(missingCompStats.partidos, 1, "played league match without competition should count");
 
 console.log("verify-squad-club-stats: ok");
