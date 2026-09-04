@@ -20,6 +20,7 @@ export const PRIMER_EQUIPO_SECTIONS = [
   "lineup",
   "noticias",
   "competicion",
+  "calculadora",
   "jornadas",
   "calendario",
 ] as const;
@@ -36,6 +37,10 @@ export function primerEquipoHasLineup(gender: PrimerEquipoGender) {
   return gender === "masculino";
 }
 
+export function primerEquipoHasCalculadora(gender: PrimerEquipoGender) {
+  return gender === "masculino";
+}
+
 export function getPrimerEquipoTabs(gender: PrimerEquipoGender) {
   const base = primerEquipoBase(gender);
   const tabs = [
@@ -43,6 +48,7 @@ export function getPrimerEquipoTabs(gender: PrimerEquipoGender) {
     ...(primerEquipoHasLineup(gender) ? [{ href: `${base}/lineup`, label: "Lineup" }] : []),
     { href: `${base}/noticias`, label: "Noticias" },
     { href: `${base}/competicion`, label: "Competición" },
+    ...(primerEquipoHasCalculadora(gender) ? [{ href: `${base}/calculadora`, label: "Calculadora" }] : []),
     { href: `${base}/jornadas`, label: "Jornadas" },
     { href: `${base}/calendario`, label: "Calendario" },
   ];
@@ -59,7 +65,8 @@ export function primerEquipoPathForGender(pathname: string, gender: PrimerEquipo
   if (
     section &&
     PRIMER_EQUIPO_SECTIONS.includes(section as PrimerEquipoSection) &&
-    !(section === "lineup" && !primerEquipoHasLineup(gender))
+    !(section === "lineup" && !primerEquipoHasLineup(gender)) &&
+    !(section === "calculadora" && !primerEquipoHasCalculadora(gender))
   ) {
     return `${primerEquipoBase(gender)}/${section}`;
   }
