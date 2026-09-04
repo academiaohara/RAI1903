@@ -1,4 +1,4 @@
-import type { MatchStatus } from "@/types";
+import type { MatchStatus, Matchday } from "@/types";
 
 export type JornadaPhaseKind = "league";
 
@@ -48,5 +48,7 @@ export type JornadaRoundData = {
 export type JornadasDataset = {
   rounds: JornadaRoundSummary[];
   currentRoundId: JornadaRoundId;
+  /** Calendario de liga usado para jornadas y avance automático. */
+  matchdays: Matchday[];
   getRound: (roundId: JornadaRoundId) => JornadaRoundData;
 };

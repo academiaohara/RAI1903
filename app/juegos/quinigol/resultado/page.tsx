@@ -9,6 +9,7 @@ import { QuinigolMatchForm } from "@/components/quinigol/QuinigolMatchForm";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useQuinigolRoundRanking } from "@/hooks/useGameRankings";
+import { useGameJornadaRound } from "@/hooks/useGameJornadaRound";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
 import type { CompetitionSeasonId } from "@/data/mock";
 import { getMatchdayByRound } from "@/lib/quiniela";
@@ -34,7 +35,7 @@ function QuinigolResultadoBody({
   currentRound: number;
   totalRounds: number;
 }) {
-  const [round, setRound] = useState(currentRound);
+  const { round, setRound } = useGameJornadaRound(matchdays, totalRounds, currentRound);
   const [view, setView] = useState<ResultadoView>("quinigol");
   const selectedMatchday = useMemo(() => getMatchdayByRound(matchdays, round), [matchdays, round]);
   const { entries, loading, countPoints, error } = useQuinigolRoundRanking(seasonId, selectedMatchday);

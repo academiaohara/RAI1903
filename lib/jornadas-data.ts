@@ -233,6 +233,7 @@ function buildFemeninoJornadasDataset(
   return {
     rounds,
     currentRoundId,
+    matchdays: source.matchdaysFemenino,
     getRound(roundId) {
       return leagueRoundDataCache.get(roundId) ?? leagueRoundDataCache.get(currentRoundId)!;
     },
@@ -268,6 +269,7 @@ export function buildJornadasDataset(
   return {
     rounds,
     currentRoundId,
+    matchdays: source.matchdays,
     getRound(roundId) {
       const leagueData = leagueRoundDataCache.get(roundId);
       if (leagueData) return leagueData;

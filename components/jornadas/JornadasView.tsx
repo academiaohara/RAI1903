@@ -6,6 +6,7 @@ import { JornadaMatchesByDay } from "@/components/jornadas/JornadaMatchesByDay";
 import { JornadaRoundJsonEditor } from "@/components/jornadas/JornadaRoundJsonEditor";
 import { JornadaRoundCarousel } from "@/components/jornadas/JornadaRoundCarousel";
 import { JornadasGrupoSwitcher } from "@/components/jornadas/JornadasGrupoSwitcher";
+import { useJornadaRoundSelection } from "@/hooks/useJornadaRoundSelection";
 import { useEditedJornadasDataset } from "@/components/jornadas/useEditedJornadasDataset";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { SectionUnderConstructionGate } from "@/components/season/SectionUnderConstructionGate";
@@ -16,8 +17,7 @@ import { getRaiTeamId } from "@/lib/fixtures";
 import { resolveClubTeamIds } from "@/lib/season/club-team-ids";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { RfefGrupoId } from "@/lib/rfef-grupos";
-import type { JornadaRoundId } from "@/types/jornadas";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 type JornadasViewProps = {
   gender: PrimerEquipoGender;
@@ -44,15 +44,18 @@ export function JornadasView({ gender }: JornadasViewProps) {
     [clubTeamIds, fixtureSource, gender],
   );
   const dataset = useEditedJornadasDataset(baseDataset, gender, clubTeamIds);
+  const totalRounds = useMemo(() => {
+    if (dataset.rounds.length === 0) return 38;
+    return Math.max(...dataset.rounds.map((round) => round.roundNumber ?? 1));
+  }, [dataset.rounds]);
+  const { selectedRoundId, selectRound } = useJornadaRoundSelection(
+    dataset.matchdays,
+    totalRounds,
+    dataset.currentRoundId,
+  );
   const raiTeamId =
     gender === "femenino" ? resolvePrimerEquipoClubTeamId(bundles, gender) : getRaiTeamId(gender);
-  const [manualRoundId, setManualRoundId] = useState<JornadaRoundId | null>(null);
-  const selectedRoundId = manualRoundId ?? dataset.currentRoundId;
   const [grupo, setGrupo] = useState<RfefGrupoId>("1");
-
-  const handleSelectRound = useCallback((roundId: JornadaRoundId) => {
-    setManualRoundId(roundId);
-  }, []);
 
   const roundData = dataset.getRound(selectedRoundId);
   const { summary } = roundData;
@@ -77,7 +80,7 @@ export function JornadasView({ gender }: JornadasViewProps) {
       <JornadaRoundCarousel
         rounds={dataset.rounds}
         selectedId={selectedRoundId}
-        onSelect={handleSelectRound}
+        onSelect={selectRound}
         gender={gender}
       />
 
