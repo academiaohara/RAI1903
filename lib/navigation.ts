@@ -48,6 +48,7 @@ export const navItems: NavItem[] = [
       { href: "/primer-equipo/masculino/plantilla", label: "Plantilla", icon: Users },
       { href: "/primer-equipo/masculino/lineup", label: "Lineup", icon: LayoutGrid },
       { href: "/primer-equipo/masculino/competicion", label: "Competición", icon: Trophy },
+      { href: "/primer-equipo/masculino/calculadora", label: "Calculadora", icon: Target },
       { href: "/primer-equipo/masculino/jornadas", label: "Jornadas", icon: Columns3 },
       { href: "/primer-equipo/masculino/calendario", label: "Calendario", icon: CalendarDays },
       { href: "/primer-equipo/masculino/noticias", label: "Noticias", icon: Newspaper },
