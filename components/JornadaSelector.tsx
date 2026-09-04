@@ -11,6 +11,8 @@ export function JornadaSelector({
   currentRound,
   onChange,
   compact = false,
+  hideHeader = false,
+  playedRounds,
 }: {
   value: number;
   total: number;
@@ -18,6 +20,10 @@ export function JornadaSelector({
   onChange: (round: number) => void;
   /** Variante integrada en tarjetas (sin caja propia). */
   compact?: boolean;
+  /** Oculta la cabecera interna (Jornada X de Y). */
+  hideHeader?: boolean;
+  /** Jornadas ya disputadas por completo (estilo distinto en el carrusel). */
+  playedRounds?: ReadonlySet<number>;
 }) {
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -62,21 +68,23 @@ export function JornadaSelector({
         !compact && "rounded-2xl border border-[#214C9B]/20 bg-white p-3 shadow-[0_12px_30px_rgba(17,24,39,0.06)] sm:rounded-3xl sm:p-4",
       )}
     >
-      <div className={cn("flex flex-wrap items-end justify-between", compact ? "gap-2" : "gap-3")}>
-        <div>
-          <p className={cn("font-bold uppercase tracking-normal text-[#214C9B]", compact ? "text-[10px]" : "text-[10px] sm:text-xs")}>
-            Jornadas
-          </p>
-          <p className={cn("font-bold text-slate-600", compact ? "mt-0.5 text-xs" : "mt-0.5 text-xs sm:mt-1 sm:text-sm")}>
-            Jornada <span className="text-[#214C9B]">{value}</span> de {total}
+      {!hideHeader ? (
+        <div className={cn("flex flex-wrap items-end justify-between", compact ? "gap-2" : "gap-3")}>
+          <div>
+            <p className={cn("font-bold uppercase tracking-normal text-[#214C9B]", compact ? "text-[10px]" : "text-[10px] sm:text-xs")}>
+              Jornadas
+            </p>
+            <p className={cn("font-bold text-slate-600", compact ? "mt-0.5 text-xs" : "mt-0.5 text-xs sm:mt-1 sm:text-sm")}>
+              Jornada <span className="text-[#214C9B]">{value}</span> de {total}
+            </p>
+          </div>
+          <p className={cn("font-bold uppercase tracking-normal text-[#981915]", compact ? "text-[10px]" : "text-[10px] sm:text-xs")}>
+            Actual: J{currentRound}
           </p>
         </div>
-        <p className={cn("font-bold uppercase tracking-normal text-[#981915]", compact ? "text-[10px]" : "text-[10px] sm:text-xs")}>
-          Actual: J{currentRound}
-        </p>
-      </div>
+      ) : null}
 
-      <div className={cn("flex items-center gap-2", compact ? "mt-2" : "mt-3 sm:mt-4")}>
+      <div className={cn("flex items-center gap-2", !hideHeader && (compact ? "mt-2" : "mt-3 sm:mt-4"))}>
         <button
           type="button"
           disabled={value <= 1}
@@ -95,6 +103,7 @@ export function JornadaSelector({
             const round = index + 1;
             const isCurrent = round === currentRound;
             const isSelected = value === round;
+            const isPlayed = playedRounds?.has(round) ?? false;
 
             return (
               <button
@@ -103,8 +112,15 @@ export function JornadaSelector({
                 data-round={round}
                 onClick={() => onChange(round)}
                 className={cn(
-                  "relative h-10 min-w-10 shrink-0 rounded border-2 border-[#d43b2f] bg-[#fdf9f1] text-xs font-extrabold text-[#981915] transition hover:bg-red-50 sm:h-11 sm:min-w-11 sm:text-sm",
-                  isCurrent && "ring-2 ring-[#214C9B]/25 ring-offset-1",
+                  "relative h-10 min-w-10 shrink-0 rounded border-2 text-xs font-extrabold transition sm:h-11 sm:min-w-11 sm:text-sm",
+                  isPlayed
+                    ? isSelected
+                      ? "border-slate-500 bg-slate-400 text-white shadow-sm"
+                      : "border-slate-300 bg-slate-100 text-slate-500 hover:border-slate-400 hover:bg-slate-200"
+                    : isSelected
+                      ? "border-[#981915] bg-[#981915] text-white shadow-sm"
+                      : "border-[#d43b2f] bg-[#fdf9f1] text-[#981915] hover:bg-red-50",
+                  isCurrent && !isPlayed && "ring-2 ring-[#214C9B]/25 ring-offset-1",
                 )}
               >
                 {round}
