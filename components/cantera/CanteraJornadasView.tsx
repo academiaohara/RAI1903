@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { CanteraJornadaMatchesByDay } from "@/components/cantera/CanteraJornadaMatchesByDay";
+import { useJornadaRoundSelection } from "@/hooks/useJornadaRoundSelection";
 import { useEditedCanteraJornadasDataset } from "@/components/cantera/useEditedCanteraJornadasDataset";
 import { PublishCanteraFixturesButton } from "@/components/editor/PublishCanteraFixturesButton";
 import { Card } from "@/components/Card";
@@ -10,7 +11,6 @@ import { buildCanteraJornadasDataset, buildCanteraJornadasDatasetFromMatches } f
 import type { CanteraCmsScope } from "@/lib/cantera/cantera-cms";
 import type { Match } from "@/types";
 import { getCanteraPrimaryAvilesTeamId, type CanteraTeamId } from "@/lib/cantera-data";
-import type { JornadaRoundId } from "@/types/jornadas";
 
 type CanteraJornadasViewProps = {
   teamId: CanteraTeamId;
@@ -33,12 +33,15 @@ export function CanteraJornadasView({
     return buildCanteraJornadasDataset(teamId, resolvedClubTeamId);
   }, [filialMatches, resolvedClubTeamId, teamId]);
   const dataset = useEditedCanteraJornadasDataset(baseDataset, cmsScope);
-  const [manualRoundId, setManualRoundId] = useState<JornadaRoundId | null>(null);
-  const selectedRoundId = manualRoundId ?? dataset.currentRoundId;
-
-  const handleSelectRound = useCallback((roundId: JornadaRoundId) => {
-    setManualRoundId(roundId);
-  }, []);
+  const totalRounds = useMemo(() => {
+    if (dataset.rounds.length === 0) return 38;
+    return Math.max(...dataset.rounds.map((round) => round.roundNumber ?? 1));
+  }, [dataset.rounds]);
+  const { selectedRoundId, selectRound } = useJornadaRoundSelection(
+    dataset.matchdays,
+    totalRounds,
+    dataset.currentRoundId,
+  );
 
   const roundData = dataset.getRound(selectedRoundId);
   const { summary } = roundData;
@@ -52,7 +55,7 @@ export function CanteraJornadasView({
         <JornadaRoundCarousel
           rounds={dataset.rounds}
           selectedId={selectedRoundId}
-          onSelect={handleSelectRound}
+          onSelect={selectRound}
         />
         <PublishCanteraFixturesButton scope={cmsScope} />
       </div>

@@ -8,6 +8,7 @@ import { PredictionForm } from "@/components/PredictionForm";
 import { QuinielaRankingList } from "@/components/quiniela/QuinielaRankingList";
 import { QuinielaViewToggle } from "@/components/QuinielaViewToggle";
 import { useSeason } from "@/components/season/SeasonProvider";
+import { useGameJornadaRound } from "@/hooks/useGameJornadaRound";
 import { useQuinielaRoundRanking } from "@/hooks/useQuinielaRoundRanking";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
 import type { CompetitionSeasonId } from "@/data/mock";
@@ -36,7 +37,7 @@ function ResultadoBody({
   currentRound,
   totalRounds,
 }: ResultadoBodyProps) {
-  const [round, setRound] = useState(currentRound);
+  const { round, setRound } = useGameJornadaRound(matchdays, totalRounds, currentRound);
   const [view, setView] = useState<ResultadoView>("quiniela");
 
   const selectedMatchday = useMemo(() => getMatchdayByRound(matchdays, round), [matchdays, round]);

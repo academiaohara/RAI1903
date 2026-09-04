@@ -8,6 +8,7 @@ import { PageHero } from "@/components/PageHero";
 import { QuinigolTicket } from "@/components/juegos/GameTicket";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { useGameJornadaRound } from "@/hooks/useGameJornadaRound";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
 import type { CompetitionSeasonId } from "@/data/mock";
 import {
@@ -37,7 +38,7 @@ function QuinigolBody({ seasonId, matchdays, teams, currentRound, totalRounds, b
   const { alert } = useAppDialog();
   const { viewedSeason, getCompetitionConfig } = useSeason();
   const { canEdit: isCmsEditor } = useInlineEditing();
-  const [round, setRound] = useState(currentRound);
+  const { round, setRound } = useGameJornadaRound(matchdays, totalRounds, currentRound);
   const [predictions, setPredictions] = useState<Record<string, QuinigolPrediction>>({});
   const [savedRounds, setSavedRounds] = useState<Record<number, string>>({});
   const [userId, setUserId] = useState<string | null>(null);

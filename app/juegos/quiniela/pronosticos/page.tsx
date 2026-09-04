@@ -9,6 +9,7 @@ import { QuinielaTicket } from "@/components/juegos/GameTicket";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { QuinielaHowItWorks } from "@/components/QuinielaHowItWorks";
 import { useSeason } from "@/components/season/SeasonProvider";
+import { useGameJornadaRound } from "@/hooks/useGameJornadaRound";
 import { useQuinielaSeason } from "@/hooks/useQuinielaSeason";
 import { buildQuinielaScoringContext, getSupportedTeamSquad, scoringOptionsForMatch } from "@/lib/quiniela/scoring-context";
 import { quinielaRequiresAuth } from "@/lib/quiniela-storage";
@@ -73,7 +74,7 @@ function PronosticosBody({
       ),
     [bundles, getOverride, matchdays, supportedTeamId],
   );
-  const [round, setRound] = useState(currentRound);
+  const { round, setRound } = useGameJornadaRound(matchdays, totalRounds, currentRound);
   const [predictions, setPredictions] = useState<Record<string, Prediction>>({});
   const [savedRounds, setSavedRounds] = useState<Record<number, string>>({});
   const [userId, setUserId] = useState<string | null>(null);
