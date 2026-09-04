@@ -13,6 +13,7 @@ import {
   computeCalculatorStandings,
   countPendingMatches,
   countSimulatedMatches,
+  getFullyPlayedRounds,
   type SimulatedScores,
 } from "@/lib/league-calculator";
 import { cn } from "@/lib/utils";
@@ -55,15 +56,19 @@ export function LeagueCalculatorView() {
     () => countSimulatedMatches(matchdays, simulations),
     [matchdays, simulations],
   );
+  const playedRounds = useMemo(() => getFullyPlayedRounds(matchdays), [matchdays]);
 
   const handleScoreChange = useCallback((matchId: string, homeScore: number | null, awayScore: number | null) => {
     setSimulations((previous) => {
       const next = { ...previous };
-      if (homeScore === null || awayScore === null) {
+      if (homeScore === null && awayScore === null) {
         delete next[matchId];
         return next;
       }
-      next[matchId] = { homeScore, awayScore };
+      const entry: SimulatedScores[string] = {};
+      if (homeScore !== null) entry.homeScore = homeScore;
+      if (awayScore !== null) entry.awayScore = awayScore;
+      next[matchId] = entry;
       return next;
     });
   }, []);
@@ -78,16 +83,8 @@ export function LeagueCalculatorView() {
   return (
     <SectionUnderConstructionGate scope="masculino" section="competicion">
       <div className="space-y-6">
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0 space-y-2">
-            <h2 className="text-3xl font-extrabold uppercase tracking-tight text-[#981915] sm:text-4xl">
-              Calculadora
-            </h2>
-            <p className="max-w-2xl text-sm font-medium text-slate-600 sm:text-base">
-              Pon los marcadores de cada jornada y mira como queda la clasificacion final del Grupo I.
-            </p>
-            <p className="text-xs font-bold uppercase tracking-[0.08em] text-[#214C9B]">{tournamentLabel}</p>
-          </div>
+        <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs font-bold uppercase tracking-[0.08em] text-[#214C9B]">{tournamentLabel}</p>
 
           <button
             type="button"
@@ -139,6 +136,8 @@ export function LeagueCalculatorView() {
                   currentRound={currentRound}
                   onChange={setSelectedRound}
                   compact
+                  hideHeader
+                  playedRounds={playedRounds}
                 />
               </div>
 

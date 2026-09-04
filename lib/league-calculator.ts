@@ -8,20 +8,36 @@ import type { LeagueTiebreakContext } from "@/lib/rfef-rules/types";
 import type { Match, Matchday, Team } from "@/types";
 
 export type SimulatedScore = {
-  homeScore: number;
-  awayScore: number;
+  homeScore?: number;
+  awayScore?: number;
 };
 
 export type SimulatedScores = Record<string, SimulatedScore>;
 
-export function isValidSimulatedScore(score: SimulatedScore | undefined): score is SimulatedScore {
+export function isValidSimulatedScore(
+  score: SimulatedScore | undefined,
+): score is { homeScore: number; awayScore: number } {
   if (!score) return false;
+  const { homeScore, awayScore } = score;
   return (
-    Number.isInteger(score.homeScore) &&
-    Number.isInteger(score.awayScore) &&
-    score.homeScore >= 0 &&
-    score.awayScore >= 0
+    homeScore !== undefined &&
+    awayScore !== undefined &&
+    Number.isInteger(homeScore) &&
+    Number.isInteger(awayScore) &&
+    homeScore >= 0 &&
+    awayScore >= 0
   );
+}
+
+export function getFullyPlayedRounds(matchdays: Matchday[]): Set<number> {
+  const rounds = new Set<number>();
+  for (const matchday of matchdays) {
+    if (matchday.matches.length === 0) continue;
+    if (matchday.matches.every((match) => isMatchPlayed(match))) {
+      rounds.add(matchday.round);
+    }
+  }
+  return rounds;
 }
 
 export function applySimulationsToMatch(match: Match, simulations: SimulatedScores): Match {
