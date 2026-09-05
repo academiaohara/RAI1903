@@ -18,8 +18,8 @@ export function parseJornadaRoundNumber(roundId: JornadaRoundId): number {
 
 /**
  * Jornada seleccionada en la sección Jornadas (carrusel).
- * Avanza sola 48 h después del último pitido de una jornada completa,
- * salvo selección manual del usuario.
+ * Por defecto: jornada activa (primer pitido ya pasado o ventana de 24 h antes),
+ * o la siguiente si la anterior terminó hace al menos 48 h. Respeta selección manual.
  */
 export function useJornadaRoundSelection(
   matchdays: Matchday[],
