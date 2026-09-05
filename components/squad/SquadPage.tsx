@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
+import { useAppDialog } from "@/components/AppDialogProvider";
 import { AnimatePresence, motion } from "framer-motion";
 import type { SquadPlayer, SquadViewMode } from "@/types/squad";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
@@ -18,7 +19,7 @@ import {
 import { getRaiTeamId } from "@/lib/fixtures";
 import { resolveSquadClubInfo } from "@/lib/season/squad-source";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
-import { defaultRosterEstado, splitSquadByAvailability } from "@/lib/squad-utils";
+import { defaultRosterEstado, getPlayerFullName, splitSquadByAvailability } from "@/lib/squad-utils";
 import { SquadHeader } from "@/components/squad/SquadHeader";
 import { SquadToolbar } from "@/components/squad/SquadToolbar";
 import { SquadAvailability } from "@/components/squad/SquadAvailability";
@@ -58,6 +59,7 @@ export function SquadPage({ gender }: SquadPageProps) {
   const { squad, updatePlayer, addPlayer, removePlayer, importSquad } = useSquadPlayers(gender, statsCompetitionFilter);
   const { averages: fanRatings, loading: fanRatingsLoading } = useSeasonPlayerRatings();
   const { editMode, getValue } = useInlineEditing();
+  const { confirm } = useAppDialog();
   const [addBusy, setAddBusy] = useState(false);
   const [stadiumOverride, setStadiumOverride] = useState<StadiumInfo | null>(null);
   const clubStats = useMemo(() => {
@@ -148,6 +150,20 @@ export function SquadPage({ gender }: SquadPageProps) {
     [importSquad],
   );
 
+  const handleRemovePlayer = useCallback(
+    async (playerId: string) => {
+      const player = squad.find((entry) => entry.id === playerId);
+      const playerName = player ? getPlayerFullName(player) : "esta jugadora";
+      const confirmed = await confirm(`¿Eliminar a ${playerName} de la plantilla? No se puede deshacer.`, {
+        confirmLabel: "Eliminar",
+      });
+      if (!confirmed) return;
+      await removePlayer(playerId);
+      setSelected(null);
+    },
+    [confirm, removePlayer, squad],
+  );
+
   const stadiumModalOpen = stadiumOpen && !editMode;
   const stadiumEditorOpen = stadiumOpen && editMode;
 
@@ -212,6 +228,7 @@ export function SquadPage({ gender }: SquadPageProps) {
               editMode={editMode}
               inlineStatsEdit={isFemenino}
               onQuickUpdate={editMode ? handleQuickUpdate : undefined}
+              onRemove={editMode && isFemenino ? (playerId) => void handleRemovePlayer(playerId) : undefined}
             />
           ) : (
             <PlayerGrid
@@ -233,7 +250,7 @@ export function SquadPage({ gender }: SquadPageProps) {
           player={selectedPlayer}
           onClose={() => setSelected(null)}
           onUpdate={updatePlayer}
-          onRemove={editMode ? (playerId) => void removePlayer(playerId).then(() => setSelected(null)) : undefined}
+          onRemove={editMode ? (playerId) => void handleRemovePlayer(playerId) : undefined}
         />
       ) : null}
       {!isFemenino && <StandingsEvolutionChart />}

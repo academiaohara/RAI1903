@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import type { SquadPlayer, SquadPosition } from "@/types/squad";
 import { SQUAD_POSITIONS, SQUAD_ROLE_CODES, SQUAD_SECTION_LABELS, SQUAD_SECTIONS } from "@/types/squad";
@@ -29,6 +30,7 @@ type PlayerTableProps = {
   inlineStatsEdit?: boolean;
   fanRatings?: Record<string, PlayerRatingAverage>;
   onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
+  onRemove?: (playerId: string) => void;
 };
 
 type SquadStatKey = "partidos" | "goles" | "asistencias" | "amarillas" | "rojas";
@@ -68,6 +70,7 @@ export function PlayerTable({
   inlineStatsEdit = false,
   fanRatings,
   onQuickUpdate,
+  onRemove,
 }: PlayerTableProps) {
   const [mobileDataView, setMobileDataView] = useState<MobileDataView>("stats");
   const grouped = groupPlayersBySquadSection(players);
@@ -94,7 +97,10 @@ export function PlayerTable({
     <div className="space-y-5 md:space-y-10">
       {inlineStatsEdit && editMode ? (
         <p className="text-sm text-slate-600">
-          <span className="text-[#981915]">Edita dorsal, nombre, posición y estadísticas directamente en la tabla.</span>
+          <span className="text-[#981915]">
+            Edita dorsal, nombre, posición y estadísticas directamente en la tabla.
+            {onRemove ? " Usa el icono de papelera para eliminar jugadoras." : null}
+          </span>
         </p>
       ) : null}
       <MobileDataToggle value={mobileDataView} onChange={setMobileDataView} />
@@ -121,12 +127,18 @@ export function PlayerTable({
                           {col.label}
                         </th>
                       ))}
+                      {inlineStatsEdit && editMode && onRemove ? (
+                        <th className={`${cellPad} ${alignClass.center}`} aria-label="Acciones" />
+                      ) : null}
                     </tr>
                   </thead>
                   <tbody>
                     {list.length === 0 ? (
                       <tr>
-                        <td colSpan={columns.length + 1} className="px-4 py-6 text-center text-sm font-semibold text-slate-400">
+                        <td
+                          colSpan={columns.length + 1 + (inlineStatsEdit && editMode && onRemove ? 1 : 0)}
+                          className="px-4 py-6 text-center text-sm font-semibold text-slate-400"
+                        >
                           Sin jugadores en esta posición
                         </td>
                       </tr>
@@ -144,6 +156,7 @@ export function PlayerTable({
                           editMode={editMode}
                           inlineStatsEdit={inlineStatsEdit}
                           onQuickUpdate={onQuickUpdate}
+                          onRemove={onRemove}
                         />
                       ))
                     )}
@@ -172,6 +185,7 @@ export function PlayerTable({
                       editMode={editMode}
                       inlineStatsEdit={inlineStatsEdit}
                       onQuickUpdate={onQuickUpdate}
+                      onRemove={onRemove}
                     />
                   ))
                 )}
@@ -199,6 +213,7 @@ function PlayerRow({
   editMode,
   inlineStatsEdit,
   onQuickUpdate,
+  onRemove,
 }: {
   player: SquadPlayer;
   onSelect?: (player: SquadPlayer) => void;
@@ -210,6 +225,7 @@ function PlayerRow({
   editMode?: boolean;
   inlineStatsEdit?: boolean;
   onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
+  onRemove?: (playerId: string) => void;
 }) {
   const interactive = Boolean(onSelect);
   const canInlineEdit = inlineStatsEdit && editMode && onQuickUpdate;
@@ -328,6 +344,18 @@ function PlayerRow({
             aria-label="Contrato"
           />
         </td>
+        {onRemove ? (
+          <td className={`${cellPad} ${alignClass.center}`}>
+            <button
+              type="button"
+              onClick={() => onRemove(player.id)}
+              className="inline-flex rounded-lg p-1.5 text-[#981915] transition hover:bg-red-50"
+              aria-label={`Eliminar a ${getPlayerFullName(player)}`}
+            >
+              <Trash2 size={16} aria-hidden />
+            </button>
+          </td>
+        ) : null}
       </motion.tr>
     );
   }
@@ -418,6 +446,7 @@ function PlayerMobileRow({
   editMode,
   inlineStatsEdit,
   onQuickUpdate,
+  onRemove,
 }: {
   player: SquadPlayer;
   onSelect?: (player: SquadPlayer) => void;
@@ -428,6 +457,7 @@ function PlayerMobileRow({
   editMode?: boolean;
   inlineStatsEdit?: boolean;
   onQuickUpdate?: (playerId: string, patch: Partial<SquadPlayer>) => void;
+  onRemove?: (playerId: string) => void;
 }) {
   const canInlineEdit = inlineStatsEdit && editMode && onQuickUpdate;
   const canQuickEdit = !inlineStatsEdit && editMode && onQuickUpdate;
@@ -511,6 +541,17 @@ function PlayerMobileRow({
           className={`${inlineFieldClass} w-full text-[10px]`}
           aria-label="Contrato"
         />
+        {onRemove ? (
+          <button
+            type="button"
+            onClick={() => onRemove(player.id)}
+            className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-[10px] font-extrabold uppercase text-[#981915] hover:bg-red-50"
+            aria-label={`Eliminar a ${getPlayerFullName(player)}`}
+          >
+            <Trash2 size={14} aria-hidden />
+            Eliminar
+          </button>
+        ) : null}
       </motion.div>
     );
   }
