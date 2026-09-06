@@ -8,6 +8,7 @@ import { MatchBanner } from "@/components/home/MatchBanner";
 import { SectionUnderConstructionGate } from "@/components/season/SectionUnderConstructionGate";
 import { useSeason } from "@/components/season/SeasonProvider";
 import { usePrimerEquipoLeagueSeason } from "@/hooks/usePrimerEquipoLeagueSeason";
+import { useEditedCanteraMatches } from "@/hooks/useEditedCanteraMatches";
 import { useSeasonMatchArticles } from "@/hooks/useSeasonMatchArticles";
 import { resolveCanteraSeasonData } from "@/lib/cantera/cantera-season-data";
 import type { CanteraCmsScope } from "@/lib/cantera/cantera-cms";
@@ -106,13 +107,14 @@ function useCanteraHomeMatches(scope: CanteraCmsScope) {
     () => resolveCanteraSeasonData(scope, bundles, viewedSeason.label),
     [scope, bundles, viewedSeason.label],
   );
+  const editedCalendar = useEditedCanteraMatches(data.calendar, scope);
   const latestMatch = useMemo(
-    () => latestMatchesBeforeToday(data.calendar, 1)[0],
-    [data.calendar],
+    () => latestMatchesBeforeToday(editedCalendar, 1)[0],
+    [editedCalendar],
   );
   const nextMatch = useMemo(
-    () => upcomingMatchesAfterToday(data.calendar, 1)[0],
-    [data.calendar],
+    () => upcomingMatchesAfterToday(editedCalendar, 1)[0],
+    [editedCalendar],
   );
   const href = (scope === "filial" ? "/cantera/filial" : "/cantera/juvenil-a") as Route;
 
