@@ -13,13 +13,30 @@ function enrichSquadPhotos(players: SquadPlayer[]): SquadPlayer[] {
   return players.map(withSquadPlayerPhoto);
 }
 
+function squadFromBundles(bundles: SeasonBundlesMap | undefined, gender: PrimerEquipoGender): SquadPlayer[] | null {
+  const bundle = getSquadBundle(bundles ?? {}, gender);
+  if (bundle?.players?.length) return enrichSquadPhotos(bundle.players);
+  return null;
+}
+
+/** Resuelve plantilla del primer equipo desde bundles CMS (síncrono). */
+export function resolveSquadPlayersSync(
+  gender: PrimerEquipoGender,
+  bundles?: SeasonBundlesMap,
+): SquadPlayer[] {
+  const fromBundles = squadFromBundles(bundles, gender);
+  if (fromBundles) return fromBundles;
+  if (shouldUseMockCompetitionFallback()) return enrichSquadPhotos(getSquadPlayers(gender));
+  return [];
+}
+
 export async function resolveSquadPlayers(
   gender: PrimerEquipoGender,
   seasonId: string,
   bundles: SeasonBundlesMap,
 ): Promise<SquadPlayer[]> {
-  const bundle = getSquadBundle(bundles, gender);
-  if (bundle?.players?.length) return enrichSquadPhotos(bundle.players);
+  const fromBundles = squadFromBundles(bundles, gender);
+  if (fromBundles) return fromBundles;
 
   const fromCms = await fetchSquadPlayersFromCms(gender, seasonId);
   if (fromCms.length) return enrichSquadPhotos(fromCms);

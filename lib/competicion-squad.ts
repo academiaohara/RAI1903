@@ -7,8 +7,11 @@ import {
   getImportedRivalSquad,
 } from "@/lib/rival-squad-imports";
 import { getRivalSquad, type RivalPlayer } from "@/lib/rival-squads";
-import { getSquadClubInfo, getSquadPlayers } from "@/lib/squad-data";
+import { getSquadBundle } from "@/lib/cms/season-bundles";
+import { getSquadClubInfo } from "@/lib/squad-data";
 import { getSquadPlayerPhoto, getStadiumPhoto } from "@/lib/squad-photos";
+import { shouldUseMockCompetitionFallback } from "@/lib/season/cms-data-policy";
+import { resolveSquadPlayersSync } from "@/lib/season/squad-source";
 import { getTeamCrestById } from "@/lib/team-crests";
 import type { PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Team } from "@/types";
@@ -124,19 +127,46 @@ export function isRaiCompetitionTeam(teamId: string, gender: PrimerEquipoGender)
   return gender === "femenino" ? teamId === RAI_FEM_TEAM_ID : teamId === RAI_TEAM_ID;
 }
 
-export function getCompeticionSquadData(
+function buildOwnClubClubInfo(
+  gender: PrimerEquipoGender,
+  bundles: SeasonBundlesMap | undefined,
+  seasonLabel: string,
+  squadSize: number,
+): SquadClubInfo {
+  const baseClub = getSquadClubInfo(gender);
+  const bundleClub = getSquadBundle(bundles ?? {}, gender)?.clubInfo;
+  return {
+    ...baseClub,
+    ...bundleClub,
+    estadioInfo: {
+      ...baseClub.estadioInfo,
+      ...bundleClub?.estadioInfo,
+    },
+    temporada: bundleClub?.temporada ?? seasonLabel,
+    jugadores: squadSize,
+  };
+}
+
+function getOwnClubSquadData(
   gender: PrimerEquipoGender,
   team: Team,
-  bundles?: SeasonBundlesMap,
-  seasonLabel = "2025/26",
-): { club: SquadClubInfo; squad: SquadPlayer[]; isOwnClub: boolean } {
-  const isOwnClub = isRaiCompetitionTeam(team.id, gender);
-  const cmsRival = !isOwnClub ? getCmsRivalSquad(bundles, gender, team.id) : null;
-  const imported = cmsRival ?? getImportedRivalSquad(team.id);
+  bundles: SeasonBundlesMap | undefined,
+  seasonLabel: string,
+): { club: SquadClubInfo; squad: SquadPlayer[]; isOwnClub: true } {
+  const bundlePlayers = getSquadBundle(bundles ?? {}, gender)?.players;
+  if (bundlePlayers?.length) {
+    const squad = resolveSquadPlayersSync(gender, bundles);
+    return {
+      club: buildOwnClubClubInfo(gender, bundles, seasonLabel, squad.length),
+      squad,
+      isOwnClub: true,
+    };
+  }
 
+  const imported = getImportedRivalSquad(team.id);
   if (imported) {
     const squad =
-      isOwnClub && gender === "masculino"
+      gender === "masculino"
         ? buildSquadFromImport(team, imported).map((player) => ({
             ...player,
             foto: getSquadPlayerPhoto(player.dorsal),
@@ -144,17 +174,48 @@ export function getCompeticionSquadData(
         : buildSquadFromImport(team, imported);
 
     return {
-      club: isOwnClub ? getSquadClubInfo(gender) : buildClubInfoFromImport(team, imported, seasonLabel),
+      club: buildOwnClubClubInfo(gender, bundles, seasonLabel, squad.length),
       squad,
-      isOwnClub,
+      isOwnClub: true,
     };
   }
 
-  if (isOwnClub) {
+  if (shouldUseMockCompetitionFallback()) {
+    const squad = resolveSquadPlayersSync(gender, bundles);
     return {
-      club: getSquadClubInfo(gender),
-      squad: getSquadPlayers(gender),
+      club: buildOwnClubClubInfo(gender, bundles, seasonLabel, squad.length),
+      squad,
       isOwnClub: true,
+    };
+  }
+
+  return {
+    club: buildOwnClubClubInfo(gender, bundles, seasonLabel, 0),
+    squad: [],
+    isOwnClub: true,
+  };
+}
+
+export function getCompeticionSquadData(
+  gender: PrimerEquipoGender,
+  team: Team,
+  bundles?: SeasonBundlesMap,
+  seasonLabel = "2025/26",
+): { club: SquadClubInfo; squad: SquadPlayer[]; isOwnClub: boolean } {
+  const isOwnClub = isRaiCompetitionTeam(team.id, gender);
+
+  if (isOwnClub) {
+    return getOwnClubSquadData(gender, team, bundles, seasonLabel);
+  }
+
+  const cmsRival = getCmsRivalSquad(bundles, gender, team.id);
+  const imported = cmsRival ?? getImportedRivalSquad(team.id);
+
+  if (imported) {
+    return {
+      club: buildClubInfoFromImport(team, imported, seasonLabel),
+      squad: buildSquadFromImport(team, imported),
+      isOwnClub: false,
     };
   }
 
