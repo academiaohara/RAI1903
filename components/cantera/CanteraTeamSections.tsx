@@ -24,7 +24,12 @@ import {
   type CanteraTeamId,
 } from "@/lib/cantera-data";
 import { getCanteraSquadImport } from "@/lib/cantera-squad";
+import {
+  buildFilialCalendarMatches,
+  buildFilialStandingsFromMatches,
+} from "@/lib/cantera/filial-season-data";
 import { useCanteraSquadStatUpdate } from "@/hooks/useCanteraSquadStatUpdate";
+import { useEditedCanteraMatches } from "@/hooks/useEditedCanteraMatches";
 import { academyTeams } from "@/data/mock";
 
 const baseSections = [
@@ -88,23 +93,29 @@ export function CanteraTeamSections({ teamId, cmsScope: cmsScopeProp }: CanteraT
       : staticTeam?.category ?? "";
   const seasonLabel = isCmsBacked && canteraSeason ? canteraSeason.seasonLabel : "2025/26";
 
-  const standings = useMemo(() => {
-    if (isCmsBacked && canteraSeason) return canteraSeason.standings;
-    return getCanteraStandings(teamId);
-  }, [canteraSeason, isCmsBacked, teamId]);
+  const editedAllMatches = useEditedCanteraMatches(
+    canteraSeason?.allMatches ?? [],
+    cmsScope ?? "filial",
+  );
 
-  const calendarMatches = useMemo(() => {
-    const source =
-      isCmsBacked && canteraSeason ? canteraSeason.calendar : staticTeam?.calendar ?? [];
-    return matchesToCanteraCalendarMatches(source, avilesTeamId);
-  }, [avilesTeamId, canteraSeason, isCmsBacked, staticTeam?.calendar]);
+  const standings = useMemo(() => {
+    if (isCmsBacked && canteraSeason && cmsScope) {
+      return buildFilialStandingsFromMatches(editedAllMatches, canteraSeason.config);
+    }
+    return getCanteraStandings(teamId);
+  }, [canteraSeason, cmsScope, editedAllMatches, isCmsBacked, teamId]);
 
   const clasificacionCalendar = useMemo(() => {
-    if (isCmsBacked && canteraSeason) {
-      return canteraSeason.calendar;
+    if (isCmsBacked && canteraSeason && cmsScope) {
+      return buildFilialCalendarMatches(editedAllMatches, avilesTeamId);
     }
     return getCanteraCalendar(teamId);
-  }, [canteraSeason, isCmsBacked, teamId]);
+  }, [avilesTeamId, canteraSeason, cmsScope, editedAllMatches, isCmsBacked, teamId]);
+
+  const calendarMatches = useMemo(
+    () => matchesToCanteraCalendarMatches(clasificacionCalendar, avilesTeamId),
+    [avilesTeamId, clasificacionCalendar],
+  );
 
   if (!isCmsBacked && !staticTeam) return null;
   if (isCmsBacked && !canteraSeason) return null;
