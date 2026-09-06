@@ -13,7 +13,8 @@
     "sync:escudos": "node --experimental-strip-types scripts/sync-escudos-manifest.ts",
     "sync:estadios": "node --experimental-strip-types scripts/sync-stadium-manifest.ts",
     "import:assets": "node --experimental-strip-types scripts/import-uploaded-assets.ts && npm run sync:escudos && npm run sync:estadios",
-    "seed:cms": "npx --yes tsx scripts/seed-cms-season.ts"
+    "seed:cms": "npx --yes tsx scripts/seed-cms-season.ts",
+    "vercel:prune": "npx --yes tsx scripts/prune-vercel-deployments.ts"
   },
   "keywords": [],
   "author": "",
