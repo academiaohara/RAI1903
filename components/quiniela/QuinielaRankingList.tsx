@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { RankingPodiumEditorShare } from "@/components/juegos/RankingPodiumEditorShare";
 import { RankingRow } from "@/components/juegos/RankingRow";
 import { YourRankingPosition } from "@/components/juegos/YourRankingPosition";
 import { Pagination } from "@/components/Pagination";
@@ -23,6 +24,8 @@ type QuinielaRankingListProps = {
   currentRound: number;
   initialModalRound?: number;
   countPoints?: boolean;
+  scope?: "round" | "season";
+  round?: number;
 };
 
 export function QuinielaRankingList({
@@ -37,6 +40,8 @@ export function QuinielaRankingList({
   currentRound,
   initialModalRound,
   countPoints = true,
+  scope = "round",
+  round = initialModalRound ?? currentRound,
 }: QuinielaRankingListProps) {
   const pagination = usePagination(entries);
   const currentUserId = useCurrentUserId();
@@ -50,6 +55,17 @@ export function QuinielaRankingList({
 
   return (
     <>
+      <RankingPodiumEditorShare
+        className="mb-3 sm:mb-4"
+        gameKind="quiniela"
+        scope={scope}
+        round={round}
+        seasonLabel={seasonLabel}
+        competitionLabel={competitionLabel}
+        entries={entries}
+        countPoints={countPoints}
+      />
+
       <YourRankingPosition
         className="mb-3 sm:mb-4"
         entries={entries}

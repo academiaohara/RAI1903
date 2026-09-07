@@ -61,6 +61,8 @@ export default function QuinigolRankingPage() {
             totalRounds={totalRounds}
             currentRound={currentRound}
             initialModalRound={round}
+            scope={scope}
+            round={round}
             emptyMessage={
               isSupabaseConfigured()
                 ? `Aún no hay quinigoles puntuables hasta la jornada ${round}.`

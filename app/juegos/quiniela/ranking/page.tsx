@@ -63,6 +63,8 @@ export default function QuinielaRankingPage() {
             totalRounds={totalRounds}
             currentRound={currentRound}
             initialModalRound={round}
+            scope={scope}
+            round={round}
             emptyMessage={
               isSupabaseConfigured()
                 ? `Aún no hay quinielas puntuables hasta la jornada ${round}.`
