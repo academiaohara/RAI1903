@@ -169,13 +169,12 @@ export function RankingPodiumEditorShare({
   entries,
   countPoints = true,
   className,
-  enabled,
 }: RankingPodiumEditorShareProps) {
   const { editMode } = useInlineEditing();
   const podiumRef = useRef<HTMLDivElement>(null);
   const [sharing, setSharing] = useState(false);
 
-  if (!(enabled ?? editMode) || entries.length < 3) return null;
+  if (!editMode || entries.length < 3) return null;
 
   const topThree = entries.slice(0, 3);
   const contextLabel = buildRankingPodiumContextLabel(scope, round);
