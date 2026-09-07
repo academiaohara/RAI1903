@@ -2,6 +2,7 @@ import { toPng } from "html-to-image";
 import type { GameModeId } from "@/lib/juegos";
 import { GAME_MODE_LABELS } from "@/lib/juegos";
 import type { RankingListEntry } from "@/lib/ranking-display";
+import { inlineImagesForCapture } from "@/lib/share-image-inline";
 
 const RANKING_PODIUM_EXPORT_WIDTH = 720;
 
@@ -54,12 +55,18 @@ function prepareCaptureNode(node: HTMLElement): HTMLElement {
   return captureNode;
 }
 
+async function prepareCaptureNodeWithImages(node: HTMLElement): Promise<HTMLElement> {
+  const captureNode = prepareCaptureNode(node);
+  await inlineImagesForCapture(captureNode);
+  return captureNode;
+}
+
 export async function captureRankingPodium(node: HTMLElement): Promise<Blob> {
   const podiumElement = resolvePodiumElement(node);
   await waitForImages(podiumElement);
   await waitForFonts();
   const captureRoot = document.createElement("div");
-  const captureNode = prepareCaptureNode(node);
+  const captureNode = await prepareCaptureNodeWithImages(node);
   captureNode.classList.add("ranking-podium--capture");
   captureRoot.setAttribute("aria-hidden", "true");
   captureRoot.style.position = "fixed";
@@ -170,7 +177,7 @@ export function buildRankingPodiumShareText({
     })
     .join(" · ");
 
-  return `Podio ${gameLabel} · ${contextLabel}\n${leaders}\n\n${footerUrl}`;
+  return `TOP 3 ${gameLabel} · ${contextLabel}\n${leaders}\n\n${footerUrl}`;
 }
 
 export function getRankingPodiumFooterUrl(gameKind: GameModeId): string {
