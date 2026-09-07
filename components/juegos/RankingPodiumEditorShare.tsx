@@ -15,6 +15,7 @@ import {
   shareRankingPodiumOnX,
 } from "@/lib/ranking-podium-share";
 import type { RankingListEntry } from "@/lib/ranking-display";
+import { getShareImageSrc } from "@/lib/share-image-inline";
 import { cn } from "@/lib/utils";
 
 type RankingPodiumEditorShareProps = {
@@ -52,12 +53,20 @@ function PodiumAvatar({
   size: "lg" | "md";
 }) {
   const initial = handle.replace(/^@/, "").charAt(0).toUpperCase() || "?";
+  const resolvedAvatarUrl = getShareImageSrc(avatarUrl);
 
   return (
     <span className={cn("ranking-podium-avatar", size === "lg" && "ranking-podium-avatar--lg")}>
-      {avatarUrl ? (
+      {resolvedAvatarUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={avatarUrl} alt="" className="ranking-podium-avatar-image" />
+        <img
+          src={resolvedAvatarUrl}
+          alt=""
+          loading="eager"
+          decoding="sync"
+          data-fallback-initial={initial}
+          className="ranking-podium-avatar-image"
+        />
       ) : (
         <span className="ranking-podium-avatar-fallback">{initial}</span>
       )}
@@ -110,7 +119,7 @@ function HiddenRankingPodium({
 
         <div className="ranking-podium-title">
           <span className="ranking-podium-title-eyebrow">{gameLabel}</span>
-          <strong>Podio del ranking</strong>
+          <strong>TOP 3</strong>
         </div>
 
         <div className="ranking-podium-stage">
@@ -160,12 +169,13 @@ export function RankingPodiumEditorShare({
   entries,
   countPoints = true,
   className,
+  enabled,
 }: RankingPodiumEditorShareProps) {
   const { editMode } = useInlineEditing();
   const podiumRef = useRef<HTMLDivElement>(null);
   const [sharing, setSharing] = useState(false);
 
-  if (!editMode || entries.length < 3) return null;
+  if (!(enabled ?? editMode) || entries.length < 3) return null;
 
   const topThree = entries.slice(0, 3);
   const contextLabel = buildRankingPodiumContextLabel(scope, round);
