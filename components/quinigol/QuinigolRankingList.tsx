@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { RankingPodiumShare } from "@/components/juegos/RankingPodiumShare";
 import { RankingRow } from "@/components/juegos/RankingRow";
 import { YourRankingPosition } from "@/components/juegos/YourRankingPosition";
 import { Pagination } from "@/components/Pagination";
@@ -23,6 +24,8 @@ type QuinigolRankingListProps = {
   currentRound: number;
   initialModalRound?: number;
   countPoints?: boolean;
+  scope?: "round" | "season";
+  round?: number;
 };
 
 export function QuinigolRankingList({
@@ -37,6 +40,8 @@ export function QuinigolRankingList({
   currentRound,
   initialModalRound,
   countPoints = true,
+  scope = "round",
+  round = initialModalRound ?? currentRound,
 }: QuinigolRankingListProps) {
   const pagination = usePagination(entries);
   const currentUserId = useCurrentUserId();
@@ -50,6 +55,17 @@ export function QuinigolRankingList({
 
   return (
     <>
+      <RankingPodiumShare
+        className="mb-4 sm:mb-5"
+        gameKind="quinigol"
+        scope={scope}
+        round={round}
+        seasonLabel={seasonLabel}
+        competitionLabel={competitionLabel}
+        entries={entries}
+        countPoints={countPoints}
+      />
+
       <YourRankingPosition
         className="mb-3 sm:mb-4"
         entries={entries}
