@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { RankingPodiumShare } from "@/components/juegos/RankingPodiumShare";
+import { RankingPodiumEditorShare } from "@/components/juegos/RankingPodiumEditorShare";
 import { RankingRow } from "@/components/juegos/RankingRow";
 import { YourRankingPosition } from "@/components/juegos/YourRankingPosition";
 import { Pagination } from "@/components/Pagination";
@@ -55,8 +55,8 @@ export function QuinielaRankingList({
 
   return (
     <>
-      <RankingPodiumShare
-        className="mb-4 sm:mb-5"
+      <RankingPodiumEditorShare
+        className="mb-3 sm:mb-4"
         gameKind="quiniela"
         scope={scope}
         round={round}

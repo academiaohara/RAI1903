@@ -2871,6 +2871,38 @@ a {
   margin-bottom: 1rem;
 }
 
+.ranking-podium-editor-share {
+  margin-bottom: 0.75rem;
+}
+
+.ranking-podium-editor-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 0.75rem;
+  border: 1px dashed rgba(33, 76, 155, 0.28);
+  border-radius: 0.85rem;
+  background: rgba(33, 76, 155, 0.05);
+  padding: 0.65rem 0.75rem;
+}
+
+.ranking-podium-editor-label {
+  color: #214c9b;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ranking-podium-wrap--capture-source {
+  position: fixed;
+  top: 0;
+  left: -10000px;
+  pointer-events: none;
+  z-index: -1;
+}
+
 .ranking-podium-wrap {
   overflow: hidden;
   border-radius: 1rem;

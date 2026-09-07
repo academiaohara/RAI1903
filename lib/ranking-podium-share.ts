@@ -106,28 +106,6 @@ function openXIntent(text: string) {
   window.open(url, "_blank", "noopener,noreferrer");
 }
 
-export async function shareRankingPodium({ node, fileName, shareText }: RankingPodiumShareOptions) {
-  const blob = await captureRankingPodium(node);
-  const file = new File([blob], fileName, { type: "image/png" });
-  const payload = { text: shareText, files: [file] };
-
-  if (
-    typeof navigator !== "undefined" &&
-    navigator.share &&
-    (!navigator.canShare || navigator.canShare(payload))
-  ) {
-    try {
-      await navigator.share(payload);
-      return;
-    } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") return;
-    }
-  }
-
-  downloadBlob(blob, fileName);
-  openXIntent(`${shareText}\n\n(Adjunta la imagen que acabamos de descargar)`);
-}
-
 export async function shareRankingPodiumOnX(options: RankingPodiumShareOptions) {
   const blob = await captureRankingPodium(options.node);
   downloadBlob(blob, options.fileName);
