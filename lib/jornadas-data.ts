@@ -9,7 +9,7 @@ import { extractKickoffTimeUtc } from "@/lib/match-kickoff-time";
 import { PLACEHOLDER_MATCH_DATE } from "@/lib/competition/normalize-fixtures";
 import { isMatchPlayed } from "@/lib/match-result";
 import { getTeam } from "@/lib/fixtures";
-import { getActiveJornadaRound } from "@/lib/juegos/default-jornada-round";
+import { computeDefaultGameRound } from "@/lib/juegos/default-jornada-round";
 import { isClubTeamMatch, resolveClubSideInMatch } from "@/lib/season/club-team-ids";
 import type { Match, Matchday } from "@/types";
 import type {
@@ -213,7 +213,7 @@ function matchdayByRound(matchdaysList: Matchday[], round: number): Matchday | u
 function resolveJornadasCurrentRound(matchdays: Matchday[]): number {
   const totalRounds =
     matchdays.length > 0 ? Math.max(...matchdays.map((matchday) => matchday.round)) : 38;
-  return getActiveJornadaRound(matchdays, totalRounds);
+  return computeDefaultGameRound(matchdays, totalRounds, 1);
 }
 
 function buildFemeninoJornadasDataset(
