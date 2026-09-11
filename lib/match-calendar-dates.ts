@@ -35,6 +35,17 @@ export function isMatchDateAfterToday(dateIso: string, now: Date = new Date()): 
   return spainCalendarDayKey(dateIso) > spainTodayKey(now);
 }
 
+/** Día siguiente al de hoy en hora peninsular. */
+export function spainTomorrowKey(now: Date = new Date()): string {
+  return spainTodayKey(new Date(now.getTime() + 24 * 60 * 60 * 1000));
+}
+
+/** Día del partido coincide con mañana (hora peninsular). */
+export function isMatchDateTomorrow(dateIso: string, now: Date = new Date()): boolean {
+  if (!isSchedulableMatchDate(dateIso)) return false;
+  return spainCalendarDayKey(dateIso) === spainTomorrowKey(now);
+}
+
 type MatchListEntry = {
   date: string;
   status?: MatchStatus;

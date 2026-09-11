@@ -1,10 +1,12 @@
+import { isPlaceholderMatch } from "@/lib/competition/normalize-fixtures";
+import { isMatchDateToday, isMatchDateTomorrow } from "@/lib/match-calendar-dates";
+import { isMatchPlayed } from "@/lib/match-result";
 import {
   getFirstKickoff,
   getMatchdayByRound,
   hasFirstMatchStarted,
-  isMatchdayFullyFinished,
 } from "@/lib/quiniela";
-import type { Matchday } from "@/types";
+import type { Match, Matchday } from "@/types";
 
 /** Tiempo tras el cierre de una jornada antes de pasar a la siguiente por defecto. */
 export const GAME_JORNADA_AUTO_ADVANCE_MS = 48 * 60 * 60 * 1000;
@@ -12,12 +14,32 @@ export const GAME_JORNADA_AUTO_ADVANCE_MS = 48 * 60 * 60 * 1000;
 /** Antelación con la que se muestra la siguiente jornada antes de su primer pitido. */
 export const JORNADA_PREVIEW_BEFORE_MS = 24 * 60 * 60 * 1000;
 
-function getMatchdayLastKickoff(matchday: Matchday): Date {
+function getSchedulableMatches(matchday: Matchday): Match[] {
+  return matchday.matches.filter((match) => !isPlaceholderMatch(match));
+}
+
+/** Partidos cuyo pitido ya debería haber pasado (ignora fechas futuras adelantadas en el CMS). */
+function getElapsedMatches(matchday: Matchday, now: Date): Match[] {
+  return getSchedulableMatches(matchday).filter(
+    (match) => new Date(match.date).getTime() <= now.getTime(),
+  );
+}
+
+function getMatchdayLastKickoff(matchday: Matchday, now: Date): Date {
   const first = getFirstKickoff(matchday);
   if (first.getFullYear() >= 2099) return first;
 
-  const dates = matchday.matches.map((match) => new Date(match.date).getTime());
+  const elapsed = getElapsedMatches(matchday, now);
+  const pool = elapsed.length > 0 ? elapsed : getSchedulableMatches(matchday);
+  const dates = pool.map((match) => new Date(match.date).getTime());
   return new Date(Math.max(...dates));
+}
+
+/** Todos los partidos ya disputados de la jornada tienen resultado. */
+function isMatchdayElapsedFinished(matchday: Matchday, now: Date): boolean {
+  const elapsed = getElapsedMatches(matchday, now);
+  if (elapsed.length === 0) return false;
+  return elapsed.every((match) => isMatchPlayed(match));
 }
 
 function clampRound(round: number, totalRounds: number): number {
@@ -30,12 +52,14 @@ function isSchedulableKickoff(date: Date): boolean {
 
 function isWithinPreviewWindow(firstKickoff: Date, now: Date, previewBeforeMs: number): boolean {
   if (!isSchedulableKickoff(firstKickoff)) return false;
+  const iso = firstKickoff.toISOString();
+  if (isMatchDateToday(iso, now) || isMatchDateTomorrow(iso, now)) return true;
   return now.getTime() >= firstKickoff.getTime() - previewBeforeMs;
 }
 
 /**
  * Jornada activa según calendario: la última cuya primera fecha ya pasó o cuya
- * siguiente está a menos de `previewBeforeMs` del primer pitido.
+ * siguiente es hoy/mañana (hora peninsular) o entra en la ventana de 24 h previa.
  */
 export function getActiveJornadaRound(
   matchdays: Matchday[],
@@ -65,7 +89,8 @@ export function getActiveJornadaRound(
 /**
  * Jornada por defecto en Jornadas / RAIniela / RAIGol:
  * - la activa por calendario (empezó o entra en ventana de previsualización),
- * - o la siguiente si la anterior terminó hace al menos 48 h (último pitido).
+ * - o la siguiente si los partidos ya disputados de la anterior terminaron
+ *   hace al menos 48 h (último pitido real, sin contar partidos futuros).
  */
 export function computeDefaultGameRound(
   matchdays: Matchday[],
@@ -79,9 +104,9 @@ export function computeDefaultGameRound(
   while (round < totalRounds) {
     const matchday = getMatchdayByRound(matchdays, round);
     if (matchday.matches.length === 0) break;
-    if (!isMatchdayFullyFinished(matchday)) break;
+    if (!isMatchdayElapsedFinished(matchday, now)) break;
 
-    const lastKickoff = getMatchdayLastKickoff(matchday);
+    const lastKickoff = getMatchdayLastKickoff(matchday, now);
     if (!isSchedulableKickoff(lastKickoff)) break;
 
     const advanceAfter = lastKickoff.getTime() + GAME_JORNADA_AUTO_ADVANCE_MS;
