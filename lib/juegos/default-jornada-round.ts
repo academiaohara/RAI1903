@@ -1,5 +1,10 @@
 import { isPlaceholderMatch } from "@/lib/competition/normalize-fixtures";
-import { isMatchDateToday, isMatchDateTomorrow } from "@/lib/match-calendar-dates";
+import {
+  addSpainCalendarDays,
+  isMatchDateToday,
+  isMatchDateTomorrow,
+} from "@/lib/match-calendar-dates";
+import { spainCalendarDayKey, spainTodayKey } from "@/lib/match-kickoff-time";
 import { isMatchPlayed } from "@/lib/match-result";
 import {
   getFirstKickoff,
@@ -8,38 +13,17 @@ import {
 } from "@/lib/quiniela";
 import type { Match, Matchday } from "@/types";
 
-/** Tiempo tras el cierre de una jornada antes de pasar a la siguiente por defecto. */
-export const GAME_JORNADA_AUTO_ADVANCE_MS = 48 * 60 * 60 * 1000;
+/** Días de calendario (hora peninsular) tras el último partido jugado antes de pasar a la siguiente jornada. */
+export const GAME_JORNADA_AUTO_ADVANCE_CALENDAR_DAYS = 2;
+
+/** @deprecated Usar GAME_JORNADA_AUTO_ADVANCE_CALENDAR_DAYS (días de calendario). */
+export const GAME_JORNADA_AUTO_ADVANCE_MS = GAME_JORNADA_AUTO_ADVANCE_CALENDAR_DAYS * 24 * 60 * 60 * 1000;
 
 /** Antelación con la que se muestra la siguiente jornada antes de su primer pitido. */
 export const JORNADA_PREVIEW_BEFORE_MS = 24 * 60 * 60 * 1000;
 
 function getSchedulableMatches(matchday: Matchday): Match[] {
   return matchday.matches.filter((match) => !isPlaceholderMatch(match));
-}
-
-/** Partidos cuyo pitido ya debería haber pasado (ignora fechas futuras adelantadas en el CMS). */
-function getElapsedMatches(matchday: Matchday, now: Date): Match[] {
-  return getSchedulableMatches(matchday).filter(
-    (match) => new Date(match.date).getTime() <= now.getTime(),
-  );
-}
-
-function getMatchdayLastKickoff(matchday: Matchday, now: Date): Date {
-  const first = getFirstKickoff(matchday);
-  if (first.getFullYear() >= 2099) return first;
-
-  const elapsed = getElapsedMatches(matchday, now);
-  const pool = elapsed.length > 0 ? elapsed : getSchedulableMatches(matchday);
-  const dates = pool.map((match) => new Date(match.date).getTime());
-  return new Date(Math.max(...dates));
-}
-
-/** Todos los partidos ya disputados de la jornada tienen resultado. */
-function isMatchdayElapsedFinished(matchday: Matchday, now: Date): boolean {
-  const elapsed = getElapsedMatches(matchday, now);
-  if (elapsed.length === 0) return false;
-  return elapsed.every((match) => isMatchPlayed(match));
 }
 
 function clampRound(round: number, totalRounds: number): number {
@@ -55,6 +39,31 @@ function isWithinPreviewWindow(firstKickoff: Date, now: Date, previewBeforeMs: n
   const iso = firstKickoff.toISOString();
   if (isMatchDateToday(iso, now) || isMatchDateTomorrow(iso, now)) return true;
   return now.getTime() >= firstKickoff.getTime() - previewBeforeMs;
+}
+
+/** Último día (hora peninsular) con al menos un partido ya jugado en la jornada. */
+function getMatchdayLastPlayedDayKey(matchday: Matchday, now: Date): string | null {
+  const playedElapsed = getSchedulableMatches(matchday).filter(
+    (match) => isMatchPlayed(match) && new Date(match.date).getTime() <= now.getTime(),
+  );
+  if (playedElapsed.length === 0) return null;
+
+  const lastPlayedMs = playedElapsed.reduce(
+    (max, match) => Math.max(max, new Date(match.date).getTime()),
+    0,
+  );
+  return spainCalendarDayKey(new Date(lastPlayedMs).toISOString());
+}
+
+/**
+ * ¿Ya toca mostrar la jornada siguiente?
+ * Ej.: último partido jugado el 7 → desde el 9 (2 días de calendario después).
+ */
+export function canAdvancePastMatchday(matchday: Matchday, now: Date): boolean {
+  const lastPlayedDay = getMatchdayLastPlayedDayKey(matchday, now);
+  if (!lastPlayedDay) return false;
+  const advanceFromDay = addSpainCalendarDays(lastPlayedDay, GAME_JORNADA_AUTO_ADVANCE_CALENDAR_DAYS);
+  return spainTodayKey(now) >= advanceFromDay;
 }
 
 /**
@@ -88,9 +97,8 @@ export function getActiveJornadaRound(
 
 /**
  * Jornada por defecto en Jornadas / RAIniela / RAIGol:
- * - la activa por calendario (empezó o entra en ventana de previsualización),
- * - o la siguiente si los partidos ya disputados de la anterior terminaron
- *   hace al menos 48 h (último pitido real, sin contar partidos futuros).
+ * - avanza a la siguiente cuando pasaron 2 días de calendario desde el último partido jugado,
+ * - o la activa por previsualización (hoy/mañana o 24 h antes del pitido).
  */
 export function computeDefaultGameRound(
   matchdays: Matchday[],
@@ -98,22 +106,15 @@ export function computeDefaultGameRound(
   currentRound: number,
   now = new Date(),
 ): number {
-  const activeRound = getActiveJornadaRound(matchdays, totalRounds, now);
-  let round = clampRound(Math.max(currentRound, activeRound), totalRounds);
+  let advancedRound = 1;
 
-  while (round < totalRounds) {
-    const matchday = getMatchdayByRound(matchdays, round);
+  while (advancedRound < totalRounds) {
+    const matchday = getMatchdayByRound(matchdays, advancedRound);
     if (matchday.matches.length === 0) break;
-    if (!isMatchdayElapsedFinished(matchday, now)) break;
-
-    const lastKickoff = getMatchdayLastKickoff(matchday, now);
-    if (!isSchedulableKickoff(lastKickoff)) break;
-
-    const advanceAfter = lastKickoff.getTime() + GAME_JORNADA_AUTO_ADVANCE_MS;
-    if (now.getTime() < advanceAfter) break;
-
-    round += 1;
+    if (!canAdvancePastMatchday(matchday, now)) break;
+    advancedRound += 1;
   }
 
-  return clampRound(round, totalRounds);
+  const previewRound = getActiveJornadaRound(matchdays, totalRounds, now);
+  return clampRound(Math.max(advancedRound, previewRound, currentRound), totalRounds);
 }

@@ -48,11 +48,7 @@ export function JornadasView({ gender }: JornadasViewProps) {
     if (dataset.rounds.length === 0) return 38;
     return Math.max(...dataset.rounds.map((round) => round.roundNumber ?? 1));
   }, [dataset.rounds]);
-  const { selectedRoundId, selectRound } = useJornadaRoundSelection(
-    dataset.matchdays,
-    totalRounds,
-    dataset.currentRoundId,
-  );
+  const { selectedRoundId, selectRound } = useJornadaRoundSelection(dataset.matchdays, totalRounds);
   const raiTeamId =
     gender === "femenino" ? resolvePrimerEquipoClubTeamId(bundles, gender) : getRaiTeamId(gender);
   const [grupo, setGrupo] = useState<RfefGrupoId>("1");

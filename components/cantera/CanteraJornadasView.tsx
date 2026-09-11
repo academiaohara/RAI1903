@@ -37,11 +37,7 @@ export function CanteraJornadasView({
     if (dataset.rounds.length === 0) return 38;
     return Math.max(...dataset.rounds.map((round) => round.roundNumber ?? 1));
   }, [dataset.rounds]);
-  const { selectedRoundId, selectRound } = useJornadaRoundSelection(
-    dataset.matchdays,
-    totalRounds,
-    dataset.currentRoundId,
-  );
+  const { selectedRoundId, selectRound } = useJornadaRoundSelection(dataset.matchdays, totalRounds);
 
   const roundData = dataset.getRound(selectedRoundId);
   const { summary } = roundData;

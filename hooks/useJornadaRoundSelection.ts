@@ -16,30 +16,35 @@ export function parseJornadaRoundNumber(roundId: JornadaRoundId): number {
   return match ? Number(match[1]) : 1;
 }
 
+function matchdaysSignature(matchdays: Matchday[]): string {
+  return matchdays.map((matchday) => `${matchday.round}:${matchday.matches.length}`).join("|");
+}
+
 /**
  * Jornada seleccionada en la sección Jornadas (carrusel).
- * Por defecto: jornada activa (primer pitido ya pasado o ventana de 24 h antes),
- * o la siguiente si la anterior terminó hace al menos 48 h. Respeta selección manual.
+ * Por defecto: jornada activa (primer pitido ya pasado o ventana de previsualización),
+ * o la siguiente si pasaron 2 días de calendario desde el último partido jugado.
  */
-export function useJornadaRoundSelection(
-  matchdays: Matchday[],
-  totalRounds: number,
-  currentRoundId: JornadaRoundId,
-) {
-  const currentRound = parseJornadaRoundNumber(currentRoundId);
+export function useJornadaRoundSelection(matchdays: Matchday[], totalRounds: number) {
   const [now, setNow] = useState(() => new Date());
   const manualSelectionRef = useRef(false);
   const lastSyncedDefaultRef = useRef<JornadaRoundId | null>(null);
+  const matchdaysSignatureValue = matchdaysSignature(matchdays);
 
   useEffect(() => {
     const id = window.setInterval(() => setNow(new Date()), AUTO_ADVANCE_CHECK_MS);
     return () => window.clearInterval(id);
   }, []);
 
+  useEffect(() => {
+    manualSelectionRef.current = false;
+    lastSyncedDefaultRef.current = null;
+  }, [matchdaysSignatureValue, totalRounds]);
+
   const defaultRoundId = useMemo(() => {
-    const round = computeDefaultGameRound(matchdays, totalRounds, currentRound, now);
+    const round = computeDefaultGameRound(matchdays, totalRounds, 1, now);
     return jornadaRoundId(round);
-  }, [matchdays, totalRounds, currentRound, now]);
+  }, [matchdays, totalRounds, now]);
 
   const [selectedRoundId, setSelectedRoundIdState] = useState(defaultRoundId);
 

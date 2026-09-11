@@ -1,5 +1,5 @@
 import { PLACEHOLDER_MATCH_DATE } from "@/lib/competition/normalize-fixtures";
-import { spainCalendarDayKey, spainTodayKey } from "@/lib/match-kickoff-time";
+import { MATCH_CALENDAR_TIMEZONE, spainCalendarDayKey, spainTodayKey } from "@/lib/match-kickoff-time";
 import { isMatchPlayed } from "@/lib/match-result";
 import type { MatchStatus } from "@/types";
 
@@ -44,6 +44,13 @@ export function spainTomorrowKey(now: Date = new Date()): string {
 export function isMatchDateTomorrow(dateIso: string, now: Date = new Date()): boolean {
   if (!isSchedulableMatchDate(dateIso)) return false;
   return spainCalendarDayKey(dateIso) === spainTomorrowKey(now);
+}
+
+/** Suma días de calendario en hora peninsular (YYYY-MM-DD). */
+export function addSpainCalendarDays(dayKey: string, days: number): string {
+  const [year, month, day] = dayKey.split("-").map(Number);
+  const utcMs = Date.UTC(year, month - 1, day + days, 12, 0);
+  return new Intl.DateTimeFormat("en-CA", { timeZone: MATCH_CALENDAR_TIMEZONE }).format(new Date(utcMs));
 }
 
 type MatchListEntry = {
