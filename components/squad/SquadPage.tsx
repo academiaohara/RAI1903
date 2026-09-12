@@ -28,9 +28,9 @@ import { PlayerGrid } from "@/components/squad/PlayerGrid";
 import { PlayerModal } from "@/components/squad/PlayerModal";
 import { StadiumModal } from "@/components/squad/StadiumModal";
 import { StadiumEditorModal } from "@/components/squad/StadiumEditorModal";
+import { CanteraSquadJsonEditor } from "@/components/editor/CanteraSquadJsonEditor";
 import { SquadEditToolbar } from "@/components/squad/SquadEditToolbar";
-import { FixturesJsonPasteSection } from "@/components/editor/FixturesJsonPasteSection";
-import { parseCanteraSquadJson } from "@/lib/cms/parse-squad-json";
+import { squadPlayersToCanteraImport } from "@/lib/cantera-squad-json";
 import { SectionUnderConstructionGate } from "@/components/season/SectionUnderConstructionGate";
 import { SeasonRatingsRanking } from "@/components/squad/SeasonRatingsRanking";
 import { StandingsEvolutionChart } from "@/components/squad/StandingsEvolutionChart";
@@ -150,6 +150,11 @@ export function SquadPage({ gender }: SquadPageProps) {
     [importSquad],
   );
 
+  const femeninoSquadImport = useMemo(
+    () => squadPlayersToCanteraImport(squad, club.entrenador),
+    [club.entrenador, squad],
+  );
+
   const handleRemovePlayer = useCallback(
     async (playerId: string) => {
       const player = squad.find((entry) => entry.id === playerId);
@@ -181,18 +186,16 @@ export function SquadPage({ gender }: SquadPageProps) {
       <SquadToolbar viewMode={viewMode} onViewModeChange={setViewMode} showViewToggle={!isFemenino} />
 
       {editMode && isFemenino ? (
-        <FixturesJsonPasteSection
-          title="Importar plantilla JSON"
-          applyLabel="Aplicar plantilla"
+        <CanteraSquadJsonEditor
           accent="femenino"
-          placeholder='{ "entrenador": "Nombre", "plantilla": [ { "dorsal": 1, "jugador": "Nombre Apellido", "pos": "Portero", "edad": 24, "pj": 0, "goles": 0, "ta": 0, "tr": 0 } ] }'
-          hint='Pega un JSON con entrenador y plantilla (dorsal, jugador, pos, edad, pj, min, goles, ta, tr). También vale un array de jugadores. Sustituye toda la plantilla actual.'
-          parse={parseCanteraSquadJson}
-          onImport={handleImportSquad}
+          squad={femeninoSquadImport}
+          onApply={handleImportSquad}
         />
       ) : null}
 
-      {editMode && <SquadEditToolbar onAddPlayer={(position) => void handleAddPlayer(position)} busy={addBusy} variant={isFemenino ? "femenino" : "default"} />}
+      {editMode && !isFemenino ? (
+        <SquadEditToolbar onAddPlayer={(position) => void handleAddPlayer(position)} busy={addBusy} />
+      ) : null}
 
       <SquadAvailability
         injured={injured}
@@ -225,10 +228,10 @@ export function SquadPage({ gender }: SquadPageProps) {
               showFanRating
               fanRatings={fanRatings}
               showEmptyPositions={editMode}
-              editMode={editMode}
-              inlineStatsEdit={isFemenino}
-              onQuickUpdate={editMode ? handleQuickUpdate : undefined}
-              onRemove={editMode && isFemenino ? (playerId) => void handleRemovePlayer(playerId) : undefined}
+              editMode={editMode && !isFemenino}
+              inlineStatsEdit={false}
+              onQuickUpdate={editMode && !isFemenino ? handleQuickUpdate : undefined}
+              onRemove={editMode && !isFemenino ? (playerId) => void handleRemovePlayer(playerId) : undefined}
             />
           ) : (
             <PlayerGrid
