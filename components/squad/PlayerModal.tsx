@@ -13,7 +13,9 @@ import {
   formatContractDate,
   formatPlayerAgeWithUnit,
   getPlayerFullName,
+  getPlayerShortName,
 } from "@/lib/squad-utils";
+import type { PlayerShortNamePart } from "@/types/squad";
 import { getTransferKind, getTransferClubAnnouncementNews } from "@/lib/fichajes";
 import { clubAnnouncementFromTransfer } from "@/lib/club-announcement";
 import { useTransfers } from "@/hooks/useTransfers";
@@ -320,6 +322,12 @@ function PlayerInlineEditor({
       <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <EditorInput label="Nombre" value={player.nombre} onChange={(value) => onUpdate({ nombre: value })} />
         <EditorInput label="Apellido" value={player.apellido} onChange={(value) => onUpdate({ apellido: value })} />
+        <PlayerShortNamePreferenceEditor
+          value={player.nombreVisible}
+          nombre={player.nombre}
+          apellido={player.apellido}
+          onChange={(nombreVisible) => onUpdate({ nombreVisible })}
+        />
         <EditorInput
           label="Dorsal"
           type="number"
@@ -381,6 +389,52 @@ function PlayerInlineEditor({
         />
       </label>
     </section>
+  );
+}
+
+const SHORT_NAME_PART_OPTIONS: Array<{ value: PlayerShortNamePart; label: string }> = [
+  { value: "apellido", label: "Apellido" },
+  { value: "nombre", label: "Nombre" },
+];
+
+function PlayerShortNamePreferenceEditor({
+  value,
+  nombre,
+  apellido,
+  onChange,
+}: {
+  value?: PlayerShortNamePart;
+  nombre: string;
+  apellido: string;
+  onChange: (value: PlayerShortNamePart) => void;
+}) {
+  const selected = value ?? "apellido";
+  const previewPlayer = { nombre, apellido, nombreVisible: selected };
+
+  return (
+    <div className="sm:col-span-2 lg:col-span-4">
+      <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Nombre en alineación y listas</p>
+      <div className="mt-1 flex flex-wrap gap-2">
+        {SHORT_NAME_PART_OPTIONS.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => onChange(option.value)}
+            className={`rounded-xl border px-3 py-2 text-sm font-semibold transition ${
+              selected === option.value
+                ? "border-[#214C9B] bg-[#214C9B] text-white"
+                : "border-[#214C9B]/20 bg-white text-slate-700 hover:border-[#214C9B]/40"
+            }`}
+            aria-pressed={selected === option.value}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+      <p className="mt-2 text-xs text-slate-600">
+        Vista previa: <span className="font-semibold text-[#214C9B]">{getPlayerShortName(previewPlayer)}</span>
+      </p>
+    </div>
   );
 }
 

@@ -26,6 +26,7 @@ import {
 import { type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { getTeamCrestById } from "@/lib/team-crests";
 import { RAI_FEM_TEAM_ID, RAI_TEAM_ID } from "@/data/mock";
+import { getPlayerShortName } from "@/lib/squad-utils";
 import type { SquadPlayer } from "@/types/squad";
 
 type LineupPageProps = {
@@ -56,7 +57,7 @@ type LineupListPanelProps = {
 };
 
 function playerListName(player: SquadPlayer): string {
-  return player.apellido || player.nombre;
+  return getPlayerShortName(player);
 }
 
 function LineupListPanel({

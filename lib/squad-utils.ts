@@ -1,5 +1,11 @@
 import type { PlayerStatus } from "@/types";
-import type { SquadPlayer, SquadPosition, SquadRoleCode, SquadSection } from "@/types/squad";
+import type {
+  PlayerShortNamePart,
+  SquadPlayer,
+  SquadPosition,
+  SquadRoleCode,
+  SquadSection,
+} from "@/types/squad";
 import { getSquadSection, SQUAD_POSITIONS, SQUAD_SECTIONS } from "@/types/squad";
 
 const ROSTER_ESTADOS: PlayerStatus[] = ["titular", "suplente", "cantera", "nuevo fichaje"];
@@ -17,6 +23,23 @@ export function getPlayerFullName(player: SquadPlayer): string {
 /** Nombre para fichas de plantilla (nombre + apellido completo). */
 export function getPlayerDisplayName(player: SquadPlayer): string {
   return player.apellido ? `${player.nombre} ${player.apellido}` : player.nombre;
+}
+
+export const DEFAULT_PLAYER_SHORT_NAME_PART: PlayerShortNamePart = "apellido";
+
+export function getPlayerShortNamePart(
+  player: Pick<SquadPlayer, "nombreVisible">,
+): PlayerShortNamePart {
+  return player.nombreVisible ?? DEFAULT_PLAYER_SHORT_NAME_PART;
+}
+
+/** Nombre corto para alineación, campo, listas compactas, etc. */
+export function getPlayerShortName(
+  player: Pick<SquadPlayer, "nombre" | "apellido" | "nombreVisible">,
+): string {
+  const part = getPlayerShortNamePart(player);
+  if (part === "nombre") return player.nombre || player.apellido;
+  return player.apellido || player.nombre;
 }
 
 export function getPlayerInitials(player: SquadPlayer): string {

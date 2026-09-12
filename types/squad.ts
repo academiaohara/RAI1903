@@ -28,10 +28,15 @@ export type PlayerCareerRecord = {
   asistencias: number;
 };
 
+/** Parte del nombre que se muestra en alineación, listas compactas, etc. Por defecto apellido. */
+export type PlayerShortNamePart = "nombre" | "apellido";
+
 export type SquadPlayer = {
   id: string;
   nombre: string;
   apellido: string;
+  /** Cómo mostrar el nombre corto fuera de la ficha completa. Omitido = apellido. */
+  nombreVisible?: PlayerShortNamePart;
   dorsal: number;
   posicion: SquadPosition;
   rol: SquadRoleCode;

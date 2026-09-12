@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { LineupMiniFicha } from "@/components/lineup/LineupMiniFicha";
 import type { SquadPlayer } from "@/types/squad";
-import { getPlayerDisplayName } from "@/lib/squad-utils";
+import { getPlayerShortName } from "@/lib/squad-utils";
 import { cn } from "@/lib/utils";
 
 type LineupPlayerChipProps = {
@@ -21,7 +21,7 @@ export function LineupPlayerChip({
   assigned = false,
   onSelect,
 }: LineupPlayerChipProps) {
-  const displayName = getPlayerDisplayName(player);
+  const displayName = getPlayerShortName(player);
 
   return (
     <motion.button

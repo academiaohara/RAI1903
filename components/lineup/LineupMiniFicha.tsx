@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import type { SquadPlayer } from "@/types/squad";
 import { getFichaPositionAbbrev } from "@/lib/ficha-design";
-import { getPlayerDisplayName } from "@/lib/squad-utils";
+import { getPlayerShortName, getPlayerShortNamePart } from "@/lib/squad-utils";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 import { cn } from "@/lib/utils";
 
@@ -23,7 +23,9 @@ export function LineupMiniFicha({
   photo,
 }: LineupMiniFichaProps) {
   const positionAbbrev = getFichaPositionAbbrev(player.posicion);
-  const displayName = getPlayerDisplayName(player);
+  const shortName = getPlayerShortName(player);
+  const secondaryName =
+    getPlayerShortNamePart(player) === "apellido" ? player.nombre : player.apellido;
 
   const photoNode =
     photo ?? (
@@ -48,8 +50,8 @@ export function LineupMiniFicha({
 
           <div className="trading-ficha-name-plate" aria-hidden>
             <div className="trading-ficha-name-plate-inner">
-              <p className="trading-ficha-first-name">{player.nombre}</p>
-              <p className="trading-ficha-last-name">{player.apellido || displayName}</p>
+              {secondaryName ? <p className="trading-ficha-first-name">{secondaryName}</p> : null}
+              <p className="trading-ficha-last-name">{shortName}</p>
             </div>
           </div>
         </article>
