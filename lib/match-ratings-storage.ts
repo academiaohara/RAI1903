@@ -12,6 +12,74 @@ export type PlayerRatingAverage = {
 
 const LEGACY_PLAYER_RATINGS_KEY = "rai1903.player-ratings.v1";
 const LEGACY_PLAYER_RATINGS_MIGRATED_KEY = "rai1903.player-ratings:migrated";
+const MATCH_RATINGS_DRAFT_KEY = "rai1903.match-ratings.draft.v1";
+
+type MatchRatingsDraftStore = Record<
+  string,
+  {
+    ratings: Record<string, number>;
+    updatedAt: string;
+  }
+>;
+
+function matchRatingDraftKey(
+  seasonId: CompetitionSeasonId,
+  matchId: string,
+  userId: string | null,
+): string {
+  return `${seasonId}:${matchId}:${userId ?? "guest"}`;
+}
+
+function readMatchRatingsDraftStore(): MatchRatingsDraftStore {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(MATCH_RATINGS_DRAFT_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as MatchRatingsDraftStore;
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeMatchRatingsDraftStore(store: MatchRatingsDraftStore): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(MATCH_RATINGS_DRAFT_KEY, JSON.stringify(store));
+}
+
+/** Borrador local de valoraciones (sin enviar aún). */
+export function loadMatchRatingDraft(
+  seasonId: CompetitionSeasonId,
+  matchId: string,
+  userId: string | null,
+): Record<string, number> {
+  const store = readMatchRatingsDraftStore();
+  return store[matchRatingDraftKey(seasonId, matchId, userId)]?.ratings ?? {};
+}
+
+export function saveMatchRatingDraft(
+  seasonId: CompetitionSeasonId,
+  matchId: string,
+  userId: string | null,
+  ratings: Record<string, number>,
+): void {
+  const key = matchRatingDraftKey(seasonId, matchId, userId);
+  const store = readMatchRatingsDraftStore();
+  store[key] = { ratings, updatedAt: new Date().toISOString() };
+  writeMatchRatingsDraftStore(store);
+}
+
+export function clearMatchRatingDraft(
+  seasonId: CompetitionSeasonId,
+  matchId: string,
+  userId: string | null,
+): void {
+  const key = matchRatingDraftKey(seasonId, matchId, userId);
+  const store = readMatchRatingsDraftStore();
+  if (!store[key]) return;
+  delete store[key];
+  writeMatchRatingsDraftStore(store);
+}
 
 type LegacyRatingsStore = {
   matches: Record<string, Record<string, number>>;
