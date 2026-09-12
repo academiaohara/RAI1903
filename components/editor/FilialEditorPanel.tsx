@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { CrestPickerPopover } from "@/components/competicion/CrestPickerPopover";
 import { EditorPanelFrame } from "@/components/editor/EditorPanelFrame";
+import { CanteraSquadJsonEditor } from "@/components/editor/CanteraSquadJsonEditor";
 import { FixturesJsonPasteSection } from "@/components/editor/FixturesJsonPasteSection";
 import { OnPageEditorSection } from "@/components/editor/OnPageEditorSection";
 import { useSeason } from "@/components/season/SeasonProvider";
@@ -19,7 +20,6 @@ import {
   type FilialTeamSeed,
 } from "@/lib/cms/filial-bundles";
 import { parseCanteraFixturesJson } from "@/lib/cms/parse-fixtures-json";
-import { parseCanteraSquadJson } from "@/lib/cms/parse-squad-json";
 import { getCanteraTeamCrests, saveCanteraBundlesAndCrests } from "@/lib/cms/save-cantera-bundles";
 import { upsertSeasonBundlesBatch } from "@/lib/cms/season-bundles";
 import { getTeamCrestById, isTeamCrestUrl } from "@/lib/team-crests";
@@ -27,7 +27,7 @@ import type { CanteraCmsScope } from "@/lib/cantera/cantera-cms";
 import { buildCanteraMockBundleEntries } from "@/lib/cantera/cantera-season-data";
 import { defaultJuvenilCompetitionConfig } from "@/lib/cantera/juvenil-season-data";
 import type { CompetitionZoneRule } from "@/lib/cms/competition-config-bundle";
-import type { CanteraSquadImport, CanteraSquadImportPlayer } from "@/types/cantera-squad-import";
+import type { CanteraSquadImport } from "@/types/cantera-squad-import";
 
 const CANTERA_EDITOR_META: Record<
   CanteraCmsScope,
@@ -78,22 +78,6 @@ function newZone(): CompetitionZoneRule {
   };
 }
 
-function emptyPlayer(): CanteraSquadImportPlayer {
-  return {
-    dorsal: null,
-    jugador: "Nuevo jugador",
-    pos: "Centrocampista",
-    edad: null,
-    pc: 0,
-    pj: 0,
-    pt: 0,
-    min: 0,
-    goles: 0,
-    ta: 0,
-    tr: 0,
-  };
-}
-
 function emptyPartido(defaultLocal: string): FilialFixturePartido {
   const today = new Date().toISOString().slice(0, 10);
   return {
@@ -106,19 +90,6 @@ function emptyPartido(defaultLocal: string): FilialFixturePartido {
     estado: "pendiente",
   };
 }
-
-const STAT_FIELDS: Array<{
-  key: keyof Pick<CanteraSquadImportPlayer, "pc" | "pj" | "pt" | "min" | "goles" | "ta" | "tr">;
-  label: string;
-}> = [
-  { key: "pc", label: "PC" },
-  { key: "pj", label: "PJ" },
-  { key: "pt", label: "PT" },
-  { key: "min", label: "Min" },
-  { key: "goles", label: "Goles" },
-  { key: "ta", label: "TA" },
-  { key: "tr", label: "TR" },
-];
 
 export function CanteraEditorPanel({ scope, onClose, variant = "panel" }: CanteraEditorPanelProps) {
   const meta = CANTERA_EDITOR_META[scope];
@@ -361,159 +332,7 @@ export function CanteraEditorPanel({ scope, onClose, variant = "panel" }: Canter
       </div>
 
       {tab === "plantilla" && (
-        <div className="space-y-4">
-          <FixturesJsonPasteSection
-            title="Importar plantilla JSON"
-            applyLabel="Aplicar plantilla"
-            placeholder='{ "entrenador": "Nombre", "mediaEdad": 17.5, "plantilla": [ { "jugador": "Nombre", "pos": "Portero", "pc": 0, "pj": 0, "pt": 0, "min": 0, "goles": 0, "ta": 0, "tr": 0 } ] }'
-            hint='Pega un JSON con entrenador, mediaEdad y plantilla (dorsal, jugador, pos, edad, pc, pj, pt, min, goles, ta, tr, golesEncajados). También vale un array de jugadores. Tras aplicar, pulsa «Guardar».'
-            onImport={(data) => setSquad(data)}
-            parse={parseCanteraSquadJson}
-          />
-
-          <label className="block text-xs font-semibold text-slate-600">
-            Entrenador
-            <input
-              value={squadDraft.entrenador}
-              onChange={(e) => setSquad((s) => (s ? { ...s, entrenador: e.target.value } : s))}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-            />
-          </label>
-          <label className="block text-xs font-semibold text-slate-600">
-            Media de edad
-            <input
-              type="number"
-              step="0.1"
-              value={squadDraft.mediaEdad}
-              onChange={(e) =>
-                setSquad((s) => (s ? { ...s, mediaEdad: Number(e.target.value) || 0 } : s))
-              }
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-            />
-          </label>
-
-          <div className="flex items-center justify-between">
-            <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">
-              {squadDraft.plantilla.length} jugadores
-            </p>
-            <button
-              type="button"
-              onClick={() => setSquad((s) => (s ? { ...s, plantilla: [...s.plantilla, emptyPlayer()] } : s))}
-              className="inline-flex items-center gap-1 rounded-lg bg-[#214C9B]/10 px-2 py-1 text-[10px] font-extrabold uppercase text-[#214C9B]"
-            >
-              <Plus size={12} /> Añadir jugador
-            </button>
-          </div>
-
-          <div className="max-h-[50vh] space-y-3 overflow-y-auto pr-1">
-            {squadDraft.plantilla.map((player, index) => (
-              <div key={index} className="rounded-xl border border-slate-100 bg-slate-50/80 p-3 space-y-2">
-                <div className="flex items-start justify-between gap-2">
-                  <p className="text-[10px] font-bold uppercase text-slate-400">Jugador {index + 1}</p>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setSquad((s) =>
-                        s ? { ...s, plantilla: s.plantilla.filter((_, i) => i !== index) } : s,
-                      )
-                    }
-                    className="text-rose-600"
-                    aria-label="Eliminar jugador"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <input
-                    placeholder="Nombre completo"
-                    value={player.jugador}
-                    onChange={(e) =>
-                      setSquad((s) => {
-                        if (!s) return s;
-                        const plantilla = [...s.plantilla];
-                        plantilla[index] = { ...plantilla[index]!, jugador: e.target.value };
-                        return { ...s, plantilla };
-                      })
-                    }
-                    className="col-span-2 rounded-lg border border-slate-200 px-2 py-1.5 text-xs"
-                  />
-                  <input
-                    placeholder="Dorsal"
-                    type="number"
-                    value={player.dorsal ?? ""}
-                    onChange={(e) =>
-                      setSquad((s) => {
-                        if (!s) return s;
-                        const plantilla = [...s.plantilla];
-                        plantilla[index] = {
-                          ...plantilla[index]!,
-                          dorsal: e.target.value === "" ? null : Number(e.target.value),
-                        };
-                        return { ...s, plantilla };
-                      })
-                    }
-                    className="rounded-lg border border-slate-200 px-2 py-1.5 text-xs"
-                  />
-                  <input
-                    placeholder="Posición"
-                    value={player.pos}
-                    onChange={(e) =>
-                      setSquad((s) => {
-                        if (!s) return s;
-                        const plantilla = [...s.plantilla];
-                        plantilla[index] = { ...plantilla[index]!, pos: e.target.value };
-                        return { ...s, plantilla };
-                      })
-                    }
-                    className="rounded-lg border border-slate-200 px-2 py-1.5 text-xs"
-                  />
-                  {STAT_FIELDS.map(({ key, label }) => (
-                    <input
-                      key={key}
-                      placeholder={label}
-                      type="number"
-                      min={0}
-                      value={player[key]}
-                      onChange={(e) =>
-                        setSquad((s) => {
-                          if (!s) return s;
-                          const plantilla = [...s.plantilla];
-                          plantilla[index] = {
-                            ...plantilla[index]!,
-                            [key]: Number(e.target.value) || 0,
-                          };
-                          return { ...s, plantilla };
-                        })
-                      }
-                      className="rounded-lg border border-slate-200 px-2 py-1.5 text-xs"
-                    />
-                  ))}
-                  {player.pos.toLowerCase().includes("portero") ? (
-                    <input
-                      placeholder="Encajados"
-                      type="number"
-                      min={0}
-                      value={player.golesEncajados ?? ""}
-                      onChange={(e) =>
-                        setSquad((s) => {
-                          if (!s) return s;
-                          const plantilla = [...s.plantilla];
-                          plantilla[index] = {
-                            ...plantilla[index]!,
-                            golesEncajados:
-                              e.target.value === "" ? undefined : Number(e.target.value) || 0,
-                          };
-                          return { ...s, plantilla };
-                        })
-                      }
-                      className="col-span-2 rounded-lg border border-slate-200 px-2 py-1.5 text-xs"
-                    />
-                  ) : null}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <CanteraSquadJsonEditor squad={squadDraft} onApply={(data) => setSquad(data)} />
       )}
 
       {tab === "calendario" && (
