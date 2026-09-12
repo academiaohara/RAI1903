@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 import type { SquadPlayer } from "@/types/squad";
 import { SQUAD_POSITIONS, SQUAD_POSITION_LABELS } from "@/types/squad";
-import { groupPlayersByPosition } from "@/lib/squad-utils";
+import { getPlayerDisplayName, getPlayerShortName, groupPlayersByPosition } from "@/lib/squad-utils";
 import type { FormationId, FormationSlot } from "@/lib/lineup-formations";
 
 function useIsClient(): boolean {
@@ -151,7 +151,7 @@ export function LineupPitch({
               style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
               aria-label={
                 player
-                  ? `${player.apellido || player.nombre}, cambiar`
+                  ? `${getPlayerShortName(player)}, cambiar`
                   : `${slot.label}, seleccionar jugador`
               }
             >
@@ -177,7 +177,7 @@ export function LineupPitch({
                     </button>
                   )}
                   <span className="pitch-player-name">
-                    {player.apellido || player.nombre}
+                    {getPlayerShortName(player)}
                   </span>
                   {showSubstitutes &&
                     (sub ? (
@@ -185,9 +185,9 @@ export function LineupPitch({
                         type="button"
                         className="pitch-player-sub-name"
                         onClick={(e) => handleSubClick(e, index)}
-                        aria-label={`Suplente: ${sub.apellido || sub.nombre}, cambiar`}
+                        aria-label={`Suplente: ${getPlayerShortName(sub)}, cambiar`}
                       >
-                        {sub.apellido || sub.nombre}
+                        {getPlayerShortName(sub)}
                       </button>
                     ) : (
                       !exportMode && (
@@ -258,7 +258,7 @@ export function LineupPitch({
                       >
                         <X className="h-3 w-3" />
                         <span>
-                          Quitar a {currentPlayer.apellido || currentPlayer.nombre}
+                          Quitar a {getPlayerShortName(currentPlayer)}
                         </span>
                       </button>
                     </div>
@@ -280,7 +280,7 @@ export function LineupPitch({
                       >
                         <X className="h-3 w-3" />
                         <span>
-                          Quitar suplente {currentSub.apellido || currentSub.nombre}
+                          Quitar suplente {getPlayerShortName(currentSub)}
                         </span>
                       </button>
                     </div>
@@ -323,11 +323,7 @@ export function LineupPitch({
                             className="h-full w-full"
                           />
                         </div>
-                        <span className="lineup-dropdown-name">
-                          {player.apellido
-                            ? `${player.nombre} ${player.apellido}`
-                            : player.nombre}
-                        </span>
+                        <span className="lineup-dropdown-name">{getPlayerDisplayName(player)}</span>
                       </button>
                     ))}
                   </div>

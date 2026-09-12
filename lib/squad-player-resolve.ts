@@ -1,4 +1,4 @@
-import { getPlayerDisplayName, getPlayerFullName } from "@/lib/squad-utils";
+import { getPlayerDisplayName, getPlayerFullName, getPlayerShortName } from "@/lib/squad-utils";
 import type { SquadPlayer } from "@/types/squad";
 
 function normalizePlayerName(value: string): string {
@@ -19,6 +19,9 @@ export function resolveSquadPlayerByName(squad: SquadPlayer[], rawName: string):
 
   const byDisplay = squad.find((player) => normalizePlayerName(getPlayerDisplayName(player)) === normalized);
   if (byDisplay) return byDisplay;
+
+  const byShortName = squad.find((player) => normalizePlayerName(getPlayerShortName(player)) === normalized);
+  if (byShortName) return byShortName;
 
   const byLastName = squad.find((player) => {
     const last = normalizePlayerName(player.apellido);

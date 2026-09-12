@@ -8,6 +8,7 @@ import {
 } from "@/lib/player-news";
 import { getPlayerRole } from "@/lib/player-roles";
 import { getSquadPlayers } from "@/lib/squad-data";
+import { getPlayerShortName } from "@/lib/squad-utils";
 import { getSquadPlayerPhoto, withSquadPlayerPhoto } from "@/lib/squad-photos";
 import { resolveTransferMarketWindowId } from "@/lib/transfer-market-windows";
 import type { NewsItem, Player, TransferKind, TransferMarketWindowId, TransferRumor } from "@/types";
@@ -41,7 +42,7 @@ function dorsalFromTransferPlayerId(playerId: string): number | null {
 function squadPlayerMatchesTransferName(player: SquadPlayer, transferName: string): boolean {
   const normalized = normalizeName(transferName);
   const full = normalizeName(`${player.nombre} ${player.apellido}`.trim());
-  const shortName = normalizeName(player.apellido || player.nombre);
+  const shortName = normalizeName(getPlayerShortName(player));
 
   if (full === normalized || shortName === normalized) return true;
 

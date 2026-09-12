@@ -1,6 +1,7 @@
 import { getRaiTeamId } from "@/lib/fixtures";
 import { resolveSquadPlayerByName } from "@/lib/squad-player-resolve";
 import { lineupPlayersToSquad } from "@/lib/squad-lineup";
+import { getPlayerShortName } from "@/lib/squad-utils";
 import type { MatchDetail, MatchEvent } from "@/types";
 import type { SquadPlayer } from "@/types/squad";
 
@@ -41,7 +42,7 @@ export function getAvilesPlayersWhoPlayed(
   for (const entry of entries) {
     const player = entry.player!;
     const fullName = `${player.nombre} ${player.apellido}`.trim().toLowerCase();
-    const display = player.nombre.toLowerCase();
+    const display = getPlayerShortName(player).toLowerCase();
     const lineupName = entry.lineupName.trim().toLowerCase();
 
     const played =

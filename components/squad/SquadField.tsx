@@ -3,10 +3,7 @@
 import { motion } from "framer-motion";
 import type { SquadPlayer } from "@/types/squad";
 import { getSquadFieldPlacement, groupPlayersByRole } from "@/lib/squad-field-layout";
-import {
-  getNationalityFlagUrl,
-  getPlayerDisplayName,
-} from "@/lib/squad-utils";
+import { getNationalityFlagUrl, getPlayerShortName } from "@/lib/squad-utils";
 import { FieldPlayerFicha } from "@/components/squad/FieldPlayerFicha";
 
 type SquadFieldProps = {
@@ -38,7 +35,7 @@ export function SquadField({ players, onSelect }: SquadFieldProps) {
         {placements.map(({ player, x, y, index }) => (
           <FieldPlayerFicha
             key={player.id}
-            name={getPlayerDisplayName(player)}
+            name={getPlayerShortName(player)}
             imageUrl={player.foto}
             flagUrl={getNationalityFlagUrl(player.nacionalidad)}
             flagAlt={player.nacionalidad}
