@@ -51,7 +51,7 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
   const [averages, setAverages] = useState<Record<string, { average: number; count: number }>>({});
   const sessionKey = `${ratingsSeasonId}:${detail.match.id}:${user?.id ?? "guest"}`;
   const [loadedKey, setLoadedKey] = useState<string | null>(null);
-  const loading = configured && (resolvingSeason || !authReady || loadedKey !== sessionKey);
+  const loading = resolvingSeason || (configured && !authReady) || loadedKey !== sessionKey;
   const [submitting, setSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
@@ -106,9 +106,22 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
   }, [configured, detail.gender, detail.match.id, mergeWithLocalDraft, ratingsSeasonId, user]);
 
   useEffect(() => {
-    if (!configured || !authReady || resolvingSeason) return;
+    if (resolvingSeason) return;
 
     let cancelled = false;
+
+    if (!configured) {
+      queueMicrotask(() => {
+        if (cancelled) return;
+        setDraftRatings(loadMatchRatingDraft(ratingsSeasonId, detail.match.id, user?.id ?? null));
+        setLoadedKey(sessionKey);
+      });
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    if (!authReady) return;
 
     void (async () => {
       if (user) await migrateLegacyPlayerRatingsToSupabase(user.id, detail.gender);
@@ -129,9 +142,9 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
   }, [authReady, configured, detail.gender, detail.match.id, mergeWithLocalDraft, ratingsSeasonId, resolvingSeason, sessionKey, user]);
 
   useEffect(() => {
-    if (!configured || loading) return;
+    if (loading || loadedKey !== sessionKey) return;
     saveMatchRatingDraft(ratingsSeasonId, detail.match.id, user?.id ?? null, draftRatings);
-  }, [configured, detail.match.id, draftRatings, loading, ratingsSeasonId, user?.id]);
+  }, [detail.match.id, draftRatings, loadedKey, loading, ratingsSeasonId, sessionKey, user?.id]);
 
   const handleRatingChange = useCallback((playerId: string, value: number) => {
     setDraftRatings((current) => ({ ...current, [playerId]: value }));
