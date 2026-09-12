@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { ChevronLeft, ChevronRight, Minus, Plus } from "lucide-react";
 import { MatchRatingsCardStack } from "@/components/match-center/MatchRatingsCardStack";
 import { MatchRatingsPlayerCard } from "@/components/match-center/MatchRatingsPlayerCard";
@@ -79,7 +79,6 @@ export function MatchRatingsCarousel({
   disabled = false,
 }: MatchRatingsCarouselProps) {
   const [activeIndex, setActiveIndex] = useStateSafe(0, players.length);
-  const mobileTrackRef = useRef<HTMLDivElement>(null);
 
   const currentPlayer = players[activeIndex];
   const prevPlayer = players[(activeIndex - 1 + players.length) % players.length];
@@ -92,16 +91,6 @@ export function MatchRatingsCarousel({
   const goNext = useCallback(() => {
     setActiveIndex((index) => (index >= players.length - 1 ? 0 : index + 1));
   }, [players.length, setActiveIndex]);
-
-  useEffect(() => {
-    const track = mobileTrackRef.current;
-    if (!track) return;
-
-    const slide = track.children[activeIndex];
-    if (!(slide instanceof HTMLElement)) return;
-
-    track.scrollTo({ left: slide.offsetLeft - (track.clientWidth - slide.clientWidth) / 2, behavior: "smooth" });
-  }, [activeIndex]);
 
   if (!currentPlayer) return null;
 
@@ -179,60 +168,41 @@ export function MatchRatingsCarousel({
         </div>
       </div>
 
-      {/* Mobile: scroll horizontal */}
+      {/* Mobile: una ficha con flechas laterales */}
       <div className="md:hidden">
-        <div
-          ref={mobileTrackRef}
-          className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          onScroll={(event) => {
-            const track = event.currentTarget;
-            const center = track.scrollLeft + track.clientWidth / 2;
-            let closestIndex = 0;
-            let closestDistance = Infinity;
+        <div className="flex items-center justify-center gap-1">
+          <button
+            type="button"
+            onClick={goPrev}
+            disabled={players.length <= 1}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#214C9B]/20 bg-white text-[#214C9B] shadow-md transition hover:border-[#214C9B]/40 hover:bg-blue-50 disabled:opacity-30"
+            aria-label="Jugador anterior"
+          >
+            <ChevronLeft size={22} />
+          </button>
 
-            for (let i = 0; i < track.children.length; i++) {
-              const slide = track.children[i];
-              if (!(slide instanceof HTMLElement)) continue;
-              const slideCenter = slide.offsetLeft + slide.clientWidth / 2;
-              const distance = Math.abs(slideCenter - center);
-              if (distance < closestDistance) {
-                closestDistance = distance;
-                closestIndex = i;
-              }
-            }
+          <div className="flex min-w-0 flex-1 items-center justify-center gap-2">
+            <MatchRatingsCardStack
+              player={currentPlayer}
+              community={community}
+              widthClass="w-[min(48vw,11rem)]"
+            />
+            <UserRatingControls
+              sliderValue={sliderValue}
+              disabled={disabled}
+              onAdjust={adjustRating}
+            />
+          </div>
 
-            if (closestIndex !== activeIndex) {
-              setActiveIndex(closestIndex);
-            }
-          }}
-        >
-          {players.map((player) => {
-            const playerSliderValue = draftRatings[player.id] ?? SLIDER_DEFAULT;
-            const playerCommunity = averages[player.id];
-
-            const adjustPlayerRating = (delta: number) => {
-              if (disabled) return;
-              onRatingChange(player.id, clampRating(playerSliderValue + delta));
-            };
-
-            return (
-              <div
-                key={player.id}
-                className="flex w-[min(88vw,20rem)] shrink-0 snap-center items-center gap-2"
-              >
-                <MatchRatingsCardStack
-                  player={player}
-                  community={playerCommunity}
-                  widthClass="w-[min(52vw,11rem)]"
-                />
-                <UserRatingControls
-                  sliderValue={playerSliderValue}
-                  disabled={disabled}
-                  onAdjust={adjustPlayerRating}
-                />
-              </div>
-            );
-          })}
+          <button
+            type="button"
+            onClick={goNext}
+            disabled={players.length <= 1}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#214C9B]/20 bg-white text-[#214C9B] shadow-md transition hover:border-[#214C9B]/40 hover:bg-blue-50 disabled:opacity-30"
+            aria-label="Jugador siguiente"
+          >
+            <ChevronRight size={22} />
+          </button>
         </div>
       </div>
 

@@ -13,9 +13,12 @@ import { useSquadPlayers } from "@/hooks/useSquadPlayers";
 import { getAvilesPlayersWhoPlayed } from "@/lib/match-rating-eligibility";
 import { isMatchRatingVotingOpen } from "@/lib/match-rating-voting";
 import {
+  clearMatchRatingDraft,
   fetchMatchRatingAverages,
   fetchUserMatchRatings,
+  loadMatchRatingDraft,
   migrateLegacyPlayerRatingsToSupabase,
+  saveMatchRatingDraft,
   submitMatchRatings,
 } from "@/lib/match-ratings-storage";
 import { createClient } from "@/lib/supabase/client";
@@ -82,6 +85,14 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
     return () => subscription.unsubscribe();
   }, [configured]);
 
+  const mergeWithLocalDraft = useCallback(
+    (serverRatings: Record<string, number>) => {
+      const localDraft = loadMatchRatingDraft(ratingsSeasonId, detail.match.id, user?.id ?? null);
+      return Object.keys(localDraft).length > 0 ? { ...serverRatings, ...localDraft } : serverRatings;
+    },
+    [detail.match.id, ratingsSeasonId, user?.id],
+  );
+
   const reloadRatings = useCallback(async () => {
     if (!configured) return;
     if (user) await migrateLegacyPlayerRatingsToSupabase(user.id, detail.gender);
@@ -91,8 +102,8 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
       user ? fetchUserMatchRatings(user.id, detail.match.id, ratingsSeasonId) : Promise.resolve({}),
     ]);
     setAverages(communityAverages);
-    setDraftRatings(userRatings);
-  }, [configured, detail.gender, detail.match.id, ratingsSeasonId, user]);
+    setDraftRatings(mergeWithLocalDraft(userRatings));
+  }, [configured, detail.gender, detail.match.id, mergeWithLocalDraft, ratingsSeasonId, user]);
 
   useEffect(() => {
     if (!configured || !authReady || resolvingSeason) return;
@@ -108,14 +119,19 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
       ]);
       if (cancelled) return;
       setAverages(communityAverages);
-      setDraftRatings(userRatings);
+      setDraftRatings(mergeWithLocalDraft(userRatings));
       setLoadedKey(sessionKey);
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [authReady, configured, detail.gender, detail.match.id, ratingsSeasonId, resolvingSeason, sessionKey, user]);
+  }, [authReady, configured, detail.gender, detail.match.id, mergeWithLocalDraft, ratingsSeasonId, resolvingSeason, sessionKey, user]);
+
+  useEffect(() => {
+    if (!configured || loading) return;
+    saveMatchRatingDraft(ratingsSeasonId, detail.match.id, user?.id ?? null, draftRatings);
+  }, [configured, detail.match.id, draftRatings, loading, ratingsSeasonId, user?.id]);
 
   const handleRatingChange = useCallback((playerId: string, value: number) => {
     setDraftRatings((current) => ({ ...current, [playerId]: value }));
@@ -141,6 +157,7 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
       return;
     }
 
+    clearMatchRatingDraft(ratingsSeasonId, detail.match.id, user.id);
     setStatusMessage("Valoración enviada. Gracias por participar.");
     await reloadRatings();
     setLoadedKey(sessionKey);
@@ -188,6 +205,20 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
       <div className="mt-5 space-y-4">
         {topRatedPlayers.length > 0 ? <MatchRatingsTop3 players={topRatedPlayers} /> : null}
         <MatchRatingsCountdown matchDate={detail.match.date} />
+
+        {user && configured && !loading && votingOpen ? (
+          <div className="flex flex-col items-center gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+            <button
+              type="button"
+              onClick={() => void handleSubmit()}
+              disabled={submitting}
+              className="w-full rounded-full bg-[#981915] px-6 py-3 text-xs font-extrabold uppercase text-white shadow-md hover:bg-[#7f1411] disabled:opacity-60 sm:w-auto sm:py-2.5"
+            >
+              {submitting ? "Enviando…" : "Enviar mi valoración"}
+            </button>
+            {statusMessage ? <p className="text-center text-sm text-slate-600 sm:text-left">{statusMessage}</p> : null}
+          </div>
+        ) : null}
       </div>
 
       {loading ? (
@@ -217,20 +248,6 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
           </div>
         </>
       )}
-
-      {user && configured && !loading && votingOpen ? (
-        <div className="mt-6 flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={() => void handleSubmit()}
-            disabled={submitting}
-            className="rounded-full bg-[#981915] px-6 py-2.5 text-xs font-extrabold uppercase text-white hover:bg-[#7f1411] disabled:opacity-60"
-          >
-            {submitting ? "Enviando…" : "Enviar mi valoración"}
-          </button>
-          {statusMessage && <p className="text-sm text-slate-600">{statusMessage}</p>}
-        </div>
-      ) : null}
 
       {user && configured && !loading && !votingOpen && statusMessage ? (
         <p className="mt-4 text-sm text-slate-600">{statusMessage}</p>
