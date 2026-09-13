@@ -1,4 +1,5 @@
 import { defaultCronicaId } from "@/lib/match-article-factory";
+import { getMatchArticleTabHref, getMatchRatingsHref } from "@/lib/match-center-tabs";
 import { primerEquipoBase, primerEquipoHasCronicas, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import type { Route } from "next";
 
@@ -11,3 +12,5 @@ export function getMatchArticlePageHref(
   const id = articleId ?? defaultCronicaId(matchId, gender);
   return `${primerEquipoBase(gender)}/cronicas/${id}` as Route;
 }
+
+export { getMatchArticleTabHref, getMatchRatingsHref };

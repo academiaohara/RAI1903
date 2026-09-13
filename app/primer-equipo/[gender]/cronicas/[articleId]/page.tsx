@@ -6,14 +6,19 @@ import {
   isLegacyPreviaArticleId,
   matchIdFromPreviaArticleId,
 } from "@/lib/match-article-factory";
+import { matchCenterTabFromSearchParams } from "@/lib/match-center-tabs";
 import { isPrimerEquipoGender, primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 
 export default async function MatchArticleDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ gender: string; articleId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { gender: genderParam, articleId } = await params;
+  const resolvedSearchParams = await searchParams;
+  const initialTab = matchCenterTabFromSearchParams(resolvedSearchParams);
   if (!isPrimerEquipoGender(genderParam)) notFound();
   const gender = genderParam as PrimerEquipoGender;
 
@@ -24,5 +29,5 @@ export default async function MatchArticleDetailPage({
     redirect(`${primerEquipoBase(gender)}/cronicas/${defaultCronicaId(legacyMatchId, gender)}` as Route);
   }
 
-  return <MatchArticleDetailSeason gender={gender} articleId={articleId} />;
+  return <MatchArticleDetailSeason gender={gender} articleId={articleId} initialTab={initialTab} />;
 }
