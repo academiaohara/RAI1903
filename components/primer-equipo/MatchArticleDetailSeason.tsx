@@ -2,7 +2,7 @@
 
 import { notFound } from "next/navigation";
 import type { Route } from "next";
-import { useCallback, useMemo } from "react";
+import { Suspense, useCallback, useMemo } from "react";
 import { MatchCenter } from "@/components/match-center/MatchCenter";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { useSeason } from "@/components/season/SeasonProvider";
@@ -15,6 +15,7 @@ import {
   matchIdFromCronicaArticleId,
 } from "@/lib/match-article-factory";
 import { buildMatchDetail, getMatchForArticle } from "@/lib/match-detail";
+import type { MatchCenterTabId } from "@/lib/match-center-tabs";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { findMatchInFixtureSource } from "@/lib/season/find-match-in-bundles";
 import { getLeagueMatchdaysForGender } from "@/lib/season/aviles-matches";
@@ -22,9 +23,10 @@ import { getLeagueMatchdaysForGender } from "@/lib/season/aviles-matches";
 type MatchArticleDetailSeasonProps = {
   gender: PrimerEquipoGender;
   articleId: string;
+  initialTab?: MatchCenterTabId;
 };
 
-export function MatchArticleDetailSeason({ gender, articleId }: MatchArticleDetailSeasonProps) {
+export function MatchArticleDetailSeason({ gender, articleId, initialTab }: MatchArticleDetailSeasonProps) {
   const { bundles, bundlesLoading, getEnrichedFixtureSource, viewedSeason } = useSeason();
   const { getOverride } = useInlineEditing();
   const { getById } = useSeasonMatchArticles();
@@ -88,11 +90,20 @@ export function MatchArticleDetailSeason({ gender, articleId }: MatchArticleDeta
   if (!detail) notFound();
 
   return (
-    <MatchCenter
-      detail={detail}
-      article={article}
-      backHref={`${primerEquipoBase(gender)}/calendario` as Route}
-      backLabel="Volver al calendario"
-    />
+    <Suspense
+      fallback={
+        <p className="rounded-2xl border border-dashed border-[#214C9B]/20 bg-slate-50/80 p-6 text-sm font-bold text-slate-600">
+          Cargando ficha del partido…
+        </p>
+      }
+    >
+      <MatchCenter
+        detail={detail}
+        article={article}
+        backHref={`${primerEquipoBase(gender)}/calendario` as Route}
+        backLabel="Volver al calendario"
+        initialTab={initialTab}
+      />
+    </Suspense>
   );
 }

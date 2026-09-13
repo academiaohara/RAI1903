@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { Check, Link2, Loader2 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { OAuthLoginButtons } from "@/components/auth/OAuthLoginButtons";
@@ -10,6 +10,7 @@ import { MatchRatingsGrid } from "@/components/match-center/MatchRatingsGrid";
 import { MatchRatingsTop3 } from "@/components/match-center/MatchRatingsTop3";
 import { useMatchRatingsSeasonId } from "@/hooks/useMatchRatingsSeasonId";
 import { useSquadPlayers } from "@/hooks/useSquadPlayers";
+import { getMatchRatingsShareUrl } from "@/lib/match-center-tabs";
 import { getAvilesPlayersWhoPlayed } from "@/lib/match-rating-eligibility";
 import { isMatchRatingVotingOpen } from "@/lib/match-rating-voting";
 import {
@@ -32,6 +33,18 @@ type MatchRatingsPanelProps = {
 
 export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
   const pathname = usePathname();
+  const ratingsPath = `${pathname}?tab=valoraciones`;
+  const shareUrl = useMemo(
+    () =>
+      getMatchRatingsShareUrl(
+        detail.match.id,
+        detail.gender,
+        undefined,
+        typeof window !== "undefined" ? window.location.origin : undefined,
+      ),
+    [detail.gender, detail.match.id],
+  );
+  const [linkCopied, setLinkCopied] = useState(false);
   const { seasonId: ratingsSeasonId, resolving: resolvingSeason } = useMatchRatingsSeasonId(
     detail.match.id,
     detail.gender,
@@ -150,6 +163,19 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
     setDraftRatings((current) => ({ ...current, [playerId]: value }));
   }, []);
 
+  const handleCopyLink = async () => {
+    const url =
+      shareUrl ??
+      (typeof window !== "undefined" ? `${window.location.origin}${ratingsPath}` : ratingsPath);
+    try {
+      await navigator.clipboard.writeText(url);
+      setLinkCopied(true);
+      window.setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      setStatusMessage("No se pudo copiar el enlace.");
+    }
+  };
+
   const handleSubmit = async () => {
     if (!user || !votingOpen) return;
     setSubmitting(true);
@@ -176,10 +202,26 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
     setLoadedKey(sessionKey);
   };
 
+  const canVote = Boolean(user && configured && votingOpen);
+
+  const ratingsHeader = (
+    <div className="flex flex-wrap items-start justify-between gap-3">
+      <h2 className="text-lg font-extrabold uppercase tracking-normal text-[#214C9B]">Valoraciones</h2>
+      <button
+        type="button"
+        onClick={() => void handleCopyLink()}
+        className="inline-flex items-center gap-1.5 rounded-full border border-[#214C9B]/20 bg-white px-3 py-1.5 text-xs font-bold text-[#214C9B] transition hover:border-[#214C9B]/40 hover:bg-slate-50"
+      >
+        {linkCopied ? <Check size={14} aria-hidden /> : <Link2 size={14} aria-hidden />}
+        {linkCopied ? "Enlace copiado" : "Copiar enlace"}
+      </button>
+    </div>
+  );
+
   if (eligiblePlayers.length === 0) {
     return (
       <section>
-        <h2 className="text-lg font-extrabold uppercase tracking-normal text-[#214C9B]">Valoraciones</h2>
+        {ratingsHeader}
         <p className="mt-4 text-sm text-slate-600">
           No hay jugadores del Avilés con minutos disputados en este partido.
         </p>
@@ -187,11 +229,9 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
     );
   }
 
-  const canVote = Boolean(user && configured && votingOpen);
-
   return (
     <section>
-      <h2 className="text-lg font-extrabold uppercase tracking-normal text-[#214C9B]">Valoraciones</h2>
+      {ratingsHeader}
       <p className="mt-2 text-sm leading-relaxed text-slate-600">
         Puntúa solo a quienes han jugado. Tienes 3 días tras el partido para enviar tu valoración.
       </p>
@@ -207,7 +247,7 @@ export function MatchRatingsPanel({ detail }: MatchRatingsPanelProps) {
           <p className="text-sm text-slate-700">Inicia sesión para enviar tu valoración.</p>
           <div className="mt-3 max-w-sm">
             <OAuthLoginButtons
-              nextPath={pathname}
+              nextPath={ratingsPath}
               googleLabel="Entrar con Google"
               xLabel="Entrar con X"
             />

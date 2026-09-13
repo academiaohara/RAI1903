@@ -1,7 +1,8 @@
 "use client";
 
 import { BarChart3, Clapperboard, ListOrdered, Megaphone, Shirt, Star, Target } from "lucide-react";
-import { useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useMemo } from "react";
 import { MatchArticleNewsLinker } from "@/components/editor/MatchArticleNewsLinker";
 import { MatchArticleClubNewsBlock } from "@/components/match-articles/MatchArticleClubNewsBlock";
 import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
@@ -14,6 +15,7 @@ import { MatchPressPanel } from "@/components/match-center/MatchPressPanel";
 import { MatchResumenPanel } from "@/components/match-center/MatchResumenPanel";
 import { MatchRatingsPanel } from "@/components/match-center/MatchRatingsPanel";
 import { getRaiTeamId } from "@/lib/fixtures";
+import { isMatchCenterTabId, type MatchCenterTabId } from "@/lib/match-center-tabs";
 import { MatchPreviaPanel } from "@/components/match-center/MatchPreviaPanel";
 import { MatchStatsPanel } from "@/components/match-center/MatchStatsPanel";
 import type { MatchArticle, MatchDetail } from "@/types";
@@ -24,6 +26,7 @@ type MatchCenterProps = {
   article?: MatchArticle;
   backHref: Route;
   backLabel: string;
+  initialTab?: MatchCenterTabId;
 };
 
 const FINISHED_TABS_BASE = [
@@ -49,16 +52,30 @@ type TabDefinition = {
   disabledReason?: string;
 };
 
-type FinishedTabId = (typeof FINISHED_TABS_BASE)[number]["id"];
-type UpcomingTabId = typeof UPCOMING_PREVIA_TAB.id | typeof UPCOMING_LINEUPS_TAB.id;
-type ActiveTabId = FinishedTabId | UpcomingTabId;
+type ActiveTabId = MatchCenterTabId;
 
 function isRaiMatch(detail: MatchDetail): boolean {
   const raiId = getRaiTeamId(detail.gender);
   return detail.match.homeTeamId === raiId || detail.match.awayTeamId === raiId;
 }
 
-export function MatchCenter({ detail, article, backHref, backLabel }: MatchCenterProps) {
+function resolveInitialTab(
+  initialTab: MatchCenterTabId | undefined,
+  tabs: TabDefinition[],
+  isFinished: boolean,
+): ActiveTabId {
+  const defaultTab: ActiveTabId = isFinished ? "eventos" : "previa";
+  if (!initialTab) return defaultTab;
+
+  const tab = tabs.find((item) => item.id === initialTab);
+  if (!tab || tab.disabled) return defaultTab;
+  return initialTab;
+}
+
+export function MatchCenter({ detail, article, backHref, backLabel, initialTab }: MatchCenterProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { items: newsItems } = usePublishedNews();
   const { editMode } = useInlineEditing();
   const resolvedDetail = useMatchDetailOverrides(detail);
@@ -80,7 +97,29 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
     );
   }, [isFinished, showRatingsTab]);
 
-  const [activeTab, setActiveTab] = useState<ActiveTabId>(isFinished ? "eventos" : "previa");
+  const activeTab = useMemo((): ActiveTabId => {
+    const tabFromUrl = searchParams.get("tab");
+    if (tabFromUrl && isMatchCenterTabId(tabFromUrl)) {
+      const tab = tabs.find((item) => item.id === tabFromUrl);
+      if (tab && !tab.disabled) return tabFromUrl;
+    }
+    return resolveInitialTab(initialTab, tabs, isFinished);
+  }, [initialTab, isFinished, searchParams, tabs]);
+
+  const syncTabToUrl = useCallback(
+    (tabId: ActiveTabId) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (tabId === "eventos" && isFinished) {
+        params.delete("tab");
+      } else {
+        params.set("tab", tabId);
+      }
+      const query = params.toString();
+      router.replace(`${pathname}${query ? `?${query}` : ""}` as Route, { scroll: false });
+    },
+    [isFinished, pathname, router, searchParams],
+  );
+
   const showTabBar = tabs.length > 0;
   const safeActiveTab = !isFinished && !UNLOCKED_UPCOMING_TAB_IDS.has(activeTab) ? "previa" : activeTab;
   const activeTabMeta = tabs.find((tab) => tab.id === safeActiveTab);
@@ -159,7 +198,7 @@ export function MatchCenter({ detail, article, backHref, backLabel }: MatchCente
             onChange={(id) => {
               const tab = tabs.find((item) => item.id === id);
               if (tab?.disabled) return;
-              setActiveTab(id as ActiveTabId);
+              syncTabToUrl(id as ActiveTabId);
             }}
           />
           {activeTabMeta &&
