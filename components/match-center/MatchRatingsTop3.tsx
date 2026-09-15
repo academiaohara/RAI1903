@@ -77,12 +77,15 @@ export function MatchRatingsTop3({ players }: MatchRatingsTop3Props) {
             <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-amber-300/90">
               MVP del partido
             </p>
-            <div className="mt-1 flex min-w-0 items-center gap-2 sm:block">
-              <h3 className="min-w-0 truncate text-xl font-extrabold uppercase leading-tight sm:text-2xl">
-                {getPlayerFullName(mvp.player)}
-              </h3>
-              <span className="shrink-0 text-lg font-extrabold tabular-nums text-amber-200 sm:hidden">
+            <h3 className="mt-1 min-w-0 truncate text-xl font-extrabold uppercase leading-tight sm:text-2xl">
+              {getPlayerFullName(mvp.player)}
+            </h3>
+            <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 sm:hidden">
+              <span className="text-4xl font-black tabular-nums leading-none text-amber-300">
                 {formatFanRating(mvp.average.average)}
+              </span>
+              <span className="text-xs font-semibold text-white/60">
+                {mvp.average.count} voto{mvp.average.count === 1 ? "" : "s"}
               </span>
             </div>
 
@@ -97,26 +100,12 @@ export function MatchRatingsTop3({ players }: MatchRatingsTop3Props) {
         </div>
 
         {rest.length > 0 ? (
-          <div className="flex flex-col items-center justify-center sm:hidden">
-            <ul className="w-full max-w-xs space-y-2">
-              {rest.map((entry, index) => (
-                <RunnerUpRow key={entry.player.id} entry={entry} position={index + 2} />
-              ))}
-            </ul>
-            <p className="mt-2 text-xs font-semibold text-white/60">
-              {mvp.average.count} voto{mvp.average.count === 1 ? "" : "s"}
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center sm:hidden">
-            <p className="text-5xl font-black tabular-nums leading-none text-amber-300">
-              {formatFanRating(mvp.average.average)}
-            </p>
-            <p className="mt-1 text-xs font-semibold text-white/60">
-              {mvp.average.count} voto{mvp.average.count === 1 ? "" : "s"}
-            </p>
-          </div>
-        )}
+          <ul className="w-full space-y-2 sm:hidden">
+            {rest.map((entry, index) => (
+              <RunnerUpRow key={entry.player.id} entry={entry} position={index + 2} />
+            ))}
+          </ul>
+        ) : null}
 
         <div className="hidden shrink-0 flex-col items-center justify-center sm:flex sm:items-end">
           <p className="text-5xl font-black tabular-nums leading-none text-amber-300 sm:text-6xl">
