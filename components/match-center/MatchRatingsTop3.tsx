@@ -23,6 +23,28 @@ function rankLabel(position: number): string {
   return `${position}º`;
 }
 
+function RunnerUpRow({ entry, position }: { entry: RatedPlayer; position: number }) {
+  return (
+    <li className="flex items-center gap-2 text-sm">
+      <PlayerAvatar
+        player={entry.player}
+        size="sm"
+        bare
+        placeholderTone="dark"
+        className="h-7 w-7 shrink-0 rounded-full"
+        imageClassName="object-cover object-top"
+      />
+      <span className="font-bold text-amber-200/80">{rankLabel(position)}</span>
+      <span className="min-w-0 truncate font-semibold text-white/90">
+        {getPlayerFullName(entry.player)}
+      </span>
+      <span className="shrink-0 font-extrabold tabular-nums text-amber-200">
+        {formatFanRating(entry.average.average)}
+      </span>
+    </li>
+  );
+}
+
 export function MatchRatingsTop3({ players }: MatchRatingsTop3Props) {
   if (players.length === 0) return null;
 
@@ -55,37 +77,37 @@ export function MatchRatingsTop3({ players }: MatchRatingsTop3Props) {
             <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-amber-300/90">
               MVP del partido
             </p>
-            <h3 className="mt-1 truncate text-xl font-extrabold uppercase leading-tight sm:text-2xl">
+            <h3 className="mt-1 min-w-0 truncate text-xl font-extrabold uppercase leading-tight sm:text-2xl">
               {getPlayerFullName(mvp.player)}
             </h3>
+            <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 sm:hidden">
+              <span className="text-4xl font-black tabular-nums leading-none text-amber-300">
+                {formatFanRating(mvp.average.average)}
+              </span>
+              <span className="text-xs font-semibold text-white/60">
+                {mvp.average.count} voto{mvp.average.count === 1 ? "" : "s"}
+              </span>
+            </div>
 
             {rest.length > 0 ? (
-              <ul className="mt-3 space-y-1.5">
+              <ul className="mt-3 hidden space-y-1.5 sm:block">
                 {rest.map((entry, index) => (
-                  <li key={entry.player.id} className="flex items-center gap-2 text-sm">
-                    <PlayerAvatar
-                      player={entry.player}
-                      size="sm"
-                      bare
-                      placeholderTone="dark"
-                      className="h-7 w-7 shrink-0 rounded-full"
-                      imageClassName="object-cover object-top"
-                    />
-                    <span className="font-bold text-amber-200/80">{rankLabel(index + 2)}</span>
-                    <span className="min-w-0 truncate font-semibold text-white/90">
-                      {getPlayerFullName(entry.player)}
-                    </span>
-                    <span className="shrink-0 font-extrabold tabular-nums text-amber-200">
-                      {formatFanRating(entry.average.average)}
-                    </span>
-                  </li>
+                  <RunnerUpRow key={entry.player.id} entry={entry} position={index + 2} />
                 ))}
               </ul>
             ) : null}
           </div>
         </div>
 
-        <div className="flex shrink-0 flex-col items-center justify-center sm:items-end">
+        {rest.length > 0 ? (
+          <ul className="w-full space-y-2 sm:hidden">
+            {rest.map((entry, index) => (
+              <RunnerUpRow key={entry.player.id} entry={entry} position={index + 2} />
+            ))}
+          </ul>
+        ) : null}
+
+        <div className="hidden shrink-0 flex-col items-center justify-center sm:flex sm:items-end">
           <p className="text-5xl font-black tabular-nums leading-none text-amber-300 sm:text-6xl">
             {formatFanRating(mvp.average.average)}
           </p>
