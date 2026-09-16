@@ -14,11 +14,45 @@ import {
   type GameSeasonRankingEntry,
   type QuinigolUserRoundResult,
 } from "@/lib/game-rankings";
+import { isPlaceholderMatch } from "@/lib/competition/normalize-fixtures";
 import { buildLeagueMatchdaysFromBundles, buildQuinielaMatchdaysFromBundles } from "@/lib/quiniela/build-matchdays";
 import { getMatchdayByRound } from "@/lib/quiniela";
 import { resolveGroupTeams } from "@/lib/cms/group-teams";
 import { canScoreClasificacionStandings } from "@/lib/clasificacion-prediction";
 import type { Matchday, Team } from "@/types";
+
+function resolveScoringMatchday(
+  round: number,
+  quinielaMatchdays: Matchday[],
+  leagueMatchdays: Matchday[],
+): Matchday {
+  const quiniela = getMatchdayByRound(quinielaMatchdays, round);
+  if (quiniela.matches.length > 0) return quiniela;
+
+  const league = getMatchdayByRound(leagueMatchdays, round);
+  const matches = league.matches.filter((match) => !isPlaceholderMatch(match));
+  return matches.length > 0 ? { round, matches } : quiniela;
+}
+
+function buildSeasonScoringMatchdays(
+  quinielaMatchdays: Matchday[],
+  leagueMatchdays: Matchday[],
+  throughRound?: number,
+): Matchday[] {
+  const roundNumbers = new Set<number>([
+    ...quinielaMatchdays.map((matchday) => matchday.round),
+    ...leagueMatchdays.map((matchday) => matchday.round),
+  ]);
+  const maxRound = throughRound ?? (roundNumbers.size > 0 ? Math.max(...roundNumbers) : 0);
+
+  const scoring: Matchday[] = [];
+  for (let round = 1; round <= maxRound; round += 1) {
+    const matchday = resolveScoringMatchday(round, quinielaMatchdays, leagueMatchdays);
+    if (matchday.matches.length === 0) continue;
+    scoring.push(matchday);
+  }
+  return scoring;
+}
 
 async function loadGameMatchdays(supabase: SupabaseClient, seasonId: CompetitionSeasonId) {
   const [bundles, inlineOverrides] = await Promise.all([
@@ -51,7 +85,7 @@ export async function computeQuinigolRankingFromSupabase(
   seasonId: CompetitionSeasonId,
   options: { scope: "round"; round: number } | { scope: "season"; throughRound?: number },
 ): Promise<QuinigolRankingComputeResult> {
-  const { quinielaMatchdays } = await loadGameMatchdays(supabase, seasonId);
+  const { quinielaMatchdays, leagueMatchdays } = await loadGameMatchdays(supabase, seasonId);
 
   if (options.scope === "round") {
     const matchday = getMatchdayByRound(quinielaMatchdays, options.round);
@@ -60,9 +94,11 @@ export async function computeQuinigolRankingFromSupabase(
     return { scope: "round", round: options.round, countPoints, entries, matchdays: quinielaMatchdays };
   }
 
-  const rankingMatchdays = options.throughRound
-    ? quinielaMatchdays.filter((matchday) => matchday.round <= options.throughRound!)
-    : quinielaMatchdays;
+  const rankingMatchdays = buildSeasonScoringMatchdays(
+    quinielaMatchdays,
+    leagueMatchdays,
+    options.throughRound,
+  );
   const countPointsForRound = (round: number) => countPointsForQuinigolRound(rankingMatchdays, round);
   const entries = await fetchQuinigolSeasonRanking(supabase, seasonId, rankingMatchdays, countPointsForRound);
   const countPoints = rankingMatchdays.some((matchday) => countPointsForQuinigolRound(rankingMatchdays, matchday.round));

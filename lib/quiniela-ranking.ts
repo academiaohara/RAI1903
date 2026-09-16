@@ -120,21 +120,7 @@ async function fetchSavedRounds(
   seasonId: CompetitionSeasonId,
   round?: number,
 ): Promise<SavedRoundRow[]> {
-  let query = supabase
-    .from("quiniela_saved_rounds")
-    .select("user_id, round, saved_at")
-    .eq("season_id", seasonId);
-
-  if (round !== undefined) {
-    query = query.eq("round", round);
-  }
-
-  const { data, error } = await query;
-  if (error) {
-    console.error("quiniela_saved_rounds select", error.message);
-    return [];
-  }
-  return (data ?? []) as SavedRoundRow[];
+  return fetchAllSavedRounds(supabase, seasonId, round);
 }
 
 async function fetchPredictions(
@@ -143,24 +129,7 @@ async function fetchPredictions(
   userIds: string[],
   matchday?: number,
 ): Promise<PredictionRow[]> {
-  if (userIds.length === 0) return [];
-
-  let query = supabase
-    .from("quiniela_predictions")
-    .select("user_id, match_id, matchday, outcome, goals_home, goals_away, scorer_id, scorer, updated_at")
-    .eq("season_id", seasonId)
-    .in("user_id", userIds);
-
-  if (matchday !== undefined) {
-    query = query.eq("matchday", matchday);
-  }
-
-  const { data, error } = await query;
-  if (error) {
-    console.error("quiniela_predictions select", error.message);
-    return [];
-  }
-  return (data ?? []) as PredictionRow[];
+  return fetchAllPredictions(supabase, seasonId, userIds, matchday);
 }
 
 async function fetchProfiles(supabase: SupabaseClient, userIds: string[]): Promise<Map<string, ProfileRow>> {
@@ -187,6 +156,93 @@ function predictionsByUser(rows: PredictionRow[]): Map<string, Record<string, Pr
     map.set(row.user_id, current);
   }
   return map;
+}
+
+/** Mismas predicciones que usa el ranking por jornada (filtro por matchday). */
+export function predictionsForRound(
+  predictions: Record<string, Prediction>,
+  round: number,
+): Record<string, Prediction> {
+  return Object.fromEntries(
+    Object.entries(predictions).filter(([, prediction]) => prediction.matchday === round),
+  );
+}
+
+const SUPABASE_PAGE_SIZE = 1000;
+
+async function fetchAllSavedRounds(
+  supabase: SupabaseClient,
+  seasonId: CompetitionSeasonId,
+  round?: number,
+): Promise<SavedRoundRow[]> {
+  const rows: SavedRoundRow[] = [];
+  let from = 0;
+
+  while (true) {
+    let query = supabase
+      .from("quiniela_saved_rounds")
+      .select("user_id, round, saved_at")
+      .eq("season_id", seasonId)
+      .order("saved_at", { ascending: true })
+      .range(from, from + SUPABASE_PAGE_SIZE - 1);
+
+    if (round !== undefined) {
+      query = query.eq("round", round);
+    }
+
+    const { data, error } = await query;
+    if (error) {
+      console.error("quiniela_saved_rounds select", error.message);
+      return rows;
+    }
+
+    const batch = (data ?? []) as SavedRoundRow[];
+    rows.push(...batch);
+    if (batch.length < SUPABASE_PAGE_SIZE) break;
+    from += SUPABASE_PAGE_SIZE;
+  }
+
+  return rows;
+}
+
+async function fetchAllPredictions(
+  supabase: SupabaseClient,
+  seasonId: CompetitionSeasonId,
+  userIds: string[],
+  matchday?: number,
+): Promise<PredictionRow[]> {
+  if (userIds.length === 0) return [];
+
+  const rows: PredictionRow[] = [];
+  let from = 0;
+
+  while (true) {
+    let query = supabase
+      .from("quiniela_predictions")
+      .select("user_id, match_id, matchday, outcome, goals_home, goals_away, scorer_id, scorer, updated_at")
+      .eq("season_id", seasonId)
+      .in("user_id", userIds)
+      .order("matchday", { ascending: true })
+      .order("match_id", { ascending: true })
+      .range(from, from + SUPABASE_PAGE_SIZE - 1);
+
+    if (matchday !== undefined) {
+      query = query.eq("matchday", matchday);
+    }
+
+    const { data, error } = await query;
+    if (error) {
+      console.error("quiniela_predictions select", error.message);
+      return rows;
+    }
+
+    const batch = (data ?? []) as PredictionRow[];
+    rows.push(...batch);
+    if (batch.length < SUPABASE_PAGE_SIZE) break;
+    from += SUPABASE_PAGE_SIZE;
+  }
+
+  return rows;
 }
 
 function earliestSavedAt(rows: SavedRoundRow[]): string {
@@ -246,28 +302,35 @@ export async function fetchQuinielaSeasonRanking(
   ]);
 
   const byUser = predictionsByUser(predictionRows);
-  const savedByUser = new Map<string, SavedRoundRow[]>();
+  const savedRoundsByUser = new Map<string, Set<number>>();
+  const savedRowsByUser = new Map<string, SavedRoundRow[]>();
   for (const row of savedRows) {
-    const list = savedByUser.get(row.user_id) ?? [];
-    list.push(row);
-    savedByUser.set(row.user_id, list);
+    const round = Number(row.round);
+    if (!Number.isFinite(round)) continue;
+
+    const rounds = savedRoundsByUser.get(row.user_id) ?? new Set<number>();
+    rounds.add(round);
+    savedRoundsByUser.set(row.user_id, rounds);
+
+    const list = savedRowsByUser.get(row.user_id) ?? [];
+    list.push({ ...row, round });
+    savedRowsByUser.set(row.user_id, list);
   }
 
-  const matchdayByRound = new Map(matchdays.map((md) => [md.round, md]));
-
   const entries = userIds.map((userId) => {
-    const userSaved = savedByUser.get(userId) ?? [];
-    const predictions = byUser.get(userId) ?? {};
+    const userSavedRounds = savedRoundsByUser.get(userId) ?? new Set<number>();
+    const userSaved = savedRowsByUser.get(userId) ?? [];
+    const allPredictions = byUser.get(userId) ?? {};
     let points = 0;
     let hits = 0;
     let roundsPlayed = 0;
 
-    for (const saved of userSaved) {
-      const matchday = matchdayByRound.get(saved.round);
-      if (!matchday) continue;
+    for (const matchday of matchdays) {
+      if (!userSavedRounds.has(matchday.round)) continue;
       roundsPlayed += 1;
-      const countPoints = countPointsForRound(saved.round);
-      const scored = scoreUserMatchday(matchday, predictions, countPoints, scoringContext);
+      const countPoints = countPointsForRound(matchday.round);
+      const roundPredictions = predictionsForRound(allPredictions, matchday.round);
+      const scored = scoreUserMatchday(matchday, roundPredictions, countPoints, scoringContext);
       points += scored.points;
       hits += scored.hits;
     }
