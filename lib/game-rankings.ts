@@ -182,29 +182,38 @@ export async function fetchQuinigolSeasonRanking(
   ]);
 
   const byUser = quinigolPredictionsByUser(predictionRows);
+  const savedRoundsByUser = new Map<string, Set<number>>();
   const savedByUser = new Map<string, SavedRoundRow[]>();
   for (const row of savedRows) {
+    const round = Number(row.round);
+    if (!Number.isFinite(round)) continue;
+
+    const rounds = savedRoundsByUser.get(row.user_id) ?? new Set<number>();
+    rounds.add(round);
+    savedRoundsByUser.set(row.user_id, rounds);
+
     const list = savedByUser.get(row.user_id) ?? [];
-    list.push(row);
+    list.push({ ...row, round });
     savedByUser.set(row.user_id, list);
   }
 
-  const matchdayByRound = new Map(matchdays.map((matchday) => [matchday.round, matchday]));
-
   const entries = userIds.map((userId) => {
+    const userSavedRounds = savedRoundsByUser.get(userId) ?? new Set<number>();
     const userSaved = savedByUser.get(userId) ?? [];
-    const predictions = byUser.get(userId) ?? {};
+    const allPredictions = byUser.get(userId) ?? {};
     let points = 0;
     let hits = 0;
     let roundsPlayed = 0;
 
-    for (const saved of userSaved) {
-      const matchday = matchdayByRound.get(saved.round);
-      if (!matchday) continue;
+    for (const matchday of matchdays) {
+      if (!userSavedRounds.has(matchday.round)) continue;
       roundsPlayed += 1;
-      if (!countPointsForRound(saved.round)) continue;
-      points += scoreQuinigolMatchday(matchday, predictions);
-      hits += countQuinigolHits(matchday, predictions);
+      if (!countPointsForRound(matchday.round)) continue;
+      const roundPredictions = Object.fromEntries(
+        Object.entries(allPredictions).filter(([, prediction]) => prediction.matchday === matchday.round),
+      );
+      points += scoreQuinigolMatchday(matchday, roundPredictions);
+      hits += countQuinigolHits(matchday, roundPredictions);
     }
 
     const profile = profileMap.get(userId);
