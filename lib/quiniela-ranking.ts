@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getProfileAvatarUrl, getProfileHandle } from "@/lib/auth/user-display";
+import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import {
   countOutcomeHits,
   getMatchdayByRound,
@@ -8,9 +9,11 @@ import {
   shouldCountQuinielaPoints,
 } from "@/lib/quiniela";
 import {
+  buildQuinielaScoringContext,
   scoringOptionsForMatch,
   type QuinielaScoringContext,
 } from "@/lib/quiniela/scoring-context";
+import { DEFAULT_SUPPORTED_TEAM_ID } from "@/lib/quiniela-supported-team";
 import type { CompetitionSeasonId } from "@/data/mock";
 import type { Matchday, Prediction } from "@/types";
 
@@ -31,6 +34,7 @@ export type QuinielaUserRoundResult = {
   userId: string;
   handle: string;
   avatarUrl: string | null;
+  supportedTeamId: string;
   round: number;
   savedRounds: number[];
   hasSavedRound: boolean;
@@ -113,6 +117,7 @@ type ProfileRow = {
   display_name: string | null;
   email: string | null;
   avatar_url: string | null;
+  supported_team_id: string | null;
 };
 
 async function fetchSavedRounds(
@@ -137,7 +142,7 @@ async function fetchProfiles(supabase: SupabaseClient, userIds: string[]): Promi
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, display_name, email, avatar_url")
+    .select("id, display_name, email, avatar_url, supported_team_id")
     .in("id", userIds);
 
   if (error) {
@@ -357,6 +362,7 @@ export async function fetchQuinielaUserRound(
   matchdays: Matchday[],
   requestedRound?: number,
   scoringContext?: QuinielaScoringContext,
+  bundles?: SeasonBundlesMap,
 ): Promise<QuinielaUserRoundResult> {
   const savedRows = await fetchSavedRounds(supabase, seasonId);
   const userSaved = savedRows.filter((row) => row.user_id === userId);
@@ -374,18 +380,23 @@ export async function fetchQuinielaUserRound(
 
   const predictions = predictionsByUser(predictionRows).get(userId) ?? {};
   const countPoints = shouldCountQuinielaPoints(matchday);
+  const profile = profileMap.get(userId);
+  const supportedTeamId = profile?.supported_team_id?.trim() || DEFAULT_SUPPORTED_TEAM_ID;
+  const resolvedScoringContext =
+    scoringContext ??
+    (bundles ? buildQuinielaScoringContext(bundles, matchdays, supportedTeamId) : undefined);
   const { points, hits } = scoreUserMatchday(
     matchday,
     predictions,
     countPoints && hasSavedRound,
-    scoringContext,
+    resolvedScoringContext,
   );
-  const profile = profileMap.get(userId);
 
   return {
     userId,
     handle: profile ? getProfileHandle(profile) : "@usuario",
     avatarUrl: profile ? getProfileAvatarUrl(profile) : null,
+    supportedTeamId,
     round,
     savedRounds,
     hasSavedRound,

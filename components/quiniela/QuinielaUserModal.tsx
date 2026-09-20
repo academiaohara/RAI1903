@@ -4,10 +4,23 @@ import { useMemo, useState } from "react";
 import { UserAvatar } from "@/components/auth/UserAvatar";
 import { JornadaSelector } from "@/components/JornadaSelector";
 import { QuinielaTicket } from "@/components/juegos/GameTicket";
+import { useInlineEditing } from "@/components/inline-editing/InlineEditingProvider";
 import { Modal } from "@/components/Modal";
+import { useSeason } from "@/components/season/SeasonProvider";
 import { useQuinielaUserRound } from "@/hooks/useQuinielaUserRound";
 import type { CompetitionSeasonId } from "@/data/mock";
-import { getMatchdayByRound, sortQuinielaMatches } from "@/lib/quiniela";
+import {
+  getMatchdayByRound,
+  isFeaturedTeamMatch,
+  isScorerPredictionCorrect,
+  sortQuinielaMatches,
+} from "@/lib/quiniela";
+import {
+  buildQuinielaScoringContext,
+  getSupportedTeamSquad,
+  scoringOptionsForMatch,
+} from "@/lib/quiniela/scoring-context";
+import { DEFAULT_SUPPORTED_TEAM_ID } from "@/lib/quiniela-supported-team";
 import type { Matchday, Team } from "@/types";
 
 type QuinielaUserModalProps = {
@@ -42,11 +55,42 @@ export function QuinielaUserModal({
   initialRound,
 }: QuinielaUserModalProps) {
   const [round, setRound] = useState(initialRound ?? currentRound);
+  const { bundles } = useSeason();
+  const { getOverride } = useInlineEditing();
 
   const { data, loading, error } = useQuinielaUserRound(seasonId, open ? userId : null, round);
 
   const matchday = useMemo(() => getMatchdayByRound(matchdays, round), [matchdays, round]);
-  const orderedMatches = useMemo(() => sortQuinielaMatches(matchday.matches), [matchday.matches]);
+  const supportedTeamId = data?.supportedTeamId ?? DEFAULT_SUPPORTED_TEAM_ID;
+  const scoringContext = useMemo(
+    () => buildQuinielaScoringContext(bundles, matchdays, supportedTeamId, getOverride),
+    [bundles, getOverride, matchdays, supportedTeamId],
+  );
+  const orderedMatches = useMemo(
+    () => sortQuinielaMatches(matchday.matches, supportedTeamId),
+    [matchday.matches, supportedTeamId],
+  );
+  const scorerCorrectByMatch = useMemo(() => {
+    const predictions = data?.predictions;
+    if (!predictions) return {};
+    return Object.fromEntries(
+      matchday.matches
+        .filter(
+          (match) =>
+            match.status === "finished" &&
+            isFeaturedTeamMatch(match, supportedTeamId) &&
+            (predictions[match.id]?.scorerId || predictions[match.id]?.scorer),
+        )
+        .map((match) => [
+          match.id,
+          isScorerPredictionCorrect(
+            match,
+            predictions[match.id]!,
+            scoringOptionsForMatch(scoringContext, match),
+          ),
+        ]),
+    );
+  }, [data, matchday.matches, scoringContext, supportedTeamId]);
   const hasMatches = orderedMatches.length > 0;
   const showPoints = Boolean(data?.hasSavedRound && data.countPoints);
 
@@ -92,10 +136,13 @@ export function QuinielaUserModal({
             round={round}
             seasonLabel={seasonLabel}
             competitionLabel={competitionLabel}
+            supportedTeamId={supportedTeamId}
+            featuredSquad={getSupportedTeamSquad(scoringContext)}
             readOnly
             creatorHandle={handle}
             savedAt={data.savedAt ?? undefined}
             points={showPoints ? data.points : undefined}
+            scorerCorrectByMatch={scorerCorrectByMatch}
             showActions={false}
           />
         ) : null}
