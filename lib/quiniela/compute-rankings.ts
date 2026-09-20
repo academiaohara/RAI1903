@@ -127,6 +127,6 @@ export async function computeQuinielaUserRoundFromSupabase(
   userId: string,
   round?: number,
 ): Promise<QuinielaUserRoundResult> {
-  const { matchdays, scoringContext } = await loadQuinielaRankingMatchdays(supabase, seasonId);
-  return fetchQuinielaUserRound(supabase, seasonId, userId, matchdays, round, scoringContext);
+  const { bundles, matchdays } = await loadQuinielaRankingMatchdays(supabase, seasonId);
+  return fetchQuinielaUserRound(supabase, seasonId, userId, matchdays, round, undefined, bundles);
 }
