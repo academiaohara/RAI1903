@@ -61,6 +61,18 @@ function PostIcon() {
   return <span className="shrink-0 text-xs font-extrabold leading-none text-[#757575]" aria-hidden>PALO</span>;
 }
 
+function DisallowedGoalIcon() {
+  return (
+    <span
+      className="inline-flex shrink-0 items-center gap-1 text-xs font-extrabold leading-none text-[#C62828]"
+      aria-hidden
+    >
+      <span className="line-through opacity-35">⚽</span>
+      ANULADO
+    </span>
+  );
+}
+
 function EventTimelineRow({ event }: { event: MatchEvent }) {
   const isHome = event.team === "home";
   const minuteLabel = formatMatchMinute(event.minute);
@@ -69,17 +81,60 @@ function EventTimelineRow({ event }: { event: MatchEvent }) {
     (event.type === "goal" || event.type === "goal_penalty" || event.type === "goal_free_kick") &&
     Boolean(event.detail);
 
-  const minuteEl = <span className="shrink-0 text-sm font-bold tabular-nums text-[#2E7D32]">{minuteLabel}</span>;
+  const minuteEl = (
+    <span
+      className={`shrink-0 text-sm font-bold tabular-nums ${
+        event.type === "goal_disallowed" ? "text-[#9E9E9E]" : "text-[#2E7D32]"
+      }`}
+    >
+      {minuteLabel}
+    </span>
+  );
+
+  if (event.type === "goal_disallowed") {
+    const icon = <DisallowedGoalIcon />;
+    const playerEl = (
+      <p className="truncate text-sm font-medium text-[#9E9E9E] line-through decoration-[#C62828]/60">
+        {playerName}
+      </p>
+    );
+    const content = isHome ? (
+      <>
+        <div className="min-w-0 text-left">{playerEl}</div>
+        {icon}
+        {minuteEl}
+      </>
+    ) : (
+      <>
+        {minuteEl}
+        {icon}
+        <div className="min-w-0 text-right">{playerEl}</div>
+      </>
+    );
+
+    return (
+      <li className="flex border-t border-[#ffebee] bg-[#fff8f8] first:border-t-0">
+        {isHome ? (
+          <div className="flex w-1/2 items-center gap-2 px-3 py-3">{content}</div>
+        ) : (
+          <div className="w-1/2" aria-hidden />
+        )}
+        {isHome ? (
+          <div className="w-1/2" aria-hidden />
+        ) : (
+          <div className="flex w-1/2 items-center justify-end gap-2 px-3 py-3">{content}</div>
+        )}
+      </li>
+    );
+  }
 
   if (
     event.type === "goal" ||
     event.type === "goal_penalty" ||
     event.type === "goal_free_kick" ||
-    event.type === "goal_disallowed" ||
     event.type === "post"
   ) {
-    const icon =
-      event.type === "post" ? <PostIcon /> : event.type === "goal_disallowed" ? <GoalBallIcon /> : <GoalBallIcon />;
+    const icon = event.type === "post" ? <PostIcon /> : <GoalBallIcon />;
     const content = (
       <>
         {isHome ? (
@@ -445,7 +500,10 @@ export function MatchEventsPanel({
   };
 
   const goals = currentEvents
-    .filter((event) => isGoalEventType(event.type) || event.type === "goal_disallowed" || event.type === "post")
+    .filter((event) => isGoalEventType(event.type) || event.type === "post")
+    .sort((a, b) => a.minute - b.minute);
+  const disallowedGoals = currentEvents
+    .filter((event) => event.type === "goal_disallowed")
     .sort((a, b) => a.minute - b.minute);
   const cards = currentEvents
     .filter((event) => event.type === "yellow" || event.type === "red" || event.type === "red_disallowed")
@@ -454,7 +512,8 @@ export function MatchEventsPanel({
     .filter((event) => event.type === "substitution")
     .sort((a, b) => a.minute - b.minute);
 
-  const hasViewEvents = goals.length > 0 || cards.length > 0 || substitutions.length > 0;
+  const hasViewEvents =
+    goals.length > 0 || disallowedGoals.length > 0 || cards.length > 0 || substitutions.length > 0;
 
   return (
     <section className="space-y-6">
@@ -582,6 +641,7 @@ export function MatchEventsPanel({
       ) : (
         <div className="space-y-6">
           <EventSection title="Goles" events={goals} />
+          <EventSection title="Goles anulados" events={disallowedGoals} />
           <EventSection title="Tarjetas" events={cards} />
           <EventSection title="Sustituciones" events={substitutions} />
         </div>
