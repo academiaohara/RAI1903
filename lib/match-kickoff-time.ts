@@ -110,7 +110,7 @@ export function isUnsetKickoff(iso: string): boolean {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return true;
   const parts = readSpainDateTimeParts(date);
-  return (parts.hour === 0 && parts.minute === 0) || (parts.hour === 12 && parts.minute === 0);
+  return parts.hour === 0 && parts.minute === 0;
 }
 
 /** @deprecated Usar isUnsetKickoff */
