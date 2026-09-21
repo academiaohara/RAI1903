@@ -1,4 +1,5 @@
 import { RAI_TEAM_ID } from "@/data/mock";
+import type { InlineOverridesMap } from "@/lib/cms/inline-overrides";
 import { getCmsRivalSquad } from "@/lib/cms/rival-squads-bundle";
 import type { SeasonBundlesMap } from "@/lib/cms/season-bundles";
 import { getSquadBundle } from "@/lib/cms/season-bundles";
@@ -14,6 +15,18 @@ export type QuinielaScoringContext = {
   squadByTeamId: Map<string, SquadPlayer[]>;
   goalsByMatchId: Map<string, MatchGoalEntry[]>;
 };
+
+export type QuinielaRankingScoringResources = {
+  bundles: SeasonBundlesMap;
+  matchdays: Matchday[];
+  getOverride?: (key: string) => unknown;
+};
+
+export function createInlineOverridesReader(
+  overrides: InlineOverridesMap,
+): (key: string) => unknown {
+  return (key) => overrides[key];
+}
 
 function resolveTeamSquad(
   bundles: SeasonBundlesMap,
@@ -101,4 +114,22 @@ export function scoringOptionsForMatch(context: QuinielaScoringContext, match: M
 
 export function getSupportedTeamSquad(context: QuinielaScoringContext): SquadPlayer[] {
   return context.squadByTeamId.get(context.supportedTeamId) ?? [];
+}
+
+export function resolveQuinielaScoringContextForTeam(
+  resources: QuinielaRankingScoringResources,
+  supportedTeamId: string,
+  cache: Map<string, QuinielaScoringContext>,
+): QuinielaScoringContext {
+  const cached = cache.get(supportedTeamId);
+  if (cached) return cached;
+
+  const context = buildQuinielaScoringContext(
+    resources.bundles,
+    resources.matchdays,
+    supportedTeamId,
+    resources.getOverride,
+  );
+  cache.set(supportedTeamId, context);
+  return context;
 }

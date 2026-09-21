@@ -7,7 +7,10 @@ import {
   buildLeagueMatchdaysFromBundles,
   buildQuinielaMatchdaysFromBundles,
 } from "@/lib/quiniela/build-matchdays";
-import { buildQuinielaScoringContext } from "@/lib/quiniela/scoring-context";
+import {
+  createInlineOverridesReader,
+  type QuinielaRankingScoringResources,
+} from "@/lib/quiniela/scoring-context";
 import {
   fetchQuinielaRoundRanking,
   fetchQuinielaSeasonRanking,
@@ -59,8 +62,12 @@ async function loadQuinielaRankingMatchdays(supabase: SupabaseClient, seasonId: 
   ]);
   const leagueMatchdays = buildLeagueMatchdaysFromBundles(bundles, inlineOverrides);
   const matchdays = buildQuinielaMatchdaysFromBundles(bundles, inlineOverrides);
-  const scoringContext = buildQuinielaScoringContext(bundles, matchdays);
-  return { bundles, matchdays, leagueMatchdays, scoringContext };
+  const scoringResources: QuinielaRankingScoringResources = {
+    bundles,
+    matchdays,
+    getOverride: createInlineOverridesReader(inlineOverrides),
+  };
+  return { bundles, matchdays, leagueMatchdays, scoringResources };
 }
 
 export type QuinielaRankingComputeResult =
@@ -83,7 +90,7 @@ export async function computeQuinielaRankingFromSupabase(
   seasonId: CompetitionSeasonId,
   options: { scope: "round"; round: number } | { scope: "season"; throughRound?: number },
 ): Promise<QuinielaRankingComputeResult> {
-  const { matchdays, leagueMatchdays, scoringContext } = await loadQuinielaRankingMatchdays(
+  const { matchdays, leagueMatchdays, scoringResources } = await loadQuinielaRankingMatchdays(
     supabase,
     seasonId,
   );
@@ -96,7 +103,7 @@ export async function computeQuinielaRankingFromSupabase(
       seasonId,
       matchday,
       countPoints,
-      scoringContext,
+      scoringResources,
     );
     return { scope: "round", round: options.round, countPoints, entries, matchdays };
   }
@@ -115,7 +122,7 @@ export async function computeQuinielaRankingFromSupabase(
     seasonId,
     rankingMatchdays,
     countPointsForRound,
-    scoringContext,
+    scoringResources,
   );
   const countPoints = rankingMatchdays.some((matchday) => shouldCountQuinielaPoints(matchday));
   return { scope: "season", entries, matchdays, countPoints };
@@ -127,6 +134,6 @@ export async function computeQuinielaUserRoundFromSupabase(
   userId: string,
   round?: number,
 ): Promise<QuinielaUserRoundResult> {
-  const { bundles, matchdays } = await loadQuinielaRankingMatchdays(supabase, seasonId);
-  return fetchQuinielaUserRound(supabase, seasonId, userId, matchdays, round, undefined, bundles);
+  const { matchdays, scoringResources } = await loadQuinielaRankingMatchdays(supabase, seasonId);
+  return fetchQuinielaUserRound(supabase, seasonId, userId, matchdays, round, scoringResources);
 }
