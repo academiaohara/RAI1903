@@ -958,7 +958,12 @@ export function QuinielaTicket({
 }) {
   const teamsById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
   const { squad: avilesSquad } = useSquadPlayers("masculino");
-  const squad = featuredSquad ?? avilesSquad;
+  const squad =
+    supportedTeamId === RAI_TEAM_ID
+      ? avilesSquad
+      : featuredSquad && featuredSquad.length > 0
+        ? featuredSquad
+        : avilesSquad;
   const date = formatTicketDate(matches);
   const update = (match: Match, current: Prediction | undefined, patch: Partial<Prediction>) => {
     if (readOnly || !onChange) return;
