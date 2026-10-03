@@ -1,5 +1,5 @@
 import { matchdays, matchdaysFemenino } from "@/data/mock";
-import { isLeagueCompetition, matchCompetitionShortLabel } from "@/lib/competition-labels";
+import { countsAsLeagueCompetition, isLeagueCompetition, matchCompetitionShortLabel } from "@/lib/competition-labels";
 import { getMatchById, getTeamMatches } from "@/lib/fixtures";
 import { isMatchPlayed } from "@/lib/match-result";
 import { getMatchesBeforeRound, leagueRoundForMatch } from "@/lib/standings";
@@ -72,12 +72,18 @@ export function collectTeamRecentMatchesForPrevia(
   gender: PrimerEquipoGender,
   options?: BuildMatchDetailOptions,
 ): Match[] {
-  if (isLeagueCompetition(referenceMatch.competition)) {
+  if (countsAsLeagueCompetition(referenceMatch.competition)) {
     const beforeRound = leagueRoundForMatch(referenceMatch);
     return getMatchesBeforeRound(resolveLeagueMatchdays(gender, options), beforeRound)
       .filter((item) => item.homeTeamId === teamId || item.awayTeamId === teamId)
       .filter((item) => isMatchPlayed(item) && item.id !== referenceMatch.id)
-      .filter((item) => isLeagueCompetition(item.competition) && item.competition === referenceMatch.competition)
+      .filter(
+        (item) =>
+          countsAsLeagueCompetition(item.competition) &&
+          (referenceMatch.competition === item.competition ||
+            !referenceMatch.competition ||
+            !item.competition),
+      )
       .sort((a, b) => {
         const roundDiff = leagueRoundForMatch(b) - leagueRoundForMatch(a);
         if (roundDiff !== 0) return roundDiff;

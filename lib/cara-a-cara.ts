@@ -1,4 +1,4 @@
-import { isLeagueCompetition } from "@/lib/competition-labels";
+import { countsAsLeagueCompetition } from "@/lib/competition-labels";
 import { getTeamByGender } from "@/lib/fixtures";
 import { getTeamsAtRound, leagueRoundForMatch } from "@/lib/standings";
 import type { FormCode, Match, Matchday, Team } from "@/types";
@@ -80,7 +80,7 @@ export function buildCaraACaraData(
 ): CaraACaraData | null {
   if (options) {
     const { referenceMatch, leagueMatchdays, sourceTeams } = options;
-    if (!isLeagueCompetition(referenceMatch.competition)) return null;
+    if (!countsAsLeagueCompetition(referenceMatch.competition)) return null;
 
     const beforeRound = leagueRoundForMatch(referenceMatch);
     if (beforeRound <= 0) return null;
