@@ -18,7 +18,8 @@ import { buildMatchDetail, getMatchForArticle } from "@/lib/match-detail";
 import type { MatchCenterTabId } from "@/lib/match-center-tabs";
 import { primerEquipoBase, type PrimerEquipoGender } from "@/lib/primer-equipo";
 import { findMatchInFixtureSource } from "@/lib/season/find-match-in-bundles";
-import { getLeagueMatchdaysForGender } from "@/lib/season/aviles-matches";
+import { resolveLeagueContextForMatch } from "@/lib/season/league-context-for-match";
+import { useEditedMatchdays } from "@/hooks/useEditedMatchdays";
 
 type MatchArticleDetailSeasonProps = {
   gender: PrimerEquipoGender;
@@ -63,20 +64,23 @@ export function MatchArticleDetailSeason({ gender, articleId, initialTab }: Matc
       : buildPlaceholderUpcomingMatch(match, gender);
   }, [articleId, findMatch, gender, getById]);
 
-  const leagueMatchdays = useMemo(
-    () => getLeagueMatchdaysForGender(getEnrichedFixtureSource(gender), gender),
-    [gender, getEnrichedFixtureSource],
-  );
+  const leagueContext = useMemo(() => {
+    const resolvedMatch = findMatch(article?.matchId ?? "");
+    if (!resolvedMatch) return null;
+    return resolveLeagueContextForMatch(resolvedMatch, gender, fixtureSource, bundles);
+  }, [article?.matchId, bundles, findMatch, fixtureSource, gender]);
+
+  const editedLeagueMatchdays = useEditedMatchdays(leagueContext?.leagueMatchdays ?? [], gender);
 
   const detail = useMemo(() => {
     if (!article || article.gender !== gender) return null;
     const match = findMatch(article.matchId) ?? getMatchForArticle(article);
     if (!match) return null;
     return buildMatchDetail(match, article.gender, {
-      leagueMatchdays,
+      leagueMatchdays: editedLeagueMatchdays,
       seasonLabel: viewedSeason.label,
     });
-  }, [article, findMatch, gender, leagueMatchdays, viewedSeason.label]);
+  }, [article, editedLeagueMatchdays, findMatch, gender, viewedSeason.label]);
 
   if (bundlesLoading) {
     return (
