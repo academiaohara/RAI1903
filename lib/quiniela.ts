@@ -267,18 +267,19 @@ export function isScorerPredictionCorrect(
   },
 ): boolean {
   const supportedTeamId = options?.supportedTeamId ?? RAI_TEAM_ID;
+  const actualIds = actualFeaturedTeamScorerIds(match, supportedTeamId, options);
   const predictedId = options?.squad
     ? resolveScorerIdFromPrediction(options.squad, prediction)
     : prediction.scorerId;
-  const actualId = actualFeaturedTeamScorerId(match, supportedTeamId, options);
 
-  if (predictedId && actualId) {
-    return predictedId === actualId;
+  if (predictedId && actualIds.length > 0) {
+    return actualIds.includes(predictedId);
   }
 
   if (!prediction.scorer) return false;
-  const actual = actualFeaturedTeamScorer(match, supportedTeamId, options);
-  return actual !== null && prediction.scorer === actual;
+  const actualLabels = actualFeaturedTeamScorers(match, supportedTeamId, options);
+  if (actualLabels.length === 0) return false;
+  return actualLabels.includes(prediction.scorer);
 }
 
 export function getTeamById(teamId: string, teams: Team[] = mockTeams) {
