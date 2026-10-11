@@ -1,5 +1,5 @@
 import { matchdays, matchdaysFemenino } from "@/data/mock";
-import { countsAsLeagueCompetition, isLeagueCompetition, matchCompetitionShortLabel } from "@/lib/competition-labels";
+import { countsAsLeagueCompetition, matchCompetitionShortLabel } from "@/lib/competition-labels";
 import { getMatchById, getTeamMatches } from "@/lib/fixtures";
 import { isMatchPlayed } from "@/lib/match-result";
 import { getMatchesBeforeRound, leagueRoundForMatch } from "@/lib/standings";
