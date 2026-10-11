@@ -1,8 +1,12 @@
+import { getAvatarImageSrc } from "@/lib/auth/avatar-url";
 import { isShareImageProxyAllowed } from "@/lib/share-image-proxy";
 
 export function getShareImageSrc(src: string | null | undefined): string | null {
   if (!src) return null;
   if (src.startsWith("data:") || src.startsWith("/")) return src;
+
+  const proxiedAvatar = getAvatarImageSrc(src);
+  if (proxiedAvatar?.startsWith("/api/share-image")) return proxiedAvatar;
 
   if (typeof window === "undefined") return src;
 

@@ -1,4 +1,5 @@
 import type { User } from "@supabase/supabase-js";
+import { normalizeOAuthAvatarUrl } from "@/lib/auth/avatar-url";
 
 export type ProfileDisplayFields = {
   display_name: string | null;
@@ -27,7 +28,8 @@ export function getProfileHandle(profile: ProfileDisplayFields): string {
 
 export function getProfileAvatarUrl(profile: ProfileDisplayFields): string | null {
   const url = profile.avatar_url?.trim();
-  return url || null;
+  if (!url) return null;
+  return normalizeOAuthAvatarUrl(url);
 }
 
 export function getUserDisplayName(user: User): string {
@@ -50,5 +52,7 @@ export function getUserDisplayName(user: User): string {
 export function getUserAvatarUrl(user: User): string | null {
   const meta = user.user_metadata as Record<string, unknown> | undefined;
   const url = meta?.avatar_url ?? meta?.picture;
-  return typeof url === "string" ? url : null;
+  if (typeof url !== "string") return null;
+  const trimmed = url.trim();
+  return trimmed ? normalizeOAuthAvatarUrl(trimmed) : null;
 }

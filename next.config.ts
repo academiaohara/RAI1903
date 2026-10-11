@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "www.realavilesindustrial1903.com" },
       { protocol: "https", hostname: "flagcdn.com" },
       { protocol: "https", hostname: "images.unsplash.com" },
-      { protocol: "https", hostname: "pbs.twimg.com" },
+      { protocol: "https", hostname: "**.twimg.com" },
     ],
   },
   async redirects() {
