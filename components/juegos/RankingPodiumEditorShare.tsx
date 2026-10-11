@@ -54,10 +54,12 @@ function PodiumAvatar({
 }) {
   const initial = handle.replace(/^@/, "").charAt(0).toUpperCase() || "?";
   const resolvedAvatarUrl = getShareImageSrc(avatarUrl);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const showImage = Boolean(resolvedAvatarUrl) && failedSrc !== resolvedAvatarUrl;
 
   return (
     <span className={cn("ranking-podium-avatar", size === "lg" && "ranking-podium-avatar--lg")}>
-      {resolvedAvatarUrl ? (
+      {showImage && resolvedAvatarUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={resolvedAvatarUrl}
@@ -66,6 +68,7 @@ function PodiumAvatar({
           decoding="sync"
           data-fallback-initial={initial}
           className="ranking-podium-avatar-image"
+          onError={() => setFailedSrc(resolvedAvatarUrl)}
         />
       ) : (
         <span className="ranking-podium-avatar-fallback">{initial}</span>

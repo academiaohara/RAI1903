@@ -1,4 +1,8 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
+import { getAvatarImageSrc } from "@/lib/auth/avatar-url";
 import { cn } from "@/lib/utils";
 
 type UserAvatarSize = "sm" | "md" | "lg";
@@ -50,6 +54,9 @@ export function UserAvatar({
 }: UserAvatarProps) {
   const initial = label.replace(/^@/, "").charAt(0).toUpperCase() || "?";
   const pixels = imagePixels[size];
+  const resolvedSrc = getAvatarImageSrc(avatarUrl);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const showImage = Boolean(resolvedSrc) && failedSrc !== resolvedSrc;
 
   return (
     <span
@@ -59,14 +66,15 @@ export function UserAvatar({
         className,
       )}
     >
-      {avatarUrl ? (
+      {showImage && resolvedSrc ? (
         <Image
-          src={avatarUrl}
+          src={resolvedSrc}
           alt=""
           width={pixels}
           height={pixels}
           className={cn("rounded-full object-cover", imageSize[size])}
           unoptimized
+          onError={() => setFailedSrc(resolvedSrc)}
         />
       ) : (
         <span
