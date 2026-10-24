@@ -1938,9 +1938,13 @@ a {
 }
 
 .lineup-card-round {
+  align-items: center;
   color: #000;
-  font-size: clamp(0.95rem, 2.6vw, 1.35rem);
+  display: flex;
+  flex-direction: column;
+  font-size: clamp(0.62rem, 1.7vw, 0.9rem);
   font-weight: 800;
+  gap: 0.3rem;
   left: 50%;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -1952,8 +1956,14 @@ a {
   white-space: nowrap;
 }
 
+.lineup-card-round-title {
+  color: #214c9b;
+  font-size: 1.35em;
+}
+
 .lineup-export-card.lineup-export-card--capture .lineup-card-round {
-  font-size: 1.75rem;
+  font-size: 1.25rem;
+  gap: 0.5rem;
 }
 
 .lineup-export-card.lineup-export-card--capture .lineup-card-header-right {

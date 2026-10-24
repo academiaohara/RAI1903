@@ -15,6 +15,7 @@ import {
   type FormationSlot,
 } from "@/lib/lineup-formations";
 import { downloadLineupImage, shareLineupImage, shareLineupOnX } from "@/lib/lineup-share";
+import { MATCH_CALENDAR_TIMEZONE, formatMatchKickoffTime } from "@/lib/match-kickoff-time";
 import { matchRoundTitle } from "@/lib/competition-labels";
 import { isSchedulableMatchDate } from "@/lib/match-calendar-dates";
 import {
@@ -125,6 +126,8 @@ type RivalPreview = {
   name: string;
   crest: string;
   roundTitle: string | null;
+  dateLabel: string;
+  timeLabel: string | null;
 };
 
 type LineupPizarraCardProps = {
@@ -176,8 +179,12 @@ function LineupPizarraCard({
           <span className="lineup-card-xi">XI RAI</span>
           <span className="lineup-card-formation-badge">{formation}</span>
         </div>
-        {rival && showRival && rival.roundTitle && (
-          <span className="lineup-card-round">{rival.roundTitle}</span>
+        {rival && showRival && (
+          <div className="lineup-card-round">
+            {rival.roundTitle && <span className="lineup-card-round-title">{rival.roundTitle}</span>}
+            <span>{rival.dateLabel}</span>
+            {rival.timeLabel && <span>{rival.timeLabel}</span>}
+          </div>
         )}
         {rival && showRival && (
           <div className="lineup-card-header-right">
@@ -251,6 +258,13 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
       name: rivalName,
       crest: rivalCrest,
       roundTitle: matchRoundTitle(nextMatch),
+      dateLabel: new Intl.DateTimeFormat("es-ES", {
+        timeZone: MATCH_CALENDAR_TIMEZONE,
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      }).format(new Date(nextMatch.date)),
+      timeLabel: formatMatchKickoffTime(nextMatch.date),
     };
   }, [hasCalendar, nextMatch, teams, highlightTeamId]);
 
