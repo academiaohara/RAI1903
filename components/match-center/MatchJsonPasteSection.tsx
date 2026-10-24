@@ -13,6 +13,8 @@ type MatchJsonPasteSectionProps<T> = {
   serialize?: (data: T) => string;
   /** Datos actuales que se cargan al abrir el editor JSON. */
   currentData?: T;
+  /** Abre el editor ya cargado con los datos actuales (requiere serialize y currentData). */
+  defaultOpen?: boolean;
 };
 
 export function MatchJsonPasteSection<T>({
@@ -24,9 +26,11 @@ export function MatchJsonPasteSection<T>({
   onImport,
   serialize,
   currentData,
+  defaultOpen = false,
 }: MatchJsonPasteSectionProps<T>) {
-  const [showJsonPaste, setShowJsonPaste] = useState(false);
-  const [jsonDraft, setJsonDraft] = useState("");
+  const startOpen = defaultOpen && currentData !== undefined && serialize !== undefined;
+  const [showJsonPaste, setShowJsonPaste] = useState(startOpen);
+  const [jsonDraft, setJsonDraft] = useState(() => (startOpen ? serialize!(currentData!) : ""));
   const [jsonError, setJsonError] = useState<string | null>(null);
   const [lastSummary, setLastSummary] = useState<string | null>(null);
 
@@ -55,8 +59,12 @@ export function MatchJsonPasteSection<T>({
     setJsonError(null);
     onImport(result.data, result.summary);
     setLastSummary(result.summary);
-    setShowJsonPaste(false);
-    setJsonDraft("");
+    if (hasCurrentData && defaultOpen) {
+      setJsonDraft(serialize!(currentData!));
+    } else {
+      setShowJsonPaste(false);
+      setJsonDraft("");
+    }
   };
 
   return (
