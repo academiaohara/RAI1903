@@ -36,7 +36,7 @@ export const FORMATION_SLOTS: Record<FormationId, FormationSlot[]> = {
   "4-4-2": [
     ...goalkeeper(),
     ...slots(72, [12, 36, 64, 88], ["LI", "DFC", "DFC", "LD"]),
-    ...slots(51, [11, 37, 63, 89], ["MI", "MC", "MC", "MD"]),
+    ...slots(51, [12, 37, 63, 88], ["MI", "MC", "MC", "MD"]),
     ...slots(24, [36, 64], ["DC", "DC"]),
   ],
   "4-3-3": [
@@ -56,7 +56,7 @@ export const FORMATION_SLOTS: Record<FormationId, FormationSlot[]> = {
     ...goalkeeper(),
     ...slots(72, [12, 36, 64, 88], ["LI", "DFC", "DFC", "LD"]),
     ...slots(58, [50], ["MCD"]),
-    ...slots(41, [11, 37, 63, 89], ["MI", "MC", "MC", "MD"]),
+    ...slots(41, [12, 37, 63, 88], ["MI", "MC", "MC", "MD"]),
     ...slots(21, [50], ["DC"]),
   ],
   "4-3-2-1": [
@@ -69,39 +69,39 @@ export const FORMATION_SLOTS: Record<FormationId, FormationSlot[]> = {
   "3-5-2": [
     ...goalkeeper(),
     ...slots(73, [28, 50, 72], ["DFC", "DFC", "DFC"]),
-    ...slots(50, [9, 31, 50, 69, 91], ["CAI", "MC", "MC", "MC", "CAD"]),
+    ...slots(50, [11, 31, 50, 69, 89], ["CAI", "MC", "MC", "MC", "CAD"]),
     ...slots(24, [36, 64], ["DC", "DC"]),
   ],
   "3-4-3": [
     ...goalkeeper(),
     ...slots(73, [28, 50, 72], ["DFC", "DFC", "DFC"]),
-    ...slots(52, [10, 38, 62, 90], ["CAI", "MC", "MC", "CAD"]),
+    ...slots(52, [11, 38, 62, 89], ["CAI", "MC", "MC", "CAD"]),
     ...slots(24, [16, 50, 84], ["EI", "DC", "ED"]),
   ],
   "3-4-2-1": [
     ...goalkeeper(),
     ...slots(74, [28, 50, 72], ["DFC", "DFC", "DFC"]),
-    ...slots(54, [10, 38, 62, 90], ["CAI", "MC", "MC", "CAD"]),
+    ...slots(54, [11, 38, 62, 89], ["CAI", "MC", "MC", "CAD"]),
     ...slots(36, [32, 68], ["MCO", "MCO"]),
     ...slots(20, [50], ["DC"]),
   ],
   "5-3-2": [
     ...goalkeeper(),
-    ...slots(60, [9, 91], ["CAI", "CAD"]),
+    ...slots(60, [11, 89], ["CAI", "CAD"]),
     ...slots(75, [30, 50, 70], ["DFC", "DFC", "DFC"]),
     ...slots(48, [28, 50, 72], ["MC", "MC", "MC"]),
     ...slots(24, [36, 64], ["DC", "DC"]),
   ],
   "5-2-3": [
     ...goalkeeper(),
-    ...slots(64, [9, 91], ["LI", "LD"]),
+    ...slots(64, [11, 89], ["LI", "LD"]),
     ...slots(75, [30, 50, 70], ["DFC", "DFC", "DFC"]),
     ...slots(51, [36, 64], ["MC", "MC"]),
     ...slots(24, [15, 50, 85], ["EI", "DC", "ED"]),
   ],
   "5-4-1": [
     ...goalkeeper(),
-    ...slots(64, [9, 91], ["LI", "LD"]),
+    ...slots(64, [11, 89], ["LI", "LD"]),
     ...slots(75, [30, 50, 70], ["DFC", "DFC", "DFC"]),
     ...slots(46, [12, 38, 62, 88], ["MI", "MC", "MC", "MD"]),
     ...slots(22, [50], ["DC"]),
@@ -109,7 +109,7 @@ export const FORMATION_SLOTS: Record<FormationId, FormationSlot[]> = {
   "4-5-1": [
     ...goalkeeper(),
     ...slots(72, [12, 36, 64, 88], ["LI", "DFC", "DFC", "LD"]),
-    ...slots(50, [10, 31, 50, 69, 90], ["MI", "MC", "MC", "MC", "MD"]),
+    ...slots(50, [11, 31, 50, 69, 89], ["MI", "MC", "MC", "MC", "MD"]),
     ...slots(23, [50], ["DC"]),
   ],
 };
