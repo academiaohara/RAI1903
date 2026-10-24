@@ -2,10 +2,15 @@ export const FORMATION_OPTIONS = [
   "4-4-2",
   "4-3-3",
   "4-2-3-1",
+  "4-1-4-1",
+  "4-3-2-1",
+  "4-5-1",
   "3-5-2",
+  "3-4-3",
   "3-4-2-1",
   "5-3-2",
-  "4-5-1",
+  "5-2-3",
+  "5-4-1",
 ] as const;
 
 export type FormationId = (typeof FORMATION_OPTIONS)[number];
@@ -18,68 +23,94 @@ export type FormationSlot = {
   label: string;
 };
 
-function row(count: number, y: number, labels: string[]): FormationSlot[] {
-  if (count <= 0) return [];
-  if (count === 1) return [{ x: 50, y, label: labels[0] ?? "" }];
-  const spread = Math.min(92, 22 * (count - 1));
-  const step = spread / (count - 1);
-  const start = 50 - spread / 2;
-  return Array.from({ length: count }, (_, i) => ({
-    x: Math.round(start + step * i),
-    y,
-    label: labels[i] ?? labels[0] ?? "",
-  }));
-}
-
 function goalkeeper(): FormationSlot[] {
   return [{ x: 50, y: 88, label: "PT" }];
+}
+
+function slots(y: number, xs: number[], labels: string[]): FormationSlot[] {
+  return xs.map((x, i) => ({ x, y, label: labels[i] ?? labels[0] ?? "" }));
 }
 
 /** Eleven slot positions on the pitch (percentages), from goalkeeper to attack. */
 export const FORMATION_SLOTS: Record<FormationId, FormationSlot[]> = {
   "4-4-2": [
     ...goalkeeper(),
-    ...row(4, 73, ["LI", "DFC", "DFC", "LD"]),
-    ...row(4, 52, ["MI", "MC", "MC", "MD"]),
-    ...row(2, 24, ["DC", "DC"]),
+    ...slots(72, [12, 36, 64, 88], ["LI", "DFC", "DFC", "LD"]),
+    ...slots(51, [12, 37, 63, 88], ["MI", "MC", "MC", "MD"]),
+    ...slots(24, [36, 64], ["DC", "DC"]),
   ],
   "4-3-3": [
     ...goalkeeper(),
-    ...row(4, 73, ["LI", "DFC", "DFC", "LD"]),
-    ...row(3, 50, ["MC", "MC", "MC"]),
-    ...row(3, 23, ["EI", "DC", "ED"]),
+    ...slots(72, [12, 36, 64, 88], ["LI", "DFC", "DFC", "LD"]),
+    ...slots(50, [28, 50, 72], ["MC", "MC", "MC"]),
+    ...slots(24, [14, 50, 86], ["EI", "DC", "ED"]),
   ],
   "4-2-3-1": [
     ...goalkeeper(),
-    ...row(4, 73, ["LI", "DFC", "DFC", "LD"]),
-    ...row(2, 58, ["MCD", "MCD"]),
-    ...row(3, 40, ["EI", "MCO", "ED"]),
-    ...row(1, 22, ["DC"]),
+    ...slots(72, [12, 36, 64, 88], ["LI", "DFC", "DFC", "LD"]),
+    ...slots(57, [36, 64], ["MCD", "MCD"]),
+    ...slots(38, [14, 50, 86], ["EI", "MCO", "ED"]),
+    ...slots(20, [50], ["DC"]),
+  ],
+  "4-1-4-1": [
+    ...goalkeeper(),
+    ...slots(72, [12, 36, 64, 88], ["LI", "DFC", "DFC", "LD"]),
+    ...slots(58, [50], ["MCD"]),
+    ...slots(41, [12, 37, 63, 88], ["MI", "MC", "MC", "MD"]),
+    ...slots(21, [50], ["DC"]),
+  ],
+  "4-3-2-1": [
+    ...goalkeeper(),
+    ...slots(72, [12, 36, 64, 88], ["LI", "DFC", "DFC", "LD"]),
+    ...slots(53, [28, 50, 72], ["MC", "MC", "MC"]),
+    ...slots(35, [34, 66], ["MCO", "MCO"]),
+    ...slots(20, [50], ["DC"]),
   ],
   "3-5-2": [
     ...goalkeeper(),
-    ...row(3, 73, ["DFC", "DFC", "DFC"]),
-    ...row(5, 52, ["MI", "MC", "MC", "MC", "MD"]),
-    ...row(2, 24, ["DC", "DC"]),
+    ...slots(73, [28, 50, 72], ["DFC", "DFC", "DFC"]),
+    ...slots(50, [11, 31, 50, 69, 89], ["CAI", "MC", "MC", "MC", "CAD"]),
+    ...slots(24, [36, 64], ["DC", "DC"]),
+  ],
+  "3-4-3": [
+    ...goalkeeper(),
+    ...slots(73, [28, 50, 72], ["DFC", "DFC", "DFC"]),
+    ...slots(52, [11, 38, 62, 89], ["CAI", "MC", "MC", "CAD"]),
+    ...slots(24, [16, 50, 84], ["EI", "DC", "ED"]),
   ],
   "3-4-2-1": [
     ...goalkeeper(),
-    ...row(3, 75, ["DFC", "DFC", "DFC"]),
-    ...row(4, 56, ["MI", "MC", "MC", "MD"]),
-    ...row(2, 37, ["MCO", "MCO"]),
-    ...row(1, 22, ["DC"]),
+    ...slots(74, [28, 50, 72], ["DFC", "DFC", "DFC"]),
+    ...slots(54, [11, 38, 62, 89], ["CAI", "MC", "MC", "CAD"]),
+    ...slots(36, [32, 68], ["MCO", "MCO"]),
+    ...slots(20, [50], ["DC"]),
   ],
   "5-3-2": [
     ...goalkeeper(),
-    ...row(5, 73, ["LI", "DFC", "DFC", "DFC", "LD"]),
-    ...row(3, 52, ["MC", "MC", "MC"]),
-    ...row(2, 24, ["DC", "DC"]),
+    ...slots(60, [11, 89], ["CAI", "CAD"]),
+    ...slots(75, [30, 50, 70], ["DFC", "DFC", "DFC"]),
+    ...slots(48, [28, 50, 72], ["MC", "MC", "MC"]),
+    ...slots(24, [36, 64], ["DC", "DC"]),
+  ],
+  "5-2-3": [
+    ...goalkeeper(),
+    ...slots(64, [11, 89], ["LI", "LD"]),
+    ...slots(75, [30, 50, 70], ["DFC", "DFC", "DFC"]),
+    ...slots(51, [36, 64], ["MC", "MC"]),
+    ...slots(24, [15, 50, 85], ["EI", "DC", "ED"]),
+  ],
+  "5-4-1": [
+    ...goalkeeper(),
+    ...slots(64, [11, 89], ["LI", "LD"]),
+    ...slots(75, [30, 50, 70], ["DFC", "DFC", "DFC"]),
+    ...slots(46, [12, 38, 62, 88], ["MI", "MC", "MC", "MD"]),
+    ...slots(22, [50], ["DC"]),
   ],
   "4-5-1": [
     ...goalkeeper(),
-    ...row(4, 73, ["LI", "DFC", "DFC", "LD"]),
-    ...row(5, 52, ["MI", "MC", "MC", "MC", "MD"]),
-    ...row(1, 24, ["DC"]),
+    ...slots(72, [12, 36, 64, 88], ["LI", "DFC", "DFC", "LD"]),
+    ...slots(50, [11, 31, 50, 69, 89], ["MI", "MC", "MC", "MC", "MD"]),
+    ...slots(23, [50], ["DC"]),
   ],
 };
 
