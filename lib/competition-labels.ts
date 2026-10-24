@@ -115,3 +115,15 @@ export function matchFixtureMeta(match: FixtureMetaSource & { matchday?: number 
   if (match.matchday === undefined) return label;
   return `${label} · J${match.matchday}`;
 }
+
+/** Texto largo para cabeceras (p. ej. «Jornada 9» en liga, ronda en Copa). */
+export function matchRoundTitle(match: FixtureMetaSource & { matchday?: number }): string | null {
+  if (match.competition === "copa-rey") {
+    const stage = copaStageMetaLabel(match);
+    if (/^\d+$/.test(stage)) return `Ronda ${stage}`;
+    return stage;
+  }
+  if (match.competition === "amistoso") return "Amistoso";
+  if (match.matchday === undefined) return null;
+  return `Jornada ${match.matchday}`;
+}

@@ -15,6 +15,7 @@ import {
   type FormationSlot,
 } from "@/lib/lineup-formations";
 import { downloadLineupImage, shareLineupImage, shareLineupOnX } from "@/lib/lineup-share";
+import { matchRoundTitle } from "@/lib/competition-labels";
 import { isSchedulableMatchDate } from "@/lib/match-calendar-dates";
 import {
   createEmptySlots,
@@ -123,6 +124,7 @@ type RivalPreview = {
   teamId: string;
   name: string;
   crest: string;
+  roundTitle: string | null;
 };
 
 type LineupPizarraCardProps = {
@@ -165,13 +167,18 @@ function LineupPizarraCard({
   return (
     <div
       ref={exportRef}
-      className={`lineup-export-card${exportMode ? " lineup-export-card--capture" : ""}`}
+      className={`lineup-export-card${exportMode ? " lineup-export-card--capture" : ""}${
+        showSubstitutes ? " lineup-export-card--subs" : ""
+      }`}
     >
       <div className="lineup-card-header">
         <div className="lineup-card-header-left">
           <span className="lineup-card-xi">XI RAI</span>
           <span className="lineup-card-formation-badge">{formation}</span>
         </div>
+        {rival && showRival && rival.roundTitle && (
+          <span className="lineup-card-round">{rival.roundTitle}</span>
+        )}
         {rival && showRival && (
           <div className="lineup-card-header-right">
             <span className="lineup-card-vs">VS</span>
@@ -239,7 +246,12 @@ function LineupBoard({ gender, seasonId, seasonLabel, squad }: LineupBoardProps)
     const rivalName = isHome ? nextMatch.awayTeam : nextMatch.homeTeam;
     const rivalTeam = teams.find((t) => t.id === rivalTeamId);
     const rivalCrest = getTeamCrestById(rivalTeamId, rivalTeam?.crestInitials);
-    return { teamId: rivalTeamId, name: rivalName, crest: rivalCrest };
+    return {
+      teamId: rivalTeamId,
+      name: rivalName,
+      crest: rivalCrest,
+      roundTitle: matchRoundTitle(nextMatch),
+    };
   }, [hasCalendar, nextMatch, teams, highlightTeamId]);
 
   const playersById = useMemo(
