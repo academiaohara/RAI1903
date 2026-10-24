@@ -5,6 +5,7 @@ import { CanteraJornadaMatchesByDay } from "@/components/cantera/CanteraJornadaM
 import { useJornadaRoundSelection } from "@/hooks/useJornadaRoundSelection";
 import { useEditedCanteraJornadasDataset } from "@/components/cantera/useEditedCanteraJornadasDataset";
 import { PublishCanteraFixturesButton } from "@/components/editor/PublishCanteraFixturesButton";
+import { CanteraRoundJsonEditor } from "@/components/cantera/CanteraRoundJsonEditor";
 import { Card } from "@/components/Card";
 import { JornadaRoundCarousel } from "@/components/jornadas/JornadaRoundCarousel";
 import { buildCanteraJornadasDataset, buildCanteraJornadasDatasetFromMatches } from "@/lib/cantera-jornadas-data";
@@ -55,6 +56,14 @@ export function CanteraJornadasView({
         />
         <PublishCanteraFixturesButton scope={cmsScope} />
       </div>
+
+      <CanteraRoundJsonEditor
+        key={selectedRoundId}
+        fixtures={matches}
+        scope={cmsScope}
+        roundNumber={summary.roundNumber}
+        roundLabel={title}
+      />
 
       <Card eyebrow="Resultados" title={title} borderlessHeader>
         <CanteraJornadaMatchesByDay

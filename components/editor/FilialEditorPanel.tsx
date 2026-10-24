@@ -6,7 +6,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { CrestPickerPopover } from "@/components/competicion/CrestPickerPopover";
 import { EditorPanelFrame } from "@/components/editor/EditorPanelFrame";
 import { CanteraSquadJsonEditor } from "@/components/editor/CanteraSquadJsonEditor";
-import { FixturesJsonPasteSection } from "@/components/editor/FixturesJsonPasteSection";
+import { CanteraFixturesJsonEditor } from "@/components/editor/CanteraFixturesJsonEditor";
 import { OnPageEditorSection } from "@/components/editor/OnPageEditorSection";
 import { useSeason } from "@/components/season/SeasonProvider";
 import {
@@ -19,7 +19,6 @@ import {
   type FilialFixturesBundle,
   type FilialTeamSeed,
 } from "@/lib/cms/filial-bundles";
-import { parseCanteraFixturesJson } from "@/lib/cms/parse-fixtures-json";
 import { getCanteraTeamCrests, saveCanteraBundlesAndCrests } from "@/lib/cms/save-cantera-bundles";
 import { upsertSeasonBundlesBatch } from "@/lib/cms/season-bundles";
 import { getTeamCrestById, isTeamCrestUrl } from "@/lib/team-crests";
@@ -337,9 +336,9 @@ export function CanteraEditorPanel({ scope, onClose, variant = "panel" }: Canter
 
       {tab === "calendario" && (
         <div className="space-y-4">
-          <FixturesJsonPasteSection
-            hint='Importa jornadas completas con fecha, hora, local, visitante, goles y estado. Tras aplicar, pulsa «Guardar» y revisa los equipos en Competición.'
-            onImport={(data) => {
+          <CanteraFixturesJsonEditor
+            fixtures={fixturesDraft}
+            onApply={(data) => {
               setFixtures(data);
               const lastRound = data.jornadas.at(-1)?.jornada ?? 0;
               if (lastRound > 0) {
@@ -359,7 +358,6 @@ export function CanteraEditorPanel({ scope, onClose, variant = "panel" }: Canter
                 });
               }
             }}
-            parse={parseCanteraFixturesJson}
           />
 
           <label className="block text-xs font-semibold text-slate-600">
