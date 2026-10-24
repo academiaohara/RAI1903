@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { ArrowLeftRight, Plus, X } from "lucide-react";
+import { ArrowLeftRight, Plus, Search, X } from "lucide-react";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 import type { SquadPlayer } from "@/types/squad";
 import { SQUAD_POSITIONS, SQUAD_POSITION_LABELS } from "@/types/squad";
@@ -58,9 +58,11 @@ export function LineupPitch({
   exportMode = false,
 }: LineupPitchProps) {
   const [dropdown, setDropdown] = useState<DropdownState | null>(null);
+  const [query, setQuery] = useState("");
   const isClient = useIsClient();
   const slotRefs = useRef<(HTMLDivElement | null)[]>([]);
   const groupedPlayers = useMemo(() => groupPlayersByPosition(squad), [squad]);
+  const normalizedQuery = query.trim().toLowerCase();
 
   useEffect(() => {
     if (!dropdown) return;
@@ -77,13 +79,14 @@ export function LineupPitch({
     const el = slotRefs.current[slotIndex];
     if (!el) return;
     const rect = el.getBoundingClientRect();
-    const dropWidth = 228;
+    const dropWidth = 264;
     let top = rect.bottom + 6;
     let left = rect.left + rect.width / 2 - dropWidth / 2;
     left = Math.max(8, Math.min(window.innerWidth - dropWidth - 8, left));
     if (top + 340 > window.innerHeight) {
       top = Math.max(8, rect.top - 340 - 6);
     }
+    setQuery("");
     setDropdown({ slotIndex, top, left, mode });
   };
 
@@ -244,6 +247,17 @@ export function LineupPitch({
                   <X className="h-3.5 w-3.5" />
                 </button>
               </div>
+              <label className="lineup-dropdown-search">
+                <Search className="h-3.5 w-3.5" aria-hidden />
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Buscar nombre o dorsal"
+                  className="lineup-dropdown-search-input"
+                  aria-label="Buscar jugador"
+                />
+              </label>
               {dropdownMode === "starter" &&
                 currentStarterId &&
                 (() => {
@@ -293,6 +307,13 @@ export function LineupPitch({
                   dropdownMode === "substitute" ? currentSubId : currentStarterId;
                 const starterInSlot = assignments[dropdownSlotIndex];
                 const list = groupedPlayers[position].filter((p) => {
+                  if (
+                    normalizedQuery &&
+                    !getPlayerDisplayName(p).toLowerCase().includes(normalizedQuery) &&
+                    String(p.dorsal) !== normalizedQuery
+                  ) {
+                    return false;
+                  }
                   if (p.id === currentSlotPlayerId) return true;
                   if (dropdownMode === "substitute" && p.id === starterInSlot) return false;
                   return !assignedIds.has(p.id);
