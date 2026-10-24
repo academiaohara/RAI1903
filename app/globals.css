@@ -1937,7 +1937,27 @@ a {
   padding: 0.35em 1em;
 }
 
-.lineup-export-card.lineup-export-card--capture .lineup-card-header-right {
+.lineup-export-card.lineup-export-card--capture .lineup-card-round {
+  color: #214c9b;
+  font-family: var(--font-bebas-neue, "Arial Black", sans-serif);
+  font-size: clamp(1.1rem, 3.6vw, 1.75rem);
+  font-weight: 900;
+  left: 50%;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  position: absolute;
+  text-align: center;
+  text-transform: uppercase;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+}
+
+.lineup-export-card.lineup-export-card--capture .lineup-card-round {
+  font-size: 2.6rem;
+}
+
+.lineup-card-header-right {
   gap: 0.85rem;
   padding-right: 1.75rem;
 }
@@ -2131,15 +2151,22 @@ a {
   display: flex;
   font-size: 0.72rem;
   font-weight: 900;
-  height: 1.15rem;
+  height: 1.35rem;
   justify-content: center;
   line-height: 1;
   padding: 0;
   position: absolute;
-  right: -0.15rem;
-  top: -0.15rem;
-  width: 1.15rem;
+  right: -0.25rem;
+  top: -0.25rem;
+  width: 1.35rem;
   z-index: 10;
+}
+
+@media (pointer: coarse) {
+  .pitch-player-remove {
+    height: 1.7rem;
+    width: 1.7rem;
+  }
 }
 
 .pitch-player-remove:hover {
@@ -2165,24 +2192,34 @@ a {
   white-space: nowrap;
 }
 
-/* Substitute name badge — granate, below starter */
-.pitch-player-sub-name {
-  background: #981915;
+/* Substitute badge — granate, pinned under the starter name (out of flow so it never pushes the node) */
+.pitch-player-sub-name,
+.pitch-player-sub-add {
+  align-items: center;
   border: none;
   border-radius: 0.24rem;
-  color: #fff;
   cursor: pointer;
-  font-size: clamp(0.55rem, 1.85%, 0.72rem);
+  display: flex;
+  font-size: clamp(0.55rem, 1.85%, 0.68rem);
   font-weight: 800;
-  letter-spacing: 0.05em;
+  gap: 0.2rem;
+  justify-content: center;
+  left: 50%;
+  letter-spacing: 0.04em;
   line-height: 1.1;
-  max-width: 7.5rem;
-  overflow: hidden;
-  padding: 0.14rem 0.32rem;
-  text-align: center;
-  text-overflow: ellipsis;
+  max-width: 130%;
+  min-width: 0;
+  padding: 0.16rem 0.38rem;
+  position: absolute;
   text-transform: uppercase;
+  top: calc(100% + 0.2rem);
+  transform: translateX(-50%);
   white-space: nowrap;
+}
+
+.pitch-player-sub-name {
+  background: #981915;
+  color: #fff;
 }
 
 .pitch-player-sub-name:hover {
@@ -2190,24 +2227,24 @@ a {
 }
 
 .pitch-player-sub-add {
-  align-items: center;
-  background: #981915;
-  border: none;
-  border-radius: 0.24rem;
-  color: #fff;
-  cursor: pointer;
-  display: flex;
-  font-size: clamp(0.55rem, 1.85%, 0.68rem);
-  font-weight: 800;
-  height: clamp(0.95rem, 3%, 1.15rem);
-  justify-content: center;
-  line-height: 1;
-  min-width: clamp(1.35rem, 4%, 1.65rem);
-  padding: 0 0.28rem;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1.5px dashed #981915;
+  color: #981915;
 }
 
 .pitch-player-sub-add:hover {
-  background: #b5201a;
+  background: #981915;
+  color: #fff;
+}
+
+/* With substitutes on, shrink circles a bit so rows never overlap */
+.lineup-export-card--subs .lineup-pitch-slot {
+  width: clamp(60px, 12.5%, 88px);
+}
+
+/* Reserve room below the name for the substitute badge */
+.lineup-export-card--subs .pitch-player-node {
+  margin-bottom: 1.35rem;
 }
 
 /* Empty slot: dashed granate ring + small add button */

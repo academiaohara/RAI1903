@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { X } from "lucide-react";
+import { ArrowLeftRight, Plus, X } from "lucide-react";
 import { PlayerAvatar } from "@/components/squad/PlayerAvatar";
 import type { SquadPlayer } from "@/types/squad";
 import { SQUAD_POSITIONS, SQUAD_POSITION_LABELS } from "@/types/squad";
@@ -187,7 +187,8 @@ export function LineupPitch({
                         onClick={(e) => handleSubClick(e, index)}
                         aria-label={`Suplente: ${getPlayerShortName(sub)}, cambiar`}
                       >
-                        {getPlayerShortName(sub)}
+                        {!exportMode && <ArrowLeftRight className="h-2.5 w-2.5 shrink-0" aria-hidden />}
+                        <span className="truncate">{getPlayerShortName(sub)}</span>
                       </button>
                     ) : (
                       !exportMode && (
@@ -197,12 +198,13 @@ export function LineupPitch({
                           onClick={(e) => handleSubClick(e, index)}
                           aria-label="Añadir suplente"
                         >
-                          +
+                          <Plus className="h-2.5 w-2.5" aria-hidden />
+                          <span>Suplente</span>
                         </button>
                       )
                     ))}
                 </div>
-              ) : (
+              ) : exportMode ? null : (
                 <div className="pitch-slot-empty">
                   <span className="pitch-slot-add" aria-hidden="true">
                     +
